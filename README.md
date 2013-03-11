@@ -57,21 +57,17 @@ progressive.fetch('/myapp/things.json')
    });
 
 
-
 // the pattern can match strings as well as objcts, if we just want to make a list of names
 // of the names we can do this:
-
 progressive.fetch('/myapp/things.json')
    .onMatch('**/name', function( name ){
       $('#things').append('<li>').text(name);
    });
 
 
-
 // We probably want to provide some visual feedback that an area is still loading data, let's
 // assume you already implemented a spinner and want to use progressive to notify the user
 // when we've loaded all the foods:
-
 My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
@@ -84,8 +80,7 @@ progressive.fetch('/myapp/things.json')
    .onMatch('//foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote
       // the DOM for each item in this array above so we don't need to use the items
-      // anymore, just hide the spinner.
-
+      // anymore, just hide the spinner:
       My.App.hideSpinner('#foods');
 
       // even though we just hid the spinner, the json might have have completely
@@ -99,8 +94,7 @@ progressive.fetch('/myapp/things.json')
 // registering a pattern for every json object we might have an interest in.
 // Say we're making some kind of Facebook clone that puts the json for a page into one response.
 // The top level objects can arrive in any order.
-{
-   notifications:{
+{  notifications:{
       newNotifications: 5,
       totalNotifications: 4
       // ...
@@ -123,7 +117,7 @@ progressive.fetch('http://facebookclone.com/homepage.json')
       // any of the sub-objects therein. The path will be a single-element array of the key
       // that mapped to the object
 
-      My.App.getModuleCalled(path[0]).newData(moduleJson);
+      My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
    });
 ```
 
