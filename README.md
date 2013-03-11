@@ -32,14 +32,14 @@ JSON.parse() so for most real-world applications this is acceptable.
 // we have things.json, to be fetched over ajax. In reality your json is probably bigger than this.
 {
    foods: [
-      {name:'aubergine', colour:'purple'},
-      {name:'apple', colour:'red'},
-      {name:'nuts', colour:'brown'}
+      {'name':'aubergine',    'colour':'purple'},
+      {'name':'apple', '      'colour'':'red'},
+      {'name':'nuts', '       'colour'':'brown'}
    ],
    non_foods: [
-      {name:'brick', colour:'red'},
-      {name:'poison', colour:'pink'},
-      {name:'broken_glass', colour:'green'}
+      {'name':'brick',        'colour':'red'},
+      {'name':'poison',       'colour':'pink'},
+      {'name':'broken_glass', 'colour':'green'}
    ]
 }
 
@@ -63,15 +63,16 @@ progressive.fetch('/myapp/things.json')
 
 progressive.fetch('/myapp/things.json')
    .onMatch('**/name', function( name ){
-      $('#thing').append('<li>').text(name)
+      $('#things').append('<li>').text(name);
    });
 
 
 
 // We probably want to provide some visual feedback that an area is still loading data, let's
-// use progressive to notify us when we've loaded all the foods:
+// assume you already implemented a spinner and want to use progressive to notify the user
+// when we've loaded all the foods:
 
-showSpinner('#foods');  //
+My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
    .onMatch('//foods/*', function( foodThing ){
@@ -85,10 +86,44 @@ progressive.fetch('/myapp/things.json')
       // the DOM for each item in this array above so we don't need to use the items
       // anymore, just hide the spinner.
 
-      hideSpinner('#foods');
+      My.App.hideSpinner('#foods');
 
-      // note that even though we just hid the spinner, the json might have have completely
-      // loaded. That's fine because we don't need the non-foods to update the #foods
+      // even though we just hid the spinner, the json might have have completely
+      // loaded. That's fine because we don't need the non-foods to update the #foods part
+      // of the page
+   });
+
+
+
+// The callback is also given the path the match was found at, which is often preferable to
+// registering a pattern for every json object we might have an interest in.
+// Say we're making some kind of Facebook clone that puts the json for a page into one response.
+// The top level objects can arrive in any order.
+{
+   notifications:{
+      newNotifications: 5,
+      totalNotifications: 4
+      // ...
+   },
+   messages: [
+      {from:'Joe', subject:'blah blah', url:'messages/1'},
+      {from:'Baz', subject:'blah blah blah', url:'messages/2'}
+   ],
+   photos: {
+      new: [
+         {'title': 'party', url:'/photos/5', peopleTagged:['Joe','Baz']}
+      ]
+   }
+}
+
+progressive.fetch('http://facebookclone.com/homepage.json')
+   .onMatch('//*', function( moduleJson, path ){
+
+      // This callback will be called for every direct child of the root object but not
+      // any of the sub-objects therein. The path will be a single-element array of the key
+      // that mapped to the object
+
+      My.App.getModuleCalled(path[0]).newData(moduleJson);
    });
 ```
 
@@ -114,6 +149,7 @@ Progressive's pattern matching recognises these special tokens:
 `*`                        // every object, string, number etc in the json!
 ```
 
+Internally the patterns are converted into regular expressions
 
 ## Use as a stream in node.js
 
