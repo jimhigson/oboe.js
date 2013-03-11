@@ -94,18 +94,18 @@ progressive.fetch('/myapp/things.json')
 // registering a pattern for every json object we might have an interest in.
 // Say we're making some kind of Facebook clone that puts the json for a page into one response.
 // The top level objects can arrive in any order.
-{  notifications:{
-      newNotifications: 5,
-      totalNotifications: 4
+{  'notifications':{
+      'newNotifications': 5,
+      'totalNotifications': 4
       // ...
    },
-   messages: [
-      {from:'Joe', subject:'blah blah', url:'messages/1'},
-      {from:'Baz', subject:'blah blah blah', url:'messages/2'}
+   'messages': [
+      {'from':'Joe', 'subject':'blah blah', 'url':'messages/1'},
+      {'from':'Baz', 'subject':'blah blah blah', 'url':'messages/2'}
    ],
-   photos: {
-      new: [
-         {'title': 'party', url:'/photos/5', peopleTagged:['Joe','Baz']}
+   'photos': {
+      'new': [
+         {'title': 'party', 'url':'/photos/5', 'peopleTagged':['Joe','Baz']}
       ]
    }
 }
@@ -115,8 +115,7 @@ progressive.fetch('http://facebookclone.com/homepage.json')
 
       // This callback will be called for every direct child of the root object but not
       // any of the sub-objects therein. The path will be a single-element array of the key
-      // that mapped to the object
-
+      // that mapped to the object:
       My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
    });
 ```
