@@ -97,7 +97,6 @@ progressive.fetch('/myapp/things.json')
 {  'notifications':{
       'newNotifications': 5,
       'totalNotifications': 4
-      // ...
    },
    'messages': [
       {'from':'Joe', 'subject':'blah blah', 'url':'messages/1'},
@@ -108,19 +107,17 @@ progressive.fetch('/myapp/things.json')
          {'title': 'party', 'url':'/photos/5', 'peopleTagged':['Joe','Baz']}
       ]
    }
+   // ... other modules ...
 }
 
 progressive.fetch('http://facebookclone.com/homepage.json')
    .onMatch('//*', function( moduleJson, path ){
-
-      // This callback will be called for every direct child of the root object but not
-      // any of the sub-objects therein. The path will be a single-element array of the key
-      // that mapped to the object:
+      // This callback will be called with every direct child of the root object but not
+      // the sub-objects therein. Because we're coming off the root, the path argument
+      // is a single-element array with the module name like ['messages'] or ['photos']
       My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
    });
 ```
-
-In the above example, progressive
 
 # Pattern matching
 
@@ -196,3 +193,8 @@ Total 60 tests (Passed: 60; Fails: 0; Errors: 0) (80.00 ms)
 
 Process finished with exit code 0
 ```
+
+# TODO
+* For Node, this should work with standard node streams
+* Support for http request params when fetching via ajax
+* More error handling
