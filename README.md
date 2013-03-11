@@ -198,3 +198,4 @@ Process finished with exit code 0
 * For Node, this should work with standard node streams
 * Support for http request params when fetching via ajax
 * More error handling
+* Better support for Internet Explorer (I'm sure I have a Windows CD somewhere...)
