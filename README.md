@@ -27,8 +27,8 @@ Think of it as the json equivalent of progressive html rendering.
 {
    foods: [
       {'name':'aubergine',    'colour':'purple'},
-      {'name':'apple', '      'colour'':'red'},
-      {'name':'nuts', '       'colour'':'brown'}
+      {'name':'apple', '      'colour':'red'},
+      {'name':'nuts', '       'colour':'brown'}
    ],
    non_foods: [
       {'name':'brick',        'colour':'red'},
@@ -66,10 +66,7 @@ My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
    .onMatch('//foods/*', function( foodThing ){
-      $('#foods')
-         .append('<div>')
-            .text('it is safe to eat', foodThing.name)
-            .style('color', foodThing.colour)
+      $('#foods').append('<div>').text('it is safe to eat', foodThing.name);
    })
    .onMatch('//foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote
