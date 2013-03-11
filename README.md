@@ -29,7 +29,7 @@ JSON.parse() so for most real-world applications this is acceptable.
 ## listening to json over ajax
 
 ``` js
-// we have things.json, to be fetched over ajax:
+// we have things.json, to be fetched over ajax. In reality your json is probably bigger than this.
 {
    foods: [
       {name:'aubergine', colour:'purple'},
@@ -43,6 +43,9 @@ JSON.parse() so for most real-world applications this is acceptable.
    ]
 }
 
+// In our webapp we want to load the json and write the foods out
+// but we don't want to wait for the non_foods to load before we show them
+// since we're going to ignore them anyway:
 progressive.fetch('/myapp/things.json')
    .onMatch('//foods/*', function( foodThing ){
       // this callback will be called everytime a new object is found in the foods array.
@@ -51,22 +54,41 @@ progressive.fetch('/myapp/things.json')
          .append('<div>')
             .text('it is safe to eat', foodThing.name)
             .style('color', foodThing.colour)
-   })
-   .onMatch('//non_foods/*', function( dangerousThing ){
-      // this callback will be called everytime a new object is found in the non-foods array
-      $('#danger')
-         .append('<div>')
-            .text('you should avoid', dangerousThing.name)
-            .style('color', dangerousThing.colour)
    });
 
 
-// if we just want to make a list of names of things and don't care if we
-// should eat them or not:
+
+// the pattern can match strings as well as objcts, if we just want to make a list of names
+// of the names we can do this:
 
 progressive.fetch('/myapp/things.json')
    .onMatch('**/name', function( name ){
       $('#thing').append('<li>').text(name)
+   });
+
+
+
+// We probably want to provide some visual feedback that an area is still loading data, let's
+// use progressive to notify us when we've loaded all the foods:
+
+showSpinner('#foods');  //
+
+progressive.fetch('/myapp/things.json')
+   .onMatch('//foods/*', function( foodThing ){
+      $('#foods')
+         .append('<div>')
+            .text('it is safe to eat', foodThing.name)
+            .style('color', foodThing.colour)
+   })
+   .onMatch('//foods', function(){
+      // Will be called when the whole foods array has loaded. We've already wrote
+      // the DOM for each item in this array above so we don't need to use the items
+      // anymore, just hide the spinner.
+
+      hideSpinner('#foods');
+
+      // note that even though we just hid the spinner, the json might have have completely
+      // loaded. That's fine because we don't need the non-foods to update the #foods
    });
 ```
 
@@ -97,7 +119,7 @@ Progressive's pattern matching recognises these special tokens:
 
 
 `Clarinet` supports use as a node stream. This hasn't been implemented in
-progressive but it should be quite easy to do so.
+progressive but it should be quite easy to do.
 
 ## Running the tests
 
