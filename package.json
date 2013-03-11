@@ -1,0 +1,29 @@
+{
+  "name": "progressive",
+  "version": "0.0.0",
+  "description": "Progressive.js listens to json streams and gives you the objects that you care about without waiting for the whole json to finish",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "json",
+    "parser",
+    "stream",
+    "progressive",
+    "sax",
+    "event",
+    "emitter",
+    "async",
+    "browser"
+  ],
+  "author": "Jim Higson",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-contrib-requirejs": "~0.4.0",
+    "grunt-markdown": "~0.1.2"
+  }
+}
