@@ -1,28 +1,22 @@
 
-`Progressive.js` is a progressive json parser built on top of [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to use the an http response while the request is still
-ongoing. The whole library gzips down to  `3.5k`.
+`Progressive.js` is an asynchronous, progressive json parser built on top of
+[clarinet](https://github.com/dscape/clarinet).
+It provides an intuitive interface to read a json http response while the request is still
+ongoing. The whole library gzips down to about `3.5k`.
 
-## Purpse
+# Purpse
 
-Your web application probably spends more time waiting for io than anything else. However,
-during much of the time it spends waiting there is already enough data loaded to start updating
-the page.
+The aim of Progressive is to let you start using your data as early as possible with as simple
+an interface as is possible.
 
-In a browser progressive allows you to start updating your page earlier, creating a
-more responsive user experience. Using $.ajax() etc is very simple but your ajax
-call will wait for the whole response to return before your javascript gets given objects.
+Your web application probably makes the user wait longer for io than anything else. However,
+during much of the waiting there will already be enough data loaded to start showing
+things on the page. This is especially true on mobile networks where requests can suddenly stall
+or if you are writing the response out asynchronously
+but even on a fast networks and synchronous web servers there are perceptual speed improvements
+with non-trivial json responses.
 
-The aim of Progressive is to let you start using the response as early as possible with only
-a slight increase in complexity for the programmer.
-
-The resulting parser makese results ready as quickly as if they had been pased using a SAX
-parser like Clarinet but the syntax is much simpler to use.
-
-The downside compared to using clarinet directly is that because the whole json object
-is stored in memory, progressive uses more memory.
-However, the memory used is no more than if the json had been parsed with
-JSON.parse() so for most real-world applications this is acceptable.
+Think of it as the json equivalent of progressive html rendering.
 
 # Example
 
@@ -147,7 +141,14 @@ Internally the patterns are converted into regular expressions
 `Clarinet` supports use as a node stream. This hasn't been implemented in
 progressive but it should be quite easy to do.
 
-## Running the tests
+## Getting the most from progressive
+
+Asynchronous parsing is better if the data is written out progressively from the server side
+(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're ``sending
+and parsing`` everything at the earliest possible oppotunity. If you can, send small bits of the
+json as soon as it is ready instead of waiting before everything is ready to start sending.
+
+# Running the tests
 
 Progressive is built using [grunt](http://gruntjs.com/) and
 [require.js](http://requirejs.org/) and tested using
