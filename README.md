@@ -3,7 +3,7 @@
 It provides an intuitive interface to read a json http response while the request is still
 ongoing. The whole library gzips down to about `3.5k`.
 
-# Purpse
+# Purpose
 
 The aim of Progressive is to let you start using your data as early as possible with as simple
 an interface as is possible.
