@@ -1,4 +1,3 @@
-
 `Progressive.js` is an asynchronous, progressive json parser built on top of
 [clarinet](https://github.com/dscape/clarinet).
 It provides an intuitive interface to read a json http response while the request is still
@@ -11,12 +10,12 @@ an interface as is possible.
 
 Your web application probably makes the user wait longer for io than anything else. However,
 during much of the waiting there will already be enough data loaded to start showing
-things on the page. This is especially true on mobile networks where requests can suddenly stall
-or if you are writing the response out asynchronously
-but even on a fast networks and synchronous web servers there are perceptual speed improvements
-with non-trivial json responses.
+things on the page. This is especially true on mobile networks where requests can sporadically stall
+or if you are writing the response out asynchronously.
+But even on a fast networks and synchronous web servers there are perceptual speed improvements
+for non-trivial json responses.
 
-Think of it as the json equivalent of progressive html rendering.
+Think of it as the json equivalent of old-style progressive html rendering.
 
 # Example
 
