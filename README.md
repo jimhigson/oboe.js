@@ -1,6 +1,6 @@
 
 `Progressive.js` is a progressive json parser built on top of [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to use the a http response while the request is still
+It provides an intuitive interface to use the an http response while the request is still
 ongoing. The whole library gzips down to  `3.5k`.
 
 ## Purpse
