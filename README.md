@@ -113,20 +113,20 @@ progressive.fetch('http://facebookclone.com/homepage.json')
 
 Progressive's pattern matching recognises these special tokens:
 
-`//` root json object
-`/`  path separator
-`*`  any named node in the path
+`//` root json object  
+`/`  path separator  
+`*`  any named node in the path  
 `**` any number of intermediate nodes (non-greedy)
 
 ## Some Example patterns:
 
 ```
-'//foods/colour'           // the colours of the foods
-'**/person'                // all people in the json
-'**/person/friends/*/name' // detecting links in social network
-`**/person/**/email`       // email anywhere as descendent of a person object
-`//`                       // the root object (once the whole document is ready, like JSON.parse())
-`*`                        // every object, string, number etc in the json!
+//foods/colour           // the colours of the foods
+**/person                // all people in the json
+**/person/friends/*/name // detecting links in social network
+**/person/**/email       // email anywhere as descendent of a person object
+//                       // the root object (once the whole document is ready, like JSON.parse())
+*                        // every object, string, number etc in the json!
 ```
 
 Internally the patterns are converted into regular expressions
