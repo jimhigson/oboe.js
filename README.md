@@ -45,7 +45,7 @@ progressive.fetch('/myapp/things.json')
       // in this example we just use jQuery to set up some simple DOM:
       $('#foods')
          .append('<div>')
-            .text('it is safe to eat', foodThing.name)
+            .text('it is safe to eat ' + foodThing.name)
             .style('color', foodThing.colour)
    });
 
@@ -65,7 +65,7 @@ My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
    .onMatch('//foods/*', function( foodThing ){
-      $('#foods').append('<div>').text('it is safe to eat', foodThing.name);
+      $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
    .onMatch('//foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote
