@@ -68,14 +68,12 @@ progressive.fetch('/myapp/things.json')
       $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
    .onMatch('//foods', function(){
-      // Will be called when the whole foods array has loaded. We've already wrote
-      // the DOM for each item in this array above so we don't need to use the items
-      // anymore, just hide the spinner:
+      // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
+      // above so we don't need to use the items anymore, just hide the spinner:
       My.App.hideSpinner('#foods');
-
-      // even though we just hid the spinner, the json might have have completely
-      // loaded. That's fine because we don't need the non-foods to update the #foods part
-      // of the page
+      // even though we just hid the spinner, the json might not have completely loaded. That's fine because we
+      // don't need the non-foods to remove the spinner from the #foods part of the page. That bit has everything we'll
+      // ever need.
    });
 
 
