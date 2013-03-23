@@ -1,18 +1,18 @@
 require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
-   (function (progressive) {
+   (function (oboe) {
 
       var clarinet = window.clarinet || require('clarinet');
 
       /**
        * @param {Object} opt an object of options. Passed though
-       * directly to clarinet.js but progressive.js does not
+       * directly to clarinet.js but oboe.js does not
        * currently provide options.
        */
-      progressive.parser = function(opt){
-         return new ProgressiveParser(opt);
+      oboe.parser = function(opt){
+         return new oboeParser(opt);
       };
-
+      
       function peek(array) {
          return array[array.length-1];
       }
@@ -21,7 +21,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return a && a.constructor === Array;
       }
 
-      function ProgressiveParser(opt) {
+      function oboeParser(opt) {
 
          var clarinetParser = clarinet.parser(opt);
 
@@ -29,7 +29,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          this._pathMatchedListeners = [];
          this._clarinet = clarinetParser;
 
-         var   progressive = this
+         var   oboe = this
          ,     root
          ,     curNode
          ,     curKey
@@ -38,7 +38,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
 
          clarinetParser.onkey = function (nextKey) {
-            notifyListeners(progressive._pathMatchedListeners, null, pathStack.concat(nextKey));
+            notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey));
 
             curKey = nextKey;
          };
@@ -46,7 +46,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             // onvalue is only called by clarinet for non-structured values
             // (ie, not arrays or objects).
 
-            notifyListeners(progressive._thingFoundListeners, value, pathStack.concat(curKey));
+            notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey));
 
             if( isArray(curNode) ) {
                curNode.push(value);
@@ -61,8 +61,8 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
             var newObj = {};
 
-            notifyListeners(progressive._pathMatchedListeners, newObj, pathStack);
-            notifyListeners(progressive._pathMatchedListeners, null, pathStack.concat(firstKey));
+            notifyListeners(oboe._pathMatchedListeners, newObj, pathStack);
+            notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey));
 
             if( curNode ) {
                curNode[curKey] = newObj;
@@ -88,7 +88,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             nodeStack.push(newArray);
             pathStack.push(curKey);
 
-            notifyListeners(progressive._pathMatchedListeners, newArray, pathStack);
+            notifyListeners(oboe._pathMatchedListeners, newArray, pathStack);
 
             curKey = 0;
          };
@@ -97,7 +97,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          clarinetParser.oncloseobject =
          clarinetParser.onclosearray = function () {
 
-            notifyListeners(progressive._thingFoundListeners, curNode, pathStack);
+            notifyListeners(oboe._thingFoundListeners, curNode, pathStack);
 
             nodeStack.pop();
             pathStack.pop();
@@ -110,13 +110,13 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          };
 
          clarinetParser.onerror = function (e) {
-            if( progressive.onerror ) {
-               progressive.onerror(e);
+            if( oboe.onerror ) {
+               oboe.onerror(e);
             }
          };
       }
 
-      ProgressiveParser.prototype.fetch = function(url) {
+      oboeParser.prototype.fetch = function(url) {
 
          // TODO: in if in node, use require('http') instead
          // of ajax
@@ -147,7 +147,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {String} nextDrip
        */
-      ProgressiveParser.prototype.read = function (nextDrip) {
+      oboeParser.prototype.read = function (nextDrip) {
          this._clarinet.write(nextDrip);
       };
 
@@ -192,7 +192,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      ProgressiveParser.prototype.onPath = function (pattern, callback) {
+      oboeParser.prototype.onPath = function (pattern, callback) {
 
          pushListener(this._pathMatchedListeners, pattern, callback);
          return this;
@@ -210,11 +210,11 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      ProgressiveParser.prototype.onFind = function (pattern, callback) {
+      oboeParser.prototype.onFind = function (pattern, callback) {
 
          pushListener(this._thingFoundListeners, pattern, callback);
          return this;
       };
 
-   })(typeof exports === "undefined" ? progressive = {} : exports);
+   })(typeof exports === "undefined" ? oboe = {} : exports);
 });

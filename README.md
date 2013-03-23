@@ -1,11 +1,11 @@
-`Progressive.js` is an asynchronous, progressive json parser built on top of
+`Oboe.js` is an asynchronous, progressive json parser built on top of
 [clarinet](https://github.com/dscape/clarinet).
 It provides an intuitive interface to read a json http response while the request is still
 ongoing. The whole library gzips down to about `3.5k`.
 
 # Purpose
 
-The aim of Progressive is to let you start using your data as early as possible with as simple
+The aim of Oboe is to let you start using your data as early as possible with as simple
 an interface as is possible.
 
 Your web application probably makes the user wait longer for io than anything else. However,
@@ -15,12 +15,12 @@ or if you are writing the response out asynchronously.
 But even on a fast networks and synchronous web servers there are perceptual speed improvements
 for non-trivial json responses.
 
-Think of it as the json equivalent of old-style progressive html rendering.
+Think of it as the json equivalent of old-style oboe html rendering.
 
 # Status
 
-Progressive is still quite early in development. Nevertheless, it is already
-[fairly well tested](https://github.com/jimhigson/progressive.js/blob/master/src/test/cases/progressiveTest.js),
+Oboe is still quite early in development. Nevertheless, it is already
+[fairly well tested](https://github.com/jimhigson/oboe.js/blob/master/src/test/cases/oboeTest.js),
 the codebase is small and hackable and it works. Try it, let me know how it goes.
 
 # Examples
@@ -48,7 +48,7 @@ but we don't want to wait for the non_foods to load before we show them
 since we're going to ignore them anyway:
 
 ``` js
-progressive.fetch('/myapp/things.json')
+oboe.fetch('/myapp/things.json')
    .onFind('//foods/*', function( foodThing ){
       // this callback will be called everytime a new object is found in the foods array.
       // in this example we just use jQuery to set up some simple DOM:
@@ -64,7 +64,7 @@ progressive.fetch('/myapp/things.json')
 Want to listen to strings instead of objects? The syntax is just the same:
 
 ``` js
-progressive.fetch('/myapp/things.json')
+oboe.fetch('/myapp/things.json')
    .onFind('**/name', function( name ){
       $('#things').append('<li>').text(name);
    });
@@ -79,7 +79,7 @@ I'll assume you already implemented a spinner
 ``` js
 My.App.showSpinner('#foods');
 
-progressive.fetch('/myapp/things.json')
+oboe.fetch('/myapp/things.json')
    .onFind('//foods/*', function( foodThing ){
       $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
@@ -100,7 +100,7 @@ be there. We might want to eagerly create elements before we have all the conten
 possible.
 ``` js
 var currentPersonDiv;
-progressive.fetch('//people.json')
+oboe.fetch('//people.json')
    .onPath('//people/*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
@@ -144,7 +144,7 @@ the top level objects in the json response can arrive in any order:
    // ... other modules ...
 }
 
-progressive.fetch('http://mysocialsite.example.com/homepage.json')
+oboe.fetch('http://mysocialsite.example.com/homepage.json')
    .onFind('//*', function( moduleJson, path ){
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
@@ -156,7 +156,7 @@ progressive.fetch('http://mysocialsite.example.com/homepage.json')
 
 # Pattern matching
 
-Progressive's pattern matching recognises these special tokens:
+Oboe's pattern matching recognises these special tokens:
 
 `//` root json object  
 `/`  path separator  
@@ -180,9 +180,9 @@ Internally the patterns are converted into regular expressions
 
 
 `Clarinet` supports use as a node stream. This hasn't been implemented in
-progressive but it should be quite easy to do.
+oboe but it should be quite easy to do.
 
-## Getting the most from progressive
+## Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
 (think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're ``sending
@@ -191,7 +191,7 @@ json as soon as it is ready instead of waiting before everything is ready to sta
 
 # Running the tests
 
-Progressive is built using [grunt](http://gruntjs.com/) and
+Oboe is built using [grunt](http://gruntjs.com/) and
 [require.js](http://requirejs.org/) and tested using
 [jstestdriver](https://code.google.com/p/js-test-driver/). JSTD might
 be chaged to jasmine later to make the tests easier to run from grunt
@@ -207,7 +207,7 @@ If everything works you will see output like below:
 
 ```
 no tests specified, will run all
-Will run progressive json tests( all ) against unminified code
+Will run oboe json tests( all ) against unminified code
 setting runnermode QUIET
 ............................................................
 Total 60 tests (Passed: 60; Fails: 0; Errors: 0) (103.00 ms)
@@ -216,16 +216,16 @@ Total 60 tests (Passed: 60; Fails: 0; Errors: 0) (103.00 ms)
   Chrome 27.0.1435.0 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (38.00 ms)
 
 Running "requirejs:compile" (requirejs) task
->> Tracing dependencies for: progressive
->> Uglifying file: /Users/jimhigson/Sites/progressivejson/progressive.min.js
->> /Users/jimhigson/Sites/progressivejson/progressive.min.js
+>> Tracing dependencies for: oboe
+>> Uglifying file: /Users/jimhigson/Sites/progressivejson/oboe.min.js
+>> /Users/jimhigson/Sites/progressivejson/oboe.min.js
 >> ----------------
 >> /Users/jimhigson/Sites/progressivejson/src/main/libs/clarinet.js
 >> /Users/jimhigson/Sites/progressivejson/src/main/streamingXhr.js
->> /Users/jimhigson/Sites/progressivejson/src/main/progressive.js
+>> /Users/jimhigson/Sites/progressivejson/src/main/oboe.js
 
 Done, without errors.
-Will run progressive json tests( all ) against minified code
+Will run oboe json tests( all ) against minified code
 setting runnermode QUIET
 ............................................................
 Total 75 tests (Passed: 75; Fails: 0; Errors: 0) (80.00 ms)
