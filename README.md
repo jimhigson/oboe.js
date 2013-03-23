@@ -23,9 +23,9 @@ Progressive is still quite early in development. Nevertheless, it is already
 [fairly well tested](https://github.com/jimhigson/progressive.js/blob/master/src/test/cases/progressiveTest.js),
 the codebase is small and hackable and it works. Try it, let me know how it goes.
 
-# Example
+# Examples
 
-## listening to json over ajax
+## listening for json objects
 
 ``` js
 // we have things.json, to be fetched over ajax. In reality your json is probably bigger than this.
@@ -46,7 +46,7 @@ the codebase is small and hackable and it works. Try it, let me know how it goes
 // but we don't want to wait for the non_foods to load before we show them
 // since we're going to ignore them anyway:
 progressive.fetch('/myapp/things.json')
-   .onMatch('//foods/*', function( foodThing ){
+   .onFind('//foods/*', function( foodThing ){
       // this callback will be called everytime a new object is found in the foods array.
       // in this example we just use jQuery to set up some simple DOM:
       $('#foods')
@@ -54,40 +54,74 @@ progressive.fetch('/myapp/things.json')
             .text('it is safe to eat ' + foodThing.name)
             .style('color', foodThing.colour)
    });
+```
 
+## listening for strings in the json stream
 
+``` js
 // the pattern can match strings as well as objcts, if we just want to make a list of names
-// of the names we can do this:
+// of things we could do this:
 progressive.fetch('/myapp/things.json')
-   .onMatch('**/name', function( name ){
+   .onFind('**/name', function( name ){
       $('#things').append('<li>').text(name);
    });
+```
 
+## providing some feedback as a page is updating
 
+``` js
 // We probably want to provide some visual feedback that an area is still loading data, let's
 // assume you already implemented a spinner and want to use progressive to notify the user
 // when we've loaded all the foods:
 My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
-   .onMatch('//foods/*', function( foodThing ){
+   .onFind('//foods/*', function( foodThing ){
       $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
-   .onMatch('//foods', function(){
+   .onFind('//foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
       // above so we don't need to use the items anymore, just hide the spinner:
       My.App.hideSpinner('#foods');
       // even though we just hid the spinner, the json might not have completely loaded. That's fine because we
-      // don't need the non-foods to remove the spinner from the #foods part of the page. That bit has everything we'll
-      // ever need.
+      // don't need the non-foods to remove the spinner from the #foods part of the page. The food bit already has
+      // the data that we need
    });
+```
+
+## Listening for paths when they are first found without waiting for the objects
+``` js
+// As well as .onFind, you can use .onPath to be notified when the path is first matched but we don't yet know what will
+// be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
+// possible.
+var currentPersonDiv;
+progressive.fetch('//people.json')
+   .onPath('//people/*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add them to the page:
+      personDiv = $('<div class="person">');
+      $('#people').append(personDiv);
+   })
+   .onPath('//people/name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onPath('//people/email', function( email ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="email"> + email + </span>');
+   })
+```
 
 
+## Using the path passback
+``` js
+// The callback is also given the path the match was found at. It is sometimes preferable to
+// register a wide-matching pattern and use the path parameter to decide what to do instead of
+// registering a seperate callback for every possible json path that we might have an interest in.
 
-// The callback is also given the path the match was found at, which is often preferable to
-// registering a pattern for every json object we might have an interest in.
-// Say we're making some kind of Facebook clone that puts the json for a page into one response.
-// The top level objects can arrive in any order.
+// Say we're making some kind of social site that puts the json for a page into one response.
+// The top level objects can arrive in any order:
+
 {  'notifications':{
       'newNotifications': 5,
       'totalNotifications': 4
@@ -104,22 +138,23 @@ progressive.fetch('/myapp/things.json')
    // ... other modules ...
 }
 
-progressive.fetch('http://facebookclone.com/homepage.json')
-   .onMatch('//*', function( moduleJson, path ){
+progressive.fetch('http://mysocialsite.example.com/homepage.json')
+   .onFind('//*', function( moduleJson, path ){
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
       My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
    });
+
 ```
 
 # Pattern matching
 
 Progressive's pattern matching recognises these special tokens:
 
-`//` root json object  
-`/`  path separator  
-`*`  any named node in the path  
+`//` root json object
+`/`  path separator
+`*`  any named node in the path
 `**` any number of intermediate nodes (non-greedy)
 
 ## Some Example patterns:

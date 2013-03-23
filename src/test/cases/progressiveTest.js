@@ -6,7 +6,7 @@ TestCase("progressiveTest", {
    testHandlesEmptyObjectDetectedWithDoubleSlash: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//')
+         .andWeAreListeningForObjectsAtPattern('//')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -18,7 +18,7 @@ TestCase("progressiveTest", {
    testOnlyFiresWhenHasWholeObject: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//')
+         .andWeAreListeningForObjectsAtPattern('//')
          .whenGivenInput('{')
           .thenTheParser(
             foundNothing
@@ -34,7 +34,7 @@ TestCase("progressiveTest", {
 ,  testHandlesEmptyObjectDetectedWithSingleStar: function() {
 
       givenAParser()
-         .andWeAreListeningTo('*')
+         .andWeAreListeningForObjectsAtPattern('*')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -45,7 +45,7 @@ TestCase("progressiveTest", {
 ,  testHandlesEmptyObjectDetectedWithDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**')
+         .andWeAreListeningForObjectsAtPattern('**')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -56,7 +56,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfStringsWhenListenedTo: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//string')
+         .andWeAreListeningForObjectsAtPattern('//string')
          .whenGivenInput('{"string":"s"}')
          .thenTheParser(
             matched("s"),
@@ -67,7 +67,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//*')
+         .andWeAreListeningForObjectsAtPattern('//*')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('A').atPath(['a'])
@@ -80,7 +80,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//*')
+         .andWeAreListeningForObjectsAtPattern('//*')
          .whenGivenInput('{"a":')
          .thenTheParser(
              foundNothing
@@ -100,7 +100,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfNamesChildOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//b')
+         .andWeAreListeningForObjectsAtPattern('//b')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('B').atPath(['b'])
@@ -111,7 +111,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfArrayElements: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//array/*')
+         .andWeAreListeningForObjectsAtPattern('//array/*')
          .whenGivenInput('{"array":["a","b","c"]}')
          .thenTheParser(
              matched('a').atPath(['array',0])
@@ -124,7 +124,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//array/2')
+         .andWeAreListeningForObjectsAtPattern('//array/2')
          .whenGivenInput('{"array":["a","b","this_one"]}')
          .thenTheParser(
              matched('this_one').atPath(['array',2])
@@ -135,7 +135,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesNestedArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningTo('//array/2/2')
+         .andWeAreListeningForObjectsAtPattern('//array/2/2')
          .whenGivenInput('{"array":["a","b",["x","y","this_one"]]}')
          .thenTheParser(
              matched('this_one').atPath(['array',2,2])
@@ -146,7 +146,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfDeeplyNestedObjects: function() {
 
       givenAParser()
-         .andWeAreListeningTo('*')
+         .andWeAreListeningForObjectsAtPattern('*')
          .whenGivenInput('{"a":{"b":{"c":{"d":"e"}}}}')
          .thenTheParser(
              matched('e').atPath(['a', 'b', 'c', 'd'])
@@ -165,7 +165,7 @@ TestCase("progressiveTest", {
       // was an array
 
       givenAParser()
-         .andWeAreListeningTo('**/find')
+         .andWeAreListeningForObjectsAtPattern('**/find')
          .whenGivenInput(
             {
                array:[
@@ -183,7 +183,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresIfOnlyStartOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/a')
+         .andWeAreListeningForObjectsAtPattern('**/a')
          .whenGivenInput({
                ab:'should_not_find_this'
             ,  a0:'nor this'
@@ -199,7 +199,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresIfOnlyEndOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/a')
+         .andWeAreListeningForObjectsAtPattern('**/a')
          .whenGivenInput({
                aa:'should_not_find_this'
             ,  ba:'nor this'
@@ -215,7 +215,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresPartialPathMatchesInArrayIndices: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/1')
+         .andWeAreListeningForObjectsAtPattern('**/1')
          .whenGivenInput({
                array : [0,1,2,3,4,5,6,7,8,9,10,11,12]
             }
@@ -230,7 +230,7 @@ TestCase("progressiveTest", {
 ,  testCanDetectAtMultipleDepthsUsingDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/find')
+         .andWeAreListeningForObjectsAtPattern('**/find')
          .whenGivenInput({
 
             array:[
@@ -256,7 +256,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedAdjacentSelector: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/0/colour')
+         .andWeAreListeningForObjectsAtPattern('**/0/colour')
          .whenGivenInput({
 
             foods: [
@@ -280,7 +280,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedSelectorSeparatedByASingleStar: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/foods/*/name')
+         .andWeAreListeningForObjectsAtPattern('**/foods/*/name')
          .whenGivenInput({
 
             foods: [
@@ -305,7 +305,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedSelectorSeparatedByDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningTo('**/foods/**/fr')
+         .andWeAreListeningForObjectsAtPattern('**/foods/**/fr')
          .whenGivenInput({
 
             foods: [
@@ -343,8 +343,13 @@ function givenAParser() {
       var parser = progressive.parser(),
           callbackStub = sinon.stub();
 
-      this.andWeAreListeningTo = function(pattern) {
-         parser.onMatch(pattern, callbackStub);
+      this.andWeAreListeningForObjectsAtPattern = function(pattern) {
+         parser.onFind(pattern, callbackStub);
+         return this;
+      };
+
+      this.andWeAreListeningForMatchesToPattern = function(pattern) {
+         parser.onPath(pattern, callbackStub);
          return this;
       };
 

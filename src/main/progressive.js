@@ -25,7 +25,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          var clarinetParser = clarinet.parser(opt);
 
-         this._notifies = [];
+         this._matchListeners = [];
          this._clarinet = clarinetParser;
 
          var   progressive = this
@@ -40,9 +40,10 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             curKey = key;
          };
          clarinetParser.onvalue = function (value) {
-            progressive._notifyMatches(value, pathStack.concat(curKey));
+            // onvalue is only called by clarinet for non-structured values
+            // (ie, not arrays or objects).
 
-            // this is only called for non-structured values (ie, not arrays or objects).
+            notifyListeners(progressive._matchListeners, value, pathStack.concat(curKey));
 
             if( isArray(curNode) ) {
                curNode.push(value);
@@ -87,7 +88,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          clarinetParser.oncloseobject =
          clarinetParser.onclosearray = function () {
 
-            progressive._notifyMatches(curNode, pathStack);
+            notifyListeners(progressive._matchListeners, curNode, pathStack);
 
             nodeStack.pop();
             pathStack.pop();
@@ -116,22 +117,21 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return this;
       };
 
-      ProgressiveParser.prototype._notifyMatches = function( foundNode, path ) {
+      function notifyListeners ( listenerList, foundNode, path ) {
 
          var stringPath = '//' + path.join('/'),
              // we don't want callback to be able to change internal state
              // of the parser so make a copy of the path:
              pathCopy = Array.prototype.slice.call(path, 0);
 
-         this._notifies.filter( function( notify ){
+         listenerList.filter( function( notify ){
 
             return notify.regex.test( stringPath );
          }).forEach( function(notify) {
 
             notify.callback( foundNode, pathCopy, notify.pattern );
          });
-
-      };
+      }
 
       /**
        * called when there is new text to parse
@@ -142,20 +142,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          this._clarinet.write(nextDrip);
       };
 
-      /**
-       * Add a new pattern to the parser
-       *
-       * @param {String} pattern
-       *    supports these special meanings:
-       *          //                - root json object
-       *          /                 - path separator
-       *          *                 - any named node in the path
-       *          **                - any number of intermediate nodes (non-greedy)
-       *
-       * @param {Function} callback
-       */
-      ProgressiveParser.prototype.onMatch = function (pattern, callback) {
-
+      function patternToRegex(pattern) {
          // convert the pattern into a regular expression using
          // an admittedly fairly incomprehensible pile of regular
          // expressions:
@@ -166,13 +153,56 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
                .replace(/\/\//, '^\\/\\/')
                .replace(/__any__/g, '.*?')
 
-         ,   regex = new RegExp(regexPattern);
+         return new RegExp(regexPattern);
+      }
 
-         this._notifies.push({
+
+      /**
+       * @returns {*} an identifier that can later be used to de-register this listener
+       */
+      function pushListener(listenerList, pattern, callback) {
+         return listenerList.push({
             pattern: pattern,
-            regex: regex,
+            regex: patternToRegex(pattern),
             callback: callback
          });
+      }
+
+      /**
+       * Add a new pattern to the parser, to be called as soon as the path is found, but before we know
+       * what value will be in there.
+       *
+       * @param {String} pattern
+       *    supports these special meanings:
+       *          //                - root json object
+       *          /                 - path separator
+       *          *                 - any named node in the path
+       *          **                - any number of intermediate nodes (non-greedy)
+       *
+       * @param {Function} callback
+       */
+      ProgressiveParser.prototype.onPath = function (pattern, callback) {
+
+         pushListener(this._pathListeners, pattern, callback);
+         return this;
+      };
+
+      /**
+       * Add a new pattern to the parser, which will be called when a value is found at the given path
+       *
+       * @param {String} pattern
+       *    supports these special meanings:
+       *          //                - root json object
+       *          /                 - path separator
+       *          *                 - any named node in the path
+       *          **                - any number of intermediate nodes (non-greedy)
+       *
+       * @param {Function} callback
+       */
+      ProgressiveParser.prototype.onFind = function (pattern, callback) {
+
+         pushListener(this._matchListeners, pattern, callback);
+         return this;
       };
 
    })(typeof exports === "undefined" ? progressive = {} : exports);
