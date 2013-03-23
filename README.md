@@ -17,6 +17,12 @@ for non-trivial json responses.
 
 Think of it as the json equivalent of old-style progressive html rendering.
 
+# Status
+
+Progressive is still quite early in development. Nevertheless, it is already
+[fairly well tested](https://github.com/jimhigson/progressive.js/blob/master/src/test/cases/progressiveTest.js),
+the codebase is small and hackable and it works. Try it, let me know how it goes.
+
 # Example
 
 ## listening to json over ajax
