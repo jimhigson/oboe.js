@@ -414,7 +414,7 @@ function givenAParser() {
 
    function Asserter() {
 
-      var parser = progressive.parser(),
+      var parser = oboe.parser(),
 
           // sinon stub is only really used to record arguments given.
           // However, we want to preserve the arguments given at the time of calling, because they might subsequently
