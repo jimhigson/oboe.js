@@ -13,6 +13,15 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return new ProgressiveParser(opt);
       };
 
+      /**
+       * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
+       * ready to call .onPath() or .onFind() to register some callbacks
+       * @param url
+       */
+      progressive.fetch = function(url){
+         return new ProgressiveParser().fetch(url);
+      };      
+
       function peek(array) {
          return array[array.length-1];
       }
