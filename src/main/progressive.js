@@ -10,7 +10,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        * currently provide options.
        */
       oboe.parser = function(opt){
-         return new oboeParser(opt);
+         return new OboeParser(opt);
       };
       
       function peek(array) {
@@ -21,7 +21,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return a && a.constructor === Array;
       }
 
-      function oboeParser(opt) {
+      function OboeParser(opt) {
 
          var clarinetParser = clarinet.parser(opt);
 
@@ -116,7 +116,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          };
       }
 
-      oboeParser.prototype.fetch = function(url) {
+      OboeParser.prototype.fetch = function(url) {
 
          // TODO: in if in node, use require('http') instead
          // of ajax
@@ -147,7 +147,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {String} nextDrip
        */
-      oboeParser.prototype.read = function (nextDrip) {
+      OboeParser.prototype.read = function (nextDrip) {
          this._clarinet.write(nextDrip);
       };
 
@@ -192,7 +192,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      oboeParser.prototype.onPath = function (pattern, callback) {
+      OboeParser.prototype.onPath = function (pattern, callback) {
 
          pushListener(this._pathMatchedListeners, pattern, callback);
          return this;
@@ -210,7 +210,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      oboeParser.prototype.onFind = function (pattern, callback) {
+      OboeParser.prototype.onFind = function (pattern, callback) {
 
          pushListener(this._thingFoundListeners, pattern, callback);
          return this;
