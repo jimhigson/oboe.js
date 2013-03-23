@@ -25,7 +25,8 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          var clarinetParser = clarinet.parser(opt);
 
-         this._matchListeners = [];
+         this._thingFoundListeners = [];
+         this._pathMatchedListeners = [];
          this._clarinet = clarinetParser;
 
          var   progressive = this
@@ -36,14 +37,16 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          ,     pathStack = [];
 
 
-         clarinetParser.onkey = function (key) {
-            curKey = key;
+         clarinetParser.onkey = function (nextKey) {
+            notifyListeners(progressive._pathMatchedListeners, null, pathStack.concat(nextKey));
+
+            curKey = nextKey;
          };
          clarinetParser.onvalue = function (value) {
             // onvalue is only called by clarinet for non-structured values
             // (ie, not arrays or objects).
 
-            notifyListeners(progressive._matchListeners, value, pathStack.concat(curKey));
+            notifyListeners(progressive._thingFoundListeners, value, pathStack.concat(curKey));
 
             if( isArray(curNode) ) {
                curNode.push(value);
@@ -54,9 +57,12 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             }
 
          };
-         clarinetParser.onopenobject = function (k) {
-            // k is the first key of the new object
+         clarinetParser.onopenobject = function (firstKey) {
+
             var newObj = {};
+
+            notifyListeners(progressive._pathMatchedListeners, newObj, pathStack);
+            notifyListeners(progressive._pathMatchedListeners, null, pathStack.concat(firstKey));
 
             if( curNode ) {
                curNode[curKey] = newObj;
@@ -69,7 +75,9 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             } else {
                pathStack.push(curKey);
             }
-            curKey = k;
+
+            // clarinet always gives the first key of the new object.
+            curKey = firstKey;
 
          };
          clarinetParser.onopenarray = function () {
@@ -80,15 +88,16 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
             nodeStack.push(newArray);
             pathStack.push(curKey);
 
+            notifyListeners(progressive._pathMatchedListeners, newArray, pathStack);
+
             curKey = 0;
-            open([]);
          };
 
          clarinetParser.onend =
          clarinetParser.oncloseobject =
          clarinetParser.onclosearray = function () {
 
-            notifyListeners(progressive._matchListeners, curNode, pathStack);
+            notifyListeners(progressive._thingFoundListeners, curNode, pathStack);
 
             nodeStack.pop();
             pathStack.pop();
@@ -153,6 +162,8 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
                .replace(/\/\//, '^\\/\\/')
                .replace(/__any__/g, '.*?')
 
+         regexPattern += '$';
+
          return new RegExp(regexPattern);
       }
 
@@ -183,7 +194,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        */
       ProgressiveParser.prototype.onPath = function (pattern, callback) {
 
-         pushListener(this._pathListeners, pattern, callback);
+         pushListener(this._pathMatchedListeners, pattern, callback);
          return this;
       };
 
@@ -201,7 +212,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        */
       ProgressiveParser.prototype.onFind = function (pattern, callback) {
 
-         pushListener(this._matchListeners, pattern, callback);
+         pushListener(this._thingFoundListeners, pattern, callback);
          return this;
       };
 

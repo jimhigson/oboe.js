@@ -1,4 +1,12 @@
 
+/*
+   BDD-style test cases for the progressive parser.
+
+   Uses sinon.js for stubs
+
+   Runs using JS Test Driver.
+
+ */
 
 TestCase("progressiveTest", {
 
@@ -6,22 +14,22 @@ TestCase("progressiveTest", {
    testHandlesEmptyObjectDetectedWithDoubleSlash: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//')
+         .andWeAreListeningForThingsFoundAtPattern('//')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
             foundOneMatch
          );
 
-   },
+   }
 
-   testOnlyFiresWhenHasWholeObject: function() {
+,  testFindOnlyFiresWhenHasWholeObject: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//')
+         .andWeAreListeningForThingsFoundAtPattern('//')
          .whenGivenInput('{')
           .thenTheParser(
-            foundNothing
+            foundNoMatches
           )
          .whenGivenInput('}')
          .thenTheParser(
@@ -31,10 +39,25 @@ TestCase("progressiveTest", {
 
    }
 
+,  testListeningForPathFiresWhenObjectStarts: function() {
+
+      // clarinet doesn't notify of matches to objects (onopenobject) until the
+      // first key is found, that is why we don't just give '{' here as the partial
+      // input.
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('//')
+         .whenGivenInput('{"foo":')
+          .thenTheParser(
+            foundNMatches(1),
+            matched({}).atRootOfJson
+          );
+   }
+
 ,  testHandlesEmptyObjectDetectedWithSingleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('*')
+         .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -45,7 +68,7 @@ TestCase("progressiveTest", {
 ,  testHandlesEmptyObjectDetectedWithDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**')
+         .andWeAreListeningForThingsFoundAtPattern('**')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -56,7 +79,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfStringsWhenListenedTo: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//string')
+         .andWeAreListeningForThingsFoundAtPattern('//string')
          .whenGivenInput('{"string":"s"}')
          .thenTheParser(
             matched("s"),
@@ -64,10 +87,32 @@ TestCase("progressiveTest", {
          );
    }
 
+,  testNotifiesOfPathForOfPropertyNameWithIncompleteJson: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('//string')
+         .whenGivenInput('{"string":')
+         .thenTheParser(
+            foundOneMatch
+         );
+   }
+
+,  testNotifiesOfSecondPropertyNameWithIncompleteJson: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('//pencils')
+         .whenGivenInput('{"pens":4, "pencils":')
+         .thenTheParser(
+            // null because the parser hasn't been given the value yet
+            matched(null).atPath(['pencils']),
+            foundOneMatch
+         );
+   }
+
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//*')
+         .andWeAreListeningForThingsFoundAtPattern('//*')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('A').atPath(['a'])
@@ -80,10 +125,10 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//*')
+         .andWeAreListeningForThingsFoundAtPattern('//*')
          .whenGivenInput('{"a":')
          .thenTheParser(
-             foundNothing
+             foundNoMatches
           )
          .whenGivenInput('"A",')
          .thenTheParser(
@@ -100,7 +145,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfNamesChildOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//b')
+         .andWeAreListeningForThingsFoundAtPattern('//b')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('B').atPath(['b'])
@@ -111,7 +156,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfArrayElements: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//array/*')
+         .andWeAreListeningForThingsFoundAtPattern('//array/*')
          .whenGivenInput('{"array":["a","b","c"]}')
          .thenTheParser(
              matched('a').atPath(['array',0])
@@ -121,10 +166,39 @@ TestCase("progressiveTest", {
          );
    }
 
+,  testNotifiesOfPathMatchWhenArrayStarts: function() {
+
+      // this is slightly strange and might need to be revisited later.
+      // basically, there is a notification when we find the property name
+      // and another (with an empty array) when we find the start of the array
+      // but both apply to the same key.
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('//array')
+         .whenGivenInput('{"array":["a"')
+         .thenTheParser(
+             foundNMatches(2)
+         ,   matched(null) // key found
+         ,   matched([])   // start of array found
+         );
+   }
+
+,  testNotifiesOfPathMatchWhenSecondArrayStarts: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('//array2')
+         .whenGivenInput('{"array1":["a","b"], "array2":["a"')
+         .thenTheParser(
+            foundNMatches(2)
+         ,  matched(null)
+         ,  matched([])
+         );
+   }
+
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//array/2')
+         .andWeAreListeningForThingsFoundAtPattern('//array/2')
          .whenGivenInput('{"array":["a","b","this_one"]}')
          .thenTheParser(
              matched('this_one').atPath(['array',2])
@@ -135,7 +209,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesNestedArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('//array/2/2')
+         .andWeAreListeningForThingsFoundAtPattern('//array/2/2')
          .whenGivenInput('{"array":["a","b",["x","y","this_one"]]}')
          .thenTheParser(
              matched('this_one').atPath(['array',2,2])
@@ -146,7 +220,7 @@ TestCase("progressiveTest", {
 ,  testNotifiesOfDeeplyNestedObjects: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('*')
+         .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{"a":{"b":{"c":{"d":"e"}}}}')
          .thenTheParser(
              matched('e').atPath(['a', 'b', 'c', 'd'])
@@ -165,7 +239,7 @@ TestCase("progressiveTest", {
       // was an array
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/find')
+         .andWeAreListeningForThingsFoundAtPattern('**/find')
          .whenGivenInput(
             {
                array:[
@@ -183,7 +257,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresIfOnlyStartOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/a')
+         .andWeAreListeningForThingsFoundAtPattern('**/a')
          .whenGivenInput({
                ab:'should_not_find_this'
             ,  a0:'nor this'
@@ -199,7 +273,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresIfOnlyEndOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/a')
+         .andWeAreListeningForThingsFoundAtPattern('**/a')
          .whenGivenInput({
                aa:'should_not_find_this'
             ,  ba:'nor this'
@@ -215,7 +289,7 @@ TestCase("progressiveTest", {
 ,  testDetectionIgnoresPartialPathMatchesInArrayIndices: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/1')
+         .andWeAreListeningForThingsFoundAtPattern('**/1')
          .whenGivenInput({
                array : [0,1,2,3,4,5,6,7,8,9,10,11,12]
             }
@@ -230,7 +304,7 @@ TestCase("progressiveTest", {
 ,  testCanDetectAtMultipleDepthsUsingDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/find')
+         .andWeAreListeningForThingsFoundAtPattern('**/find')
          .whenGivenInput({
 
             array:[
@@ -256,7 +330,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedAdjacentSelector: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/0/colour')
+         .andWeAreListeningForThingsFoundAtPattern('**/0/colour')
          .whenGivenInput({
 
             foods: [
@@ -280,7 +354,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedSelectorSeparatedByASingleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/foods/*/name')
+         .andWeAreListeningForThingsFoundAtPattern('**/foods/*/name')
          .whenGivenInput({
 
             foods: [
@@ -305,7 +379,7 @@ TestCase("progressiveTest", {
 ,  testMatchesNestedSelectorSeparatedByDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForObjectsAtPattern('**/foods/**/fr')
+         .andWeAreListeningForThingsFoundAtPattern('**/foods/**/fr')
          .whenGivenInput({
 
             foods: [
@@ -334,22 +408,37 @@ TestCase("progressiveTest", {
 
 
 var foundOneMatch = foundNMatches(1);
-var foundNothing = foundNMatches(0);
+var foundNoMatches = foundNMatches(0);
 
 function givenAParser() {
 
    function Asserter() {
 
       var parser = progressive.parser(),
-          callbackStub = sinon.stub();
 
-      this.andWeAreListeningForObjectsAtPattern = function(pattern) {
-         parser.onFind(pattern, callbackStub);
+          // sinon stub is only really used to record arguments given.
+          // However, we want to preserve the arguments given at the time of calling, because they might subsequently
+          // be changed inside the parser so everything gets cloned before going to the stub
+
+          stub = sinon.stub(), //erk: only one callback stub per Asserter right now :-s
+
+          callback = function(){
+            var clones = [];
+
+            for (var i = 0; i < arguments.length; i++) {
+               clones.push(JSON.parse( JSON.stringify(arguments[i]) ));
+            }
+
+            stub.apply( null, clones );
+          };
+
+      this.andWeAreListeningForThingsFoundAtPattern = function(pattern) {
+         parser.onFind(pattern, callback);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern) {
-         parser.onPath(pattern, callbackStub);
+         parser.onPath(pattern, callback);
          return this;
       };
 
@@ -365,7 +454,7 @@ function givenAParser() {
       this.thenTheParser = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
             var fn = arguments[i];
-            fn(callbackStub);
+            fn(stub);
          }
 
          return this;
@@ -374,6 +463,8 @@ function givenAParser() {
    return new Asserter();
 }
 
+// higher-level function to create assertions. Pass output to Asserter#thenTheParser.
+// test how many matches were found
 function foundNMatches(n){
    return function(callback) {
       if( n != callback.callCount ) {
@@ -384,6 +475,8 @@ function foundNMatches(n){
    }
 }
 
+// higher-level function to create assertions. Pass output to Asserter#thenTheParser
+// test what was matched
 function matched(obj) {
    function testRightObject( callback ) {
       if(!callback.calledWith(obj)) {
@@ -423,6 +516,3 @@ function matched(obj) {
 
    return testRightObject;
 }
-
-
-//test( {'s0':'s','t1':{'t2a':{t3a:'bar'}, t2b:{t3b:{}}}, 's1':'baz', 'a1':[1,[2,{inArray:'inArray'}],4]}  );
