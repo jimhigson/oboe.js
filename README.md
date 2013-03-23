@@ -69,10 +69,11 @@ progressive.fetch('/myapp/things.json')
 
 ## providing some feedback as a page is updating
 
+Let's provide some visual feedback that one area of the page is loading and remove it when we have just that json,
+no matter what else we get at the same time 
+
+I'll assume you already implemented a spinner
 ``` js
-// We probably want to provide some visual feedback that an area is still loading data, let's
-// assume you already implemented a spinner and want to use progressive to notify the user
-// when we've loaded all the foods:
 My.App.showSpinner('#foods');
 
 progressive.fetch('/myapp/things.json')
@@ -90,10 +91,11 @@ progressive.fetch('/myapp/things.json')
 ```
 
 ## Listening for paths when they are first found without waiting for the objects
+
+As well as .onFind, you can use .onPath to be notified when the path is first matched but we don't yet know what will
+be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
+possible.
 ``` js
-// As well as .onFind, you can use .onPath to be notified when the path is first matched but we don't yet know what will
-// be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
-// possible.
 var currentPersonDiv;
 progressive.fetch('//people.json')
    .onPath('//people/*', function(){
@@ -114,14 +116,15 @@ progressive.fetch('//people.json')
 
 
 ## Using the path passback
+
+The callback is also given the path the match was found at. It is sometimes preferable to
+register a wide-matching pattern and use the path parameter to decide what to do instead of
+registering a seperate callback for every possible json path that we might have an interest in.
+
+Say we're making some kind of social site that puts the json for a page into one response and
+the top level objects in the json response can arrive in any order:
+
 ``` js
-// The callback is also given the path the match was found at. It is sometimes preferable to
-// register a wide-matching pattern and use the path parameter to decide what to do instead of
-// registering a seperate callback for every possible json path that we might have an interest in.
-
-// Say we're making some kind of social site that puts the json for a page into one response.
-// The top level objects can arrive in any order:
-
 {  'notifications':{
       'newNotifications': 5,
       'totalNotifications': 4
