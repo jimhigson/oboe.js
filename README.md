@@ -228,10 +228,10 @@ Done, without errors.
 Will run progressive json tests( all ) against minified code
 setting runnermode QUIET
 ............................................................
-Total 60 tests (Passed: 60; Fails: 0; Errors: 0) (80.00 ms)
-  Firefox 17.0 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (80.00 ms)
-  Safari 536.26.17 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (33.00 ms)
-  Chrome 27.0.1435.0 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (38.00 ms)
+Total 75 tests (Passed: 60; Fails: 0; Errors: 0) (80.00 ms)
+  Firefox 17.0 Mac OS: Run 20 tests (Passed: 25; Fails: 0; Errors 0) (80.00 ms)
+  Safari 536.26.17 Mac OS: Run 20 tests (Passed: 25; Fails: 0; Errors 0) (33.00 ms)
+  Chrome 27.0.1435.0 Mac OS: Run 20 tests (Passed: 25; Fails: 0; Errors 0) (38.00 ms)
 
 Process finished with exit code 0
 ```
