@@ -27,8 +27,8 @@ the codebase is small and hackable and it works. Try it, let me know how it goes
 
 ## listening for json objects
 
+Let's say we have this file, things.json, to be fetched over ajax (In reality your json is probably bigger than this :-)
 ``` js
-// we have things.json, to be fetched over ajax. In reality your json is probably bigger than this.
 {
    foods: [
       {'name':'aubergine',    'colour':'purple'},
@@ -41,10 +41,13 @@ the codebase is small and hackable and it works. Try it, let me know how it goes
       {'name':'broken_glass', 'colour':'green'}
    ]
 }
+```
 
-// In our webapp we want to load the json and write the foods out
-// but we don't want to wait for the non_foods to load before we show them
-// since we're going to ignore them anyway:
+In our webapp we want to load the json and write the foods out
+but we don't want to wait for the non_foods to load before we show them
+since we're going to ignore them anyway:
+
+``` js
 progressive.fetch('/myapp/things.json')
    .onFind('//foods/*', function( foodThing ){
       // this callback will be called everytime a new object is found in the foods array.
@@ -58,9 +61,9 @@ progressive.fetch('/myapp/things.json')
 
 ## listening for strings in the json stream
 
+Want to listen to strings instead of objects? The syntax is just the same:
+
 ``` js
-// the pattern can match strings as well as objcts, if we just want to make a list of names
-// of things we could do this:
 progressive.fetch('/myapp/things.json')
    .onFind('**/name', function( name ){
       $('#things').append('<li>').text(name);
@@ -92,7 +95,7 @@ progressive.fetch('/myapp/things.json')
 
 ## Listening for paths when they are first found without waiting for the objects
 
-As well as .onFind, you can use .onPath to be notified when the path is first matched but we don't yet know what will
+As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first matched but we don't yet know what will
 be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
 possible.
 ``` js
