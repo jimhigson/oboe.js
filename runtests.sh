@@ -24,7 +24,7 @@ java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-dev.conf -
 echo &&
 
 export PATH=$PATH:/usr/local/bin/ &&
-grunt build &&
+grunt &&
 echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-built.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
 
