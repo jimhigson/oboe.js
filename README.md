@@ -18,8 +18,9 @@ Think of it as the json equivalent of old-style oboe html rendering.
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[quite well tested](src/test/cases/oboeTest.js).
-The codebase is small and hackable and it works. Try it, let me know how it goes.
+[quite well tested](src/test/cases/oboeTest.js) and has proven stable enough for
+production applications. The codebase is small and hackable and it works. Try it, 
+let me know how it goes.
 
 Old browsers might not be so well supported but it should be easy enough to branch and 
 build support in if you need it.
