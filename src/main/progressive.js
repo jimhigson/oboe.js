@@ -109,10 +109,8 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          };
 
-         clarinetParser.onerror = function (e) {
-            if( oboe.onerror ) {
-               oboe.onerror(e);
-            }
+         clarinetParser.onerror = function () {
+            notifyListeners(oboe._errorListeners);
          };
       }
 
@@ -126,17 +124,25 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return this;
       };
 
+
+      function matchesPath( path ) {
+         var stringPath = '//' + path.join('/');
+      
+         return function( notify ) {
+            return notify.regex.test( stringPath );         
+         }; 
+      }
+           
       function notifyListeners ( listenerList, foundNode, path ) {
 
-         var stringPath = '//' + path.join('/'),
+         var 
              // we don't want callback to be able to change internal state
              // of the parser so make a copy of the path:
-             pathCopy = Array.prototype.slice.call(path, 0);
+             pathCopy = Array.prototype.slice.call(path, 0),
+             
+             matchingListeners = listenerList.filter(matchesPath(path)); 
 
-         listenerList.filter( function( notify ){
-
-            return notify.regex.test( stringPath );
-         }).forEach( function(notify) {
+         matchingListeners.forEach( function(notify) {
 
             notify.callback( foundNode, pathCopy, notify.pattern );
          });
