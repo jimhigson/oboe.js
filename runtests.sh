@@ -18,14 +18,14 @@ else
   TESTS=all
 fi
 
-echo "Will run progressive json tests(" ${TESTS} ") against unminified code"
+echo "Will run oboe json tests(" ${TESTS} ") against unminified code"
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-dev.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
 
 echo &&
 
 export PATH=$PATH:/usr/local/bin/ &&
 grunt build &&
-echo "Will run progressive json tests(" ${TESTS} ") against minified code" &&
+echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-built.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
 
 gzip oboe.min.js --stdout > oboe.min.js.gz

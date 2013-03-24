@@ -126,7 +126,7 @@ give any further callbacks.
  
 ``` js
 var currentPersonDiv;
-progressive.fetch('//people.json')
+oboe.fetch('//people.json')
    .onPath('//people/*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
@@ -205,26 +205,25 @@ Internally the patterns are converted into regular expressions
 
 ## Use as a stream in node.js
 
-
-`Clarinet` supports use as a node stream. This hasn't been implemented in
-oboe but it should be quite easy to do.
+**Clarinet** supports use as a node stream. This hasn't been implemented in
+Oboe but it should be quite easy to do.
 
 ## Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
-(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're ``sending
-and parsing`` everything at the earliest possible oppotunity. If you can, send small bits of the
+(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're *sending
+and parsing* everything at the earliest possible oppotunity. If you can, send small bits of the
 json as soon as it is ready instead of waiting before everything is ready to start sending.
 
 # Running the tests
 
 Oboe is built using [grunt](http://gruntjs.com/) and
 [require.js](http://requirejs.org/) and tested using
-[jstestdriver](https://code.google.com/p/js-test-driver/). JSTD might
-be chaged to jasmine later to make the tests easier to run from grunt
-(there is a jstd plugin for Grunt but it doesn't work with Grunt v4).
+[jstestdriver](https://code.google.com/p/js-test-driver/). 
+The [jstd plugin for grunt](https://github.com/rickyclegg/grunt-jstestdriver) was just updated
+to support grunt 0.4 so the shell script part can probably be removed now.
 
-The `runtests.sh` script combines several steps into one:
+The **runtests.sh** script combines several steps into one:
 
 * Runs the unminified code against the tests
 * build the code using grunt
