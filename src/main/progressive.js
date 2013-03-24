@@ -135,19 +135,21 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return this;
       };
 
+      function matchesPath( path ) {
+         var stringPath = '//' + path.join('/');
+      
+         return function( notify ) {
+            return notify.regex.test( stringPath );         
+         }; 
+      }
+           
       function notifyListeners ( listenerList, foundNode, path ) {
 
-         var stringPath = '//' + path.join('/'),
-             // we don't want callback to be able to change internal state
-             // of the parser so make a copy of the path:
-             pathCopy = Array.prototype.slice.call(path, 0);
+         var matchingListeners = listenerList.filter(matchesPath(path)); 
 
-         listenerList.filter( function( notify ){
+         matchingListeners.forEach( function(notify) {
 
-            return notify.regex.test( stringPath );
-         }).forEach( function(notify) {
-
-            notify.callback( foundNode, pathCopy, notify.pattern );
+            notify.callback( foundNode, path );
          });
       }
 
