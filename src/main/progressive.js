@@ -36,6 +36,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          this._thingFoundListeners = [];
          this._pathMatchedListeners = [];
+         this._errorListeners = [];
          this._clarinet = clarinetParser;
 
          var   progressive = this
@@ -135,22 +136,27 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return this;
       };
 
+      /**
+       * returns a function which tests if a listener is interested in the given path
+       */
       function matchesPath( path ) {
          var stringPath = '//' + path.join('/');
       
-         return function( notify ) {
-            return notify.regex.test( stringPath );         
+         return function( listener ) {
+            return listener.regex.test( stringPath );         
          }; 
       }
-           
+
+      /**
+       * notify any of the listeners that are interested in the path.       
+       */  
       function notifyListeners ( listenerList, foundNode, path ) {
 
-         var matchingListeners = listenerList.filter(matchesPath(path)); 
+         listenerList.filter(matchesPath(path))
+            .forEach( function(listener) {
 
-         matchingListeners.forEach( function(notify) {
-
-            notify.callback( foundNode, path );
-         });
+               listener.callback( foundNode, path );               
+            });
       }
 
       /**
