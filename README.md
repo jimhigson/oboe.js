@@ -1,7 +1,7 @@
 **Oboe.js** is an asynchronous, progressive json parser built on top of
 [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read a json http response while the request is still
-ongoing. With libraries built in oboe gzips down to about **3.5k**.
+It provides an intuitive interface to read an ajax responsewhile the request is still
+ongoing and gzips down to about **3.5k**.
 
 # Purpose
 
@@ -9,24 +9,23 @@ The aim of Oboe is to let you start using your data as early as possible with as
 an interface as is possible.
 
 Your web application probably makes the user wait longer for io than anything else. However,
-during much of the waiting there will already be enough data loaded to start showing
-things on the page. This is especially true on mobile networks where requests can sporadically stall
-or if you are writing the response out asynchronously.
-But even on a fast networks and synchronous web servers there are perceptual speed improvements
-for non-trivial json responses.
+during much of the waiting there will already be enough data loaded in the browser to show
+things on the page. This is especially true on mobile networks where requests sporadically stall
+or cut out halfway.
 
 Think of it as the json equivalent of old-style oboe html rendering.
 
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[fairly well tested](src/test/cases/oboeTest.js).
+[quite well tested](src/test/cases/oboeTest.js).
 The codebase is small and hackable and it works. Try it, let me know how it goes.
 
-Old browsers might not be so well supported but it should be easy enough to branch and build support in if you need it.
+Old browsers might not be so well supported but it should be easy enough to branch and 
+build support in if you need it.
 
 Oboe used to be called **Progressive.js** until I noticed that a project 
-[already existed with that name](https://github.com/jamesallardice/Progressive.js). D'oh! 
+[already exists with that name](https://github.com/jamesallardice/Progressive.js). D'oh! 
 
 # Examples
 
@@ -55,8 +54,8 @@ since we're going to ignore them anyway:
 ``` js
 oboe.fetch('/myapp/things.json')
    .onFind('//foods/*', function( foodThing ){
-      // this callback will be called everytime a new object is found in the foods array.
-      // in this example we just use jQuery to set up some simple DOM:
+      // this callback will be called everytime a new object is found in the 
+      // foods array. In this example we just use jQuery to set up some simple DOM:
       $('#foods')
          .append('<div>')
             .text('it is safe to eat ' + foodThing.name)
