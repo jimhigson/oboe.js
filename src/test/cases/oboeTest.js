@@ -1,6 +1,6 @@
 
 /*
-   BDD-style test cases for the progressive parser.
+   BDD-style test cases for the oboe progressive parser.
 
    Uses sinon.js for stubs
 
@@ -8,7 +8,7 @@
 
  */
 
-TestCase("progressiveTest", {
+TestCase("oboeTest", {
 
 
    testHandlesEmptyObjectDetectedWithDoubleSlash: function() {
