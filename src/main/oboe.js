@@ -160,10 +160,9 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
        * returns a function which tests if a listener is interested in the given path
        */
       function matchesPath( path ) {
-         var stringPath = '//' + path.join('/');
       
          return function( listener ) {
-            return listener.pattern.test( stringPath );         
+            return listener.pattern.test( path );         
          }; 
       }
 

@@ -14,7 +14,7 @@ TestCase("oboeTest", {
    testHandlesEmptyObjectDetectedWithDollar: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//')
+         .andWeAreListeningForThingsFoundAtPattern('$')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -26,7 +26,7 @@ TestCase("oboeTest", {
 ,  testFindOnlyFiresWhenHasWholeObject: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//')
+         .andWeAreListeningForThingsFoundAtPattern('$')
          .whenGivenInput('{')
           .thenTheParser(
             foundNoMatches
@@ -46,7 +46,7 @@ TestCase("oboeTest", {
       // input.
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('//')
+         .andWeAreListeningForMatchesToPattern('$')
          .whenGivenInput('{"foo":')
           .thenTheParser(
             foundNMatches(1),
@@ -65,10 +65,10 @@ TestCase("oboeTest", {
          );
    }
 
-,  testHandlesEmptyObjectDetectedWithDoubleStar: function() {
+,  testHandlesEmptyObjectDetectedWithDoubleDot: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**')
+         .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
          .thenTheParser(
             matched({}).atRootOfJson,
@@ -79,7 +79,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfStringsWhenListenedTo: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//string')
+         .andWeAreListeningForThingsFoundAtPattern('$.string')
          .whenGivenInput('{"string":"s"}')
          .thenTheParser(
             matched("s"),
@@ -90,7 +90,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathForOfPropertyNameWithIncompleteJson: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('//string')
+         .andWeAreListeningForMatchesToPattern('$.string')
          .whenGivenInput('{"string":')
          .thenTheParser(
             foundOneMatch
@@ -100,7 +100,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfSecondPropertyNameWithIncompleteJson: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('//pencils')
+         .andWeAreListeningForMatchesToPattern('$.pencils')
          .whenGivenInput('{"pens":4, "pencils":')
          .thenTheParser(
             // null because the parser hasn't been given the value yet
@@ -112,7 +112,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//*')
+         .andWeAreListeningForThingsFoundAtPattern('$.*')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('A').atPath(['a'])
@@ -125,7 +125,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//*')
+         .andWeAreListeningForThingsFoundAtPattern('$.*')
          .whenGivenInput('{"a":')
          .thenTheParser(
              foundNoMatches
@@ -142,10 +142,10 @@ TestCase("oboeTest", {
          );
    }
 
-,  testNotifiesOfNamesChildOfRoot: function() {
+,  testNotifiesOfNamedChildOfRoot: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//b')
+         .andWeAreListeningForThingsFoundAtPattern('$.b')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheParser(
              matched('B').atPath(['b'])
@@ -156,12 +156,12 @@ TestCase("oboeTest", {
 ,  testNotifiesOfArrayElements: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//array/*')
-         .whenGivenInput('{"array":["a","b","c"]}')
+         .andWeAreListeningForThingsFoundAtPattern('$.testArray.*')
+         .whenGivenInput('{"testArray":["a","b","c"]}')
          .thenTheParser(
-             matched('a').atPath(['array',0])
-         ,   matched('b').atPath(['array',1])
-         ,   matched('c').atPath(['array',2])
+             matched('a').atPath(['testArray',0])
+         ,   matched('b').atPath(['testArray',1])
+         ,   matched('c').atPath(['testArray',2])
          ,   foundNMatches(3)
          );
    }
@@ -174,8 +174,8 @@ TestCase("oboeTest", {
       // but both apply to the same key.
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('//array')
-         .whenGivenInput('{"array":["a"')
+         .andWeAreListeningForMatchesToPattern('$.testArray')
+         .whenGivenInput('{"testArray":["a"')
          .thenTheParser(
              foundNMatches(2)
          ,   matched(null) // key found
@@ -186,7 +186,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathMatchWhenSecondArrayStarts: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('//array2')
+         .andWeAreListeningForMatchesToPattern('$.array2')
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
          .thenTheParser(
             foundNMatches(2)
@@ -198,10 +198,10 @@ TestCase("oboeTest", {
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//array/2')
-         .whenGivenInput('{"array":["a","b","this_one"]}')
+         .andWeAreListeningForThingsFoundAtPattern('$.testArray[2]')
+         .whenGivenInput('{"testArray":["a","b","this_one"]}')
          .thenTheParser(
-             matched('this_one').atPath(['array',2])
+             matched('this_one').atPath(['testArray',2])
          ,   foundOneMatch
          );
    }
@@ -209,18 +209,18 @@ TestCase("oboeTest", {
 ,  testNotifiesNestedArrayElementsSelectedByIndex: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('//array/2/2')
-         .whenGivenInput('{"array":["a","b",["x","y","this_one"]]}')
+         .andWeAreListeningForThingsFoundAtPattern('$.testArray[2][2]')
+         .whenGivenInput('{"testArray":["a","b",["x","y","this_one"]]}')
          .thenTheParser(
-             matched('this_one').atPath(['array',2,2])
+             matched('this_one').atPath(['testArray',2,2])
          ,   foundOneMatch
          );
-   }
+   }     
 
 ,  testNotifiesOfDeeplyNestedObjects: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('*')
+         .andWeAreListeningForThingsFoundAtPattern('..')
          .whenGivenInput('{"a":{"b":{"c":{"d":"e"}}}}')
          .thenTheParser(
              matched('e').atPath(['a', 'b', 'c', 'd'])
@@ -239,7 +239,7 @@ TestCase("oboeTest", {
       // was an array
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/find')
+         .andWeAreListeningForThingsFoundAtPattern('$..find')
          .whenGivenInput(
             {
                array:[
@@ -257,7 +257,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresIfOnlyStartOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/a')
+         .andWeAreListeningForThingsFoundAtPattern('$..a')
          .whenGivenInput({
                ab:'should_not_find_this'
             ,  a0:'nor this'
@@ -273,7 +273,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresIfOnlyEndOfPatternMatches: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/a')
+         .andWeAreListeningForThingsFoundAtPattern('$..a')
          .whenGivenInput({
                aa:'should_not_find_this'
             ,  ba:'nor this'
@@ -289,7 +289,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresPartialPathMatchesInArrayIndices: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/1')
+         .andWeAreListeningForThingsFoundAtPattern('$..[1]')
          .whenGivenInput({
                array : [0,1,2,3,4,5,6,7,8,9,10,11,12]
             }
@@ -304,7 +304,7 @@ TestCase("oboeTest", {
 ,  testCanDetectAtMultipleDepthsUsingDoubleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/find')
+         .andWeAreListeningForThingsFoundAtPattern('$..find')
          .whenGivenInput({
 
             array:[
@@ -330,7 +330,7 @@ TestCase("oboeTest", {
 ,  testMatchesNestedAdjacentSelector: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/0/colour')
+         .andWeAreListeningForThingsFoundAtPattern('$..[0].colour')
          .whenGivenInput({
 
             foods: [
@@ -354,7 +354,7 @@ TestCase("oboeTest", {
 ,  testMatchesNestedSelectorSeparatedByASingleStar: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/foods/*/name')
+         .andWeAreListeningForThingsFoundAtPattern('$..foods.*.name')
          .whenGivenInput({
 
             foods: [
@@ -376,10 +376,11 @@ TestCase("oboeTest", {
                );
    }
 
-,  testMatchesNestedSelectorSeparatedByDoubleStar: function() {
+,  testMatchesNestedSelectorSeparatedByDoubleDot: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern('**/foods/**/fr')
+         // we just want the French names of foods:
+         .andWeAreListeningForThingsFoundAtPattern('$..foods..fr')
          .whenGivenInput({
 
             foods: [
