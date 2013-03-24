@@ -19,9 +19,11 @@ Think of it as the json equivalent of old-style progressive html rendering.
 
 # Status
 
-Progressive is still quite early in development. Nevertheless, it is already
-[fairly well tested](https://github.com/jimhigson/progressive.js/blob/master/src/test/cases/progressiveTest.js),
-the codebase is small and hackable and it works. Try it, let me know how it goes.
+Progressive is still in development. Nevertheless, it is already
+[fairly well tested](https://github.com/jimhigson/progressive.js/blob/master/src/test/cases/progressiveTest.js).
+The codebase is small and hackable and it works. Try it, let me know how it goes.
+
+Old browsers might not be so well supported but it should be easy enough to branch and build support in if you need it.
 
 # Examples
 
