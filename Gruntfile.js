@@ -6,25 +6,29 @@ module.exports = function (grunt) {
    ,  requirejs:{
          compile:{
             options:{
-               baseUrl:"src/main/", out:"oboe.min.js", name:"oboe"
+               optimize:'none',
+               baseUrl:"src/main/", 
+               out:"oboe.js", 
+               name:"oboe"
+            }
+         }
+      }
+      
+   ,  uglify: {
+         build:{
+            files:{
+               'oboe.min.js': 'oboe.js'
             }
          }
       }
 
-   /* bah, grunt-markdown doesn't support v0.4!
-   ,  markdown: {
-         all:{
-            files:['*.md']
-         ,  dest : 'html'
-         }
-      } */
    });
 
    grunt.loadNpmTasks('grunt-contrib-requirejs');
-   //grunt.loadNpmTasks('grunt-markdown');
+   grunt.loadNpmTasks('grunt-contrib-uglify');   
 
    grunt.registerTask('build', ['requirejs']);
-   grunt.registerTask('default', ['requirejs']);
+   grunt.registerTask('minify', ['uglify']);   
+   grunt.registerTask('default', ['requirejs', 'uglify']);
 
- //grunt.registerTask('htlmreadme', ['markdown:readme']);
 };
