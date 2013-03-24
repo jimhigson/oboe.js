@@ -25,7 +25,11 @@ echo &&
 
 export PATH=$PATH:/usr/local/bin/ &&
 grunt &&
+
+echo "Will run oboe json tests(" ${TESTS} ") against concatenated code" &&
+java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-concat.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
+
 echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
-java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-built.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
+java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-minified.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
 
 gzip oboe.min.js --stdout > oboe.min.js.gz

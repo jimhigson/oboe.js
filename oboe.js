@@ -616,11 +616,33 @@ define("libs/clarinet", function(){});
 
 define("streamingXhr", function(){});
 
-require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
+
+;(function (paths) {
+
+   paths.compile = function( jsonPath ){
+        
+      var regexPattern = jsonPath
+                  .replace(/\w+/g, '$&(\\b|$)')
+                  .replace(/\*\*/g, '__any__')
+                  .replace(/\*/g, '(//|[^\\/]+?)')
+                  .replace(/\/\//, '^\\/\\/')
+                  .replace(/__any__/g, '.*?');
+                  
+      regexPattern += '$';                  
+                  
+      return new RegExp(regexPattern);      
+   };    
+   
+})(typeof exports === "undefined" ? paths = {} : exports);
+define("paths", function(){});
+
+require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streamingXhr, paths) {
 
    (function (oboe) {
 
-      var clarinet = window.clarinet || require('clarinet');
+      var paths = window.paths || require('paths'),
+          clarinet = window.clarinet || require('clarinet'),
+          streamingXhr = window.streamingXhr || require('streamingXhr');
 
       /**
        * @param {Object} opt an object of options. Passed though
@@ -779,7 +801,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          var stringPath = '//' + path.join('/');
       
          return function( listener ) {
-            return listener.regex.test( stringPath );         
+            return listener.pattern.test( stringPath );         
          }; 
       }
 
@@ -804,29 +826,13 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          this._clarinet.write(nextDrip);
       };
 
-      function jsonPathToRegex(jsonPath) {
-         // convert the json path into a regular expression using
-         // an admittedly fairly incomprehensible pile of regular
-         // expressions:
-         var regexPattern = jsonPath
-               .replace(/\w+/g, '$&(\\b|$)')
-               .replace(/\*\*/g, '__any__')
-               .replace(/\*/g, '(//|[^\\/]+?)')
-               .replace(/\/\//, '^\\/\\/')
-               .replace(/__any__/g, '.*?')
-
-         regexPattern += '$';
-
-         return new RegExp(regexPattern);
-      }
-
 
       /**
        * @returns {*} an identifier that can later be used to de-register this listener
        */
       function pushListener(listenerList, jsonPath, callback) {
          return listenerList.push({
-            regex: jsonPathToRegex(jsonPath),
+            pattern: paths.compile(jsonPath),
             callback: callback
          });
       }
@@ -836,11 +842,15 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        * what value will be in there.
        *
        * @param {String} jsonPath
-       *    supports these special meanings:
-       *          //                - root json object
-       *          /                 - path separator
-       *          *                 - any named node in the path
-       *          **                - any number of intermediate nodes (non-greedy)
+       *    The jsonPath is a subset of JSONPath patterns and supports these special meanings.
+       *    See http://goessner.net/articles/JsonPath/
+       *          $                - root json object
+       *          .                - path separator
+       *          foo              - path node 'foo'
+       *          ['foo']          - path node 'foo'
+       *          [1]              - path node '1' (only for numbers indexes, usually arrays)
+       *          *                - wildcard - all objects/properties
+       *          ..               - any number of intermediate nodes (non-greedy)
        *
        * @param {Function} callback
        */
