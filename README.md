@@ -1,7 +1,7 @@
 **Oboe.js** is an asynchronous, progressive json parser built on top of
 [clarinet](https://github.com/dscape/clarinet).
 It provides an intuitive interface to read a json http response while the request is still
-ongoing. The whole library gzips down to about **3.5k**.
+ongoing. With libraries built in oboe gzips down to about **3.5k**.
 
 # Purpose
 
