@@ -25,6 +25,9 @@ The codebase is small and hackable and it works. Try it, let me know how it goes
 
 Old browsers might not be so well supported but it should be easy enough to branch and build support in if you need it.
 
+Oboe used to be called **Progressive.js** until I noticed that a project 
+[already existed with that name](https://github.com/jamesallardice/Progressive.js). D'oh! 
+
 # Examples
 
 ## listening for json objects
