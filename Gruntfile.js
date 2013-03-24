@@ -6,7 +6,7 @@ module.exports = function (grunt) {
    ,  requirejs:{
          compile:{
             options:{
-               baseUrl:"src/main/", out:"progressive.min.js", name:"progressive"
+               baseUrl:"src/main/", out:"oboe.min.js", name:"oboe"
             }
          }
       }
