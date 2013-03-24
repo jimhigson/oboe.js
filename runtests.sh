@@ -28,4 +28,4 @@ grunt build &&
 echo "Will run progressive json tests(" ${TESTS} ") against minified code" &&
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-built.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} &&
 
-gzip progressive.min.js --stdout > progressive.min.js.gz
+gzip oboe.min.js --stdout > oboe.min.js.gz
