@@ -121,8 +121,8 @@ oboe.fetch('//people.json')
 
 ## Error handling
 
-You use the error handler to roll back if there is an error in the json. Once there is an error, progressive won't
-give any further callbacks.
+You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
+give any further callbacks no matter what is in the rest of the json.
  
 ``` js
 var currentPersonDiv;
