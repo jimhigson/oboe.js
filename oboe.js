@@ -804,11 +804,11 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          this._clarinet.write(nextDrip);
       };
 
-      function patternToRegex(pattern) {
-         // convert the pattern into a regular expression using
+      function jsonPathToRegex(jsonPath) {
+         // convert the json path into a regular expression using
          // an admittedly fairly incomprehensible pile of regular
          // expressions:
-         var regexPattern = pattern
+         var regexPattern = jsonPath
                .replace(/\w+/g, '$&(\\b|$)')
                .replace(/\*\*/g, '__any__')
                .replace(/\*/g, '(//|[^\\/]+?)')
@@ -824,19 +824,18 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
       /**
        * @returns {*} an identifier that can later be used to de-register this listener
        */
-      function pushListener(listenerList, pattern, callback) {
+      function pushListener(listenerList, jsonPath, callback) {
          return listenerList.push({
-            pattern: pattern,
-            regex: patternToRegex(pattern),
+            regex: jsonPathToRegex(jsonPath),
             callback: callback
          });
       }
 
       /**
-       * Add a new pattern to the parser, to be called as soon as the path is found, but before we know
+       * Add a new json path to the parser, to be called as soon as the path is found, but before we know
        * what value will be in there.
        *
-       * @param {String} pattern
+       * @param {String} jsonPath
        *    supports these special meanings:
        *          //                - root json object
        *          /                 - path separator
@@ -845,16 +844,16 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      OboeParser.prototype.onPath = function (pattern, callback) {
+      OboeParser.prototype.onPath = function (jsonPath, callback) {
 
-         pushListener(this._pathMatchedListeners, pattern, callback);
+         pushListener(this._pathMatchedListeners, jsonPath, callback);
          return this;
       };
 
       /**
-       * Add a new pattern to the parser, which will be called when a value is found at the given path
+       * Add a new json path to the parser, which will be called when a value is found at the given path
        *
-       * @param {String} pattern
+       * @param {String} jsonPath
        *    supports these special meanings:
        *          //                - root json object
        *          /                 - path separator
@@ -863,21 +862,14 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
        *
        * @param {Function} callback
        */
-      OboeParser.prototype.onFind = function (pattern, callback) {
+      OboeParser.prototype.onFind = function (jsonPath, callback) {
 
-         pushListener(this._thingFoundListeners, pattern, callback);
+         pushListener(this._thingFoundListeners, jsonPath, callback);
          return this;
       };
       
       /**
-       * Add a new pattern to the parser, which will be called when a value is found at the given path
-       *
-       * @param {String} pattern
-       *    supports these special meanings:
-       *          //                - root json object
-       *          /                 - path separator
-       *          *                 - any named node in the path
-       *          **                - any number of intermediate nodes (non-greedy)
+       * Add a new json path to the parser, which will be called when a value is found at the given path
        *
        * @param {Function} callback
        */

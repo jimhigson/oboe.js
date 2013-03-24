@@ -11,7 +11,7 @@
 TestCase("oboeTest", {
 
 
-   testHandlesEmptyObjectDetectedWithDoubleSlash: function() {
+   testHandlesEmptyObjectDetectedWithDollar: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('//')
