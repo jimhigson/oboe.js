@@ -119,10 +119,28 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          };
 
-         clarinetParser.onerror = function (e) {
-            if( progressive.onerror ) {
-               progressive.onerror(e);
-            }
+
+         clarinetParser.onerror = function (e) {    
+            console.log('error', e.message);
+             
+            progressive._errorListeners.forEach( function( listener ) {
+               listener();
+            });
+            
+            // errors are not recoverable so discard all listeners, they shouldn't be called again:
+            progressive._thingFoundListeners = [];
+            progressive._pathMatchedListeners = [];
+            progressive._errorListeners = [];
+            
+            // quit listening to clarinet as well. We've lost it with this stream:
+            clarinetParser.onkey = 
+            clarinetParser.onvalue = 
+            clarinetParser.onopenobject = 
+            clarinetParser.onopenarray = 
+            clarinetParser.onend = 
+            clarinetParser.oncloseobject =                         
+            clarinetParser.onclosearray = 
+            clarinetParser.onerror = null;            
          };
       }
 
@@ -230,6 +248,24 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
       ProgressiveParser.prototype.onFind = function (pattern, callback) {
 
          pushListener(this._thingFoundListeners, pattern, callback);
+         return this;
+      };
+      
+      /**
+       * Add a new pattern to the parser, which will be called when a value is found at the given path
+       *
+       * @param {String} pattern
+       *    supports these special meanings:
+       *          //                - root json object
+       *          /                 - path separator
+       *          *                 - any named node in the path
+       *          **                - any number of intermediate nodes (non-greedy)
+       *
+       * @param {Function} callback
+       */
+      ProgressiveParser.prototype.onError = function (callback) {
+
+         this._errorListeners.push(callback);
          return this;
       };
 

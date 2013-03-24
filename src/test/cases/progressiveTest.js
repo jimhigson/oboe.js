@@ -401,14 +401,18 @@ TestCase("progressiveTest", {
                );
    }
 
-
-// TODO: Handle invalid JSON
-
+   
+,  testErrorsOnInvalidJson: function() {
+  
+      givenAParser()
+        .andWeAreListeningForErrors()
+        .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
+        .thenTheParser
+           (   calledCallbackOnce
+           );
+   }
 });
 
-
-var foundOneMatch = foundNMatches(1);
-var foundNoMatches = foundNMatches(0);
 
 function givenAParser() {
 
@@ -441,6 +445,11 @@ function givenAParser() {
          parser.onPath(pattern, callback);
          return this;
       };
+      
+      this.andWeAreListeningForErrors = function() {
+         parser.onError(callback);
+         return this;
+      };      
 
       this.whenGivenInput = function(json) {
          if( typeof json != 'string' ) {
@@ -474,6 +483,10 @@ function foundNMatches(n){
       }
    }
 }
+
+var foundOneMatch = foundNMatches(1),
+    calledCallbackOnce = foundNMatches(1),    
+    foundNoMatches = foundNMatches(0);
 
 // higher-level function to create assertions. Pass output to Asserter#thenTheParser
 // test what was matched
