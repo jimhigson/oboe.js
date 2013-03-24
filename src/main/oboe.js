@@ -254,13 +254,6 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
       /**
        * Add a new pattern to the parser, which will be called when a value is found at the given path
        *
-       * @param {String} pattern
-       *    supports these special meanings:
-       *          //                - root json object
-       *          /                 - path separator
-       *          *                 - any named node in the path
-       *          **                - any number of intermediate nodes (non-greedy)
-       *
        * @param {Function} callback
        */
       OboeParser.prototype.onError = function (callback) {
