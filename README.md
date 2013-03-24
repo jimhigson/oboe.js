@@ -19,9 +19,11 @@ Think of it as the json equivalent of old-style oboe html rendering.
 
 # Status
 
-Oboe is still quite early in development. Nevertheless, it is already
-[fairly well tested](https://github.com/jimhigson/oboe.js/blob/master/src/test/cases/oboeTest.js),
-the codebase is small and hackable and it works. Try it, let me know how it goes.
+Oboe is still in development. Nevertheless, it is already
+[fairly well tested](https://github.com/jimhigson/oboe.js/blob/master/src/test/cases/progressiveTest.js).
+The codebase is small and hackable and it works. Try it, let me know how it goes.
+
+Old browsers might not be so well supported but it should be easy enough to branch and build support in if you need it.
 
 # Examples
 
@@ -114,6 +116,30 @@ oboe.fetch('//people.json')
    .onPath('//people/email', function( email ){
       // we just found out that person's name, lets add it to their div:
       currentPersonDiv.append('<span class="email"> + email + </span>');
+   })
+```
+
+## Error handling
+
+You use the error handler to roll back if there is an error in the json. Once there is an error, progressive won't
+give any further callbacks.
+ 
+``` js
+var currentPersonDiv;
+progressive.fetch('//people.json')
+   .onPath('//people/*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add them to the page:
+      personDiv = $('<div class="person">');
+      $('#people').append(personDiv);
+   })
+   .onPath('//people/name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onError('//people/email', function( email ){
+      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
+      currentPersonDiv.remove();
    })
 ```
 

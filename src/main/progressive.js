@@ -12,7 +12,16 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
       oboe.parser = function(opt){
          return new OboeParser(opt);
       };
-      
+
+      /**
+       * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
+       * ready to call .onPath() or .onFind() to register some callbacks
+       * @param url
+       */
+      oboe.fetch = function(url){
+         return new OboeParser().fetch(url);
+      };      
+
       function peek(array) {
          return array[array.length-1];
       }
@@ -27,6 +36,7 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          this._thingFoundListeners = [];
          this._pathMatchedListeners = [];
+         this._errorListeners = [];
          this._clarinet = clarinetParser;
 
          var   oboe = this
@@ -109,8 +119,28 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
 
          };
 
-         clarinetParser.onerror = function () {
-            notifyListeners(oboe._errorListeners);
+
+         clarinetParser.onerror = function (e) {    
+            console.log('error', e.message);
+             
+            oboe._errorListeners.forEach( function( listener ) {
+               listener();
+            });
+            
+            // errors are not recoverable so discard all listeners, they shouldn't be called again:
+            oboe._thingFoundListeners = [];
+            oboe._pathMatchedListeners = [];
+            oboe._errorListeners = [];
+            
+            // quit listening to clarinet as well. We've lost it with this stream:
+            clarinetParser.onkey = 
+            clarinetParser.onvalue = 
+            clarinetParser.onopenobject = 
+            clarinetParser.onopenarray = 
+            clarinetParser.onend = 
+            clarinetParser.oncloseobject =                         
+            clarinetParser.onclosearray = 
+            clarinetParser.onerror = null;            
          };
       }
 
@@ -124,28 +154,27 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
          return this;
       };
 
-
+      /**
+       * returns a function which tests if a listener is interested in the given path
+       */
       function matchesPath( path ) {
          var stringPath = '//' + path.join('/');
       
-         return function( notify ) {
-            return notify.regex.test( stringPath );         
+         return function( listener ) {
+            return listener.regex.test( stringPath );         
          }; 
       }
-           
+
+      /**
+       * notify any of the listeners that are interested in the path.       
+       */  
       function notifyListeners ( listenerList, foundNode, path ) {
 
-         var 
-             // we don't want callback to be able to change internal state
-             // of the parser so make a copy of the path:
-             pathCopy = Array.prototype.slice.call(path, 0),
-             
-             matchingListeners = listenerList.filter(matchesPath(path)); 
+         listenerList.filter(matchesPath(path))
+            .forEach( function(listener) {
 
-         matchingListeners.forEach( function(notify) {
-
-            notify.callback( foundNode, pathCopy, notify.pattern );
-         });
+               listener.callback( foundNode, path );               
+            });
       }
 
       /**
@@ -219,6 +248,24 @@ require(['libs/clarinet', 'streamingXhr'], function(clarinet, streamingXhr) {
       OboeParser.prototype.onFind = function (pattern, callback) {
 
          pushListener(this._thingFoundListeners, pattern, callback);
+         return this;
+      };
+      
+      /**
+       * Add a new pattern to the parser, which will be called when a value is found at the given path
+       *
+       * @param {String} pattern
+       *    supports these special meanings:
+       *          //                - root json object
+       *          /                 - path separator
+       *          *                 - any named node in the path
+       *          **                - any number of intermediate nodes (non-greedy)
+       *
+       * @param {Function} callback
+       */
+      OboeParser.prototype.onError = function (callback) {
+
+         this._errorListeners.push(callback);
          return this;
       };
 
