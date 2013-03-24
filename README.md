@@ -193,6 +193,7 @@ Oboe's pattern matching recognises these special tokens:
 
 ```
 //foods/colour           // the colours of the foods
+**/person/emails/1       // the first element in the email array for each person
 **/person                // all people in the json
 **/person/friends/*/name // detecting links in social network
 **/person/**/email       // email anywhere as descendent of a person object
