@@ -117,6 +117,30 @@ progressive.fetch('//people.json')
    })
 ```
 
+## Error handling
+
+You use the error handler to roll back if there is an error in the json. Once there is an error, progressive won't
+give any further callbacks.
+ 
+``` js
+var currentPersonDiv;
+progressive.fetch('//people.json')
+   .onPath('//people/*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add them to the page:
+      personDiv = $('<div class="person">');
+      $('#people').append(personDiv);
+   })
+   .onPath('//people/name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onError('//people/email', function( email ){
+      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
+      currentPersonDiv.remove();
+   })
+```
+
 
 ## Using the path passback
 
