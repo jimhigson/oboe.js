@@ -186,7 +186,7 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
 
 # Pattern matching
 
-Oboe's pattern matching is a subset of [JSONPath](http://goessner.net/articles/JsonPath)
+Oboe's pattern matching is a subset of [JSONPath](https://code.google.com/p/json-path/)
 and closely resembles the normal syntax for descending into sub-objects parsed
 from Json.
 
