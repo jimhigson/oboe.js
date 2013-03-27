@@ -1,6 +1,6 @@
-**Oboe.js** is an asynchronous, progressive json parser built on top of
+**Oboe.js** is an asynchronous, progressive json parser for ajax built on top of
 [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read an ajax responsewhile the request is still
+It provides an intuitive interface to read the ajax responsewhile the request is still
 ongoing and gzips down to about **3.8k**.
 
 # Purpose
