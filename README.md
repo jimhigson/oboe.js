@@ -199,17 +199,13 @@ It is possible that the rest of JSONPath could be added later.
 
 ## Some Example patterns:
 
-```
-$.foods.colour           // the colours of the foods
-person.emails[1]         // the first element in the email array for each person
-person                   // all people in the json
-person.friends.*.name    // detecting friend names in a social network
-person..email            // email anywhere as descendent of a person object
-*                        // every object, string, number etc in the json!
-$                        // the root object (fired when the whole json is available, like JSON.parse())
-```
-
-Internally the patterns are converted into regular expressions
+`$.foods.colour` the colours of the foods  
+`person.emails[1]` the first element in the email array for each person  
+`person` all people in the json  
+`person.friends.*.name` detecting friend names in a social network  
+`person..email` email anywhere as descendent of a person object  
+`*` every object, string, number etc in the json!  
+`$` the root object (fired when the whole json is available, like JSON.parse())
 
 ## Getting the most from oboe
 
