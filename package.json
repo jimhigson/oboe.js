@@ -1,12 +1,12 @@
 {
   "name": "Oboe.js",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "description": "Oboe.js ajaxes in json, giving you the objects that you care about without waiting for the whole request to finish",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./runTests.sh"
   },
-  "repository": "",
+  "repository": "https://github.com/jimhigson/oboe.js.git",
   "keywords": [
     "json",
     "parser",
