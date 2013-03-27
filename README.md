@@ -1,7 +1,7 @@
 **Oboe.js** is an asynchronous, progressive json parser built on top of
 [clarinet](https://github.com/dscape/clarinet).
 It provides an intuitive interface to read an ajax responsewhile the request is still
-ongoing and gzips down to about **3.5k**.
+ongoing and gzips down to about **3.8k**.
 
 # Purpose
 
@@ -18,9 +18,10 @@ Think of it as the json equivalent of old-style oboe html rendering.
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[quite well tested](src/test/cases/oboeTest.js) and has proven stable enough for
-production applications. The codebase is small and hackable and it works. Try it, 
-let me know how it goes.
+[quite](src/test/cases/oboeTest.js) [well](src/test/cases/pathsTest.js)
+tested and has proven stable enough for production applications. The 
+codebase is small and hackable and it works. Try it, let me know how
+it goes.
 
 Old browsers might not be so well supported but it should be easy enough to branch and 
 build support in if you need it.
@@ -54,7 +55,7 @@ since we're going to ignore them anyway:
 
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('//foods/*', function( foodThing ){
+   .onFind('foods.*', function( foodThing ){
       // this callback will be called everytime a new object is found in the 
       // foods array. In this example we just use jQuery to set up some simple DOM:
       $('#foods')
@@ -70,7 +71,7 @@ Want to listen to strings instead of objects? The syntax is just the same:
 
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('**/name', function( name ){
+   .onFind('name', function( name ){
       $('#things').append('<li>').text(name);
    });
 ```
@@ -85,10 +86,10 @@ I'll assume you already implemented a spinner
 My.App.showSpinner('#foods');
 
 oboe.fetch('/myapp/things.json')
-   .onFind('//foods/*', function( foodThing ){
+   .onFind('$.foods.*', function( foodThing ){
       $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
-   .onFind('//foods', function(){
+   .onFind('$.foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
       // above so we don't need to use the items anymore, just hide the spinner:
       My.App.hideSpinner('#foods');
@@ -106,17 +107,17 @@ possible.
 ``` js
 var currentPersonDiv;
 oboe.fetch('//people.json')
-   .onPath('//people/*', function(){
+   .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
       personDiv = $('<div class="person">');
       $('#people').append(personDiv);
    })
-   .onPath('//people/name', function( name ){
+   .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
       currentPersonDiv.append('<span class="name"> + name + </span>');
    })
-   .onPath('//people/email', function( email ){
+   .onPath('people.*.email', function( email ){
       // we just found out that person's name, lets add it to their div:
       currentPersonDiv.append('<span class="email"> + email + </span>');
    })
@@ -129,18 +130,18 @@ give any further callbacks no matter what is in the rest of the json.
  
 ``` js
 var currentPersonDiv;
-oboe.fetch('//people.json')
-   .onPath('//people/*', function(){
+oboe.fetch('people.json')
+   .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
       personDiv = $('<div class="person">');
       $('#people').append(personDiv);
    })
-   .onPath('//people/name', function( name ){
+   .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
       currentPersonDiv.append('<span class="name"> + name + </span>');
    })
-   .onError('//people/email', function( email ){
+   .onError(function( email ){
       // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
       currentPersonDiv.remove();
    })
@@ -174,7 +175,7 @@ the top level objects in the json response can arrive in any order:
 }
 
 oboe.fetch('http://mysocialsite.example.com/homepage.json')
-   .onFind('//*', function( moduleJson, path ){
+   .onFind('$.*', function( moduleJson, path ){
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
@@ -185,31 +186,30 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
 
 # Pattern matching
 
-Oboe's pattern matching recognises these special tokens:
+Oboe's pattern matching is a subset of [JSONPath](http://goessner.net/articles/JsonPath)
+and closely resembles the normal syntax for descending into sub-objects parsed
+from Json.
 
-`//` root json object  
-`/`  path separator  
-`*`  any named node in the path  
-`**` any number of intermediate nodes (non-greedy)  
+`$` root json object  
+`.`  path separator  
+`*`  any named element  
+`..` any number of intermediate nodes (non-greedy)
+
+It is possible that the rest of JSONPath could be added later.  
 
 ## Some Example patterns:
 
 ```
-//foods/colour           // the colours of the foods
+$.foods.colour           // the colours of the foods
 **/person/emails/1       // the first element in the email array for each person
-**/person                // all people in the json
-**/person/friends/*/name // detecting links in social network
-**/person/**/email       // email anywhere as descendent of a person object
-//                       // the root object (once the whole document is ready, like JSON.parse())
+person                   // all people in the json
+person.friends.*.name    // detecting links in social network
+person/**/email          // email anywhere as descendent of a person object
 *                        // every object, string, number etc in the json!
+$                        // the root object (fired when the whole json is available, like JSON.parse())
 ```
 
 Internally the patterns are converted into regular expressions
-
-## Use as a stream in node.js
-
-**Clarinet** supports use as a node stream. This hasn't been implemented in
-Oboe but it should be quite easy to do.
 
 ## Getting the most from oboe
 
@@ -217,6 +217,11 @@ Asynchronous parsing is better if the data is written out progressively from the
 (think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're *sending
 and parsing* everything at the earliest possible oppotunity. If you can, send small bits of the
 json as soon as it is ready instead of waiting before everything is ready to start sending.
+
+## Use as a stream in node.js
+
+**Clarinet** supports use as a node stream. This hasn't been implemented in
+Oboe but it should be quite easy to do.
 
 # Running the tests
 
