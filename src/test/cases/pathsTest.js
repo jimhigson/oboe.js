@@ -48,6 +48,18 @@
             .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
       }
       
+   ,  testAncestorOfRootRelationshipCanBeImplicit: function() {
+         givenAPattern('foo')
+             .thenShouldNotMatch(   [])         
+            .thenShouldMatch(       ['foo'])      
+            .thenShouldMatch(       ['a', 'foo'])
+            .thenShouldNotMatch(    ['a', 'foo', 'a'])            
+            .thenShouldMatch(       ['a', 'foo', 'foo'])
+            .thenShouldMatch(       ['a', 'a', 'foo'])
+            .thenShouldNotMatch(    ['a', 'a', 'foot'])            
+            .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
+      }      
+      
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
          givenAPattern('$..foo.bar')
              .thenShouldNotMatch(   [])         
@@ -58,6 +70,17 @@
             .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'bar'])
             .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
       }
+      
+   ,  testMatchingTwoNamedAncestorsOfImpliedRootWorks: function() {
+         givenAPattern('foo.bar')
+             .thenShouldNotMatch(   [])         
+            .thenShouldNotMatch(    ['foo'])      
+            .thenShouldNotMatch(    ['a', 'foo'])
+            .thenShouldMatch(       ['a', 'foo', 'bar'])            
+            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
+            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'bar'])
+            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
+      }      
       
    ,  testMatchingTwoNamedAncestorsSeperatedByStar: function() {
          givenAPattern('$..foo.*.bar')

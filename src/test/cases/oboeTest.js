@@ -1,10 +1,14 @@
 
 /*
    BDD-style test cases for the oboe progressive parser.
+   
+   Since the path matching is already separately tested
+   and not stubbed, this isn't really a unit test here.
 
    Uses sinon.js for stubs
 
-   Runs using JS Test Driver.
+   Runs using JS Test Driver directly, or using the runtests.sh
+   shell script.
 
  */
 
@@ -301,7 +305,7 @@ TestCase("oboeTest", {
    }
 
 
-,  testCanDetectAtMultipleDepthsUsingDoubleStar: function() {
+,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$..find')
@@ -326,6 +330,32 @@ TestCase("oboeTest", {
          ,   foundNMatches(5)
          );
    }
+   
+,  testCanDetectAtMultipleDepthsUsingImpliedAncestorOfRootRelationship: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('find')
+         .whenGivenInput({
+
+            array:[
+               {find:'first_find'}
+            ,  {padding:{find:'second_find'}, find:'third_find'}
+            ]
+         ,  find: {
+               find:'fourth_find'
+            }
+
+         })
+         .thenTheParser(
+             matched('first_find').atPath(['array',0,'find'])
+         ,   matched('second_find').atPath(['array',1,'padding','find'])
+         ,   matched('third_find').atPath(['array',1,'find'])
+         ,   matched('fourth_find').atPath(['find','find'])
+         ,   matched({find:'fourth_find'}).atPath(['find'])
+
+         ,   foundNMatches(5)
+         );
+   }   
 
 ,  testMatchesNestedAdjacentSelector: function() {
 
@@ -351,7 +381,7 @@ TestCase("oboeTest", {
                );
    }
 
-,  testMatchesNestedSelectorSeparatedByASingleStar: function() {
+,  testMatchesNestedSelectorSeparatedByASingleStarSelector: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$..foods.*.name')
