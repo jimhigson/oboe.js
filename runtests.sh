@@ -33,4 +33,4 @@ echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-minified.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset &&
 
 mv oboe.concat.js oboe.js &&
-gzip oboe.js --stdout > oboe.min.js.gz
+gzip -9 oboe.min.js --stdout > oboe.min.js.gz
