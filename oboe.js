@@ -794,7 +794,7 @@ var oboe = (function(oboe){
          oboe._errorListeners.forEach( function( listener ) {
             listener();
          });
-         
+            
          // errors are not recoverable so discard all listeners, they shouldn't be called again:
          oboe._thingFoundListeners = [];
          oboe._pathMatchedListeners = [];
@@ -811,17 +811,17 @@ var oboe = (function(oboe){
          clarinetParser.onerror = null;            
       };
    }
-   
+      
    OboeParser.prototype.fetch = function(url) {
-   
+
       // TODO: in if in node, use require('http') instead
       // of ajax
-   
+
       streamingXhr.fetch(url, this.read.bind(this));
-   
+
       return this;
    };
-   
+
    /**
     * returns a function which tests if a listener is interested in the given path
     */
@@ -829,14 +829,14 @@ var oboe = (function(oboe){
    
       return function( listener ) {
          return listener.pattern.test( path );         
-      }; 
-   }
+      };
+   } 
    
    /**
     * notify any of the listeners that are interested in the path.       
     */  
    function notifyListeners ( listenerList, foundNode, path ) {
-   
+
       listenerList.filter(matchesPath(path))
          .forEach( function(listener) {
              var context = listener.context || window;
@@ -844,17 +844,17 @@ var oboe = (function(oboe){
              listener.callback.call(context, foundNode, path );               
          });
    }
-   
+
    /**
     * called when there is new text to parse
-    *
+    * 
     * @param {String} nextDrip
     */
    OboeParser.prototype.read = function (nextDrip) {
       this._clarinet.write(nextDrip);
    };
-   
-   
+
+
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
@@ -865,7 +865,18 @@ var oboe = (function(oboe){
          context: context
       });
    }
+
+   /**
+    * 
+    * @param listenerMap
+    */
+   function pushListeners(listenerList, listenerMap) {
+      for( var path in listenerMap ) {
+         pushListener(listenerList, path, listenerMap[path]);
+      }
+   }
    
+
    /**
     * Add a new json path to the parser, to be called as soon as the path is found, but before we know
     * what value will be in there.
@@ -885,11 +896,15 @@ var oboe = (function(oboe){
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
-   
-      pushListener(this._pathMatchedListeners, jsonPath, callback, context);
+
+      if( typeof jsonPath === 'string' ) {
+         pushListener(this._pathMatchedListeners, jsonPath, callback, context);
+      } else {
+         pushListeners(this._pathMatchedListeners, jsonPath);
+      }
       return this;
    };
-   
+
    /**
     * Add a new json path to the parser, which will be called when a value is found at the given path
     *
@@ -904,7 +919,7 @@ var oboe = (function(oboe){
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
-   
+
       pushListener(this._thingFoundListeners, jsonPath, callback, context);
       return this;
    };
@@ -915,12 +930,11 @@ var oboe = (function(oboe){
     * @param {Function} callback
     */
    OboeParser.prototype.onError = function (callback) {
-   
+
       this._errorListeners.push(callback);
       return this;
    };
    
    return oboe;
-   
-})( typeof exports === "undefined" ? {} : exports );
-window.oboe = oboe; })();
+
+})( typeof exports === "undefined" ? {} : exports );window.oboe = oboe; })();
