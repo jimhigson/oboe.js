@@ -3,21 +3,34 @@ module.exports = function (grunt) {
    grunt.initConfig({
 
       pkg:grunt.file.readJSON("package.json")
-   ,  requirejs:{
-         compile:{
-            options:{
-               optimize:'none',
-               baseUrl:"src/main/", 
-               out:"oboe.js", 
-               name:"oboe"
-            }
+      
+   ,  concat: {
+         oboe:{         
+            src: [
+               'src/main/libs/clarinet.js'
+            ,  'src/main/streamingXhr.js'
+            ,  'src/main/paths.js'
+            ,  'src/main/oboe.js'
+            ],
+            dest: 'oboe.concat.js'
          }
       }
       
+   ,  wrap: {
+         export: {
+            src: 'oboe.concat.js',
+            dest: '.',
+            wrapper: [
+               '(function () {'
+            ,  'window.oboe = oboe; })();'
+            ]
+         }
+      }      
+            
    ,  uglify: {
          build:{
             files:{
-               'oboe.min.js': 'oboe.js'
+               'oboe.min.js': 'oboe.concat.js'
             }
          }
       }
@@ -32,13 +45,14 @@ module.exports = function (grunt) {
 
    });
 
-   grunt.loadNpmTasks('grunt-contrib-requirejs');
+   grunt.loadNpmTasks('grunt-contrib-concat');
+   grunt.loadNpmTasks('grunt-wrap');
    grunt.loadNpmTasks('grunt-contrib-uglify');   
    grunt.loadNpmTasks('grunt-jstestdriver');   
 
    grunt.registerTask('devtest', ['jstestdriver']);
-   grunt.registerTask('build', ['requirejs']);
+   grunt.registerTask('build', ['concat:oboe']);
    grunt.registerTask('minify', ['uglify']);   
-   grunt.registerTask('default', ['requirejs', 'uglify']);
+   grunt.registerTask('default', ['concat:oboe', 'wrap:export', 'uglify']);
 
 };

@@ -1,5 +1,5 @@
 
-;(function (paths) {
+var paths = (function (paths) {
 
    paths.compile = function( jsonPath ){
         
@@ -54,14 +54,6 @@
       };      
    };    
    
-})(typeof exports === "undefined" ? paths = {} : exports);
-
-var jsonPath = '';
-var regexPattern = jsonPath
-            .replace(/\w+/g, '$&(\\b|$)')
-            .replace(/\*\*/g, '__any__')
-            .replace(/\*/g, '(//|[^\\/]+?)')
-            .replace(/\/\//, '^\\/\\/')
-            .replace(/__any__/g, '.*?');
-            
-regexPattern += '$';                  
+   return paths;
+   
+})( typeof exports === "undefined" ? {} : exports );
