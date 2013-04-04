@@ -26,6 +26,23 @@ TestCase("oboeTest", {
          );
 
    }
+   
+,  testGivesWindowAsContextWhenNothingGivenExplicitly: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$')
+         .whenGivenInput('{}')
+         .thenTheParser( calledbackWithContext(window) );
+   }
+   
+,  testCallsOnGivenContext: function() {
+      var myObject = { doSomething: function(){} };
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$', myObject.doSomething, myObject)
+         .whenGivenInput('{}')
+         .thenTheParser( calledbackWithContext(myObject) );
+   }   
 
 ,  testFindOnlyFiresWhenHasWholeObject: function() {
 
@@ -456,30 +473,36 @@ function givenAParser() {
           // However, we want to preserve the arguments given at the time of calling, because they might subsequently
           // be changed inside the parser so everything gets cloned before going to the stub
 
-          stub = sinon.stub(), //erk: only one callback stub per Asserter right now :-s
+          spiedCallback, //erk: only one callback stub per Asserter right now :-s
 
-          callback = function(){
+          wrappedCallback = function(){
             var clones = [];
 
             for (var i = 0; i < arguments.length; i++) {
                clones.push(JSON.parse( JSON.stringify(arguments[i]) ));
             }
 
-            stub.apply( null, clones );
+            spiedCallback.apply( this, clones );
           };
 
-      this.andWeAreListeningForThingsFoundAtPattern = function(pattern) {
-         parser.onFind(pattern, callback);
+      this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
+         spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
+      
+         parser.onFind(pattern, wrappedCallback, scope);
          return this;
       };
 
-      this.andWeAreListeningForMatchesToPattern = function(pattern) {
-         parser.onPath(pattern, callback);
+      this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
+         spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
+      
+         parser.onPath(pattern, wrappedCallback, scope);
          return this;
       };
       
       this.andWeAreListeningForErrors = function() {
-         parser.onError(callback);
+         spiedCallback = sinon.stub();
+         
+         parser.onError(wrappedCallback);
          return this;
       };      
 
@@ -495,7 +518,7 @@ function givenAParser() {
       this.thenTheParser = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
             var fn = arguments[i];
-            fn(stub);
+            fn(spiedCallback);
          }
 
          return this;
@@ -520,17 +543,26 @@ var foundOneMatch = foundNMatches(1),
     calledCallbackOnce = foundNMatches(1),    
     foundNoMatches = foundNMatches(0);
 
+function calledbackWithContext(callbackScope) {
+   return function(callbackStub) {
+      if(!callbackStub.calledOn(callbackScope)){
+         fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
+            callbackStub.getCall(0).thisValue);
+      }   
+   };
+}
+
 // higher-level function to create assertions. Pass output to Asserter#thenTheParser
 // test what was matched
 function matched(obj) {
-   function testRightObject( callback ) {
-      if(!callback.calledWith(obj)) {
+   function testRightObject( callbackStub ) {
+      if(!callbackStub.calledWith(obj)) {
 
          fail( "was not called with the object " +  JSON.stringify(obj) + "\n" +
              "objects that I got are:" +
-             JSON.stringify(callback.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
+             JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
              "all calls were with:" +
-             JSON.stringify(callback.args));
+             JSON.stringify(callbackStub.args));
 
       }
    }
@@ -541,18 +573,18 @@ function matched(obj) {
          path = path.split(',');
       }
 
-      return function(callback) {
+      return function(callbackStub) {
 
-         testRightObject(callback);
+         testRightObject(callbackStub);
 
-         if(!callback.calledWithMatch(obj, path)) {
+         if(!callbackStub.calledWithMatch(obj, path)) {
             fail( "was not called with the path " +  JSON.stringify(path) + "\n" +
                 "paths that I have are:\n" +
-                callback.args.map(function(callArgs){
+                callbackStub.args.map(function(callArgs){
                   return "\t" + JSON.stringify(callArgs[1]) + "\n";
                 }) + "\n" +
                 "all calls were with:" +
-                JSON.stringify(callback.args));
+                JSON.stringify(callbackStub.args));
          }
       }
    };

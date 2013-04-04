@@ -860,8 +860,9 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
 
          listenerList.filter(matchesPath(path))
             .forEach( function(listener) {
-
-               listener.callback( foundNode, path );               
+                var context = listener.context || window;
+                
+                listener.callback.call(context, foundNode, path );               
             });
       }
 
@@ -878,10 +879,11 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
       /**
        * @returns {*} an identifier that can later be used to de-register this listener
        */
-      function pushListener(listenerList, jsonPath, callback) {
+      function pushListener(listenerList, jsonPath, callback, context) {
          return listenerList.push({
             pattern: paths.compile(jsonPath),
-            callback: callback
+            callback: callback,
+            context: context
          });
       }
 
@@ -901,10 +903,11 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
        *          ..               - any number of intermediate nodes (non-greedy)
        *
        * @param {Function} callback
+       * @param {Object} [context] the scope for the callback
        */
-      OboeParser.prototype.onPath = function (jsonPath, callback) {
+      OboeParser.prototype.onPath = function (jsonPath, callback, context) {
 
-         pushListener(this._pathMatchedListeners, jsonPath, callback);
+         pushListener(this._pathMatchedListeners, jsonPath, callback, context);
          return this;
       };
 
@@ -919,10 +922,11 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
        *          **                - any number of intermediate nodes (non-greedy)
        *
        * @param {Function} callback
+       * @param {Object} [context] the scope for the callback
        */
-      OboeParser.prototype.onFind = function (jsonPath, callback) {
+      OboeParser.prototype.onFind = function (jsonPath, callback, context) {
 
-         pushListener(this._thingFoundListeners, jsonPath, callback);
+         pushListener(this._thingFoundListeners, jsonPath, callback, context);
          return this;
       };
       
