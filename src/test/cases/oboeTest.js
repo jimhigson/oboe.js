@@ -469,40 +469,43 @@ function givenAParser() {
 
       var parser = oboe.parser(),
 
-          // sinon stub is only really used to record arguments given.
-          // However, we want to preserve the arguments given at the time of calling, because they might subsequently
-          // be changed inside the parser so everything gets cloned before going to the stub
+          spiedCallback; //erk: only one callback stub per Asserter right now :-s
 
-          spiedCallback, //erk: only one callback stub per Asserter right now :-s
 
-          wrappedCallback = function(){
+      /** sinon stub is only really used to record arguments given.
+       *  However, we want to preserve the arguments given at the time of calling, because they might subsequently
+       *  be changed inside the parser so everything gets cloned before going to the stub 
+       */
+      function cloningCallback(delegateCallback) {
+         return function(){
             var clones = [];
 
             for (var i = 0; i < arguments.length; i++) {
                clones.push(JSON.parse( JSON.stringify(arguments[i]) ));
             }
 
-            spiedCallback.apply( this, clones );
-          };
+            delegateCallback.apply( this, clones );
+         };
+      }
 
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         parser.onFind(pattern, wrappedCallback, scope);
+         parser.onFind(pattern, cloningCallback(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
-         parser.onPath(pattern, wrappedCallback, scope);
+         parser.onPath(pattern, cloningCallback(spiedCallback), scope);
          return this;
       };
       
       this.andWeAreListeningForErrors = function() {
          spiedCallback = sinon.stub();
          
-         parser.onError(wrappedCallback);
+         parser.onError(cloningCallback(spiedCallback));
          return this;
       };      
 
