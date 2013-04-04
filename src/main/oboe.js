@@ -201,6 +201,17 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
       }
 
       /**
+       * 
+       * @param listenerMap
+       */
+      function pushListeners(listenerList, listenerMap) {
+         for( var path in listenerMap ) {
+            pushListener(listenerList, path, listenerMap[path]);
+         }
+      }
+      
+
+      /**
        * Add a new json path to the parser, to be called as soon as the path is found, but before we know
        * what value will be in there.
        *
@@ -220,10 +231,14 @@ require(['libs/clarinet', 'streamingXhr', 'paths'], function(clarinet, streaming
        */
       OboeParser.prototype.onPath = function (jsonPath, callback, context) {
 
-         pushListener(this._pathMatchedListeners, jsonPath, callback, context);
+         if( typeof jsonPath === 'string' ) {
+            pushListener(this._pathMatchedListeners, jsonPath, callback, context);
+         } else {
+            pushListeners(this._pathMatchedListeners, jsonPath);
+         }
          return this;
       };
-
+      
       /**
        * Add a new json path to the parser, which will be called when a value is found at the given path
        *

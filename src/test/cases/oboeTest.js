@@ -107,6 +107,21 @@ TestCase("oboeTest", {
             foundOneMatch
          );
    }
+   
+/*,  testAllowsMultiplePathsToBeListenedToInOneCall: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern(
+          {
+               'a':function(){}
+          ,    'b':function(){}
+          })
+         .whenGivenInput({a:'A', b:'B'})
+         .thenTheParser(
+            matched("s"),
+            foundOneMatch
+         );
+   } */   
 
 ,  testNotifiesOfPathForOfPropertyNameWithIncompleteJson: function() {
 
@@ -476,36 +491,40 @@ function givenAParser() {
        *  However, we want to preserve the arguments given at the time of calling, because they might subsequently
        *  be changed inside the parser so everything gets cloned before going to the stub 
        */
-      function cloningCallback(delegateCallback) {
+      function argumentClone(delegateCallback) {
          return function(){
-            var clones = [];
-
-            for (var i = 0; i < arguments.length; i++) {
-               clones.push(JSON.parse( JSON.stringify(arguments[i]) ));
+         
+            function clone(original){
+               return JSON.parse( JSON.stringify( original ) );
             }
-
-            delegateCallback.apply( this, clones );
+            function toArray(args) {
+               return Array.prototype.slice.call(args);
+            }
+            
+            var cloneArguments = toArray(arguments).map(clone);
+            
+            delegateCallback.apply( this, cloneArguments );
          };
       }
 
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         parser.onFind(pattern, cloningCallback(spiedCallback), scope);
+         parser.onFind(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
-         parser.onPath(pattern, cloningCallback(spiedCallback), scope);
+         parser.onPath(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
       
       this.andWeAreListeningForErrors = function() {
          spiedCallback = sinon.stub();
          
-         parser.onError(cloningCallback(spiedCallback));
+         parser.onError(argumentClone(spiedCallback));
          return this;
       };      
 
@@ -518,6 +537,9 @@ function givenAParser() {
          return this;
       };
 
+      /**
+       * Assert any number of conditions were met on the spied callback
+       */
       this.thenTheParser = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
             var fn = arguments[i];
