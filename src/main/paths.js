@@ -33,22 +33,12 @@ var paths = (function (paths) {
                + '$'
                                                    
       ,   regex = new RegExp(regexPattern);                  
-
-      console.log('______________');
-      console.log('jsonPath', jsonPath);                  
-      console.log('tokens', tokens);                  
-      console.log('regexPattern', regexPattern);                  
                   
       return {
          test: function(path) {
          
             var stringPath = '%root%' + path.join('.');         
-
-            console.log('_____');         
-            console.log( path );
-            console.log('stringPath', stringPath);
-            console.log('result', regex.test(stringPath) );  
-         
+           
             return !!regex.test(stringPath);            
          }
       };      

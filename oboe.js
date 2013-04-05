@@ -646,11 +646,6 @@ var paths = (function (paths) {
                + '$'
                                                    
       ,   regex = new RegExp(regexPattern);                  
-
-      console.log('______________');
-      console.log('jsonPath', jsonPath);                  
-      console.log('tokens', tokens);                  
-      console.log('regexPattern', regexPattern);                  
                   
       return {
          test: function(path) {
@@ -659,7 +654,9 @@ var paths = (function (paths) {
 
             console.log('_____');         
             console.log( path );
+            console.log('jsonPath', jsonPath);
             console.log('stringPath', stringPath);
+            console.log('regex', regex);             
             console.log('result', regex.test(stringPath) );  
          
             return !!regex.test(stringPath);            
