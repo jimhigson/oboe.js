@@ -651,14 +651,7 @@ var paths = (function (paths) {
          test: function(path) {
          
             var stringPath = '%root%' + path.join('.');         
-
-            console.log('_____');         
-            console.log( path );
-            console.log('jsonPath', jsonPath);
-            console.log('stringPath', stringPath);
-            console.log('regex', regex);             
-            console.log('result', regex.test(stringPath) );  
-         
+           
             return !!regex.test(stringPath);            
          }
       };      
@@ -819,20 +812,20 @@ var oboe = (function(oboe){
       return this;
    };
 
-   /**
-    * returns a function which tests if a listener is interested in the given path
-    */
-   function matchesPath( path ) {
-   
-      return function( listener ) {
-         return listener.pattern.test( path );         
-      };
-   } 
    
    /**
     * notify any of the listeners that are interested in the path.       
     */  
    function notifyListeners ( listenerList, foundNode, path ) {
+
+      /**
+       * returns a function which tests if a listener is interested in the given path
+       */
+      function matchesPath( path ) {      
+         return function( listener ) {
+            return listener.pattern.test( path );         
+         };
+      } 
 
       listenerList.filter(matchesPath(path))
          .forEach( function(listener) {
@@ -905,19 +898,19 @@ var oboe = (function(oboe){
    /**
     * Add a new json path to the parser, which will be called when a value is found at the given path
     *
-    * @param {String} jsonPath
-    *    supports these special meanings:
-    *          //                - root json object
-    *          /                 - path separator
-    *          *                 - any named node in the path
-    *          **                - any number of intermediate nodes (non-greedy)
+    * @param {String} jsonPath supports the same syntax as .onPath.
     *
     * @param {Function} callback
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
 
-      pushListener(this._thingFoundListeners, jsonPath, callback, context);
+      if( typeof jsonPath === 'string' ) {
+         pushListener(this._thingFoundListeners, jsonPath, callback, context);
+      } else {
+         pushListeners(this._thingFoundListeners, jsonPath);
+      }
+
       return this;
    };
    
