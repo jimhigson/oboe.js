@@ -371,24 +371,11 @@ TestCase("oboeTest", {
 
             array:[
                {find:'first_find'}
-            ,  {padding:{find:'second_find'}, find:'third_find'}
             ]
-         ,  find: {
-               find:'fourth_find'
-            }
-
          })
          .thenTheParser(
              matched('first_find')
-               .withParent(      {find:'first_find'} )
-               .withGrandparent( [{find:'first_find'}] )
-               
-         /*,   matched('second_find').atPath(['array',1,'padding','find'])
-         ,   matched('third_find').atPath(['array',1,'find'])
-         ,   matched('fourth_find').atPath(['find','find'])
-         ,   matched({find:'fourth_find'}).atPath(['find']) */
-
-         ,   foundNMatches(5)
+               .withParent( {find:'first_find'} )
          );
    }   
    
@@ -649,13 +636,26 @@ function matched(obj) {
          return this;   
       }
       
-   ,  withParent: function( callbackStub ) {
+   ,  withParent: function( parentElement ) {
          var oldAssertion = this.testAgainst;
          
          this.testAgainst = function( callbackStub ){
             oldAssertion.apply(this, arguments);
             
-            // just let it pass for now            
+            var parentMatcher = sinon.match(function (array) {
+                try{
+                  assertEquals( parentElement, array[array.length-1] );
+                } catch(_e){
+                  return false;
+                }
+                return true;
+            }, "had the right parent");
+            
+            if(!callbackStub.calledWithMatch(sinon.match.any, sinon.match.any, parentMatcher)) {
+               fail( "was not called with the parent object" +  JSON.stringify(parentElement) +
+                   "all calls were with:" +
+                   JSON.stringify(callbackStub.args));
+            }            
          };
          
          return this;

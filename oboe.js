@@ -706,7 +706,7 @@ var oboe = (function(oboe){
    
    
       clarinetParser.onkey = function (nextKey) {
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey));
+         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
@@ -714,7 +714,7 @@ var oboe = (function(oboe){
          // onvalue is only called by clarinet for non-structured values
          // (ie, not arrays or objects).
    
-         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey));
+         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
             curNode.push(value);
@@ -729,8 +729,8 @@ var oboe = (function(oboe){
    
          var newObj = {};
    
-         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack);
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey));
+         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
    
          if( curNode ) {
             curNode[curKey] = newObj;
@@ -756,7 +756,7 @@ var oboe = (function(oboe){
          nodeStack.push(newArray);
          pathStack.push(curKey);
    
-         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack);
+         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack, nodeStack);
    
          curKey = 0;
       };
@@ -765,7 +765,7 @@ var oboe = (function(oboe){
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
    
-         notifyListeners(oboe._thingFoundListeners, curNode, pathStack);
+         notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
    
          nodeStack.pop();
          pathStack.pop();
@@ -816,7 +816,7 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, foundNode, path ) {
+   function notifyListeners ( listenerList, foundNode, path, ancestors ) {
 
       /**
        * returns a function which tests if a listener is interested in the given path
@@ -831,7 +831,7 @@ var oboe = (function(oboe){
          .forEach( function(listener) {
              var context = listener.context || window;
              
-             listener.callback.call(context, foundNode, path );               
+             listener.callback.call(context, foundNode, path, ancestors );               
          });
    }
 
