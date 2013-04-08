@@ -713,14 +713,13 @@ var oboe = (function(oboe){
       clarinetParser.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
          // (ie, not arrays or objects).
-   
+
+         curNode[curKey] = value;   
          notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
-            curNode.push(value);
             curKey++;
          } else {
-            curNode[curKey] = value;
             curKey = null;
          }
    

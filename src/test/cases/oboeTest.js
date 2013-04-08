@@ -371,11 +371,22 @@ TestCase("oboeTest", {
 
             array:[
                {find:'first_find'}
+            ,  {padding:{find:'second_find'}, find:'third_find'}
             ]
+         ,  find: {
+               find:'fourth_find'
+            }
+
          })
          .thenTheParser(
              matched('first_find')
                .withParent( {find:'first_find'} )
+               .withGrandparent( [{find:'first_find'}] )
+               
+         /*,   matched('second_find').atPath(['array',1,'padding','find'])
+         ,   matched('third_find').atPath(['array',1,'find'])
+         ,   matched('fourth_find').atPath(['find','find'])
+         ,   matched({find:'fourth_find'}).atPath(['find']) */
          );
    }   
    
@@ -636,7 +647,7 @@ function matched(obj) {
          return this;   
       }
       
-   ,  withParent: function( parentElement ) {
+   ,  withParent: function( parentObject ) {
          var oldAssertion = this.testAgainst;
          
          this.testAgainst = function( callbackStub ){
@@ -644,15 +655,15 @@ function matched(obj) {
             
             var parentMatcher = sinon.match(function (array) {
                 try{
-                  assertEquals( parentElement, array[array.length-1] );
+                  assertEquals( parentObject, array[array.length-1] );
                 } catch(_e){
                   return false;
                 }
                 return true;
             }, "had the right parent");
             
-            if(!callbackStub.calledWithMatch(sinon.match.any, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the parent object" +  JSON.stringify(parentElement) +
+            if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
+               fail( "was not called with the parent object" +  JSON.stringify(parentObject) +
                    "all calls were with:" +
                    JSON.stringify(callbackStub.args));
             }            
@@ -661,13 +672,26 @@ function matched(obj) {
          return this;
       }
       
-   ,  withGrandparent: function( callbackStub ) {
+   ,  withGrandparent: function( grandparentObject ) {
          var oldAssertion = this.testAgainst;
          
          this.testAgainst = function( callbackStub ){
             oldAssertion.apply(this, arguments);
             
-            // just let it pass for now            
+            var parentMatcher = sinon.match(function (array) {
+                try{
+                  assertEquals( grandparentObject, array[array.length-2] );
+                } catch(_e){
+                  return false;
+                }
+                return true;
+            }, "had the right grandparent");
+            
+            if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
+               fail( "was not called with the grand parent object" +  JSON.stringify(grandparentObject) +
+                   "all calls were with:" +
+                   JSON.stringify(callbackStub.args));
+            }            
          };
          
          return this;
