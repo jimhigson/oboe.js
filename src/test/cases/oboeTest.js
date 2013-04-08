@@ -387,9 +387,12 @@ TestCase("oboeTest", {
                .withParent({find:'second_find'})
                .withGrandparent({padding:{find:'second_find'}})
                
-         /*,   matched('third_find').atPath(['array',1,'find'])
-         ,   matched('fourth_find').atPath(['find','find'])
-         ,   matched({find:'fourth_find'}).atPath(['find'])*/
+         ,   matched('third_find')
+              .withParent({padding:{find:'second_find'}, find:'third_find'})
+              .withGrandparent([
+                    {find:'first_find'}
+                 ,  {padding:{find:'second_find'}, find:'third_find'}
+                 ])                          
          );
    }   
    
