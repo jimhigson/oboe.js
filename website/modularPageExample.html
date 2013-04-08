@@ -12,7 +12,7 @@
 
 </head>
 
-<body class="modularPage" ng-app>
+<body class="modularPage">
 
    <h1>An example page modular webpage</h1>
    
@@ -20,76 +20,44 @@
       It doesn't really do anything but it looks like a lot of websites.
    </h2>
    
-   <section>
-      <section data-module="barChart">
-         <header>Bar Chart</header>
-         <p>Here is a bar chart with some bars on it:</p>
-      </section>
+   <div class="content">
+      <div class="mainContent">
+         <section data-module="barChart">
+            <header>Bar Chart</header>
+            <p>Here is a bar chart with some bars on it:</p>
+         </section>
+         
+         <section data-module="imageSlider">
+            <header>Images</header>
+            <p>Here are some images in a slider thing::</p>
+         </section>
+         
+         <section data-module="map">
+            <header>API Map</header>
+            <p>Here is a map with some points loaded onto it:</p>
+         </section>
+      </div>
       
-      <section data-module="imageSlider">
-         <header>Images</header>
-         <p>Here are some images in a slider thing::</p>
-      </section>
-      
-      <section data-module="map">
-         <header>API Map</header>
-         <p>Here is a map with some points loaded onto it:</p>
-      </section>
-   </section>
-   
-   <section data-module="tables" data-template="TableTemplate">
-      <header>Table</header>
-      <p>Here is a table:</p>
-      <h2 class="data-cloak">{{heading}}</h2>      
-           
-      <table class="data-cloak">
-         <tbody data-repeat="row in data">
-            <tr><th>{{row.heading}}</th><td>{{row.value}}</td></tr>
-         </tbody>
-      </table>
-   </section>
+      <div class="secondaryContent">
+         <section data-module="tables" id="TableTemplate">
+            <header>Table</header>
+            <p>Here is a table:</p>
+            <h2 class="data-cloak">{{heading}}</h2>      
+                 
+            <table class="data-cloak">
+               <tbody data-repeat="row in data">
+                  <tr><th>{{row.heading}}</th><td>{{row.value}}</td></tr>
+               </tbody>
+            </table>
+         </section>
+      </div>
+   </div>
 
+   <script src="components/jquery/jquery.min.js"></script>
    <script src="modularPageExampleData.js" type="text/javascript" ></script>
    <script src="libs/soma-template.js" type="text/javascript" ></script>
    <script src="../oboe.js" type="text/javascript" ></script>
-   <script>
-      var parser = oboe.parser();            
-   
-      function renderTemplateWithNewData( template, scope, fieldName ) {
-         return function(data) {
-            scope[fieldName] = data;
-            template.render();
-         }
-      }
-   
-      function TableTemplate(template, scope){
-         parser.onFind({
-         
-            '$.table.heading' : renderTemplateWithNewData( template, scope, 'heading' )            
-         ,  '$.table.data':     renderTemplateWithNewData( template, scope, 'data' )
-         });         
-      }
-   
-      function expandJsonTemplate( template ) {
-                  
-         return template;
-         // TODO: expand examples out
-         // TODO: ramdomise the order.
-      }
-      
-      function loadThrottled(parser, exampleData) {
-         parser.read(exampleData);
-      }
-   
-      // some time later, let's start reading:
-      window.setTimeout(function(){
-         // pretend to fetch in the data:
-         var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
-      
-         loadThrottled(parser, exampleJsonResponse);
-      }, 1000);
-                  
-   </script>
+   <script src="js/modularPageOboeLoad.js"></script>
 
 </body>
 </html>

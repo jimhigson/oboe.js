@@ -3,7 +3,7 @@
     src: url(../fonts/BLOKKNeue-Regular.ttf) format("truetype");
 }
 * {
-   font-family: Blokk, Sans;
+   /*font-family: Blokk, Sans;*/
 }
 
 .data-cloak {
