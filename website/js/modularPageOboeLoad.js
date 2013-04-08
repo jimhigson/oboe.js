@@ -17,16 +17,34 @@ $(function(){
       ,  '$.table.data':     renderTemplateWithNewData( template, 'data' )
       });         
    }
-   
-   function expandJsonTemplate( template ) {
+         
+   function expandJsonTemplate( jsonTemplate ) {
                
-      return template;
+      return jsonTemplate;
       // TODO: expand examples out
-      // TODO: ramdomise the order.
+      // TODO: ramdomise the order (even though the order is non-deterministic!).
    }
    
-   function loadThrottled(parser, exampleData) {
-      parser.read(exampleData);
+   function loadThrottled(fullData, dripSize, dripInterval) {
+      
+   
+      var cursorPosition = 0;         
+         
+      var intervalId = window.setInterval(function(){
+      
+         var nextDrip = fullData.substr(cursorPosition, dripSize);         
+         
+         cursorPosition += dripSize;
+         
+         console.log('next drip is', nextDrip);
+                  
+         parser.read(nextDrip);
+         
+         if( cursorPosition >= fullData.length ) {
+            window.clearInterval(intervalId);
+         }                                                        
+
+      }, dripInterval);
    }
    
    // some time later, let's start reading:
@@ -34,7 +52,7 @@ $(function(){
       // pretend to fetch in the data:
       var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
    
-      loadThrottled(parser, exampleJsonResponse);
+      loadThrottled(exampleJsonResponse, 20, 100);
    }, 1000);
    
    setupTableTemplate('#TableTemplate');

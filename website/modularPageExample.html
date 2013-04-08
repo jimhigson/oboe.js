@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
    <meta charset="utf-8">
-   <title>HTML5 boilerplate – all you really need…</title>
+   <title>An example modular-style webpage</title>
 
    <link rel="stylesheet" href="css/modularPageExample.css">
    <!--[if IE]>
    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
    <![endif]-->
-
 
 </head>
 
@@ -22,16 +21,19 @@
    
    <div class="content">
       <div class="mainContent">
+         <!-- DOM for the bar chart module -->
          <section data-module="barChart">
             <header>Bar Chart</header>
             <p>Here is a bar chart with some bars on it:</p>
          </section>
-         
+
+         <!-- DOM for the image slider module -->         
          <section data-module="imageSlider">
             <header>Images</header>
             <p>Here are some images in a slider thing::</p>
          </section>
-         
+
+         <!-- DOM for the map module -->         
          <section data-module="map">
             <header>API Map</header>
             <p>Here is a map with some points loaded onto it:</p>
@@ -39,6 +41,8 @@
       </div>
       
       <div class="secondaryContent">
+      
+         <!-- DOM for the table module -->      
          <section data-module="tables" id="TableTemplate">
             <header>Table</header>
             <p>Here is a table:</p>
