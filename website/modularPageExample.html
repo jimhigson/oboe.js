@@ -13,14 +13,27 @@
 
 <body class="modularPage">
 
-   <h1>An example page modular webpage</h1>
+   <h1>An example page modular webpage</h1>   
    
    <h2 data-module="pageInfo">
-      It doesn't really do anything but it looks like a lot of websites.
+      It doesn't really do anything but it looks like a lot of websites. It is 
+      loosely based on <a href="sourceImages/strava.png">this screenshot</a> of 
+      <a href="http://app.strava.com/athletes/182755">My Strava profile</a>.      
    </h2>
    
    <div class="content">
       <div class="mainContent">
+         <!-- DOM for the bar chart module -->
+         <section data-module="recentAchievements">
+            <header>Recent Achievements</header>
+            <div class="awards data-cloak">
+               <div data-repeat="award in awards">
+                  <img src="//placehold.it/32x32">
+                  <a href="{{award.segment.url}}">{{award.segment.name}}</a>
+               </div>               
+            </div>
+         </section>      
+      
          <!-- DOM for the bar chart module -->
          <section data-module="barChart">
             <header>Bar Chart</header>
@@ -49,8 +62,10 @@
             <h2 class="data-cloak">{{heading}}</h2>      
                  
             <table class="data-cloak">
-               <tbody data-repeat="row in data">
-                  <tr><th>{{row.heading}}</th><td>{{row.value}}</td></tr>
+               <tbody>
+                  <tr data-repeat="row in data">
+                     <th>{{row.heading}}</th><td>{{row.value}}</td>
+                  </tr>
                </tbody>
             </table>
          </section>

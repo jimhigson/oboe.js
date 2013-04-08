@@ -8,15 +8,29 @@ $(function(){
          template.render();
       }
    }
+   function renderRepeaterTemplateWithNewItem( template, fieldName ) {
+      return function(data, _path, ancestors) {
+         template.scope[fieldName] = ancestors[ancestors.length-1];
+         template.render();
+      }
+   }   
    
-   function setupTableTemplate( cssSelector ) {
-      var template = soma.template.create($(cssSelector)[0]);
+   function setupActivityView( templateElement ) {
+      var template = soma.template.create(templateElement);
    
       parser.onFind({         
-         '$.table.heading' : renderTemplateWithNewData( template, 'heading' )            
-      ,  '$.table.data':     renderTemplateWithNewData( template, 'data' )
+         '$.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
+      ,  '$.activity.data':     renderTemplateWithNewData( template, 'data' )
       });         
    }
+   
+   function setupRecentAchievementsView( templateElement ) {
+      var template = soma.template.create(templateElement);
+   
+      parser.onFind({         
+         '$.recentAchievements.awards.*' : renderRepeaterTemplateWithNewItem( template, 'awards' )
+      });         
+   }   
          
    function expandJsonTemplate( jsonTemplate ) {
                
@@ -26,8 +40,7 @@ $(function(){
    }
    
    function loadThrottled(fullData, dripSize, dripInterval) {
-      
-   
+         
       var cursorPosition = 0;         
          
       var intervalId = window.setInterval(function(){
@@ -47,14 +60,11 @@ $(function(){
       }, dripInterval);
    }
    
-   // some time later, let's start reading:
-   window.setTimeout(function(){
-      // pretend to fetch in the data:
-      var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
    
-      loadThrottled(exampleJsonResponse, 20, 100);
-   }, 1000);
+   var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
+   loadThrottled(exampleJsonResponse, 1, 5);
    
-   setupTableTemplate('#TableTemplate');
+   setupActivityView($('#TableTemplate')[0]);
+   setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);
 
 });

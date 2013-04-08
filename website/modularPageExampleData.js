@@ -18,14 +18,51 @@ var dataTemplate =
    ,  "points"    : [
       ]   
    }      
+   
+,  "recentAchievements": {
+      "awards":[
+         {
+            "type":"Personal Record",
+            "when": "7 days ago",
+            "segment":{
+               "name": "Ditching Beacon"
+            ,  "url": "/example-link"
+            }
+         }
+      ,  {
+            "type":"Personal Record",
+            "when": "7 days ago",
+            "segment":{
+               "name": "Ditching Beacon"
+            ,  "url": "/example-link"
+            }
+         }
+      ,  {
+            "type":"Personal Record",
+            "when": "7 days ago",
+            "segment":{
+               "name": "Ditching Beacon"
+            ,  "url": "/example-link"
+            }
+         }
+      ,  {
+            "type":"Personal Record",
+            "when": "7 days ago",
+            "segment":{
+               "name": "Ditching Beacon"
+            ,  "url": "/example-link"
+            }
+         }                                    
+      ]
+      
+   }   
 
-,  "table": {
-      "heading"   :"A table of some data"
+,  "activity": {
+      "heading"   :"Activity"
    ,  "data"      : [
-         {heading:'Weight', value:'20kg'}
-      ,  {heading:'', value:''}
-      ,  {heading:'', value:''}
-      ,  {heading:'', value:''}
+         {heading:'Avg Rides / Week', value:'4'}
+      ,  {heading:'Avg Distance / Week', value:'76km'}
+      ,  {heading:'Avg Time / Week', value:'3 hr 59 m'}
       ]
    }
             
