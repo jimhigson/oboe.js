@@ -26,7 +26,7 @@ $(function(){
    
    function setupRecentAchievementsView( templateElement ) {
       var template = soma.template.create(templateElement);
-   
+      
       parser.onFind({         
          '$.recentAchievements.awards.*' : renderRepeaterTemplateWithNewItem( template, 'awards' )
       });         
