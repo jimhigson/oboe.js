@@ -246,9 +246,17 @@ TestCase("oboeTest", {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$.testArray[2][2]')
-         .whenGivenInput('{"testArray":["a","b",["x","y","this_one"]]}')
+         .whenGivenInput( {"testArray":
+                              ["a","b",
+                                 ["x","y","this_one"]
+                              ]
+                          }
+                        )
          .thenTheParser(
-             matched('this_one').atPath(['testArray',2,2])
+             matched('this_one')
+               .atPath(['testArray',2,2])
+               .withParent( ["x","y","this_one"] )
+               .withGrandparent( ["a","b", ["x","y","this_one"]] )
          ,   foundOneMatch
          );
    }     
@@ -257,13 +265,19 @@ TestCase("oboeTest", {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('..')
-         .whenGivenInput('{"a":{"b":{"c":{"d":"e"}}}}')
+         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
          .thenTheParser(
-             matched('e').atPath(['a', 'b', 'c', 'd'])
-         ,   matched({d:"e"}).atPath(['a', 'b', 'c'])
-         ,   matched({c:{d:"e"}}).atPath(['a', 'b'])
-         ,   matched({b:{c:{d:"e"}}}).atPath(['a'])
-         ,   matched({a:{b:{c:{d:"e"}}}}).atRootOfJson()
+             matched('e')
+               .atPath(['a', 'b', 'c', 'd'])
+               .withParent({d:'e'})
+         ,   matched({d:"e"})
+               .atPath(['a', 'b', 'c'])
+         ,   matched({c:{d:"e"}})
+               .atPath(['a', 'b'])
+         ,   matched({b:{c:{d:"e"}}})
+               .atPath(['a'])
+         ,   matched({a:{b:{c:{d:"e"}}}})
+               .atRootOfJson()
          ,   foundNMatches(5)
          );
    }
@@ -332,6 +346,7 @@ TestCase("oboeTest", {
          )
          .thenTheParser(
             matched(1)
+               .withParent([0,1])
          ,  foundOneMatch
          );
    }
