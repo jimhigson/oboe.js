@@ -383,10 +383,13 @@ TestCase("oboeTest", {
                .withParent( {find:'first_find'} )
                .withGrandparent( [{find:'first_find'}] )
                
-         /*,   matched('second_find').atPath(['array',1,'padding','find'])
-         ,   matched('third_find').atPath(['array',1,'find'])
+         ,   matched('second_find')
+               .withParent({find:'second_find'})
+               .withGrandparent({padding:{find:'second_find'}})
+               
+         /*,   matched('third_find').atPath(['array',1,'find'])
          ,   matched('fourth_find').atPath(['find','find'])
-         ,   matched({find:'fourth_find'}).atPath(['find']) */
+         ,   matched({find:'fourth_find'}).atPath(['find'])*/
          );
    }   
    
