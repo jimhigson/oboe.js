@@ -619,15 +619,16 @@ var paths = (function (paths) {
       // should be fast enough. The aim is to be readable and debuggable above fast compilation
       // because patterns are executed many times more than they are compiled.
       // Still, it is a candidate to be replaced with a functional equivalent later.
-              
-      //.replace(/((\w+)|\[(\d+)\])/g,          '<name $2$3>')
-      
+                    
       var simplified = jsonPath                                 
             // standardise by removing [2] style path nodes - change into .2:
             .replace(/\[(\d+)\]/g,      '.$1')
           
             // standardise by removing ["foo"] style path nodes - change into .foo:
-            .replace(/\["(\w+)"\]/g,    '.$1');               
+            .replace(/\["(\w+)"\]/g,    '.$1')
+            
+            // standardise by removing [*] - change into .*:
+            .replace(/\[\*\]/g,    '.*');                           
               
       var tokens = simplified                         
             .replace(/(\w+)/g,          '<name $1>')
@@ -749,10 +750,12 @@ var oboe = (function(oboe){
          
          curNode = [];
          
-         ancestor[curKey] = curNode;
+         if( ancestor ) {
+            ancestor[curKey] = curNode;
+            pathStack.push(curKey);            
+         }
                   
          nodeStack.push(curNode);
-         pathStack.push(curKey);
    
          notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
    
@@ -781,8 +784,7 @@ var oboe = (function(oboe){
       
    OboeParser.prototype.fetch = function(url) {
 
-      // TODO: in if in node, use require('http') instead
-      // of ajax
+      // TODO: in if in node, use require('http') instead of ajax
 
       streamingXhr.fetch(
          url, 
@@ -909,6 +911,7 @@ var oboe = (function(oboe){
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
+    *          [*]              - equivalent to .*
     *
     * @param {Function} callback
     * @param {Object} [context] the scope for the callback
