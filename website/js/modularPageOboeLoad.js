@@ -22,7 +22,7 @@ $(function(){
    
       parser.onFind({         
          '$.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
-      ,  '$.activity.data':     renderTemplateWithNewData( template, 'data' )
+      ,  '$.activity.data[*]':     renderTemplateWithNewDataParent( template, 'data' )
       });         
    }
    
@@ -30,7 +30,7 @@ $(function(){
       var template = soma.template.create(templateElement);
       
       parser.onFind({         
-         '$.recentAchievements.awards.*' : renderTemplateWithNewDataParent( template, 'awards' )
+         '$.recentAchievements.awards[*]' : renderTemplateWithNewDataParent( template, 'awards' )
       });         
    }   
          

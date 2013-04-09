@@ -184,7 +184,6 @@ var oboe = (function(oboe){
             
    /**
     * called when the input is done
-    * 
     */
    OboeParser.prototype.close = function () {
       this.closed = true;
