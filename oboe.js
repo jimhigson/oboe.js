@@ -697,7 +697,6 @@ var oboe = (function(oboe){
       this._clarinet = clarinetParser;
    
       var   oboe = this
-      ,     root
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
@@ -712,8 +711,7 @@ var oboe = (function(oboe){
       clarinetParser.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
          // (ie, not arrays or objects). 
-         // For (strings/numbers) in (objects/arrays) this is where the 
-         // flow goes.
+         // For (strings/numbers) in (objects/arrays) this is where the flow goes.
 
          curNode[curKey] = value;   
          notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
@@ -732,17 +730,14 @@ var oboe = (function(oboe){
          notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
          notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
    
+         // if the object we just found is the root, there will be no curNode already
          if( curNode ) {
+            // we're not the root, modify the parent object:
             curNode[curKey] = newObj;
+            pathStack.push(curKey);            
          }
          curNode = newObj;
          nodeStack.push(newObj);
-   
-         if( !root ) {
-            root = curNode;
-         } else {
-            pathStack.push(curKey);
-         }
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;

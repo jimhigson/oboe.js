@@ -35,7 +35,6 @@ var oboe = (function(oboe){
       this._clarinet = clarinetParser;
    
       var   oboe = this
-      ,     root
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
@@ -69,22 +68,18 @@ var oboe = (function(oboe){
          notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
          notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
    
+         // if the object we just found is the root, there will be no curNode already
          if( curNode ) {
+            // we're not the root, modify the parent object:
             curNode[curKey] = newObj;
+            pathStack.push(curKey);            
          }
          curNode = newObj;
          nodeStack.push(newObj);
    
-         if( !root ) {
-            root = curNode;
-         } else {
-            pathStack.push(curKey);
-         }
-   
          // clarinet always gives the first key of the new object.
-         curKey = firstKey;
-   
-      };
+         curKey = firstKey;  
+      };      
       clarinetParser.onopenarray = function () {
    
          var newArray = [];
@@ -96,8 +91,7 @@ var oboe = (function(oboe){
          notifyListeners(oboe._pathMatchedListeners, newArray, pathStack, nodeStack);
    
          curKey = 0;
-      };
-   
+      };   
       clarinetParser.onend =
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
@@ -115,8 +109,7 @@ var oboe = (function(oboe){
             curKey = curNode.length;
          }
    
-      };
-   
+      };   
       clarinetParser.onerror = this._handleErrorFromClarinet.bind(this);
    }
       
