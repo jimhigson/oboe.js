@@ -87,10 +87,12 @@ var oboe = (function(oboe){
          
          curNode = [];
          
-         ancestor[curKey] = curNode;
+         if( ancestor ) {
+            ancestor[curKey] = curNode;
+            pathStack.push(curKey);            
+         }
                   
          nodeStack.push(curNode);
-         pathStack.push(curKey);
    
          notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
    

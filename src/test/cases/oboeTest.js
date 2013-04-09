@@ -390,12 +390,12 @@ TestCase("oboeTest", {
          );
    }
    
-,  testGivesCorrectParentForEveryObjectItemOfAMixedArray: function() {
+,  testGivesCorrectParentForEveryItemInAMixedArray: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$.array.*')
          .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, ['d'], 'e']
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
          .thenTheParser(
@@ -405,12 +405,36 @@ TestCase("oboeTest", {
                .withParent([{'a':1},'b'])               
          ,  matched({'c':3})
                .withParent([{'a':1},'b',{'c':3}])
+         ,  matched({})
+               .withParent([{'a':1},'b',{'c':3}, {}])                              
          ,  matched(['d'])
-               .withParent([{'a':1},'b',{'c':3}, ['d']])
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
          ,  matched('e')
-               .withParent([{'a':1},'b',{'c':3}, ['d'], 'e'])                                             
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          );
-   }         
+   }
+   
+,  testGivesCorrectParentForEveryItemInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched('b')
+               .withParent([{'a':1},'b'])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},'b',{'c':3}])
+         ,  matched({})
+               .withParent([{'a':1},'b',{'c':3}, {}])                              
+         ,  matched(['d'])
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+         ,  matched('e')
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         );
+   }                     
 
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 
