@@ -34,7 +34,7 @@ var oboe = (function(oboe){
       this._errorListeners = [];
       this._clarinet = clarinetParser;
    
-      var   oboe = this
+      var   oboeInstance = this
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
@@ -42,7 +42,7 @@ var oboe = (function(oboe){
    
    
       clarinetParser.onkey = function (nextKey) {
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
@@ -52,7 +52,7 @@ var oboe = (function(oboe){
          // For (strings/numbers) in (objects/arrays) this is where the flow goes.
 
          curNode[curKey] = value;   
-         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
+         notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
             curKey++;
@@ -67,8 +67,8 @@ var oboe = (function(oboe){
          
          curNode = {};
    
-         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
-         notifyListeners(oboe._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
          if( ancestor ) {
             // we're not the root, modify the parent object:
@@ -94,7 +94,7 @@ var oboe = (function(oboe){
                   
          nodeStack.push(curNode);
    
-         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
    
          curKey = 0;
       };   
@@ -106,7 +106,7 @@ var oboe = (function(oboe){
          // identified and it shouldn't be listed as an ancestor of itself:
          nodeStack.pop();
    
-         notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
    
          pathStack.pop();
          curNode = peek(nodeStack);
