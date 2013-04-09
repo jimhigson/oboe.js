@@ -351,7 +351,7 @@ TestCase("oboeTest", {
          );
    }
    
-,  testGivesCorrectParentForEveryItemOfAnArray: function() {
+,  testGivesCorrectParentAndGrandparentForEveryItemOfAnArray: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$.array.*')
@@ -370,8 +370,47 @@ TestCase("oboeTest", {
                .withParent(['a', 'b', 'c'])
                .withGrandparent({array:['a','b','c']})               
          );
-   }   
+   }
+   
+,  testGivesCorrectParentForEveryObjectItemOfAnArrayOfObjects: function() {
 
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : [{'a':1},{'b':2},{'c':3}]
+            }
+         )
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched({'b':2})
+               .withParent([{'a':1},{'b':2}])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},{'b':2},{'c':3}])               
+         );
+   }
+   
+,  testGivesCorrectParentForEveryObjectItemOfAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched('b')
+               .withParent([{'a':1},'b'])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},'b',{'c':3}])
+         ,  matched(['d'])
+               .withParent([{'a':1},'b',{'c':3}, ['d']])
+         ,  matched('e')
+               .withParent([{'a':1},'b',{'c':3}, ['d'], 'e'])                                             
+         );
+   }         
 
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 

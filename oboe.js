@@ -711,7 +711,9 @@ var oboe = (function(oboe){
       };
       clarinetParser.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
-         // (ie, not arrays or objects).
+         // (ie, not arrays or objects). 
+         // For (strings/numbers) in (objects/arrays) this is where the 
+         // flow goes.
 
          curNode[curKey] = value;   
          notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
@@ -762,10 +764,13 @@ var oboe = (function(oboe){
       clarinetParser.onend =
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
+
+         // pop the curNode off the nodestack because curNode is the thing we just
+         // identified and it shouldn't be listed as an ancestor of itself:
+         nodeStack.pop();
    
          notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
    
-         nodeStack.pop();
          pathStack.pop();
          curNode = peek(nodeStack);
    
