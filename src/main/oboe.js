@@ -247,6 +247,7 @@ var oboe = (function(oboe){
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
+    *          [*]              - equivalent to .*
     *
     * @param {Function} callback
     * @param {Object} [context] the scope for the callback

@@ -192,7 +192,10 @@ from Json.
 
 `$` root json object  
 `.`  path separator  
-`*`  any named element  
+`foo` an element at name foo
+`*`  any element at any name 
+`[2]`  the second element (of an array)  
+`[*]`  equivalent to .*  
 `..` any number of intermediate nodes (non-greedy)
 
 It is possible that the rest of JSONPath could be added later.  
