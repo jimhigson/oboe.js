@@ -1,4 +1,4 @@
-
+(function(){
 /*
    BDD-style test cases for the oboe progressive parser.
    
@@ -350,6 +350,27 @@ TestCase("oboeTest", {
          ,  foundOneMatch
          );
    }
+   
+,  testGivesCorrectParentForEveryItemOfAnArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : ['a','b','c']
+            }
+         )
+         .thenTheParser(
+            matched('a')
+               .withParent(['a'])
+               .withGrandparent({array:['a']})
+         ,  matched('b')
+               .withParent(['a', 'b'])
+               .withGrandparent({array:['a','b']})               
+         ,  matched('c')
+               .withParent(['a', 'b', 'c'])
+               .withGrandparent({array:['a','b','c']})               
+         );
+   }   
 
 
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
@@ -642,6 +663,13 @@ function calledbackWithContext(callbackScope) {
    };
 }
 
+function lastOf(array){
+   return array[array.length-1];
+}
+function penultimateOf(array){
+   return array[array.length-2];
+}
+
 // higher-level function to create assertions which will be used by the asserter.
 function matched(obj) {
 
@@ -687,7 +715,7 @@ function matched(obj) {
             
             var parentMatcher = sinon.match(function (array) {
                 try{
-                  assertEquals( parentObject, array[array.length-1] );
+                  assertEquals( parentObject, lastOf(array) );
                 } catch(_e){
                   return false;
                 }
@@ -712,7 +740,7 @@ function matched(obj) {
             
             var parentMatcher = sinon.match(function (array) {
                 try{
-                  assertEquals( grandparentObject, array[array.length-2] );
+                  assertEquals( grandparentObject, penultimateOf(array) );
                 } catch(_e){
                   return false;
                 }
@@ -734,5 +762,6 @@ function matched(obj) {
          return this;
       }
    };
-
 }
+
+})();
