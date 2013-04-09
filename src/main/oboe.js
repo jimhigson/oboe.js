@@ -119,8 +119,7 @@ var oboe = (function(oboe){
       
    OboeParser.prototype.fetch = function(url) {
 
-      // TODO: in if in node, use require('http') instead
-      // of ajax
+      // TODO: in if in node, use require('http') instead of ajax
 
       streamingXhr.fetch(
          url, 
