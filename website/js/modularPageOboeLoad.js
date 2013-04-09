@@ -8,9 +8,11 @@ $(function(){
          template.render();
       }
    }
-   function renderRepeaterTemplateWithNewItem( template, fieldName ) {
+   function renderTemplateWithNewDataParent( template, fieldName ) {
       return function(data, _path, ancestors) {
-         template.scope[fieldName] = ancestors[ancestors.length-1];
+         var parentObject = ancestors[ancestors.length-1];
+         
+         template.scope[fieldName] = parentObject;
          template.render();
       }
    }   
@@ -28,7 +30,7 @@ $(function(){
       var template = soma.template.create(templateElement);
       
       parser.onFind({         
-         '$.recentAchievements.awards.*' : renderRepeaterTemplateWithNewItem( template, 'awards' )
+         '$.recentAchievements.awards.*' : renderTemplateWithNewDataParent( template, 'awards' )
       });         
    }   
          
@@ -62,7 +64,7 @@ $(function(){
    
    
    var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
-   loadThrottled(exampleJsonResponse, 1, 5);
+   loadThrottled(exampleJsonResponse, 5, 5);
    
    setupActivityView($('#TableTemplate')[0]);
    setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);
