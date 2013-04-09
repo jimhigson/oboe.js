@@ -704,7 +704,9 @@ function foundNMatches(n){
          if( n != callback.callCount ) {
             fail('expected to have been called ' + n + ' times but has been called ' +
                callback.callCount + ' times. \n' +
-                   'I have these calls:' + JSON.stringify(callback.args)  )
+                   "all calls were with:" +
+                   reportArgumentsToCallback(callback.args)
+            )
          }
       }
    }
@@ -733,25 +735,29 @@ function penultimateOf(array){
    return array[array.length-2];
 }
 
+/**
+ * Make a string version of the callback arguments given from oboe
+ * @param {[[*]]} callbackArgs
+ */
+function reportArgumentsToCallback(callbackArgs) {
+
+   return "\n" + callbackArgs.map( function( args, i ){
+
+      var ancestors = args[2];
+      
+      return "Call number " + i + " was: \n" + 
+               "\tnode:         " + JSON.stringify( args[0] ) + "\n" + 
+               "\tpath:         " + JSON.stringify( args[1] ) + "\n" +
+               "\tparent:       " + JSON.stringify( lastOf(ancestors) ) + "\n" +
+               "\tgrandparent:  " + JSON.stringify( penultimateOf(ancestors) ) + "\n" +
+               "\tancestors:    " + JSON.stringify( ancestors );
+   
+   }).join("\n\n");
+         
+}
+
 // higher-level function to create assertions which will be used by the asserter.
 function matched(obj) {
-
-   function reportArgumentsToCallback(callbackArgs) {
-   
-      return "\n" + callbackArgs.map( function( args, i ){
-
-         var ancestors = args[2];
-         
-         return "Call number " + i + " was: \n" + 
-                  "\tnode:         " + JSON.stringify( args[0] ) + "\n" + 
-                  "\tpath:         " + JSON.stringify( args[1] ) + "\n" +
-                  "\tparent:       " + JSON.stringify( lastOf(ancestors) ) + "\n" +
-                  "\tgrandparent:  " + JSON.stringify( penultimateOf(ancestors) ) + "\n" +
-                  "\tancestors:    " + JSON.stringify( ancestors );
-      
-      }).join("\n\n");
-            
-   }
 
    return {   
       testAgainst: function assertMatchedRightObject( callbackStub ) {
