@@ -673,6 +673,19 @@ function penultimateOf(array){
 // higher-level function to create assertions which will be used by the asserter.
 function matched(obj) {
 
+   function reportArgumentsToCallback(callbackArgs) {
+   
+      return "\n" + callbackArgs.map( function( args, i ){
+      
+         return "Call number " + i + " is: \n" + 
+                  "\tnode:      " + JSON.stringify( args[0] ) + "\n" + 
+                  "\tpath:      " + JSON.stringify( args[1] ) + "\n" +
+                  "\tancestors: " + JSON.stringify( args[2] );
+      
+      }).join("\n\n");
+            
+   }
+
    return {   
       testAgainst: function assertMatchedRightObject( callbackStub ) {
       
@@ -682,7 +695,7 @@ function matched(obj) {
                 "objects that I got are:" +
                 JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
                 "all calls were with:" +
-                JSON.stringify(callbackStub.args));
+                reportArgumentsToCallback(callbackStub.args));
    
          }
       }
@@ -700,7 +713,7 @@ function matched(obj) {
                      return "\t" + JSON.stringify(callArgs[1]) + "\n";
                    }) + "\n" +
                    "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+                   reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -725,7 +738,7 @@ function matched(obj) {
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
                fail( "was not called with the parent object" +  JSON.stringify(parentObject) +
                    "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+                   reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -750,7 +763,7 @@ function matched(obj) {
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
                fail( "was not called with the grand parent object" +  JSON.stringify(grandparentObject) +
                    "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+                   reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
