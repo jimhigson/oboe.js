@@ -780,7 +780,14 @@ var oboe = (function(oboe){
          }
    
       };   
-      clarinetParser.onerror = this._handleErrorFromClarinet.bind(this);
+      clarinetParser.onerror = function(e) {
+         oboeInstance._errorListeners.forEach( function( listener ) {
+            listener(e);
+         });
+         
+         // after errors, we won't bother trying to recover so just give up:
+         oboeInstance.close();
+      };   
    }
       
    OboeParser.prototype.fetch = function(url) {
@@ -810,7 +817,8 @@ var oboe = (function(oboe){
          };
       } 
 
-      listenerList.filter(matchesPath(path))
+      listenerList
+         .filter(matchesPath(path))
          .forEach( function(listener) {
              var context = listener.context || window;
              
@@ -864,18 +872,6 @@ var oboe = (function(oboe){
       clarinet.close();            
    };
    
-   /** react when an error from clarinet occurs, usually because we have an
-    *  some invalid json
-    */ 
-   OboeParser.prototype._handleErrorFromClarinet = function(e) {
-      this._errorListeners.forEach( function( listener ) {
-         listener(e);
-      });
-      
-      // after errors, we won't bother trying to recover so just give up:
-      this.close();
-   };   
-
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
