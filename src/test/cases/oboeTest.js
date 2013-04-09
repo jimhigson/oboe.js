@@ -21,7 +21,7 @@ TestCase("oboeTest", {
          .andWeAreListeningForThingsFoundAtPattern('$')
          .whenGivenInput('{}')
          .thenTheParser(
-            matched({}).atRootOfJson,
+            matched({}).atRootOfJson(),
             foundOneMatch
          );
 
@@ -54,7 +54,7 @@ TestCase("oboeTest", {
           )
          .whenGivenInput('}')
          .thenTheParser(
-            matched({}).atRootOfJson,
+            matched({}).atRootOfJson(),
             foundOneMatch
          );
 
@@ -71,7 +71,7 @@ TestCase("oboeTest", {
          .whenGivenInput('{"foo":')
           .thenTheParser(
             foundNMatches(1),
-            matched({}).atRootOfJson
+            matched({}).atRootOfJson()
           );
    }
 
@@ -81,7 +81,7 @@ TestCase("oboeTest", {
          .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
          .thenTheParser(
-            matched({}).atRootOfJson,
+            matched({}).atRootOfJson(),
             foundOneMatch
          );
    }
@@ -92,7 +92,7 @@ TestCase("oboeTest", {
          .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
          .thenTheParser(
-            matched({}).atRootOfJson,
+            matched({}).atRootOfJson(),
             foundOneMatch
          );
    }
@@ -246,9 +246,17 @@ TestCase("oboeTest", {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$.testArray[2][2]')
-         .whenGivenInput('{"testArray":["a","b",["x","y","this_one"]]}')
+         .whenGivenInput( {"testArray":
+                              ["a","b",
+                                 ["x","y","this_one"]
+                              ]
+                          }
+                        )
          .thenTheParser(
-             matched('this_one').atPath(['testArray',2,2])
+             matched('this_one')
+               .atPath(['testArray',2,2])
+               .withParent( ["x","y","this_one"] )
+               .withGrandparent( ["a","b", ["x","y","this_one"]] )
          ,   foundOneMatch
          );
    }     
@@ -257,13 +265,19 @@ TestCase("oboeTest", {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('..')
-         .whenGivenInput('{"a":{"b":{"c":{"d":"e"}}}}')
+         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
          .thenTheParser(
-             matched('e').atPath(['a', 'b', 'c', 'd'])
-         ,   matched({d:"e"}).atPath(['a', 'b', 'c'])
-         ,   matched({c:{d:"e"}}).atPath(['a', 'b'])
-         ,   matched({b:{c:{d:"e"}}}).atPath(['a'])
-         ,   matched({a:{b:{c:{d:"e"}}}}).atRootOfJson
+             matched('e')
+               .atPath(['a', 'b', 'c', 'd'])
+               .withParent({d:'e'})
+         ,   matched({d:"e"})
+               .atPath(['a', 'b', 'c'])
+         ,   matched({c:{d:"e"}})
+               .atPath(['a', 'b'])
+         ,   matched({b:{c:{d:"e"}}})
+               .atPath(['a'])
+         ,   matched({a:{b:{c:{d:"e"}}}})
+               .atRootOfJson()
          ,   foundNMatches(5)
          );
    }
@@ -332,6 +346,7 @@ TestCase("oboeTest", {
          )
          .thenTheParser(
             matched(1)
+               .withParent([0,1])
          ,  foundOneMatch
          );
    }
@@ -362,6 +377,39 @@ TestCase("oboeTest", {
          ,   foundNMatches(5)
          );
    }
+   
+,  testPassesAncestorsOfFoundObjectCorrectly: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$..find')
+         .whenGivenInput({
+
+            array:[
+               {find:'first_find'}
+            ,  {padding:{find:'second_find'}, find:'third_find'}
+            ]
+         ,  find: {
+               find:'fourth_find'
+            }
+
+         })
+         .thenTheParser(
+             matched('first_find')
+               .withParent( {find:'first_find'} )
+               .withGrandparent( [{find:'first_find'}] )
+               
+         ,   matched('second_find')
+               .withParent({find:'second_find'})
+               .withGrandparent({padding:{find:'second_find'}})
+               
+         ,   matched('third_find')
+              .withParent({padding:{find:'second_find'}, find:'third_find'})
+              .withGrandparent([
+                    {find:'first_find'}
+                 ,  {padding:{find:'second_find'}, find:'third_find'}
+                 ])                          
+         );
+   }   
    
 ,  testCanDetectAtMultipleDepthsUsingImpliedAncestorOfRootRelationship: function() {
 
@@ -468,7 +516,7 @@ TestCase("oboeTest", {
 ,  testErrorsOnInvalidJson: function() {
   
       givenAParser()
-        .andWeAreListeningForErrors()
+        .andWeAreExpectingSomeErrors()
         .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
         .thenTheParser
            (   calledCallbackOnce
@@ -482,9 +530,18 @@ function givenAParser() {
 
    function Asserter() {
 
-      var parser = oboe.parser(),
+      var oboeParser = oboe.parser(),
+
+          expectingErrors = false,
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
+          
+      oboeParser.onError(function(e) {
+         // Unless stated, the test isn't expecting errors. Fail the test on error: 
+         if(!expectingErrors){ 
+            fail('unexpected error: ' + e);
+         }
+      });
 
 
       /** sinon stub is only really used to record arguments given.
@@ -510,21 +567,23 @@ function givenAParser() {
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         parser.onFind(pattern, argumentClone(spiedCallback), scope);
+         oboeParser.onFind(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
-         parser.onPath(pattern, argumentClone(spiedCallback), scope);
+         oboeParser.onPath(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
       
-      this.andWeAreListeningForErrors = function() {
+      this.andWeAreExpectingSomeErrors = function() {
+         expectingErrors = true;
+      
          spiedCallback = sinon.stub();
          
-         parser.onError(argumentClone(spiedCallback));
+         oboeParser.onError(argumentClone(spiedCallback));
          return this;
       };      
 
@@ -533,7 +592,7 @@ function givenAParser() {
             json = JSON.stringify(json);
          }
 
-         parser.read(json);
+         oboeParser.read(json);
          return this;
       };
 
@@ -542,8 +601,8 @@ function givenAParser() {
        */
       this.thenTheParser = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
-            var fn = arguments[i];
-            fn(spiedCallback);
+            var assertion = arguments[i];
+            assertion.testAgainst(spiedCallback);
          }
 
          return this;
@@ -555,11 +614,14 @@ function givenAParser() {
 // higher-level function to create assertions. Pass output to Asserter#thenTheParser.
 // test how many matches were found
 function foundNMatches(n){
-   return function(callback) {
-      if( n != callback.callCount ) {
-         fail('expected to have been called ' + n + ' times but has been called ' +
-            callback.callCount + ' times. \n' +
-                'I have these calls:' + JSON.stringify(callback.args)  )
+   return {
+      testAgainst:
+      function(callback) {
+         if( n != callback.callCount ) {
+            fail('expected to have been called ' + n + ' times but has been called ' +
+               callback.callCount + ' times. \n' +
+                   'I have these calls:' + JSON.stringify(callback.args)  )
+         }
       }
    }
 }
@@ -569,52 +631,108 @@ var foundOneMatch = foundNMatches(1),
     foundNoMatches = foundNMatches(0);
 
 function calledbackWithContext(callbackScope) {
-   return function(callbackStub) {
-      if(!callbackStub.calledOn(callbackScope)){
-         fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
-            callbackStub.getCall(0).thisValue);
-      }   
+   return { 
+      testAgainst:
+      function(callbackStub) {
+         if(!callbackStub.calledOn(callbackScope)){
+            fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
+               callbackStub.getCall(0).thisValue);
+         }   
+      }
    };
 }
 
-// higher-level function to create assertions. Pass output to Asserter#thenTheParser
-// test what was matched
+// higher-level function to create assertions which will be used by the asserter.
 function matched(obj) {
-   function testRightObject( callbackStub ) {
-      if(!callbackStub.calledWith(obj)) {
 
-         fail( "was not called with the object " +  JSON.stringify(obj) + "\n" +
-             "objects that I got are:" +
-             JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
-             "all calls were with:" +
-             JSON.stringify(callbackStub.args));
-
-      }
-   }
-
-   testRightObject.atPath = function(path) {
-
-      if( typeof path == 'string' ) {
-         path = path.split(',');
-      }
-
-      return function(callbackStub) {
-
-         testRightObject(callbackStub);
-
-         if(!callbackStub.calledWithMatch(obj, path)) {
-            fail( "was not called with the path " +  JSON.stringify(path) + "\n" +
-                "paths that I have are:\n" +
-                callbackStub.args.map(function(callArgs){
-                  return "\t" + JSON.stringify(callArgs[1]) + "\n";
-                }) + "\n" +
+   return {   
+      testAgainst: function assertMatchedRightObject( callbackStub ) {
+      
+         if(!callbackStub.calledWith(obj)) {
+   
+            fail( "was not called with the object " +  JSON.stringify(obj) + "\n" +
+                "objects that I got are:" +
+                JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
                 "all calls were with:" +
                 JSON.stringify(callbackStub.args));
+   
          }
+      }
+   
+   ,  atPath: function assertAtRightPath(path) {
+         var oldAssertion = this.testAgainst;
+         
+         this.testAgainst = function( callbackStub ){
+            oldAssertion.apply(this, arguments);
+            
+            if(!callbackStub.calledWithMatch(sinon.match.any, path)) {
+               fail( "was not called with the path " +  JSON.stringify(path) + "\n" +
+                   "paths that I have are:\n" +
+                   callbackStub.args.map(function(callArgs){
+                     return "\t" + JSON.stringify(callArgs[1]) + "\n";
+                   }) + "\n" +
+                   "all calls were with:" +
+                   JSON.stringify(callbackStub.args));
+            }            
+         };
+         
+         return this;   
+      }
+      
+   ,  withParent: function( parentObject ) {
+         var oldAssertion = this.testAgainst;
+         
+         this.testAgainst = function( callbackStub ){
+            oldAssertion.apply(this, arguments);
+            
+            var parentMatcher = sinon.match(function (array) {
+                try{
+                  assertEquals( parentObject, array[array.length-1] );
+                } catch(_e){
+                  return false;
+                }
+                return true;
+            }, "had the right parent");
+            
+            if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
+               fail( "was not called with the parent object" +  JSON.stringify(parentObject) +
+                   "all calls were with:" +
+                   JSON.stringify(callbackStub.args));
+            }            
+         };
+         
+         return this;
+      }
+      
+   ,  withGrandparent: function( grandparentObject ) {
+         var oldAssertion = this.testAgainst;
+         
+         this.testAgainst = function( callbackStub ){
+            oldAssertion.apply(this, arguments);
+            
+            var parentMatcher = sinon.match(function (array) {
+                try{
+                  assertEquals( grandparentObject, array[array.length-2] );
+                } catch(_e){
+                  return false;
+                }
+                return true;
+            }, "had the right grandparent");
+            
+            if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
+               fail( "was not called with the grand parent object" +  JSON.stringify(grandparentObject) +
+                   "all calls were with:" +
+                   JSON.stringify(callbackStub.args));
+            }            
+         };
+         
+         return this;
+      }                  
+      
+   ,  atRootOfJson: function assertAtRootOfJson() {
+         this.atPath([]);
+         return this;
       }
    };
 
-   testRightObject.atRootOfJson = testRightObject.atPath([]);
-
-   return testRightObject;
 }

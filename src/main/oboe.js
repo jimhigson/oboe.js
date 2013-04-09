@@ -43,21 +43,20 @@ var oboe = (function(oboe){
    
    
       clarinetParser.onkey = function (nextKey) {
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey));
+         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
       clarinetParser.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
          // (ie, not arrays or objects).
-   
-         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey));
+
+         curNode[curKey] = value;   
+         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
-            curNode.push(value);
             curKey++;
          } else {
-            curNode[curKey] = value;
             curKey = null;
          }
    
@@ -66,8 +65,8 @@ var oboe = (function(oboe){
    
          var newObj = {};
    
-         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack);
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey));
+         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
    
          if( curNode ) {
             curNode[curKey] = newObj;
@@ -93,7 +92,7 @@ var oboe = (function(oboe){
          nodeStack.push(newArray);
          pathStack.push(curKey);
    
-         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack);
+         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack, nodeStack);
    
          curKey = 0;
       };
@@ -102,7 +101,7 @@ var oboe = (function(oboe){
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
    
-         notifyListeners(oboe._thingFoundListeners, curNode, pathStack);
+         notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
    
          nodeStack.pop();
          pathStack.pop();
@@ -114,29 +113,7 @@ var oboe = (function(oboe){
    
       };
    
-   
-      clarinetParser.onerror = function (e) {    
-         console.log('error', e.message);
-          
-         oboe._errorListeners.forEach( function( listener ) {
-            listener();
-         });
-            
-         // errors are not recoverable so discard all listeners, they shouldn't be called again:
-         oboe._thingFoundListeners = [];
-         oboe._pathMatchedListeners = [];
-         oboe._errorListeners = [];
-         
-         // quit listening to clarinet as well. We've lost it with this stream:
-         clarinetParser.onkey = 
-         clarinetParser.onvalue = 
-         clarinetParser.onopenobject = 
-         clarinetParser.onopenarray = 
-         clarinetParser.onend = 
-         clarinetParser.oncloseobject =                         
-         clarinetParser.onclosearray = 
-         clarinetParser.onerror = null;            
-      };
+      clarinetParser.onerror = this._handleErrorFromClarinet.bind(this);
    }
       
    OboeParser.prototype.fetch = function(url) {
@@ -144,7 +121,10 @@ var oboe = (function(oboe){
       // TODO: in if in node, use require('http') instead
       // of ajax
 
-      streamingXhr.fetch(url, this.read.bind(this));
+      streamingXhr.fetch(
+         url, 
+         this.read.bind(this),
+         this.close.bind(this) );
 
       return this;
    };
@@ -153,7 +133,7 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, foundNode, path ) {
+   function notifyListeners ( listenerList, foundNode, path, ancestors ) {
 
       /**
        * returns a function which tests if a listener is interested in the given path
@@ -168,7 +148,7 @@ var oboe = (function(oboe){
          .forEach( function(listener) {
              var context = listener.context || window;
              
-             listener.callback.call(context, foundNode, path );               
+             listener.callback.call(context, foundNode, path, ancestors );               
          });
    }
 
@@ -178,9 +158,57 @@ var oboe = (function(oboe){
     * @param {String} nextDrip
     */
    OboeParser.prototype.read = function (nextDrip) {
-      this._clarinet.write(nextDrip);
+      if( closed ) {
+         throw new Error();
+      }
+   
+      try {
+         this._clarinet.write(nextDrip);
+      } catch(e) {
+         // we don't have to do anything here because we always assign a .onerror
+         // to clarinet which will have already been called by the time this 
+         // exception is thrown.       
+      }
    };
-
+            
+   /**
+    * called when the input is done
+    * 
+    */
+   OboeParser.prototype.close = function () {
+      this.closed = true;
+      
+      // we won't fire any more events again so forget our listeners:
+      this._thingFoundListeners = [];
+      this._pathMatchedListeners = [];
+      this._errorListeners = [];
+      
+      var clarinet = this._clarinet;
+      
+      // quit listening to clarinet as well. We've done with this stream:
+      clarinet.onkey = 
+      clarinet.onvalue = 
+      clarinet.onopenobject = 
+      clarinet.onopenarray = 
+      clarinet.onend = 
+      clarinet.oncloseobject =                         
+      clarinet.onclosearray = 
+      clarinet.onerror = null;
+      
+      clarinet.close();            
+   };
+   
+   /** react when an error from clarinet occurs, usually because we have an
+    *  some invalid json
+    */ 
+   OboeParser.prototype._handleErrorFromClarinet = function(e) {
+      this._errorListeners.forEach( function( listener ) {
+         listener(e);
+      });
+      
+      // after errors, we won't bother trying to recover so just give up:
+      this.close();
+   };   
 
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
