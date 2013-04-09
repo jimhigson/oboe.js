@@ -697,15 +697,25 @@ var oboe = (function(oboe){
       this._errorListeners = [];
       this._clarinet = clarinetParser;
    
-      var   oboe = this
+      var   oboeInstance = this
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
       ,     pathStack = [];
    
+      function addNewChild(parentNode) {
+
+         if (parentNode) { // if not the root node
+         
+            parentNode[curKey] = curNode;
+            pathStack.push(curKey);
+         }
+
+         nodeStack.push(curNode);
+      }   
    
       clarinetParser.onkey = function (nextKey) {
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
@@ -715,7 +725,7 @@ var oboe = (function(oboe){
          // For (strings/numbers) in (objects/arrays) this is where the flow goes.
 
          curNode[curKey] = value;   
-         notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
+         notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
             curKey++;
@@ -723,42 +733,33 @@ var oboe = (function(oboe){
             curKey = null;
          }
    
-      };
+      };            
       clarinetParser.onopenobject = function (firstKey) {
    
-         var ancestor = curNode;
+         var parentNode = curNode;
          
          curNode = {};
    
-         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
-         notifyListeners(oboe._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
-         if( ancestor ) {
-            // we're not the root, modify the parent object:
-            ancestor[curKey] = curNode;
-            pathStack.push(curKey);            
-         }
-         nodeStack.push(curNode);
+         addNewChild(parentNode);
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
-      };      
+      };
       clarinetParser.onopenarray = function () {
    
          // arrays can't be the root of a json so we know we'll always have an ancestor
-         var ancestor = curNode;
+         var parentNode = curNode;
          
          curNode = [];
          
-         if( ancestor ) {
-            ancestor[curKey] = curNode;
-            pathStack.push(curKey);            
-         }
-                  
-         nodeStack.push(curNode);
+         addNewChild(parentNode);
+         
+         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
    
-         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
-   
+         // arrays always start at zero:
          curKey = 0;
       };   
       clarinetParser.onend =
@@ -769,7 +770,7 @@ var oboe = (function(oboe){
          // identified and it shouldn't be listed as an ancestor of itself:
          nodeStack.pop();
    
-         notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
    
          pathStack.pop();
          curNode = peek(nodeStack);

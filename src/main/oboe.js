@@ -40,6 +40,16 @@ var oboe = (function(oboe){
       ,     nodeStack = [] // TODO: use fastlist
       ,     pathStack = [];
    
+      function addNewChild(parentNode) {
+
+         if (parentNode) { // if not the root node
+         
+            parentNode[curKey] = curNode;
+            pathStack.push(curKey);
+         }
+
+         nodeStack.push(curNode);
+      }   
    
       clarinetParser.onkey = function (nextKey) {
          notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
@@ -60,42 +70,33 @@ var oboe = (function(oboe){
             curKey = null;
          }
    
-      };
+      };            
       clarinetParser.onopenobject = function (firstKey) {
    
-         var ancestor = curNode;
+         var parentNode = curNode;
          
          curNode = {};
    
          notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
          notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
-         if( ancestor ) {
-            // we're not the root, modify the parent object:
-            ancestor[curKey] = curNode;
-            pathStack.push(curKey);            
-         }
-         nodeStack.push(curNode);
+         addNewChild(parentNode);
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
-      };      
+      };
       clarinetParser.onopenarray = function () {
    
          // arrays can't be the root of a json so we know we'll always have an ancestor
-         var ancestor = curNode;
+         var parentNode = curNode;
          
          curNode = [];
          
-         if( ancestor ) {
-            ancestor[curKey] = curNode;
-            pathStack.push(curKey);            
-         }
-                  
-         nodeStack.push(curNode);
-   
+         addNewChild(parentNode);
+         
          notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
    
+         // arrays always start at zero:
          curKey = 0;
       };   
       clarinetParser.onend =
