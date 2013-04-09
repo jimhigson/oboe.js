@@ -9,7 +9,7 @@
  */
 (function (streamingXhr) {
 
-   streamingXhr.fetch = function(url, streamCallback){
+   streamingXhr.fetch = function(url, streamCallback, successCallback){
       var xhr = new XMLHttpRequest();
       var charsSent = 0;
 
@@ -27,10 +27,9 @@
             streamCallback( newResponseText );
          }
       }
-
-      xhr.onprogress =
-      xhr.onload =
-         handleInput;
+      
+      xhr.onprogress = handleInput;         
+      xhr.onload = successCallback;
    };
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);

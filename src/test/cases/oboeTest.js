@@ -516,7 +516,7 @@ TestCase("oboeTest", {
 ,  testErrorsOnInvalidJson: function() {
   
       givenAParser()
-        .andWeAreListeningForErrors()
+        .andWeAreExpectingSomeErrors()
         .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
         .thenTheParser
            (   calledCallbackOnce
@@ -530,9 +530,18 @@ function givenAParser() {
 
    function Asserter() {
 
-      var parser = oboe.parser(),
+      var oboeParser = oboe.parser(),
+
+          expectingErrors = false,
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
+          
+      oboeParser.onError(function(e) {
+         // Unless stated, the test isn't expecting errors. Fail the test on error: 
+         if(!expectingErrors){ 
+            fail('unexpected error: ' + e);
+         }
+      });
 
 
       /** sinon stub is only really used to record arguments given.
@@ -558,21 +567,23 @@ function givenAParser() {
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         parser.onFind(pattern, argumentClone(spiedCallback), scope);
+         oboeParser.onFind(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
-         parser.onPath(pattern, argumentClone(spiedCallback), scope);
+         oboeParser.onPath(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
       
-      this.andWeAreListeningForErrors = function() {
+      this.andWeAreExpectingSomeErrors = function() {
+         expectingErrors = true;
+      
          spiedCallback = sinon.stub();
          
-         parser.onError(argumentClone(spiedCallback));
+         oboeParser.onError(argumentClone(spiedCallback));
          return this;
       };      
 
@@ -581,7 +592,7 @@ function givenAParser() {
             json = JSON.stringify(json);
          }
 
-         parser.read(json);
+         oboeParser.read(json);
          return this;
       };
 
