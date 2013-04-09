@@ -676,11 +676,15 @@ function matched(obj) {
    function reportArgumentsToCallback(callbackArgs) {
    
       return "\n" + callbackArgs.map( function( args, i ){
-      
-         return "Call number " + i + " is: \n" + 
-                  "\tnode:      " + JSON.stringify( args[0] ) + "\n" + 
-                  "\tpath:      " + JSON.stringify( args[1] ) + "\n" +
-                  "\tancestors: " + JSON.stringify( args[2] );
+
+         var ancestors = args[2];
+         
+         return "Call number " + i + " was: \n" + 
+                  "\tnode:         " + JSON.stringify( args[0] ) + "\n" + 
+                  "\tpath:         " + JSON.stringify( args[1] ) + "\n" +
+                  "\tparent:       " + JSON.stringify( lastOf(ancestors) ) + "\n" +
+                  "\tgrandparent:  " + JSON.stringify( penultimateOf(ancestors) ) + "\n" +
+                  "\tancestors:    " + JSON.stringify( ancestors );
       
       }).join("\n\n");
             
@@ -736,9 +740,10 @@ function matched(obj) {
             }, "had the right parent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the parent object" +  JSON.stringify(parentObject) +
-                   "all calls were with:" +
-                   reportArgumentsToCallback(callbackStub.args));
+               fail( "was not called with the object" + JSON.stringify(obj) + 
+                        " and parent object " +  JSON.stringify(parentObject) +
+                        "all calls were with:" +
+                        reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -761,9 +766,10 @@ function matched(obj) {
             }, "had the right grandparent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the grand parent object" +  JSON.stringify(grandparentObject) +
-                   "all calls were with:" +
-                   reportArgumentsToCallback(callbackStub.args));
+               fail( "was not called with the object" + JSON.stringify(obj) + 
+                        " and garndparent object " +  JSON.stringify(grandparentObject) +
+                        "all calls were with:" +
+                        reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
