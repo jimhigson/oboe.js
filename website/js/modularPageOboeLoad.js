@@ -33,10 +33,22 @@ $(function(){
          '$.recentAchievements.awards[*]' : renderTemplateWithNewDataParent( template, 'awards' )
       });         
    }   
+      
+   function randomiseMapOrder(map) {
+      var randomkeys = _.shuffle( _.keys(map) ),
+          newMap = {};
+      
+      _.each( randomkeys, function( key ) {
+         newMap[key] = map[key];      
+      });
+      
+      return newMap;
+   }      
          
    function expandJsonTemplate( jsonTemplate ) {
                
-      return jsonTemplate;
+      return randomiseMapOrder(jsonTemplate);
+      
       // TODO: expand examples out
       // TODO: ramdomise the order (even though the order is non-deterministic!).
    }
