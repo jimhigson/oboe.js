@@ -896,7 +896,14 @@ var oboe = (function(oboe){
       }
    }
    
-
+   function on(listenerList, jsonPath, callback, context) {
+      if( typeof jsonPath === 'string' ) {
+         pushListener(listenerList, jsonPath, callback, context);
+      } else {
+         pushListeners(listenerList, jsonPath);
+      }      
+   }
+   
    /**
     * Add a new json path to the parser, to be called as soon as the path is found, but before we know
     * what value will be in there.
@@ -917,12 +924,8 @@ var oboe = (function(oboe){
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
-
-      if( typeof jsonPath === 'string' ) {
-         pushListener(this._pathMatchedListeners, jsonPath, callback, context);
-      } else {
-         pushListeners(this._pathMatchedListeners, jsonPath);
-      }
+   
+      on(this._pathMatchedListeners, jsonPath, callback, context);
       return this;
    };
 
@@ -935,13 +938,8 @@ var oboe = (function(oboe){
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
-
-      if( typeof jsonPath === 'string' ) {
-         pushListener(this._thingFoundListeners, jsonPath, callback, context);
-      } else {
-         pushListeners(this._thingFoundListeners, jsonPath);
-      }
-
+   
+      on(this._thingFoundListeners, jsonPath, callback, context);
       return this;
    };
    
