@@ -135,6 +135,22 @@
             .thenShouldNotMatch(    ['a'])
       }
       
+   ,  testArrayNotationAtRoot: function() {
+         givenAPattern('$[2]')
+            .thenShouldMatch(       [2])      
+            .thenShouldMatch(       ['2'])      
+            .thenShouldNotMatch(    [])            
+            .thenShouldNotMatch(    ['a'])
+      }
+      
+   ,  testArrayStarNotationAtRoot: function() {
+         givenAPattern('$[*]')
+            .thenShouldMatch(       [2])      
+            .thenShouldMatch(       ['2'])      
+            .thenShouldMatch(       ['a'])            
+            .thenShouldNotMatch(    [])            
+      }            
+      
    ,  testTrickyCase: function() {
          givenAPattern('$..foods..fr')
             .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      

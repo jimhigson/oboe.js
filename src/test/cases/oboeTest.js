@@ -1,4 +1,4 @@
-
+(function(){
 /*
    BDD-style test cases for the oboe progressive parser.
    
@@ -350,7 +350,91 @@ TestCase("oboeTest", {
          ,  foundOneMatch
          );
    }
+   
+,  testGivesCorrectParentAndGrandparentForEveryItemOfAnArray: function() {
 
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : ['a','b','c']
+            }
+         )
+         .thenTheParser(
+            matched('a')
+               .withParent(['a'])
+               .withGrandparent({array:['a']})
+         ,  matched('b')
+               .withParent(['a', 'b'])
+               .withGrandparent({array:['a','b']})               
+         ,  matched('c')
+               .withParent(['a', 'b', 'c'])
+               .withGrandparent({array:['a','b','c']})               
+         );
+   }
+   
+,  testGivesCorrectParentForEveryObjectItemOfAnArrayOfObjects: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : [{'a':1},{'b':2},{'c':3}]
+            }
+         )
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched({'b':2})
+               .withParent([{'a':1},{'b':2}])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},{'b':2},{'c':3}])               
+         );
+   }
+   
+,  testGivesCorrectParentForEveryItemInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched('b')
+               .withParent([{'a':1},'b'])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},'b',{'c':3}])
+         ,  matched({})
+               .withParent([{'a':1},'b',{'c':3}, {}])                              
+         ,  matched(['d'])
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+         ,  matched('e')
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         );
+   }
+   
+,  testGivesCorrectParentForEveryItemInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+            matched({'a':1})
+               .withParent([{'a':1}])
+         ,  matched('b')
+               .withParent([{'a':1},'b'])               
+         ,  matched({'c':3})
+               .withParent([{'a':1},'b',{'c':3}])
+         ,  matched({})
+               .withParent([{'a':1},'b',{'c':3}, {}])                              
+         ,  matched(['d'])
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+         ,  matched('e')
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         );
+   }                     
 
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 
@@ -620,7 +704,9 @@ function foundNMatches(n){
          if( n != callback.callCount ) {
             fail('expected to have been called ' + n + ' times but has been called ' +
                callback.callCount + ' times. \n' +
-                   'I have these calls:' + JSON.stringify(callback.args)  )
+                   "all calls were with:" +
+                   reportArgumentsToCallback(callback.args)
+            )
          }
       }
    }
@@ -642,6 +728,34 @@ function calledbackWithContext(callbackScope) {
    };
 }
 
+function lastOf(array){
+   return array[array.length-1];
+}
+function penultimateOf(array){
+   return array[array.length-2];
+}
+
+/**
+ * Make a string version of the callback arguments given from oboe
+ * @param {[[*]]} callbackArgs
+ */
+function reportArgumentsToCallback(callbackArgs) {
+
+   return "\n" + callbackArgs.map( function( args, i ){
+
+      var ancestors = args[2];
+      
+      return "Call number " + i + " was: \n" + 
+               "\tnode:         " + JSON.stringify( args[0] ) + "\n" + 
+               "\tpath:         " + JSON.stringify( args[1] ) + "\n" +
+               "\tparent:       " + JSON.stringify( lastOf(ancestors) ) + "\n" +
+               "\tgrandparent:  " + JSON.stringify( penultimateOf(ancestors) ) + "\n" +
+               "\tancestors:    " + JSON.stringify( ancestors );
+   
+   }).join("\n\n");
+         
+}
+
 // higher-level function to create assertions which will be used by the asserter.
 function matched(obj) {
 
@@ -654,7 +768,7 @@ function matched(obj) {
                 "objects that I got are:" +
                 JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
                 "all calls were with:" +
-                JSON.stringify(callbackStub.args));
+                reportArgumentsToCallback(callbackStub.args));
    
          }
       }
@@ -672,7 +786,7 @@ function matched(obj) {
                      return "\t" + JSON.stringify(callArgs[1]) + "\n";
                    }) + "\n" +
                    "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+                   reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -687,7 +801,7 @@ function matched(obj) {
             
             var parentMatcher = sinon.match(function (array) {
                 try{
-                  assertEquals( parentObject, array[array.length-1] );
+                  assertEquals( parentObject, lastOf(array) );
                 } catch(_e){
                   return false;
                 }
@@ -695,9 +809,10 @@ function matched(obj) {
             }, "had the right parent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the parent object" +  JSON.stringify(parentObject) +
-                   "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+               fail( "was not called with the object" + JSON.stringify(obj) + 
+                        " and parent object " +  JSON.stringify(parentObject) +
+                        "all calls were with:" +
+                        reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -712,7 +827,7 @@ function matched(obj) {
             
             var parentMatcher = sinon.match(function (array) {
                 try{
-                  assertEquals( grandparentObject, array[array.length-2] );
+                  assertEquals( grandparentObject, penultimateOf(array) );
                 } catch(_e){
                   return false;
                 }
@@ -720,9 +835,10 @@ function matched(obj) {
             }, "had the right grandparent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the grand parent object" +  JSON.stringify(grandparentObject) +
-                   "all calls were with:" +
-                   JSON.stringify(callbackStub.args));
+               fail( "was not called with the object" + JSON.stringify(obj) + 
+                        " and garndparent object " +  JSON.stringify(grandparentObject) +
+                        "all calls were with:" +
+                        reportArgumentsToCallback(callbackStub.args));
             }            
          };
          
@@ -734,5 +850,6 @@ function matched(obj) {
          return this;
       }
    };
-
 }
+
+})();

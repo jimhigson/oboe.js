@@ -35,7 +35,6 @@ var oboe = (function(oboe){
       this._clarinet = clarinetParser;
    
       var   oboe = this
-      ,     root
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
@@ -49,7 +48,8 @@ var oboe = (function(oboe){
       };
       clarinetParser.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
-         // (ie, not arrays or objects).
+         // (ie, not arrays or objects). 
+         // For (strings/numbers) in (objects/arrays) this is where the flow goes.
 
          curNode[curKey] = value;   
          notifyListeners(oboe._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
@@ -63,47 +63,51 @@ var oboe = (function(oboe){
       };
       clarinetParser.onopenobject = function (firstKey) {
    
-         var newObj = {};
+         var ancestor = curNode;
+         
+         curNode = {};
    
-         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
-         if( curNode ) {
-            curNode[curKey] = newObj;
+         if( ancestor ) {
+            // we're not the root, modify the parent object:
+            ancestor[curKey] = curNode;
+            pathStack.push(curKey);            
          }
-         curNode = newObj;
-         nodeStack.push(newObj);
-   
-         if( !root ) {
-            root = curNode;
-         } else {
-            pathStack.push(curKey);
-         }
+         nodeStack.push(curNode);
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
-   
-      };
+      };      
       clarinetParser.onopenarray = function () {
    
-         var newArray = [];
-         curNode[curKey] = newArray;
-         curNode = newArray;
-         nodeStack.push(newArray);
-         pathStack.push(curKey);
+         // arrays can't be the root of a json so we know we'll always have an ancestor
+         var ancestor = curNode;
+         
+         curNode = [];
+         
+         if( ancestor ) {
+            ancestor[curKey] = curNode;
+            pathStack.push(curKey);            
+         }
+                  
+         nodeStack.push(curNode);
    
-         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
    
          curKey = 0;
-      };
-   
+      };   
       clarinetParser.onend =
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
+
+         // pop the curNode off the nodestack because curNode is the thing we just
+         // identified and it shouldn't be listed as an ancestor of itself:
+         nodeStack.pop();
    
          notifyListeners(oboe._thingFoundListeners, curNode, pathStack, nodeStack);
    
-         nodeStack.pop();
          pathStack.pop();
          curNode = peek(nodeStack);
    
@@ -111,15 +115,13 @@ var oboe = (function(oboe){
             curKey = curNode.length;
          }
    
-      };
-   
+      };   
       clarinetParser.onerror = this._handleErrorFromClarinet.bind(this);
    }
       
    OboeParser.prototype.fetch = function(url) {
 
-      // TODO: in if in node, use require('http') instead
-      // of ajax
+      // TODO: in if in node, use require('http') instead of ajax
 
       streamingXhr.fetch(
          url, 
@@ -231,7 +233,14 @@ var oboe = (function(oboe){
       }
    }
    
-
+   function on(listenerList, jsonPath, callback, context) {
+      if( typeof jsonPath === 'string' ) {
+         pushListener(listenerList, jsonPath, callback, context);
+      } else {
+         pushListeners(listenerList, jsonPath);
+      }      
+   }
+   
    /**
     * Add a new json path to the parser, to be called as soon as the path is found, but before we know
     * what value will be in there.
@@ -246,17 +255,14 @@ var oboe = (function(oboe){
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
+    *          [*]              - equivalent to .*
     *
     * @param {Function} callback
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
-
-      if( typeof jsonPath === 'string' ) {
-         pushListener(this._pathMatchedListeners, jsonPath, callback, context);
-      } else {
-         pushListeners(this._pathMatchedListeners, jsonPath);
-      }
+   
+      on(this._pathMatchedListeners, jsonPath, callback, context);
       return this;
    };
 
@@ -269,13 +275,8 @@ var oboe = (function(oboe){
     * @param {Object} [context] the scope for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
-
-      if( typeof jsonPath === 'string' ) {
-         pushListener(this._thingFoundListeners, jsonPath, callback, context);
-      } else {
-         pushListeners(this._thingFoundListeners, jsonPath);
-      }
-
+   
+      on(this._thingFoundListeners, jsonPath, callback, context);
       return this;
    };
    
