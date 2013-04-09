@@ -725,37 +725,39 @@ var oboe = (function(oboe){
       };
       clarinetParser.onopenobject = function (firstKey) {
    
-         var newObj = {};
+         var ancestor = curNode;
+         
+         curNode = {};
    
-         notifyListeners(oboe._pathMatchedListeners, newObj, pathStack, nodeStack);
-         notifyListeners(oboe._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
-         // if the object we just found is the root, there will be no curNode already
-         if( curNode ) {
+         if( ancestor ) {
             // we're not the root, modify the parent object:
-            curNode[curKey] = newObj;
+            ancestor[curKey] = curNode;
             pathStack.push(curKey);            
          }
-         curNode = newObj;
-         nodeStack.push(newObj);
+         nodeStack.push(curNode);
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
-   
-      };
+      };      
       clarinetParser.onopenarray = function () {
    
-         var newArray = [];
-         curNode[curKey] = newArray;
-         curNode = newArray;
-         nodeStack.push(newArray);
+         // arrays can't be the root of a json so we know we'll always have an ancestor
+         var ancestor = curNode;
+         
+         curNode = [];
+         
+         ancestor[curKey] = curNode;
+                  
+         nodeStack.push(curNode);
          pathStack.push(curKey);
    
-         notifyListeners(oboe._pathMatchedListeners, newArray, pathStack, nodeStack);
+         notifyListeners(oboe._pathMatchedListeners, curNode, pathStack, nodeStack);
    
          curKey = 0;
-      };
-   
+      };   
       clarinetParser.onend =
       clarinetParser.oncloseobject =
       clarinetParser.onclosearray = function () {
@@ -773,8 +775,7 @@ var oboe = (function(oboe){
             curKey = curNode.length;
          }
    
-      };
-   
+      };   
       clarinetParser.onerror = this._handleErrorFromClarinet.bind(this);
    }
       
