@@ -76,11 +76,16 @@
       </div>
       
       <div class="secondaryContent">
+
+         <section data-module="user" class="data-cloak">
+            <img src="{{user.avitar}}" />
+            <header>{{user.username}}</header>
+            <span class="location">{{user.location}}</span>            
+         </section>
       
          <!-- DOM for the table module -->      
-         <section data-module="tables" id="TableTemplate">
-            <header>Table</header>
-            <p>Here is a table:</p>
+         <section data-module="tables">
+
             <h2 class="data-cloak">{{heading}}</h2>      
                  
             <table class="data-cloak">

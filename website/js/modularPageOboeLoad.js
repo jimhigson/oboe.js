@@ -34,14 +34,14 @@ $(function(){
       });         
    }   
    
-   function setupUserBarView( templateElement ) {
+   function setupUserView( templateElement ) {
       var template = soma.template.create(templateElement);
       
       requestOboe.onFind({
          '$.user' : renderTemplateWithNewData( template, 'user' )
       });
    }
-      
+         
    function randomiseMapOrder(map) {
       var randomkeys = _.shuffle( _.keys(map) ),
           newMap = {};
@@ -86,6 +86,7 @@ $(function(){
    
    setupActivityView($('[data-module=tables]')[0]);
    setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);
-   setupUserBarView($('[data-module=accountBar]')[0]);
+   setupUserView($('[data-module=accountBar]')[0]);
+   setupUserView($('[data-module=user]')[0]);
 
 });
