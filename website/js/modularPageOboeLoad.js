@@ -1,6 +1,6 @@
 $(function(){
 
-   var parser = oboe.parser();            
+   var requestOboe = oboe.parser();            
    
    function renderTemplateWithNewData( template, fieldName ) {
       return function(data) {
@@ -11,7 +11,7 @@ $(function(){
    function renderTemplateWithNewDataParent( template, fieldName ) {
       return function(data, _path, ancestors) {
          var parentObject = ancestors[ancestors.length-1];
-         
+                  
          template.scope[fieldName] = parentObject;
          template.render();
       }
@@ -20,7 +20,7 @@ $(function(){
    function setupActivityView( templateElement ) {
       var template = soma.template.create(templateElement);
    
-      parser.onFind({         
+      requestOboe.onFind({         
          '$.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
       ,  '$.activity.data[*]':     renderTemplateWithNewDataParent( template, 'data' )
       });         
@@ -29,10 +29,18 @@ $(function(){
    function setupRecentAchievementsView( templateElement ) {
       var template = soma.template.create(templateElement);
       
-      parser.onFind({         
+      requestOboe.onFind({         
          '$.recentAchievements.awards[*]' : renderTemplateWithNewDataParent( template, 'awards' )
       });         
    }   
+   
+   function setupUserBarView( templateElement ) {
+      var template = soma.template.create(templateElement);
+      
+      requestOboe.onFind({
+         '$.user' : renderTemplateWithNewData( template, 'user' )
+      });
+   }
       
    function randomiseMapOrder(map) {
       var randomkeys = _.shuffle( _.keys(map) ),
@@ -48,9 +56,7 @@ $(function(){
    function expandJsonTemplate( jsonTemplate ) {
                
       return randomiseMapOrder(jsonTemplate);
-      
-      // TODO: expand examples out
-      // TODO: ramdomise the order (even though the order is non-deterministic!).
+            
    }
    
    function loadThrottled(fullData, dripSize, dripInterval) {
@@ -65,7 +71,7 @@ $(function(){
          
          console.log('next drip is', nextDrip);
                   
-         parser.read(nextDrip);
+         requestOboe.read(nextDrip);
          
          if( cursorPosition >= fullData.length ) {
             window.clearInterval(intervalId);
@@ -78,7 +84,8 @@ $(function(){
    var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
    loadThrottled(exampleJsonResponse, 5, 5);
    
-   setupActivityView($('#TableTemplate')[0]);
+   setupActivityView($('[data-module=tables]')[0]);
    setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);
+   setupUserBarView($('[data-module=accountBar]')[0]);
 
 });

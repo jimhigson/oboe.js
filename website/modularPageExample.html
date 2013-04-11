@@ -12,14 +12,35 @@
 </head>
 
 <body class="modularPage">
-
-   <h1>An example page modular webpage</h1>   
    
-   <h2 data-module="pageInfo">
+   <div class="topLinks">
+
+      <h1 id="logo">Logo</h1>
+      
+      <a href="#">Dashboard</a>
+      <a href="#">Training</a>
+      <a href="#">Explore</a>
+      <a href="#">Challenges</a>
+      
+      <span class="accountBar">
+         <a href="#">Upgrade to Premium</a>
+         
+         <span data-module="accountBar" class="data-cloak">
+            <img src="{{user.avitar}}" />
+            <a href="#">{{user.usernameShort}}</a>
+         </span>
+      </span>
+      
+      <button>Upload Activity</button>
+   </div>
+
+   <h2>An example page modular webpage</h2>   
+   
+   <h3 data-module="pageInfo">
       It doesn't really do anything but it looks like a lot of websites. It is 
       loosely based on <a href="sourceImages/strava.png">this screenshot</a> of 
       <a href="http://app.strava.com/athletes/182755">My Strava profile</a>.      
-   </h2>
+   </h3>
    
    <div class="content">
       <div class="mainContent">

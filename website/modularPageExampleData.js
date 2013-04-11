@@ -1,7 +1,14 @@
 var dataTemplate = 
 {
 
-   "pageInfo": {
+   "user": {
+      "usernameShort":"Jim"
+   ,  "username":"Jim Higson"
+   ,  "avitar":"//placehold.it/32"
+   ,  "location":"London, United Kingdom"
+   }
+
+,  "pageInfo": {
    }
 
 ,  "barChart": {

@@ -1,3 +1,6 @@
+.data-cloak {
+   display:none;
+}
 @font-face {
     font-family: "Blokk";
     src: url(../fonts/BLOKKNeue-Regular.ttf) format("truetype");
@@ -6,6 +9,19 @@
    /*font-family: Blokk, Sans;*/
 }
 
-.data-cloak {
-   display:none;
+body.modularPage {
+   background: #F6F6F6;
+}
+
+.topLinks {
+   background-color: white;
+}
+
+#logo {
+   color:#E14823;
+}
+
+button {
+   background-color:#E14823;
+   color:white;
 }
