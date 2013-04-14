@@ -1,6 +1,6 @@
 (function(){
 
-   TestCase("pathTest", {
+   TestCase("pathsTest", {
    
       testMatchesRoot: function() {
          givenAPattern('$')
@@ -165,24 +165,39 @@
    
    function Asserter( pattern ){
       this._pattern = pattern;
-      this._compiledPattern = paths.compile(pattern);          
+      
+      try {
+         this._compiledPattern = paths.compile(pattern);
+      } catch( e ) {
+         fail( 'problem parsing:' + pattern + "\n" + e );
+      }          
    }
    
    Asserter.prototype.thenShouldMatch = function(path) {
-   
-      assertTrue( 
-         'pattern ' + this._pattern + ' should have matched ' + '..' + path.join('.')
-      ,   this._compiledPattern.test(path) 
-      );
+
+      try{   
+         assertTrue( 
+            'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
+         ,   this._compiledPattern.test(path) 
+         );
+      } catch( e ) {
+         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+      }      
+      
       return this;
    };
    
    Asserter.prototype.thenShouldNotMatch = function(path) {
    
-      assertFalse( 
-         'pattern ' + this._pattern + ' should not have matched ' + '..' + path.join('.')
-      ,  this._compiledPattern.test(path)
-      );      
+      try{
+         assertFalse( 
+            'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
+         ,  this._compiledPattern.test(path)
+         );
+      } catch( e ) {
+         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+      }    
+        
       return this;         
    };
 
