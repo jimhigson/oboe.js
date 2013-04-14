@@ -46,24 +46,23 @@
       <div class="mainContent">
          <section data-module="activitySummary">
             <header>Activity Summary Last 4 Weeks</header>
-            <div class="total">
+            <div class="total data-cloak">
                Total Activities
-               <span class="number">{{activitySummary.number}}</span>
+               <span class="number">{{totalNumber}}</span>
             </div>
-            <section class="calendar">
+            <section class="calendar data-cloak">
             
                <header>Calendar</header>
                
-               <div data-repeat="week in activitySummary.weeks" class="weekRow">
-                  <span data-repeat="day in week.days" class="day {{day.active}}"></span>
+               <div data-repeat="week in weeks" class="weekRow">
+                  <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
                   <span class="weekSummary">
                      {{week.timeSpent}} 
                   </span>
                </div>
                
                <div class="dayHeadings">
-                  <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
-                  <span>S</span><span>S</span>
+                  <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
                </div>
             </section>
          </section>

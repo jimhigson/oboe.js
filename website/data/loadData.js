@@ -1,9 +1,32 @@
 
 
-function expandJsonTemplate( jsonTemplate ) {
+function expandJsonTemplate( json ) {
             
-   return randomiseMapOrder(jsonTemplate);
+   // traveerse json recursively, replacing some special tokens with random values:
+   
+   function replacePlaceholders(templateString){
+      return templateString.replace(
+         "{{Boolean}}", 
+         function(){ return Math.random() > 0.5 }
+      );
+   }
+   
+   for( var i in json ) {
+   
+      switch( json[i].constructor.name ) {
          
+         case "Object":
+         case "Array":         
+            json[i] = expandJsonTemplate(json[i]);
+            break;
+         
+         case "String":
+            json[i] = replacePlaceholders( json[i] );
+            break;                       
+      }
+   }
+                  
+   return json;         
 }
 
 /** I can't remember if Javascript objects are deterministic in their ordering, but in practice

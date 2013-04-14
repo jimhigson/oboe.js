@@ -25,3 +25,12 @@ button {
    background-color:#E14823;
    color:white;
 }
+
+.calendar .day {
+   display:inline-block;
+   width: 20px;
+   height: 20px;
+}
+.calendar .day.active-true {
+   background-color: black;
+}
