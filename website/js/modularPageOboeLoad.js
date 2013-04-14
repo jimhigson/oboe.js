@@ -41,48 +41,12 @@ $(function(){
          '$.user' : renderTemplateWithNewData( template, 'user' )
       });
    }
+                      
+   var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));
          
-   function randomiseMapOrder(map) {
-      var randomkeys = _.shuffle( _.keys(map) ),
-          newMap = {};
-      
-      _.each( randomkeys, function( key ) {
-         newMap[key] = map[key];      
-      });
-      
-      return newMap;
-   }      
-         
-   function expandJsonTemplate( jsonTemplate ) {
-               
-      return randomiseMapOrder(jsonTemplate);
-            
-   }
-   
-   function loadThrottled(fullData, dripSize, dripInterval) {
-         
-      var cursorPosition = 0;         
-         
-      var intervalId = window.setInterval(function(){
-      
-         var nextDrip = fullData.substr(cursorPosition, dripSize);         
-         
-         cursorPosition += dripSize;
-         
-         console.log('next drip is', nextDrip);
-                  
-         requestOboe.read(nextDrip);
-         
-         if( cursorPosition >= fullData.length ) {
-            window.clearInterval(intervalId);
-         }                                                        
-
-      }, dripInterval);
-   }
-   
-   
-   var exampleJsonResponse = JSON.stringify(expandJsonTemplate(dataTemplate));      
-   loadThrottled(exampleJsonResponse, 5, 5);
+   loadThrottled(exampleJsonResponse, 5, 5, function(nextDrip){
+      requestOboe.read(nextDrip);
+   });
    
    setupActivityView($('[data-module=tables]')[0]);
    setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);

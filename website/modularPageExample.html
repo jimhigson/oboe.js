@@ -44,7 +44,31 @@
    
    <div class="content">
       <div class="mainContent">
-         <!-- DOM for the bar chart module -->
+         <section data-module="activitySummary">
+            <header>Activity Summary Last 4 Weeks</header>
+            <div class="total">
+               Total Activities
+               <span class="number">{{activitySummary.number}}</span>
+            </div>
+            <section class="calendar">
+            
+               <header>Calendar</header>
+               
+               <div data-repeat="week in activitySummary.weeks" class="weekRow">
+                  <span data-repeat="day in week.days" class="day {{day.active}}"></span>
+                  <span class="weekSummary">
+                     {{week.timeSpent}} 
+                  </span>
+               </div>
+               
+               <div class="dayHeadings">
+                  <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
+                  <span>S</span><span>S</span>
+               </div>
+            </section>
+         </section>
+         
+         <!-- DOM for the bar recent achievements module -->
          <section data-module="recentAchievements">
             <header>Recent Achievements</header>
             <div class="awards data-cloak">
@@ -101,7 +125,8 @@
 
    <script src="components/jquery/jquery.min.js"></script>
    <script src="components/underscore/underscore.js"></script>
-   <script src="modularPageExampleData.js" type="text/javascript" ></script>
+   <script src="data/modularPageExampleData.js" type="text/javascript" ></script>
+   <script src="data/loadData.js" type="text/javascript" ></script>
    <script src="libs/soma-template.js" type="text/javascript" ></script>
    <script src="../oboe.js" type="text/javascript" ></script>
    <script src="js/modularPageOboeLoad.js"></script>
