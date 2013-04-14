@@ -107,7 +107,7 @@ var jsonPathCompiler = (function () {
     * A function that, given a jsonPath string, returns a function that tests against that
     * jsonPath.
     */
-   return function compileJsonPath(jsonPath) {        
+   return function (jsonPath) {        
       try {        
          return statement(compileNextToken(jsonPath, function(){return true}));
       } catch( e ) {
