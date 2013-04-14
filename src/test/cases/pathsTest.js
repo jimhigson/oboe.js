@@ -167,7 +167,7 @@
       this._pattern = pattern;
       
       try {
-         this._compiledPattern = paths.compile(pattern);
+         this._compiledPattern = jsonPathCompiler(pattern);
       } catch( e ) {
          fail( 'problem parsing:' + pattern + "\n" + e );
       }          
@@ -178,7 +178,7 @@
       try{   
          assertTrue( 
             'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
-         ,   this._compiledPattern.test(path) 
+         ,   this._compiledPattern(path) 
          );
       } catch( e ) {
          fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
@@ -192,7 +192,7 @@
       try{
          assertFalse( 
             'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
-         ,  this._compiledPattern.test(path)
+         ,  this._compiledPattern(path)
          );
       } catch( e ) {
          fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      

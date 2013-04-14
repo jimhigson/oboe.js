@@ -150,7 +150,7 @@ var oboe = (function(oboe){
        */
       function matchesPath( path ) {      
          return function( listener ) {
-            return listener.pattern.test( path );         
+            return listener.pattern( path );         
          };
       } 
 
@@ -214,7 +214,7 @@ var oboe = (function(oboe){
     */
    function pushListener(listenerList, jsonPath, callback, context) {
       return listenerList.push({
-         pattern: paths.compile(jsonPath),
+         pattern: jsonPathCompiler(jsonPath),
          callback: callback,
          context: context
       });

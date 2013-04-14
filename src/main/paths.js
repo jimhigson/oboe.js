@@ -1,5 +1,5 @@
 
-var paths = (function (paths) {
+var jsonPathCompiler = (function () {
 
    function namedNodeExpr(previousExpr, name) {
       return function( pathArray, pathArrayIndex ){
@@ -37,6 +37,12 @@ var paths = (function (paths) {
          return pathArrayIndex == -1;
       }   
    }
+   
+   function statement(statementExpr) {
+      return function(pathArray){
+         return statementExpr(pathArray, pathArray.length-1);
+      }
+   }
      
    var tokenExprs = [
       [/^(\w+)/       , namedNodeExpr],
@@ -49,9 +55,9 @@ var paths = (function (paths) {
       [/^\./          , passthrough]
    ];
 
-   function compileJsonPath(jsonPath, previousParser) {
+   function compileJsonPath(jsonPath) {
         
-
+      function compileNextToken( jsonPath, previousParser ) {
          // terminal case for the recursion:
          if( jsonPath.length == 0 ) {
             return previousParser;
@@ -66,30 +72,18 @@ var paths = (function (paths) {
                var remainingString = jsonPath.substr(match[0].length),
                    parser = tokenParserFunction(previousParser, match[1]);
             
-               return compileJsonPath(remainingString, parser);
+               return compileNextToken(remainingString, parser);
             }
          }
          throw new Error('got stuck at "' + jsonPath + '"');      
+      }
 
-        
-
+      try {        
+         return statement(compileNextToken(jsonPath, function(){return true}));
+      } catch( e ) {
+         throw new Error('Could not compile ' + jsonPath + e);
+      }
    }
    
-   return {
-      compile: function( jsonPath ){
-   
-         try {
-            var compiled = compileJsonPath(jsonPath, function(){return true;});
-         } catch( e ) {
-            throw new Error('Could not compile ' + jsonPath + e);
-         } 
-   
-         return {
-            test: function(path){
-               return compiled(path, path.length-1);
-            }         
-         };      
-      }
-   };
-   
-})( typeof exports === "undefined" ? {} : exports );
+   return compileJsonPath;   
+})();
