@@ -66,11 +66,11 @@ var jsonPathCompiler = (function () {
          for (var i = 0; i < tokenExprs.length; i++) {
             var tokenExpr = tokenExprs[i],
                 match = tokenExpr[0].exec(jsonPath),
-                tokenParserFunction =  tokenExpr[1];
+                tokenExprParser = tokenExpr[1];
       
             if(match) {
                var remainingString = jsonPath.substr(match[0].length),
-                   parser = tokenParserFunction(previousParser, match[1]);
+                   parser = tokenExprParser(previousParser, match[1]);
             
                return compileNextToken(remainingString, parser);
             }
@@ -81,7 +81,7 @@ var jsonPathCompiler = (function () {
       try {        
          return statement(compileNextToken(jsonPath, function(){return true}));
       } catch( e ) {
-         throw new Error('Could not compile ' + jsonPath + e);
+         throw new Error('Could not compile ' + jsonPath + ' because ' + e);
       }
    }
    
