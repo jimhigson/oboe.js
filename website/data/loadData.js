@@ -1,9 +1,15 @@
+
+
 function expandJsonTemplate( jsonTemplate ) {
             
    return randomiseMapOrder(jsonTemplate);
          
 }
 
+/** I can't remember if Javascript objects are deterministic in their ordering, but in practice
+ *  they always output to JSON in the order that the keys were added. Make things a bit more
+ *  interesting by randomising that order
+ */
 function randomiseMapOrder(map) {
    var randomkeys = _.shuffle( _.keys(map) ),
        newMap = {};
@@ -35,3 +41,4 @@ function loadThrottled(fullData, dripSize, dripInterval, callback) {
 
    }, dripInterval);
 }
+
