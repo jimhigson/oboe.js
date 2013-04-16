@@ -15,6 +15,22 @@ or cut out halfway.
 
 Think of it as the json equivalent of old-style oboe html rendering.
 
+# Use cases
+
+**Sarah** is using her mobile phone to check her email. The phone has almost finished downloading her inbox when
+the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
+still read most of her emails.
+
+**Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
+when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
+wait for the slow module to load before she can udate the page. Because she chose **Oboe.js**, the page changes very quickly
+and the slow modules load later. Her users are happy because they can navigate page-to-page more fluidly and not all of
+them cared about the slow module anyway.
+
+**Michael** is writing a scrollable timeline data visualisation. His json contains data for 200 events but until the 
+user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load before showing the 
+starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not be waiting.
+
 # Status
 
 Oboe is still in development. Nevertheless, it is already
