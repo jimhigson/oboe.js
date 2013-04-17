@@ -27,7 +27,7 @@ wait for the slow module to load before she can udate the page. Because she chos
 and the slow modules load later. Her users are happy because they can navigate page-to-page more fluidly and not all of
 them cared about the slow module anyway.
 
-**Michael** is writing a scrollable timeline data visualisation. His json contains data for 200 events but until the 
+**Michael** is writing a scrollable timeline data visualisation using [d3](http://d3js.org/). His json contains data for 200 events but until the 
 user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load before showing the 
 starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not be waiting.
 
