@@ -218,6 +218,12 @@
       return new Asserter(pattern);     
    }
    
+   // for the given pattern, return an array of empty objects of the same length to
+   // stand in for the nodestack in the cases where we only care about match or not match
+   function fakeNodeStack(pattern){
+      return pattern.map(function(){return {}});      
+   }
+   
    function Asserter( pattern ){
       this._pattern = pattern;
       
@@ -228,12 +234,16 @@
       }          
    }
    
-   Asserter.prototype.thenShouldMatch = function(path) {
+   Asserter.prototype.thenShouldMatch = function(path, nodeStack) {
+
+      nodeStack = nodeStack || fakeNodeStack(path);
+      
+      this._lastResult = this._compiledPattern(path, nodeStack);
 
       try{   
          assertTrue( 
             'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
-         ,   this._compiledPattern(path) 
+         ,   this._lastResult 
          );
       } catch( e ) {
          fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
@@ -242,32 +252,22 @@
       return this;
    };
    
-   Asserter.prototype.thenShouldNotMatch = function(path) {
-   
+   Asserter.prototype.thenShouldNotMatch = function(path, nodeStack) {
+
+      nodeStack = nodeStack || fakeNodeStack(path);
+      
+      this._lastResult = this._compiledPattern(path, nodeStack);      
+         
       try{
          assertFalse( 
             'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
-         ,  this._compiledPattern(path)
+         ,  this._lastResult
          );
       } catch( e ) {
          fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
       }    
         
       return this;         
-   };
-   
-   Asserter.prototype.thenShouldMatchPathAndNodes = function(path, nodes) {
-   
-      try{
-         assertFalse( 
-            'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
-         ,  this._compiledPattern(path)
-         );
-      } catch( e ) {
-         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
-      }    
-        
-      return this;         
-   };   
+   };      
 
 })();

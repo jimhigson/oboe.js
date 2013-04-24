@@ -145,21 +145,14 @@ var oboe = (function(oboe){
     */  
    function notifyListeners ( listenerList, foundNode, path, ancestors ) {
 
-      /**
-       * returns a function which tests if a listener is interested in the given path
-       */
-      function matchesPath( path ) {      
-         return function( listener ) {
-            return listener.pattern( path );         
-         };
-      } 
-
       listenerList
-         .filter(matchesPath(path))
          .forEach( function(listener) {
-             var context = listener.context || window;
-             
-             listener.callback.call(context, foundNode, path, ancestors );               
+         
+             if( listener.text( path ) ) {         
+                var context = listener.context || window;
+                
+                listener.callback.call(context, foundNode, path, ancestors );
+             }                            
          });
    }
 
@@ -214,7 +207,7 @@ var oboe = (function(oboe){
     */
    function pushListener(listenerList, jsonPath, callback, context) {
       return listenerList.push({
-         pattern: jsonPathCompiler(jsonPath),
+         text: jsonPathCompiler(jsonPath),
          callback: callback,
          context: context
       });
@@ -245,7 +238,7 @@ var oboe = (function(oboe){
     * @param {String} jsonPath
     *    The jsonPath is a subset of JSONPath patterns and supports these special meanings.
     *    See http://goessner.net/articles/JsonPath/
-    *          $                - root json object
+    *          !                - root json object
     *          .                - path separator
     *          foo              - path node 'foo'
     *          ['foo']          - path node 'foo'

@@ -87,6 +87,7 @@ var jsonPathCompiler = (function () {
     * @returns {Object|False} either the object that was found, or false if nothing was found         
     */   
    function statement(lastStatementExpr, pathStack, nodeStack){
+   
       return lastStatementExpr(pathStack, nodeStack, pathStack.length-1);
    }   
 
