@@ -3,54 +3,66 @@ var jsonPathCompiler = (function () {
 
    /**
     * Expression for a named path node
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found
     */
-   function namedNodeExpr(previousExpr, name, pathArray, pathArrayIndex ) {
-      return pathArray[pathArrayIndex] == name && previousExpr(pathArray, pathArrayIndex-1);         
+   function namedNodeExpr(previousExpr, name, pathStack, stackIndex, nodeStack ) {
+      return pathStack[stackIndex] == name && previousExpr(pathStack, stackIndex-1);         
    }
 
    /**
     * Expression for *, [*] etc
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found         
     */
-   function anyNodeExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex ){      
-      return previousExpr(pathArray, pathArrayIndex-1);
+   function anyNodeExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ){      
+      return previousExpr(pathStack, stackIndex-1);
    }
    
    /**
-    * Expression for .. (double dot) token
+    * Expression for .. (double dot) token              
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found         
     */   
-   function multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex ) {
+   function multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ) {
       
       // past the start, not a match:
-      if( pathArrayIndex < -1 ) {
+      if( stackIndex < -1 ) {
          return false;
       }
    
-      return pathArrayIndex == -1 || // -1 is sometimes the root 
-             previousExpr(pathArray, pathArrayIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex-1);         
+      return stackIndex == -1 || // -1 is sometimes the root 
+             previousExpr(pathStack, stackIndex) || 
+             multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex-1);         
    }      
    
    /**
     * Expression for $ - matches only the root element of the json
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found         
     */   
-   function rootExpr(ignoredPreviousExprs, ignoredSubexpression, pathArray, pathArrayIndex ){
-      return pathArrayIndex == -1;
+   function rootExpr(ignoredPreviousExprs, ignoredSubexpression, pathStack, stackIndex ){
+      return stackIndex == -1;
    }   
    
    /**
     * Expression for . does no tests since . is just a seperator. Just passes through to the
     * next function in the chain.
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found         
     */   
-   function passthrough(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex) {
-      return previousExpr(pathArray, pathArrayIndex);
+   function passthrough(previousExpr, ignoredSubexpression, pathStack, stackIndex) {
+      return previousExpr(pathStack, stackIndex);
    }   
         
    /**
     * Wrapper for an expression that makes up a statement.
     * Returns a function that acts as the kick-off point for evaluating the expression
+    * 
+    * @returns {Object|False} either the object that was found, or false if nothing was found         
     */   
-   function statement(lastStatementExpr, pathArray){
-      return lastStatementExpr(pathArray, pathArray.length-1);
+   function statement(lastStatementExpr, pathStack){
+      return lastStatementExpr(pathStack, pathStack.length-1);
    }
 
    /**
