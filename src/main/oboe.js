@@ -236,7 +236,7 @@ var oboe = (function(oboe){
     * what value will be in there.
     *
     * @param {String} jsonPath
-    *    The jsonPath is a subset of JSONPath patterns and supports these special meanings.
+    *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
     *    See http://goessner.net/articles/JsonPath/
     *          !                - root json object
     *          .                - path separator
@@ -245,7 +245,7 @@ var oboe = (function(oboe){
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
-    *          [*]              - equivalent to .*
+    *          [*]              - equivalent to .*         
     *
     * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
     * 
