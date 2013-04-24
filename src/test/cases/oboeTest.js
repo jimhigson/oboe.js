@@ -544,7 +544,7 @@ TestCase("oboeTest", {
                ,   foundNMatches(2)
                );
    }
-
+      
 ,  testMatchesNestedSelectorSeparatedByASingleStarSelector: function() {
 
       givenAParser()
@@ -569,6 +569,49 @@ TestCase("oboeTest", {
                ,   foundNMatches(3)
                );
    }
+   
+,  testGetsAllSimpleObjectsFromAnArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('foods.*')
+         .whenGivenInput({
+            foods: [
+               {name:'aubergine'},
+               {name:'apple'},
+               {name:'nuts'}
+            ]
+         })
+         // essentially, the parser should have been called three times with the same object, but each time
+         // an additional item should have been added
+         .thenTheParser
+               (   foundNMatches(3)
+               ,   matched({name:'aubergine'})
+               ,   matched({name:'apple'})
+               ,   matched({name:'nuts'})   
+               );
+   }   
+   
+,  testGetsSameObjectRepeatedlyUsingCss4Syntax: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$foods.*')
+         .whenGivenInput({
+
+            foods: [
+               {name:'aubergine'},
+               {name:'apple'},
+               {name:'nuts'}
+            ]
+         })
+         // essentially, the parser should have been called three times with the same object, but each time
+         // an additional item should have been added
+         .thenTheParser
+               (   foundNMatches(3)
+               ,   matched([{name:'aubergine'}])
+               ,   matched([{name:'aubergine'},{name:'apple'}])
+               ,   matched([{name:'aubergine'},{name:'apple'},{name:'nuts'}])   
+               );
+   }   
 
 ,  testMatchesNestedSelectorSeparatedByDoubleDot: function() {
 

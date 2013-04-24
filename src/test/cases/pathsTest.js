@@ -213,9 +213,7 @@
                    ['root', 'target',   'child'])
                       .returning('target');
       }                  
-      
-                                                               
-        
+
    });
    
    function givenAPattern( pattern ) {

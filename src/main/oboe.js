@@ -143,15 +143,22 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, foundNode, path, ancestors ) {
+   function notifyListeners ( listenerList, curNode, path, ancestors ) {
+
+      console.log('testing to notify for path', path, 'against', listenerList.length, 'listeners');
 
       listenerList
          .forEach( function(listener) {
+
+             var foundNode = listener.test( path );
+             
+             console.log('for path ', path, 'and ancestors', ancestors, 'against pattern', listener.pattern, 'found node is', foundNode); 
          
-             if( listener.text( path ) ) {         
+             if( foundNode ) {         
                 var context = listener.context || window;
                 
-                listener.callback.call(context, foundNode, path, ancestors );
+                // change curNode to foundNode when it stops breaking tests
+                listener.callback.call(context, curNode, path, ancestors );
              }                            
          });
    }
@@ -205,9 +212,10 @@ var oboe = (function(oboe){
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
-   function pushListener(listenerList, jsonPath, callback, context) {
+   function pushListener(listenerList, pattern, callback, context) {
       return listenerList.push({
-         text: jsonPathCompiler(jsonPath),
+         pattern:pattern,
+         test: jsonPathCompiler(pattern),
          callback: callback,
          context: context
       });

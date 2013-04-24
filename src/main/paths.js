@@ -7,7 +7,10 @@ var jsonPathCompiler = (function () {
     */
    var tokenExprs = (function(){
       /**
-       * Expression for a named path node
+       * Expression for a named path node. 
+       *    foo
+       *    ["foo"]
+       *    [2]
        * 
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
@@ -23,7 +26,9 @@ var jsonPathCompiler = (function () {
       }
    
       /**
-       * Expression for *, [*] etc
+       * Expression for:
+       *    *
+       *    [*]
        * 
        * @returns {Object|false} either the object that was found, or false if nothing was found         
        */
