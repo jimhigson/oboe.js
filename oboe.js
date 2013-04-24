@@ -650,8 +650,8 @@ var jsonPathCompiler = (function () {
    }   
    
    /**
-    * Expression for . does nothing since . has no meaning, just passes through to the
-    * next in the chain
+    * Expression for . does no tests since . is just a seperator. Just passes through to the
+    * next function in the chain.
     */   
    function passthrough(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex) {
       return previousExpr(pathArray, pathArrayIndex);
@@ -669,8 +669,8 @@ var jsonPathCompiler = (function () {
     * Each of the sub-arrays has at index 0 a pattern matching the token.
     * At index 1 is the expression function to return a function to parse that expression
     */
-   function tokenExpr(pattern, test) {
-      return {pattern:pattern, test:test};
+   function tokenExpr(pattern, parser) {
+      return {pattern:pattern, parser:parser};
    }     
    var tokenExprs = [
       tokenExpr(/^(\w+)/       , namedNodeExpr),
@@ -687,20 +687,15 @@ var jsonPathCompiler = (function () {
     * compile the next part of a jsonPath
     */
    function compileNextToken( jsonPath, compiledSoFar ) {
-      // terminal case for the recursion:
-      if( jsonPath.length == 0 ) {
-         return compiledSoFar;
-      }        
-        
+                
       for (var i = 0; i < tokenExprs.length; i++) {
-         var tokenExpr = tokenExprs[i],
-             match = tokenExpr.pattern.exec(jsonPath);
+         var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
-         if(match) {
-            var remainingString = jsonPath.substr(match[0].length),
-                parser = tokenExpr.test.bind(null, compiledSoFar, match[1]);
+         if(tokenMatch) {
+            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, tokenMatch[1]),
+                remainingString = jsonPath.substr(tokenMatch[0].length);
          
-            return compileNextToken(remainingString, parser);
+            return remainingString? compileNextToken(remainingString, parser) : parser;
          }
       }
       
@@ -711,6 +706,8 @@ var jsonPathCompiler = (function () {
    /**
     * A function that, given a jsonPath string, returns a function that tests against that
     * jsonPath.
+    * 
+    *    String -> (String[] -> Boolean)
     */
    return function (jsonPath) {        
       try {        
