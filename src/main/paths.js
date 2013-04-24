@@ -61,14 +61,14 @@ var jsonPathCompiler = (function () {
       return {pattern:pattern, parser:parser};
    }     
    var tokenExprs = [
-      tokenExpr(/^(\w+)/       , namedNodeExpr),
-      tokenExpr(/^\[(\d+)\]/   , namedNodeExpr),
-      tokenExpr(/^\["(\w+)"\]/ , namedNodeExpr),
-      tokenExpr(/^\.\./        , multipleUnnamedNodesExpr),
-      tokenExpr(/^\$/          , rootExpr),      
-      tokenExpr(/^\*/          , anyNodeExpr),
-      tokenExpr(/^\[\*\]/      , anyNodeExpr),      
-      tokenExpr(/^\./          , passthrough)
+      tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
+      tokenExpr(/^\[(\$?)(\d+)\]/    , namedNodeExpr),
+      tokenExpr(/^\[(\$?)"(\w+)"\]/  , namedNodeExpr),
+      tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
+      tokenExpr(/^!/                 , rootExpr),      
+      tokenExpr(/^(\$?)\*/           , anyNodeExpr),
+      tokenExpr(/^\[(\$?)\*\]/       , anyNodeExpr),      
+      tokenExpr(/^\./                , passthrough)
    ];
 
    /** 
@@ -80,7 +80,7 @@ var jsonPathCompiler = (function () {
          var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
          if(tokenMatch) {
-            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, tokenMatch[1]),
+            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, tokenMatch[2]),
                 remainingString = jsonPath.substr(tokenMatch[0].length);
          
             return remainingString? compileNextToken(remainingString, parser) : parser;

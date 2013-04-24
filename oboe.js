@@ -677,7 +677,7 @@ var jsonPathCompiler = (function () {
       tokenExpr(/^\[(\d+)\]/   , namedNodeExpr),
       tokenExpr(/^\["(\w+)"\]/ , namedNodeExpr),
       tokenExpr(/^\.\./        , multipleUnnamedNodesExpr),
-      tokenExpr(/^\$/          , rootExpr),      
+      tokenExpr(/^!/           , rootExpr),      
       tokenExpr(/^\*/          , anyNodeExpr),
       tokenExpr(/^\[\*\]/      , anyNodeExpr),      
       tokenExpr(/^\./          , passthrough)
@@ -713,7 +713,7 @@ var jsonPathCompiler = (function () {
       try {        
          return statement.bind(null, compileNextToken(jsonPath, function(){return true}));
       } catch( e ) {
-         throw Error('Could not compile ' + jsonPath + ' because ' + e);
+         throw Error('Could not compile "' + jsonPath + '" because ' + e);
       }
    };
    
