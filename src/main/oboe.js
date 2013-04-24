@@ -254,8 +254,9 @@ var oboe = (function(oboe){
     *          ..               - any number of intermediate nodes (non-greedy)
     *          [*]              - equivalent to .*
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * 
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
    
@@ -268,8 +269,8 @@ var oboe = (function(oboe){
     *
     * @param {String} jsonPath supports the same syntax as .onPath.
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
    
