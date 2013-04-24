@@ -19,7 +19,7 @@ var jsonPathCompiler = (function () {
       
          var previous = previousExpr(pathStack, nodeStack, stackIndex-1);
                
-         return previous && (capturing? nodeStack[stackIndex+1] : (previous || true));         
+         return previous && returnValue(capturing, previous, nodeStack, stackIndex);         
       }
    
       /**
@@ -30,7 +30,7 @@ var jsonPathCompiler = (function () {
       function anyNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
          var previous = previousExpr(pathStack, nodeStack, stackIndex-1);                   
                   
-         return previous && (capturing? nodeStack[stackIndex+1] : (previous || true));
+         return previous && returnValue(capturing, previous, nodeStack, stackIndex);
       }
       
       /**
@@ -56,7 +56,7 @@ var jsonPathCompiler = (function () {
        * @returns {Object|false} either the object that was found, or false if nothing was found         
        */   
       function rootExpr(_cantHaveExprsBeforeRoot, capturing, _nameless, pathStack, nodeStack, stackIndex ){
-         return stackIndex == -1 && (capturing? nodeStack[0] : true);
+         return stackIndex == -1 && returnValue(capturing, true, nodeStack, stackIndex);
       }   
       
       /**
@@ -68,6 +68,14 @@ var jsonPathCompiler = (function () {
       function passthroughExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) {
          return previousExpr(pathStack, nodeStack, stackIndex);
       }   
+           
+      /** extraction of some common logic used by expression when they have matched.
+       *  If is a capturing node, will return it's item on the nodestack. Otherwise, will return the item
+       *  from the nodestack given by the previous expression, or true if none
+       */
+      function returnValue(capturing, previousExprReturnValue, nodeStack, stackIndex) {
+         return capturing? nodeStack[stackIndex+1] : (previousExprReturnValue || true);
+      }
            
       /**
        * Each of the sub-arrays has at index 0 a pattern matching the token.

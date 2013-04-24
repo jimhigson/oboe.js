@@ -169,7 +169,7 @@
    ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
          givenAPattern('!..$foo..bar')                     
             .thenShouldMatch( 
-                  [        'a',      'foo',    'a',      'bar'], 
+                  [        'p',      'foo',    'c',      'bar'], 
                   ['root', 'parent', 'target', 'child',  'gchild'])
                      .returning('target');            
       }
@@ -177,35 +177,33 @@
    ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
          givenAPattern('$!.*')                     
             .thenShouldMatch( 
-                  ['a'], 
+                  [        'a'    ], 
                   ['root', 'child'])
                      .returning('root');     
       }                  
       
    ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
-         givenAPattern('!..$["foo"].*.bar')         
-            .thenShouldNotMatch( [] )         
-            .thenShouldNotMatch( ['foo'] )
+         givenAPattern('$["foo"].bar')         
+             .thenShouldMatch( 
+                   [        'foo',    'bar'  ], 
+                   ['root', 'target', 'child'])
+                      .returning('target');
       }
       
    ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
-         givenAPattern('!..foo.$[2].bar')         
-            .thenShouldNotMatch( [] )         
-            .thenShouldNotMatch( ['foo'] )
+         givenAPattern('$[2].bar')         
+             .thenShouldMatch( 
+                   [        '2',      'bar'  ], 
+                   ['root', 'target', 'child'])
+                      .returning('target');
       }      
       
    ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
-         givenAPattern('!..foo.$*.bar')         
-            .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'bar'])            
-            .thenShouldMatch(       ['a', 'foo', 'a', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
+         givenAPattern('!..$*.bar')         
+             .thenShouldMatch( 
+                   [        'anything', 'bar'  ], 
+                   ['root', 'target',   'child'])
+                      .returning('target');
       }
       
    ,  testCanReturnCorrectNodeWithArrayStarCss4StylePattern: function() {      
