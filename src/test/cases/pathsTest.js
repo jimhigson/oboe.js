@@ -206,18 +206,12 @@
                       .returning('target');
       }
       
-   ,  testCanReturnCorrectNodeWithArrayStarCss4StylePattern: function() {      
-         givenAPattern('!..foo.$[*].bar')         
-            .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'bar'])            
-            .thenShouldMatch(       ['a', 'foo', 'a', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
+   ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
+         givenAPattern('!..$[*].bar')         
+             .thenShouldMatch( 
+                   [        'anything', 'bar'  ], 
+                   ['root', 'target',   'child'])
+                      .returning('target');
       }                  
       
                                                                
