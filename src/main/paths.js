@@ -101,7 +101,7 @@ var jsonPathCompiler = (function () {
       try {        
          return statement.bind(null, compileNextToken(jsonPath, function(){return true}));
       } catch( e ) {
-         throw Error('Could not compile ' + jsonPath + ' because ' + e);
+         throw Error('Could not compile "' + jsonPath + '" because ' + e);
       }
    };
    
