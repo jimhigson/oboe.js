@@ -668,16 +668,19 @@ var jsonPathCompiler = (function () {
    /**
     * Each of the sub-arrays has at index 0 a pattern matching the token.
     * At index 1 is the expression function to return a function to parse that expression
-    */     
+    */
+   function tokenExpr(pattern, test) {
+      return {pattern:pattern, test:test};
+   }     
    var tokenExprs = [
-      [/^(\w+)/       , namedNodeExpr],
-      [/^\[(\d+)\]/   , namedNodeExpr],
-      [/^\["(\w+)"\]/ , namedNodeExpr],
-      [/^\.\./        , multipleUnnamedNodesExpr],
-      [/^\$/          , rootExpr],      
-      [/^\*/          , anyNodeExpr],
-      [/^\[\*\]/      , anyNodeExpr],      
-      [/^\./          , passthrough]
+      tokenExpr(/^(\w+)/       , namedNodeExpr),
+      tokenExpr(/^\[(\d+)\]/   , namedNodeExpr),
+      tokenExpr(/^\["(\w+)"\]/ , namedNodeExpr),
+      tokenExpr(/^\.\./        , multipleUnnamedNodesExpr),
+      tokenExpr(/^\$/          , rootExpr),      
+      tokenExpr(/^\*/          , anyNodeExpr),
+      tokenExpr(/^\[\*\]/      , anyNodeExpr),      
+      tokenExpr(/^\./          , passthrough)
    ];
 
    /** 
@@ -691,16 +694,17 @@ var jsonPathCompiler = (function () {
         
       for (var i = 0; i < tokenExprs.length; i++) {
          var tokenExpr = tokenExprs[i],
-             match = tokenExpr[0].exec(jsonPath),
-             tokenExprParser = tokenExpr[1];
-   
+             match = tokenExpr.pattern.exec(jsonPath);
+             
          if(match) {
             var remainingString = jsonPath.substr(match[0].length),
-                parser = tokenExprParser.bind(null, compiledSoFar, match[1]);
+                parser = tokenExpr.test.bind(null, compiledSoFar, match[1]);
          
             return compileNextToken(remainingString, parser);
          }
       }
+      
+      // couldn't find any match, jsonPath is probably invalid:
       throw Error('got stuck at "' + jsonPath + '"');      
    }
 
