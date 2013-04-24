@@ -156,7 +156,7 @@
             .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      
       }        
 
-   ,  testCanReturnCorrectNamedNodeInCss4Style: function() {      
+   ,  testCanReturnCorrectNamedNodeInCss4StylePattern: function() {      
          givenAPattern('!..$foo.*.bar')         
             .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
@@ -170,7 +170,7 @@
             .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
       }
       
-   ,  testCanReturnCorrectStarNodeInCss4Style: function() {      
+   ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
          givenAPattern('!..foo.$*.bar')         
             .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
@@ -184,7 +184,7 @@
             .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
       }
       
-   ,  testCanReturnCorrectArrayStarStyleInCss4Style: function() {      
+   ,  testCanReturnCorrectNodeWithArrayStarCss4StylePattern: function() {      
          givenAPattern('!..foo.[$*].bar')         
             .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
@@ -198,11 +198,17 @@
             .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
       }                  
       
-   ,  testCanReturnCorrectArrayNumberedStyleInCss4Style: function() {      
+   ,  testCanReturnCorrectNodeWithArrayNumberedCss4StylePattern: function() {      
          givenAPattern('!..foo.[$2].bar')         
             .thenShouldNotMatch( [] )         
             .thenShouldNotMatch( ['foo'] )
-      }      
+      }
+      
+   ,  testCanReturnCorrectNodeWithArrayNumberedCss4StylePattern: function() {      
+         givenAPattern('!..foo.[$2].bar')         
+            .thenShouldNotMatch( [] )         
+            .thenShouldNotMatch( ['foo'] )
+      }            
                                                     
         
    });
