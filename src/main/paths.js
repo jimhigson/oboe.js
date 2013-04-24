@@ -1,60 +1,86 @@
 
 var jsonPathCompiler = (function () {
 
-   /**
-    * Expression for a named path node
-    * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found
+   /** 
+    * tokenExprs is an array of pairs. Each pair contains a regular expression for matching a 
+    * jsonpath language feature and a function for parsing that feature.
     */
-   function namedNodeExpr(previousExpr, name, pathStack, stackIndex, nodeStack ) {
-      return pathStack[stackIndex] == name && previousExpr(pathStack, stackIndex-1);         
-   }
-
-   /**
-    * Expression for *, [*] etc
-    * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found         
-    */
-   function anyNodeExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ){      
-      return previousExpr(pathStack, stackIndex-1);
-   }
-   
-   /**
-    * Expression for .. (double dot) token              
-    * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found         
-    */   
-   function multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ) {
-      
-      // past the start, not a match:
-      if( stackIndex < -1 ) {
-         return false;
+   var tokenExprs = (function(){
+      /**
+       * Expression for a named path node
+       * 
+       * @returns {Object|False} either the object that was found, or false if nothing was found
+       */
+      function namedNodeExpr(previousExpr, name, pathStack, stackIndex, nodeStack ) {
+         return pathStack[stackIndex] == name && previousExpr(pathStack, stackIndex-1);         
       }
    
-      return stackIndex == -1 || // -1 is sometimes the root 
-             previousExpr(pathStack, stackIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex-1);         
-   }      
+      /**
+       * Expression for *, [*] etc
+       * 
+       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       */
+      function anyNodeExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ){      
+         return previousExpr(pathStack, stackIndex-1);
+      }
+      
+      /**
+       * Expression for .. (double dot) token              
+       * 
+       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       */   
+      function multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex ) {
+         
+         // past the start, not a match:
+         if( stackIndex < -1 ) {
+            return false;
+         }
+      
+         return stackIndex == -1 || // -1 is sometimes the root 
+                previousExpr(pathStack, stackIndex) || 
+                multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex-1);         
+      }      
+      
+      /**
+       * Expression for $ - matches only the root element of the json
+       * 
+       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       */   
+      function rootExpr(ignoredPreviousExprs, ignoredSubexpression, pathStack, stackIndex ){
+         return stackIndex == -1;
+      }   
+      
+      /**
+       * Expression for . does no tests since . is just a seperator. Just passes through to the
+       * next function in the chain.
+       * 
+       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       */   
+      function passthroughExpr(previousExpr, ignoredSubexpression, pathStack, stackIndex) {
+         return previousExpr(pathStack, stackIndex);
+      }   
+           
+      /**
+       * Each of the sub-arrays has at index 0 a pattern matching the token.
+       * At index 1 is the expression function to return a function to parse that expression
+       */
+      function tokenExpr(pattern, parser) {
+         return {pattern:pattern, parser:parser};
+      }     
+      
+      return [
+         tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
+         tokenExpr(/^\[(\$?)(\d+)\]/    , namedNodeExpr),
+         tokenExpr(/^\[(\$?)"(\w+)"\]/  , namedNodeExpr),
+         tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
+         tokenExpr(/^(\$?)!/            , rootExpr),      
+         tokenExpr(/^(\$?)\*/           , anyNodeExpr),
+         tokenExpr(/^\[(\$?)\*\]/       , anyNodeExpr),      
+         tokenExpr(/^\./                , passthroughExpr)
+      ];
+   })(); // end of tokenExprs definition
    
-   /**
-    * Expression for $ - matches only the root element of the json
-    * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found         
-    */   
-   function rootExpr(ignoredPreviousExprs, ignoredSubexpression, pathStack, stackIndex ){
-      return stackIndex == -1;
-   }   
    
-   /**
-    * Expression for . does no tests since . is just a seperator. Just passes through to the
-    * next function in the chain.
-    * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found         
-    */   
-   function passthrough(previousExpr, ignoredSubexpression, pathStack, stackIndex) {
-      return previousExpr(pathStack, stackIndex);
-   }   
-        
    /**
     * Wrapper for an expression that makes up a statement.
     * Returns a function that acts as the kick-off point for evaluating the expression
@@ -63,25 +89,7 @@ var jsonPathCompiler = (function () {
     */   
    function statement(lastStatementExpr, pathStack){
       return lastStatementExpr(pathStack, pathStack.length-1);
-   }
-
-   /**
-    * Each of the sub-arrays has at index 0 a pattern matching the token.
-    * At index 1 is the expression function to return a function to parse that expression
-    */
-   function tokenExpr(pattern, parser) {
-      return {pattern:pattern, parser:parser};
-   }     
-   var tokenExprs = [
-      tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
-      tokenExpr(/^\[(\$?)(\d+)\]/    , namedNodeExpr),
-      tokenExpr(/^\[(\$?)"(\w+)"\]/  , namedNodeExpr),
-      tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
-      tokenExpr(/^(\$?)!/            , rootExpr),      
-      tokenExpr(/^(\$?)\*/           , anyNodeExpr),
-      tokenExpr(/^\[(\$?)\*\]/       , anyNodeExpr),      
-      tokenExpr(/^\./                , passthrough)
-   ];
+   }   
 
    /** 
     * compile the next part of a jsonPath
