@@ -9,54 +9,63 @@ var jsonPathCompiler = (function () {
       /**
        * Expression for a named path node
        * 
-       * @returns {Object|False} either the object that was found, or false if nothing was found
+       * @returns {Object|false} either the object that was found, or false if nothing was found
        */
       function namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex ) {
-         return pathStack[stackIndex] == name && previousExpr(pathStack, nodeStack, stackIndex-1);         
+                     
+         if( pathStack[stackIndex] != name ) {
+            return false;
+         }
+      
+         var previous = previousExpr(pathStack, nodeStack, stackIndex-1);
+               
+         return previous && (capturing? nodeStack[stackIndex+1] : (previous || true));         
       }
    
       /**
        * Expression for *, [*] etc
        * 
-       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
        */
-      function anyNodeExpr(previousExpr, capturing, nameless, pathStack, nodeStack, stackIndex ){      
-         return previousExpr(pathStack, nodeStack, stackIndex-1);
+      function anyNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
+         var previous = previousExpr(pathStack, nodeStack, stackIndex-1);                   
+                  
+         return previous && (capturing? nodeStack[stackIndex+1] : (previous || true));
       }
       
       /**
        * Expression for .. (double dot) token              
        * 
-       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
        */   
-      function multipleUnnamedNodesExpr(previousExpr, capturing, nameless, pathStack, nodeStack, stackIndex ) {
-         
+      function multipleUnnamedNodesExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ) {
+               
          // past the start, not a match:
          if( stackIndex < -1 ) {
             return false;
          }
       
-         return stackIndex == -1 || // -1 is sometimes the root 
-                previousExpr(pathStack, stackIndex) || 
-                multipleUnnamedNodesExpr(previousExpr, capturing, nameless, pathStack, nodeStack, stackIndex-1);         
+         return stackIndex == -1 || // -1 is the root 
+                previousExpr(pathStack, nodeStack, stackIndex) || 
+                multipleUnnamedNodesExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex-1);         
       }      
       
       /**
        * Expression for $ - matches only the root element of the json
        * 
-       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
        */   
-      function rootExpr(ignoredPreviousExprs, capturing, nameless, pathStack, nodeStack, stackIndex ){
-         return stackIndex == -1;
+      function rootExpr(_cantHaveExprsBeforeRoot, capturing, _nameless, pathStack, nodeStack, stackIndex ){
+         return stackIndex == -1 && (capturing? nodeStack[0] : true);
       }   
       
       /**
        * Expression for . does no tests since . is just a seperator. Just passes through to the
        * next function in the chain.
        * 
-       * @returns {Object|False} either the object that was found, or false if nothing was found         
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
        */   
-      function passthroughExpr(previousExpr, capturing, nameless, pathStack, nodeStack, stackIndex) {
+      function passthroughExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) {
          return previousExpr(pathStack, nodeStack, stackIndex);
       }   
            
@@ -70,12 +79,12 @@ var jsonPathCompiler = (function () {
       
       return [
          tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
-         tokenExpr(/^\[(\$?)(\d+)\]/    , namedNodeExpr),
-         tokenExpr(/^\[(\$?)"(\w+)"\]/  , namedNodeExpr),
+         tokenExpr(/^(\$?)\[(\d+)\]/    , namedNodeExpr),
+         tokenExpr(/^(\$?)\["(\w+)"\]/  , namedNodeExpr),
          tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
          tokenExpr(/^(\$?)!/            , rootExpr),      
          tokenExpr(/^(\$?)\*/           , anyNodeExpr),
-         tokenExpr(/^\[(\$?)\*\]/       , anyNodeExpr),      
+         tokenExpr(/^(\$?)\[\*\]/       , anyNodeExpr),      
          tokenExpr(/^\./                , passthroughExpr)
       ];
    })(); // end of tokenExprs definition
@@ -84,7 +93,7 @@ var jsonPathCompiler = (function () {
    /**
     * Given a parser for a token, parse the statement ending in that token against a pathStack
     * 
-    * @returns {Object|False} either the object that was found, or false if nothing was found         
+    * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
    function statement(lastStatementExpr, pathStack, nodeStack){
    
@@ -100,7 +109,7 @@ var jsonPathCompiler = (function () {
          var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
          if(tokenMatch) {
-            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, tokenMatch[1], tokenMatch[2]),
+            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, !!tokenMatch[1], tokenMatch[2]),
                 remainingString = jsonPath.substr(tokenMatch[0].length);
          
             return remainingString? compileNextToken(remainingString, parser) : parser;

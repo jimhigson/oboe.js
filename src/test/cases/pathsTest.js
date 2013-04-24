@@ -156,19 +156,43 @@
             .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      
       }        
 
-   ,  testCanReturnCorrectNamedNodeInCss4StylePattern: function() {      
-         givenAPattern('!..$foo.*.bar')         
-            .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'bar'])            
-            .thenShouldMatch(       ['a', 'foo', 'a', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
+   // now several tests for css4-style pattern matching
+   
+   ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
+         givenAPattern('$foo.*')                     
+            .thenShouldMatch( 
+                  [        'a',      'foo',     'a'], 
+                  ['root', 'parent', 'target',  'child'])
+                     .returning('target');
       }
+      
+   ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
+         givenAPattern('!..$foo..bar')                     
+            .thenShouldMatch( 
+                  [        'a',      'foo',    'a',      'bar'], 
+                  ['root', 'parent', 'target', 'child',  'gchild'])
+                     .returning('target');            
+      }
+      
+   ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
+         givenAPattern('$!.*')                     
+            .thenShouldMatch( 
+                  ['a'], 
+                  ['root', 'child'])
+                     .returning('root');     
+      }                  
+      
+   ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
+         givenAPattern('!..$["foo"].*.bar')         
+            .thenShouldNotMatch( [] )         
+            .thenShouldNotMatch( ['foo'] )
+      }
+      
+   ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
+         givenAPattern('!..foo.$[2].bar')         
+            .thenShouldNotMatch( [] )         
+            .thenShouldNotMatch( ['foo'] )
+      }      
       
    ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
          givenAPattern('!..foo.$*.bar')         
@@ -185,7 +209,7 @@
       }
       
    ,  testCanReturnCorrectNodeWithArrayStarCss4StylePattern: function() {      
-         givenAPattern('!..foo.[$*].bar')         
+         givenAPattern('!..foo.$[*].bar')         
             .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
             .thenShouldNotMatch(    ['a', 'foo'])
@@ -198,18 +222,7 @@
             .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
       }                  
       
-   ,  testCanReturnCorrectNodeWithArrayNumberedCss4StylePattern: function() {      
-         givenAPattern('!..foo.[$2].bar')         
-            .thenShouldNotMatch( [] )         
-            .thenShouldNotMatch( ['foo'] )
-      }
-      
-   ,  testCanReturnCorrectNodeWithArrayNumberedCss4StylePattern: function() {      
-         givenAPattern('!..foo.[$2].bar')         
-            .thenShouldNotMatch( [] )         
-            .thenShouldNotMatch( ['foo'] )
-      }            
-                                                    
+                                                               
         
    });
    
@@ -218,10 +231,13 @@
       return new Asserter(pattern);     
    }
    
-   // for the given pattern, return an array of empty objects of the same length to
-   // stand in for the nodestack in the cases where we only care about match or not match
-   function fakeNodeStack(pattern){
-      return pattern.map(function(){return {}});      
+   // for the given pattern, return an array of empty objects of the one greater length to
+   // stand in for the nodestack in the cases where we only care about match or not match.
+   // one greater because the root node doesnt have a name
+   function fakeNodeStack(path){
+      var rtn = path.map(function(){return {}});
+      rtn.unshift({iAm:'root'});
+      return rtn;      
    }
    
    function Asserter( pattern ){
@@ -243,7 +259,7 @@
       try{   
          assertTrue( 
             'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
-         ,   this._lastResult 
+         ,   !!this._lastResult 
          );
       } catch( e ) {
          fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
@@ -268,6 +284,12 @@
       }    
         
       return this;         
+   };
+   
+   Asserter.prototype.returning = function(node) {
+      assertEquals(node, this._lastResult);
+      
+      return this;
    };      
 
 })();
