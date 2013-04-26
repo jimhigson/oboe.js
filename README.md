@@ -238,7 +238,13 @@ from Json.
 
 **Oboe**'s pattern matching engine also supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar ```$``` symbol, with much the same meaning as in css4.   
+using the dollar ```$``` symbol, with much the same meaning as in css4. 
+
+Like css, by default, a selector like ```foo.bar``` applies to the last node in the chain
+(in this case bar). Using ```$```, the selector ```$foo.bar``` matches the same elements, but
+replaces the element at foo rather than bar. This is useful especially when selecting array
+elements ```!.$someArray[*]``` because often it is useful to be repeatedly given the same
+array as it is added to rather than the individual elements.   
 
 ## Some Example patterns:
 
