@@ -30,7 +30,7 @@ echo "Will run oboe json tests(" ${TESTS} ") against concatenated code" &&
 java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-concat.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset &&
 
 echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
-java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-minified.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset &&
+java -jar ${JSTD_JAR} --captureConsole --config src/test/jsTestDriver-minified.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset
 
-mv oboe.concat.js oboe.js &&
-gzip -9 oboe.min.js --stdout > oboe.min.js.gz
+mv oboe.concat.js oboe.js 
+
