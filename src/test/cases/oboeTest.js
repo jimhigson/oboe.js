@@ -15,7 +15,7 @@
 TestCase("oboeTest", {
 
 
-   testHandlesEmptyObjectDetectedWithDollar: function() {
+   testHandlesEmptyObjectDetectedWithBang: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('!')
@@ -26,6 +26,18 @@ TestCase("oboeTest", {
          );
 
    }
+   
+,  testHandlesEmptyObjectDetectedWithBangWhenExplicitlySelected: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$!')
+         .whenGivenInput('{}')
+         .thenTheParser(
+            matched({}).atRootOfJson(),
+            foundOneMatch
+         );
+
+   }   
    
 ,  testGivesWindowAsContextWhenNothingGivenExplicitly: function() {
 
@@ -158,14 +170,27 @@ TestCase("oboeTest", {
          );
    }
    
+,  testNotifiesOfMultipleChildrenOfRootWhenSelectingTheRoot: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$!.*')
+         .whenGivenInput({"a":"A", "b":"B", "c":"C"})
+         .thenTheParser(
+            // rather than getting the fully formed objects, we should now see the root object
+            // being grown step by step:
+             matched({"a":"A"})
+         ,   matched({"a":"A", "b":"B"})
+         ,   matched({"a":"A", "b":"B", "c":"C"})
+         ,   foundNMatches(3)
+         );
+   }   
+   
 ,  testDoesNotNotifySpuriouslyOfFoundPath: function() {
 
       givenAParser()
          .andWeAreListeningForMatchesToPattern('!.a')
          .whenGivenInput([{a:'a'}])
-         .thenTheParser(             
-            foundNoMatches
-         );
+         .thenTheParser(foundNoMatches);
    }
    
 ,  testDoesNotNotifySpuriouslyOfFoundObject: function() {
@@ -173,9 +198,7 @@ TestCase("oboeTest", {
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('!.a')
          .whenGivenInput([{a:'a'}])
-         .thenTheParser(             
-            foundNoMatches
-         );
+         .thenTheParser(foundNoMatches);
    }      
 
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
@@ -279,7 +302,25 @@ TestCase("oboeTest", {
                .withGrandparent( ["a","b", ["x","y","this_one"]] )
          ,   foundOneMatch
          );
-   }     
+   }
+   
+,  testCanNotifyNestedArrayElementsSelectedByIndexByPassingTheRootArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.$testArray[2][2]')
+         .whenGivenInput( {"testArray":
+                              ["a","b",
+                                 ["x","y","this_one"]
+                              ]
+                          }
+                        )
+         .thenTheParser(
+             matched(   ["a","b",
+                           ["x","y","this_one"]
+                        ])
+         ,   foundOneMatch
+         );
+   }        
 
 ,  testNotifiesOfDeeplyNestedObjects: function() {
 
@@ -370,6 +411,17 @@ TestCase("oboeTest", {
          ,  foundOneMatch
          );
    }
+   
+,  testCanGiveAnArrayBackWhenJustPartiallyDone: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('$![5]')
+         .whenGivenInput([0,1,2,3,4,5,6,7,8,9,10,11,12])
+         .thenTheParser(
+            matched([0,1,2,3,4,5])
+         ,  foundOneMatch
+         );
+   }   
    
 ,  testGivesCorrectParentAndGrandparentForEveryItemOfAnArray: function() {
 
@@ -750,7 +802,7 @@ TestCase("oboeTest", {
    
 ,  testGetsAllSimpleObjectsFromAnArray: function() {
 
-      // this test is similar to the following one, except it does not use dollar in the pattern
+      // this test is similar to the following one, except it does not use ! in the pattern
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('foods.*')
          .whenGivenInput({

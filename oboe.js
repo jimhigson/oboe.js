@@ -748,7 +748,9 @@ var jsonPathCompiler = (function () {
          var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
          if(tokenMatch) {
-            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, !!tokenMatch[1], tokenMatch[2]),
+            var capturing = !!tokenMatch[1],
+                name = tokenMatch[2],
+                parser = tokenExprs[i].parser.bind(null, compiledSoFar, capturing, name),
                 remainingString = jsonPath.substr(tokenMatch[0].length);
          
             return remainingString? compileNextToken(remainingString, parser) : parser;
