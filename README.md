@@ -103,9 +103,10 @@ spec. The dollar can be used to get ancestor objects to the object that is match
 oboe.fetch('/myapp/things.json')
    .onFind('$people[*]', function( peopleLoadedSoFar ){
       
-      // this callback will be called with a 1-length array, a 2-length array, a 3-length array
-      // etc until the whole thing is loaded. You can put this on the scope object if you're using 
-      // Angular etc.
+      // This callback will be called with a 1-length array, a 2-length array, a 3-length array
+      // etc until the whole thing is loaded (actually, the same array with extra people objects
+      // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
+      // nicely re-render your list of people.
       
    });
 ```
@@ -248,8 +249,9 @@ using the dollar ```$``` symbol, with much the same meaning as in css4.
    passed the array so far rather than the array elements as they are found.  
 `person` all people in the json  
 `person.friends.*.name` detecting friend names in a social network  
-`person..email` email anywhere as descendent of a person object  
-`*` every object, string, number etc in the json!  
+`person..email` email addresses anywhere as descendent of a person object
+`$person..email` any person in the json stream with an email address
+`*` every object, string, number etc found in the json stream  
 `!` the root object (fired when the whole json is available, like JSON.parse())
 
 ## Getting the most from oboe
