@@ -15,6 +15,22 @@ or cut out halfway.
 
 Think of it as the json equivalent of old-style oboe html rendering.
 
+# Use cases
+
+**Sarah** is using her mobile phone to check her email. The phone has almost finished downloading her inbox when
+the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
+still read most of her emails.
+
+**Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
+when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
+wait for the slow module to load before she can udate the page. Because she chose **Oboe.js**, the page changes very quickly
+and the slow modules load later. Her users are happy because they can navigate page-to-page more fluidly and not all of
+them cared about the slow module anyway.
+
+**Michael** is writing a scrollable timeline data visualisation using [d3](http://d3js.org/). His json contains data for 200 events but until the 
+user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load before showing the 
+starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not be waiting.
+
 # Status
 
 Oboe is still in development. Nevertheless, it is already
@@ -58,7 +74,7 @@ oboe.fetch('/myapp/things.json')
    .onFind('foods.*', function( foodThing ){
       // this callback will be called everytime a new object is found in the 
       // foods array. In this example we just use jQuery to set up some simple DOM:
-      $('#foods')
+      jQuery('#foods')
          .append('<div>')
             .text('it is safe to eat ' + foodThing.name)
             .style('color', foodThing.colour)
@@ -72,9 +88,29 @@ Want to listen to strings instead of objects? The syntax is just the same:
 ``` js
 oboe.fetch('/myapp/things.json')
    .onFind('name', function( name ){
-      $('#things').append('<li>').text(name);
+      jQuery('#things').append('<li>').text(name);
    });
 ```
+
+## Using Css4 style matching to combine with engines like scope from [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
+
+Sometimes you are downloading an array of items but it isn't very useful to be given each individual item
+from the array individually. It is easier to integrate with these frameworks if you're given the array. 
+Oboe supports css4-style selectors and gives them much the same meaning as in the proposed css4 selector
+spec. The dollar can be used to get ancestor objects to the object that is matched.
+
+``` js
+oboe.fetch('/myapp/things.json')
+   .onFind('$people[*]', function( peopleLoadedSoFar ){
+      
+      // This callback will be called with a 1-length array, a 2-length array, a 3-length array
+      // etc until the whole thing is loaded (actually, the same array with extra people objects
+      // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
+      // nicely re-render your list of people.
+      
+   });
+```
+  
 
 ## providing some feedback as a page is updating
 
@@ -86,10 +122,10 @@ I'll assume you already implemented a spinner
 My.App.showSpinner('#foods');
 
 oboe.fetch('/myapp/things.json')
-   .onFind('$.foods.*', function( foodThing ){
-      $('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
+   .onFind('!.foods.*', function( foodThing ){
+      jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
-   .onFind('$.foods', function(){
+   .onFind('!.foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
       // above so we don't need to use the items anymore, just hide the spinner:
       My.App.hideSpinner('#foods');
@@ -110,8 +146,8 @@ oboe.fetch('//people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
-      personDiv = $('<div class="person">');
-      $('#people').append(personDiv);
+      personDiv = jQuery('<div class="person">');
+      jQuery('#people').append(personDiv);
    })
    .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
@@ -134,8 +170,8 @@ oboe.fetch('people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
-      personDiv = $('<div class="person">');
-      $('#people').append(personDiv);
+      personDiv = jQuery('<div class="person">');
+      jQuery('#people').append(personDiv);
    })
    .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
@@ -175,7 +211,7 @@ the top level objects in the json response can arrive in any order:
 }
 
 oboe.fetch('http://mysocialsite.example.com/homepage.json')
-   .onFind('$.*', function( moduleJson, path ){
+   .onFind('!.*', function( moduleJson, path ){
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
@@ -190,25 +226,39 @@ Oboe's pattern matching is a subset of [JSONPath](https://code.google.com/p/json
 and closely resembles the normal syntax for descending into sub-objects parsed
 from Json.
 
-`$` root json object  
-`.`  path separator  
-`foo` an element at name foo
-`*`  any element at any name 
+`!` root json object   
+`.`  path separator   
+`foo` an element at name foo  
+`*`  any element at any name  
 `[2]`  the second element (of an array)  
 `[*]`  equivalent to .*  
 `..` any number of intermediate nodes (non-greedy)
 
-It is possible that the rest of JSONPath could be added later.  
+## CSS-4 style selectors
 
-## Some Example patterns:
+**Oboe**'s pattern matching engine also supports 
+[CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
+using the dollar ```$``` symbol, with much the same meaning as in css4. 
 
-`$.foods.colour` the colours of the foods  
+Like css, by default, a selector like ```foo.bar``` applies to the last node in the chain
+(in this case bar). Using ```$```, the selector ```$foo.bar``` matches the same elements, but
+replaces the element at foo rather than bar. This is useful especially when selecting array
+elements ```!.$someArray[*]``` because often it is useful to be repeatedly given the same
+array as it is added to rather than the individual elements.   
+
+## Some example patterns:
+
+`!.foods.colour` the colours of the foods  
 `person.emails[1]` the first element in the email array for each person  
+`person.emails[*]` any element in the email array for each person  
+`person.$emails[*]` any element in the email array for each person, but the callback will be
+   passed the array so far rather than the array elements as they are found.  
 `person` all people in the json  
 `person.friends.*.name` detecting friend names in a social network  
-`person..email` email anywhere as descendent of a person object  
-`*` every object, string, number etc in the json!  
-`$` the root object (fired when the whole json is available, like JSON.parse())
+`person..email` email addresses anywhere as descendent of a person object  
+`$person..email` any person in the json stream with an email address  
+`*` every object, string, number etc found in the json stream  
+`!` the root object (fired when the whole json is available, like JSON.parse())  
 
 ## Getting the most from oboe
 
@@ -221,53 +271,6 @@ json as soon as it is ready instead of waiting before everything is ready to sta
 
 **Clarinet** supports use as a node stream. This hasn't been implemented in
 Oboe but it should be quite easy to do.
-
-# Running the tests
-
-Oboe is built using [grunt](http://gruntjs.com/) and
-[require.js](http://requirejs.org/) and tested using
-[jstestdriver](https://code.google.com/p/js-test-driver/). 
-The [jstd plugin for grunt](https://github.com/rickyclegg/grunt-jstestdriver) was just updated
-to support grunt 0.4 so the shell script part can probably be removed now.
-
-The **runtests.sh** script combines several steps into one:
-
-* Runs the unminified code against the tests
-* build the code using grunt
-* Run the minified code against the tests
-
-If everything works you will see output like below:
-
-```
-no tests specified, will run all
-Will run oboe json tests( all ) against unminified code
-setting runnermode QUIET
-............................................................
-Total 60 tests (Passed: 60; Fails: 0; Errors: 0) (103.00 ms)
-  Firefox 17.0 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (103.00 ms)
-  Safari 536.26.17 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (31.00 ms)
-  Chrome 27.0.1435.0 Mac OS: Run 20 tests (Passed: 20; Fails: 0; Errors 0) (38.00 ms)
-
-Running "requirejs:compile" (requirejs) task
->> Tracing dependencies for: oboe
->> Uglifying file: /Users/jimhigson/Sites/progressivejson/oboe.min.js
->> /Users/jimhigson/Sites/progressivejson/oboe.min.js
->> ----------------
->> /Users/jimhigson/Sites/progressivejson/src/main/libs/clarinet.js
->> /Users/jimhigson/Sites/progressivejson/src/main/streamingXhr.js
->> /Users/jimhigson/Sites/progressivejson/src/main/oboe.js
-
-Done, without errors.
-Will run oboe json tests( all ) against minified code
-setting runnermode QUIET
-............................................................
-Total 75 tests (Passed: 75; Fails: 0; Errors: 0) (80.00 ms)
-  Firefox 17.0 Mac OS: Run 25 tests (Passed: 25; Fails: 0; Errors 0) (80.00 ms)
-  Safari 536.26.17 Mac OS: Run 25 tests (Passed: 25; Fails: 0; Errors 0) (33.00 ms)
-  Chrome 27.0.1435.0 Mac OS: Run 25 tests (Passed: 25; Fails: 0; Errors 0) (38.00 ms)
-
-Process finished with exit code 0
-```
 
 # TODO
 * For Node, this should work with standard node streams

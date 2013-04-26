@@ -16,15 +16,7 @@ var oboe = (function(oboe){
    oboe.fetch = function(url){
       return new OboeParser().fetch(url);
    };      
-   
-   function peek(array) {
-      return array[array.length-1];
-   }
-   
-   function isArray(a) {
-      return a && a.constructor === Array;
-   }
-   
+      
    function OboeParser(opt) {
    
       var clarinetParser = clarinet.parser(opt);
@@ -78,9 +70,10 @@ var oboe = (function(oboe){
          curNode = {};
    
          notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
-         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
          addNewChild(parentNode);
+         
+         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
@@ -110,7 +103,7 @@ var oboe = (function(oboe){
          notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
    
          pathStack.pop();
-         curNode = peek(nodeStack);
+         curNode = lastOf(nodeStack);
    
          if( isArray(curNode) ) {
             curKey = curNode.length;
@@ -143,23 +136,31 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, foundNode, path, ancestors ) {
-
-      /**
-       * returns a function which tests if a listener is interested in the given path
-       */
-      function matchesPath( path ) {      
-         return function( listener ) {
-            return listener.pattern.test( path );         
-         };
-      } 
+   function notifyListeners ( listenerList, curNode, path, ancestors ) {
+      
+      var nodeList = ancestors.concat([curNode]);
 
       listenerList
-         .filter(matchesPath(path))
          .forEach( function(listener) {
-             var context = listener.context || window;
-             
-             listener.callback.call(context, foundNode, path, ancestors );               
+            
+            var foundNode = listener.test( path, nodeList );
+            
+            // possible values for foundNode now:
+            //
+            //    false: 
+            //       we did not match
+            //    an object/array/string/number: 
+            //       that node is the one that matched
+            //    null: like above, but we don't have the node yet. ie, we know there is a
+            //          node that matches but we don't know if it is an array, object, string
+            //          etc yet so we can't say anything about it 
+                        
+            if( foundNode !== false ) {                     
+               var context = listener.context || window;
+               
+               // change curNode to foundNode when it stops breaking tests
+               listener.callback.call(context, foundNode, path, ancestors );
+            }                            
          });
    }
 
@@ -178,7 +179,8 @@ var oboe = (function(oboe){
       } catch(e) {
          // we don't have to do anything here because we always assign a .onerror
          // to clarinet which will have already been called by the time this 
-         // exception is thrown.       
+         // exception is thrown.
+         console.log('Error:' + e.message);       
       }
    };
             
@@ -211,9 +213,10 @@ var oboe = (function(oboe){
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
-   function pushListener(listenerList, jsonPath, callback, context) {
+   function pushListener(listenerList, pattern, callback, context) {
       return listenerList.push({
-         pattern: paths.compile(jsonPath),
+         pattern:pattern,
+         test: jsonPathCompiler(pattern),
          callback: callback,
          context: context
       });
@@ -242,19 +245,20 @@ var oboe = (function(oboe){
     * what value will be in there.
     *
     * @param {String} jsonPath
-    *    The jsonPath is a subset of JSONPath patterns and supports these special meanings.
+    *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
     *    See http://goessner.net/articles/JsonPath/
-    *          $                - root json object
+    *          !                - root json object
     *          .                - path separator
     *          foo              - path node 'foo'
     *          ['foo']          - path node 'foo'
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
-    *          [*]              - equivalent to .*
+    *          [*]              - equivalent to .*         
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * 
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
    
@@ -267,8 +271,8 @@ var oboe = (function(oboe){
     *
     * @param {String} jsonPath supports the same syntax as .onPath.
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
    

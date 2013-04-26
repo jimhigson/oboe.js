@@ -1,9 +1,9 @@
 (function(){
 
-   TestCase("pathTest", {
+   TestCase("pathsTest", {
    
       testMatchesRoot: function() {
-         givenAPattern('$')
+         givenAPattern('!')
             .thenShouldMatch(       [])
              .thenShouldNotMatch(   ['a'])
              .thenShouldNotMatch(   ['a','b'])
@@ -17,14 +17,14 @@
       }
       
    ,  testMatchingForAllDescendantsOfRootMatchAnythingExceptTheRoot: function() {
-         givenAPattern('$..*')
+         givenAPattern('!..*')
             .thenShouldNotMatch(    [])
             .thenShouldMatch(       ['a'])
             .thenShouldMatch(       ['a','b'])
       }
       
    ,  testMatchingNamedChildOfRootWorks: function() {
-         givenAPattern('$.foo')
+         givenAPattern('!.foo')
             .thenShouldMatch(       ['foo'])      
             .thenShouldNotMatch(    [])
             .thenShouldNotMatch(    ['foo', 'bar'])
@@ -32,12 +32,12 @@
       }
       
    ,  testIsNotFooledBySubstringPatterns: function() {
-         givenAPattern('$.foo')
+         givenAPattern('!.foo')
             .thenShouldNotMatch(    ['foot'])      
       }      
       
    ,  testMatchingNamedAncestorOfRootWorks: function() {
-         givenAPattern('$..foo')
+         givenAPattern('!..foo')
              .thenShouldNotMatch(   [])         
             .thenShouldMatch(       ['foo'])      
             .thenShouldMatch(       ['a', 'foo'])
@@ -61,7 +61,7 @@
       }      
       
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
-         givenAPattern('$..foo.bar')
+         givenAPattern('!..foo.bar')
              .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
             .thenShouldNotMatch(    ['a', 'foo'])
@@ -83,7 +83,7 @@
       }      
       
    ,  testMatchingTwoNamedAncestorsSeperatedByStar: function() {
-         givenAPattern('$..foo.*.bar')
+         givenAPattern('!..foo.*.bar')
              .thenShouldNotMatch(   [])         
             .thenShouldNotMatch(    ['foo'])      
             .thenShouldNotMatch(    ['a', 'foo'])
@@ -97,7 +97,7 @@
       }                  
       
    ,  testMatchingAnyNamedChildOfRootWorks: function() {
-         givenAPattern('$.*')
+         givenAPattern('!.*')
             .thenShouldMatch(       ['foo'])      
             .thenShouldMatch(      ['bar'])            
             .thenShouldNotMatch(    [])
@@ -105,14 +105,14 @@
       }
       
    ,  testMatchingSequenceOfNamesWorks: function() {
-         givenAPattern('$.a.b')
+         givenAPattern('!.a.b')
             .thenShouldMatch(       ['a', 'b'])      
             .thenShouldNotMatch(    [])            
             .thenShouldNotMatch(    ['a'])
       }
       
    ,  testNumericIndex: function() {
-         givenAPattern('$.a.2')
+         givenAPattern('!.a.2')
             .thenShouldMatch(       ['a', 2])      
             .thenShouldMatch(       ['a', '2'])      
             .thenShouldNotMatch(    [])            
@@ -120,7 +120,7 @@
       }
                  
    ,  testNumericExpressedInArrayNotation: function() {
-         givenAPattern('$.a[2]')
+         givenAPattern('!.a[2]')
             .thenShouldMatch(       ['a', 2])      
             .thenShouldMatch(       ['a', '2'])      
             .thenShouldNotMatch(    [])            
@@ -128,7 +128,7 @@
       }
       
    ,  testArrayNotation: function() {
-         givenAPattern('$["a"][2]')
+         givenAPattern('!["a"][2]')
             .thenShouldMatch(       ['a', 2])      
             .thenShouldMatch(       ['a', '2'])      
             .thenShouldNotMatch(    [])            
@@ -136,7 +136,7 @@
       }
       
    ,  testArrayNotationAtRoot: function() {
-         givenAPattern('$[2]')
+         givenAPattern('![2]')
             .thenShouldMatch(       [2])      
             .thenShouldMatch(       ['2'])      
             .thenShouldNotMatch(    [])            
@@ -144,7 +144,7 @@
       }
       
    ,  testArrayStarNotationAtRoot: function() {
-         givenAPattern('$[*]')
+         givenAPattern('![*]')
             .thenShouldMatch(       [2])      
             .thenShouldMatch(       ['2'])      
             .thenShouldMatch(       ['a'])            
@@ -152,10 +152,68 @@
       }            
       
    ,  testTrickyCase: function() {
-         givenAPattern('$..foods..fr')
+         givenAPattern('!..foods..fr')
             .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      
-      }                                                      
-        
+      }        
+
+   // now several tests for css4-style pattern matching
+   
+   ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
+         givenAPattern('$foo.*')                     
+            .thenShouldMatch( 
+                  [        'a',      'foo',     'a'], 
+                  ['root', 'parent', 'target',  'child'])
+                     .returning('target');
+      }
+      
+   ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
+         givenAPattern('!..$foo..bar')                     
+            .thenShouldMatch( 
+                  [        'p',      'foo',    'c',      'bar'], 
+                  ['root', 'parent', 'target', 'child',  'gchild'])
+                     .returning('target');            
+      }
+      
+   ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
+         givenAPattern('$!.*')                     
+            .thenShouldMatch( 
+                  [        'a'    ], 
+                  ['root', 'child'])
+                     .returning('root');     
+      }                  
+      
+   ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
+         givenAPattern('$["foo"].bar')         
+             .thenShouldMatch( 
+                   [        'foo',    'bar'  ], 
+                   ['root', 'target', 'child'])
+                      .returning('target');
+      }
+      
+   ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
+         givenAPattern('$[2].bar')         
+             .thenShouldMatch( 
+                   [        '2',      'bar'  ], 
+                   ['root', 'target', 'child'])
+                      .returning('target');
+      }      
+      
+   ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
+         givenAPattern('!..$*.bar')         
+             .thenShouldMatch( 
+                   [        'anything', 'bar'  ], 
+                   ['root', 'target',   'child'])
+                      .returning('target');
+      }
+      
+   ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
+         givenAPattern('!..$[*].bar')         
+             .thenShouldMatch( 
+                   [        'anything', 'bar'  ], 
+                   ['root', 'target',   'child'])
+                      .returning('target');
+      }                  
+
    });
    
    function givenAPattern( pattern ) {
@@ -163,27 +221,65 @@
       return new Asserter(pattern);     
    }
    
-   function Asserter( pattern ){
-      this._pattern = pattern;
-      this._compiledPattern = paths.compile(pattern);          
+   // for the given pattern, return an array of empty objects of the one greater length to
+   // stand in for the nodestack in the cases where we only care about match or not match.
+   // one greater because the root node doesnt have a name
+   function fakeNodeStack(path){
+      var rtn = path.map(function(){return {}});
+      rtn.unshift({iAm:'root'});
+      return rtn;      
    }
    
-   Asserter.prototype.thenShouldMatch = function(path) {
+   function Asserter( pattern ){
+      this._pattern = pattern;
+      
+      try {
+         this._compiledPattern = jsonPathCompiler(pattern);
+      } catch( e ) {
+         fail( 'problem parsing:' + pattern + "\n" + e );
+      }          
+   }
    
-      assertTrue( 
-         'pattern ' + this._pattern + ' should have matched ' + '..' + path.join('.')
-      ,   this._compiledPattern.test(path) 
-      );
+   Asserter.prototype.thenShouldMatch = function(path, nodeStack) {
+
+      nodeStack = nodeStack || fakeNodeStack(path);
+      
+      this._lastResult = this._compiledPattern(path, nodeStack);
+
+      try{   
+         assertTrue( 
+            'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
+         ,   !!this._lastResult 
+         );
+      } catch( e ) {
+         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+      }      
+      
       return this;
    };
    
-   Asserter.prototype.thenShouldNotMatch = function(path) {
-   
-      assertFalse( 
-         'pattern ' + this._pattern + ' should not have matched ' + '..' + path.join('.')
-      ,  this._compiledPattern.test(path)
-      );      
+   Asserter.prototype.thenShouldNotMatch = function(path, nodeStack) {
+
+      nodeStack = nodeStack || fakeNodeStack(path);
+      
+      this._lastResult = this._compiledPattern(path, nodeStack);      
+         
+      try{
+         assertFalse( 
+            'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
+         ,  this._lastResult
+         );
+      } catch( e ) {
+         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+      }    
+        
       return this;         
    };
+   
+   Asserter.prototype.returning = function(node) {
+      assertEquals(node, this._lastResult);
+      
+      return this;
+   };      
 
 })();
