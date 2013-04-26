@@ -226,10 +226,10 @@ Oboe's pattern matching is a subset of [JSONPath](https://code.google.com/p/json
 and closely resembles the normal syntax for descending into sub-objects parsed
 from Json.
 
-`!` root json object  
-`.`  path separator  
-`foo` an element at name foo
-`*`  any element at any name 
+`!` root json object   
+`.`  path separator   
+`foo` an element at name foo  
+`*`  any element at any name  
 `[2]`  the second element (of an array)  
 `[*]`  equivalent to .*  
 `..` any number of intermediate nodes (non-greedy)
@@ -240,19 +240,19 @@ from Json.
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
 using the dollar ```$``` symbol, with much the same meaning as in css4.   
 
-## Some Example patterns:
+## Some example patterns:
 
 `!.foods.colour` the colours of the foods  
-`person.emails[1]` the first element in the email array for each person
-`person.emails[*]` any element in the email array for each person
-`person.$emails[*]` any element in the email array for each person, but the callback will be 
+`person.emails[1]` the first element in the email array for each person  
+`person.emails[*]` any element in the email array for each person  
+`person.$emails[*]` any element in the email array for each person, but the callback will be
    passed the array so far rather than the array elements as they are found.  
 `person` all people in the json  
 `person.friends.*.name` detecting friend names in a social network  
-`person..email` email addresses anywhere as descendent of a person object
-`$person..email` any person in the json stream with an email address
+`person..email` email addresses anywhere as descendent of a person object  
+`$person..email` any person in the json stream with an email address  
 `*` every object, string, number etc found in the json stream  
-`!` the root object (fired when the whole json is available, like JSON.parse())
+`!` the root object (fired when the whole json is available, like JSON.parse())  
 
 ## Getting the most from oboe
 
