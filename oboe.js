@@ -574,6 +574,14 @@ if(typeof FastList === 'function') {
 
 })(typeof exports === "undefined" ? clarinet = {} : exports);
 
+function lastOf(array) {
+   return array[array.length-1];
+}
+
+function isArray(a) {
+   return a && a.constructor === Array;
+}
+
 /**
  * An xhr wrapper that calls a callback whenever some of the
  * response is available, without waiting for all of it
@@ -613,75 +621,123 @@ if(typeof FastList === 'function') {
 
 var jsonPathCompiler = (function () {
 
-   /**
-    * Expression for a named path node
+   /** 
+    * tokenExprs is an array of pairs. Each pair contains a regular expression for matching a 
+    * jsonpath language feature and a function for parsing that feature.
     */
-   function namedNodeExpr(previousExpr, name, pathArray, pathArrayIndex ) {
-      return pathArray[pathArrayIndex] == name && previousExpr(pathArray, pathArrayIndex-1);         
-   }
-
-   /**
-    * Expression for *, [*] etc
-    */
-   function anyNodeExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex ){      
-      return previousExpr(pathArray, pathArrayIndex-1);
-   }
-   
-   /**
-    * Expression for .. (double dot) token
-    */   
-   function multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex ) {
+   var tokenExprs = (function(){
+      /**
+       * Expression for a named path node. 
+       *    foo
+       *    ["foo"]
+       *    [2]
+       * 
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */
+      function namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex ) {
+                     
+         if( pathStack[stackIndex] != name ) {
+            return false;
+         }
       
-      // past the start, not a match:
-      if( pathArrayIndex < -1 ) {
-         return false;
+         var previous = previousExpr(pathStack, nodeStack, stackIndex-1);
+               
+         return previous && returnValue(capturing, previous, nodeStack, stackIndex);         
       }
    
-      return pathArrayIndex == -1 || // -1 is sometimes the root 
-             previousExpr(pathArray, pathArrayIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex-1);         
-   }      
+      /**
+       * Expression for:
+       *    *
+       *    [*]
+       * 
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
+       */
+      function anyNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
+         var previous = previousExpr(pathStack, nodeStack, stackIndex-1);                   
+                  
+         return previous && returnValue(capturing, previous, nodeStack, stackIndex);
+      }
+      
+      /**
+       * Expression for .. (double dot) token              
+       * 
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
+       */   
+      function multipleUnnamedNodesExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ) {
+               
+         // past the start, not a match:
+         if( stackIndex < -1 ) {
+            return false;
+         }
+      
+         return stackIndex == -1 || // -1 is the root 
+                previousExpr(pathStack, nodeStack, stackIndex) || 
+                multipleUnnamedNodesExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex-1);         
+      }      
+      
+      /**
+       * Expression for $ - matches only the root element of the json
+       * 
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
+       */   
+      function rootExpr(_cantHaveExprsBeforeRoot, capturing, _nameless, pathStack, nodeStack, stackIndex ){
+         return stackIndex == -1 && returnValue(capturing, true, nodeStack, stackIndex);
+      }   
+      
+      /**
+       * Expression for . does no tests since . is just a seperator. Just passes through to the
+       * next function in the chain.
+       * 
+       * @returns {Object|false} either the object that was found, or false if nothing was found         
+       */   
+      function passthroughExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) {
+         return previousExpr(pathStack, nodeStack, stackIndex);
+      }   
+           
+      /** extraction of some common logic used by expression when they have matched.
+       *  If is a capturing node, will return it's item on the nodestack. Otherwise, will return the item
+       *  from the nodestack given by the previous expression, or true if none
+       */
+      function returnValue(capturing, previousExprEvaluation, nodeStack, stackIndex) {
+         return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
+      }
+           
+      /**
+       * Each of the sub-arrays has at index 0 a pattern matching the token.
+       * At index 1 is the expression function to return a function to parse that expression
+       */
+      function tokenExpr(pattern, parser) {
+         return {pattern:pattern, parser:parser};
+      }     
+      
+      return [
+         tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
+         tokenExpr(/^(\$?)\[(\d+)\]/    , namedNodeExpr),
+         tokenExpr(/^(\$?)\["(\w+)"\]/  , namedNodeExpr),
+         tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
+         tokenExpr(/^(\$?)!/            , rootExpr),      
+         tokenExpr(/^(\$?)\*/           , anyNodeExpr),
+         tokenExpr(/^(\$?)\[\*\]/       , anyNodeExpr),      
+         tokenExpr(/^\./                , passthroughExpr)
+      ];
+   })(); // end of tokenExprs definition
+   
    
    /**
-    * Expression for $ - matches only the root element of the json
+    * Given a parser for a token, parse the statement ending in that token against a pathStack
+    * 
+    * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
-   function rootExpr(ignoredPreviousExprs, ignoredSubexpression, pathArray, pathArrayIndex ){
-      return pathArrayIndex == -1;
-   }   
+   function statement(expr, pathStack, nodeStack){
    
-   /**
-    * Expression for . does no tests since . is just a seperator. Just passes through to the
-    * next function in the chain.
-    */   
-   function passthrough(previousExpr, ignoredSubexpression, pathArray, pathArrayIndex) {
-      return previousExpr(pathArray, pathArrayIndex);
+      var exprMatch = expr(pathStack, nodeStack, pathStack.length-1);
+                            
+      // Returning exactly true indicates that there has been a match but no node is captured. 
+      // By default, the node at the top of the stack gets returned. Just like in css4 selector 
+      // spec, if there is no $, the last node in the selector is the one being styled.                      
+                      
+      return exprMatch === true ? lastOf(nodeStack) : exprMatch;
    }   
-        
-   /**
-    * Wrapper for an expression that makes up a statement.
-    * Returns a function that acts as the kick-off point for evaluating the expression
-    */   
-   function statement(lastStatementExpr, pathArray){
-      return lastStatementExpr(pathArray, pathArray.length-1);
-   }
-
-   /**
-    * Each of the sub-arrays has at index 0 a pattern matching the token.
-    * At index 1 is the expression function to return a function to parse that expression
-    */
-   function tokenExpr(pattern, parser) {
-      return {pattern:pattern, parser:parser};
-   }     
-   var tokenExprs = [
-      tokenExpr(/^(\w+)/       , namedNodeExpr),
-      tokenExpr(/^\[(\d+)\]/   , namedNodeExpr),
-      tokenExpr(/^\["(\w+)"\]/ , namedNodeExpr),
-      tokenExpr(/^\.\./        , multipleUnnamedNodesExpr),
-      tokenExpr(/^!/           , rootExpr),      
-      tokenExpr(/^\*/          , anyNodeExpr),
-      tokenExpr(/^\[\*\]/      , anyNodeExpr),      
-      tokenExpr(/^\./          , passthrough)
-   ];
 
    /** 
     * compile the next part of a jsonPath
@@ -692,7 +748,7 @@ var jsonPathCompiler = (function () {
          var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
          if(tokenMatch) {
-            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, tokenMatch[1]),
+            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, !!tokenMatch[1], tokenMatch[2]),
                 remainingString = jsonPath.substr(tokenMatch[0].length);
          
             return remainingString? compileNextToken(remainingString, parser) : parser;
@@ -737,15 +793,7 @@ var oboe = (function(oboe){
    oboe.fetch = function(url){
       return new OboeParser().fetch(url);
    };      
-   
-   function peek(array) {
-      return array[array.length-1];
-   }
-   
-   function isArray(a) {
-      return a && a.constructor === Array;
-   }
-   
+      
    function OboeParser(opt) {
    
       var clarinetParser = clarinet.parser(opt);
@@ -799,9 +847,10 @@ var oboe = (function(oboe){
          curNode = {};
    
          notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
-         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);
    
          addNewChild(parentNode);
+         
+         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
@@ -831,7 +880,7 @@ var oboe = (function(oboe){
          notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
    
          pathStack.pop();
-         curNode = peek(nodeStack);
+         curNode = lastOf(nodeStack);
    
          if( isArray(curNode) ) {
             curKey = curNode.length;
@@ -864,23 +913,31 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, foundNode, path, ancestors ) {
-
-      /**
-       * returns a function which tests if a listener is interested in the given path
-       */
-      function matchesPath( path ) {      
-         return function( listener ) {
-            return listener.pattern( path );         
-         };
-      } 
+   function notifyListeners ( listenerList, curNode, path, ancestors ) {
+      
+      var nodeList = ancestors.concat([curNode]);
 
       listenerList
-         .filter(matchesPath(path))
          .forEach( function(listener) {
-             var context = listener.context || window;
-             
-             listener.callback.call(context, foundNode, path, ancestors );               
+            
+            var foundNode = listener.test( path, nodeList );
+            
+            // possible values for foundNode now:
+            //
+            //    false: 
+            //       we did not match
+            //    an object/array/string/number: 
+            //       that node is the one that matched
+            //    null: like above, but we don't have the node yet. ie, we know there is a
+            //          node that matches but we don't know if it is an array, object, string
+            //          etc yet so we can't say anything about it 
+                        
+            if( foundNode !== false ) {                     
+               var context = listener.context || window;
+               
+               // change curNode to foundNode when it stops breaking tests
+               listener.callback.call(context, foundNode, path, ancestors );
+            }                            
          });
    }
 
@@ -899,7 +956,8 @@ var oboe = (function(oboe){
       } catch(e) {
          // we don't have to do anything here because we always assign a .onerror
          // to clarinet which will have already been called by the time this 
-         // exception is thrown.       
+         // exception is thrown.
+         console.log('Error:' + e.message);       
       }
    };
             
@@ -933,9 +991,10 @@ var oboe = (function(oboe){
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
-   function pushListener(listenerList, jsonPath, callback, context) {
+   function pushListener(listenerList, pattern, callback, context) {
       return listenerList.push({
-         pattern: jsonPathCompiler(jsonPath),
+         pattern:pattern,
+         test: jsonPathCompiler(pattern),
          callback: callback,
          context: context
       });
@@ -964,19 +1023,20 @@ var oboe = (function(oboe){
     * what value will be in there.
     *
     * @param {String} jsonPath
-    *    The jsonPath is a subset of JSONPath patterns and supports these special meanings.
+    *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
     *    See http://goessner.net/articles/JsonPath/
-    *          $                - root json object
+    *          !                - root json object
     *          .                - path separator
     *          foo              - path node 'foo'
     *          ['foo']          - path node 'foo'
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
-    *          [*]              - equivalent to .*
+    *          [*]              - equivalent to .*         
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * 
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
    
@@ -989,8 +1049,8 @@ var oboe = (function(oboe){
     *
     * @param {String} jsonPath supports the same syntax as .onPath.
     *
-    * @param {Function} callback
-    * @param {Object} [context] the scope for the callback
+    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+    * @param {Object} [context] the context ('this') for the callback
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
    

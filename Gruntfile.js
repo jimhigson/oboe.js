@@ -8,6 +8,7 @@ module.exports = function (grunt) {
          oboe:{         
             src: [
                'src/main/libs/clarinet.js'
+            ,  'src/main/util.js'               
             ,  'src/main/streamingXhr.js'
             ,  'src/main/paths.js'
             ,  'src/main/oboe.js'

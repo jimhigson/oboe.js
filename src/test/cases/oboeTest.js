@@ -157,6 +157,26 @@ TestCase("oboeTest", {
          ,   foundNMatches(3)
          );
    }
+   
+,  testDoesNotNotifySpuriouslyOfFoundPath: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('!.a')
+         .whenGivenInput([{a:'a'}])
+         .thenTheParser(             
+            foundNoMatches
+         );
+   }
+   
+,  testDoesNotNotifySpuriouslyOfFoundObject: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.a')
+         .whenGivenInput([{a:'a'}])
+         .thenTheParser(             
+            foundNoMatches
+         );
+   }      
 
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
 
@@ -390,7 +410,7 @@ TestCase("oboeTest", {
          );
    }
    
-,  testGivesCorrectParentForEveryItemInAMixedArray: function() {
+,  testGivesCorrectParentForObjectInAMixedArray: function() {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('!.array.*')
@@ -400,41 +420,199 @@ TestCase("oboeTest", {
          )
          .thenTheParser(
             matched({'a':1})
-               .withParent([{'a':1}])
-         ,  matched('b')
-               .withParent([{'a':1},'b'])               
-         ,  matched({'c':3})
-               .withParent([{'a':1},'b',{'c':3}])
-         ,  matched({})
-               .withParent([{'a':1},'b',{'c':3}, {}])                              
-         ,  matched(['d'])
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-         ,  matched('e')
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+               .withParent([{'a':1}])         
          );
    }
    
-,  testGivesCorrectParentForEveryItemInAMixedArrayAtRootOfJson: function() {
+,  testGivesCorrectParentForStringInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+         
+            matched('b')
+               .withParent([{'a':1},'b'])
+               
+         );
+   }
+   
+,  testGivesCorrectParentForSecondObjectInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+               
+            matched({'c':3})
+               .withParent([{'a':1},'b',{'c':3}])
+
+         );
+   }
+   
+,  testGivesCorrectParentForEmptyObjectInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+         
+            matched({})
+               .withParent([{'a':1},'b',{'c':3}, {}])
+                                             
+         );
+   }
+   
+,  testGivesCorrectParentForSingletonStringArrayInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(  
+                                     
+            matched(['d'])            
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+               
+         );
+   }
+   
+,  testGivesCorrectParentForSingletonStringArrayInSingletonArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [['d']]
+            }
+         )
+         .thenTheParser(  
+                                     
+            matched(['d'])            
+               .withParent([['d']])
+               
+         );
+   }   
+      
+,  testGivesCorrectParentForLastStringInAMixedArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .whenGivenInput({
+               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+            }
+         )
+         .thenTheParser(
+         
+            matched('e')
+               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+               
+         );
+   }   
+   
+     
+,  testGivesCorrectParentForOpeningObjectInAMixedArrayAtRootOfJson: function() {
       // same test as above but without the object wrapper around the array:
       
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheParser(
+         
             matched({'a':1})
                .withParent([{'a':1}])
-         ,  matched('b')
+               
+         );
+   }   
+,  testGivesCorrectParentForStringInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+
+            matched('b')
                .withParent([{'a':1},'b'])               
-         ,  matched({'c':3})
+
+         );
+   }   
+,  testGivesCorrectParentForSecondObjectInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+               
+            matched({'c':3})
                .withParent([{'a':1},'b',{'c':3}])
-         ,  matched({})
+
+         );
+   }   
+,  testGivesCorrectParentForEmptyObjectInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+
+            matched({})
                .withParent([{'a':1},'b',{'c':3}, {}])                              
-         ,  matched(['d'])
+
+         );
+   }   
+,  testGivesCorrectParentForSingletonStringArrayInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+                              
+            matched(['d'])
                .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-         ,  matched('e')
+
+         );
+   }
+   
+,  testGivesCorrectParentForSingletonStringArrayInASingletonArrayAtRootOfJson: function() {
+      // non-mixed array, easier version:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([['d']])
+         .thenTheParser(
+                              
+            matched(['d'])
+               .withParent([['d']])
+
+         );
+   }                        
+   
+,  testGivesCorrectParentForFinalStringInAMixedArrayAtRootOfJson: function() {
+      // same test as above but without the object wrapper around the array:
+      
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+         .thenTheParser(
+
+            matched('e')
                .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          );
-   }                     
+   }    
 
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 
@@ -572,6 +750,7 @@ TestCase("oboeTest", {
    
 ,  testGetsAllSimpleObjectsFromAnArray: function() {
 
+      // this test is similar to the following one, except it does not use dollar in the pattern
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('foods.*')
          .whenGivenInput({
@@ -581,8 +760,6 @@ TestCase("oboeTest", {
                {name:'nuts'}
             ]
          })
-         // essentially, the parser should have been called three times with the same object, but each time
-         // an additional item should have been added
          .thenTheParser
                (   foundNMatches(3)
                ,   matched({name:'aubergine'})
@@ -595,8 +772,7 @@ TestCase("oboeTest", {
 
       givenAParser()
          .andWeAreListeningForThingsFoundAtPattern('$foods.*')
-         .whenGivenInput({
-
+         .whenGivenInput({        
             foods: [
                {name:'aubergine'},
                {name:'apple'},

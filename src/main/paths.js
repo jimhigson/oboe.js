@@ -78,8 +78,8 @@ var jsonPathCompiler = (function () {
        *  If is a capturing node, will return it's item on the nodestack. Otherwise, will return the item
        *  from the nodestack given by the previous expression, or true if none
        */
-      function returnValue(capturing, previousExprReturnValue, nodeStack, stackIndex) {
-         return capturing? nodeStack[stackIndex+1] : (previousExprReturnValue || true);
+      function returnValue(capturing, previousExprEvaluation, nodeStack, stackIndex) {
+         return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
       }
            
       /**
@@ -108,9 +108,15 @@ var jsonPathCompiler = (function () {
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
-   function statement(lastStatementExpr, pathStack, nodeStack){
+   function statement(expr, pathStack, nodeStack){
    
-      return lastStatementExpr(pathStack, nodeStack, pathStack.length-1);
+      var exprMatch = expr(pathStack, nodeStack, pathStack.length-1);
+                            
+      // Returning exactly true indicates that there has been a match but no node is captured. 
+      // By default, the node at the top of the stack gets returned. Just like in css4 selector 
+      // spec, if there is no $, the last node in the selector is the one being styled.                      
+                      
+      return exprMatch === true ? lastOf(nodeStack) : exprMatch;
    }   
 
    /** 
@@ -122,7 +128,9 @@ var jsonPathCompiler = (function () {
          var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
              
          if(tokenMatch) {
-            var parser = tokenExprs[i].parser.bind(null, compiledSoFar, !!tokenMatch[1], tokenMatch[2]),
+            var capturing = !!tokenMatch[1],
+                name = tokenMatch[2],
+                parser = tokenExprs[i].parser.bind(null, compiledSoFar, capturing, name),
                 remainingString = jsonPath.substr(tokenMatch[0].length);
          
             return remainingString? compileNextToken(remainingString, parser) : parser;
