@@ -92,7 +92,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Using Css4 style matching to combine with engines like scope from [http://angularjs.org/](Angular) or [http://soundstep.github.io/soma-template/](Soma)
+## Using Css4 style matching to combine with engines like scope from [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
 
 Sometimes you are downloading an array of items but it isn't very useful to be given each individual item
 from the array individually. It is easier to integrate with these frameworks if you're given the array. 
