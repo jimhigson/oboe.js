@@ -44,24 +44,26 @@ function randomiseMapOrder(map) {
    return newMap;
 }      
 
-function loadThrottled(fullData, dripSize, dripInterval, callback) {
+var FakeAjax = {
+   loadThrottled: function loadThrottled(dripSize, dripInterval, callback) {
       
-   var cursorPosition = 0;         
+      var fullData = JSON.stringify(randomiseMapOrder(expandJsonTemplate(dataTemplate)));      
+         
+      var cursorPosition = 0;         
+         
+      var intervalId = window.setInterval(function(){
       
-   var intervalId = window.setInterval(function(){
+         var nextDrip = fullData.substr(cursorPosition, dripSize);         
+         
+         cursorPosition += dripSize;
+                        
+         callback(nextDrip);                     
+         
+         if( cursorPosition >= fullData.length ) {
+            window.clearInterval(intervalId);
+         }                                                        
    
-      var nextDrip = fullData.substr(cursorPosition, dripSize);         
-      
-      cursorPosition += dripSize;
-      
-      //console.log('next drip is', nextDrip);
-               
-      callback(nextDrip);                     
-      
-      if( cursorPosition >= fullData.length ) {
-         window.clearInterval(intervalId);
-      }                                                        
-
-   }, dripInterval);
-}
+      }, dripInterval);
+   }
+};
 

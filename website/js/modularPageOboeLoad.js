@@ -3,13 +3,17 @@ $(function(){
    var requestOboe = oboe.parser();            
    
    function renderTemplateWithNewData( template, fieldName ) {
+      var scope = template.scope;
+      
       return function(data) {      
-         template.scope[fieldName] = data;
+         // when oboe finds new data, put it in the template scope
+         // and re-render the template: 
+         scope[fieldName] = data;
          template.render();
       }
    }
 
-   function setupActivityView( templateElement ) {
+   function ActivityView( templateElement ) {
       var template = soma.template.create(templateElement);
    
       requestOboe.onFind({         
@@ -18,7 +22,7 @@ $(function(){
       });         
    }
    
-   function setupRecentAchievementsView( templateElement ) {
+   function RecentAchievementsView( templateElement ) {
       var template = soma.template.create(templateElement);
       
       requestOboe.onFind({         
@@ -26,7 +30,7 @@ $(function(){
       });         
    }   
    
-   function setupUserView( templateElement ) {
+   function UserView( templateElement ) {
       var template = soma.template.create(templateElement);
       
       requestOboe.onFind({
@@ -34,7 +38,7 @@ $(function(){
       });
    }
    
-   function setupActivitySummaryView(templateElement) {
+   function ActivitySummaryView(templateElement) {
       var template = soma.template.create(templateElement);
             
       template.scope.calendar = [[]];                  
@@ -47,17 +51,13 @@ $(function(){
    function elementForModule(moduleName) {
       return $('[data-module=' + moduleName + ']')[0];
    }                      
-                      
-   var exampleJsonResponse = JSON.stringify(randomiseMapOrder(expandJsonTemplate(dataTemplate)));
-         
-   loadThrottled(exampleJsonResponse, 5, 5, function(nextDrip){
-      requestOboe.read(nextDrip);
-   });
+                                  
+   ActivityView(elementForModule('tables'));
+   RecentAchievementsView(elementForModule('recentAchievements'));
+   UserView(elementForModule('accountBar'));
+   UserView(elementForModule('user'));
+   ActivitySummaryView(elementForModule('activitySummary'));
    
-   setupActivityView(elementForModule('tables'));
-   setupRecentAchievementsView(elementForModule('recentAchievements'));
-   setupUserView(elementForModule('accountBar'));
-   setupUserView(elementForModule('user'));
-   setupActivitySummaryView(elementForModule('activitySummary'));   
-
+   // ok, let's simulate a slow connection:
+   FakeAjax.loadThrottled(5, 5, requestOboe.read.bind(requestOboe));      
 });
