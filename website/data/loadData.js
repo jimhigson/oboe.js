@@ -54,7 +54,7 @@ function loadThrottled(fullData, dripSize, dripInterval, callback) {
       
       cursorPosition += dripSize;
       
-      console.log('next drip is', nextDrip);
+      //console.log('next drip is', nextDrip);
                
       callback(nextDrip);                     
       

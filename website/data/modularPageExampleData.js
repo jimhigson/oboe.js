@@ -68,7 +68,7 @@ var dataTemplate =
       "totalNumber":9
    ,  "calendar":{
          "weeks":[
-            {timeSpent:"",        days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
+            {timeSpent:"-",       days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
          ,  {timeSpent:"7hr 7 m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}  
          ,  {timeSpent:"1hr 20m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
          ,  {timeSpent:"2hr 10m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}

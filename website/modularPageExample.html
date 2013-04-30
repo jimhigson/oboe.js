@@ -54,10 +54,10 @@
             
                <header>Calendar</header>
                
-               <div data-repeat="week in weeks" class="weekRow">
+               <div data-repeat="week in calendar.weeks" class="weekRow">
                   <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
                   <span class="weekSummary">
-                     {{week.timeSpent}} 
+                     {{week.timeSpent}}
                   </span>
                </div>
                

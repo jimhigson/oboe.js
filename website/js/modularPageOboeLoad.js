@@ -3,34 +3,18 @@ $(function(){
    var requestOboe = oboe.parser();            
    
    function renderTemplateWithNewData( template, fieldName ) {
-      return function(data) {
+      return function(data) {      
          template.scope[fieldName] = data;
          template.render();
       }
    }
-   function renderTemplateWithNewDataParent( template, fieldName ) {
-      return function(data, _path, ancestors) {
-         var parentObject = ancestors[ancestors.length-1];
-                  
-         template.scope[fieldName] = parentObject;
-         template.render();
-      }
-   }
-   function renderTemplateWithNewAncestorParent( template, fieldName ) {
-      return function(data, _path, ancestors) {
-         var parentObject = ancestors[ancestors.length-1];
-                  
-         template.scope[fieldName] = parentObject;
-         template.render();
-      }
-   }      
-   
+
    function setupActivityView( templateElement ) {
       var template = soma.template.create(templateElement);
    
       requestOboe.onFind({         
-         '$.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
-      ,  '$.activity.data[*]':  renderTemplateWithNewDataParent( template, 'data' )
+         '!.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
+      ,  '!.activity.$data[*]':  renderTemplateWithNewData( template, 'data' )
       });         
    }
    
@@ -38,7 +22,7 @@ $(function(){
       var template = soma.template.create(templateElement);
       
       requestOboe.onFind({         
-         '$.recentAchievements.awards[*]' : renderTemplateWithNewDataParent( template, 'awards' )
+         '!.recentAchievements.$awards[*]' : renderTemplateWithNewData( template, 'awards' )
       });         
    }   
    
@@ -46,18 +30,23 @@ $(function(){
       var template = soma.template.create(templateElement);
       
       requestOboe.onFind({
-         '$.user' : renderTemplateWithNewData( template, 'user' )
+         '!.user' : renderTemplateWithNewData( template, 'user' )
       });
    }
    
    function setupActivitySummaryView(templateElement) {
       var template = soma.template.create(templateElement);
             
+      template.scope.calendar = [[]];                  
       requestOboe.onFind({
-         '$.activitySummary.totalNumber' : renderTemplateWithNewData( template, 'totalNumber' )
-      ,  '$.activitySummary.calendar.weeks[*].days[*]' : renderTemplateWithNewDataParent( template, 'weeks' )
+         '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' ) 
+      ,  '!.activitySummary.$calendar.weeks[*].days[*]' : renderTemplateWithNewData( template, 'calendar' )
       });
    }
+                      
+   function elementForModule(moduleName) {
+      return $('[data-module=' + moduleName + ']')[0];
+   }                      
                       
    var exampleJsonResponse = JSON.stringify(randomiseMapOrder(expandJsonTemplate(dataTemplate)));
          
@@ -65,10 +54,10 @@ $(function(){
       requestOboe.read(nextDrip);
    });
    
-   setupActivityView($('[data-module=tables]')[0]);
-   setupRecentAchievementsView($('[data-module=recentAchievements]')[0]);
-   setupUserView($('[data-module=accountBar]')[0]);
-   setupUserView($('[data-module=user]')[0]);
-   setupActivitySummaryView($('[data-module=activitySummary]')[0]);   
+   setupActivityView(elementForModule('tables'));
+   setupRecentAchievementsView(elementForModule('recentAchievements'));
+   setupUserView(elementForModule('accountBar'));
+   setupUserView(elementForModule('user'));
+   setupActivitySummaryView(elementForModule('activitySummary'));   
 
 });
