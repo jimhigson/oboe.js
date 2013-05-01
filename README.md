@@ -1,6 +1,6 @@
 **Oboe.js** is an asynchronous, progressive json parser for ajax built on top of
 [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read the ajax responsewhile the request is still
+It provides an intuitive interface to read the ajax response while the request is still
 ongoing and gzips down to about **3.8k**.
 
 # Purpose
@@ -27,7 +27,7 @@ The query is many-dimensional so screening all possible companies sometimes take
 means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
 of streaming, Oboe's ajax-based stream is compatible with his browser cache so now he sees the same results straight away.
 
-**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, agregated json 
+**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, aggregated json 
 for all of her modules.
 Unfortunately, one of the services being aggregated is slower than the others and under traditional
 ajax she is forced to wait for the slowest module to load before she can update any of the page. 
@@ -110,7 +110,7 @@ It is easier to integrate with libraries like Angular if you're passed the conta
 again whenever a new element is added to it. 
 Oboe supports css4-style selectors and gives them much the same meaning as in the 
 [proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
-Prefixing a term with dollar means the callback receives the object matching that term rather than the usual implict 
+Prefixing a term with dollar means the callback receives the object matching that term rather than the usual implicit 
 arrangement of receiving the object matched by the last term of the jsonPath.
 
 ``` js
@@ -193,7 +193,7 @@ oboe.fetch('//people.json')
 
 The callback is also given the path the match was found at. It is sometimes preferable to
 register a wide-matching pattern and use the path parameter to decide what to do instead of
-registering a seperate callback for every possible json path that we might have an interest in.
+registering a separate callback for every possible json path that we might have an interest in.
 
 Say we're making some kind of social site that puts the json for a page into one response and
 the top level objects in the json response can arrive in any order:
@@ -294,8 +294,8 @@ array as it is added to rather than the individual elements.
 ## Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
-(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're *sending
-and parsing* everything at the earliest possible oppotunity. If you can, send small bits of the
+(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're sending
+and parsing everything at the earliest possible opportunity. If you can, send small bits of the
 json as soon as it is ready instead of waiting before everything is ready to start sending.
 
 ## Use as a stream in node.js
@@ -305,7 +305,7 @@ Oboe but it should be quite easy to do.
 
 # TODO
 * For Node, this should work with standard node streams
-* Oboe shoule also use standard js promises
+* Oboe should also use standard js promises
 * Support for http request params when fetching via ajax
 * More error handling
 * Better support for Internet Explorer (I'm sure I have a Windows CD somewhere...)
