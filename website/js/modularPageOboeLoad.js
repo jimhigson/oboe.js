@@ -13,8 +13,7 @@ $(function(){
       }
    }
 
-   function ActivityView( templateElement ) {
-      var template = soma.template.create(templateElement);
+   function ActivityView( template ) {
    
       requestOboe.onFind({         
          '!.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
@@ -22,24 +21,21 @@ $(function(){
       });         
    }
    
-   function RecentAchievementsView( templateElement ) {
-      var template = soma.template.create(templateElement);
+   function RecentAchievementsView( template ) {
       
       requestOboe.onFind({         
          '!.recentAchievements.$awards[*]' : renderTemplateWithNewData( template, 'awards' )
       });         
    }   
    
-   function UserView( templateElement ) {
-      var template = soma.template.create(templateElement);
+   function UserView( template ) {
       
       requestOboe.onFind({
          '!.user' : renderTemplateWithNewData( template, 'user' )
       });
    }
    
-   function ActivitySummaryView(templateElement) {
-      var template = soma.template.create(templateElement);
+   function ActivitySummaryView(template) {
             
       template.scope.calendar = [[]];                  
       requestOboe.onFind({
@@ -48,15 +44,15 @@ $(function(){
       });
    }
                       
-   function elementForModule(moduleName) {
-      return $('[data-module=' + moduleName + ']')[0];
+   function templateForModule(moduleName) {
+      return soma.template.create($('[data-module=' + moduleName + ']')[0]);
    }                      
                                   
-   ActivityView(elementForModule('tables'));
-   RecentAchievementsView(elementForModule('recentAchievements'));
-   UserView(elementForModule('accountBar'));
-   UserView(elementForModule('user'));
-   ActivitySummaryView(elementForModule('activitySummary'));
+   ActivityView(templateForModule('tables'));
+   RecentAchievementsView(templateForModule('recentAchievements'));
+   UserView(templateForModule('accountBar'));
+   UserView(templateForModule('user'));
+   ActivitySummaryView(templateForModule('activitySummary'));
    
    // ok, let's simulate a slow connection:
    FakeAjax.loadThrottled(5, 5, requestOboe.read.bind(requestOboe));      
