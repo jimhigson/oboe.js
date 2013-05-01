@@ -11,16 +11,16 @@ happen to be using.
 
 Your web application probably makes the user wait longer for io than anything else. However,
 during much of the waiting there will already be enough data loaded in the browser to show
-things on the page. This is especially true on mobile networks where requests sporadically stall
+things on the page. This is especially true on mobile networks where requests can sporadically stall
 or cut out halfway.
 
-Think of it as the json equivalent of old-style progressive html rendering.
+Think of it as progressive html rendering for the ajax age.
 
 # Use cases
 
-**Sarah** is using her mobile phone to check her email. The phone has almost finished downloading her inbox when
-the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
-still read most of her emails.
+**Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
+inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
+she can still read most of her emails.
 
 **Arnold** is using a programmable stock screener.
 The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
