@@ -103,21 +103,40 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Using Css4 style matching to combine with engines like scope from [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
+## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
 
-Sometimes you are downloading an array of items but it isn't very useful to be given each individual item
-from the array individually. It is easier to integrate with these frameworks if you're given the array. 
-Oboe supports css4-style selectors and gives them much the same meaning as in the proposed css4 selector
-spec. The dollar can be used to get ancestor objects to the object that is matched.
+Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
+It is easier to integrate with libraries like Angular if you're passed the containing array 
+again whenever a new element is added to it. 
+Oboe supports css4-style selectors and gives them much the same meaning as in the 
+[proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
+Prefixing a term with dollar means the callback receives the object matching that term rather than the usual implict 
+arrangement of receiving the object matched by the last term of the jsonPath.
+
+``` js
+
+function PeopleListCtrl($scope) {
+
+   oboe.fetch('/myapp/things.json')
+      .onFind('$people[*]', function( peopleLoadedSoFar ){
+         
+         // This callback will be called with a 1-length array, a 2-length array, a 3-length array
+         // etc until the whole thing is loaded (actually, the same array with extra people objects
+         // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
+         // nicely re-render your list of people.
+         
+         $scope.people = peopleLoadedSoFar;
+      });
+}      
+```
 
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('$people[*]', function( peopleLoadedSoFar ){
+   .onFind('people.$*.email', function( objectForAPersonWithAnEmailAddress ){
       
-      // This callback will be called with a 1-length array, a 2-length array, a 3-length array
-      // etc until the whole thing is loaded (actually, the same array with extra people objects
-      // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
-      // nicely re-render your list of people.
+      // Here we have an alternative use of css4-style syntax. The callback will be called only for the 
+      // people objects when we know the person's email address, and won't be called at all if the person
+      // object doesn't have an email field. 
       
    });
 ```
@@ -146,7 +165,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Listening for paths when they are first found without waiting for the objects
+## Listening for paths when they are first found without waiting for the objects to be parsed
 
 As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first matched but we don't yet know what will
 be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
@@ -169,31 +188,6 @@ oboe.fetch('//people.json')
       currentPersonDiv.append('<span class="email"> + email + </span>');
    })
 ```
-
-## Error handling
-
-You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
-give any further callbacks no matter what is in the rest of the json.
- 
-``` js
-var currentPersonDiv;
-oboe.fetch('people.json')
-   .onPath('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the json stream, we can
-      // use this to eagerly add them to the page:
-      personDiv = jQuery('<div class="person">');
-      jQuery('#people').append(personDiv);
-   })
-   .onPath('people.*.name', function( name ){
-      // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="name"> + name + </span>');
-   })
-   .onError(function( email ){
-      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
-      currentPersonDiv.remove();
-   })
-```
-
 
 ## Using the path passback
 
@@ -226,9 +220,35 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
-      My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
+      var moduleName = path[0];
+      
+      My.App.getModuleCalled(moduleName).showNewData(moduleJson);
    });
 
+```
+
+## Error handling
+
+You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
+give any further callbacks no matter what is in the rest of the json.
+ 
+``` js
+var currentPersonDiv;
+oboe.fetch('people.json')
+   .onPath('people.*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add them to the page:
+      personDiv = jQuery('<div class="person">');
+      jQuery('#people').append(personDiv);
+   })
+   .onPath('people.*.name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onError(function( email ){
+      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
+      currentPersonDiv.remove();
+   })
 ```
 
 # Pattern matching
@@ -285,6 +305,7 @@ Oboe but it should be quite easy to do.
 
 # TODO
 * For Node, this should work with standard node streams
+* Oboe shoule also use standard js promises
 * Support for http request params when fetching via ajax
 * More error handling
 * Better support for Internet Explorer (I'm sure I have a Windows CD somewhere...)
