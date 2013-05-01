@@ -733,11 +733,11 @@ var jsonPathCompiler = (function () {
       var nameInObjectNotation    = /^(\$?)(\w+)/       
       ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
       ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/
-      ,   doubleDot               = /^\.\./
-      ,   bang                    = /^(\$?)!/
       ,   starInObjectNotation    = /^(\$?)\*/
-      ,   starInArrayNotation     = /^(\$?)\[\*\]/
-      ,   dot                     = /^\./
+      ,   starInArrayNotation     = /^(\$?)\[\*\]/      
+      ,   doubleDot               = /^\.\./
+      ,   dot                     = /^\./      
+      ,   bang                    = /^(\$?)!/
       ,   emptyString             = /^$/;
       
       // a mapping of token regular expressions to the functions which evalate conformance to the jsonPath 
