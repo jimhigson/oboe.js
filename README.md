@@ -6,7 +6,8 @@ ongoing and gzips down to about **3.8k**.
 # Purpose
 
 The aim of Oboe is to let you start using your data as early as possible with as simple
-an interface as is possible.
+an interface as is possible. It works with jQuery, Angular, d3 or any other library you might
+happen to be using.
 
 Your web application probably makes the user wait longer for io than anything else. However,
 during much of the waiting there will already be enough data loaded in the browser to show
@@ -21,10 +22,10 @@ Think of it as the json equivalent of old-style progressive html rendering.
 the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
 still read most of her emails.
 
-**Arnold** is using a stock screener, a bit like the one on [Google Finance](https://www.google.com/finance/stockscreener).
-Because the query is many-dimensional, screening all possible companies takes some time but because of **Oboe.js**,
-the results stream in as soon as they are found. Later, he revisits the same results page. Unlike other methods of streaming,
-Oboe's ajax-based streaming is compatible with his browser cache so next time he gets the same results straight away.
+**Arnold** is using a programmable stock screener.
+The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
+means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
+of streaming, Oboe's ajax-based stream is compatible with his browser cache so now he sees the same results straight away.
 
 **Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
 when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
@@ -37,10 +38,13 @@ them cared about the slow module anyway.
 before showing the starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not 
 be waiting.
 
+**John** is developing internally on a fast network so he doesn't really care about progressive parsing. Oboe.js provides 
+a neat way to route different parts of a json response to different parts of his application. One less thing to write.
+
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[quite](src/test/cases/oboeTest.js) [well](src/test/cases/pathsTest.js)
+[quite](src/test/cases/oboeTest.js) [well](src/test/cases/jsonPathTest.js)
 tested and has proven stable enough for production applications. The 
 codebase is small and hackable and it works. Try it, let me know how
 it goes.

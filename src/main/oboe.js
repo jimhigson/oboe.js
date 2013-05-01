@@ -251,7 +251,7 @@ var oboe = (function(oboe){
     *          !                - root json object
     *          .                - path separator
     *          foo              - path node 'foo'
-    *          ['foo']          - path node 'foo'
+    *          ['foo']          - paFth node 'foo'
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
