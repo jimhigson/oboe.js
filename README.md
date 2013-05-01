@@ -27,11 +27,12 @@ The query is many-dimensional so screening all possible companies sometimes take
 means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
 of streaming, Oboe's ajax-based stream is compatible with his browser cache so now he sees the same results straight away.
 
-**Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
-when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
-wait for the slow module to load before she can udate the page. Because she chose **Oboe.js**, the page changes very quickly
-and the slow modules load later. Her users are happy because they can navigate page-to-page more fluidly and not all of
-them cared about the slow module anyway.
+**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, agregated json 
+for all of her modules.
+Unfortunately, one of the services being aggregated is slower than the others and under traditional
+ajax she is forced to wait for the slowest module to load before she can update any of the page. 
+After switching to **Oboe.js**, the fast modules load quickly and the slow modules load later. 
+Her users are happy because they can navigate page-to-page more fluidly and not all of them cared about the slow module anyway.
 
 **Michael** is writing a scrollable timeline data visualisation using [d3](http://d3js.org/). His json contains data for 
 200 events but until the user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load 
