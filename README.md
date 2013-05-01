@@ -21,6 +21,11 @@ Think of it as the json equivalent of old-style oboe html rendering.
 the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
 still read most of her emails.
 
+**Arnold** is using a stock screener, a bit like the one on [Google Finance](https://www.google.com/finance/stockscreener).
+Because the query is many-dimensional, screening all possible companies takes some time but because of **Oboe.js**,
+the results stream in as soon as they are found. Later, he revisits the same results page. Unlike other methods of streaming,
+Oboe's ajax-based streaming is compatible with his browser cache so next time he gets the same results straight away.
+
 **Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
 when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
 wait for the slow module to load before she can udate the page. Because she chose **Oboe.js**, the page changes very quickly
