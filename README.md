@@ -13,7 +13,7 @@ during much of the waiting there will already be enough data loaded in the brows
 things on the page. This is especially true on mobile networks where requests sporadically stall
 or cut out halfway.
 
-Think of it as the json equivalent of old-style oboe html rendering.
+Think of it as the json equivalent of old-style progressive html rendering.
 
 # Use cases
 
