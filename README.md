@@ -1,46 +1,51 @@
 **Oboe.js** is an asynchronous, progressive json parser for ajax built on top of
 [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read the ajax responsewhile the request is still
+It provides an intuitive interface to read the ajax response while the request is still
 ongoing and gzips down to about **3.8k**.
 
 # Purpose
 
 The aim of Oboe is to let you start using your data as early as possible with as simple
-an interface as is possible.
+an interface as is possible. It works with jQuery, Angular, d3 or any other library you might
+happen to be using.
 
 Your web application probably makes the user wait longer for io than anything else. However,
 during much of the waiting there will already be enough data loaded in the browser to show
-things on the page. This is especially true on mobile networks where requests sporadically stall
+things on the page. This is especially true on mobile networks where requests can sporadically stall
 or cut out halfway.
 
-Think of it as the json equivalent of old-style progressive html rendering.
+Think of it as progressive html rendering for the ajax age.
 
 # Use cases
 
-**Sarah** is using her mobile phone to check her email. The phone has almost finished downloading her inbox when
-the train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing she can
-still read most of her emails.
+**Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
+inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
+she can still read most of her emails.
 
-**Arnold** is using a stock screener, a bit like the one on [Google Finance](https://www.google.com/finance/stockscreener).
-Because the query is many-dimensional, screening all possible companies takes some time but because of **Oboe.js**,
-the results stream in as soon as they are found. Later, he revisits the same results page. Unlike other methods of streaming,
-Oboe's ajax-based streaming is compatible with his browser cache so next time he gets the same results straight away.
+**Arnold** is using a programmable stock screener.
+The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
+means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
+of streaming, Oboe's ajax-based stream is compatible with his browser cache so now he sees the same results straight away.
 
-**Janet** is working on a single-page modular webapp. She wants to ajax in a single, agregated json for all her modules 
-when the page changes. Unfortunately, one of the services being aggregated is slower than the others and she is forced to 
-wait for the slow module to load before she can udate the page. Because she chose **Oboe.js**, the page changes very quickly
-and the slow modules load later. Her users are happy because they can navigate page-to-page more fluidly and not all of
-them cared about the slow module anyway.
+**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, aggregated json 
+for all of her modules.
+Unfortunately, one of the services being aggregated is slower than the others and under traditional
+ajax she is forced to wait for the slowest module to load before she can update any of the page. 
+After switching to **Oboe.js**, the fast modules load quickly and the slow modules load later. 
+Her users are happy because they can navigate page-to-page more fluidly and not all of them cared about the slow module anyway.
 
 **Michael** is writing a scrollable timeline data visualisation using [d3](http://d3js.org/). His json contains data for 
 200 events but until the user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load 
 before showing the starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not 
 be waiting.
 
+**John** is developing internally on a fast network so he doesn't really care about progressive parsing. Oboe.js provides 
+a neat way to route different parts of a json response to different parts of his application. One less thing to write.
+
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[quite](src/test/cases/oboeTest.js) [well](src/test/cases/pathsTest.js)
+[quite](src/test/cases/oboeTest.js) [well](src/test/cases/jsonPathTest.js)
 tested and has proven stable enough for production applications. The 
 codebase is small and hackable and it works. Try it, let me know how
 it goes.
@@ -98,21 +103,40 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Using Css4 style matching to combine with engines like scope from [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
+## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
 
-Sometimes you are downloading an array of items but it isn't very useful to be given each individual item
-from the array individually. It is easier to integrate with these frameworks if you're given the array. 
-Oboe supports css4-style selectors and gives them much the same meaning as in the proposed css4 selector
-spec. The dollar can be used to get ancestor objects to the object that is matched.
+Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
+It is easier to integrate with libraries like Angular if you're passed the containing array 
+again whenever a new element is added to it. 
+Oboe supports css4-style selectors and gives them much the same meaning as in the 
+[proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
+Prefixing a term with dollar means the callback receives the object matching that term rather than the usual implicit 
+arrangement of receiving the object matched by the last term of the jsonPath.
+
+``` js
+
+function PeopleListCtrl($scope) {
+
+   oboe.fetch('/myapp/things.json')
+      .onFind('$people[*]', function( peopleLoadedSoFar ){
+         
+         // This callback will be called with a 1-length array, a 2-length array, a 3-length array
+         // etc until the whole thing is loaded (actually, the same array with extra people objects
+         // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
+         // nicely re-render your list of people.
+         
+         $scope.people = peopleLoadedSoFar;
+      });
+}      
+```
 
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('$people[*]', function( peopleLoadedSoFar ){
+   .onFind('people.$*.email', function( objectForAPersonWithAnEmailAddress ){
       
-      // This callback will be called with a 1-length array, a 2-length array, a 3-length array
-      // etc until the whole thing is loaded (actually, the same array with extra people objects
-      // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
-      // nicely re-render your list of people.
+      // Here we have an alternative use of css4-style syntax. The callback will be called only for the 
+      // people objects when we know the person's email address, and won't be called at all if the person
+      // object doesn't have an email field. 
       
    });
 ```
@@ -141,7 +165,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Listening for paths when they are first found without waiting for the objects
+## Listening for paths when they are first found without waiting for the objects to be parsed
 
 As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first matched but we don't yet know what will
 be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
@@ -165,36 +189,11 @@ oboe.fetch('//people.json')
    })
 ```
 
-## Error handling
-
-You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
-give any further callbacks no matter what is in the rest of the json.
- 
-``` js
-var currentPersonDiv;
-oboe.fetch('people.json')
-   .onPath('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the json stream, we can
-      // use this to eagerly add them to the page:
-      personDiv = jQuery('<div class="person">');
-      jQuery('#people').append(personDiv);
-   })
-   .onPath('people.*.name', function( name ){
-      // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="name"> + name + </span>');
-   })
-   .onError(function( email ){
-      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
-      currentPersonDiv.remove();
-   })
-```
-
-
 ## Using the path passback
 
 The callback is also given the path the match was found at. It is sometimes preferable to
 register a wide-matching pattern and use the path parameter to decide what to do instead of
-registering a seperate callback for every possible json path that we might have an interest in.
+registering a separate callback for every possible json path that we might have an interest in.
 
 Say we're making some kind of social site that puts the json for a page into one response and
 the top level objects in the json response can arrive in any order:
@@ -221,9 +220,35 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
-      My.App.getModuleCalled(path[0]).dataLoaded(moduleJson);
+      var moduleName = path[0];
+      
+      My.App.getModuleCalled(moduleName).showNewData(moduleJson);
    });
 
+```
+
+## Error handling
+
+You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
+give any further callbacks no matter what is in the rest of the json.
+ 
+``` js
+var currentPersonDiv;
+oboe.fetch('people.json')
+   .onPath('people.*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add them to the page:
+      personDiv = jQuery('<div class="person">');
+      jQuery('#people').append(personDiv);
+   })
+   .onPath('people.*.name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onError(function( email ){
+      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
+      currentPersonDiv.remove();
+   })
 ```
 
 # Pattern matching
@@ -269,8 +294,8 @@ array as it is added to rather than the individual elements.
 ## Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
-(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're *sending
-and parsing* everything at the earliest possible oppotunity. If you can, send small bits of the
+(think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're sending
+and parsing everything at the earliest possible opportunity. If you can, send small bits of the
 json as soon as it is ready instead of waiting before everything is ready to start sending.
 
 ## Use as a stream in node.js
@@ -280,6 +305,7 @@ Oboe but it should be quite easy to do.
 
 # TODO
 * For Node, this should work with standard node streams
+* Oboe should also use standard js promises
 * Support for http request params when fetching via ajax
 * More error handling
 * Better support for Internet Explorer (I'm sure I have a Windows CD somewhere...)

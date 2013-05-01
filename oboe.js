@@ -730,9 +730,9 @@ var jsonPathCompiler = (function () {
          return {pattern:pattern, expr:expr};
       }     
       
-      var nameInObjectNotation    = /^(\$?)(\w+)/       
+      var nameInObjectNotation    = /^(\$?)(\w+)/    
+      ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/         
       ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
-      ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/
       ,   starInObjectNotation    = /^(\$?)\*/
       ,   starInArrayNotation     = /^(\$?)\[\*\]/      
       ,   doubleDot               = /^\.\./
@@ -744,8 +744,8 @@ var jsonPathCompiler = (function () {
       // language feature represented by that token:      
       return [
          tokenExpr(nameInObjectNotation   , namedNodeExpr),
+         tokenExpr(nameInArrayNotation    , namedNodeExpr),         
          tokenExpr(numberInArrayNotation  , namedNodeExpr),
-         tokenExpr(nameInArrayNotation    , namedNodeExpr),
          tokenExpr(starInObjectNotation   , unnamedNodeExpr),
          tokenExpr(starInArrayNotation    , unnamedNodeExpr),         
          tokenExpr(doubleDot              , multipleUnnamedNodesExpr),
@@ -1060,7 +1060,7 @@ var oboe = (function(oboe){
     *          !                - root json object
     *          .                - path separator
     *          foo              - path node 'foo'
-    *          ['foo']          - path node 'foo'
+    *          ['foo']          - paFth node 'foo'
     *          [1]              - path node '1' (only for numbers indexes, usually arrays)
     *          *                - wildcard - all objects/properties
     *          ..               - any number of intermediate nodes (non-greedy)
