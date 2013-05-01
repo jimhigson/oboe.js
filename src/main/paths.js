@@ -110,19 +110,28 @@ var jsonPathCompiler = (function () {
          return {pattern:pattern, expr:expr};
       }     
       
+      var nameInObjectNotation    = /^(\$?)(\w+)/       
+      ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
+      ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/
+      ,   doubleDot               = /^\.\./
+      ,   bang                    = /^(\$?)!/
+      ,   starInObjectNotation    = /^(\$?)\*/
+      ,   starInArrayNotation     = /^(\$?)\[\*\]/
+      ,   dot                     = /^\./
+      ,   emptyString             = /^$/;
+      
       // a mapping of token regular expressions to the functions which evalate conformance to the jsonPath 
-      // language feature represented by that token: 
+      // language feature represented by that token:      
       return [
-         tokenExpr(/^(\$?)(\w+)/        , namedNodeExpr),
-         tokenExpr(/^(\$?)\[(\d+)\]/    , namedNodeExpr),
-         tokenExpr(/^(\$?)\["(\w+)"\]/  , namedNodeExpr),
-         tokenExpr(/^\.\./              , multipleUnnamedNodesExpr),
-         tokenExpr(/^(\$?)!/            , rootExpr),      
-         tokenExpr(/^(\$?)\*/           , unnamedNodeExpr),
-         tokenExpr(/^(\$?)\[\*\]/       , unnamedNodeExpr),      
-         tokenExpr(/^\./                , passthroughExpr),
-         // regex for empty string 
-         tokenExpr(/^$/                 , statementExpr)
+         tokenExpr(nameInObjectNotation   , namedNodeExpr),
+         tokenExpr(numberInArrayNotation  , namedNodeExpr),
+         tokenExpr(nameInArrayNotation    , namedNodeExpr),
+         tokenExpr(starInObjectNotation   , unnamedNodeExpr),
+         tokenExpr(starInArrayNotation    , unnamedNodeExpr),         
+         tokenExpr(doubleDot              , multipleUnnamedNodesExpr),
+         tokenExpr(dot                    , passthroughExpr),         
+         tokenExpr(bang                   , rootExpr),             
+         tokenExpr(emptyString            , statementExpr)
       ];
    })(); // end of tokenExprs definition
    
