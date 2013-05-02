@@ -55,5 +55,5 @@ $(function(){
    ActivitySummaryView(templateForModule('activitySummary'));
    
    // ok, let's simulate a slow connection:
-   FakeAjax.loadThrottled(5, 5, requestOboe.read.bind(requestOboe));      
+   FakeAjax.fetch(5, 5, requestOboe.read.bind(requestOboe));      
 });

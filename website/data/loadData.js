@@ -1,5 +1,6 @@
 
-/* The purpose of this file is to simulate a slow-loading ajax call of some template-based data */
+/** The purpose of this file is to simulate a slow-loading ajax call of some template-based data.
+ *    */
 var FakeAjax = (function(){
 
    /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
@@ -50,7 +51,15 @@ var FakeAjax = (function(){
    }      
    
    return {
-      loadThrottled: function loadThrottled(dripSize, dripInterval, callback) {
+      /**
+       * Drip the data in, x chars at a time.
+       * 
+       * @param {Number} dripSize how many chars to fake the load of at once
+       * @param {Number} dripInterval how often to fake a drip of data arriving
+       * @param {String -> *} callback for when data arrives, should accept the new data 
+       *    as a string 
+       */
+      fetch: function loadThrottled(dripSize, dripInterval, callback) {
          
          var fullData = JSON.stringify(randomiseMapOrder(expandJsonTemplate(dataTemplate)));      
             
