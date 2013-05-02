@@ -25,7 +25,12 @@ body.modularPage {
    width: 90%;
    margin-left: auto;
    margin-right: auto;
-   
+   background-color: white;
+}
+
+.module {
+   padding:20px;
+   border: 1px #eee solid;
 }
 
 .content {
@@ -35,19 +40,12 @@ body.modularPage {
 }
 .secondaryContent {
   position: absolute;
-  width: 200px;
+  width: 400px;
   top: 2em;
   right:2em;
-  background-color: #FF6A00;
 }
 .mainContent {
-  margin-right: 250px;
-}
-
-
-
-.topLinks {
-   background-color: white;
+  margin-right: 431px;
 }
 
 #logo {

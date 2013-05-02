@@ -47,7 +47,7 @@ $(function(){
       template.scope.calendar = [[]];                  
       requestOboe.onFind({
          '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' )
-      ,  '!.activitySummary.$byType.*'          :                renderTemplateWithNewData( template, 'byType' )          
+      ,  '!.activitySummary.$byType.*'          :         renderTemplateWithNewData( template, 'byType' )          
       ,  '!.activitySummary.$calendar.weeks[*].days[*]' : renderTemplateWithNewData( template, 'calendar' )
       });
    }
