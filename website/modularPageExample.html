@@ -36,7 +36,7 @@
 
    <h2 class="mainHeading">An example page modular webpage</h2>   
    
-   <h3 data-module="pageInfo" class="module pageInfo">
+   <h3 data-module="pageInfo" class="pageInfo">
       This page simulates loading of json data via streaming. I built a clone of something that I knew but 
       the application domain is largely irrelevant. The page is  
       a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
@@ -46,7 +46,7 @@
    
    <div class="content">
       <div class="mainContent column">
-         <section data-module="activitySummary" class="module">
+         <section data-module="activitySummary" class="module moduleBox">
             <header>Activity Summary Last 4 Weeks</header>
             <div class="total data-cloak">
                Total Activities
@@ -81,7 +81,7 @@
          </section>
          
          <!-- DOM for the bar recent achievements module -->
-         <section data-module="recentAchievements" class="module">
+         <section data-module="recentAchievements" class="module moduleBox">
             <header>Recent Achievements</header>
             <div class="awards data-cloak">
                <div data-repeat="award in awards">
@@ -93,19 +93,19 @@
          </section>      
       
          <!-- DOM for the bar chart module -->
-         <section data-module="barChart module">
+         <section data-module="barChart module moduleBox">
             <header>Bar Chart</header>
             <p>Here is a bar chart with some bars on it:</p>
          </section>
 
          <!-- DOM for the image slider module -->         
-         <section data-module="imageSlider module">
+         <section data-module="imageSlider module moduleBox">
             <header>Images</header>
             <p>Here are some images in a slider thing::</p>
          </section>
 
          <!-- DOM for the map module -->         
-         <section data-module="map module">
+         <section data-module="map module moduleBox">
             <header>API Map</header>
             <p>Here is a map with some points loaded onto it:</p>
          </section>
@@ -113,14 +113,14 @@
       
       <div class="secondaryContent column">
 
-         <section data-module="user" class="data-cloak module">
+         <section data-module="user" class="data-cloak module moduleBox">
             <img src="{{user.avitar}}" />
             <header>{{user.username}}</header>
             <span class="location">{{user.location}}</span>            
          </section>
       
          <!-- DOM for the social stats -->      
-         <section data-module="socialStats" class="module">
+         <section data-module="socialStats" class="module moduleBox">
 
             <header>Social Stats</header>
                  
@@ -141,7 +141,7 @@
          </section>      
       
          <!-- DOM for the table module -->      
-         <section data-module="tables" class="module">
+         <section data-module="tables" class="module moduleBox">
 
             <header>My Stats</header>
 
