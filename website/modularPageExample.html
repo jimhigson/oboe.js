@@ -51,14 +51,24 @@
                Total Activities
                <span class="number">{{totalNumber}}</span>
             </div>
+            
+            <div class="byType">
+               <ul>
+                  <li class="data-cloak">{{byType.cycling}} Cycling</li>
+                  <li class="data-cloak">{{byType.running}} Running</li>
+               </ul>
+            </div>
+            
             <section class="calendar data-cloak">
             
                <header>Calendar</header>
                
                <div data-repeat="week in calendar.weeks" class="weekRow">
-                  <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
+                  <span class="days">
+                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
+                  </span>
                   <span class="weekSummary">
-                     {{week.timeSpent}}
+                     {{week.timeSpent.hours}}hrs {{week.timeSpent.minutes}}mins
                   </span>
                </div>
                
@@ -107,8 +117,31 @@
             <span class="location">{{user.location}}</span>            
          </section>
       
+         <!-- DOM for the social stats -->      
+         <section data-module="socialStats" class="module">
+
+            <header>Social Stats</header>
+                 
+            <ul>
+               <li class="data-cloak">
+                  Following {{socialStats.following}}
+               </li>
+               <li class="data-cloak">
+                  Followers {{socialStats.followers}}
+               </li>
+               <li class="data-cloak">
+                  Kudos {{socialStats.kudos}}
+               </li>
+               <li class="data-cloak">
+                  Comments {{socialStats.comments}}
+               </li>               
+            </ul>
+         </section>      
+      
          <!-- DOM for the table module -->      
          <section data-module="tables" class="module">
+
+            <header>My Stats</header>
 
             <h2 class="data-cloak">{{heading}}</h2>      
                  

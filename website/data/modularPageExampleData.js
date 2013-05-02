@@ -64,14 +64,29 @@ var dataTemplate =
       
    }   
    
+,  "socialStats": {
+      "following":"{{Number 0 to 100}}"
+   ,  "followers":"{{Number 0 to 100}}"
+   ,  "kudos":    "{{Number 0 to 100}}"
+   ,  "comments": "{{Number 0 to 100}}"
+   }   
+   
 ,  "activitySummary" : {
-      "totalNumber":9
+      "totalNumber":"{{Number 10 to 25}}"
+   ,  "byType": {
+         "cycling":"{{Number 3 to 10}}",
+         "running":"{{Number 3 to 10}}"         
+      }   
    ,  "calendar":{
          "weeks":[
-            {timeSpent:"-",       days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
-         ,  {timeSpent:"7hr 7 m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}  
-         ,  {timeSpent:"1hr 20m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
-         ,  {timeSpent:"2hr 10m", days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
+            {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}, 
+               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
+         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}, 
+               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}  
+         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"},
+               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
+         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"},
+               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
          ]
       }      
    }   

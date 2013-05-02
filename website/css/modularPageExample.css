@@ -64,6 +64,15 @@ button {
    width: 20px;
    height: 20px;
 }
+
+.calendar .days {
+   display:inline-block;
+   width:140px;
+}
 .calendar .day.active-true {
    background-color: black;
+}
+
+section header {
+   font-size: 1.8em
 }

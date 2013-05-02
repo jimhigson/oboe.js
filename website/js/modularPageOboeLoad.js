@@ -2,10 +2,11 @@ $(function(){
 
    var requestOboe = oboe.parser();            
    
+   /* A tiny layer of glue to fix together oboe's callback and a request for soma to render the data */
    function renderTemplateWithNewData( template, fieldName ) {
       var scope = template.scope;
       
-      return function(data) {      
+      return function(data) {            
          // when oboe finds new data, put it in the template scope
          // and re-render the template: 
          scope[fieldName] = data;
@@ -16,8 +17,14 @@ $(function(){
    function ActivityView( template ) {
    
       requestOboe.onFind({         
-         '!.activity.heading' : renderTemplateWithNewData( template, 'heading' )            
-      ,  '!.activity.$data[*]':  renderTemplateWithNewData( template, 'data' )
+         '!.activity.heading'   : renderTemplateWithNewData( template, 'heading' )                        
+      ,  '!.activity.$data[*]'  :  renderTemplateWithNewData( template, 'data' )
+      });         
+   }
+   
+   function SocialStatsView( template ) {   
+      requestOboe.onFind({         
+         '!.$socialStats.*' : renderTemplateWithNewData( template, 'socialStats' )            
       });         
    }
    
@@ -39,7 +46,8 @@ $(function(){
             
       template.scope.calendar = [[]];                  
       requestOboe.onFind({
-         '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' ) 
+         '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' )
+      ,  '!.activitySummary.$byType.*'          :                renderTemplateWithNewData( template, 'byType' )          
       ,  '!.activitySummary.$calendar.weeks[*].days[*]' : renderTemplateWithNewData( template, 'calendar' )
       });
    }
@@ -49,11 +57,12 @@ $(function(){
    function templateForModule(moduleName) {   
       return soma.template.create($('[data-module=' + moduleName + ']')[0]);
    }                      
-                                     
+                 
+   SocialStatsView(templateForModule('socialStats'));                    
    ActivityView(templateForModule('tables'));
    RecentAchievementsView(templateForModule('recentAchievements'));
    UserView(templateForModule('accountBar'));
-   UserView(templateForModule('user'));
+   UserView(templateForModule('user')); 
    ActivitySummaryView(templateForModule('activitySummary'));
    
    // ok, let's simulate a slow connection and feed the response into our oboe:
