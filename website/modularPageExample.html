@@ -25,7 +25,7 @@
       <span class="accountBar">
          <a href="#">Upgrade to Premium</a>
          
-         <span data-module="accountBar" class="data-cloak">
+         <span data-module="accountBar" class="data-cloak module">
             <img src="{{user.avitar}}" />
             <a href="#">{{user.usernameShort}}</a>
          </span>
@@ -36,7 +36,7 @@
 
    <h2>An example page modular webpage</h2>   
    
-   <h3 data-module="pageInfo">
+   <h3 data-module="pageInfo" class="module">
       It doesn't really do anything but it looks like a lot of websites. It is 
       a clone of <a href="sourceImages/strava.png">this screenshot</a> of 
       <a href="http://app.strava.com/athletes/182755">My Strava profile</a>.      
@@ -44,7 +44,7 @@
    
    <div class="content">
       <div class="mainContent">
-         <section data-module="activitySummary">
+         <section data-module="activitySummary module">
             <header>Activity Summary Last 4 Weeks</header>
             <div class="total data-cloak">
                Total Activities
@@ -68,7 +68,7 @@
          </section>
          
          <!-- DOM for the bar recent achievements module -->
-         <section data-module="recentAchievements">
+         <section data-module="recentAchievements module">
             <header>Recent Achievements</header>
             <div class="awards data-cloak">
                <div data-repeat="award in awards">
@@ -80,19 +80,19 @@
          </section>      
       
          <!-- DOM for the bar chart module -->
-         <section data-module="barChart">
+         <section data-module="barChart module">
             <header>Bar Chart</header>
             <p>Here is a bar chart with some bars on it:</p>
          </section>
 
          <!-- DOM for the image slider module -->         
-         <section data-module="imageSlider">
+         <section data-module="imageSlider module">
             <header>Images</header>
             <p>Here are some images in a slider thing::</p>
          </section>
 
          <!-- DOM for the map module -->         
-         <section data-module="map">
+         <section data-module="map module">
             <header>API Map</header>
             <p>Here is a map with some points loaded onto it:</p>
          </section>
@@ -100,14 +100,14 @@
       
       <div class="secondaryContent">
 
-         <section data-module="user" class="data-cloak">
+         <section data-module="user" class="data-cloak module">
             <img src="{{user.avitar}}" />
             <header>{{user.username}}</header>
             <span class="location">{{user.location}}</span>            
          </section>
       
          <!-- DOM for the table module -->      
-         <section data-module="tables">
+         <section data-module="tables" class="module">
 
             <h2 class="data-cloak">{{heading}}</h2>      
                  
