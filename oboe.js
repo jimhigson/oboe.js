@@ -775,11 +775,14 @@ var jsonPathCompiler = (function () {
     * We parse the jsonPath spec from left to right, generating a parser which parses the found paths from 
     * right to left (or, deepest to shallowest path names).
     * 
-    *    (String jsonPath, (String[], Object[] -> (Object|Boolean))) -> (Object[] -> (Object|Boolean))
+    *    (String jsonPath, ((String[], Object[]) -> (Object|Boolean))) -> ((String[], Object[]) -> (Object|Boolean))
     *    
-    * or, if we consider Expr = (Object[] -> (Object|Boolean)) it can be expressed more simply as:
+    * or, if we consider Expr = ((String[], Object[]) -> (Object|Boolean)) it can be expressed more simply as:
     * 
     *    (String jsonPath, Expr) -> Expr
+    *    
+    * In practice, an Expr is any of the functions from tokenExprs[*].expr after being partially completed by 
+    * filling in the first three arguments
     */
    function compileJsonPathToFunction( jsonPath, compiledSoFar ) {
                 
