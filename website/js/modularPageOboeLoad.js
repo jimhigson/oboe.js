@@ -44,7 +44,11 @@ $(function(){
       });
    }
                       
+   /* For a named module, finds the element in the DOM for it and wraps it in a soma template                           
+    */
    function templateForModule(moduleName) {
+      console.log($('[data-module=' + moduleName + ']')[0], moduleName);
+   
       return soma.template.create($('[data-module=' + moduleName + ']')[0]);
    }                      
                                   
@@ -54,6 +58,6 @@ $(function(){
    UserView(templateForModule('user'));
    ActivitySummaryView(templateForModule('activitySummary'));
    
-   // ok, let's simulate a slow connection:
+   // ok, let's simulate a slow connection and feed the response into our oboe:
    FakeAjax.fetch(5, 5, requestOboe.read.bind(requestOboe));      
 });

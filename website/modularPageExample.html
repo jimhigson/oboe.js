@@ -37,14 +37,15 @@
    <h2>An example page modular webpage</h2>   
    
    <h3 data-module="pageInfo" class="module">
-      It doesn't really do anything but it looks like a lot of websites. It is 
-      a clone of <a href="sourceImages/strava.png">this screenshot</a> of 
-      <a href="http://app.strava.com/athletes/182755">My Strava profile</a>.      
+      This page simulates loading of json data via streaming. I built a clone of something that I knew but 
+      the application domain is largely irrelevant. The page is  
+      a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
+      <a href="http://app.strava.com/athletes/182755">My personal Strava profile</a>.      
    </h3>
    
    <div class="content">
       <div class="mainContent">
-         <section data-module="activitySummary module">
+         <section data-module="activitySummary" class="module">
             <header>Activity Summary Last 4 Weeks</header>
             <div class="total data-cloak">
                Total Activities
@@ -68,7 +69,7 @@
          </section>
          
          <!-- DOM for the bar recent achievements module -->
-         <section data-module="recentAchievements module">
+         <section data-module="recentAchievements" class="module">
             <header>Recent Achievements</header>
             <div class="awards data-cloak">
                <div data-repeat="award in awards">
