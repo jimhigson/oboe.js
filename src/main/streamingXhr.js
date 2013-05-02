@@ -1,11 +1,14 @@
 /**
- * An xhr wrapper that calls a callback whenever some of the
- * response is available, without waiting for all of it
+ * An xhr wrapper that calls a callback whenever some more of the
+ * response is available, without waiting for all of it.
+ * 
+ * This probably needs more development and testing more than most other parts 
+ * of Oboe.
  *
  * TODO:
  *    error handling
  *    allow setting of request params and other such options
- *    x-browser testing, compatability
+ *    x-browser testing, compatibility
  */
 (function (streamingXhr) {
 
@@ -28,6 +31,7 @@
          }
       }
       
+      // TODO: where onprogress isn't supported, poll the responseText.      
       xhr.onprogress = handleInput;         
       xhr.onload = successCallback;
    };
