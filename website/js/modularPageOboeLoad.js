@@ -48,7 +48,7 @@ $(function(){
       requestOboe.onFind({
          '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' )
       ,  '!.activitySummary.$byType.*'          :         renderTemplateWithNewData( template, 'byType' )          
-      ,  '!.activitySummary.$calendar.weeks[*].days[*]' : renderTemplateWithNewData( template, 'calendar' )
+      ,  '!.activitySummary.$calendar.weeks[*]' : renderTemplateWithNewData( template, 'calendar' )
       });
    }
                       

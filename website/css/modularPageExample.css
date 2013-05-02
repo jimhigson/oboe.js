@@ -28,9 +28,13 @@ body.modularPage {
    background-color: white;
 }
 
-.moduleBox {
+section.moduleBox {
    padding:20px;
    border: 1px #eee solid;
+}
+
+section header {
+   font-size: 1.8em
 }
 
 .content {
@@ -57,20 +61,31 @@ button {
    color:white;
 }
 
-.calendar .day {
-   display:inline-block;
-   width: 20px;
-   height: 20px;
+.calendar .weeks {
+   display: table;
 }
 
-.calendar .days {
-   display:inline-block;
-   width:140px;
+.calendar .weekRow,
+.calendar .dayHeadings {
+   display: table-row;
 }
+
+.calendar .dayHeadings span {
+   display: table-cell;
+   text-align: center;
+}
+
+.calendar .day {
+   display:table-cell;
+   width: 19px;
+   height: 19px;
+   border-left:1px white solid;
+   border-bottom:1px white solid;
+   background-color:#D4D4D4;
+}
+.calendar .weekSummary {
+   display:table-cell;
+} 
 .calendar .day.active-true {
    background-color: black;
-}
-
-section header {
-   font-size: 1.8em
 }

@@ -79,14 +79,21 @@ var dataTemplate =
       }   
    ,  "calendar":{
          "weeks":[
-            {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}, 
-               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
-         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}, 
-               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}  
-         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"},
-               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
-         ,  {  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"},
-               days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]}
+            {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+            ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
+            }
+            
+         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+            ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
+            }
+              
+         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+            ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
+            }
+               
+         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+            ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
+            }
          ]
       }      
    }   

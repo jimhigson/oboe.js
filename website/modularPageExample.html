@@ -65,18 +65,18 @@
             
                <header>Calendar</header>
                
-               <div data-repeat="week in calendar.weeks" class="weekRow">
-                  <span class="days">
-                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
-                  </span>
-                  <span class="weekSummary">
-                     {{week.timeSpent.hours}}hrs {{week.timeSpent.minutes}}mins
-                  </span>
+               <div class="weeks">
+                  <div data-repeat="week in calendar.weeks" class="weekRow">
+                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>                     
+                     <span class="weekSummary data-cloak">
+                        {{week.timeSpent.hours}}hrs {{week.timeSpent.minutes}}mins
+                     </span>                  
+                  </div>
+                  <div class="dayHeadings">
+                     <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                  </div>                  
                </div>
                
-               <div class="dayHeadings">
-                  <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
-               </div>
             </section>
          </section>
          
