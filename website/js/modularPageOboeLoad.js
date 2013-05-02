@@ -46,12 +46,10 @@ $(function(){
                       
    /* For a named module, finds the element in the DOM for it and wraps it in a soma template                           
     */
-   function templateForModule(moduleName) {
-      console.log($('[data-module=' + moduleName + ']')[0], moduleName);
-   
+   function templateForModule(moduleName) {   
       return soma.template.create($('[data-module=' + moduleName + ']')[0]);
    }                      
-                                  
+                                     
    ActivityView(templateForModule('tables'));
    RecentAchievementsView(templateForModule('recentAchievements'));
    UserView(templateForModule('accountBar'));

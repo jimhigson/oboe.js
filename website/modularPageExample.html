@@ -34,9 +34,9 @@
       <button>Upload Activity</button>
    </div>
 
-   <h2>An example page modular webpage</h2>   
+   <h2 class="mainHeading">An example page modular webpage</h2>   
    
-   <h3 data-module="pageInfo" class="module">
+   <h3 data-module="pageInfo" class="module pageInfo">
       This page simulates loading of json data via streaming. I built a clone of something that I knew but 
       the application domain is largely irrelevant. The page is  
       a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
@@ -44,7 +44,7 @@
    </h3>
    
    <div class="content">
-      <div class="mainContent">
+      <div class="mainContent column">
          <section data-module="activitySummary" class="module">
             <header>Activity Summary Last 4 Weeks</header>
             <div class="total data-cloak">
@@ -99,7 +99,7 @@
          </section>
       </div>
       
-      <div class="secondaryContent">
+      <div class="secondaryContent column">
 
          <section data-module="user" class="data-cloak module">
             <img src="{{user.avitar}}" />

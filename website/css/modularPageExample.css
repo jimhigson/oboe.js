@@ -16,7 +16,35 @@
 
 body.modularPage {
    background: #F6F6F6;
+
 }
+.content,
+.pageInfo,
+.mainHeading,
+.topLinks {
+   width: 90%;
+   margin-left: auto;
+   margin-right: auto;
+   
+}
+
+.content {
+  position: relative;
+  min-height: 40em;
+  width:90%;
+}
+.secondaryContent {
+  position: absolute;
+  width: 200px;
+  top: 2em;
+  right:2em;
+  background-color: #FF6A00;
+}
+.mainContent {
+  margin-right: 250px;
+}
+
+
 
 .topLinks {
    background-color: white;
