@@ -41,11 +41,11 @@ body.modularPage {
 .secondaryContent {
   position: absolute;
   width: 400px;
-  top: 2em;
-  right:2em;
+  top: 0;
+  right:0;
 }
 .mainContent {
-  margin-right: 431px;
+  margin-right: 399px;
 }
 
 #logo {
