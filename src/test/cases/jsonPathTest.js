@@ -9,13 +9,22 @@
              .thenShouldNotMatch(   ['a','b'])
       }
       
-   ,  testMatchesSingleStarAloneAnywhere: function() {
+   ,  testMatchesSingleStarAloneAgainstEveryObject: function() {
          givenAPattern('*')
             .thenShouldMatch(       [])
             .thenShouldMatch(       ['a'])
+            .thenShouldMatch(       ['a', 2])
             .thenShouldMatch(       ['a','b'])
       }
       
+   ,  testEmptyStringIsEquivalentToSingleStar: function() { 
+         givenAPattern('')
+            .thenShouldMatch(       [])
+            .thenShouldMatch(       ['a'])
+            .thenShouldMatch(       ['a', 2])
+            .thenShouldMatch(       ['a','b'])
+      }
+                       
    ,  testMatchingForAllDescendantsOfRootMatchAnythingExceptTheRoot: function() {
          givenAPattern('!..*')
             .thenShouldNotMatch(    [])
@@ -212,7 +221,8 @@
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
                       .returning('target');
-      }                  
+      }          
+      
 
    });
    

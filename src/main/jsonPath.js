@@ -2,8 +2,9 @@
 var jsonPathCompiler = (function () {
 
    /** 
-    * tokenExprs is an array of pairs. Each pair contains a regular expression for matching a 
-    * jsonpath language feature and a function for parsing that feature.
+    * tokenExprs is A list of functions representing features in the jsonPath expression. For each function, 
+    * if a given string matches the pattern for that language feature, it will return a generated parser for that 
+    * expression. Otherwise, returns undefined. 
     */
    var tokenExprs = (function(){
    
@@ -106,13 +107,62 @@ var jsonPathCompiler = (function () {
       function returnValueForMatch(capturing, previousExprEvaluation, nodeStack, stackIndex) {
          return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
       }
-           
+
+
       /**
-       * Each of the sub-arrays has at index 0 a pattern matching the token.
-       * At index 1 is the expression function to return a function to parse that expression
+       * For when a token match has been found. Compiles the parser for that token.
+       * 
+       * @param {Function} expr the expression that parses this token 
+       * @param {Function} parserGeneratedSoFar the parser already found
+       * @param tokenMatch the match given by the regex engine when the token was found
        */
-      function tokenExpr(pattern, expr) {
-         return {pattern:pattern, expr:expr};
+      function compileTokenToParser( expr, parserGeneratedSoFar, tokenMatch ) {
+         var capturing = !!tokenMatch[1],
+             name = tokenMatch[2];      
+      
+         return expr.bind(null, parserGeneratedSoFar, capturing, name);      
+      }
+
+      /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
+       *  which is ready to be used as a jsonPath parser. 
+       *  
+       *  This function is designed to be partially completed with the pattern and expr, leaving a function
+       *  which can be stored in the tokenExprs array. tokenExpr(pattern, expr) is a shorthand for this
+       *  partial completion.
+       *  
+       *  Returns undefined on no match
+       *  
+       * @param {RegExp} pattern
+       * @param {Function} expr
+       * @param {String} jsonPath
+       * @param {Function} parserGeneratedSoFar
+       * 
+       * @param {Function(Function, String)} onSuccess a function to pass the generated parser to if one can be made,
+       *    also passes the remaining string from jsonPath that is still to parse
+       * 
+       * @return {*|undefined}
+       */
+      function compileTokenToParserIfMatches(pattern, expr, jsonPath, parserGeneratedSoFar, onSuccess) {
+         var tokenMatch = pattern.exec(jsonPath);
+
+         if(tokenMatch) {
+            var compiledParser = compileTokenToParser(expr, parserGeneratedSoFar, tokenMatch),
+                remaining = jsonPath.substr(tokenMatch[0].length);                
+                                
+             // partially complete the expression with the previous expr, the capturing flag and the name
+             // (some exprs ignore some of these params)  
+            return onSuccess(remaining, compiledParser);
+         }         
+      }
+                 
+      /**
+       * Generate a function which parses the pattern in the given regex. If matches, returns a parser
+       * generated from that token that processes the given expr, otherwise returns null.
+       * 
+       * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
+       */
+      function tokenExpr(pattern, expr) {     
+         return compileTokenToParserIfMatches.bind(null, pattern, expr);
       }     
       
       var nameInObjectNotation    = /^(\$?)(\w+)/    
@@ -125,8 +175,8 @@ var jsonPathCompiler = (function () {
       ,   bang                    = /^(\$?)!/
       ,   emptyString             = /^$/;
       
-      // a mapping of token regular expressions to the functions which evalate conformance to the jsonPath 
-      // language feature represented by that token:      
+      // A list of functions which test if a string matches the required patter and, if it does, returns
+      // a generated parser for that expression      
       return [
          tokenExpr(nameInObjectNotation   , namedNodeExpr),
          tokenExpr(nameInArrayNotation    , namedNodeExpr),         
@@ -139,7 +189,22 @@ var jsonPathCompiler = (function () {
          tokenExpr(emptyString            , statementExpr)
       ];
    })(); // end of tokenExprs definition
-   
+
+
+   /**
+    * This value is one possible value for the onSuccess argument of compileTokenToParserIfMatches.
+    * When this function is passed, compileTokenToParserIfMatches simply returns the compiledParser that it
+    * made, regardless of if there is any remaining jsonPath to be compiled.
+    * 
+    * The other possible value is compileJsonPathToFunction, which causes it to recursively compile
+    * the rest of the string.
+    * 
+    * @param {String} _remainingJsonPath since this function never recurs, anything left over is ignored.
+    * @param {Function} compiledParser
+    */
+   function returnFoundParser(_remainingJsonPath, compiledParser){ 
+      return compiledParser 
+   }     
      
    /** 
     * Recursively compile a jsonPath into a function.
@@ -155,27 +220,34 @@ var jsonPathCompiler = (function () {
     *    
     * In practice, an Expr is any of the functions from tokenExprs[*].expr after being partially completed by 
     * filling in the first three arguments
+    * 
+    * Note that this function's signature matches the onSuccess callback to compileTokenIfMatches, meaning that
+    * compileTokenIfMatches is able to make our recursive call back to here for us.
     */
-   function compileJsonPathToFunction( jsonPath, compiledSoFar ) {
-                
-      for (var i = 0; i < tokenExprs.length; i++) {
-         var tokenMatch = tokenExprs[i].pattern.exec(jsonPath);
+   function compileJsonPathToFunction( jsonPath, parserGeneratedSoFar ) {
+
+      /**
+       * Called when a matching token is found. 
+       * 
+       * @param {Function} parser the parser that has just been compiled
+       * @param {String} remaining the remaining jsonPath that has not been compiled yet
+       * 
+       * On finding a match, we want to either continue parsing using a recursive call to compileJsonPathToFunction
+       * or we want to stop and just return the parser that we've found so far.
+       * 
+       * We use the jsonPath rather than the remaining to branch on here because it is
+       * valid to recur onto an empty string (there's a tokenExpr for that) but it is not
+       * valid to recur past that point. 
+       */
+      var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
              
-         if(tokenMatch) {
-            var capturing = !!tokenMatch[1],
-                name = tokenMatch[2],
-                
-                // partially complete the expression with the previous expr, the capturing flag and the name
-                // (some exprs ignore some of these params)  
-                parser = tokenExprs[i].expr.bind(null, compiledSoFar, capturing, name);
-                
-            // Recurse to parse the rest of the jsonPath expression, unless there is none:
-            return jsonPath? compileJsonPathToFunction(jsonPath.substr(tokenMatch[0].length), parser) : parser;
-         }
+      // to be called by firstMatching if no match could be found. Report the input
+      // that could not be tokenized and leave to handlers up-stack to work out what to do.
+      function onFail() {
+         throw Error('"' + jsonPath + '" could not be tokenised')      
       }
       
-      // couldn't find any match, jsonPath is probably invalid:
-      throw Error('"' + jsonPath + '" could not be tokenised');      
+      return firstMatching( tokenExprs, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
    /**
@@ -195,7 +267,7 @@ var jsonPathCompiler = (function () {
          // matched part are.         
          return compileJsonPathToFunction(jsonPath, function(){return true});
       } catch( e ) {
-         throw Error('Could not compile "' + jsonPath + '" because ' + e);
+         throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
       }
    };
    
