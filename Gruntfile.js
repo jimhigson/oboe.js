@@ -7,19 +7,19 @@ module.exports = function (grunt) {
    ,  concat: {
          oboe:{         
             src: [
-               'src/main/libs/clarinet.js'
-            ,  'src/main/util.js'               
-            ,  'src/main/streamingXhr.js'
-            ,  'src/main/jsonPath.js'
-            ,  'src/main/oboe.js'
+               'src/libs/clarinet.js'
+            ,  'src/util.js'               
+            ,  'src/streamingXhr.js'
+            ,  'src/jsonPath.js'
+            ,  'src/oboe.js'
             ],
-            dest: 'oboe.concat.js'
+            dest: 'dist/oboe.concat.js'
          }
       }
       
    ,  wrap: {
          export: {
-            src: 'oboe.concat.js',
+            src: 'dist/oboe.concat.js',
             dest: '.',
             wrapper: [
                '(function () {'
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
    ,  uglify: {
          build:{
             files:{
-               'oboe.min.js': 'oboe.concat.js'
+               'dist/oboe.min.js': 'dist/oboe.concat.js'
             }
          }
       }
@@ -41,7 +41,7 @@ module.exports = function (grunt) {
          options:{
             verbose:true
          }
-      ,  files:{src:['src/test/jsTestDriver-dev.conf']}  
+      ,  files:{src:['test/jsTestDriver-dev.conf']}  
       }      
 
    });

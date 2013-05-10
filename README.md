@@ -45,7 +45,7 @@ a neat way to route different parts of a json response to different parts of his
 # Status
 
 Oboe is still in development. Nevertheless, it is already
-[quite](src/test/cases/oboeTest.js) [well](src/test/cases/jsonPathTest.js)
+[quite](test/cases/oboeTest.js) [well](test/cases/jsonPathTest.js)
 tested and has proven stable enough for production applications. The 
 codebase is small and hackable and it works. Try it, let me know how
 it goes.
