@@ -179,7 +179,7 @@ var oboe = (function(oboe){
     */
    OboeParser.prototype.read = function (nextDrip) {
       if( this.closed ) {
-         throw new Error('closed');
+         throw Error('closed');
       }
    
       try {

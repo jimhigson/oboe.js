@@ -667,8 +667,11 @@ var jsonPathCompiler = (function () {
     *    
     * Normally, this would be compiled into a jsonPath parser by partially completing
     *    previousExpr, capturing, name to give a function which takes just the particularities
-    *    of the path being evaluated, pathStack, nodeStack, stackIndex. All other expr functions
-    *    follow this pattern too.
+    *    of the path being evaluated: pathStack, nodeStack, stackIndex. 
+    *    
+    *    All other fooExpr functions follow this same signature. My means of partial completion, we end up with a parser
+    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
+    *    matches, it delegates the remaining matching to the next function in the chain.
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */

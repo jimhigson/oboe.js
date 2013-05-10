@@ -8,8 +8,11 @@ var jsonPathCompiler = (function () {
     *    
     * Normally, this would be compiled into a jsonPath parser by partially completing
     *    previousExpr, capturing, name to give a function which takes just the particularities
-    *    of the path being evaluated, pathStack, nodeStack, stackIndex. All other expr functions
-    *    follow this pattern too.
+    *    of the path being evaluated: pathStack, nodeStack, stackIndex. 
+    *    
+    *    All other fooExpr functions follow this same signature. My means of partial completion, we end up with a parser
+    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
+    *    matches, it delegates the remaining matching to the next function in the chain.
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */
@@ -101,7 +104,8 @@ var jsonPathCompiler = (function () {
     *  Returns undefined on no match
     *  
     * @param {RegExp} pattern
-    * @param {Function} expr
+    * @param {Function} parserGenerator a function which knows how to generate a parser. Either a partial completion of
+    *    exprParserGenerator with the expr given, or passthroughParserGenerator.
     * @param {String} jsonPath
     * @param {Function} parserGeneratedSoFar
     * 
@@ -110,7 +114,7 @@ var jsonPathCompiler = (function () {
     * 
     * @return {*|undefined}
     */
-   function compileTokenToParserIfMatches(pattern, parserGenerator, jsonPath, parserGeneratedSoFar, onSuccess) {
+   function generateTokenParserIfJsonPathMatchesPattern(pattern, parserGenerator, jsonPath, parserGeneratedSoFar, onSuccess) {
       var tokenMatch = pattern.exec(jsonPath);
 
       if(tokenMatch) {
@@ -164,9 +168,15 @@ var jsonPathCompiler = (function () {
       // passthroughParserGenerator instead
       var parserGenerator = expr? partialComplete( exprParserGenerator, expr) : passthroughParserGenerator;
        
-      return partialComplete( compileTokenToParserIfMatches, pattern, parserGenerator );
+      return partialComplete( generateTokenParserIfJsonPathMatchesPattern, pattern, parserGenerator );
    }
               
+   // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
+   // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, allowing
+   // new token regexes to match.
+   //    For all regular expressions:
+   //       The first subexpression is the $ (if the token is eligible to capture)
+   //       The second subexpression is the name of the expected path node (if the token may have a name)               
    var nameInObjectNotation    = /^(\$?)(\w+)/    
    ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/         
    ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
