@@ -1,6 +1,7 @@
 $(function(){
 
-   var requestOboe = oboe.parser();            
+   var requestOboe = oboe.parser()
+         .onError(function(e){ console.error( e ) });            
    
    /* A tiny layer of glue to fix together oboe's callback and a request for soma to render the data */
    function renderTemplateWithNewData( template, fieldName ) {
@@ -44,7 +45,12 @@ $(function(){
    
    function ActivitySummaryView(template) {
             
-      template.scope.calendar = [[]];                  
+      template.scope.calendar = [[]];
+      
+      template.scope.barWidth = function(timeSpent) {
+         return timeSpent.hours * 60;
+      };
+                        
       requestOboe.onFind({
          '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' )
       ,  '!.activitySummary.$byType.*'          :         renderTemplateWithNewData( template, 'byType' )          

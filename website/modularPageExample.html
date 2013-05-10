@@ -67,7 +67,11 @@
                
                <div class="weeks">
                   <div data-repeat="week in calendar.weeks" class="weekRow">
-                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>                     
+                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
+                     <span class="barCell data-cloak">
+                        <span class="bar" 
+                           style="width:{{barWidth(week.timeSpent}}px"></span>
+                     </span>                                                   
                      <span class="weekSummary data-cloak">
                         {{week.timeSpent.hours}}hrs {{week.timeSpent.minutes}}mins
                      </span>                  
