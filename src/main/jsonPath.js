@@ -119,8 +119,8 @@ var jsonPathCompiler = (function () {
       function compileTokenToParser( expr, parserGeneratedSoFar, tokenMatch ) {
          var capturing = !!tokenMatch[1],
              name = tokenMatch[2];      
-      
-         return expr.bind(null, parserGeneratedSoFar, capturing, name);      
+            
+         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
       }
 
       /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
@@ -161,8 +161,9 @@ var jsonPathCompiler = (function () {
        * 
        * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
        */
-      function tokenExpr(pattern, expr) {     
-         return compileTokenToParserIfMatches.bind(null, pattern, expr);
+      function tokenExpr(pattern, expr) {
+      
+         return partialComplete( compileTokenToParserIfMatches, pattern, expr );
       }     
       
       var nameInObjectNotation    = /^(\$?)(\w+)/    

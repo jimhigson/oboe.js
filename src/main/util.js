@@ -25,3 +25,15 @@ function firstMatching( fns, args, onFail ) {
    
    onFail();
 }
+
+/** Partially complete the given function by filling it in with all arguments given
+ *  after the function itself. Returns the partially completed version.    
+ */
+function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
+
+   var args = Array.prototype.slice.call(arguments, 0);
+   args[0] = null; // the first argument to bind should be null since we
+                   // wish to specify no context
+
+   return Function.prototype.bind.apply(fn, args); 
+}

@@ -601,6 +601,18 @@ function firstMatching( fns, args, onFail ) {
    
    onFail();
 }
+
+/** Partially complete the given function by filling it in with all arguments given
+ *  after the function itself. Returns the partially completed version.    
+ */
+function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
+
+   var args = Array.prototype.slice.call(arguments, 0);
+   args[0] = null; // the first argument to bind should be null since we
+                   // wish to specify no context
+
+   return Function.prototype.bind.apply(fn, args); 
+}
 /**
  * An xhr wrapper that calls a callback whenever some more of the
  * response is available, without waiting for all of it.
@@ -766,8 +778,8 @@ var jsonPathCompiler = (function () {
       function compileTokenToParser( expr, parserGeneratedSoFar, tokenMatch ) {
          var capturing = !!tokenMatch[1],
              name = tokenMatch[2];      
-      
-         return expr.bind(null, parserGeneratedSoFar, capturing, name);      
+            
+         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
       }
 
       /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
@@ -808,8 +820,9 @@ var jsonPathCompiler = (function () {
        * 
        * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
        */
-      function tokenExpr(pattern, expr) {     
-         return compileTokenToParserIfMatches.bind(null, pattern, expr);
+      function tokenExpr(pattern, expr) {
+      
+         return partialComplete( compileTokenToParserIfMatches, pattern, expr );
       }     
       
       var nameInObjectNotation    = /^(\$?)(\w+)/    
