@@ -875,7 +875,7 @@ var oboe = (function(oboe){
       }   
    
       clarinetParser.onkey = function (nextKey) {
-         notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
@@ -885,7 +885,7 @@ var oboe = (function(oboe){
          // For (strings/numbers) in (objects/arrays) this is where the flow goes.
 
          curNode[curKey] = value;   
-         notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
+         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
    
          if( isArray(curNode) ) {
             curKey++;
@@ -900,11 +900,11 @@ var oboe = (function(oboe){
          
          curNode = {};
    
-         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
    
          addNewChild(parentNode);
          
-         notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
@@ -918,7 +918,7 @@ var oboe = (function(oboe){
          
          addNewChild(parentNode);
          
-         notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
    
          // arrays always start at zero:
          curKey = 0;
@@ -931,7 +931,7 @@ var oboe = (function(oboe){
          // identified and it shouldn't be listed as an ancestor of itself:
          nodeStack.pop();
    
-         notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
+         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
    
          pathStack.pop();
          curNode = lastOf(nodeStack);
@@ -942,11 +942,9 @@ var oboe = (function(oboe){
    
       };   
       clarinetParser.onerror = function(e) {
-         oboeInstance._errorListeners.forEach( function( listener ) {
-            listener(e);
-         });
+         oboeInstance._notifyErrors(e);
          
-         // after errors, we won't bother trying to recover so just give up:
+         // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
          oboeInstance.close();
       };   
    }
@@ -967,7 +965,7 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   function notifyListeners ( listenerList, curNode, path, ancestors ) {
+   OboeParser.prototype._notifyListeners = function ( listenerList, curNode, path, ancestors ) {
       
       var nodeList = ancestors.concat([curNode]);
 
@@ -990,10 +988,20 @@ var oboe = (function(oboe){
                var context = listener.context || window;
                
                // change curNode to foundNode when it stops breaking tests
-               listener.callback.call(context, foundNode, path, ancestors );
+               try{
+                  listener.callback.call(context, foundNode, path, ancestors );
+               } catch(e) {
+                  this._notifyErrors(Error('Error thrown by callback ' + e.message));
+               }
             }                            
-         });
-   }
+         }, this);
+   };
+   
+   OboeParser.prototype._notifyErrors = function(error) {
+      this._errorListeners.forEach( function( listener ) {
+         listener(error);
+      });   
+   };   
 
    /**
     * called when there is new text to parse
@@ -1001,8 +1009,8 @@ var oboe = (function(oboe){
     * @param {String} nextDrip
     */
    OboeParser.prototype.read = function (nextDrip) {
-      if( closed ) {
-         throw new Error();
+      if( this.closed ) {
+         throw new Error('closed');
       }
    
       try {
@@ -1010,8 +1018,7 @@ var oboe = (function(oboe){
       } catch(e) {
          // we don't have to do anything here because we always assign a .onerror
          // to clarinet which will have already been called by the time this 
-         // exception is thrown.
-         console.log('Error:' + e.message);       
+         // exception is thrown.                
       }
    };
             

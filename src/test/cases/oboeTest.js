@@ -868,15 +868,40 @@ TestCase("oboeTest", {
    }
 
    
-,  testErrorsOnInvalidJson: function() {
+,  testErrorsOnJsonWithUnquotedKeys: function() {
   
       givenAParser()
         .andWeAreExpectingSomeErrors()
         .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
         .thenTheParser
            (   calledCallbackOnce
+           ,   wasPassedAnErrorObject
            );
    }
+   
+,  testErrorsOnMalformedJson: function() {
+  
+      givenAParser()
+        .andWeAreExpectingSomeErrors()
+        .whenGivenInput('{{') // invalid!
+        .thenTheParser
+           (   calledCallbackOnce
+           ,   wasPassedAnErrorObject
+           );
+   }
+   
+,  testCallsErrorListenerIfCallbackErrors: function() {
+  
+      givenAParser()
+        .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
+        .andWeAreExpectingSomeErrors()
+        .whenGivenInput('{}') // valid json, should provide callback
+        .thenTheParser
+           (   calledCallbackOnce
+           ,   wasPassedAnErrorObject
+           );
+   }      
+   
       
 });
 
@@ -933,6 +958,13 @@ function givenAParser() {
          return this;
       };
       
+      this.andWeHaveAFaultyCallbackListeningFor = function(pattern) {
+         spiedCallback = sinon.stub().throws();      
+      
+         oboeParser.onPath(pattern, argumentClone(spiedCallback));
+         return this;
+      };      
+      
       this.andWeAreExpectingSomeErrors = function() {
          expectingErrors = true;
       
@@ -940,8 +972,8 @@ function givenAParser() {
          
          oboeParser.onError(argumentClone(spiedCallback));
          return this;
-      };      
-
+      };
+                 
       this.whenGivenInput = function(json) {
          if( typeof json != 'string' ) {
             json = JSON.stringify(json);
@@ -965,6 +997,18 @@ function givenAParser() {
    }
    return new Asserter();
 }
+
+
+var wasPassedAnErrorObject = {
+   testAgainst: function failIfNotPassedAnError(callback) {
+   
+      if( !callback.args[0][0] instanceof Error ) {
+         fail("Callback should have been given an error but was given" + callback.constructor.name);
+      }
+      
+   }
+};
+
 
 // higher-level function to create assertions. Pass output to Asserter#thenTheParser.
 // test how many matches were found
