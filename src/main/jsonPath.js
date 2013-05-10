@@ -172,15 +172,15 @@ var jsonPathCompiler = (function () {
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression      
    var tokenExprs = [
-      tokenExpr(nameInObjectNotation   , namedNodeExpr),
-      tokenExpr(nameInArrayNotation    , namedNodeExpr),         
-      tokenExpr(numberInArrayNotation  , namedNodeExpr),
-      tokenExpr(starInObjectNotation   , unnamedNodeExpr),
-      tokenExpr(starInArrayNotation    , unnamedNodeExpr),         
-      tokenExpr(doubleDot              , multipleUnnamedNodesExpr),
-      tokenExpr(dot                    , passthroughExpr),         
-      tokenExpr(bang                   , rootExpr),             
-      tokenExpr(emptyString            , statementExpr)
+   ,   tokenExpr(nameInObjectNotation   , namedNodeExpr)
+   ,   tokenExpr(nameInArrayNotation    , namedNodeExpr)         
+   ,   tokenExpr(numberInArrayNotation  , namedNodeExpr)
+   ,   tokenExpr(starInObjectNotation   , unnamedNodeExpr)
+   ,   tokenExpr(starInArrayNotation    , unnamedNodeExpr)         
+   ,   tokenExpr(doubleDot              , multipleUnnamedNodesExpr)
+   ,   tokenExpr(dot                    , passthroughExpr)         
+   ,   tokenExpr(bang                   , rootExpr)             
+   ,   tokenExpr(emptyString            , statementExpr)
    ];
 
 
