@@ -78,12 +78,7 @@ section header {
 }
 
 #logo {
-   color:#E14823;
-}
-
-button {
-   background-color:#E14823;
-   color:white;
+   color:#fc5e1c;
 }
 
 .calendar .weeks {
@@ -106,13 +101,17 @@ button {
    width: 19px;
 }
 
+.dayHeadings {
+   color: #999;
+}
+
 .calendar .barCell {
    display:table-cell;
    width:200px;
 }
 .calendar .bar {
    display:inline-block;
-   background-color:#E14823;
+   background-color:#fc5e1c;
    height:15px;
    transition: width 0.5s;
    border-left:1px white solid;
@@ -139,3 +138,12 @@ button {
 table {
    text-align: left;
 }
+
+
+[data-module=activitySummary] {
+   background: #f5f5f5;
+   background: -moz-linear-gradient(top, #fff, #f5f5f5);
+   background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
+   background: -o-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
+   background: -ms-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
+}   
