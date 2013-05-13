@@ -19,6 +19,14 @@
 .pageInfo {
    background-color:green;
    color:white;
+   padding: 10px 50px; 
+}
+
+a {
+   text-decoration: none;
+}
+a:hover {
+   text-decoration: underline;
 }
 
 .notLoaded{
