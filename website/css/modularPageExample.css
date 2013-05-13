@@ -31,7 +31,7 @@ a:hover {
 
 .notLoaded{
    opacity:0;
-   font-size:0; /* don't let placeholder text expand the layout */
+   font-size:0.1px; /* don't let placeholder text expand the layout, just make it very small */
 }
 .loaded {
    opacity:1;
@@ -92,7 +92,11 @@ button {
 
 .calendar .weekRow,
 .calendar .dayHeadings {
-   display: table-row;
+   display: table-row;   
+}
+
+.calendar .weekRow {
+   height: 20px;
 }
 
 .calendar .day,
@@ -123,6 +127,7 @@ button {
 }
 .calendar .weekSummary {
    display:table-cell;
+   width:100px;
 } 
 .calendar .day.active-true {
    background-color: black;
