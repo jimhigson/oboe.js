@@ -5,7 +5,7 @@ var dataTemplate =
       "firstname":"{{Firstname}}"
    ,  "surname":"{{Surname}}"
    ,  "avitar":"//placehold.it/32"
-   ,  "location":"London, United Kingdom"
+   ,  "location":"{{Location}}"
    }
       
 ,  "recentAchievements": {

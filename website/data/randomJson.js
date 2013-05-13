@@ -1,27 +1,28 @@
 var RandomJson = (function() {
 
    // 20 random names from here: http://listofrandomnames.com/index.cfm?generated
-   var NAMES = [
-      {first:"Brett"      , surname:"Stearman"    }
-   ,  {first:"Pansy"      , surname:"Brunson"     }
-   ,  {first:"Cleveland"  , surname:"Selvage"     }
-   ,  {first:"Victor"     , surname:"Stucky"      }
-   ,  {first:"Buster"     , surname:"Damiano"     }
-   ,  {first:"Kelle"      , surname:"Demaio"      }
-   ,  {first:"Lea"        , surname:"Pozo"        }
-   ,  {first:"Grazyna"    , surname:"Sylvest"     }
-   ,  {first:"Jesusita"   , surname:"Wiebe"       }
-   ,  {first:"Yulanda"    , surname:"Lachapelle"  }
-   ,  {first:"Emely"      , surname:"Holmberg"    }
-   ,  {first:"Tu"         , surname:"Dizon"       }
-   ,  {first:"Jimmie"     , surname:"Lynn"        }
-   ,  {first:"Pok"        , surname:"Branner"     }
-   ,  {first:"Josette"    , surname:"Swann"       }
-   ,  {first:"Lazaro"     , surname:"Neufeld"     }
-   ,  {first:"Rudy"       , surname:"Renninger"   }
-   ,  {first:"Felipe"     , surname:"Kilburn"     }
-   ,  {first:"Jorge"      , surname:"Swearngin"   }
-   ,  {first:"Joette"     , surname:"Varney"      }
+   // locations are 20 top from here: https://en.wikipedia.org/wiki/Largest_cities_of_the_European_Union_by_population_within_city_limits
+   var PEOPLE = [
+      {firstname:"Brett"      , surname:"Stearman"    , location:"London, United Kingdom"}
+   ,  {firstname:"Pansy"      , surname:"Brunson"     , location:"Berlin, Germany"}
+   ,  {firstname:"Roger"      , surname:"Selvage"     , location:"Madrid, Spain"}
+   ,  {firstname:"Victor"     , surname:"Stucky"      , location:"Rome, Italy"}
+   ,  {firstname:"Buster"     , surname:"Damiano"     , location:"Paris, France"}
+   ,  {firstname:"Kelle"      , surname:"Demaio"      , location:"Bucharest, Romania"}
+   ,  {firstname:"Lea"        , surname:"Pozo"        , location:"Hamburg, Germany"}
+   ,  {firstname:"Grazyna"    , surname:"Sylvest"     , location:"Budapest, Hungary"}
+   ,  {firstname:"Jesusita"   , surname:"Wiebe"       , location:"Vienna, Austria"}
+   ,  {firstname:"Yulanda"    , surname:"Lachapelle"  , location:"Warsaw, Poland"}
+   ,  {firstname:"Emely"      , surname:"Holmberg"    , location:"Barcelona, Spain"}
+   ,  {firstname:"Tu"         , surname:"Dizon"       , location:"Munich, Germany"}
+   ,  {firstname:"Jimmie"     , surname:"Lynn"        , location:"Milan, Italy"}
+   ,  {firstname:"Pok"        , surname:"Branner"     , location:"Prague, Czech Republic"}
+   ,  {firstname:"Josette"    , surname:"Swann"       , location:"Sofia, Bulgaria"}
+   ,  {firstname:"Lazaro"     , surname:"Neufeld"     , location:"Brussels, Belgium"}
+   ,  {firstname:"Rudy"       , surname:"Renninger"   , location:"Birmingham, United Kingdom"}
+   ,  {firstname:"Felipe"     , surname:"Kilburn"     , location:"Cologne, Germany"}
+   ,  {firstname:"Jorge"      , surname:"Swearngin"   , location:"Naples, Italy"}
+   ,  {firstname:"Joette"     , surname:"Varney"      , location:"Stockholm, Sweden"}
    ];
    
    /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
@@ -30,7 +31,7 @@ var RandomJson = (function() {
    function expandJsonTemplate( json ) {
          
       // let's pick a name for the user:         
-      var userName = NAMES[ Math.floor(Math.random() * NAMES.length) ];      
+      var user = PEOPLE[ Math.floor(Math.random() * PEOPLE.length) ];      
 
       // traveerse json recursively, replacing some special tokens with random values:      
       function replacePlaceholders(templateString){
@@ -56,8 +57,10 @@ var RandomJson = (function() {
                   return Math.round(Math.random() * (to - from +1) + from) 
                }
                
-            ).replace("{{Firstname}}", userName.first)
-             .replace("{{Surname}}", userName.surname);
+            ).replace("{{Firstname}}", user.firstname)
+             .replace("{{Surname}}", user.surname)
+             .replace("{{Location}}", user.location)
+             ;
             
             
          } while( changed );
