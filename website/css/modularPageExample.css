@@ -31,6 +31,7 @@ a:hover {
 
 .notLoaded{
    opacity:0;
+   font-size:0; /* don't let placeholder text expand the layout */
 }
 .loaded {
    opacity:1;
