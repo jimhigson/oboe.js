@@ -16,6 +16,11 @@
    /*font-family: Blokk, Sans;*/
 }
 
+.pageInfo {
+   background-color:green;
+   color:white;
+}
+
 .notLoaded{
    opacity:0;
 }
@@ -24,15 +29,16 @@
    transition:opacity 0.5s;
 }
 
-body.modularPage {
+body {
    background: #F6F6F6;
-
+   margin:0; padding: 0;
 }
+
 .content,
-.pageInfo,
 .mainHeading,
 .topLinks {
    width: 90%;
+   max-width: 1150px;
    margin-left: auto;
    margin-right: auto;
    background-color: white;

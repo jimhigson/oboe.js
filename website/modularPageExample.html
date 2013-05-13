@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
    <meta charset="utf-8">
-   <title>An example modular-style webpage</title>
+   <title>An example modular-style webpage loading via Oboe.js
+   </title>
 
    <link rel="stylesheet" href="css/modularPageExample.css">
    <!--[if IE]>
@@ -11,160 +12,166 @@
 
 </head>
 
-<body class="modularPage">
-   
-   <div class="topLinks">
+<body>
 
-      <h1 id="logo">Logo</h1>
+   <section class="pageInfo">
+      <header>An example page modular webpage 
+         Loading via <a href="https://github.com/jimhigson/oboe.js">Oboe.js</a>
+      </header>
       
-      <a href="#">Dashboard</a>
-      <a href="#">Training</a>
-      <a href="#">Explore</a>
-      <a href="#">Challenges</a>
-      
-      <span class="accountBar">
-         <a href="#">Upgrade to Premium</a>
-         
-         <span data-module="accountBar" class="data-cloak module">
-            <img src="{{user.avitar}}" />
-            <a href="#">{{user.usernameShort}}</a>
-         </span>
-      </span>
-      
-      <button>Upload Activity</button>
-   </div>
-
-   <h2 class="mainHeading">An example page modular webpage</h2>   
-   
-   <h3 data-module="pageInfo" class="pageInfo">
       This page simulates loading of json data via streaming. I built a clone of something that I knew but 
       the application domain is largely irrelevant. The page is  
       a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
       <a href="http://app.strava.com/athletes/182755">my personal Strava profile</a>
       because I'm a massive fan of those guys. 
-   </h3>
+   </section>
    
-   <div class="content">
-      <div class="mainContent column">
-         <section data-module="activitySummary" class="module moduleBox">
-            <header>Activity Summary Last 4 Weeks</header>
-            <div class="data-cloak total">
-               Total Activities
-               <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
-            </div>
+   <section class="modularPage">
+      
+      <div class="topLinks">
+   
+         <h1 id="logo">Logo</h1>
+         
+         <a href="#">Dashboard</a>
+         <a href="#">Training</a>
+         <a href="#">Explore</a>
+         <a href="#">Challenges</a>
+         
+         <span class="accountBar">
+            <a href="#">Upgrade to Premium</a>
             
-            <div class="byType data-cloak {{gotData(byType)}}">
-               <header>Activity type</header>
-               <ul>
-                  <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
-                  <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
-               </ul>
-            </div>
-            
-            <section class="calendar data-cloak {{gotData(calendar)}}">
-            
-               <header>Calendar</header>
-               
-               <div class="weeks">
-                  <div data-repeat="week in calendar.weeks" class="weekRow">
-                     <span class="day active-{{known(week.days.mon)}}"></span>
-                     <span class="day active-{{known(week.days.tue)}}"></span>
-                     <span class="day active-{{known(week.days.wed)}}"></span>
-                     <span class="day active-{{known(week.days.thur)}}"></span>
-                     <span class="day active-{{known(week.days.fri)}}"></span>
-                     <span class="day active-{{known(week.days.sat)}}"></span>
-                     <span class="day active-{{known(week.days.sun)}}"></span>
-                     <span class="barCell">
-                        <span class="bar" 
-                           style="width:{{barWidth(week.timeSpent)}}px"></span>
-                     </span>                                                   
-                     <span class="weekSummary">
-                        <span class="{{gotData(week.timeSpent.hours)}}">
-                           {{week.timeSpent.hours}}hrs
-                        </span>
-                        <span class="{{gotData(week.timeSpent.minutes)}}"> 
-                           {{week.timeSpent.minutes}}mins
-                        </span>
-                     </span>                  
-                  </div>
-                  <div class="dayHeadings">
-                     <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
-                  </div>                  
+            <span data-module="accountBar" class="data-cloak module">
+               <img src="{{user.avitar}}" />
+               <a href="#">{{user.usernameShort}}</a>
+            </span>
+         </span>
+         
+         <button>Upload Activity</button>
+      </div>
+      
+        
+      <div class="content">
+         <div class="mainContent column">
+            <section data-module="activitySummary" class="module moduleBox">
+               <header>Activity Summary Last 4 Weeks</header>
+               <div class="data-cloak total">
+                  Total Activities
+                  <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
                </div>
                
+               <div class="byType data-cloak {{gotData(byType)}}">
+                  <header>Activity type</header>
+                  <ul>
+                     <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
+                     <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
+                  </ul>
+               </div>
+               
+               <section class="calendar data-cloak {{gotData(calendar)}}">
+               
+                  <header>Calendar</header>
+                  
+                  <div class="weeks">
+                     <div data-repeat="week in calendar.weeks" class="weekRow">
+                        <span class="day active-{{known(week.days.mon)}}"></span>
+                        <span class="day active-{{known(week.days.tue)}}"></span>
+                        <span class="day active-{{known(week.days.wed)}}"></span>
+                        <span class="day active-{{known(week.days.thur)}}"></span>
+                        <span class="day active-{{known(week.days.fri)}}"></span>
+                        <span class="day active-{{known(week.days.sat)}}"></span>
+                        <span class="day active-{{known(week.days.sun)}}"></span>
+                        <span class="barCell">
+                           <span class="bar" 
+                              style="width:{{barWidth(week.timeSpent)}}px"></span>
+                        </span>                                                   
+                        <span class="weekSummary">
+                           <span class="{{gotData(week.timeSpent.hours)}}">
+                              {{week.timeSpent.hours}}hrs
+                           </span>
+                           <span class="{{gotData(week.timeSpent.minutes)}}"> 
+                              {{week.timeSpent.minutes}}mins
+                           </span>
+                        </span>                  
+                     </div>
+                     <div class="dayHeadings">
+                        <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                     </div>                  
+                  </div>
+                  
+               </section>
             </section>
-         </section>
+            
+            <!-- DOM for the bar recent achievements module -->
+            <section data-module="recentAchievements" class="module moduleBox">
+               <header>Recent Achievements</header>
+               <div class="awards data-cloak">
+                  <div data-repeat="award in awards">
+                     <img src="//placehold.it/32">
+                     <a class="{{gotData(award.segment.name)}}" href="{{award.segment.url}}">
+                        {{award.segment.name}}
+                     </a>
+                     <span class="when {{gotData(award.segment.name, award.when)}}">{{award.when}}</span>
+                  </div>               
+               </div>
+            </section>      
+              
+         </div>
          
-         <!-- DOM for the bar recent achievements module -->
-         <section data-module="recentAchievements" class="module moduleBox">
-            <header>Recent Achievements</header>
-            <div class="awards data-cloak">
-               <div data-repeat="award in awards">
-                  <img src="//placehold.it/32">
-                  <a class="{{gotData(award.segment.name)}}" href="{{award.segment.url}}">
-                     {{award.segment.name}}
-                  </a>
-                  <span class="when {{gotData(award.segment.name, award.when)}}">{{award.when}}</span>
-               </div>               
-            </div>
-         </section>      
-           
+         <div class="secondaryContent column">
+   
+            <section data-module="user" class="data-cloak module moduleBox">
+               <img src="{{user.avitar}}" />
+               <header>{{user.username}}</header>
+               <span class="location">{{user.location}}</span>            
+            </section>
+         
+            <!-- DOM for the social stats -->      
+            <section data-module="socialStats" class="module moduleBox">
+   
+               <header>Social Stats</header>
+                    
+               <ul class="data-cloak">
+                  <li class="{{gotData(socialStats.following)}}">
+                     Following {{socialStats.following}}
+                  </li>
+                  <li class="{{gotData(socialStats.followers)}}">
+                     Followers {{socialStats.followers}}
+                  </li>
+                  <li class="{{gotData(socialStats.kudos)}}">
+                     Kudos {{socialStats.kudos}}
+                  </li>
+                  <li class="{{gotData(socialStats.comments)}}">
+                     Comments {{socialStats.comments}}
+                  </li>               
+               </ul>
+            </section>      
+         
+            <!-- DOM for the table module -->      
+            <section data-module="tables" class="module moduleBox">
+   
+               <header>My Stats</header>
+   
+               <h2 class="data-cloak {{gotData(heading)}}">{{heading}}</h2>      
+                                                    
+               <table class="data-cloak">
+                  <tbody>
+                     <tr data-repeat="row in data">
+                        <th>{{row.heading}}</th><td>{{row.value}}</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </section>
+         </div>
       </div>
-      
-      <div class="secondaryContent column">
-
-         <section data-module="user" class="data-cloak module moduleBox">
-            <img src="{{user.avitar}}" />
-            <header>{{user.username}}</header>
-            <span class="location">{{user.location}}</span>            
-         </section>
-      
-         <!-- DOM for the social stats -->      
-         <section data-module="socialStats" class="module moduleBox">
-
-            <header>Social Stats</header>
-                 
-            <ul class="data-cloak">
-               <li class="{{gotData(socialStats.following)}}">
-                  Following {{socialStats.following}}
-               </li>
-               <li class="{{gotData(socialStats.followers)}}">
-                  Followers {{socialStats.followers}}
-               </li>
-               <li class="{{gotData(socialStats.kudos)}}">
-                  Kudos {{socialStats.kudos}}
-               </li>
-               <li class="{{gotData(socialStats.comments)}}">
-                  Comments {{socialStats.comments}}
-               </li>               
-            </ul>
-         </section>      
-      
-         <!-- DOM for the table module -->      
-         <section data-module="tables" class="module moduleBox">
-
-            <header>My Stats</header>
-
-            <h2 class="data-cloak {{gotData(heading)}}">{{heading}}</h2>      
-                                                 
-            <table class="data-cloak">
-               <tbody>
-                  <tr data-repeat="row in data">
-                     <th>{{row.heading}}</th><td>{{row.value}}</td>
-                  </tr>
-               </tbody>
-            </table>
-         </section>
-      </div>
-   </div>
-
-   <script src="components/jquery/jquery.min.js"></script>
-   <script src="components/underscore/underscore.js"></script>
-   <script src="data/modularPageExampleData.js" type="text/javascript" ></script>
-   <script src="data/fakeAjax.js" type="text/javascript" ></script>
-   <script src="libs/soma-template.js" type="text/javascript" ></script>
-   <script src="../dist/oboe.js" type="text/javascript" ></script>
-   <script src="js/modularPageOboeLoad.js"></script>
-
+   
+      <script src="components/jquery/jquery.min.js"></script>
+      <script src="components/underscore/underscore.js"></script>
+      <script src="data/modularPageExampleData.js" type="text/javascript" ></script>
+      <script src="data/fakeAjax.js" type="text/javascript" ></script>
+      <script src="libs/soma-template.js" type="text/javascript" ></script>
+      <script src="../dist/oboe.js" type="text/javascript" ></script>
+      <script src="js/modularPageOboeLoad.js"></script>
+   
+   </section>
 </body>
 </html>
