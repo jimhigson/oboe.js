@@ -7,15 +7,6 @@ var dataTemplate =
    ,  "avitar":"//placehold.it/32"
    ,  "location":"London, United Kingdom"
    }
-
-,  "pageInfo": {
-   }
-
-,  "barChart": {
-   }
-   
-,  "imageSlider":{
-   }
    
 ,  "map": {
       "minLat"    :""
