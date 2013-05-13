@@ -87,6 +87,17 @@ button {
    width: 19px;
 }
 
+.calendar .barCell {
+   display:table-cell;
+   width:200px;
+}
+.calendar .bar {
+   display:inline-block;
+   background-color:#E14823;
+   height:15px;
+   transition: width 0.5s;
+}
+
 .calendar .day {
    height: 19px;
    border-left:1px white solid;

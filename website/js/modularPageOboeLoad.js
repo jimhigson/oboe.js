@@ -3,6 +3,11 @@ $(function(){
    var requestOboe = oboe.parser()
          .onError(function(e){ console.error( e ) });            
    
+   function allDefined(/* arg1, arg2 ... */) {
+      var argArray = Array.prototype.slice.apply(arguments);
+      return argArray.every(function(a){ return a !== undefined });   
+   }   
+   
    /* A tiny layer of glue to fix together oboe's callback and a request for soma to render the data */
    function renderTemplateWithData( template, fieldName, data ) {
        
@@ -48,7 +53,16 @@ $(function(){
       template.scope.calendar = [[]];
       
       template.scope.barWidth = function(timeSpent) {
-         return 100;//timeSpent.hours * 60;
+         
+         if( timeSpent === undefined || timeSpent.hours === undefined || timeSpent.minutes === undefined ) {
+            return 0;
+         }
+         
+         function widthOfBar( timeSpent ) {
+            return 0.15 * parseInt(timeSpent.hours) * 60 + parseInt(timeSpent.minutes);
+         }
+         
+         return widthOfBar(timeSpent);
       };
                         
       requestOboe.onFind({
@@ -61,8 +75,7 @@ $(function(){
    
    soma.template.helpers({
       gotData: function(/* arg1, arg2 ... */) {
-         var argArray = Array.prototype.slice.apply(arguments);
-         return argArray.every(function(a){ return a !== undefined }) ? 'loaded' : 'notLoaded';   
+         return allDefined.apply(null, arguments) ? 'loaded' : 'notLoaded';   
       },
       known: function(value) {
          return value === undefined? 'unknown':value;
@@ -83,5 +96,5 @@ $(function(){
    ActivitySummaryView(templateForModule('activitySummary'));
           
    // ok, let's simulate a slow connection and feed the response into our oboe:
-   FakeAjax.fetch(5, 50, requestOboe.read.bind(requestOboe));      
+   FakeAjax.fetch(5, 5, requestOboe.read.bind(requestOboe));      
 });
