@@ -96,6 +96,7 @@ button {
    background-color:#E14823;
    height:15px;
    transition: width 0.5s;
+   border-left:1px white solid;
 }
 
 .calendar .day {

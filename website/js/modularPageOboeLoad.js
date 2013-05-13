@@ -53,16 +53,12 @@ $(function(){
       template.scope.calendar = [[]];
       
       template.scope.barWidth = function(timeSpent) {
-         
+         // return zero if we don't have the answer (this allows a nice animated effect when we do get the answer) 
          if( timeSpent === undefined || timeSpent.hours === undefined || timeSpent.minutes === undefined ) {
             return 0;
          }
          
-         function widthOfBar( timeSpent ) {
-            return 0.15 * parseInt(timeSpent.hours) * 60 + parseInt(timeSpent.minutes);
-         }
-         
-         return widthOfBar(timeSpent);
+         return Math.round(0.15 * parseInt(timeSpent.hours) * 60 + parseInt(timeSpent.minutes));
       };
                         
       requestOboe.onFind({
