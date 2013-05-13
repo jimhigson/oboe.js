@@ -25,13 +25,34 @@ var RandomJson = (function() {
    ,  {firstname:"Joette"     , surname:"Varney"      , location:"Stockholm, Sweden"}
    ];
    
+   var LOREMS = [
+      "Lorem ipsum dolor sit amet" ,
+      "consectetur adipisicing " ,
+      "elit, sed do " ,
+      "eiusmod tempor incididunt" ,
+      "ut labore et" ,
+      "dolore magna aliqua." ,
+      "Ut enim" ,
+      "ad minim veniam" ,
+      "quis nostrud" ,
+      "exercitation" ,
+      "ullamco laboris nisi" ,
+      "ut aliquip ex ea commodo consequat." ,
+      "Duis aute" ,
+      "irure dolor in reprehenderit"
+   ];
+   
+   function randomFrom( array ) {
+      return array[ Math.floor(Math.random() * array.length) ];
+   }
+   
    /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
     *  a sample page. 
     */
    function expandJsonTemplate( json ) {
          
       // let's pick a name for the user:         
-      var user = PEOPLE[ Math.floor(Math.random() * PEOPLE.length) ];      
+      var user = randomFrom(PEOPLE);      
 
       // traveerse json recursively, replacing some special tokens with random values:      
       function replacePlaceholders(templateString){
@@ -51,12 +72,30 @@ var RandomJson = (function() {
                
             ).replace(
             
-               /\{\{Number (\d+) to (\d+)\}\}/, 
-               function(match, from, to){ 
+               /\{\{Number(?: (\d+) to (\d+))?\}\}/, 
+               function(match, from, to){
+                  // by default, go from 0 to 10
+                  from = from || 1;
+                  to = to || 10;
+                
                   changed = true; 
                   return Math.round(Math.random() * (to - from +1) + from) 
                }
                
+            ).replace(
+                        
+               /\{\{One from ([\w\s]*)\}\}/, 
+               function(match, choices){                
+                  changed = true; 
+                  return randomFrom(choices.split(' ')); 
+               }
+               
+            ).replace(
+               "{{Lorem}}", 
+               function(){
+                  changed = true;
+                  return randomFrom(LOREMS);
+               }            
             ).replace("{{Firstname}}", user.firstname)
              .replace("{{Surname}}", user.surname)
              .replace("{{Location}}", user.location)

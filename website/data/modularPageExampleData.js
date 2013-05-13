@@ -12,35 +12,35 @@ var dataTemplate =
       "awards":[
          {
             "segment":{
-               "name": "Ditching Beacon"
+               "name": "{{Lorem}}"
             ,  "url": "/example-link"
             },         
             "type":"Personal Record",
-            "when": "2 days ago"
+            "when": "{{Number}} {{One from weeks days}} ago"
          }
       ,  {
             "segment":{
-               "name": "A406 to Town Hall"
+               "name": "{{Lorem}}"
             ,  "url": "/example-link"
             },      
             "type":"KOM",
-            "when": "7 days ago"
+            "when": "{{Number}} {{One from weeks days}} ago"
          }
       ,  {
             "segment":{
-               "name": "Silly sprint"
+               "name": "{{Lorem}}"
             ,  "url": "/example-link"
             },      
             "type":"Personal Record",
-            "when": "today"
+            "when": "{{Number}} {{One from weeks days}} ago"
          }
       ,  {
             "segment":{
-               "name": "Archway Rd climb"
+               "name": "{{Lorem}}"
             ,  "url": "/example-link"
             },      
             "type":"6th Overall",
-            "when": "2 weeks ago"
+            "when": "{{Number}} {{One from weeks days}} ago"
          }                                    
       ]
       
