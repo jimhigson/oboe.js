@@ -32,7 +32,7 @@ $(function(){
    function RecentAchievementsView( template ) {
       
       requestOboe.onFind({         
-         '!.recentAchievements.$awards[*]' : sendNewDataToTemplate( template, 'awards' )
+         '!.recentAchievements.$awards[*].*' : sendNewDataToTemplate( template, 'awards' )
       });         
    }   
    

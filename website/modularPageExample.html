@@ -101,8 +101,10 @@
             <div class="awards data-cloak">
                <div data-repeat="award in awards">
                   <img src="//placehold.it/32">
-                  <a href="{{award.segment.url}}">{{award.segment.name}}</a>
-                  <span class="when">{{award.when}}</span>
+                  <a class="{{gotData(award.segment.name)}}" href="{{award.segment.url}}">
+                     {{award.segment.name}}
+                  </a>
+                  <span class="when {{gotData(award.segment.name, award.when)}}">{{award.when}}</span>
                </div>               
             </div>
          </section>      

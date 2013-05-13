@@ -29,36 +29,36 @@ var dataTemplate =
 ,  "recentAchievements": {
       "awards":[
          {
-            "type":"Personal Record",
-            "when": "2 days ago",
             "segment":{
                "name": "Ditching Beacon"
             ,  "url": "/example-link"
-            }
+            },         
+            "type":"Personal Record",
+            "when": "2 days ago"
          }
       ,  {
-            "type":"KOM",
-            "when": "7 days ago",
             "segment":{
                "name": "A406 to Town Hall"
             ,  "url": "/example-link"
-            }
+            },      
+            "type":"KOM",
+            "when": "7 days ago"
          }
       ,  {
-            "type":"Personal Record",
-            "when": "today",
             "segment":{
                "name": "Silly sprint"
             ,  "url": "/example-link"
-            }
+            },      
+            "type":"Personal Record",
+            "when": "today"
          }
       ,  {
-            "type":"6th Overall",
-            "when": "2 weeks ago",
             "segment":{
                "name": "Archway Rd climb"
             ,  "url": "/example-link"
-            }
+            },      
+            "type":"6th Overall",
+            "when": "2 weeks ago"
          }                                    
       ]
       
