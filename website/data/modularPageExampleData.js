@@ -7,16 +7,7 @@ var dataTemplate =
    ,  "avitar":"//placehold.it/32"
    ,  "location":"London, United Kingdom"
    }
-   
-,  "map": {
-      "minLat"    :""
-   ,  "minLong"   :""
-   ,  "maxLat"    :""
-   ,  "maxLong"   :""
-   ,  "points"    : [
-      ]   
-   }      
-   
+      
 ,  "recentAchievements": {
       "awards":[
          {
