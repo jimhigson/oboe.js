@@ -48,7 +48,7 @@ $(function(){
       template.scope.calendar = [[]];
       
       template.scope.barWidth = function(timeSpent) {
-         return timeSpent.hours * 60;
+         return 100;//timeSpent.hours * 60;
       };
                         
       requestOboe.onFind({
