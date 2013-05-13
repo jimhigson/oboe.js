@@ -29,7 +29,7 @@ var FakeAjax = (function(){
        */
       fetch: function loadThrottled(dripSize, dripInterval, callback) {
          
-         var fullData = JSON.stringify(randomiseMapOrder(expandJsonTemplate(dataTemplate)));      
+         var fullData = JSON.stringify(randomiseMapOrder(RandomJson.expandJsonTemplate(dataTemplate)));      
             
          var cursorPosition = 0;         
             
