@@ -11,19 +11,33 @@ var FakeAjax = (function(){
       // traveerse json recursively, replacing some special tokens with random values:
       
       function replacePlaceholders(templateString){
-         return   templateString.replace(
          
-                     "{{Boolean}}", 
-                     function(){ return Math.random() > 0.5 }
-                     
-                  ).replace(
-                  
-                     /\{\{Number (\d+) to (\d+)\}\}/, 
-                     function(match, from, to){ 
-                        return Math.round(Math.random() * (to - from +1) + from) 
-                     }
-                     
-                  );
+         var changed;
+         
+         do{
+            changed = false;
+         
+            templateString = templateString.replace(
+   
+               "{{Boolean}}", 
+               function(){ 
+                  changed = true; 
+                  return Math.random() > 0.5 
+               }
+               
+            ).replace(
+            
+               /\{\{Number (\d+) to (\d+)\}\}/, 
+               function(match, from, to){ 
+                  changed = true; 
+                  return Math.round(Math.random() * (to - from +1) + from) 
+               }
+               
+            );
+            
+         } while( changed );
+         
+         return templateString;
       }
       
       for( var i in json ) {
