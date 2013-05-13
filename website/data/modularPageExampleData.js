@@ -2,8 +2,8 @@ var dataTemplate =
 {
 
    "user": {
-      "usernameShort":"Jim"
-   ,  "username":"Jim Higson"
+      "firstname":"{{Firstname}}"
+   ,  "surname":"{{Surname}}"
    ,  "avitar":"//placehold.it/32"
    ,  "location":"London, United Kingdom"
    }

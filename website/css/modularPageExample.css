@@ -35,7 +35,7 @@ a:hover {
 }
 .loaded {
    opacity:1;
-   transition:opacity 0.5s;
+   transition: opacity 0.5s;
 }
 
 body {
@@ -134,4 +134,8 @@ button {
 }
 .calendar .day.active-unknown {
    opacity:0.2;
+}
+
+table {
+   text-align: left;
 }

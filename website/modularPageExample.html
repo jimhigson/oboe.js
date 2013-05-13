@@ -42,7 +42,7 @@
             
             <span data-module="accountBar" class="data-cloak module">
                <img src="{{user.avitar}}" />
-               <a href="#">{{user.usernameShort}}</a>
+               <a href="#">{{user.firstName}}</a>
             </span>
          </span>
          
@@ -121,7 +121,7 @@
    
             <section data-module="user" class="data-cloak module moduleBox">
                <img src="{{user.avitar}}" />
-               <header>{{user.username}}</header>
+               <header>{{user.firstname}} {{user.surname}}</header>
                <span class="location">{{user.location}}</span>            
             </section>
          
@@ -167,6 +167,7 @@
       <script src="components/jquery/jquery.min.js"></script>
       <script src="components/underscore/underscore.js"></script>
       <script src="data/modularPageExampleData.js" type="text/javascript" ></script>
+      <script src="data/randomJson.js" type="text/javascript" ></script>
       <script src="data/fakeAjax.js" type="text/javascript" ></script>
       <script src="libs/soma-template.js" type="text/javascript" ></script>
       <script src="../dist/oboe.js" type="text/javascript" ></script>

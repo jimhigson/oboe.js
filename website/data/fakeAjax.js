@@ -2,61 +2,6 @@
 /** The purpose of this file is to simulate a slow-loading ajax call of some template-based data.
  *    */
 var FakeAjax = (function(){
-
-   /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
-    *  a sample page. 
-    */
-   function expandJsonTemplate( json ) {
-               
-      // traveerse json recursively, replacing some special tokens with random values:
-      
-      function replacePlaceholders(templateString){
-         
-         var changed;
-         
-         do{
-            changed = false;
-         
-            templateString = templateString.replace(
-   
-               "{{Boolean}}", 
-               function(){ 
-                  changed = true; 
-                  return Math.random() > 0.5 
-               }
-               
-            ).replace(
-            
-               /\{\{Number (\d+) to (\d+)\}\}/, 
-               function(match, from, to){ 
-                  changed = true; 
-                  return Math.round(Math.random() * (to - from +1) + from) 
-               }
-               
-            );
-            
-         } while( changed );
-         
-         return templateString;
-      }
-      
-      for( var i in json ) {
-      
-         switch( json[i].constructor.name ) {
-            
-            case "Object":
-            case "Array":         
-               json[i] = expandJsonTemplate(json[i]);
-               break;
-            
-            case "String":
-               json[i] = replacePlaceholders( json[i] );
-               break;                       
-         }
-      }
-                     
-      return json;         
-   }
    
    /** I can't remember if Javascript objects are deterministic in their ordering, but in practice
     *  they always output to JSON in the order that the keys were added. Make things a bit more
