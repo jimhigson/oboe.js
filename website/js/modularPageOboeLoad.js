@@ -4,42 +4,42 @@ $(function(){
          .onError(function(e){ console.error( e ) });            
    
    /* A tiny layer of glue to fix together oboe's callback and a request for soma to render the data */
-   function renderTemplateWithNewData( template, fieldName ) {
-      var scope = template.scope;
-      
-      return function(data) {            
-         // when oboe finds new data, put it in the template scope
-         // and re-render the template: 
-         scope[fieldName] = data;
-         template.render();
-      }
+   function renderTemplateWithData( template, fieldName, data ) {
+       
+      template.scope[fieldName] = data;
+      template.render();
+   }
+   
+   /* a convenient way to get a partially completed version of renderTemplateWithData */
+   function sendNewDataToTemplate( template, fieldName ) {
+      return renderTemplateWithData.bind(null, template, fieldName); 
    }
 
    function ActivityView( template ) {
    
       requestOboe.onFind({         
-         '!.activity.heading'   : renderTemplateWithNewData( template, 'heading' )                        
-      ,  '!.activity.$data[*]'  :  renderTemplateWithNewData( template, 'data' )
+         '!.activity.heading'   : sendNewDataToTemplate( template, 'heading' )                        
+      ,  '!.activity.$data[*]'  :  sendNewDataToTemplate( template, 'data' )
       });         
    }
    
    function SocialStatsView( template ) {   
       requestOboe.onFind({         
-         '!.$socialStats.*' : renderTemplateWithNewData( template, 'socialStats' )            
+         '!.$socialStats.*' : sendNewDataToTemplate( template, 'socialStats' )            
       });         
    }
    
    function RecentAchievementsView( template ) {
       
       requestOboe.onFind({         
-         '!.recentAchievements.$awards[*]' : renderTemplateWithNewData( template, 'awards' )
+         '!.recentAchievements.$awards[*]' : sendNewDataToTemplate( template, 'awards' )
       });         
    }   
    
    function UserView( template ) {
       
       requestOboe.onFind({
-         '!.user' : renderTemplateWithNewData( template, 'user' )
+         '!.user' : sendNewDataToTemplate( template, 'user' )
       });
    }
    
@@ -52,11 +52,22 @@ $(function(){
       };
                         
       requestOboe.onFind({
-         '!.activitySummary.totalNumber' :                renderTemplateWithNewData( template, 'totalNumber' )
-      ,  '!.activitySummary.$byType.*'          :         renderTemplateWithNewData( template, 'byType' )          
-      ,  '!.activitySummary.$calendar.weeks[*]' : renderTemplateWithNewData( template, 'calendar' )
+         '!.activitySummary.totalNumber'                     : sendNewDataToTemplate( template, 'totalNumber' )
+      ,  '!.activitySummary.$byType.*'                       : sendNewDataToTemplate( template, 'byType' )          
+      ,  '!.activitySummary.$calendar.weeks[*].days.*'       : sendNewDataToTemplate( template, 'calendar' )
+      ,  '!.activitySummary.$calendar.weeks[*].timeSpent.*'  : sendNewDataToTemplate( template, 'calendar' )
       });
    }
+   
+   soma.template.helpers({
+      gotData: function(/* arg1, arg2 ... */) {
+         var argArray = Array.prototype.slice.apply(arguments);
+         return argArray.every(function(a){ return a !== undefined }) ? 'loaded' : 'notLoaded';   
+      },
+      known: function(value) {
+         return value === undefined? 'unknown':value;
+      }
+   });   
                       
    /* For a named module, finds the element in the DOM for it and wraps it in a soma template                           
     */
@@ -70,7 +81,7 @@ $(function(){
    UserView(templateForModule('accountBar'));
    UserView(templateForModule('user')); 
    ActivitySummaryView(templateForModule('activitySummary'));
-   
+          
    // ok, let's simulate a slow connection and feed the response into our oboe:
-   FakeAjax.fetch(5, 5, requestOboe.read.bind(requestOboe));      
+   FakeAjax.fetch(5, 50, requestOboe.read.bind(requestOboe));      
 });

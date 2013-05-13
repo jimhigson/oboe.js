@@ -6,12 +6,22 @@
 .data-cloak {
    display:none;
 }
+
+
 @font-face {
     font-family: "Blokk";
     src: url(../fonts/BLOKKNeue-Regular.ttf) format("truetype");
 }
 * {
    /*font-family: Blokk, Sans;*/
+}
+
+.notLoaded{
+   opacity:0;
+}
+.loaded {
+   opacity:1;
+   transition:opacity 0.5s;
 }
 
 body.modularPage {
@@ -70,22 +80,26 @@ button {
    display: table-row;
 }
 
+.calendar .day,
 .calendar .dayHeadings span {
-   display: table-cell;
    text-align: center;
+   display:table-cell;
+   width: 19px;
 }
 
 .calendar .day {
-   display:table-cell;
-   width: 19px;
    height: 19px;
    border-left:1px white solid;
    border-bottom:1px white solid;
    background-color:#D4D4D4;
+   transition: background-color 0.5s;
 }
 .calendar .weekSummary {
    display:table-cell;
 } 
 .calendar .day.active-true {
    background-color: black;
+}
+.calendar .day.active-unknown {
+   opacity:0.2;
 }

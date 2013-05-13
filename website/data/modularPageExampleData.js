@@ -79,19 +79,19 @@ var dataTemplate =
       }   
    ,  "calendar":{
          "weeks":[
-            {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+            {  days:{mon:"{{Boolean}}", tue:"{{Boolean}}", wed:"{{Boolean}}", thur:"{{Boolean}}", fri:"{{Boolean}}", sat:"{{Boolean}}", sun:"{{Boolean}}"}
             ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
             }
             
-         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+         ,  {  days:{mon:"{{Boolean}}", tue:"{{Boolean}}", wed:"{{Boolean}}", thur:"{{Boolean}}", fri:"{{Boolean}}", sat:"{{Boolean}}", sun:"{{Boolean}}"}
             ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
             }
               
-         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+         ,  {  days:{mon:"{{Boolean}}", tue:"{{Boolean}}", wed:"{{Boolean}}", thur:"{{Boolean}}", fri:"{{Boolean}}", sat:"{{Boolean}}", sun:"{{Boolean}}"}
             ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
             }
                
-         ,  {  days:["{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}", "{{Boolean}}"]
+         ,  {  days:{mon:"{{Boolean}}", tue:"{{Boolean}}", wed:"{{Boolean}}", thur:"{{Boolean}}", fri:"{{Boolean}}", sat:"{{Boolean}}", sun:"{{Boolean}}"}
             ,  timeSpent:{hours:"{{Number 1 to 12}}", minutes:"{{Number 0 to 59}}"}
             }
          ]

@@ -48,32 +48,43 @@
       <div class="mainContent column">
          <section data-module="activitySummary" class="module moduleBox">
             <header>Activity Summary Last 4 Weeks</header>
-            <div class="total data-cloak">
+            <div class="data-cloak total">
                Total Activities
-               <span class="number">{{totalNumber}}</span>
+               <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
             </div>
             
-            <div class="byType data-cloak">
+            <div class="byType data-cloak {{gotData(byType)}}">
                <header>Activity type</header>
                <ul>
-                  <li class="data-cloak">{{byType.cycling}} Cycling</li>
-                  <li class="data-cloak">{{byType.running}} Running</li>
+                  <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
+                  <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
                </ul>
             </div>
             
-            <section class="calendar data-cloak">
+            <section class="calendar data-cloak {{gotData(calendar)}}">
             
                <header>Calendar</header>
                
                <div class="weeks">
                   <div data-repeat="week in calendar.weeks" class="weekRow">
-                     <span data-repeat="dayActive in week.days" class="day active-{{dayActive}}"></span>
-                     <span class="barCell data-cloak">
+                     <span class="day active-{{known(week.days.mon)}}"></span>
+                     <span class="day active-{{known(week.days.tue)}}"></span>
+                     <span class="day active-{{known(week.days.wed)}}"></span>
+                     <span class="day active-{{known(week.days.thur)}}"></span>
+                     <span class="day active-{{known(week.days.fri)}}"></span>
+                     <span class="day active-{{known(week.days.sat)}}"></span>
+                     <span class="day active-{{known(week.days.sun)}}"></span>
+                     <span class="barCell">
                         <span class="bar" 
-                           style="width:{{barWidth(week.timeSpent}}px"></span>
+                           style="width:{{barWidth(week.timeSpent)}}px"></span>
                      </span>                                                   
-                     <span class="weekSummary data-cloak">
-                        {{week.timeSpent.hours}}hrs {{week.timeSpent.minutes}}mins
+                     <span class="weekSummary">
+                        <span class="{{gotData(week.timeSpent.hours)}}">
+                           {{week.timeSpent.hours}}hrs
+                        </span>
+                        <span class="{{gotData(week.timeSpent.minutes)}}"> 
+                           {{week.timeSpent.minutes}}mins
+                        </span>
                      </span>                  
                   </div>
                   <div class="dayHeadings">
@@ -128,17 +139,17 @@
 
             <header>Social Stats</header>
                  
-            <ul>
-               <li class="data-cloak">
+            <ul class="data-cloak">
+               <li class="{{gotData(socialStats.following)}}">
                   Following {{socialStats.following}}
                </li>
-               <li class="data-cloak">
+               <li class="{{gotData(socialStats.followers)}}">
                   Followers {{socialStats.followers}}
                </li>
-               <li class="data-cloak">
+               <li class="{{gotData(socialStats.kudos)}}">
                   Kudos {{socialStats.kudos}}
                </li>
-               <li class="data-cloak">
+               <li class="{{gotData(socialStats.comments)}}">
                   Comments {{socialStats.comments}}
                </li>               
             </ul>
@@ -149,8 +160,8 @@
 
             <header>My Stats</header>
 
-            <h2 class="data-cloak">{{heading}}</h2>      
-                 
+            <h2 class="data-cloak {{gotData(heading)}}">{{heading}}</h2>      
+                                                 
             <table class="data-cloak">
                <tbody>
                   <tr data-repeat="row in data">
