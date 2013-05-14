@@ -20,11 +20,16 @@
          Loading via <a href="https://github.com/jimhigson/oboe.js">Oboe.js</a>
       </header>
       
-      This page simulates loading of json data via streaming. I built a clone of something that I knew but 
-      the application domain is largely irrelevant. The page is  
-      a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
-      <a href="http://app.strava.com/athletes/182755">my personal Strava profile</a>
-      because I'm a massive fan of those guys. 
+      <p>
+         This page simulates loading of json data via streaming. I built a clone of something that I knew but 
+         the application domain is largely irrelevant.
+      </p>
+      <p>
+         The page is  
+         a clone from <a href="sourceImages/strava.png">this screenshot</a> of 
+         <a href="http://app.strava.com/athletes/182755">my personal Strava profile</a>
+         because I'm a massive fan of those guys.
+      </p> 
    </section>
    
    <section class="modularPage">
@@ -35,7 +40,7 @@
                   
          <span class="accountBar">            
             <span data-module="accountBar" class="data-cloak module">
-               <img src="{{user.avitar}}" />
+               <img src="{{user.avitar}}/32" width="32" height="32" />
                <a href="#">{{user.firstname}}</a>
             </span>
          </span>         
@@ -58,8 +63,8 @@
                      <header>Activity type</header>
                      
                      <ul>
-                        <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
-                        <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
+                        <li class="{{gotData(byType.cycling)}}"><span class="number">{{byType.cycling}}</span> Cycling</li>
+                        <li class="{{gotData(byType.running)}}"><span class="number">{{byType.running}}</span> Running</li>
                      </ul>
                   </section>
                   
@@ -99,7 +104,7 @@
                <header>Recent Achievements</header>
                <div class="awards data-cloak">
                   <div data-repeat="award in awards">
-                     <img src="//placehold.it/32">
+                     <img src="//placehold.it/32" width="32" height="32">
                      <a class="{{gotData(award.segment.name)}}" href="{{award.segment.url}}">
                         {{award.segment.name}}
                      </a>
@@ -113,7 +118,7 @@
          <div class="secondaryContent column">
    
             <section data-module="user" class="data-cloak module moduleBox">
-               <img src="{{user.avitar}}" />
+               <img src="{{user.avitar}}/128" width="128" height="128" />
                <header>{{user.firstname}} {{user.surname}}</header>
                <span class="location">{{user.location}}</span>            
             </section>

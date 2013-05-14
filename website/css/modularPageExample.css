@@ -62,6 +62,7 @@ body {
 section.moduleBox {
    padding:20px;
    border: 1px #eee solid;
+   min-height: 100px;
 }
 
 section header {
@@ -117,11 +118,16 @@ section header {
 }
 .calendar .bar {
    display:inline-block;
-   background-color:#fc5e1c;
    height:19px;
    vertical-align: top;
    transition: width 0.5s;
    border-left:1px white solid;
+   
+   background: #e34503;
+   background: -moz-linear-gradient(top, #fc5e1c, #e34503);
+   background: -webkit-gradient(linear, left top, left bottom, from(#fc5e1c), to(#e34503));
+   background: -o-gradient(linear, left top, left bottom, from(#fc5e1c), to(#e34503));
+   background: -ms-gradient(linear, left top, left bottom, from(#fc5e1c), to(#e34503));   
 }
 
 .calendar .day {
@@ -135,7 +141,7 @@ section header {
    background-color: black;
 }
 .calendar .day.active-unknown {
-   opacity:0.2;
+   opacity:0;
 }
 
 table {
@@ -150,7 +156,7 @@ table {
    background: -o-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
    background: -ms-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
    
-   min-height: 235px;
+   min-height: 173px;
 }
 
 .moduleContents {
@@ -159,8 +165,7 @@ table {
 
 [data-module=activitySummary] .moduleContents > section {
    /* activity sumary has 3 parts, needing horizontal stacking. */
-   display: inline-block;
-   height: 150px;   
+   display: inline-block;   
    vertical-align:top;
    margin-right:20px;
 }   

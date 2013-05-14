@@ -4,7 +4,7 @@ var dataTemplate =
    "user": {
       "firstname":"{{Firstname}}"
    ,  "surname":"{{Surname}}"
-   ,  "avitar":"//placehold.it/32"
+   ,  "avitar":"//placehold.it"
    ,  "location":"{{Location}}"
    }
       
