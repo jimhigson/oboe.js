@@ -160,7 +160,7 @@ var jsonPathCompiler = (function () {
     * Generate a function which parses the pattern in the given regex. If matches, returns a parser
     * generated from that token that processes the given expr, otherwise returns null.
     * 
-    * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
+    * @returns {Function(Function parserGeneratedSoFar, Function onSuccess)}
     */
    function tokenMatcher(pattern, expr) {
    
@@ -272,12 +272,12 @@ var jsonPathCompiler = (function () {
     * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
     */
    return function (jsonPath) {        
-      try {
+      try {           
          // Kick off the recursive parsing of the jsonPath with a function which always returns true.
          // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
          // in the tree. So long as they match the part specified, they don't care what the ancestors of the
          // matched part are.         
-         return compileJsonPathToFunction(jsonPath, function(){return true});
+         return compileJsonPathToFunction(jsonPath, always);
       } catch( e ) {
          throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
       }
