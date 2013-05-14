@@ -49,14 +49,14 @@
         
       <div class="content">
          <div class="mainContent column">
-            <section data-module="activitySummary" class="module moduleBox">
+            <section data-module="activitySummary" class="module moduleBox module-{{startedLoading}}">
                <header>Activity Summary Last 4 Weeks</header>
                <div class="moduleContents">
                
-                  <section class="data-cloak total">                  
+                  <section class="data-cloak total {{gotData(byType.cycling, byType.running)}}" >                  
                      <header>Total Activities</header>
                      
-                     <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
+                     <span class="number">{{add(byType.cycling, byType.running)}}</span>
                   </section>
                   
                   <section class="byType data-cloak {{gotData(byType)}}">

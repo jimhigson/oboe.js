@@ -54,8 +54,7 @@ var dataTemplate =
    }   
    
 ,  "activitySummary" : {
-      "totalNumber":"{{Number 10 to 25}}"
-   ,  "byType": {
+      "byType": {
          "cycling":"{{Number 3 to 10}}",
          "running":"{{Number 3 to 10}}"         
       }   
