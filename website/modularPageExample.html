@@ -45,51 +45,54 @@
          <div class="mainContent column">
             <section data-module="activitySummary" class="module moduleBox">
                <header>Activity Summary Last 4 Weeks</header>
-               <div class="data-cloak total">
-                  Total Activities
-                  <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
-               </div>
+               <div class="moduleContents">
                
-               <div class="byType data-cloak {{gotData(byType)}}">
-                  <header>Activity type</header>
-                  <ul>
-                     <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
-                     <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
-                  </ul>
-               </div>
-               
-               <section class="calendar data-cloak {{gotData(calendar)}}">
-               
-                  <header>Calendar</header>
+                  <section class="data-cloak total">                  
+                     <header>Total Activities</header>
+                     
+                     <span class="{{gotData(totalNumber)}} number">{{totalNumber}}</span>
+                  </section>
                   
-                  <div class="weeks">
-                     <div data-repeat="week in calendar.weeks" class="weekRow">
-                        <span class="day active-{{known(week.days.mon)}}"></span>
-                        <span class="day active-{{known(week.days.tue)}}"></span>
-                        <span class="day active-{{known(week.days.wed)}}"></span>
-                        <span class="day active-{{known(week.days.thur)}}"></span>
-                        <span class="day active-{{known(week.days.fri)}}"></span>
-                        <span class="day active-{{known(week.days.sat)}}"></span>
-                        <span class="day active-{{known(week.days.sun)}}"></span>
-                        <span class="barCell">
-                           <span class="bar" 
-                              style="width:{{barWidth(week.timeSpent)}}px"></span>
-                        </span>                                                   
-                        <span class="weekSummary">
-                           <span class="{{gotData(week.timeSpent.hours)}}">
-                              {{week.timeSpent.hours}}hrs
-                           </span>
-                           <span class="{{gotData(week.timeSpent.minutes)}}"> 
-                              {{week.timeSpent.minutes}}mins
-                           </span>
-                        </span>                  
+                  <section class="byType data-cloak {{gotData(byType)}}">
+                     <header>Activity type</header>
+                     
+                     <ul>
+                        <li class="{{gotData(byType.cycling)}}">{{byType.cycling}} Cycling</li>
+                        <li class="{{gotData(byType.running)}}">{{byType.running}} Running</li>
+                     </ul>
+                  </section>
+                  
+                  <section class="calendar data-cloak {{gotData(calendar)}}">                  
+                     <header>Calendar</header>
+                     
+                     <div class="weeks">
+                        <div data-repeat="week in calendar.weeks" class="weekRow">
+                           <span class="day active-{{known(week.days.mon)}}"></span>
+                           <span class="day active-{{known(week.days.tue)}}"></span>
+                           <span class="day active-{{known(week.days.wed)}}"></span>
+                           <span class="day active-{{known(week.days.thur)}}"></span>
+                           <span class="day active-{{known(week.days.fri)}}"></span>
+                           <span class="day active-{{known(week.days.sat)}}"></span>
+                           <span class="day active-{{known(week.days.sun)}}"></span>
+                           <span class="barCell">
+                              <span class="bar" 
+                                 style="width:{{barWidth(week.timeSpent)}}px"></span>
+                           </span>                                                   
+                           <span class="weekSummary">
+                              <span class="{{gotData(week.timeSpent.hours)}}">
+                                 {{week.timeSpent.hours}}hrs
+                              </span>
+                              <span class="{{gotData(week.timeSpent.minutes)}}"> 
+                                 {{week.timeSpent.minutes}}mins
+                              </span>
+                           </span>                  
+                        </div>
+                        <div class="dayHeadings">
+                           <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                        </div>                  
                      </div>
-                     <div class="dayHeadings">
-                        <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
-                     </div>                  
-                  </div>
-                  
-               </section>
+                  </section>                     
+               </div>                  
             </section>
             
             <!-- DOM for the bar recent achievements module -->

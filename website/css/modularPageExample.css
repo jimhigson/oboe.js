@@ -4,7 +4,7 @@
 */    
 
 .data-cloak {
-   display:none;
+   display:none !important;
 }
 
 
@@ -13,13 +13,18 @@
     src: url(../fonts/BLOKKNeue-Regular.ttf) format("truetype");
 }
 * {
-   /*font-family: Blokk, Sans;*/
+   /*font-family: Blokk, sans-serif;*/
 }
 
 .pageInfo {
    background-color:green;
    color:white;
    padding: 10px 50px; 
+}
+
+.modularPage {
+   font-family: Helvetica, Arial, sans-serif;
+   font-weight: 300;
 }
 
 a {
@@ -107,7 +112,7 @@ section header {
 
 .calendar .barCell {
    display:table-cell;
-   width:200px;
+   width:110px;
 }
 .calendar .bar {
    display:inline-block;
@@ -146,4 +151,25 @@ table {
    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
    background: -o-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
    background: -ms-gradient(linear, left top, left bottom, from(#fff), to(#f5f5f5));
+   
+   min-height: 235px;
+}
+
+.moduleContents {
+   margin-top: 20px;  
+}
+
+[data-module=activitySummary] .moduleContents > section {
+   /* activity sumary has 3 parts, needing horizontal stacking. */
+   display: inline-block;
+   height: 150px;   
+   vertical-align:top;
+   margin-right:20px;
 }   
+
+[data-module=activitySummary] .moduleContents > section > header {
+   color: #999;
+   font-size: 0.9em;
+   font-weight: 400;
+   text-transform: uppercase;
+}
