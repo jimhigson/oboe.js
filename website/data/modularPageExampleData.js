@@ -79,7 +79,7 @@ var dataTemplate =
       }      
    }   
 
-,  "activity": {
+,  "tables": {
       "heading"   :"Activity"
    ,  "data"      : [
          {heading:'Avg Rides / Week', value:'4'}

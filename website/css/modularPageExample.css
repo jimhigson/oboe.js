@@ -44,6 +44,19 @@ a:hover {
    transition: opacity 0.5s;
 }
 
+section.module {
+   transition:opacity 0.5s;
+}
+section.module-notStartedLoading {
+   opacity: 0.2;   
+}
+section.module-loading {
+   opacity: 0.5;
+}
+section.module-loaded {
+   opacity: 1;
+}
+
 body {
    background: #F6F6F6;
    margin:0; padding: 0;
@@ -189,3 +202,4 @@ table {
    font-size: 64px;
    font-weight: 400;
 }
+ 

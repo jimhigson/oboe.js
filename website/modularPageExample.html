@@ -21,8 +21,8 @@
       </header>
       
       <p>
-         This page simulates loading of json data via streaming. I built a clone of something that I knew but 
-         the application domain is largely irrelevant.
+         This page simulates loading of json data via a hybrid ajax/streaming approach.
+         I built a clone of something that I knew but the application domain is largely irrelevant.
       </p>
       <p>
          The page is  
@@ -41,7 +41,7 @@
          <span class="accountBar">            
             <span data-module="accountBar" class="data-cloak module">
                <img src="{{user.avitar}}/32" width="32" height="32" />
-               <a href="#">{{user.firstname}}</a>
+               <a class="{{gotData(user.firstname)}}" href="#">{{user.firstname}}</a>
             </span>
          </span>         
       </div>
@@ -100,7 +100,7 @@
             </section>
             
             <!-- DOM for the bar recent achievements module -->
-            <section data-module="recentAchievements" class="module moduleBox">
+            <section data-module="recentAchievements" class="module moduleBox module-{{startedLoading}}">
                <header>Recent Achievements</header>
                <div class="awards data-cloak">
                   <div data-repeat="award in awards">
@@ -117,14 +117,14 @@
          
          <div class="secondaryContent column">
    
-            <section data-module="user" class="data-cloak module moduleBox">
+            <section data-module="user" class="data-cloak module moduleBox module-{{startedLoading}}">
                <img src="{{user.avitar}}/128" width="128" height="128" />
-               <header>{{user.firstname}} {{user.surname}}</header>
-               <span class="location">{{user.location}}</span>            
+               <header class="{{gotData(user.firstname, user.surname)}}">{{user.firstname}} {{user.surname}}</header>
+               <span class="location {{gotData(user.location)}}">{{user.location}}</span>            
             </section>
          
             <!-- DOM for the social stats -->      
-            <section data-module="socialStats" class="module moduleBox">
+            <section data-module="socialStats" class="module moduleBox module-{{startedLoading}}">
    
                <header>Social Stats</header>
                     
@@ -145,7 +145,7 @@
             </section>      
          
             <!-- DOM for the table module -->      
-            <section data-module="tables" class="module moduleBox">
+            <section data-module="tables" class="module moduleBox module-{{startedLoading}}">
    
                <header>My Stats</header>
    

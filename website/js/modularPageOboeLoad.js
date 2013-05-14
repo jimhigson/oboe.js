@@ -20,11 +20,11 @@ $(function(){
       return renderTemplateWithData.bind(null, template, fieldName); 
    }
 
-   function ActivityView( template ) {
+   function TablesView( template ) {
    
       requestOboe.onFind({         
-         '!.activity.heading'   : sendNewDataToTemplate( template, 'heading' )                        
-      ,  '!.activity.$data[*]'  :  sendNewDataToTemplate( template, 'data' )
+         '!.tables.heading'   : sendNewDataToTemplate( template, 'heading' )                        
+      ,  '!.tables.$data[*]'  :  sendNewDataToTemplate( template, 'data' )
       });         
    }
    
@@ -60,12 +60,12 @@ $(function(){
          
          return Math.round(0.15 * parseInt(timeSpent.hours) * 60 + parseInt(timeSpent.minutes));
       };
-                        
+      
       requestOboe.onFind({
          '!.activitySummary.totalNumber'                     : sendNewDataToTemplate( template, 'totalNumber' )
       ,  '!.activitySummary.$byType.*'                       : sendNewDataToTemplate( template, 'byType' )          
       ,  '!.activitySummary.$calendar.weeks[*].days.*'       : sendNewDataToTemplate( template, 'calendar' )
-      ,  '!.activitySummary.$calendar.weeks[*].timeSpent.*'  : sendNewDataToTemplate( template, 'calendar' )
+      ,  '!.activitySummary.$calendar.weeks[*].timeSpent.*'  : sendNewDataToTemplate( template, 'calendar' )      
       });
    }
    
@@ -75,17 +75,37 @@ $(function(){
       },
       known: function(value) {
          return value === undefined? 'unknown':value;
+      },
+      add: function(a, b) {
+         return parseInt(a) + parseInt(b);
       }
    });   
                       
    /* For a named module, finds the element in the DOM for it and wraps it in a soma template                           
     */
    function templateForModule(moduleName) {   
-      return soma.template.create($('[data-module=' + moduleName + ']')[0]);
+      var template = soma.template.create($('[data-module=' + moduleName + ']')[0]),
+      
+          // set some boilerplate listeners that apply to every module:
+          moduleRootJsonPath = '!.' + moduleName;
+                  
+      template.scope.startedLoading = 'notStartedLoading';
+      template.render();
+            
+      requestOboe.onPath( moduleRootJsonPath, function(){ 
+         template.scope.startedLoading = 'loading'; 
+         template.render();
+                   
+      }).onFind( moduleRootJsonPath, function() {
+         template.scope.startedLoading = 'loaded'; 
+         template.render();            
+      });      
+            
+      return template;
    }                      
                  
    SocialStatsView(templateForModule('socialStats'));                    
-   ActivityView(templateForModule('tables'));
+   TablesView(templateForModule('tables'));
    RecentAchievementsView(templateForModule('recentAchievements'));
    UserView(templateForModule('accountBar'));
    UserView(templateForModule('user')); 
