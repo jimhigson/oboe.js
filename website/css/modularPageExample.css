@@ -14,6 +14,7 @@
 }
 * {
    /*font-family: Blokk, sans-serif;*/
+   list-style: none;
 }
 
 .pageInfo {
@@ -112,26 +113,23 @@ section header {
 
 .calendar .barCell {
    display:table-cell;
-   width:110px;
+   width:250px;
 }
 .calendar .bar {
    display:inline-block;
    background-color:#fc5e1c;
-   height:15px;
+   height:19px;
+   vertical-align: top;
    transition: width 0.5s;
    border-left:1px white solid;
 }
 
 .calendar .day {
    height: 19px;
-   border-left:1px white solid;
-   border-bottom:1px white solid;
+   border-left:2px white solid;
+   border-bottom:2px white solid;
    background-color:#D4D4D4;
    transition: background-color 0.5s;
-}
-.calendar .weekSummary {
-   display:table-cell;
-   width:100px;
 } 
 .calendar .day.active-true {
    background-color: black;
@@ -170,6 +168,14 @@ table {
 [data-module=activitySummary] .moduleContents > section > header {
    color: #999;
    font-size: 0.9em;
-   font-weight: 400;
    text-transform: uppercase;
+   margin-bottom: 7px;
+}
+
+.total {
+   text-align: center;
+}
+.total .number {
+   font-size: 64px;
+   font-weight: 400;
 }

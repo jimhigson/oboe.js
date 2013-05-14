@@ -6,6 +6,7 @@
    </title>
 
    <link rel="stylesheet" href="css/modularPageExample.css">
+   <link rel="stylesheet" href="css/reset.css">
    <!--[if IE]>
    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
    <![endif]-->
@@ -77,15 +78,13 @@
                            <span class="barCell">
                               <span class="bar" 
                                  style="width:{{barWidth(week.timeSpent)}}px"></span>
-                           </span>                                                   
-                           <span class="weekSummary">
                               <span class="{{gotData(week.timeSpent.hours)}}">
-                                 {{week.timeSpent.hours}}hrs
+                                 {{week.timeSpent.hours}}hr
                               </span>
                               <span class="{{gotData(week.timeSpent.minutes)}}"> 
-                                 {{week.timeSpent.minutes}}mins
-                              </span>
-                           </span>                  
+                                 {{week.timeSpent.minutes}}m
+                              </span>                                 
+                           </span>                                                                     
                         </div>
                         <div class="dayHeadings">
                            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
