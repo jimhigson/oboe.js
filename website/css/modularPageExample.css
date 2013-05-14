@@ -47,6 +47,7 @@ a:hover {
 body {
    background: #F6F6F6;
    margin:0; padding: 0;
+   font-size:90%;
 }
 
 .content,
@@ -65,8 +66,8 @@ section.moduleBox {
    min-height: 100px;
 }
 
-section header {
-   font-size: 1.8em
+.moduleBox > header {
+   font-size: 1.5em
 }
 
 .content {
@@ -161,6 +162,10 @@ table {
 
 .moduleContents {
    margin-top: 20px;  
+}
+
+[data-module=activitySummary] > header {
+   font-size: 1.8em;
 }
 
 [data-module=activitySummary] .moduleContents > section {
