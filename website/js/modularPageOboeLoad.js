@@ -112,6 +112,5 @@ $(function(){
    UserView(templateForModule('user')); 
    ActivitySummaryView(templateForModule('activitySummary'));
           
-   // ok, let's simulate a slow connection and feed the response into our oboe:
-   FakeAjax.fetch(5, 5, requestOboe.read.bind(requestOboe));      
+   initTopBar(requestOboe);                
 });
