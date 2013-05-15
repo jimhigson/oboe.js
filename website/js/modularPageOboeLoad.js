@@ -68,7 +68,8 @@ $(function(){
       ,  '!.activitySummary.$calendar.weeks[*].timeSpent.*'  : sendNewDataToTemplate( template, 'calendar' )      
       });
    }
-   
+  
+   // TODO: move into own file 
    soma.template.helpers({
       gotData: function(/* arg1, arg2 ... */) {
          return allDefined.apply(null, arguments) ? 'loaded' : 'notLoaded';   
@@ -81,7 +82,7 @@ $(function(){
       }
    });   
                       
-   /* For a named module, finds the element in the DOM for it and wraps it in a soma template                           
+   /* For a named module, finds the element in the DOM for it and wraps it in a soma template
     */
    function templateForModule(moduleName) {   
       var template = soma.template.create($('[data-module=' + moduleName + ']')[0]),

@@ -42,87 +42,112 @@ var RandomJson = (function() {
       "irure dolor in reprehenderit"
    ];
    
-   function randomFrom( array ) {
-      return array[ Math.floor(Math.random() * array.length) ];
+   
+   
+   /* pick a random item from an array and return that item. The array will have the item removed from it
+      so that it will not be chosen again.
+    */
+   function randomIndex(array) {
+      return Math.floor(Math.random() * array.length);
    }
+
+   function randomFrom( array ) {
+      return array[ randomIndex(array) ];
+   }
+   
+   function pluckRandomly( array ) {
+          
+      // splice returns the item removed as an array. in our case, that array is always of length one:               
+      return array.splice(randomIndex(array),1)[0];                           
+   }   
    
    /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
     *  a sample page. 
     */
    function expandJsonTemplate( json ) {
-         
-      // let's pick a name for the user:         
-      var user = randomFrom(PEOPLE);      
-
-      // traveerse json recursively, replacing some special tokens with random values:      
-      function replacePlaceholders(templateString){
-         
-         var changed;
-         
-         do{
-            changed = false;
-         
-            templateString = templateString.replace(
    
-               "{{Boolean}}", 
-               function(){ 
-                  changed = true; 
-                  return Math.random() > 0.5 
-               }
-               
-            ).replace(
-            
-               /\{\{Number(?: (\d+) to (\d+))?\}\}/, 
-               function(match, from, to){
-                  // by default, go from 0 to 10
-                  from = from || 1;
-                  to = to || 10;
-                
-                  changed = true; 
-                  return Math.round(Math.random() * (to - from +1) + from) 
-               }
-               
-            ).replace(
-                        
-               /\{\{One from ([\w\s]*)\}\}/, 
-               function(match, choices){                
-                  changed = true; 
-                  return randomFrom(choices.split(' ')); 
-               }
-               
-            ).replace(
-               "{{Lorem}}", 
-               function(){
-                  changed = true;
-                  return randomFrom(LOREMS);
-               }            
-            ).replace("{{Firstname}}", user.firstname)
-             .replace("{{Surname}}", user.surname)
-             .replace("{{Location}}", user.location)
-             ;
-            
-            
-         } while( changed );
-         
-         return templateString;
-      }
+      // clone the LOREMS array so we don't break the master copy. Items will be removed from this array
+      // as they are used so they don't get used again:
+                  
+      var lorems = LOREMS.slice(0);          
+      // let's pick a name for the user:         
+      var user = randomFrom(PEOPLE);
       
-      for( var i in json ) {
+      return expandJsonTemplateImpl(json);
       
-         switch( json[i].constructor.name ) {
+      function expandJsonTemplateImpl(json) {      
+
+         // traveerse json recursively, replacing some special tokens with random values:                        
+      
+         function replacePlaceholders(templateString){
             
-            case "Object":
-            case "Array":         
-               json[i] = expandJsonTemplate(json[i]);
-               break;
+            var changed;
             
-            case "String":
-               json[i] = replacePlaceholders( json[i] );
-               break;                       
+            do{
+               changed = false;
+            
+               templateString = templateString.replace(
+      
+                  "{{Boolean}}", 
+                  function(){ 
+                     changed = true; 
+                     return Math.random() > 0.5 
+                  }
+                  
+               ).replace(
+               
+                  /\{\{Number(?: (\d+) to (\d+))?\}\}/, 
+                  function(match, from, to){
+                     // by default, go from 0 to 10
+                     from = from || 1;
+                     to = to || 10;
+                   
+                     changed = true; 
+                     return Math.round(Math.random() * (to - from +1) + from) 
+                  }
+                  
+               ).replace(
+                           
+                  /\{\{One from ([\w\s]*)\}\}/, 
+                  function(match, choices){                
+                     changed = true; 
+                     return randomFrom(choices.split(' ')); 
+                  }
+                  
+               ).replace(
+                  "{{Lorem}}", 
+                  function(){
+                     changed = true;
+                     return pluckRandomly(lorems);
+                  }            
+               ).replace("{{Firstname}}", user.firstname)
+                .replace("{{Surname}}", user.surname)
+                .replace("{{Location}}", user.location)
+                ;
+               
+               
+            } while( changed );
+            
+            return templateString;
          }
-      }
-                     
-      return json;         
+         
+         for( var i in json ) {
+         
+            switch( json[i].constructor.name ) {
+               
+               case "Object":
+               case "Array":         
+                  json[i] = expandJsonTemplate(json[i]);
+                  break;
+               
+               case "String":
+                  json[i] = replacePlaceholders( json[i] );
+                  break;                       
+            }
+         }
+                        
+         return json;    
+      }     
    }
    
    return {
