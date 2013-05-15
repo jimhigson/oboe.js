@@ -1,4 +1,5 @@
 $(function(){
+   "use strict";
 
    var requestOboe = oboe.parser()
          .onError(function(e){ console.error( e ) });            

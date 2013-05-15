@@ -1,4 +1,5 @@
 var RandomJson = (function() {
+   "use strict";
 
    // 20 random names from here: http://listofrandomnames.com/index.cfm?generated
    // locations are 20 top from here: https://en.wikipedia.org/wiki/Largest_cities_of_the_European_Union_by_population_within_city_limits
@@ -64,7 +65,7 @@ var RandomJson = (function() {
    /** The json template has placeholders like {{Boolean}} or {{Name}}. Traverse it and replace them to make
     *  a sample page. 
     */
-   function expandJsonTemplate( json ) {
+   function expandJsonTemplate( obj ) {
    
       // clone the LOREMS array so we don't break the master copy. Items will be removed from this array
       // as they are used so they don't get used again:
@@ -73,11 +74,13 @@ var RandomJson = (function() {
       // let's pick a name for the user:         
       var user = randomFrom(PEOPLE);
       
-      return expandJsonTemplateImpl(json);
+      return expandJsonTemplateImpl(obj);
       
-      function expandJsonTemplateImpl(json) {      
 
-         // traveerse json recursively, replacing some special tokens with random values:                        
+      // traveerse json recursively, replacing some special tokens with random values:      
+      function expandJsonTemplateImpl(obj) {      
+
+         var newObj = new obj.constructor;                  
       
          function replacePlaceholders(templateString){
             
@@ -131,26 +134,43 @@ var RandomJson = (function() {
             return templateString;
          }
          
-         for( var i in json ) {
+         for( var i in obj ) {
          
-            switch( json[i].constructor.name ) {
+            switch( typeof obj[i] ) {
                
-               case "Object":
-               case "Array":         
-                  json[i] = expandJsonTemplate(json[i]);
+               case "object": // objects and arrays: recurse to process         
+                  newObj[i] = expandJsonTemplate(obj[i]);
                   break;
                
-               case "String":
-                  json[i] = replacePlaceholders( json[i] );
-                  break;                       
+               case "string":
+               case "number":
+               case "boolean":
+                  newObj[i] = replacePlaceholders( obj[i] );
+                  break;                                                           
             }
          }
                         
-         return json;    
+         return newObj;    
       }     
    }
    
+   /** I can't remember if Javascript objects are deterministic in their ordering, but in practice
+    *  they always output to JSON in the order that the keys were added. Make things a bit more
+    *  interesting by randomising that order
+    */
+   function randomiseMapOrder(map) {
+      var randomkeys = _.shuffle( _.keys(map) ),
+          newMap = {};
+      
+      _.each( randomkeys, function( key ) {
+         newMap[key] = map[key];      
+      });
+      
+      return newMap;
+   }   
+   
    return {
-      expandJsonTemplate: expandJsonTemplate
+      randomiseMapOrder: randomiseMapOrder
+   ,  expandJsonTemplate: expandJsonTemplate
    };
 }());   
