@@ -22,6 +22,13 @@ Think of it as progressive html rendering for the ajax age.
 inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
 she can still read most of her emails.
 
+**Jack** has a RESTFUL JSON data service and wants to implement some streaming to his webpage. ***Oboe.js*** isn't a full blown 
+streaming solution but for short-lived streams (streams that don't continue indefinately) it does the same thing.
+Oboe streaming has the advantage that the http traffic is still valid REST so he can provide just one endpoint and the rest of his 
+technology stack can use the service as a normal download without understanding how to stream.
+Debugging is easier than with a full-blown streaming framework too, just like any other REST service he can check out the 
+data by visiting the URL in his browser and checking out what he gets.
+
 **Arnold** is using a programmable stock screener.
 The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
 means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
