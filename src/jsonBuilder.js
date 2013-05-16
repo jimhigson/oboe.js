@@ -74,15 +74,18 @@ function jsonBuilder( clarinet, oboeInstance ) {
     * manages the state and notifications for when the current node has ended
     */
    function curNodeFinished( ) {
-   
-      var completeNode = curNode;
-   
-      // go up one level in the parsed json's tree
-      nodeStack.pop();
-      curNode = lastOf(nodeStack);      
-   
+      
+      // we need to go up one level in the parsed json's tree
+      var completeNode = nodeStack.pop();
+      
+      // notify of the found node now that we don't have the curNode on the nodeStack anymore
+      // but we still want the
+      // pathstack to contain everything for this call: 
       oboeInstance.nodeFound( completeNode, pathStack, nodeStack );      
-   
+      
+      curNode = lastOf(nodeStack);      
+      pathStack.pop();   
+         
       if( isArray(curNode) ) {
          // we're going back to an array, the curKey (the key the next item will be given) needs to match
          // the length of that array:
@@ -91,9 +94,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // we're in an object, curKey has been used now and we don't know what the next key will 
          // be so mark as null:
          curKey = null;
-      }      
-      
-      pathStack.pop();
+      }            
    }      
     
    /* 
