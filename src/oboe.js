@@ -64,21 +64,9 @@ var oboe = (function(oboe){
          // if it is an array or object we will call this on its close.            
          if( thingFoundIsPrimative ) {
             oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, pathStack.concat(curKey), nodeStack);         
-         }               
+         }
       }
-      
-      clarinet.onvalue = function (value) {
-         console.log('onvalue', value);
-      
-         entityFound(value, curNode);
-         
-         if( isArray(curNode) ) {
-            curKey++;
-         } else {
-            curKey = null;
-         }            
-      };            
-
+          
       /**
        * implementation of onopenobject and onopenarray 
        * */                    
@@ -102,7 +90,7 @@ var oboe = (function(oboe){
             
             entityFound(newObject, parentNode);
                         
-            pathStack.push(curKey);
+            pathStack.push(curKey);                          
          }
    
          nodeStack.push(curNode); 
@@ -129,7 +117,24 @@ var oboe = (function(oboe){
       clarinet.onopenarray = function () {
                   
          onOpen([], 0, false);
-      };   
+      };
+      
+      function entityFinished( foundIn ) {
+         if( isArray(foundIn) ) {
+            curKey = curNode.length;
+         } else {
+            // we're in an object, curKey has been used now and we don't know what the next key will 
+            // be so mark as null:
+            curKey = null;
+         }      
+      }      
+      
+      clarinet.onvalue = function (value) {
+      
+         entityFound(value, curNode);
+         
+         entityFinished(curNode);
+      };         
       
       clarinet.onend =
       clarinet.oncloseobject =
@@ -144,10 +149,7 @@ var oboe = (function(oboe){
          pathStack.pop();
          curNode = lastOf(nodeStack);
    
-         if( isArray(curNode) ) {
-            curKey = curNode.length;
-         }
-   
+         entityFinished(curNode);   
       };
          
       clarinet.onerror = function(e) {
