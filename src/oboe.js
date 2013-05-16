@@ -50,21 +50,13 @@ var oboe = (function(oboe){
       
       function entityFound( thingFound, foundIn ) {
 
-         var foundInArray = isArray(foundIn),
-             thingFoundIsPrimative = (typeof thingFound) !== 'object';
+         var foundInArray = isArray(foundIn);
          
          if( foundInArray ) {
-            console.log('found something in an arary, at path', pathStack.concat(curKey));
             oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack.concat(curKey), nodeStack);            
          }
          
          foundIn[curKey] = thingFound;
-
-         // if the thing we have found is a primitive, we can notify of it being found now. Otherwise, 
-         // if it is an array or object we will call this on its close.            
-         if( thingFoundIsPrimative ) {
-            oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, pathStack.concat(curKey), nodeStack);         
-         }
       }
           
       /**
@@ -132,6 +124,8 @@ var oboe = (function(oboe){
       clarinet.onvalue = function (value) {
       
          entityFound(value, curNode);
+         
+         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);         
          
          entityFinished(curNode);
       };         
