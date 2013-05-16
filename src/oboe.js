@@ -81,7 +81,7 @@ var oboe = (function(oboe){
       /**
        * implementation of onopenobject and onopenarray 
        * */                    
-      function onOpen( newObject, firstKey, hasKnownContents ) {
+      function onOpen( newObject, firstKey ) {
 
          var parentNode = curNode;
                               
@@ -92,26 +92,23 @@ var oboe = (function(oboe){
 
          curNode = newObject;            
          nodeStack.push(curNode); 
-
-         // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-         // perminantly onto pathStack yet because we haven't identified what is at that key yet. We also give null
-         // as the curNode because we've only so far seen the key, not the node.
-         // If the entity just opened is an empty object or an array, there are no known contents so this will not be
-         // notified here. For non-empty arrays the paths will have to be notified in the following calls to 
-         // onvalue or onopenfoo. 
-         if( hasKnownContents ) {         
-            notifyOfKeyFound(firstKey, null);
-         }            
       }                    
                                      
       clarinet.onopenobject = function (firstKey) {
 
-         onOpen({}, firstKey, firstKey !== undefined);
+         onOpen({}, firstKey);
+         
+         if( firstKey !== undefined ) {
+            // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
+            // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
+            // value because we haven't seen that far into the json yet          
+            notifyOfKeyFound(firstKey, null);
+         }
       };
       
       clarinet.onopenarray = function () {
                   
-         onOpen([], 0, false);
+         onOpen([], 0);
       };
       
       function entityFinished( thingFound) {
