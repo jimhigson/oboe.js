@@ -79,61 +79,6 @@ var oboe = (function(oboe){
    };
 
    /**
-    * Something has been found. Notify matching listeners.
-    */
-   OboeParser.prototype.nodeFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
-   };
-   
-   /**
-    * A path has been found. Notify matching listeners.
-    */
-   OboeParser.prototype.pathFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
-   };   
-   
-   /**
-    * Notify any of the listeners in a list that are interested in the path.       
-    */  
-   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
-      
-      var nodeList = ancestors.concat([node]);
-
-      listenerList
-         .forEach( function(listener) {
-            
-            var foundNode = listener.test( path, nodeList );
-            
-            // possible values for foundNode now:
-            //
-            //    false: 
-            //       we did not match
-            //    an object/array/string/number: 
-            //       that node is the one that matched
-            //    null: like above, but we don't have the node yet. ie, we know there is a
-            //          node that matches but we don't know if it is an array, object, string
-            //          etc yet so we can't say anything about it 
-                        
-            if( foundNode !== false ) {                     
-               var context = listener.context || window;
-               
-               // change curNode to foundNode when it stops breaking tests
-               try{
-                  listener.callback.call(context, foundNode, path, ancestors );
-               } catch(e) {
-                  this.notifyErrors(Error('Error thrown by callback ' + e.message));
-               }
-            }                            
-         }, this);
-   };
-   
-   OboeParser.prototype.notifyErrors = function(error) {
-      this._errorListeners.forEach( function( listener ) {
-         listener(error);
-      });   
-   };   
-
-   /**
     * called when there is new text to parse
     * 
     * @param {String} nextDrip
@@ -180,10 +125,69 @@ var oboe = (function(oboe){
    };
    
    /**
+    * Notify any of the listeners in a list that are interested in the path.       
+    */  
+   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
+      
+      var nodeList = ancestors.concat([node]);
+
+      listenerList
+         .forEach( function(listener) {
+            
+            var foundNode = listener.test( path, nodeList );
+            
+            // possible values for foundNode now:
+            //
+            //    false: 
+            //       we did not match
+            //    an object/array/string/number: 
+            //       that node is the one that matched
+            //    null: like above, but we don't have the node yet. ie, we know there is a
+            //          node that matches but we don't know if it is an array, object, string
+            //          etc yet so we can't say anything about it 
+                        
+            if( foundNode !== false ) {                     
+               var context = listener.context || window;
+               
+               // change curNode to foundNode when it stops breaking tests
+               try{
+                  listener.callback.call(context, foundNode, path, ancestors );
+               } catch(e) {
+                  this.notifyErrors(Error('Error thrown by callback ' + e.message));
+               }
+            }                            
+         }, this);
+   };
+   
+   /**
+    * Something has been found. Notify matching listeners.
+    */
+   OboeParser.prototype.nodeFound = function( node, path, ancestors ) {   
+      this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
+   };
+   
+   /**
+    * A path has been found. Notify matching listeners.
+    */
+   OboeParser.prototype.pathFound = function( node, path, ancestors ) {   
+      this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
+   };
+
+   /**
+    * 
+    * @param error
+    */
+   OboeParser.prototype.notifyErrors = function(error) {
+      this._errorListeners.forEach( function( listener ) {
+         listener(error);
+      });   
+   };   
+   
+   /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
    function pushListener(listenerList, pattern, callback, context) {
-      return listenerList.push({
+      listenerList.push({
          pattern:pattern,
          test: jsonPathCompiler(pattern),
          callback: callback,
