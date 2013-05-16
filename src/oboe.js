@@ -45,9 +45,10 @@ var oboe = (function(oboe){
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
       }
               
-      function entityFound( thingFound, foundIn, foundAtKey ) {
+      function entityFound( thingFound, foundAtKey ) {
 
-         var thingIsRoot = !foundIn;
+         var foundIn = curNode,
+             thingIsRoot = !foundIn;
 
          if( isArray(foundIn) ) {
             // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
@@ -94,7 +95,7 @@ var oboe = (function(oboe){
                                                                                                     
       clarinet.onopenobject = function (firstKey) {
 
-         entityFound({}, curNode, firstKey);
+         entityFound({}, firstKey);
          
          if( firstKey !== undefined ) {
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
@@ -106,7 +107,7 @@ var oboe = (function(oboe){
       
       clarinet.onopenarray = function () {
 
-         entityFound([], curNode, 0);
+         entityFound([], 0);
       };
                   
       clarinet.onkey = function (nextKey) {
@@ -122,7 +123,7 @@ var oboe = (function(oboe){
          // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
          // descendants.
       
-         entityFound(value, curNode, curKey);
+         entityFound(value, curKey);
                            
          entityFinished(value);
       };         
