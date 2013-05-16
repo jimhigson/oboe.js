@@ -37,11 +37,9 @@ var oboe = (function(oboe){
       var   oboeInstance = this
       ,     curNode
       ,     curKey
-      ,     nodeStack = [] // TODO: use fastlist
+      ,     nodeStack = [] // TODO: use fastlist?
       ,     pathStack = [];
-
-   
-   
+     
       /* For when we find a new key in the json. The value may not be known in which case null can be given */  
       function notifyOfKeyFound(key, value) {
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
