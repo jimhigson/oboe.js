@@ -1233,32 +1233,11 @@ var oboe = (function(oboe){
       
       var nodeList = ancestors.concat([node]);
 
-      listenerList
-         .forEach( function(listener) {
-            
-            var foundNode = listener.test( path, nodeList );
-            
-            // possible values for foundNode now:
-            //
-            //    false: 
-            //       we did not match
-            //    an object/array/string/number: 
-            //       that node is the one that matched
-            //    null: like above, but we don't have the node yet. ie, we know there is a
-            //          node that matches but we don't know if it is an array, object, string
-            //          etc yet so we can't say anything about it 
-                        
-            if( foundNode !== false ) {                     
-               var context = listener.context || window;
-               
-               // change curNode to foundNode when it stops breaking tests
-               try{
-                  listener.callback.call(context, foundNode, path, ancestors );
-               } catch(e) {
-                  this.notifyErrors(Error('Error thrown by callback ' + e.message));
-               }
-            }                            
-         }, this);
+      for (var i = 0; i < listenerList.length; i++) {
+         // each item in the listener list is already a function that will test if the callback needs to be 
+         // called and call it if it does. So all we have to do here is execute.
+         listenerList[i].call(this, node, path, ancestors, nodeList);         
+      }      
    };
    
    /**
@@ -1283,18 +1262,66 @@ var oboe = (function(oboe){
       this._errorListeners.forEach( function( listener ) {
          listener(error);
       });   
-   };   
+   };
+
+
+   /**
+    * Create a new function that tests if something found in the json matches the pattern and, if it does,
+    * calls the callback.
+    * 
+    * @param pattern
+    * @param callback
+    * @param context
+    */
+   function callIfPatternMatches( pattern, callback, context ) {
+   
+      context = context || window;   
+   
+      var test = jsonPathCompiler(pattern);
+         
+      /**
+       * A function which when called with the details of something called in the parsed json, calls the listener
+       * if it matches.
+       * 
+       * Will be called in the context of the current oboe instance from OboeParser#notifyListeners.
+       */ 
+     return function( node, path, ancestors, nodeList ) {
+     
+         var foundNode = test( path, nodeList );
+        
+         // Possible values for foundNode are now:
+         //
+         //    false: 
+         //       we did not match
+         //
+         //    an object/array/string/number/null: 
+         //       that node is the one that matched. Because json can have nulls, this can 
+         //       be null.
+         //
+         //    undefined: like above, but we don't have the node yet. ie, we know there is a
+         //       node that matches but we don't know if it is an array, object, string
+         //       etc yet so we can't say anything about it. Null isn't used here because
+         //       that would be indistinguishable from us finding a node with a value of
+         //       null.
+         //                      
+         if( foundNode !== false ) {                                 
+           
+            // change curNode to foundNode when it stops breaking tests
+            try{
+               callback.call(context, foundNode, path, ancestors );
+            } catch(e) {
+               this.notifyErrors(Error('Error thrown by callback ' + e.message));
+            }
+         }
+      }   
+   }
    
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
     */
    function pushListener(listenerList, pattern, callback, context) {
-      listenerList.push({
-         pattern:pattern,
-         test: jsonPathCompiler(pattern),
-         callback: callback,
-         context: context
-      });
+         
+      listenerList.push( callIfPatternMatches(pattern, callback, context) );            
    }
 
    /**
