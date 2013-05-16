@@ -3,12 +3,12 @@ var oboe = (function(oboe){
    "use strict";
 
    /**
-    * @param {Object} opt an object of options. Passed though
+    * @param {Object} options an object of options. Passed though
     * directly to clarinet.js but oboe.js does not
     * currently provide options.
     */
-   oboe.parser = function(opt){
-      return new OboeParser(opt);
+   oboe.parser = function(options){
+      return new OboeParser(options);
    };
    
    /**
@@ -18,11 +18,15 @@ var oboe = (function(oboe){
     */
    oboe.fetch = function(url){
       return new OboeParser().fetch(url);
-   };      
-      
-   function OboeParser(opt) {
+   };
+
+   /**
+    * @constructor 
+    * @param {Object} options
+    */      
+   function OboeParser(options) {
    
-      var clarinetParser = clarinet.parser(opt);
+      var clarinetParser = clarinet.parser(options);
    
       this._nodeFoundListeners = [];
       this._pathMatchedListeners = [];
@@ -38,8 +42,12 @@ var oboe = (function(oboe){
          // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
          this.close();
       }.bind(this);
-   }   
-      
+   }
+
+   /**
+    * Ask this oboe instance to fetch the given url
+    * @param {String} url
+    */      
    OboeParser.prototype.fetch = function(url) {
 
       // TODO: in if in node, use require('http') instead of ajax
@@ -67,7 +75,7 @@ var oboe = (function(oboe){
    };   
    
    /**
-    * notify any of the listeners that are interested in the path.       
+    * Notify any of the listeners in a list that are interested in the path.       
     */  
    OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
@@ -166,7 +174,7 @@ var oboe = (function(oboe){
    }
 
    /**
-    * 
+    * implementation behind .onPath() and .onFind: add several listeners in one call  
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {
@@ -175,6 +183,8 @@ var oboe = (function(oboe){
       }
    }
    
+   /** implementation behind .onPath() and .onFind 
+    */
    function on(listenerList, jsonPath, callback, context) {
       if( typeof jsonPath === 'string' ) {
          pushListener(listenerList, jsonPath, callback, context);
@@ -206,7 +216,7 @@ var oboe = (function(oboe){
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
    
       on(this._pathMatchedListeners, jsonPath, callback, context);
-      return this;
+      return this; // chaining
    };
 
    /**
@@ -220,7 +230,7 @@ var oboe = (function(oboe){
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
    
       on(this._nodeFoundListeners, jsonPath, callback, context);
-      return this;
+      return this; // chaining
    };
    
    /**
@@ -231,7 +241,7 @@ var oboe = (function(oboe){
    OboeParser.prototype.onError = function (callback) {
 
       this._errorListeners.push(callback);
-      return this;
+      return this; // chaining
    };
    
    return oboe;
