@@ -1,6 +1,7 @@
-console.log('file opened');
 
 var oboe = (function(oboe){
+   "use strict";
+
    /**
     * @param {Object} opt an object of options. Passed though
     * directly to clarinet.js but oboe.js does not
