@@ -295,6 +295,56 @@ TestCase("oboeTest", {
                           // that it contains an array
          );
    }
+   
+,  testNotifiesOfPathsInsideArrays: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![*]')
+         .whenGivenInput( [{}, 'b', 2, []] )
+         .thenTheParser(
+            foundNMatches(4)
+         );
+   }
+      
+,  testCorrectlyGivesIndexWhenFindingObjectsInArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![1]')
+         .whenGivenInput( [{}, {}, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+      
+,  testCorrectlyGivesIndexWhenFindingArraysInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![1]')
+         .whenGivenInput( [[], [], 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testCorrectlyGivesIndexWhenFindingStringsInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![1]')
+         .whenGivenInput( ['', '', 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testNotifiesOfPathsInsideObjects: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![*]')
+         .whenGivenInput( {a:{}, b:'b', c:2, d:[]} )
+         .thenTheParser(
+            foundNMatches(4)
+         );
+   }      
 
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
