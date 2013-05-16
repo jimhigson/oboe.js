@@ -61,7 +61,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       }
       
       // add the newly found node to its parent. Unless it is the root in which case there is no parent to add to:
-      if( !parentOfFoundNode ) {
+      if( parentOfFoundNode ) {
          parentOfFoundNode[curKey] = foundNode;
          pathStack.push(curKey);
       }

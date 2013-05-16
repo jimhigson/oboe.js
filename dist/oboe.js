@@ -999,33 +999,32 @@ function jsonBuilder( clarinet, oboeInstance ) {
    /**
     * manages the state and notifications for when the current node has ended
     * 
-    * @param {*} thingFound the thing that has been found in the json
+    * @param {*} foundNode the thing that has been found in the json
     */              
-   function nodeFound( thingFound ) {
+   function nodeFound( foundNode ) {
 
-      var foundIn = curNode,
-          thingIsRoot = !foundIn;
-
-      if( thingIsRoot ) {
+      var parentOfFoundNode = curNode;
       
-         // Parsed the root object. Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
-         // (because this is the root, it can't have a key, hence null)            
-         keyDiscovered(null, thingFound);                  
+      if( !parentOfFoundNode ) {      
+         // There is no parent because we just found the root object. 
+         // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
+         // (because this is the root, it can't have a key, hence null)
+         keyDiscovered(null, foundNode);                  
       }
 
-      if( isArray(foundIn) ) {
+      if( isArray(parentOfFoundNode) ) {
          // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
          // so we need to notify of the paths when we find the items: 
-         keyDiscovered(curKey, thingFound);
+         keyDiscovered(curKey, foundNode);
       }
       
       // add the newly found node to its parent. Unless it is the root in which case there is no parent to add to:
-      if( !thingIsRoot ) {
-         foundIn[curKey] = thingFound;
+      if( parentOfFoundNode ) {
+         parentOfFoundNode[curKey] = foundNode;
          pathStack.push(curKey);
       }
                         
-      curNode = thingFound;            
+      curNode = foundNode;            
       nodeStack.push(curNode);                  
    }
 
@@ -1097,6 +1096,24 @@ function jsonBuilder( clarinet, oboeInstance ) {
       curNodeFinished;      
          
 }
+
+/**
+ * Welcome to the oboe.js source.
+ * 
+ * This codebase is made out of a few components.
+ * 
+ *    * oboe:         Really just a shell with some event dispatching
+ *    * jsonBuilder:  A wrapper around clarinet that progressively builds up the parsed json based on clarinet's
+ *                    callbacks and provides higher-level callbacks into oboe
+ *    * jsonPath:     Pure functional javascript. Parses the jsonpath specs for matches.
+ *    * streamingXhr: A very basic Ajax wrapper that provides a streaming interface
+ *    * util:         Things that didn't fit anywhere else.
+ *    
+ * When the source is built into the distributable js, a single object is exposed at window.oboe    
+ * 
+ * Happy hacking!
+ */
+
 
 var oboe = (function(oboe){
    "use strict";
