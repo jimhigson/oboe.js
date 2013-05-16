@@ -46,7 +46,12 @@ var oboe = (function(oboe){
             // array of strings - the path from the root of the dom to the node currently being parsed
       ,     pathStack = [];
      
-      /* For when we find a new key in the json. The value may not be known in which case null can be given */  
+      /**
+       * For when we find a new key in the json.
+       * 
+       * @param {String|Number} key the key. If we are in an array will be a number, otherwise a string. 
+       * @param {*} value usually this won't be known so can be null
+       **/  
       function keyDiscovered(key, value) {
       
          var fullPath = key === null? pathStack : pathStack.concat(key);
@@ -54,7 +59,12 @@ var oboe = (function(oboe){
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, fullPath, nodeStack);
          curKey = key;      
       }
-              
+         
+      /**
+       * manages the state and notifications for when the current node has ended
+       * 
+       * @param {*} thingFound the thing that has been found in the json
+       */              
       function nodeFound( thingFound ) {
 
          var foundIn = curNode,
@@ -82,7 +92,10 @@ var oboe = (function(oboe){
          curNode = thingFound;            
          nodeStack.push(curNode);                  
       }
-      
+
+      /**
+       * manages the state and notifications for when the current node has ended
+       */
       function curNodeFinished( ) {
       
          var thingFound = curNode;
