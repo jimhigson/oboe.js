@@ -111,7 +111,10 @@ var oboe = (function(oboe){
          onOpen([], 0, false);
       };
       
-      function entityFinished( foundIn ) {
+      function entityFinished( thingFound, foundIn, foundAtPath ) {
+      
+         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, foundAtPath, nodeStack);      
+      
          if( isArray(foundIn) ) {
             curKey = curNode.length;
          } else {
@@ -124,10 +127,8 @@ var oboe = (function(oboe){
       clarinet.onvalue = function (value) {
       
          entityFound(value, curNode);
-         
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);         
-         
-         entityFinished(curNode);
+                           
+         entityFinished(value, curNode, pathStack.concat(curKey));
       };         
       
       clarinet.onend =
@@ -136,14 +137,14 @@ var oboe = (function(oboe){
 
          // pop the curNode off the nodestack because curNode is the thing we just
          // identified and it shouldn't be listed as an ancestor of itself:
+         var closedItem = curNode;
          nodeStack.pop();
-   
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
-   
-         pathStack.pop();
+      
+         // go up one level in the parsed json's tree
          curNode = lastOf(nodeStack);
-   
-         entityFinished(curNode);   
+         entityFinished(closedItem, curNode, pathStack);
+         pathStack.pop();
+      
       };
          
       clarinet.onerror = function(e) {
