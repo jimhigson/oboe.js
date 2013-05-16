@@ -132,10 +132,9 @@ var oboe = (function(oboe){
       
       clarinet.onend =
       clarinet.oncloseobject =
-      clarinet.onclosearray = function () {
+      clarinet.onclosearray =       
+         curNodeFinished;      
 
-         curNodeFinished();      
-      };
          
       clarinet.onerror = function(e) {
          oboeInstance._notifyErrors(e);
