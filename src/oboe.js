@@ -46,15 +46,7 @@ var oboe = (function(oboe){
       function notifyOfKeyFound(key, value) {
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
       }
-   
-      clarinet.onkey = function (nextKey) {
-         // called by Clarinet when keys are found in objects
-      
-         notifyOfKeyFound(nextKey, null);
-   
-         curKey = nextKey;
-      };
-           
+              
       function entityFound( thingFound, foundIn, foundAtKey ) {
 
          var thingIsRoot = !foundIn;
@@ -75,43 +67,17 @@ var oboe = (function(oboe){
             pathStack.push(curKey);
          }
                   
-         curKey = foundAtKey;         
-      }
-          
-      /**
-       * implementation of onopenobject and onopenarray 
-       * */                    
-      function onOpen( newObject, firstKey ) {
-
-         var parentNode = curNode;
-                              
-         // found some object other than the root object. no new path to notify of for this object because
-         // should have already been notified.
-         //parentNode[curKey] = curNode;            
-         entityFound(newObject, parentNode, firstKey);                                                  
-
-         curNode = newObject;            
-         nodeStack.push(curNode); 
-      }                    
-                                     
-      clarinet.onopenobject = function (firstKey) {
-
-         onOpen({}, firstKey);
+         curKey = foundAtKey;
          
-         if( firstKey !== undefined ) {
-            // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-            // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
-            // value because we haven't seen that far into the json yet          
-            notifyOfKeyFound(firstKey, null);
-         }
-      };
+         curNode = thingFound;            
+         nodeStack.push(curNode);                  
+      }
       
-      clarinet.onopenarray = function () {
-                  
-         onOpen([], 0);
-      };
+      function entityFinished( thingFound ) {
       
-      function entityFinished( thingFound) {
+         // go up one level in the parsed json's tree
+         nodeStack.pop();
+         curNode = lastOf(nodeStack);      
       
          oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, pathStack, nodeStack);      
       
@@ -127,10 +93,36 @@ var oboe = (function(oboe){
          
          pathStack.pop();
       }      
+                                                                                                    
+      clarinet.onopenobject = function (firstKey) {
+
+         entityFound({}, curNode, firstKey);
+         
+         if( firstKey !== undefined ) {
+            // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
+            // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
+            // value because we haven't seen that far into the json yet          
+            notifyOfKeyFound(firstKey, null);
+         }
+      };
       
+      clarinet.onopenarray = function () {
+
+         entityFound([], curNode, 0);
+      };
+                  
+      clarinet.onkey = function (nextKey) {
+         // called by Clarinet when keys are found in objects
+      
+         notifyOfKeyFound(nextKey, null);
+   
+         curKey = nextKey;
+      };                  
+                  
       clarinet.onvalue = function (value) {
+      
          // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
-         // ancestors. 
+         // descendants.
       
          entityFound(value, curNode, curKey);
                            
@@ -141,15 +133,7 @@ var oboe = (function(oboe){
       clarinet.oncloseobject =
       clarinet.onclosearray = function () {
 
-         // pop the curNode off the nodestack because curNode is the thing we just
-         // identified and it shouldn't be listed as an ancestor of itself:
-         var closedItem = curNode;
-      
-         // go up one level in the parsed json's tree
-         nodeStack.pop();
-         curNode = lastOf(nodeStack);
-         
-         entityFinished(closedItem);      
+         entityFinished(curNode);      
       };
          
       clarinet.onerror = function(e) {
