@@ -41,26 +41,41 @@ var oboe = (function(oboe){
       ,     pathStack = [];
 
    
+   
+      /* For when we find a new key in the json. The value may not be known in which case null can be given */  
+      function notifyOfKeyFound(key, value) {
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
+      }
+   
       clarinet.onkey = function (nextKey) {
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
+         // called by Clarinet when keys are found in objects
+      
+         notifyOfKeyFound(nextKey, null);
    
          curKey = nextKey;
       };
-      
-      
-      function entityFound( thingFound, foundIn ) {
+           
+      function entityFound( thingFound, foundIn, foundAtKey ) {
 
-         var foundInArray = isArray(foundIn);
-         
-         if( foundInArray ) {
+         var thingIsRoot = !foundIn;
+
+         if( isArray(foundIn) ) {
             // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
             // so we need to notify of the paths when we find the items: 
-            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack.concat(curKey), nodeStack);            
+            notifyOfKeyFound(curKey, thingFound);
+         }
+
+         if( thingIsRoot ) {
+            // Parsed the root object. Notify path listeners (eg to '!' or '*') that the root path has been satisfied:         
+            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, thingFound, pathStack, nodeStack);         
          }
          
-         foundIn[curKey] = thingFound;
-         
-         pathStack.push(curKey);         
+         if( !thingIsRoot ) {
+            foundIn[curKey] = thingFound;
+            pathStack.push(curKey);
+         }
+                  
+         curKey = foundAtKey;         
       }
           
       /**
@@ -68,25 +83,14 @@ var oboe = (function(oboe){
        * */                    
       function onOpen( newObject, firstKey, hasKnownContents ) {
 
-         var openedObjectIsRoot = !curNode,      
-             parentNode = curNode;
-                  
-         curNode = newObject;
-   
-         if( openedObjectIsRoot ) {
-         
-            // Parsed the root object. Notify path listeners (eg to '!' or '*') that the root object has been found:
-            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
-            
-         } else {
-         
-            // found some object other than the root object. no new path to notify of for this object because
-            // should have already been notified.
-            //parentNode[curKey] = curNode;
-            
-            entityFound(newObject, parentNode);                                                  
-         }
-   
+         var parentNode = curNode;
+                              
+         // found some object other than the root object. no new path to notify of for this object because
+         // should have already been notified.
+         //parentNode[curKey] = curNode;            
+         entityFound(newObject, parentNode, firstKey);                                                  
+
+         curNode = newObject;            
          nodeStack.push(curNode); 
 
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
@@ -97,10 +101,7 @@ var oboe = (function(oboe){
          // onvalue or onopenfoo. 
          if( hasKnownContents ) {         
             oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
-         }         
-   
-         // clarinet always gives the first key of the new object.
-         curKey = firstKey;            
+         }            
       }                    
                                      
       clarinet.onopenobject = function (firstKey) {
@@ -134,7 +135,7 @@ var oboe = (function(oboe){
          // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
          // ancestors. 
       
-         entityFound(value, curNode);
+         entityFound(value, curNode, curKey);
                            
          entityFinished(value);
       };         
@@ -178,9 +179,9 @@ var oboe = (function(oboe){
    /**
     * notify any of the listeners that are interested in the path.       
     */  
-   OboeParser.prototype._notifyListeners = function ( listenerList, curNode, path, ancestors ) {
+   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
-      var nodeList = ancestors.concat([curNode]);
+      var nodeList = ancestors.concat([node]);
 
       listenerList
          .forEach( function(listener) {
