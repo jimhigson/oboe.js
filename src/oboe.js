@@ -45,7 +45,7 @@ var oboe = (function(oboe){
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
       }
               
-      function entityFound( thingFound, foundAtKey ) {
+      function nodeFound( thingFound, foundAtKey ) {
 
          var foundIn = curNode,
              thingIsRoot = !foundIn;
@@ -72,7 +72,9 @@ var oboe = (function(oboe){
          nodeStack.push(curNode);                  
       }
       
-      function entityFinished( thingFound ) {
+      function curNodeFinished( ) {
+      
+         var thingFound = curNode;
       
          // go up one level in the parsed json's tree
          nodeStack.pop();
@@ -95,7 +97,7 @@ var oboe = (function(oboe){
                                                                                                     
       clarinet.onopenobject = function (firstKey) {
 
-         entityFound({}, firstKey);
+         nodeFound({}, firstKey);
          
          if( firstKey !== undefined ) {
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
@@ -107,7 +109,7 @@ var oboe = (function(oboe){
       
       clarinet.onopenarray = function () {
 
-         entityFound([], 0);
+         nodeFound([], 0);
       };
                   
       clarinet.onkey = function (nextKey) {
@@ -123,16 +125,16 @@ var oboe = (function(oboe){
          // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
          // descendants.
       
-         entityFound(value, curKey);
+         nodeFound(value, curKey);
                            
-         entityFinished(value);
+         curNodeFinished();
       };         
       
       clarinet.onend =
       clarinet.oncloseobject =
       clarinet.onclosearray = function () {
 
-         entityFinished(curNode);      
+         curNodeFinished();      
       };
          
       clarinet.onerror = function(e) {
