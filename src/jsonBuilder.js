@@ -76,13 +76,13 @@ function jsonBuilder( clarinet, oboeInstance ) {
     */
    function curNodeFinished( ) {
    
-      var nodeFinished = curNode;
+      var completeNode = curNode;
    
       // go up one level in the parsed json's tree
       nodeStack.pop();
       curNode = lastOf(nodeStack);      
    
-      oboeInstance.nodeFound( nodeFinished, pathStack, nodeStack );      
+      oboeInstance.nodeFound( completeNode, pathStack, nodeStack );      
    
       if( isArray(curNode) ) {
          // we're going back to an array, the curKey (the key the next item will be given) needs to match
@@ -99,7 +99,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
     
    /* 
     * Finally, assign listeners to clarinet. Mostly these are just wrappers and pass-throughs for the higher
-    * level functions above.
+    * level functions above. 
     */     
    clarinet.onopenobject = function (firstKey) {
 
