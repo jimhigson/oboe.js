@@ -100,7 +100,7 @@ var oboe = (function(oboe){
          // notified here. For non-empty arrays the paths will have to be notified in the following calls to 
          // onvalue or onopenfoo. 
          if( hasKnownContents ) {         
-            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
+            notifyOfKeyFound(firstKey, null);
          }            
       }                    
                                      
