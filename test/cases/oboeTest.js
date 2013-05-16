@@ -178,11 +178,25 @@ TestCase("oboeTest", {
          .andWeAreListeningForMatchesToPattern('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":')
          .thenTheParser(
-            // null because the parser hasn't been given the value yet
-            matched(null).atPath(['pencils']),
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(undefined).atPath(['pencils']),
             foundOneMatch
          );
    }
+   
+,  testIsAbleToNotifyOfNull: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.pencils')
+         .whenGivenInput('{"pens":4, "pencils":null}')
+         .thenTheParser(
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(null).atPath(['pencils']),
+            foundOneMatch
+         );
+   }   
 
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
@@ -279,8 +293,10 @@ TestCase("oboeTest", {
          .whenGivenInput('{"testArray":["a"')
          .thenTheParser(
              foundNMatches(1)
-         ,   matched(null) // when path is matched, it is not known yet
-                           // that it contains an array
+         ,   matched(undefined) // when path is matched, it is not known yet
+                                // that it contains an array. Null should not
+                                // be used here because that is an allowed
+                                // value in json
          );
    }
 
@@ -291,8 +307,10 @@ TestCase("oboeTest", {
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
          .thenTheParser(
             foundNMatches(1)
-         ,  matched(null) // when path is matched, it is not known yet
-                          // that it contains an array
+         ,  matched(undefined) // when path is matched, it is not known yet
+                               // that it contains an array. Null should not
+                               // be used here because that is an allowed
+                               // value in json
          );
    }
    
@@ -1042,7 +1060,12 @@ function givenAParser() {
          return function(){
          
             function clone(original){
-               return JSON.parse( JSON.stringify( original ) );
+               // Note: window.eval being used here instead of JSON.parse because
+               // eval can handle 'undefined' in the string but JSON.parse cannot.
+               // This isn't wholy ideal since this means we're relying on JSON.
+               // stringify to create invalid JSON. But at least there are no
+               // security concerns with this being a test. 
+               return window.eval( '(' + JSON.stringify( original ) + ')' );
             }
             function toArray(args) {
                return Array.prototype.slice.call(args);

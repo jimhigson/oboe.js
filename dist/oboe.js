@@ -985,10 +985,11 @@ function jsonBuilder( clarinet, oboeInstance ) {
     * For when we find a new key in the json.
     * 
     * @param {String|Number} key the key. If we are in an array will be a number, otherwise a string. 
-    * @param {*} value usually this won't be known so can be null
+    * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
+    *    can't use null because null is a valid value in some json
     **/  
    function keyDiscovered(key, value) {
-   
+      
       var fullPath = key === null? pathStack : pathStack.concat(key);
    
       oboeInstance.pathFound(value, fullPath, nodeStack);
@@ -1057,8 +1058,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
    /* 
     * Finally, assign listeners to clarinet. Mostly these are just wrappers and pass-throughs for the higher
     * level functions above.
-    */
-    
+    */     
    clarinet.onopenobject = function (firstKey) {
 
       nodeFound({});
@@ -1067,7 +1067,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
          // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
          // value because we haven't seen that far into the json yet          
-         keyDiscovered(firstKey, null);
+         keyDiscovered(firstKey);
       }
    };
    
@@ -1077,11 +1077,9 @@ function jsonBuilder( clarinet, oboeInstance ) {
       // curKey in case there are contents
       curKey = 0;
    };
-               
-   clarinet.onkey = function (nextKey) {
-      // called by Clarinet when keys are found in objects      
-      keyDiscovered(nextKey, null);   
-   };                  
+
+   // called by Clarinet when keys are found in objects               
+   clarinet.onkey = keyDiscovered;   
                
    clarinet.onvalue = function (value) {
    
@@ -1138,7 +1136,7 @@ var oboe = (function(oboe){
          
          // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
          this.close();
-      }.bind(this);              
+      }.bind(this);
    }   
       
    OboeParser.prototype.fetch = function(url) {
