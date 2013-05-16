@@ -72,7 +72,7 @@ TestCase("oboeTest", {
 
    }
 
-,  testListeningForPathFiresWhenObjectStarts: function() {
+,  testListeningForPathFiresWhenRootObjectStarts: function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -86,7 +86,24 @@ TestCase("oboeTest", {
             matched({}).atRootOfJson()
           );
    }
+   
+,  testListeningForPathFiresWhenRootArrayStarts: function() {
 
+      // clarinet doesn't notify of matches to objects (onopenobject) until the
+      // first key is found, that is why we don't just give '{' here as the partial
+      // input.
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('!')
+         .whenGivenInput('[1') // the minimum string required for clarinet 
+                               // to fire onopenarray. Won't fire with '['.
+          .thenTheParser(
+            foundNMatches(1),
+            matched([]).atRootOfJson()
+          );
+   }
+   
+     
 ,  testHandlesEmptyObjectDetectedWithSingleStar: function() {
 
       givenAParser()
@@ -97,6 +114,16 @@ TestCase("oboeTest", {
             foundOneMatch
          );
    }
+   
+,  testDoesntDetectSpuriousPathOffEmptyObject: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('!.foo.*')
+         .whenGivenInput( {foo:{}} )
+         .thenTheParser(
+            foundNoMatches
+         );
+   }   
 
 ,  testHandlesEmptyObjectDetectedWithDoubleDot: function() {
 
@@ -247,18 +274,13 @@ TestCase("oboeTest", {
 
 ,  testNotifiesOfPathMatchWhenArrayStarts: function() {
 
-      // this is slightly strange and might need to be revisited later.
-      // basically, there is a notification when we find the property name
-      // and another (with an empty array) when we find the start of the array
-      // but both apply to the same key.
-
       givenAParser()
          .andWeAreListeningForMatchesToPattern('!.testArray')
          .whenGivenInput('{"testArray":["a"')
          .thenTheParser(
-             foundNMatches(2)
-         ,   matched(null) // key found
-         ,   matched([])   // start of array found
+             foundNMatches(1)
+         ,   matched(null) // when path is matched, it is not known yet
+                           // that it contains an array
          );
    }
 
@@ -268,9 +290,9 @@ TestCase("oboeTest", {
          .andWeAreListeningForMatchesToPattern('!.array2')
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
          .thenTheParser(
-            foundNMatches(2)
-         ,  matched(null)
-         ,  matched([])
+            foundNMatches(1)
+         ,  matched(null) // when path is matched, it is not known yet
+                          // that it contains an array
          );
    }
 

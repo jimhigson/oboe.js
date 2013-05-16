@@ -1,3 +1,5 @@
+console.log('file opened');
+
 var oboe = (function(oboe){
    /**
     * @param {Object} opt an object of options. Passed though
@@ -25,30 +27,25 @@ var oboe = (function(oboe){
       this._pathMatchedListeners = [];
       this._errorListeners = [];
       this._clarinet = clarinetParser;
+         
+      this._listenForSaxEvents(clarinetParser)        
+   }
+   
+   OboeParser.prototype._listenForSaxEvents = function( clarinet ) {
    
       var   oboeInstance = this
       ,     curNode
       ,     curKey
       ,     nodeStack = [] // TODO: use fastlist
       ,     pathStack = [];
-   
-      function addNewChild(parentNode) {
 
-         if (parentNode) { // if not the root node
-         
-            parentNode[curKey] = curNode;
-            pathStack.push(curKey);
-         }
-
-         nodeStack.push(curNode);
-      }   
    
-      clarinetParser.onkey = function (nextKey) {
+      clarinet.onkey = function (nextKey) {
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
    
          curKey = nextKey;
       };
-      clarinetParser.onvalue = function (value) {
+      clarinet.onvalue = function (value) {
          // onvalue is only called by clarinet for non-structured values
          // (ie, not arrays or objects). 
          // For (strings/numbers) in (objects/arrays) this is where the flow goes.
@@ -63,38 +60,71 @@ var oboe = (function(oboe){
          }
    
       };            
-      clarinetParser.onopenobject = function (firstKey) {
+
+      /** 
+       *  Used when a new object or array is discovered. These behave in pretty much the same way.
+       *  @param parentNode
+       */
+      function addNewChild(parentNode) {
+      
+         var root = !parentNode;
+      
+         if (!root) {
+            
+            parentNode[curKey] = curNode;
+            pathStack.push(curKey);
+         }
    
+         nodeStack.push(curNode);
+      }   
+                                     
+      clarinet.onopenobject = function (firstKey) {
+      
          var parentNode = curNode;
          
          curNode = {};
    
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         if( !parentNode ) {
+            // Parsed the root object. Notify path listeners to '!' or '*' that the root object has been found:
+            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         }
    
          addNewChild(parentNode);
-         
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
+
+         // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
+         // perminantly onto pathStack yet because we haven't identified what is at that key yet. We also give null
+         // as the curNode because we've only so far seen the key, not the node.
+         // If the object just opened is empty, firstKey will be undefined so there is no sub-path to notify of.
+         if( firstKey !== undefined ) {         
+            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(firstKey), nodeStack);
+         }         
    
          // clarinet always gives the first key of the new object.
          curKey = firstKey;
       };
-      clarinetParser.onopenarray = function () {
-   
-         // arrays can't be the root of a json so we know we'll always have an ancestor
+      
+      clarinet.onopenarray = function () {
+                  
          var parentNode = curNode;
          
          curNode = [];
-         
+
+         // notify of the path of the new array that was just found.
+         if( !parentNode ) {
+            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+         }
+                  
          addNewChild(parentNode);
-         
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
+                  
+         // we don't here notify of a path at pathStack.concat(0) because we don't know yet if the array is empty or not                  
    
          // arrays always start at zero:
          curKey = 0;
       };   
-      clarinetParser.onend =
-      clarinetParser.oncloseobject =
-      clarinetParser.onclosearray = function () {
+      
+      clarinet.onend =
+      clarinet.oncloseobject =
+      clarinet.onclosearray = function () {
 
          // pop the curNode off the nodestack because curNode is the thing we just
          // identified and it shouldn't be listed as an ancestor of itself:
@@ -109,14 +139,15 @@ var oboe = (function(oboe){
             curKey = curNode.length;
          }
    
-      };   
-      clarinetParser.onerror = function(e) {
+      };
+         
+      clarinet.onerror = function(e) {
          oboeInstance._notifyErrors(e);
          
          // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
          oboeInstance.close();
-      };   
-   }
+      };       
+   }; 
       
    OboeParser.prototype.fetch = function(url) {
 
