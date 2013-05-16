@@ -41,7 +41,7 @@ var oboe = (function(oboe){
       ,     pathStack = [];
      
       /* For when we find a new key in the json. The value may not be known in which case null can be given */  
-      function notifyOfKeyFound(key, value) {
+      function keyDiscovered(key, value) {
          oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
       }
               
@@ -53,7 +53,7 @@ var oboe = (function(oboe){
          if( isArray(foundIn) ) {
             // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
             // so we need to notify of the paths when we find the items: 
-            notifyOfKeyFound(curKey, thingFound);
+            keyDiscovered(curKey, thingFound);
          }
 
          if( thingIsRoot ) {
@@ -103,7 +103,7 @@ var oboe = (function(oboe){
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
             // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
             // value because we haven't seen that far into the json yet          
-            notifyOfKeyFound(firstKey, null);
+            keyDiscovered(firstKey, null);
          }
       };
       
@@ -115,7 +115,7 @@ var oboe = (function(oboe){
       clarinet.onkey = function (nextKey) {
          // called by Clarinet when keys are found in objects
       
-         notifyOfKeyFound(nextKey, null);
+         keyDiscovered(nextKey, null);
    
          curKey = nextKey;
       };                  
