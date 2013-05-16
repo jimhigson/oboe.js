@@ -11,12 +11,10 @@ function jsonBuilder( clarinet, oboeInstance ) {
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the oboeInstance 
     
-   var   // The node we are currently parsing. Either an object or an array. May be transiently set to primitives
-         // for the sake of code simplification but won't stay that way between callbacks.
-         curNode
+   var   
          // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
          // of curNode that we are currently parsing
-   ,     curKey
+         curKey
          // array of nodes from curNode up to the root of the document.
    ,     nodeStack = [] // TODO: use fastlist?
          // array of strings - the path from the root of the dom to the node currently being parsed
@@ -45,7 +43,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
     */              
    function nodeFound( foundNode ) {
 
-      var parentOfFoundNode = curNode;
+      var parentOfFoundNode = lastOf(nodeStack);
       
       if( !parentOfFoundNode ) {      
          // There is no parent because we just found the root object. 
@@ -65,9 +63,8 @@ function jsonBuilder( clarinet, oboeInstance ) {
          parentOfFoundNode[curKey] = foundNode;
          pathStack.push(curKey);
       }
-                        
-      curNode = foundNode;            
-      nodeStack.push(curNode);                  
+                          
+      nodeStack.push(foundNode);                  
    }
 
    /**
@@ -76,20 +73,20 @@ function jsonBuilder( clarinet, oboeInstance ) {
    function curNodeFinished( ) {
       
       // we need to go up one level in the parsed json's tree
-      var completeNode = nodeStack.pop();
+      var completeNode = nodeStack.pop(),
+          parentOfCompleteNode = lastOf(nodeStack);
       
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
       oboeInstance.nodeFound( completeNode, pathStack, nodeStack );      
-      
-      curNode = lastOf(nodeStack);      
+            
       pathStack.pop();   
          
-      if( isArray(curNode) ) {
+      if( isArray(parentOfCompleteNode) ) {
          // we're going back to an array, the curKey (the key the next item will be given) needs to match
          // the length of that array:
-         curKey = curNode.length;
+         curKey = parentOfCompleteNode.length;
       } else {
          // we're in an object, curKey has been used now and we don't know what the next key will 
          // be so mark as null:
