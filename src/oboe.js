@@ -35,39 +35,50 @@ var oboe = (function(oboe){
    OboeParser.prototype._listenForSaxEvents = function( clarinet ) {
    
       var   oboeInstance = this
+            // The node we are currently parsing. Either an object or an array. May be transiently set to primitives
+            // for the sake of code simplification but won't stay that way between callbacks.
       ,     curNode
+            // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
+            // of curNode that we are currently parsing
       ,     curKey
+            // array of nodes from curNode up to the root of the document.
       ,     nodeStack = [] // TODO: use fastlist?
+            // array of strings - the path from the root of the dom to the node currently being parsed
       ,     pathStack = [];
      
       /* For when we find a new key in the json. The value may not be known in which case null can be given */  
       function keyDiscovered(key, value) {
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, pathStack.concat(key), nodeStack);      
+      
+         var fullPath = key === null? pathStack : pathStack.concat(key);
+      
+         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, value, fullPath, nodeStack);
+         curKey = key;      
       }
               
-      function nodeFound( thingFound, foundAtKey ) {
+      function nodeFound( thingFound ) {
 
          var foundIn = curNode,
              thingIsRoot = !foundIn;
+
+         if( thingIsRoot ) {
+         
+            // Parsed the root object. Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
+            // (because this is the root, it can't have a key, hence null)            
+            keyDiscovered(null, thingFound);                  
+         }
 
          if( isArray(foundIn) ) {
             // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
             // so we need to notify of the paths when we find the items: 
             keyDiscovered(curKey, thingFound);
          }
-
-         if( thingIsRoot ) {
-            // Parsed the root object. Notify path listeners (eg to '!' or '*') that the root path has been satisfied:         
-            oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, thingFound, pathStack, nodeStack);         
-         }
          
+         // add the newly found node to its parent. Unless it is the root in which case there is no parent to add to:
          if( !thingIsRoot ) {
             foundIn[curKey] = thingFound;
             pathStack.push(curKey);
          }
-                  
-         curKey = foundAtKey;
-         
+                           
          curNode = thingFound;            
          nodeStack.push(curNode);                  
       }
@@ -97,7 +108,7 @@ var oboe = (function(oboe){
                                                                                                     
       clarinet.onopenobject = function (firstKey) {
 
-         nodeFound({}, firstKey);
+         nodeFound({});
          
          if( firstKey !== undefined ) {
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
@@ -108,16 +119,15 @@ var oboe = (function(oboe){
       };
       
       clarinet.onopenarray = function () {
-
-         nodeFound([], 0);
+         nodeFound([]);
+         // We haven't discovered a key in the json because we don't know if the array is empty or not. So, set 
+         // curKey in case there are contents
+         curKey = 0;
       };
                   
       clarinet.onkey = function (nextKey) {
-         // called by Clarinet when keys are found in objects
-      
-         keyDiscovered(nextKey, null);
-   
-         curKey = nextKey;
+         // called by Clarinet when keys are found in objects      
+         keyDiscovered(nextKey, null);   
       };                  
                   
       clarinet.onvalue = function (value) {
@@ -125,7 +135,7 @@ var oboe = (function(oboe){
          // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
          // descendants.
       
-         nodeFound(value, curKey);
+         nodeFound(value);
                            
          curNodeFinished();
       };         
@@ -141,7 +151,7 @@ var oboe = (function(oboe){
          
          // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
          oboeInstance.close();
-      };       
+      };
    }; 
       
    OboeParser.prototype.fetch = function(url) {
