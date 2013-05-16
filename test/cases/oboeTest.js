@@ -309,7 +309,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingObjectsInArray: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('![1]')
+         .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [{}, {}, 'this_one'] )
          .thenTheParser(
             foundNMatches(1)
@@ -319,22 +319,60 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingArraysInsideArray: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('![1]')
+         .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [[], [], 'this_one'] )
          .thenTheParser(
             foundNMatches(1)
          );
    }
    
+,  testCorrectlyGivesIndexWhenFindingArraysInsideArraysEtc: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2][2]')
+         .whenGivenInput( [   
+                              [], 
+                              [], 
+                              [  
+                                 [], 
+                                 [], 
+                                 ['this_array']
+                              ]
+                          ] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }   
+   
 ,  testCorrectlyGivesIndexWhenFindingStringsInsideArray: function() {
 
       givenAParser()
-         .andWeAreListeningForMatchesToPattern('![1]')
+         .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( ['', '', 'this_one'] )
          .thenTheParser(
             foundNMatches(1)
          );
    }
+   
+,  testCorrectlyGivesIndexWhenFindingNumbersInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [1, 1, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testCorrectlyGivesIndexWhenFindingNullsInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [null, null, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }      
    
 ,  testNotifiesOfPathsInsideObjects: function() {
 

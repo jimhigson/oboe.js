@@ -47,46 +47,35 @@ var oboe = (function(oboe){
       };
       
       
-      function onEntityFound( thingFound ) {
+      function entityFound( thingFound, foundIn ) {
 
-         var addingToArray = isArray(curNode);
+         var foundInArray = isArray(foundIn),
+             thingFoundIsPrimative = (typeof thingFound) !== 'object';
          
-         if( addingToArray ) {
+         if( foundInArray ) {
+            console.log('found something in an arary, at path', pathStack.concat(curKey));
             oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack.concat(curKey), nodeStack);            
          }
          
-         curNode[curKey] = thingFound;
+         foundIn[curKey] = thingFound;
 
-         // if the thing we have found is a primative, we can notify of it being found now. Otherwise, 
+         // if the thing we have found is a primitive, we can notify of it being found now. Otherwise, 
          // if it is an array or object we will call this on its close.            
-         if( typeof thingFound !== 'object' ) {
+         if( thingFoundIsPrimative ) {
             oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, pathStack.concat(curKey), nodeStack);         
-         }            
-   
-         if( isArray(curNode) ) {
-            curKey++;
-         } else {
-            curKey = null;
-         }
+         }               
       }
       
       clarinet.onvalue = function (value) {
-         onEntityFound(value);
-         return;
+         console.log('onvalue', value);
       
-         // onvalue is only called by clarinet for non-structured values
-         // (ie, not arrays or objects). 
-         // For (strings/numbers) in (objects/arrays) this is where the flow goes.
-
-         curNode[curKey] = value;   
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
-   
+         entityFound(value, curNode);
+         
          if( isArray(curNode) ) {
             curKey++;
          } else {
             curKey = null;
-         }
-   
+         }            
       };            
 
       /**
@@ -96,7 +85,7 @@ var oboe = (function(oboe){
 
          var openedObjectIsRoot = !curNode,      
              parentNode = curNode;
-         
+                  
          curNode = newObject;
    
          if( openedObjectIsRoot ) {
@@ -108,7 +97,10 @@ var oboe = (function(oboe){
          
             // found some object other than the root object. no new path to notify of for this object because
             // should have already been notified.
-            parentNode[curKey] = curNode;
+            //parentNode[curKey] = curNode;
+            
+            entityFound(newObject, parentNode);
+                        
             pathStack.push(curKey);
          }
    
