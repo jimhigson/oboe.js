@@ -53,10 +53,14 @@ var oboe = (function(oboe){
          var foundInArray = isArray(foundIn);
          
          if( foundInArray ) {
+            // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
+            // so we need to notify of the paths when we find the items: 
             oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack.concat(curKey), nodeStack);            
          }
          
          foundIn[curKey] = thingFound;
+         
+         pathStack.push(curKey);         
       }
           
       /**
@@ -80,9 +84,7 @@ var oboe = (function(oboe){
             // should have already been notified.
             //parentNode[curKey] = curNode;
             
-            entityFound(newObject, parentNode);
-                        
-            pathStack.push(curKey);                          
+            entityFound(newObject, parentNode);                                                  
          }
    
          nodeStack.push(curNode); 
@@ -111,24 +113,30 @@ var oboe = (function(oboe){
          onOpen([], 0, false);
       };
       
-      function entityFinished( thingFound, foundIn, foundAtPath ) {
+      function entityFinished( thingFound) {
       
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, foundAtPath, nodeStack);      
+         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, thingFound, pathStack, nodeStack);      
       
-         if( isArray(foundIn) ) {
+         if( isArray(curNode) ) {
+            // we're going back to an array, the curKey (the key the next item will be given) needs to match
+            // the length of that array:
             curKey = curNode.length;
          } else {
             // we're in an object, curKey has been used now and we don't know what the next key will 
             // be so mark as null:
             curKey = null;
          }      
+         
+         pathStack.pop();
       }      
       
       clarinet.onvalue = function (value) {
+         // Called for strings, numbers, boolean, null etc. These are found and finished at once since they can't have
+         // ancestors. 
       
          entityFound(value, curNode);
                            
-         entityFinished(value, curNode, pathStack.concat(curKey));
+         entityFinished(value);
       };         
       
       clarinet.onend =
@@ -138,13 +146,12 @@ var oboe = (function(oboe){
          // pop the curNode off the nodestack because curNode is the thing we just
          // identified and it shouldn't be listed as an ancestor of itself:
          var closedItem = curNode;
-         nodeStack.pop();
       
          // go up one level in the parsed json's tree
+         nodeStack.pop();
          curNode = lastOf(nodeStack);
-         entityFinished(closedItem, curNode, pathStack);
-         pathStack.pop();
-      
+         
+         entityFinished(closedItem);      
       };
          
       clarinet.onerror = function(e) {
