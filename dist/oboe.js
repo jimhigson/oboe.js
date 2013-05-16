@@ -977,7 +977,8 @@ function jsonBuilder( clarinet, oboeInstance ) {
    ,     nodeStack = [] // TODO: use fastlist?
          // array of strings - the path from the root of the dom to the node currently being parsed
    ,     pathStack = []
-   ;
+   ,     undefined;
+   
   
    /**
     * For when we find a new key in the json.
@@ -1047,8 +1048,8 @@ function jsonBuilder( clarinet, oboeInstance ) {
          curKey = parentOfCompleteNode.length;
       } else {
          // we're in an object, curKey has been used now and we don't know what the next key will 
-         // be so mark as null:
-         curKey = null;
+         // be so mark as unknown:
+         curKey = undefined;
       }            
    }      
     
@@ -1060,7 +1061,10 @@ function jsonBuilder( clarinet, oboeInstance ) {
 
       nodeFound({});
       
+      // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
+      // so can't do !firstKey here, have to compare against undefined
       if( firstKey !== undefined ) {
+      
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
          // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
          // value because we haven't seen that far into the json yet          
