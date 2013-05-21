@@ -1,6 +1,6 @@
 (function(){
 
-   TestCase("pathsTest", {
+   TestCase("jsonPathTest", {
    
       testMatchesRoot: function() {
          givenAPattern('!')
