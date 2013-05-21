@@ -613,6 +613,8 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
    return Function.prototype.bind.apply(fn, args); 
 }
+
+function always(){return true}
 /**
  * An xhr wrapper that calls a callback whenever some more of the
  * response is available, without waiting for all of it.
@@ -627,7 +629,9 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
  */
 (function (streamingXhr) {
 
-   streamingXhr.fetch = function(url, streamCallback){
+   streamingXhr.fetch = function(url, streamCallback, doneCallback){
+      doneCallback = doneCallback || always;
+   
       var xhr = new XMLHttpRequest();
       var charsSent = 0;
 
@@ -649,10 +653,14 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
       // TODO: where onprogress isn't supported, poll the responseText.      
       xhr.onprogress = handleInput;         
       
-      // in case the xhr doesn't support partial loading, by registering the same callback
-      // onload, we at least get the whole response. This shouldn't be necessary once
-      // polling is implemented in lieu of onprogress.
-      xhr.onload = handleInput;
+
+      xhr.onload = function() {
+         // in case the xhr doesn't support partial loading, by registering the same callback
+         // onload, we at least get the whole response. This shouldn't be necessary once
+         // polling is implemented in lieu of onprogress.      
+         handleInput();
+         doneCallback();
+      }
    };
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
@@ -948,7 +956,7 @@ var jsonPathCompiler = (function () {
          // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
          // in the tree. So long as they match the part specified, they don't care what the ancestors of the
          // matched part are.         
-         return compileJsonPathToFunction(jsonPath, function(){return true});
+         return compileJsonPathToFunction(jsonPath, always);
       } catch( e ) {
          throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
       }
