@@ -1022,6 +1022,11 @@ function jsonBuilder( clarinet, oboeInstance ) {
       curKey = key;      
    }
 
+   /**
+    * Common implementation for rootNodeFound and nonRootNodeFound
+    * 
+    * @param {*} foundNode
+    */
    function _nodeFound(foundNode) {
       var parentOfFoundNode = lastOf(nodeStack);
             
@@ -1046,8 +1051,13 @@ function jsonBuilder( clarinet, oboeInstance ) {
                           
       nodeStack.push(foundNode);   
    }
-   
-   
+
+   /**
+    * This function is one of the possible values of nodeFound, for the sub-case where we have never found
+    * a node before
+    * 
+    * @param {*} foundNode
+    */   
    function rootNodeFound( foundNode ) {
       root = foundNode;
       _nodeFound(foundNode);
@@ -1057,14 +1067,21 @@ function jsonBuilder( clarinet, oboeInstance ) {
    }
       
    /**
-    * Manage the state and notifications for when a new node is found
+    * This function is one of the possible values of nodeFound, for the sub-case where we have found
+    * a node before
     * 
-    * @param {*} foundNode the thing that has been found in the json
+    * @param {*} foundNode
     */              
    function nonRootNodeFound( foundNode ) {
       _nodeFound(foundNode);                        
    }
-   
+
+   /**
+    * Manage the state and notifications for when a new node is found.
+    * Will be set to either rootNodeFound or nonRootNodeFound
+    * 
+    * @param {*} foundNode the thing that has been found in the json
+    */   
    var nodeFound = rootNodeFound;
 
 
