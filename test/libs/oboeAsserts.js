@@ -6,15 +6,25 @@
 
  */
 
-function givenAParser() {
+var givenAParserFetching = givenAParser; // givenAParserFetching is a synonym for givenAParser
+
+function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
 
    function Asserter() {
 
-      var oboeParser = oboe.parser(),
+      var oboeParser,
 
           expectingErrors = false,
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
+          
+          
+      /* we might be testing creation of the oboe via .fetch or .parser */          
+      if( jsonFileName ) {
+         oboeParser = oboe.fetch(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
+      } else {
+         oboeParser = oboe.parser()
+      }          
           
       oboeParser.onError(function(e) {
          // Unless stated, the test isn't expecting errors. Fail the test on error: 
@@ -103,8 +113,8 @@ function givenAParser() {
       
          var callback = jstdCallbacksList.add(callbackFromTest || noop);
       
-         var url = '/test/test/json/' + jsonFilename;
-         oboeParser.fetch(url, callback);
+
+         oboeParser.fetch(urlForJsonTestFile(jsonFilename), callback);
          
          return this;
       };      
@@ -122,6 +132,11 @@ function givenAParser() {
       }
    }
    return new Asserter();
+}
+
+/* get the url that jstd will serve a test json file on */
+function urlForJsonTestFile(jsonFilename) {
+   return '/test/test/json/' + jsonFilename;
 }
 
 
