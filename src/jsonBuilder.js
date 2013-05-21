@@ -74,13 +74,12 @@ function jsonBuilder( clarinet, oboeInstance ) {
     * @param {*} foundNode
     */   
    function rootNodeFound( foundNode ) {
-
-      // There is no parent because we just found the root object. 
-      // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
-      // (because this is the root, it can't have a key, hence null)
+ 
+      // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
+      // to finding the root node because non-root nodes will have their paths notified as their keys are 
+      // discovered. Because this is the root, it can't have a key, hence null
       keyDiscovered(null, foundNode);                  
-   
-   
+      
       // store a reference to the root node (root var declared at top of file)
       root = foundNode;
       _nodeFound(foundNode);
