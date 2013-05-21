@@ -52,13 +52,6 @@ function jsonBuilder( clarinet, oboeInstance ) {
    function _nodeFound(foundNode) {
       var parentOfFoundNode = lastOf(nodeStack);
             
-      if( !parentOfFoundNode ) {      
-         // There is no parent because we just found the root object. 
-         // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
-         // (because this is the root, it can't have a key, hence null)
-         keyDiscovered(null, foundNode);                  
-      }
-
       if( isArray(parentOfFoundNode) ) {
          // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
          // so we need to notify of the paths when we find the items: 
@@ -81,6 +74,14 @@ function jsonBuilder( clarinet, oboeInstance ) {
     * @param {*} foundNode
     */   
    function rootNodeFound( foundNode ) {
+
+      // There is no parent because we just found the root object. 
+      // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
+      // (because this is the root, it can't have a key, hence null)
+      keyDiscovered(null, foundNode);                  
+   
+   
+      // store a reference to the root node (root var declared at top of file)
       root = foundNode;
       _nodeFound(foundNode);
       
