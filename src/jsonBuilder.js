@@ -16,7 +16,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // of curNode that we are currently parsing
          curKey
          // array of nodes from curNode up to the root of the document.
-   ,     nodeStack = [] // TODO: use fastlist?
+   ,     nodeStack = [] // TODO: use fastlist? https://github.com/isaacs/fast-list
          // array of strings - the path from the root of the dom to the node currently being parsed
    ,     pathStack = []
    
@@ -45,29 +45,6 @@ function jsonBuilder( clarinet, oboeInstance ) {
    }
 
    /**
-    * Common implementation for rootNodeFound and nonRootNodeFound
-    * 
-    * @param {*} foundNode
-    */
-   function _nodeFound(foundNode) {
-      var parentOfFoundNode = lastOf(nodeStack);
-            
-      if( isArray(parentOfFoundNode) ) {
-         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
-         // so we need to notify of the paths when we find the items: 
-         keyDiscovered(curKey, foundNode);
-      }
-      
-      // add the newly found node to its parent. Unless it is the root in which case there is no parent to add to:
-      if( parentOfFoundNode ) {
-         parentOfFoundNode[curKey] = foundNode;
-         pathStack.push(curKey);
-      }
-                          
-      nodeStack.push(foundNode);   
-   }
-
-   /**
     * This function is one of the possible values of nodeFound, for the sub-case where we have never found
     * a node before
     * 
@@ -82,10 +59,12 @@ function jsonBuilder( clarinet, oboeInstance ) {
       
       // store a reference to the root node (root var declared at top of file)
       root = foundNode;
-      _nodeFound(foundNode);
+         
+      // nodeStack will be empty, let's give it its first value            
+      nodeStack.push(foundNode);
       
-      // the next node to be found won't be the root
-      nodeFound = nonRootNodeFound;
+      // the next node to be found won't be the root. Reassign this function:
+      nodeFound = nonRootNodeFound;      
    }
       
    /**
@@ -95,7 +74,20 @@ function jsonBuilder( clarinet, oboeInstance ) {
     * @param {*} foundNode
     */              
    function nonRootNodeFound( foundNode ) {
-      _nodeFound(foundNode);                        
+   
+      var parentOfFoundNode = lastOf(nodeStack);
+            
+      if( isArray(parentOfFoundNode) ) {
+         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
+         // so we need to notify of the paths when we find the items: 
+         keyDiscovered(curKey, foundNode);
+      }
+      
+      // add the newly found node to its parent
+      parentOfFoundNode[curKey] = foundNode;
+      pathStack.push(curKey);
+   
+      nodeStack.push(foundNode);                        
    }
 
    /**
