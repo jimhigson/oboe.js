@@ -289,7 +289,7 @@ var jsonPathCompiler = (function () {
          // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
          // in the tree. So long as they match the part specified, they don't care what the ancestors of the
          // matched part are.         
-         return compileJsonPathToFunction(jsonPath, function(){return true});
+         return compileJsonPathToFunction(jsonPath, always);
       } catch( e ) {
          throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
       }

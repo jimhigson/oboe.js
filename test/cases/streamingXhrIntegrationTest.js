@@ -1,4 +1,5 @@
-/* Tests the streaming xhr without stubbing anything */
+/* Tests the streaming xhr without stubbing anything. Really just a test that 
+*  we've got the interface of the in-browser XHR object pinned down  */
 
 (function(){
 
@@ -17,10 +18,36 @@
             }));            
          });
 
-         queue.call("check we got the json back", function(callbacks){
+         queue.call("check we got the json back", function(){
             assertEquals('{}', combinedResult);
          });      
-      }
+      },
+      
+      testCanAjaxInAVeryLargeFile: function(queue) {
+      
+         var combinedResult = '';
+      
+         queue.call("ask the streaming xhr to fetch", function(callbacks){
+
+            // since this is a large file, even serving locally we're going to get multiple callbacks:       
+            streamingXhr.fetch('/test/test/json/tenThousandRecords.json', function(nextDrip){
+               console.log('got a bit of json');
+               combinedResult += nextDrip;                                                                                     
+            },
+            // callback for when the stream is complete. we register this just so that jstd knows
+            // when to move onto the next queuer            
+            callbacks.add(function(){}));            
+         });
+
+         queue.call("check we got the correct json back", function(){
+         
+            // should have given valid json;
+            var parsedResult = JSON.parse(combinedResult);
+            
+            // should have 10,000 records:                     
+            assertEquals(10000, parsedResult.result.length);
+         });      
+      }      
    });
    
 

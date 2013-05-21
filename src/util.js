@@ -37,3 +37,5 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
    return Function.prototype.bind.apply(fn, args); 
 }
+
+function always(){return true}
