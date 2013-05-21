@@ -89,6 +89,23 @@ function givenAParser() {
       };
 
       /**
+       * Fetch the given test json file.
+       * 
+       * Unless the browser's xhr or streamingXhr has been stubbed, this will make an actual
+       * ajax call. In which case this is for end-to-end testing only.
+       * 
+       * @param {String} jsonFilename
+       * @param {Function} doneCallback a callback for when all the json has been read
+       */
+      this.whenFinishedFetching = function(jsonFilename, doneCallback) {
+      
+         var url = '/test/test/json/' + jsonFilename;
+         oboeParser.fetch(url, doneCallback);
+         
+         return this;
+      };      
+
+      /**
        * Assert any number of conditions were met on the spied callback
        */
       this.thenTheParser = function( /* ... functions ... */ ){

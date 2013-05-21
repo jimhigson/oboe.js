@@ -20,6 +20,11 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // array of strings - the path from the root of the dom to the node currently being parsed
    ,     pathStack = []
    
+         // the root node. This is not always the same as nodeStack[0], for example after finishing parsing
+         // the nodeStack will be empty but this will preserve a reference to the root element after parsing is
+         // finished
+   ,     root 
+   
          // local undefined allows slightly better minification:
    ,     undefined;
    
@@ -38,16 +43,10 @@ function jsonBuilder( clarinet, oboeInstance ) {
       oboeInstance.pathFound(value, fullPath, nodeStack);
       curKey = key;      
    }
-      
-   /**
-    * manages the state and notifications for when the current node has ended
-    * 
-    * @param {*} foundNode the thing that has been found in the json
-    */              
-   function nodeFound( foundNode ) {
 
+   function _nodeFound(foundNode) {
       var parentOfFoundNode = lastOf(nodeStack);
-      
+            
       if( !parentOfFoundNode ) {      
          // There is no parent because we just found the root object. 
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
@@ -67,8 +66,29 @@ function jsonBuilder( clarinet, oboeInstance ) {
          pathStack.push(curKey);
       }
                           
-      nodeStack.push(foundNode);                  
+      nodeStack.push(foundNode);   
    }
+   
+   
+   function rootNodeFound( foundNode ) {
+      root = foundNode;
+      _nodeFound(foundNode);
+      
+      // the next node to be found won't be the root
+      nodeFound = nonRootNodeFound;
+   }
+      
+   /**
+    * Manage the state and notifications for when a new node is found
+    * 
+    * @param {*} foundNode the thing that has been found in the json
+    */              
+   function nonRootNodeFound( foundNode ) {
+      _nodeFound(foundNode);                        
+   }
+   
+   var nodeFound = rootNodeFound;
+
 
    /**
     * manages the state and notifications for when the current node has ended
@@ -140,5 +160,11 @@ function jsonBuilder( clarinet, oboeInstance ) {
    clarinet.oncloseobject =
    clarinet.onclosearray =       
       curNodeFinished;      
+      
+   return {
+      getRoot: function() {
+         return root;
+      }
+   };      
          
 }

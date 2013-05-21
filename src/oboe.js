@@ -49,11 +49,9 @@ var oboe = (function(oboe){
       this._nodeFoundListeners = [];
       this._pathMatchedListeners = [];
       this._errorListeners = [];
-      this._clarinet = clarinetParser;
-               
-      jsonBuilder(clarinetParser, this);
-      
-      
+      this._clarinet = clarinetParser;               
+      this._jsonBuilder = jsonBuilder(clarinetParser, this);
+            
       clarinetParser.onerror = function(e) {
          this.notifyErrors(e);
          
@@ -64,17 +62,27 @@ var oboe = (function(oboe){
 
    /**
     * Ask this oboe instance to fetch the given url
+    * 
     * @param {String} url
+    * @param {Function (String|Array wholeParsedJson)} doneCallback a callback for when the request is
+    *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
+    *    works in a very similar to normal ajax.
     */      
-   OboeParser.prototype.fetch = function(url) {
+   OboeParser.prototype.fetch = function(url, doneCallback) {
 
       // TODO: in if in node, use require('http') instead of ajax
 
       streamingXhr.fetch(
          url, 
          this.read.bind(this),
-         this.close.bind(this) );
-
+         function( _wholeResponseText ) {
+            
+            this.close();
+            
+            (doneCallback || always)(this._jsonBuilder.getRoot());
+                                          
+         }.bind(this) );
+               
       return this;
    };
 

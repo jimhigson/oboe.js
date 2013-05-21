@@ -629,6 +629,17 @@ function always(){return true}
  */
 (function (streamingXhr) {
 
+   /**
+    * Fetch something over ajax, calling back as often as new data is available.
+    * 
+    * @param {String} url
+    * @param {Function(String nextResponseDrip)} streamCallback
+    *    A callback to be called repeatedly as the input comes in.
+    *    Will be passed the new string since the last call.
+    * @param {Function(String wholeResponse)} doneCallback
+    *    A callback to be called when the request is complete.
+    *    Will be passed the total response
+    */
    streamingXhr.fetch = function(url, streamCallback, doneCallback){
       doneCallback = doneCallback || always;
    
@@ -659,7 +670,8 @@ function always(){return true}
          // onload, we at least get the whole response. This shouldn't be necessary once
          // polling is implemented in lieu of onprogress.      
          handleInput();
-         doneCallback();
+         
+         doneCallback( xhr.responseText );
       }
    };
 
@@ -986,6 +998,11 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // array of strings - the path from the root of the dom to the node currently being parsed
    ,     pathStack = []
    
+         // the root node. This is not always the same as nodeStack[0], for example after finishing parsing
+         // the nodeStack will be empty but this will preserve a reference to the root element after parsing is
+         // finished
+   ,     root 
+   
          // local undefined allows slightly better minification:
    ,     undefined;
    
@@ -1004,16 +1021,10 @@ function jsonBuilder( clarinet, oboeInstance ) {
       oboeInstance.pathFound(value, fullPath, nodeStack);
       curKey = key;      
    }
-      
-   /**
-    * manages the state and notifications for when the current node has ended
-    * 
-    * @param {*} foundNode the thing that has been found in the json
-    */              
-   function nodeFound( foundNode ) {
 
+   function _nodeFound(foundNode) {
       var parentOfFoundNode = lastOf(nodeStack);
-      
+            
       if( !parentOfFoundNode ) {      
          // There is no parent because we just found the root object. 
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied.
@@ -1033,8 +1044,29 @@ function jsonBuilder( clarinet, oboeInstance ) {
          pathStack.push(curKey);
       }
                           
-      nodeStack.push(foundNode);                  
+      nodeStack.push(foundNode);   
    }
+   
+   
+   function rootNodeFound( foundNode ) {
+      root = foundNode;
+      _nodeFound(foundNode);
+      
+      // the next node to be found won't be the root
+      nodeFound = nonRootNodeFound;
+   }
+      
+   /**
+    * Manage the state and notifications for when a new node is found
+    * 
+    * @param {*} foundNode the thing that has been found in the json
+    */              
+   function nonRootNodeFound( foundNode ) {
+      _nodeFound(foundNode);                        
+   }
+   
+   var nodeFound = rootNodeFound;
+
 
    /**
     * manages the state and notifications for when the current node has ended
@@ -1106,6 +1138,12 @@ function jsonBuilder( clarinet, oboeInstance ) {
    clarinet.oncloseobject =
    clarinet.onclosearray =       
       curNodeFinished;      
+      
+   return {
+      getRoot: function() {
+         return root;
+      }
+   };      
          
 }
 
@@ -1159,11 +1197,9 @@ var oboe = (function(oboe){
       this._nodeFoundListeners = [];
       this._pathMatchedListeners = [];
       this._errorListeners = [];
-      this._clarinet = clarinetParser;
-               
-      jsonBuilder(clarinetParser, this);
-      
-      
+      this._clarinet = clarinetParser;               
+      this._jsonBuilder = jsonBuilder(clarinetParser, this);
+            
       clarinetParser.onerror = function(e) {
          this.notifyErrors(e);
          
@@ -1174,17 +1210,27 @@ var oboe = (function(oboe){
 
    /**
     * Ask this oboe instance to fetch the given url
+    * 
     * @param {String} url
+    * @param {Function (String|Array wholeParsedJson)} doneCallback a callback for when the request is
+    *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
+    *    works in a very similar to normal ajax.
     */      
-   OboeParser.prototype.fetch = function(url) {
+   OboeParser.prototype.fetch = function(url, doneCallback) {
 
       // TODO: in if in node, use require('http') instead of ajax
 
       streamingXhr.fetch(
          url, 
          this.read.bind(this),
-         this.close.bind(this) );
-
+         function( _wholeResponseText ) {
+            
+            this.close();
+            
+            (doneCallback || always)(this._jsonBuilder.getRoot());
+                                          
+         }.bind(this) );
+               
       return this;
    };
 

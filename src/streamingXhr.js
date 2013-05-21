@@ -12,6 +12,17 @@
  */
 (function (streamingXhr) {
 
+   /**
+    * Fetch something over ajax, calling back as often as new data is available.
+    * 
+    * @param {String} url
+    * @param {Function(String nextResponseDrip)} streamCallback
+    *    A callback to be called repeatedly as the input comes in.
+    *    Will be passed the new string since the last call.
+    * @param {Function(String wholeResponse)} doneCallback
+    *    A callback to be called when the request is complete.
+    *    Will be passed the total response
+    */
    streamingXhr.fetch = function(url, streamCallback, doneCallback){
       doneCallback = doneCallback || always;
    
@@ -42,7 +53,8 @@
          // onload, we at least get the whole response. This shouldn't be necessary once
          // polling is implemented in lieu of onprogress.      
          handleInput();
-         doneCallback();
+         
+         doneCallback( xhr.responseText );
       }
    };
 
