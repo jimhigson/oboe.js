@@ -7,6 +7,8 @@
 #   runtests.sh   # run named tests
 
 # Edit these variables to suit your install:
+echo "building at $(date)"
+
 JSTD_JAR=~/dev/jstestdriver/JsTestDriver-1.3.5.jar
 SERVER=http://localhost:4224
 BASEPATH=~/Sites/progressivejson/

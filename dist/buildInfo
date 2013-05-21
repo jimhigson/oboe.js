@@ -1,0 +1,60 @@
+building at Tue 21 May 2013 13:35:37 BST
+no tests specified, will run all
+Will run oboe json tests( all ) against unminified code
+setting runnermode QUIET
+Safari: Reset
+Safari: Reset
+Firefox: Reset
+Firefox: Reset
+Chrome: Reset
+Chrome: Reset
+......................................................................
+.......................................................................
+......................................................................
+......................................................................
+..........
+Total 291 tests (Passed: 291; Fails: 0; Errors: 0) (743.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 97 tests (Passed: 97; Fails: 0; Errors 0) (743.00 ms)
+  Firefox 19.0 Mac OS: Run 97 tests (Passed: 97; Fails: 0; Errors 0) (540.00 ms)
+  Safari 536.28.10 Mac OS: Run 97 tests (Passed: 97; Fails: 0; Errors 0) (399.00 ms)
+
+[4mRunning "concat:oboe" (concat) task[24m
+File "dist/oboe.concat.js" created.
+
+[4mRunning "wrap:export" (wrap) task[24m
+Wrapped files created in ".".
+
+[4mRunning "uglify:build" (uglify) task[24m
+File "dist/oboe.min.js" created.
+
+[32mDone, without errors.[39m
+Will run oboe json tests( all ) against concatenated code
+setting runnermode QUIET
+Firefox: Reset
+Firefox: Reset
+Safari: Reset
+Safari: Reset
+Chrome: Reset
+Chrome: Reset
+......................................................................
+......................................................................
+...................................................................
+Total 207 tests (Passed: 207; Fails: 0; Errors: 0) (378.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (378.00 ms)
+  Firefox 19.0 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (262.00 ms)
+  Safari 536.28.10 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (108.00 ms)
+Will run oboe json tests( all ) against minified code
+setting runnermode QUIET
+Firefox: Reset
+Firefox: Reset
+Safari: Reset
+Safari: Reset
+Chrome: Reset
+Chrome: Reset
+......................................................................
+......................................................................
+...................................................................
+Total 207 tests (Passed: 207; Fails: 0; Errors: 0) (315.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (315.00 ms)
+  Firefox 19.0 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (246.00 ms)
+  Safari 536.28.10 Mac OS: Run 69 tests (Passed: 69; Fails: 0; Errors 0) (109.00 ms)
