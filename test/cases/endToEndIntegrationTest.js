@@ -14,23 +14,19 @@
       
       testGetsJsonPathCallbacksBeforeRequestFinishes: function( queue ) {
       
-         var asserter;
+         var asserter = givenAParser();
    
          queue.call("request the numbers json", function(callbacks){
          
-            asserter = givenAParser()
+            asserter
                .andWeAreListeningForThingsFoundAtPattern('![*]')
                .whenFinishedFetching(
                   'firstTenNaturalNumbers.json', 
-                  callbacks.add(function ajaxFinished(_wholeJsonObject){
-                     // this will be called when the json is complete, allowing jstd to move onto 
-                     // the next item in the queue.
-                  })
+                  callbacks
                );         
          });
 
-         queue.call("should have gotten all the numbers", function(){
-            console.log('doing the asserts');
+         queue.call("should have gotten all the numbers", function( _queue ){
                   
             asserter.thenTheParser(
                 matched(0).atPath([0])
@@ -48,20 +44,19 @@
       }
       
    ,  testProvidesFullJsonWhenRequestFinishes: function( queue ) {
-         
-         var wholeJson;
-   
+            
          queue.call("request the numbers json", function(callbacks){
-         
+                  
             givenAParser()
-               .whenFinishedFetching(
-                  'firstTenNaturalNumbers.json', 
-                  callbacks.add(function ajaxFinished(wholeJsonFromOboe){                  
+               .whenFinishedFetching(               
+                  'firstTenNaturalNumbers.json',
+                  callbacks,
+                  function ajaxFinished(wholeJsonFromOboe) {
+                                       
                      assertEquals([0,1,2,3,4,5,6,7,8,9], wholeJsonFromOboe);
-                  })
+                  }
                );         
-         });
-
+         });         
       }
    })   
 

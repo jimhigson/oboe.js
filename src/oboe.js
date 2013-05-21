@@ -32,10 +32,11 @@ var oboe = (function(oboe){
    /**
     * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
     * ready to call .onPath() or .onFind() to register some callbacks
+    * 
     * @param url
     */
-   oboe.fetch = function(url){
-      return new OboeParser().fetch(url);
+   oboe.fetch = function(url, doneCallback){
+      return new OboeParser({}).fetch(url, doneCallback);
    };
 
    /**

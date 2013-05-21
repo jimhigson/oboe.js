@@ -88,6 +88,8 @@ function givenAParser() {
          return this;
       };
 
+      function noop(){}
+
       /**
        * Fetch the given test json file.
        * 
@@ -95,12 +97,14 @@ function givenAParser() {
        * ajax call. In which case this is for end-to-end testing only.
        * 
        * @param {String} jsonFilename
-       * @param {Function} doneCallback a callback for when all the json has been read
+       * @param {Function} [callbackFromTest] a callback for when all the json has been read
        */
-      this.whenFinishedFetching = function(jsonFilename, doneCallback) {
+      this.whenFinishedFetching = function(jsonFilename, jstdCallbacksList, callbackFromTest) {
+      
+         var callback = jstdCallbacksList.add(callbackFromTest || noop);
       
          var url = '/test/test/json/' + jsonFilename;
-         oboeParser.fetch(url, doneCallback);
+         oboeParser.fetch(url, callback);
          
          return this;
       };      
