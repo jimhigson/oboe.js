@@ -28,44 +28,38 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // local undefined allows slightly better minification:
    ,     undefined;
    
-  
    /**
-    * For when we find a new key in the json.
+    * Manage the state and notifications for when a new node is found.
     * 
-    * @param {String|Number} key the key. If we are in an array will be a number, otherwise a string. 
-    * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
-    *    can't use null because null is a valid value in some json
-    **/  
-   function keyDiscovered(key, value) {
-      
-      var fullPath = key === null? pathStack : pathStack.concat(key);
-   
-      oboeInstance.pathFound(value, fullPath, nodeStack);
-      curKey = key;      
-   }
-
-   /**
-    * This function is one of the possible values of nodeFound, for the sub-case where we have never found
-    * a node before
+    * Valid values are either rootNodeFound or nonRootNodeFound. Will initially be rootNodeFound, 
+    * but reassigned to nonRootNodeFound after the first call.
     * 
-    * @param {*} foundNode
+    * @param {*} foundNode the thing that has been found in the json
+    * @function
     */   
-   function rootNodeFound( foundNode ) {
- 
-      // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
-      // to finding the root node because non-root nodes will have their paths notified as their keys are 
-      // discovered. Because this is the root, it can't have a key, hence null
-      keyDiscovered(null, foundNode);                  
-      
-      // store a reference to the root node (root var declared at top of file)
-      root = foundNode;
+   var nodeFound =
+      /**
+       * This function is one of the possible values of nodeFound, for the sub-case where we have never found
+       * a node before
+       * 
+       * @param {*} foundNode
+       */   
+      function rootNodeFound( foundNode ) {
+    
+         // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
+         // to finding the root node because non-root nodes will have their paths notified as their keys are 
+         // discovered. Because this is the root, it can't have a key, hence null
+         keyDiscovered(null, foundNode);                  
          
-      // nodeStack will be empty, let's give it its first value            
-      nodeStack.push(foundNode);
-      
-      // the next node to be found won't be the root. Reassign this function:
-      nodeFound = nonRootNodeFound;      
-   }
+         // store a reference to the root node (root var declared at top of file)
+         root = foundNode;
+            
+         // nodeStack will be empty, let's give it its first value            
+         nodeStack.push(foundNode);
+         
+         // the next node to be found won't be the root. Reassign this function:
+         nodeFound = nonRootNodeFound;      
+      };
       
    /**
     * This function is one of the possible values of nodeFound, for the sub-case where we have found
@@ -88,15 +82,22 @@ function jsonBuilder( clarinet, oboeInstance ) {
       pathStack.push(curKey);
    
       nodeStack.push(foundNode);                        
-   }
-
+   }   
+  
    /**
-    * Manage the state and notifications for when a new node is found.
-    * Will be set to either rootNodeFound or nonRootNodeFound
+    * For when we find a new key in the json.
     * 
-    * @param {*} foundNode the thing that has been found in the json
-    */   
-   var nodeFound = rootNodeFound;
+    * @param {String|Number} key the key. If we are in an array will be a number, otherwise a string. 
+    * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
+    *    can't use null because null is a valid value in some json
+    **/  
+   function keyDiscovered(key, value) {
+      
+      var fullPath = key === null? pathStack : pathStack.concat(key);
+   
+      oboeInstance.pathFound(value, fullPath, nodeStack);
+      curKey = key;      
+   }
 
 
    /**
