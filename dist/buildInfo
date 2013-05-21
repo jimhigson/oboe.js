@@ -1,6 +1,6 @@
-building at Tue 21 May 2013 14:16:40 BST
 no tests specified, will run all
-Will run oboe json tests( all ) against unminified code
+building at Tue 21 May 2013 16:30:09 BST
+Will run oboe json tests( all ) against dev
 setting runnermode QUIET
 Safari: Reset
 Safari: Reset
@@ -13,11 +13,10 @@ Chrome: Reset
 ......................................................................
 ......................................................................
 ..............
-Total 294 tests (Passed: 294; Fails: 0; Errors: 0) (613.00 ms)
-  Chrome 27.0.1453.81 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (613.00 ms)
-  Firefox 19.0 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (450.00 ms)
-  Safari 536.28.10 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (297.00 ms)
-
+Total 294 tests (Passed: 294; Fails: 0; Errors: 0) (582.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (582.00 ms)
+  Firefox 19.0 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (381.00 ms)
+  Safari 536.28.10 Mac OS: Run 98 tests (Passed: 98; Fails: 0; Errors 0) (257.00 ms)
 [4mRunning "concat:oboe" (concat) task[24m
 File "dist/oboe.concat.js" created.
 
@@ -28,7 +27,7 @@ Wrapped files created in ".".
 File "dist/oboe.min.js" created.
 
 [32mDone, without errors.[39m
-Will run oboe json tests( all ) against concatenated code
+Will run oboe json tests( all ) against concat
 setting runnermode QUIET
 Safari: Reset
 Safari: Reset
@@ -40,11 +39,11 @@ Chrome: Reset
 ......................................................................
 ......................................................................
 
-Total 210 tests (Passed: 210; Fails: 0; Errors: 0) (435.00 ms)
-  Chrome 27.0.1453.81 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (435.00 ms)
-  Firefox 19.0 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (267.00 ms)
-  Safari 536.28.10 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (155.00 ms)
-Will run oboe json tests( all ) against minified code
+Total 210 tests (Passed: 210; Fails: 0; Errors: 0) (373.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (373.00 ms)
+  Firefox 19.0 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (275.00 ms)
+  Safari 536.28.10 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (133.00 ms)
+Will run oboe json tests( all ) against minified
 setting runnermode QUIET
 Safari: Reset
 Safari: Reset
@@ -56,7 +55,7 @@ Chrome: Reset
 ......................................................................
 ......................................................................
 
-Total 210 tests (Passed: 210; Fails: 0; Errors: 0) (256.00 ms)
-  Chrome 27.0.1453.81 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (256.00 ms)
-  Firefox 19.0 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (247.00 ms)
-  Safari 536.28.10 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (141.00 ms)
+Total 210 tests (Passed: 210; Fails: 0; Errors: 0) (408.00 ms)
+  Chrome 27.0.1453.81 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (408.00 ms)
+  Firefox 19.0 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (338.00 ms)
+  Safari 536.28.10 Mac OS: Run 70 tests (Passed: 70; Fails: 0; Errors 0) (118.00 ms)

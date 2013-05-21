@@ -3,15 +3,18 @@
 # Since the grunt jstd plugin doesn't support v3, here's a little
 # shell script to do the same. Usage is:
 #
-#   runtests.sh   # run all tests
-#   runtests.sh   # run named tests
+#   build.sh            # run all tests
+#   build.sh foo.bar    # build but only run test foo.bar
 
 # Edit these variables to suit your install:
-echo "building at $(date)"
-
 JSTD_JAR=~/dev/jstestdriver/JsTestDriver-1.3.5.jar
 SERVER=http://localhost:4224
 BASEPATH=~/Sites/progressivejson/
+
+function test {
+   echo "Will run oboe json tests(" ${TESTS} ") against $1"
+   java -jar ${JSTD_JAR} --captureConsole --config test/jsTestDriver-${1}.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset   
+}
 
 if [ "$1" ] ; then
   TESTS=$1
@@ -20,19 +23,15 @@ else
   TESTS=all
 fi
 
-echo "Will run oboe json tests(" ${TESTS} ") against unminified code"
-java -jar ${JSTD_JAR} --captureConsole --config test/jsTestDriver-dev.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset &&
+echo "building at $(date)"
 
-echo &&
+test dev
+ 
+env grunt 
 
-export PATH=$PATH:/usr/local/bin/ &&
-grunt &&
+test concat 
 
-echo "Will run oboe json tests(" ${TESTS} ") against concatenated code" &&
-java -jar ${JSTD_JAR} --captureConsole --config test/jsTestDriver-concat.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset &&
-
-echo "Will run oboe json tests(" ${TESTS} ") against minified code" &&
-java -jar ${JSTD_JAR} --captureConsole --config test/jsTestDriver-minified.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset
+test minified 
 
 mv dist/oboe.concat.js dist/oboe.js 
 
