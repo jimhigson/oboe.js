@@ -72,7 +72,7 @@ TestCase("oboeTest", {
 
    }
 
-,  testListeningForPathFiresWhenObjectStarts: function() {
+,  testListeningForPathFiresWhenRootObjectStarts: function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -86,7 +86,24 @@ TestCase("oboeTest", {
             matched({}).atRootOfJson()
           );
    }
+   
+,  testListeningForPathFiresWhenRootArrayStarts: function() {
 
+      // clarinet doesn't notify of matches to objects (onopenobject) until the
+      // first key is found, that is why we don't just give '{' here as the partial
+      // input.
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('!')
+         .whenGivenInput('[1') // the minimum string required for clarinet 
+                               // to fire onopenarray. Won't fire with '['.
+          .thenTheParser(
+            foundNMatches(1),
+            matched([]).atRootOfJson()
+          );
+   }
+   
+     
 ,  testHandlesEmptyObjectDetectedWithSingleStar: function() {
 
       givenAParser()
@@ -97,6 +114,16 @@ TestCase("oboeTest", {
             foundOneMatch
          );
    }
+   
+,  testDoesntDetectSpuriousPathOffEmptyObject: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('!.foo.*')
+         .whenGivenInput( {foo:{}} )
+         .thenTheParser(
+            foundNoMatches
+         );
+   }   
 
 ,  testHandlesEmptyObjectDetectedWithDoubleDot: function() {
 
@@ -151,11 +178,25 @@ TestCase("oboeTest", {
          .andWeAreListeningForMatchesToPattern('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":')
          .thenTheParser(
-            // null because the parser hasn't been given the value yet
-            matched(null).atPath(['pencils']),
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(undefined).atPath(['pencils']),
             foundOneMatch
          );
    }
+   
+,  testIsAbleToNotifyOfNull: function() {
+
+      givenAParser()
+         .andWeAreListeningForThingsFoundAtPattern('!.pencils')
+         .whenGivenInput('{"pens":4, "pencils":null}')
+         .thenTheParser(
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(null).atPath(['pencils']),
+            foundOneMatch
+         );
+   }   
 
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
@@ -247,18 +288,15 @@ TestCase("oboeTest", {
 
 ,  testNotifiesOfPathMatchWhenArrayStarts: function() {
 
-      // this is slightly strange and might need to be revisited later.
-      // basically, there is a notification when we find the property name
-      // and another (with an empty array) when we find the start of the array
-      // but both apply to the same key.
-
       givenAParser()
          .andWeAreListeningForMatchesToPattern('!.testArray')
          .whenGivenInput('{"testArray":["a"')
          .thenTheParser(
-             foundNMatches(2)
-         ,   matched(null) // key found
-         ,   matched([])   // start of array found
+             foundNMatches(1)
+         ,   matched(undefined) // when path is matched, it is not known yet
+                                // that it contains an array. Null should not
+                                // be used here because that is an allowed
+                                // value in json
          );
    }
 
@@ -268,11 +306,101 @@ TestCase("oboeTest", {
          .andWeAreListeningForMatchesToPattern('!.array2')
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
          .thenTheParser(
-            foundNMatches(2)
-         ,  matched(null)
-         ,  matched([])
+            foundNMatches(1)
+         ,  matched(undefined) // when path is matched, it is not known yet
+                               // that it contains an array. Null should not
+                               // be used here because that is an allowed
+                               // value in json
          );
    }
+   
+,  testNotifiesOfPathsInsideArrays: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![*]')
+         .whenGivenInput( [{}, 'b', 2, []] )
+         .thenTheParser(
+            foundNMatches(4)
+         );
+   }
+      
+,  testCorrectlyGivesIndexWhenFindingObjectsInArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [{}, {}, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+      
+,  testCorrectlyGivesIndexWhenFindingArraysInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [[], [], 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testCorrectlyGivesIndexWhenFindingArraysInsideArraysEtc: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2][2]')
+         .whenGivenInput( [   
+                              [], 
+                              [], 
+                              [  
+                                 [], 
+                                 [], 
+                                 ['this_array']
+                              ]
+                          ] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }   
+   
+,  testCorrectlyGivesIndexWhenFindingStringsInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( ['', '', 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testCorrectlyGivesIndexWhenFindingNumbersInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [1, 1, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }
+   
+,  testCorrectlyGivesIndexWhenFindingNullsInsideArray: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![2]')
+         .whenGivenInput( [null, null, 'this_one'] )
+         .thenTheParser(
+            foundNMatches(1)
+         );
+   }      
+   
+,  testNotifiesOfPathsInsideObjects: function() {
+
+      givenAParser()
+         .andWeAreListeningForMatchesToPattern('![*]')
+         .whenGivenInput( {a:{}, b:'b', c:2, d:[]} )
+         .thenTheParser(
+            foundNMatches(4)
+         );
+   }      
 
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
@@ -932,7 +1060,12 @@ function givenAParser() {
          return function(){
          
             function clone(original){
-               return JSON.parse( JSON.stringify( original ) );
+               // Note: window.eval being used here instead of JSON.parse because
+               // eval can handle 'undefined' in the string but JSON.parse cannot.
+               // This isn't wholy ideal since this means we're relying on JSON.
+               // stringify to create invalid JSON. But at least there are no
+               // security concerns with this being a test. 
+               return window.eval( '(' + JSON.stringify( original ) + ')' );
             }
             function toArray(args) {
                return Array.prototype.slice.call(args);

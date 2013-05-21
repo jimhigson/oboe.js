@@ -1,11 +1,32 @@
+
+/**
+ * Welcome to the oboe.js source.
+ * 
+ * This codebase is made out of a few components.
+ * 
+ *    * oboe:         Really just a shell with some event dispatching
+ *    * jsonBuilder:  A wrapper around clarinet that progressively builds up the parsed json based on clarinet's
+ *                    callbacks and provides higher-level callbacks into oboe
+ *    * jsonPath:     Pure functional javascript. Parses the jsonpath specs for matches.
+ *    * streamingXhr: A very basic Ajax wrapper that provides a streaming interface
+ *    * util:         Things that didn't fit anywhere else.
+ *    
+ * When the source is built into the distributable js, a single object is exposed at window.oboe    
+ * 
+ * Happy hacking!
+ */
+
+
 var oboe = (function(oboe){
+   "use strict";
+
    /**
-    * @param {Object} opt an object of options. Passed though
+    * @param {Object} options an object of options. Passed though
     * directly to clarinet.js but oboe.js does not
     * currently provide options.
     */
-   oboe.parser = function(opt){
-      return new OboeParser(opt);
+   oboe.parser = function(options){
+      return new OboeParser(options);
    };
    
    /**
@@ -15,109 +36,36 @@ var oboe = (function(oboe){
     */
    oboe.fetch = function(url){
       return new OboeParser().fetch(url);
-   };      
-      
-   function OboeParser(opt) {
+   };
+
+   /**
+    * @constructor 
+    * @param {Object} options
+    */      
+   function OboeParser(options) {
    
-      var clarinetParser = clarinet.parser(opt);
+      var clarinetParser = clarinet.parser(options);
    
-      this._thingFoundListeners = [];
+      this._nodeFoundListeners = [];
       this._pathMatchedListeners = [];
       this._errorListeners = [];
       this._clarinet = clarinetParser;
-   
-      var   oboeInstance = this
-      ,     curNode
-      ,     curKey
-      ,     nodeStack = [] // TODO: use fastlist
-      ,     pathStack = [];
-   
-      function addNewChild(parentNode) {
-
-         if (parentNode) { // if not the root node
-         
-            parentNode[curKey] = curNode;
-            pathStack.push(curKey);
-         }
-
-         nodeStack.push(curNode);
-      }   
-   
-      clarinetParser.onkey = function (nextKey) {
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null, pathStack.concat(nextKey), nodeStack);
-   
-         curKey = nextKey;
-      };
-      clarinetParser.onvalue = function (value) {
-         // onvalue is only called by clarinet for non-structured values
-         // (ie, not arrays or objects). 
-         // For (strings/numbers) in (objects/arrays) this is where the flow goes.
-
-         curNode[curKey] = value;   
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, value, pathStack.concat(curKey), nodeStack);
-   
-         if( isArray(curNode) ) {
-            curKey++;
-         } else {
-            curKey = null;
-         }
-   
-      };            
-      clarinetParser.onopenobject = function (firstKey) {
-   
-         var parentNode = curNode;
-         
-         curNode = {};
-   
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
-   
-         addNewChild(parentNode);
-         
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, null,    pathStack.concat(firstKey), nodeStack);         
-   
-         // clarinet always gives the first key of the new object.
-         curKey = firstKey;
-      };
-      clarinetParser.onopenarray = function () {
-   
-         // arrays can't be the root of a json so we know we'll always have an ancestor
-         var parentNode = curNode;
-         
-         curNode = [];
-         
-         addNewChild(parentNode);
-         
-         oboeInstance._notifyListeners(oboeInstance._pathMatchedListeners, curNode, pathStack, nodeStack);
-   
-         // arrays always start at zero:
-         curKey = 0;
-      };   
-      clarinetParser.onend =
-      clarinetParser.oncloseobject =
-      clarinetParser.onclosearray = function () {
-
-         // pop the curNode off the nodestack because curNode is the thing we just
-         // identified and it shouldn't be listed as an ancestor of itself:
-         nodeStack.pop();
-   
-         oboeInstance._notifyListeners(oboeInstance._thingFoundListeners, curNode, pathStack, nodeStack);
-   
-         pathStack.pop();
-         curNode = lastOf(nodeStack);
-   
-         if( isArray(curNode) ) {
-            curKey = curNode.length;
-         }
-   
-      };   
+               
+      jsonBuilder(clarinetParser, this);
+      
+      
       clarinetParser.onerror = function(e) {
-         oboeInstance._notifyErrors(e);
+         this.notifyErrors(e);
          
          // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-         oboeInstance.close();
-      };   
+         this.close();
+      }.bind(this);
    }
-      
+
+   /**
+    * Ask this oboe instance to fetch the given url
+    * @param {String} url
+    */      
    OboeParser.prototype.fetch = function(url) {
 
       // TODO: in if in node, use require('http') instead of ajax
@@ -129,48 +77,6 @@ var oboe = (function(oboe){
 
       return this;
    };
-
-   
-   /**
-    * notify any of the listeners that are interested in the path.       
-    */  
-   OboeParser.prototype._notifyListeners = function ( listenerList, curNode, path, ancestors ) {
-      
-      var nodeList = ancestors.concat([curNode]);
-
-      listenerList
-         .forEach( function(listener) {
-            
-            var foundNode = listener.test( path, nodeList );
-            
-            // possible values for foundNode now:
-            //
-            //    false: 
-            //       we did not match
-            //    an object/array/string/number: 
-            //       that node is the one that matched
-            //    null: like above, but we don't have the node yet. ie, we know there is a
-            //          node that matches but we don't know if it is an array, object, string
-            //          etc yet so we can't say anything about it 
-                        
-            if( foundNode !== false ) {                     
-               var context = listener.context || window;
-               
-               // change curNode to foundNode when it stops breaking tests
-               try{
-                  listener.callback.call(context, foundNode, path, ancestors );
-               } catch(e) {
-                  this._notifyErrors(Error('Error thrown by callback ' + e.message));
-               }
-            }                            
-         }, this);
-   };
-   
-   OboeParser.prototype._notifyErrors = function(error) {
-      this._errorListeners.forEach( function( listener ) {
-         listener(error);
-      });   
-   };   
 
    /**
     * called when there is new text to parse
@@ -198,7 +104,7 @@ var oboe = (function(oboe){
       this.closed = true;
       
       // we won't fire any more events again so forget our listeners:
-      this._thingFoundListeners = [];
+      this._nodeFoundListeners = [];
       this._pathMatchedListeners = [];
       this._errorListeners = [];
       
@@ -218,19 +124,105 @@ var oboe = (function(oboe){
    };
    
    /**
-    * @returns {*} an identifier that can later be used to de-register this listener
+    * Notify any of the listeners in a list that are interested in the path.       
+    */  
+   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
+      
+      var nodeList = ancestors.concat([node]);
+
+      for (var i = 0; i < listenerList.length; i++) {
+         // each item in the listener list is already a function that will test if the callback needs to be 
+         // called and call it if it does. So all we have to do here is execute.
+         listenerList[i].call(this, node, path, ancestors, nodeList);         
+      }      
+   };
+   
+   /**
+    * Something has been found. Notify matching listeners.
     */
-   function pushListener(listenerList, pattern, callback, context) {
-      return listenerList.push({
-         pattern:pattern,
-         test: jsonPathCompiler(pattern),
-         callback: callback,
-         context: context
-      });
-   }
+   OboeParser.prototype.nodeFound = function( node, path, ancestors ) {   
+      this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
+   };
+   
+   /**
+    * A path has been found. Notify matching listeners.
+    */
+   OboeParser.prototype.pathFound = function( node, path, ancestors ) {   
+      this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
+   };
 
    /**
     * 
+    * @param error
+    */
+   OboeParser.prototype.notifyErrors = function(error) {
+      this._errorListeners.forEach( function( listener ) {
+         listener(error);
+      });   
+   };
+
+
+   /**
+    * Create a new function that tests if something found in the json matches the pattern and, if it does,
+    * calls the callback.
+    * 
+    * @param pattern
+    * @param callback
+    * @param context
+    */
+   function callIfPatternMatches( pattern, callback, context ) {
+   
+      context = context || window;   
+   
+      var test = jsonPathCompiler(pattern);
+         
+      /**
+       * A function which when called with the details of something called in the parsed json, calls the listener
+       * if it matches.
+       * 
+       * Will be called in the context of the current oboe instance from OboeParser#notifyListeners.
+       */ 
+     return function( node, path, ancestors, nodeList ) {
+     
+         var foundNode = test( path, nodeList );
+        
+         // Possible values for foundNode are now:
+         //
+         //    false: 
+         //       we did not match
+         //
+         //    an object/array/string/number/null: 
+         //       that node is the one that matched. Because json can have nulls, this can 
+         //       be null.
+         //
+         //    undefined: like above, but we don't have the node yet. ie, we know there is a
+         //       node that matches but we don't know if it is an array, object, string
+         //       etc yet so we can't say anything about it. Null isn't used here because
+         //       that would be indistinguishable from us finding a node with a value of
+         //       null.
+         //                      
+         if( foundNode !== false ) {                                 
+           
+            // change curNode to foundNode when it stops breaking tests
+            try{
+               callback.call(context, foundNode, path, ancestors );
+            } catch(e) {
+               this.notifyErrors(Error('Error thrown by callback ' + e.message));
+            }
+         }
+      }   
+   }
+   
+   /**
+    * @returns {*} an identifier that can later be used to de-register this listener
+    */
+   function pushListener(listenerList, pattern, callback, context) {
+         
+      listenerList.push( callIfPatternMatches(pattern, callback, context) );            
+   }
+
+   /**
+    * implementation behind .onPath() and .onFind: add several listeners in one call  
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {
@@ -239,6 +231,8 @@ var oboe = (function(oboe){
       }
    }
    
+   /** implementation behind .onPath() and .onFind 
+    */
    function on(listenerList, jsonPath, callback, context) {
       if( typeof jsonPath === 'string' ) {
          pushListener(listenerList, jsonPath, callback, context);
@@ -270,7 +264,7 @@ var oboe = (function(oboe){
    OboeParser.prototype.onPath = function (jsonPath, callback, context) {
    
       on(this._pathMatchedListeners, jsonPath, callback, context);
-      return this;
+      return this; // chaining
    };
 
    /**
@@ -283,8 +277,8 @@ var oboe = (function(oboe){
     */
    OboeParser.prototype.onFind = function (jsonPath, callback, context) {
    
-      on(this._thingFoundListeners, jsonPath, callback, context);
-      return this;
+      on(this._nodeFoundListeners, jsonPath, callback, context);
+      return this; // chaining
    };
    
    /**
@@ -295,7 +289,7 @@ var oboe = (function(oboe){
    OboeParser.prototype.onError = function (callback) {
 
       this._errorListeners.push(callback);
-      return this;
+      return this; // chaining
    };
    
    return oboe;

@@ -11,6 +11,7 @@ module.exports = function (grunt) {
             ,  'src/util.js'               
             ,  'src/streamingXhr.js'
             ,  'src/jsonPath.js'
+            ,  'src/jsonBuilder.js'
             ,  'src/oboe.js'
             ],
             dest: 'dist/oboe.concat.js'

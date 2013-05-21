@@ -10,7 +10,7 @@ function isArray(a) {
 
    Returns the first return value that is given that is non-truthy.
    
-   If none are found, calls onFail    
+   If none are found, calls onFail and returns whatever that gives    
  */
 function firstMatching( fns, args, onFail ) {
 
@@ -23,7 +23,7 @@ function firstMatching( fns, args, onFail ) {
       }      
    }  
    
-   onFail();
+   return onFail();
 }
 
 /** Partially complete the given function by filling it in with all arguments given
