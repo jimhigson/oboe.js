@@ -41,10 +41,10 @@ if( !Function.prototype.bind ) {
  
    Function.prototype.bind = function( context /*, arg1, arg2 ... */ ){
       var f = this,
-          boundArgs = Array.prototype.slice.call(arguments, 1);
+          boundArgs = toArray(arguments, 1);
    
       return function( /* yet more arguments */ ) {
-         var callArgs = boundArgs.concat(Array.prototype.slice.call(arguments));            
+         var callArgs = boundArgs.concat(toArray(arguments));            
             
          return f.apply(context, callArgs);
       }
