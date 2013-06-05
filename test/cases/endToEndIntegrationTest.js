@@ -14,7 +14,7 @@
    
       // shorten the waiting time before a test fails. Default 30s is too long:
       setUp: function(){
-         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 2000; //2seconds
+         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 1000; //1 second
       }
       
    ,  testGetsJsonPathCallbacksBeforeRequestFinishes: function( queue ) {
