@@ -11,7 +11,7 @@ JSTD_JAR=~/dev/jstestdriver/JsTestDriver-1.3.5.jar
 SERVER=http://localhost:4224
 BASEPATH=~/Sites/progressivejson/
 
-function test {
+function runjstd {
    echo "Will run oboe json tests(" ${TESTS} ") against $1"
    java -jar ${JSTD_JAR} --captureConsole --config test/jsTestDriver-${1}.conf --server ${SERVER} --tests ${TESTS} --basePath ${BASEPATH} --reset   
 }
@@ -25,13 +25,13 @@ fi
 
 echo "building at $(date)"
 
-test dev
+runjstd dev
  
 env grunt 
 
-test concat 
+runjstd concat 
 
-test minified 
+runjstd minified 
 
 mv dist/oboe.concat.js dist/oboe.js 
 

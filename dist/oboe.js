@@ -1,4 +1,43 @@
-(function () {;(function (clarinet) {
+(function () {/**
+ * Here we have a fairly minimal set of polyfills needed to give old and rubbish browsers a fighting
+ * chance of running the code. IE8, I'm looking at you.
+ * 
+ * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
+ * to make a custom build without this.
+ */
+
+if( !Array.prototype.filter ) {
+
+   /* Array.filter this has to be done as a polyfill, clarinet expects it */ 
+   Array.prototype.filter = function( func ){
+      var out = [];
+   
+      for( var i = 0 ; i < this.length ; i++ ) {
+      
+         if( func( this[i] ) ) {
+            out.push(this[i]);                                                            
+         }                  
+      }
+      
+      return out;
+   };
+   
+}
+
+if( !Function.prototype.bind ) {
+ 
+   Function.prototype.bind = function( context /*, arg1, arg2 ... */ ){
+      var f = this,
+          boundArgs = Array.prototype.slice.call(arguments, 1);
+   
+      return function( /* yet more arguments */ ) {
+         var callArgs = boundArgs.concat(Array.prototype.slice.call(arguments));            
+            
+         return f.apply(context, callArgs);
+      }
+   };
+}
+;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
     , fastlist
@@ -582,6 +621,17 @@ function isArray(a) {
    return a && a.constructor === Array;
 }
 
+/*
+   Call each of a list of functions with the same arguments, ignoring any return
+   values.
+ */
+function callAll( fns, args ) {
+
+   for (var i = 0; i < fns.length; i++) {            
+      fns[i].apply(null, args);      
+   }
+}
+
 /* call a list of functions with the same args until one returns truthy.
 
    Returns the first return value that is given that is non-truthy.
@@ -601,6 +651,7 @@ function firstMatching( fns, args, onFail ) {
    
    return onFail();
 }
+
 
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
@@ -1324,9 +1375,7 @@ var oboe = (function(oboe){
     * @param error
     */
    OboeParser.prototype.notifyErrors = function(error) {
-      this._errorListeners.forEach( function( listener ) {
-         listener(error);
-      });   
+      callAll(this._errorListeners, [error]);            
    };
 
 

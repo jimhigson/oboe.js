@@ -166,9 +166,7 @@ var oboe = (function(oboe){
     * @param error
     */
    OboeParser.prototype.notifyErrors = function(error) {
-      this._errorListeners.forEach( function( listener ) {
-         listener(error);
-      });   
+      callAll(this._errorListeners, [error]);            
    };
 
 

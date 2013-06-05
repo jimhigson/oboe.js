@@ -6,6 +6,17 @@ function isArray(a) {
    return a && a.constructor === Array;
 }
 
+/*
+   Call each of a list of functions with the same arguments, ignoring any return
+   values.
+ */
+function callAll( fns, args ) {
+
+   for (var i = 0; i < fns.length; i++) {            
+      fns[i].apply(null, args);      
+   }
+}
+
 /* call a list of functions with the same args until one returns truthy.
 
    Returns the first return value that is given that is non-truthy.
@@ -25,6 +36,7 @@ function firstMatching( fns, args, onFail ) {
    
    return onFail();
 }
+
 
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
