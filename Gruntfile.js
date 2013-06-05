@@ -24,7 +24,7 @@ module.exports = function (grunt) {
             src: 'dist/oboe.concat.js',
             dest: '.',
             wrapper: [
-               // having a local undefined allows slightly better minification:
+               // having a local undefined and window allows slightly better minification:
                '(function (window, undefined) {' 
             ,  'window.oboe = oboe; })(window);'
             ]
