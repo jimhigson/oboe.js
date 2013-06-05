@@ -27,20 +27,28 @@
       doneCallback = doneCallback || always;
    
       var xhr = new XMLHttpRequest();
-      var charsSent = 0;
+      var numberOfCharsGivenToCallback = 0;
 
       xhr.open("GET", url, true);
       xhr.send(null);
 
       function handleProgress() {
+         
+         try{
+            var textSoFar = xhr.responseText;
+         } catch(e) {
+            // ie sometimes errors if you try to get the responseText too early but just
+            // ignore it when this happens.
+            return;
+         }
 
-         if( xhr.responseText.length > charsSent ) {
+         if( textSoFar.length > numberOfCharsGivenToCallback ) {
 
-            var newResponseText = xhr.responseText.substr(charsSent);
+            var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
 
-            charsSent = xhr.responseText.length;
+            progressCallback( latestText );
 
-            progressCallback( newResponseText );
+            numberOfCharsGivenToCallback = textSoFar.length;
          }
       }
       
@@ -68,25 +76,21 @@
     * listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
    function listenToXhr1(xhr, progressListener, completeListener){
-      var interval;
    
-      /* handle the resuest being complete */
+      // We are recieving the content, check for progress as often as the browser allows. 
+      // The progress listener makes sure there is something to report so just call it as often 
+      // as possible regardless of if something happened to the xhr1 object.
+      var interval = window.setInterval(progressListener, 0);      
+   
+      // handle the request being complete: 
       xhr.onreadystatechange = function() {
 
-         if(this.readyState == 3 ) {
+         if(this.readyState == 4 ) {
          
-            // we are recieving the content
-            // check for progress as often as the browser allows. The progress listener makes sure there
-            // is something to report so just call it as often as possible regardless of if something
-            // happened to the xhr1 object.                     
-            interval = window.setInterval(function(){
-               progressListener();
-            }, 0);         
-         }
-
-         else if(this.readyState == 4 && this.status == 200) {
-            // XHR is complete. Notify of completeness and stop notifying of progress:             
-            completeListener();
+            // XHR is complete. Notify of completeness and stop notifying of progress:
+            if( this.status == 200 ) {             
+               completeListener();
+            }
             
             window.clearInterval(interval);
          }               
