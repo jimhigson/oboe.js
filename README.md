@@ -49,19 +49,10 @@ be waiting.
 **John** is developing internally on a fast network so he doesn't really care about progressive parsing. Oboe.js provides 
 a neat way to route different parts of a json response to different parts of his application. One less thing to write.
 
-# Status
+# Browser support
 
-Oboe is still in development. Nevertheless, it is already
-[quite](test/cases/oboeTest.js) [well](test/cases/jsonPathTest.js)
-tested and has proven stable enough for production applications. The 
-codebase is small and hackable and it works. Try it, let me know how
-it goes.
-
-Old browsers might not be so well supported but it should be easy enough to branch and 
-build support in if you need it.
-
-Oboe used to be called **Progressive.js** until I noticed that a project 
-[already exists with that name](https://github.com/jamesallardice/Progressive.js). D'oh! 
+* IE8 and up
+* Good browsers
 
 # Examples
 
