@@ -51,7 +51,7 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
    args[0] = null; // the first argument to bind should be null since we
                    // wish to specify no context
 
-   return Function.prototype.bind.apply(fn, args); 
+   return fn.bind.apply(fn, args); 
 }
 
 function always(){return true}
