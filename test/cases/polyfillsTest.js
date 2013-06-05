@@ -96,12 +96,18 @@
          assertTrue(func.calledWith(1)); 
          assertTrue(func.calledWith(2)); 
          assertTrue(func.calledWith(3)); 
-      }                                                      
+      }
+      
+   ,  testMap: function() {
+                  
+         assertEquals([2,4,6], [1,2,3].map(doubleUp));          
+      }                                                            
    });
        
    function odd(n){ return n % 2 ===1 }
    function always(){return true}       
    function never(){return false}       
+   function doubleUp(n){return n * 2}       
        
    function givenTheArray( startArray ) {
       

@@ -219,10 +219,12 @@ function matched(obj) {
       testAgainst: function assertMatchedRightObject( callbackStub ) {
       
          if(!callbackStub.calledWith(obj)) {
-   
+
+            var objectPassedToCall = function(callArgs){return callArgs[0]};
+            
             fail( "was not called with the object " +  JSON.stringify(obj) + "\n" +
                 "objects that I got are:" +
-                JSON.stringify(callbackStub.args.map(function(callArgs){return callArgs[0]}) ) + "\n" +
+                JSON.stringify(callbackStub.args.map(objectPassedToCall) ) + "\n" +
                 "all calls were with:" +
                 reportArgumentsToCallback(callbackStub.args));
    

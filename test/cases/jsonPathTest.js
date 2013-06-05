@@ -235,7 +235,9 @@
    // stand in for the nodestack in the cases where we only care about match or not match.
    // one greater because the root node doesnt have a name
    function fakeNodeStack(path){
+   
       var rtn = path.map(function(){return {}});
+      
       rtn.unshift({iAm:'root'});
       return rtn;      
    }
