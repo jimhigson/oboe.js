@@ -58,7 +58,7 @@
          bound(); 
       }
       
-   ,  testPropogatesCallTimeArguments: function() {
+   ,  testBindPropagatesCallTimeArguments: function() {
          
          var bound = (function(arg1, arg2){ 
             assertEquals('b', arg1 ); 
@@ -68,7 +68,7 @@
          bound('b', 'c'); 
       }
       
-   ,  testWithCallTimeAndBoundArguments: function() {
+   ,  testBindWithCallTimeAndBoundArguments: function() {
          
          var bound = (function(arg1, arg2){ 
             assertEquals('b', arg1 ); 
@@ -76,7 +76,27 @@
          }).bind('a','b');
          
          bound('c'); 
-      }                                          
+      }
+      
+   ,  testForEachCallsTheCorrectNumberOftimes: function() {
+         
+         var func = sinon.spy();
+         
+         [1,2,3].forEach(func);
+         
+         assertEquals(3, func.callCount); 
+      }
+      
+   ,  testForEachCallsWithEachItemFromTheArray: function() {
+         
+         var func = sinon.spy();
+         
+         [1,2,3].forEach(func);
+         
+         assertTrue(func.calledWith(1)); 
+         assertTrue(func.calledWith(2)); 
+         assertTrue(func.calledWith(3)); 
+      }                                                      
    });
        
    function odd(n){ return n % 2 ===1 }
