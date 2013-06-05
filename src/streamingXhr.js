@@ -57,10 +57,17 @@
    };
    
    /* little abstration to get XHRs working sensibly in IE */
-   function listenToXhr(xhr, progressListener, completeListener) {
-      
+   function listenToNiceXhr(xhr, progressListener, completeListener) {      
       xhr.onprogress = progressListener;
       xhr.onload = completeListener;
    }
+           
+   function listenToLegacyXhr(xhr, progressListener, completeListener){
+   
+      xhr.onreadystatechange  = function() {         
+      };
+   }
+      
+   var listenToXhr = window.ActiveXObject? listenToLegacyXhr : listenToNiceXhr;   
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
