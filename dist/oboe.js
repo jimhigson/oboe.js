@@ -1,7 +1,7 @@
 (function () {(function(arrayProto, functionProto){
 
    /**
-    * Here we have a fairly minimal set of polyfills needed to let the code run in older browsers such
+    * Here we have a minimal set of polyfills needed to let the code run in older browsers such
     * as IE8.
     * 
     * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
@@ -9,50 +9,43 @@
     * 
     */
    
-   if( !arrayProto.forEach ) {
+   // Array.forEach has to be a polyfill, clarinet expects it
+   // Ignoring all but function argument since not needed, eg can't take a context       
+   arrayProto.forEach = arrayProto.forEach || function( func ){
    
-      // Array.forEach has to be a polyfill, clarinet expects it
-      // Ignoring all but function argument since not needed, eg can't take a context       
-      arrayProto.forEach = function( func ){
-      
-         for( var i = 0 ; i < this.length ; i++ ) {      
-            func( this[i] );    
-         }      
-      };         
-   }
+      for( var i = 0 ; i < this.length ; i++ ) {      
+         func( this[i] );    
+      }      
+   };         
    
-   if( !arrayProto.filter ) {
    
-      // Array.filter has to be a polyfill, clarinet expects it.
-      // Ignoring all but function argument since not needed, eg can't take a context   
-      arrayProto.filter = function( func ){
-            
-         var out = [];
-      
-         // let's use the .forEach we just declared above to implement .filter
-         this.forEach(function(item){      
-            if( func( item ) ) {
-               out.push(item);
-            }                  
-         });
+   // Array.filter has to be a polyfill, clarinet expects it.
+   // Ignoring all but function argument since not needed, eg can't take a context   
+   arrayProto.filter = arrayProto.filter || function( func ){
          
-         return out;
-      };
-   }
+      var out = [];
    
-   if( !functionProto.bind ) {
-    
-      functionProto.bind = function( context /*, arg1, arg2 ... */ ){
-         var f = this,
-             boundArgs = toArray(arguments, 1);
+      // let's use the .forEach we just declared above to implement .filter
+      this.forEach(function(item){      
+         if( func( item ) ) {
+            out.push(item);
+         }                  
+      });
       
-         return function( /* yet more arguments */ ) {
-            var callArgs = boundArgs.concat(toArray(arguments));            
-               
-            return f.apply(context, callArgs);
-         }
-      };
-   }
+      return out;
+   };
+   
+    
+   functionProto.bind = functionProto.bind || function( context /*, arg1, arg2 ... */ ){
+      var f = this,
+          boundArgs = toArray(arguments, 1);
+   
+      return function( /* yet more arguments */ ) {
+         var callArgs = boundArgs.concat(toArray(arguments));            
+            
+         return f.apply(context, callArgs);
+      }
+   };
 
 })(Array.prototype, Function.prototype);
 ;(function (clarinet) {
