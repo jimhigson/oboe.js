@@ -56,21 +56,22 @@
       listenToXhr( xhr, handleProgress, handleDone);
    };
    
-   /* xhr2 already supports everything that we need so very little abstraction required */
+   /* xhr2 already supports everything that we need so very little abstraction required.\
+   *  listenToXhr2 is one of two possible values to use as listenToXhr  
+   */
    function listenToXhr2(xhr, progressListener, completeListener) {      
       xhr.onprogress = progressListener;
       xhr.onload = completeListener;
    }
 
-   /* xhr1 supports little so a bit more work is needed */           
+   /* xhr1 supports little so a bit more work is needed 
+    * listenToXhr1 is one of two possible values to use as listenToXhr  
+    */           
    function listenToXhr1(xhr, progressListener, completeListener){
-
-
-
+      var interval;
    
       /* handle the resuest being complete */
       xhr.onreadystatechange = function() {
-         var interval;
 
          if(this.readyState == 3 ) {
          
@@ -95,7 +96,16 @@
    function supportsXhr2(){
       return ('onprogress' in new XMLHttpRequest());
    }      
-      
+   
+   /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
+    * supports
+    * 
+    * @function
+    * 
+    * @param {XmlHttpRequest} xhr
+    * @param {Function} progressListener
+    * @param {Function} completeListener
+    */
    var listenToXhr = supportsXhr2()? listenToXhr2 : listenToXhr1;   
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
