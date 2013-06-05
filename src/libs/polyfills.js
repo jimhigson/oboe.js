@@ -10,8 +10,8 @@
    
    if( !arrayProto.forEach ) {
    
-      /* Array.forEach has to be a polyfill, clarinet expects it
-       *  Ignoring all but function argument since not needed, eg can't take a context  */     
+      // Array.forEach has to be a polyfill, clarinet expects it
+      // Ignoring all but function argument since not needed, eg can't take a context       
       arrayProto.forEach = function( func ){
       
          for( var i = 0 ; i < this.length ; i++ ) {      
@@ -22,8 +22,8 @@
    
    if( !arrayProto.filter ) {
    
-      /* Array.filter has to be a polyfill, clarinet expects it.
-       *  Ignoring all but function argument since not needed, eg can't take a context  */ 
+      // Array.filter has to be a polyfill, clarinet expects it.
+      // Ignoring all but function argument since not needed, eg can't take a context   
       arrayProto.filter = function( func ){
             
          var out = [];
