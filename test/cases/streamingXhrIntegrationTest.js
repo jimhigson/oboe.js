@@ -39,7 +39,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr.fetch(
-               '/test/test/json/tenThousandRecords.json',
+               '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -56,8 +56,8 @@
             // should have given valid json;
             var parsedResult = JSON.parse(combinedResult);
             
-            // should have 10,000 records:                     
-            assertEquals(10000, parsedResult.result.length);
+            // as per the name, should have 20,000 records in that file:                     
+            assertEquals(20000, parsedResult.result.length);
          });      
       },
       
@@ -67,7 +67,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr.fetch(
-               '/test/test/json/tenThousandRecords.json',
+               '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
                   if( nextDrip.length === 0 ) {
@@ -91,7 +91,7 @@
          
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr.fetch(
-               '/test/test/json/tenThousandRecords.json',
+               '/test/test/json/twentyThousandRecords.json',
                 
                function onProgress(){ numberOfProgressCallbacks++; },
                
