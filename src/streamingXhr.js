@@ -64,8 +64,15 @@
            
    function listenToLegacyXhr(xhr, progressListener, completeListener){
    
-      xhr.onreadystatechange  = function() {         
+      /* handle the resuest being complete */
+      xhr.onreadystatechange = function() {
+
+         if(this.readyState == 4 && this.status == 200) {
+            completeListener();
+         }               
       };
+      
+      
    }
       
    var listenToXhr = window.ActiveXObject? listenToLegacyXhr : listenToNiceXhr;   
