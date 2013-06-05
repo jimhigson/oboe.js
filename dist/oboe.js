@@ -1,4 +1,4 @@
-(function (window, undefined) {function lastOf(array) {
+(function (window, Object, Array, undefined) {function lastOf(array) {
    return array[len(array)-1];
 }
 
@@ -1579,4 +1579,4 @@ var oboe = (function(){
       }     
    };
 
-})();window.oboe = oboe; })(window);
+})();window.oboe = oboe; })(window, Object, Array);
