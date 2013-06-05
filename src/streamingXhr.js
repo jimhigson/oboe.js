@@ -64,16 +64,32 @@
 
    /* xhr1 supports little so a bit more work is needed */           
    function listenToXhr1(xhr, progressListener, completeListener){
+
+
+
    
       /* handle the resuest being complete */
       xhr.onreadystatechange = function() {
+         var interval;
 
-         if(this.readyState == 4 && this.status == 200) {
+         if(this.readyState == 3 ) {
+         
+            // we are recieving the content
+            // check for progress as often as the browser allows. The progress listener makes sure there
+            // is something to report so just call it as often as possible regardless of if something
+            // happened to the xhr1 object.                     
+            interval = window.setInterval(function(){
+               progressListener();
+            }, 0);         
+         }
+
+         else if(this.readyState == 4 && this.status == 200) {
+            // XHR is complete. Notify of completeness and stop notifying of progress:             
             completeListener();
+            
+            window.clearInterval(interval);
          }               
       };
-      
-            
    }
       
    function supportsXhr2(){

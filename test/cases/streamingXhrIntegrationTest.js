@@ -7,7 +7,7 @@
 
       // shorten the waiting time before a test fails. Default 30s is too long:
       setUp: function(){
-         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 2000; //2 seconds
+         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 5000; //5 seconds
       },
    
       testCanAjaxInASmallKnownFile: function(queue) {
@@ -61,6 +61,28 @@
          });      
       },
       
+      testDoesntCallbackWithoutNewData: function(queue) {
+            
+         queue.call("ask the streaming xhr to fetch", function(callbacks){
+
+            // since this is a large file, even serving locally we're going to get multiple callbacks:       
+            streamingXhr.fetch(
+               '/test/test/json/tenThousandRecords.json',
+                
+               function(nextDrip){            
+                  if( nextDrip.length === 0 ) {
+                     fail('zero-length drip received');
+                  }                                                                                     
+               },
+               
+               // callback for when the stream is complete. we register this just so that jstd knows
+               // we're done
+               callbacks.noop()
+            )         
+         });
+      
+      },      
+      
       testAjaxingInAVeryLargeFileGivesMoreThanOneCallback: function(queue) {
       
          var numberOfProgressCallbacks = 0;
@@ -71,9 +93,7 @@
             streamingXhr.fetch(
                '/test/test/json/tenThousandRecords.json',
                 
-               function(nextDrip){            
-                  numberOfProgressCallbacks++;                                                                                     
-               },
+               function onProgress(){ numberOfProgressCallbacks++; },
                
                // callback for when the stream is complete. we register this just so that jstd knows
                // when to move onto the next queuer            
@@ -85,7 +105,7 @@
                                         
             if( numberOfProgressCallbacks < 2)(
                fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
-                   "had multiple")                
+                   " had multiple")                
             );
          });      
       }            
