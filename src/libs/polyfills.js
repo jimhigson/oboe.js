@@ -1,11 +1,12 @@
 (function(arrayProto, functionProto){
 
    /**
-    * Here we have a fairly minimal set of polyfills needed to give old and rubbish browsers a fighting
-    * chance of running the code. IE8, I'm looking at you.
+    * Here we have a fairly minimal set of polyfills needed to let the code run in older browsers such
+    * as IE8.
     * 
     * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
-    * to make a custom build without this.
+    * to make a custom build without this. However, it is as small as it can be to get the job done.
+    * 
     */
    
    if( !arrayProto.forEach ) {
