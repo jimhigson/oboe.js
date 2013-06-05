@@ -17,27 +17,8 @@
  */
 
 
-var oboe = (function(oboe){
+var oboe = (function(){
    "use strict";
-
-   /**
-    * @param {Object} options an object of options. Passed though
-    * directly to clarinet.js but oboe.js does not
-    * currently provide options.
-    */
-   oboe.parser = function(options){
-      return new OboeParser(options);
-   };
-   
-   /**
-    * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
-    * ready to call .onPath() or .onFind() to register some callbacks
-    * 
-    * @param url
-    */
-   oboe.fetch = function(url, doneCallback){
-      return new OboeParser({}).fetch(url, doneCallback);
-   };
 
    /**
     * @constructor 
@@ -301,7 +282,28 @@ var oboe = (function(oboe){
       this._errorListeners.push(callback);
       return this; // chaining
    };
-   
-   return oboe;
 
-})( typeof exports === "undefined" ? {} : exports );
+   /* finally, let's export factory methods for making a new oboe instance */ 
+   return {
+      /**
+      * @param {Object} options an object of options. Passed though
+      * directly to clarinet.js but oboe.js does not
+      * currently provide options.
+      */
+      parser:function(options){
+         return new OboeParser(options);
+      }
+   
+   
+      /**
+       * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
+       * ready to call .onPath() or .onFind() to register some callbacks
+       * 
+       * @param url
+       */
+   ,  fetch: function(url, doneCallback){
+         return new OboeParser({}).fetch(url, doneCallback);
+      }     
+   };
+
+})();
