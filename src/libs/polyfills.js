@@ -29,7 +29,7 @@ if( !Array.prototype.filter ) {
       // let's use the .forEach we just declared above to implement .filter
       this.forEach(function(item){      
          if( func( item ) ) {
-            out.push(item);                                                            
+            out.push(item);
          }                  
       });
       

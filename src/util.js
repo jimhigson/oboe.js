@@ -16,9 +16,9 @@ function toArray(arrayLikeThing, startIndex) {
  */
 function callAll( fns, args ) {
 
-   for (var i = 0; i < fns.length; i++) {            
-      fns[i].apply(null, args);      
-   }
+   fns.forEach(function( fn ){
+      fn.apply(null, args);
+   });
 }
 
 /* call a list of functions with the same args until one returns truthy.
