@@ -1,42 +1,60 @@
-(function () {/**
- * Here we have a fairly minimal set of polyfills needed to give old and rubbish browsers a fighting
- * chance of running the code. IE8, I'm looking at you.
- * 
- * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
- * to make a custom build without this.
- */
+(function () {(function(arrayProto, functionProto){
 
-if( !Array.prototype.filter ) {
-
-   /* Array.filter this has to be done as a polyfill, clarinet expects it */ 
-   Array.prototype.filter = function( func ){
-      var out = [];
+   /**
+    * Here we have a fairly minimal set of polyfills needed to let the code run in older browsers such
+    * as IE8.
+    * 
+    * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
+    * to make a custom build without this. However, it is as small as it can be to get the job done.
+    * 
+    */
    
-      for( var i = 0 ; i < this.length ; i++ ) {
+   if( !arrayProto.forEach ) {
+   
+      // Array.forEach has to be a polyfill, clarinet expects it
+      // Ignoring all but function argument since not needed, eg can't take a context       
+      arrayProto.forEach = function( func ){
       
-         if( func( this[i] ) ) {
-            out.push(this[i]);                                                            
-         }                  
-      }
-      
-      return out;
-   };
+         for( var i = 0 ; i < this.length ; i++ ) {      
+            func( this[i] );    
+         }      
+      };         
+   }
    
-}
-
-if( !Function.prototype.bind ) {
- 
-   Function.prototype.bind = function( context /*, arg1, arg2 ... */ ){
-      var f = this,
-          boundArgs = Array.prototype.slice.call(arguments, 1);
+   if( !arrayProto.filter ) {
    
-      return function( /* yet more arguments */ ) {
-         var callArgs = boundArgs.concat(Array.prototype.slice.call(arguments));            
+      // Array.filter has to be a polyfill, clarinet expects it.
+      // Ignoring all but function argument since not needed, eg can't take a context   
+      arrayProto.filter = function( func ){
             
-         return f.apply(context, callArgs);
-      }
-   };
-}
+         var out = [];
+      
+         // let's use the .forEach we just declared above to implement .filter
+         this.forEach(function(item){      
+            if( func( item ) ) {
+               out.push(item);
+            }                  
+         });
+         
+         return out;
+      };
+   }
+   
+   if( !functionProto.bind ) {
+    
+      functionProto.bind = function( context /*, arg1, arg2 ... */ ){
+         var f = this,
+             boundArgs = toArray(arguments, 1);
+      
+         return function( /* yet more arguments */ ) {
+            var callArgs = boundArgs.concat(toArray(arguments));            
+               
+            return f.apply(context, callArgs);
+         }
+      };
+   }
+
+})(Array.prototype, Function.prototype);
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
@@ -621,15 +639,19 @@ function isArray(a) {
    return a && a.constructor === Array;
 }
 
+function toArray(arrayLikeThing, startIndex) {
+   return Array.prototype.slice.call(arrayLikeThing, startIndex);
+}
+
 /*
    Call each of a list of functions with the same arguments, ignoring any return
    values.
  */
 function callAll( fns, args ) {
 
-   for (var i = 0; i < fns.length; i++) {            
-      fns[i].apply(null, args);      
-   }
+   fns.forEach(function( fn ){
+      fn.apply(null, args);
+   });
 }
 
 /* call a list of functions with the same args until one returns truthy.
@@ -658,11 +680,11 @@ function firstMatching( fns, args, onFail ) {
  */
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
-   var args = Array.prototype.slice.call(arguments, 0);
+   var args = toArray(arguments);
    args[0] = null; // the first argument to bind should be null since we
                    // wish to specify no context
 
-   return Function.prototype.bind.apply(fn, args); 
+   return fn.bind.apply(fn, args); 
 }
 
 function always(){return true}
@@ -684,47 +706,101 @@ function always(){return true}
     * Fetch something over ajax, calling back as often as new data is available.
     * 
     * @param {String} url
-    * @param {Function(String nextResponseDrip)} streamCallback
+    * @param {Function(String nextResponseDrip)} progressCallback
     *    A callback to be called repeatedly as the input comes in.
     *    Will be passed the new string since the last call.
     * @param {Function(String wholeResponse)} doneCallback
     *    A callback to be called when the request is complete.
     *    Will be passed the total response
     */
-   streamingXhr.fetch = function(url, streamCallback, doneCallback){
+   streamingXhr.fetch = function(url, progressCallback, doneCallback){
       doneCallback = doneCallback || always;
    
       var xhr = new XMLHttpRequest();
-      var charsSent = 0;
+      var numberOfCharsGivenToCallback = 0;
 
       xhr.open("GET", url, true);
       xhr.send(null);
 
-      function handleInput() {
+      function handleProgress() {
+         
+         try{
+            var textSoFar = xhr.responseText;
+         } catch(e) {
+            // ie sometimes errors if you try to get the responseText too early but just
+            // ignore it when this happens.
+            return;
+         }
 
-         if( xhr.responseText.length > charsSent ) {
+         if( textSoFar.length > numberOfCharsGivenToCallback ) {
 
-            var newResponseText = xhr.responseText.substr(charsSent);
+            var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
 
-            charsSent = xhr.responseText.length;
+            progressCallback( latestText );
 
-            streamCallback( newResponseText );
+            numberOfCharsGivenToCallback = textSoFar.length;
          }
       }
       
-      // TODO: where onprogress isn't supported, poll the responseText.      
-      xhr.onprogress = handleInput;         
-      
-
-      xhr.onload = function() {
+      function handleDone() {
          // in case the xhr doesn't support partial loading, by registering the same callback
          // onload, we at least get the whole response. This shouldn't be necessary once
          // polling is implemented in lieu of onprogress.      
-         handleInput();
+         handleProgress();
          
          doneCallback( xhr.responseText );
-      }
+      }      
+         
+      listenToXhr( xhr, handleProgress, handleDone);
    };
+   
+   /* xhr2 already supports everything that we need so very little abstraction required.\
+   *  listenToXhr2 is one of two possible values to use as listenToXhr  
+   */
+   function listenToXhr2(xhr, progressListener, completeListener) {      
+      xhr.onprogress = progressListener;
+      xhr.onload = completeListener;
+   }
+
+   /* xhr1 supports little so a bit more work is needed 
+    * listenToXhr1 is one of two possible values to use as listenToXhr  
+    */           
+   function listenToXhr1(xhr, progressListener, completeListener){
+   
+      // We are recieving the content, check for progress as often as the browser allows. 
+      // The progress listener makes sure there is something to report so just call it as often 
+      // as possible regardless of if something happened to the xhr1 object.
+      var interval = window.setInterval(progressListener, 0);      
+   
+      // handle the request being complete: 
+      xhr.onreadystatechange = function() {
+
+         if(this.readyState == 4 ) {
+         
+            // XHR is complete. Notify of completeness and stop notifying of progress:
+            if( this.status == 200 ) {             
+               completeListener();
+            }
+            
+            window.clearInterval(interval);
+         }               
+      };
+   }
+      
+   function supportsXhr2(){
+      return ('onprogress' in new XMLHttpRequest());
+   }      
+   
+   /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
+    * supports
+    * 
+    * @function
+    * 
+    * @param {XmlHttpRequest} xhr
+    * @param {Function} progressListener
+    * @param {Function} completeListener
+    */
+   var listenToXhr = supportsXhr2()? listenToXhr2 : listenToXhr1;   
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
 
@@ -1269,6 +1345,8 @@ var oboe = (function(oboe){
          this.close();
       }.bind(this);
    }
+   
+   var oboeProto = OboeParser.prototype;
 
    /**
     * Ask this oboe instance to fetch the given url
@@ -1278,7 +1356,7 @@ var oboe = (function(oboe){
     *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
     *    works in a very similar to normal ajax.
     */      
-   OboeParser.prototype.fetch = function(url, doneCallback) {
+   oboeProto.fetch = function(url, doneCallback) {
 
       // TODO: in if in node, use require('http') instead of ajax
 
@@ -1301,7 +1379,7 @@ var oboe = (function(oboe){
     * 
     * @param {String} nextDrip
     */
-   OboeParser.prototype.read = function (nextDrip) {
+   oboeProto.read = function (nextDrip) {
       if( this.closed ) {
          throw Error('closed');
       }
@@ -1319,7 +1397,7 @@ var oboe = (function(oboe){
     * called when the input is done
     * 
     */
-   OboeParser.prototype.close = function () {
+   oboeProto.close = function () {
       this.closed = true;
       
       // we won't fire any more events again so forget our listeners:
@@ -1345,7 +1423,7 @@ var oboe = (function(oboe){
    /**
     * Notify any of the listeners in a list that are interested in the path.       
     */  
-   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
+   oboeProto._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
       var nodeList = ancestors.concat([node]);
 
@@ -1359,14 +1437,14 @@ var oboe = (function(oboe){
    /**
     * Something has been found. Notify matching listeners.
     */
-   OboeParser.prototype.nodeFound = function( node, path, ancestors ) {   
+   oboeProto.nodeFound = function( node, path, ancestors ) {   
       this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
    };
    
    /**
     * A path has been found. Notify matching listeners.
     */
-   OboeParser.prototype.pathFound = function( node, path, ancestors ) {   
+   oboeProto.pathFound = function( node, path, ancestors ) {   
       this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
    };
 
@@ -1374,7 +1452,7 @@ var oboe = (function(oboe){
     * 
     * @param error
     */
-   OboeParser.prototype.notifyErrors = function(error) {
+   oboeProto.notifyErrors = function(error) {
       callAll(this._errorListeners, [error]);            
    };
 
@@ -1478,7 +1556,7 @@ var oboe = (function(oboe){
     * 
     * @param {Object} [context] the context ('this') for the callback
     */
-   OboeParser.prototype.onPath = function (jsonPath, callback, context) {
+   oboeProto.onPath = function (jsonPath, callback, context) {
    
       on(this._pathMatchedListeners, jsonPath, callback, context);
       return this; // chaining
@@ -1492,7 +1570,7 @@ var oboe = (function(oboe){
     * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
     * @param {Object} [context] the context ('this') for the callback
     */
-   OboeParser.prototype.onFind = function (jsonPath, callback, context) {
+   oboeProto.onFind = function (jsonPath, callback, context) {
    
       on(this._nodeFoundListeners, jsonPath, callback, context);
       return this; // chaining
@@ -1503,7 +1581,7 @@ var oboe = (function(oboe){
     *
     * @param {Function} callback
     */
-   OboeParser.prototype.onError = function (callback) {
+   oboeProto.onError = function (callback) {
 
       this._errorListeners.push(callback);
       return this; // chaining

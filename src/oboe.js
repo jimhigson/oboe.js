@@ -60,6 +60,8 @@ var oboe = (function(oboe){
          this.close();
       }.bind(this);
    }
+   
+   var oboeProto = OboeParser.prototype;
 
    /**
     * Ask this oboe instance to fetch the given url
@@ -69,7 +71,7 @@ var oboe = (function(oboe){
     *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
     *    works in a very similar to normal ajax.
     */      
-   OboeParser.prototype.fetch = function(url, doneCallback) {
+   oboeProto.fetch = function(url, doneCallback) {
 
       // TODO: in if in node, use require('http') instead of ajax
 
@@ -92,7 +94,7 @@ var oboe = (function(oboe){
     * 
     * @param {String} nextDrip
     */
-   OboeParser.prototype.read = function (nextDrip) {
+   oboeProto.read = function (nextDrip) {
       if( this.closed ) {
          throw Error('closed');
       }
@@ -110,7 +112,7 @@ var oboe = (function(oboe){
     * called when the input is done
     * 
     */
-   OboeParser.prototype.close = function () {
+   oboeProto.close = function () {
       this.closed = true;
       
       // we won't fire any more events again so forget our listeners:
@@ -136,7 +138,7 @@ var oboe = (function(oboe){
    /**
     * Notify any of the listeners in a list that are interested in the path.       
     */  
-   OboeParser.prototype._notifyListeners = function ( listenerList, node, path, ancestors ) {
+   oboeProto._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
       var nodeList = ancestors.concat([node]);
 
@@ -150,14 +152,14 @@ var oboe = (function(oboe){
    /**
     * Something has been found. Notify matching listeners.
     */
-   OboeParser.prototype.nodeFound = function( node, path, ancestors ) {   
+   oboeProto.nodeFound = function( node, path, ancestors ) {   
       this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
    };
    
    /**
     * A path has been found. Notify matching listeners.
     */
-   OboeParser.prototype.pathFound = function( node, path, ancestors ) {   
+   oboeProto.pathFound = function( node, path, ancestors ) {   
       this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
    };
 
@@ -165,7 +167,7 @@ var oboe = (function(oboe){
     * 
     * @param error
     */
-   OboeParser.prototype.notifyErrors = function(error) {
+   oboeProto.notifyErrors = function(error) {
       callAll(this._errorListeners, [error]);            
    };
 
@@ -269,7 +271,7 @@ var oboe = (function(oboe){
     * 
     * @param {Object} [context] the context ('this') for the callback
     */
-   OboeParser.prototype.onPath = function (jsonPath, callback, context) {
+   oboeProto.onPath = function (jsonPath, callback, context) {
    
       on(this._pathMatchedListeners, jsonPath, callback, context);
       return this; // chaining
@@ -283,7 +285,7 @@ var oboe = (function(oboe){
     * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
     * @param {Object} [context] the context ('this') for the callback
     */
-   OboeParser.prototype.onFind = function (jsonPath, callback, context) {
+   oboeProto.onFind = function (jsonPath, callback, context) {
    
       on(this._nodeFoundListeners, jsonPath, callback, context);
       return this; // chaining
@@ -294,7 +296,7 @@ var oboe = (function(oboe){
     *
     * @param {Function} callback
     */
-   OboeParser.prototype.onError = function (callback) {
+   oboeProto.onError = function (callback) {
 
       this._errorListeners.push(callback);
       return this; // chaining
