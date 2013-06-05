@@ -65,7 +65,7 @@ var jsonPathCompiler = (function () {
    
       return stackIndex == -1 || // -1 is the root 
              previousExpr(pathStack, nodeStack, stackIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, null, null, pathStack, nodeStack, stackIndex-1);         
+             multipleUnnamedNodesExpr(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
    }      
    
    /**
@@ -89,7 +89,7 @@ var jsonPathCompiler = (function () {
    
       // kick off the parsing by passing through to the first expression with the stackIndex set to the
       // top of the stack:
-      var exprMatch = startingExpr(pathStack, nodeStack, pathStack.length-1);
+      var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
                             
       // Returning exactly true indicates that there has been a match but no node is captured. 
       // By default, the node at the top of the stack gets returned. Just like in css4 selector 
@@ -131,7 +131,7 @@ var jsonPathCompiler = (function () {
 
       if(tokenMatch) {
          var compiledParser = parserGenerator(parserGeneratedSoFar, tokenMatch),
-             remaining = jsonPath.substr(tokenMatch[0].length);                
+             remaining = jsonPath.substr(len(tokenMatch[0]));                
                                
          return onSuccess(remaining, compiledParser);
       }         

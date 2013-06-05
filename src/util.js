@@ -1,9 +1,13 @@
 function lastOf(array) {
-   return array[array.length-1];
+   return array[len(array)-1];
 }
 
 function isArray(a) {
    return a && a.constructor === Array;
+}
+
+function len(array){
+   return array.length;
 }
 
 function toArray(arrayLikeThing, startIndex) {
@@ -14,10 +18,12 @@ function toArray(arrayLikeThing, startIndex) {
    Call each of a list of functions with the same arguments, ignoring any return
    values.
  */
-function callAll( fns, args ) {
+function callAll( fns, scope /*, arg1, arg2, arg3...*/ ) {
+
+   var args = toArray(arguments, 2);
 
    fns.forEach(function( fn ){
-      fn.apply(null, args);
+      fn.apply(scope, args);
    });
 }
 
@@ -31,9 +37,9 @@ function firstMatching( fns, args, onFail ) {
 
    var rtn;
 
-   for (var i = 0; i < fns.length; i++) {
+   for (var i = 0; i < len(fns); i++) {
             
-      if( rtn = fns[i].apply(null, args) ) {
+      if( rtn = fns[i].apply(undefined, args) ) {
          return rtn;
       }      
    }  
@@ -48,8 +54,8 @@ function firstMatching( fns, args, onFail ) {
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
    var args = toArray(arguments);
-   args[0] = null; // the first argument to bind should be null since we
-                   // wish to specify no context
+   args[0] = undefined; // the first argument to bind should be null since we
+                        // wish to specify no context
 
    return fn.bind.apply(fn, args); 
 }

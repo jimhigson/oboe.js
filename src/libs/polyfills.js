@@ -12,8 +12,8 @@
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
    arrayProto.forEach = arrayProto.forEach || function( func ){
-   
-      for( var i = 0 ; i < this.length ; i++ ) {      
+         
+      for( var i = 0 ; i < len(this) ; i++ ) {      
          func( this[i] );    
       }      
    };         

@@ -92,13 +92,13 @@ var streamingXhr = (function () {
             return;
          }
 
-         if( textSoFar.length > numberOfCharsGivenToCallback ) {
+         if( len(textSoFar) > numberOfCharsGivenToCallback ) {
 
             var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
 
             progressCallback( latestText );
 
-            numberOfCharsGivenToCallback = textSoFar.length;
+            numberOfCharsGivenToCallback = len(textSoFar);
          }
       }
       

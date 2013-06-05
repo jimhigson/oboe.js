@@ -23,10 +23,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // the root node. This is not always the same as nodeStack[0], for example after finishing parsing
          // the nodeStack will be empty but this will preserve a reference to the root element after parsing is
          // finished
-   ,     root 
-   
-         // local undefined allows slightly better minification:
-   ,     undefined;
+   ,     root;
    
    /**
     * Manage the state and notifications for when a new node is found.
@@ -49,7 +46,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
          // to finding the root node because non-root nodes will have their paths notified as their keys are 
          // discovered. Because this is the root, it can't have a key, hence null
-         keyDiscovered(null, foundNode);                  
+         keyDiscovered(undefined, foundNode);                  
          
          // store a reference to the root node (root var declared at top of file)
          root = foundNode;
@@ -93,7 +90,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
     **/  
    function keyDiscovered(key, value) {
       
-      var fullPath = key === null? pathStack : pathStack.concat(key);
+      var fullPath = key === undefined? pathStack : pathStack.concat(key);
    
       oboeInstance.pathFound(value, fullPath, nodeStack);
       curKey = key;      
@@ -119,7 +116,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       if( isArray(parentOfCompleteNode) ) {
          // we're going back to an array, the curKey (the key the next item will be given) needs to match
          // the length of that array:
-         curKey = parentOfCompleteNode.length;
+         curKey = len(parentOfCompleteNode);
       } else {
          // we're in an object, curKey has been used now and we don't know what the next key will 
          // be so mark as unknown:

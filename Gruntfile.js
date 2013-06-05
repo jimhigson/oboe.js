@@ -7,9 +7,9 @@ module.exports = function (grunt) {
    ,  concat: {
          oboe:{         
             src: [
-               'src/libs/polyfills.js'
-            ,  'src/libs/clarinet.js'
-            ,  'src/util.js'               
+               'src/util.js'            
+            ,  'src/libs/polyfills.js'
+            ,  'src/libs/clarinet.js'               
             ,  'src/streamingXhr.js'
             ,  'src/jsonPath.js'
             ,  'src/jsonBuilder.js'
@@ -24,7 +24,8 @@ module.exports = function (grunt) {
             src: 'dist/oboe.concat.js',
             dest: '.',
             wrapper: [
-               '(function () {'
+               // having a local undefined allows slightly better minification:
+               '(function (undefined) {' 
             ,  'window.oboe = oboe; })();'
             ]
          }

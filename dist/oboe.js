@@ -1,4 +1,67 @@
-(function () {(function(arrayProto, functionProto){
+(function (undefined) {function lastOf(array) {
+   return array[len(array)-1];
+}
+
+function isArray(a) {
+   return a && a.constructor === Array;
+}
+
+function len(array){
+   return array.length;
+}
+
+function toArray(arrayLikeThing, startIndex) {
+   return Array.prototype.slice.call(arrayLikeThing, startIndex);
+}
+
+/*
+   Call each of a list of functions with the same arguments, ignoring any return
+   values.
+ */
+function callAll( fns, scope /*, arg1, arg2, arg3...*/ ) {
+
+   var args = toArray(arguments, 2);
+
+   fns.forEach(function( fn ){
+      fn.apply(scope, args);
+   });
+}
+
+/* call a list of functions with the same args until one returns truthy.
+
+   Returns the first return value that is given that is non-truthy.
+   
+   If none are found, calls onFail and returns whatever that gives    
+ */
+function firstMatching( fns, args, onFail ) {
+
+   var rtn;
+
+   for (var i = 0; i < len(fns); i++) {
+            
+      if( rtn = fns[i].apply(undefined, args) ) {
+         return rtn;
+      }      
+   }  
+   
+   return onFail();
+}
+
+
+/** Partially complete the given function by filling it in with all arguments given
+ *  after the function itself. Returns the partially completed version.    
+ */
+function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
+
+   var args = toArray(arguments);
+   args[0] = undefined; // the first argument to bind should be null since we
+                        // wish to specify no context
+
+   return fn.bind.apply(fn, args); 
+}
+
+function always(){return true}
+(function(arrayProto, functionProto){
 
    /**
     * Here we have a minimal set of polyfills needed to let the code run in older browsers such
@@ -12,8 +75,8 @@
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
    arrayProto.forEach = arrayProto.forEach || function( func ){
-   
-      for( var i = 0 ; i < this.length ; i++ ) {      
+         
+      for( var i = 0 ; i < len(this) ; i++ ) {      
          func( this[i] );    
       }      
    };         
@@ -624,63 +687,6 @@ if(typeof FastList === 'function') {
 
 })(typeof exports === "undefined" ? clarinet = {} : exports);
 
-function lastOf(array) {
-   return array[array.length-1];
-}
-
-function isArray(a) {
-   return a && a.constructor === Array;
-}
-
-function toArray(arrayLikeThing, startIndex) {
-   return Array.prototype.slice.call(arrayLikeThing, startIndex);
-}
-
-/*
-   Call each of a list of functions with the same arguments, ignoring any return
-   values.
- */
-function callAll( fns, args ) {
-
-   fns.forEach(function( fn ){
-      fn.apply(null, args);
-   });
-}
-
-/* call a list of functions with the same args until one returns truthy.
-
-   Returns the first return value that is given that is non-truthy.
-   
-   If none are found, calls onFail and returns whatever that gives    
- */
-function firstMatching( fns, args, onFail ) {
-
-   var rtn;
-
-   for (var i = 0; i < fns.length; i++) {
-            
-      if( rtn = fns[i].apply(null, args) ) {
-         return rtn;
-      }      
-   }  
-   
-   return onFail();
-}
-
-
-/** Partially complete the given function by filling it in with all arguments given
- *  after the function itself. Returns the partially completed version.    
- */
-function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
-
-   var args = toArray(arguments);
-   args[0] = null; // the first argument to bind should be null since we
-                   // wish to specify no context
-
-   return fn.bind.apply(fn, args); 
-}
-
-function always(){return true}
 /**
  * An xhr wrapper that calls a callback whenever some more of the
  * response is available, without waiting for all of it.
@@ -775,13 +781,13 @@ var streamingXhr = (function () {
             return;
          }
 
-         if( textSoFar.length > numberOfCharsGivenToCallback ) {
+         if( len(textSoFar) > numberOfCharsGivenToCallback ) {
 
             var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
 
             progressCallback( latestText );
 
-            numberOfCharsGivenToCallback = textSoFar.length;
+            numberOfCharsGivenToCallback = len(textSoFar);
          }
       }
       
@@ -866,7 +872,7 @@ var jsonPathCompiler = (function () {
    
       return stackIndex == -1 || // -1 is the root 
              previousExpr(pathStack, nodeStack, stackIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, null, null, pathStack, nodeStack, stackIndex-1);         
+             multipleUnnamedNodesExpr(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
    }      
    
    /**
@@ -890,7 +896,7 @@ var jsonPathCompiler = (function () {
    
       // kick off the parsing by passing through to the first expression with the stackIndex set to the
       // top of the stack:
-      var exprMatch = startingExpr(pathStack, nodeStack, pathStack.length-1);
+      var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
                             
       // Returning exactly true indicates that there has been a match but no node is captured. 
       // By default, the node at the top of the stack gets returned. Just like in css4 selector 
@@ -932,7 +938,7 @@ var jsonPathCompiler = (function () {
 
       if(tokenMatch) {
          var compiledParser = parserGenerator(parserGeneratedSoFar, tokenMatch),
-             remaining = jsonPath.substr(tokenMatch[0].length);                
+             remaining = jsonPath.substr(len(tokenMatch[0]));                
                                
          return onSuccess(remaining, compiledParser);
       }         
@@ -1123,10 +1129,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // the root node. This is not always the same as nodeStack[0], for example after finishing parsing
          // the nodeStack will be empty but this will preserve a reference to the root element after parsing is
          // finished
-   ,     root 
-   
-         // local undefined allows slightly better minification:
-   ,     undefined;
+   ,     root;
    
    /**
     * Manage the state and notifications for when a new node is found.
@@ -1149,7 +1152,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
          // to finding the root node because non-root nodes will have their paths notified as their keys are 
          // discovered. Because this is the root, it can't have a key, hence null
-         keyDiscovered(null, foundNode);                  
+         keyDiscovered(undefined, foundNode);                  
          
          // store a reference to the root node (root var declared at top of file)
          root = foundNode;
@@ -1193,7 +1196,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
     **/  
    function keyDiscovered(key, value) {
       
-      var fullPath = key === null? pathStack : pathStack.concat(key);
+      var fullPath = key === undefined? pathStack : pathStack.concat(key);
    
       oboeInstance.pathFound(value, fullPath, nodeStack);
       curKey = key;      
@@ -1219,7 +1222,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       if( isArray(parentOfCompleteNode) ) {
          // we're going back to an array, the curKey (the key the next item will be given) needs to match
          // the length of that array:
-         curKey = parentOfCompleteNode.length;
+         curKey = len(parentOfCompleteNode);
       } else {
          // we're in an object, curKey has been used now and we don't know what the next key will 
          // be so mark as unknown:
@@ -1389,7 +1392,7 @@ var oboe = (function(){
       clarinet.onend = 
       clarinet.oncloseobject =                         
       clarinet.onclosearray = 
-      clarinet.onerror = null;
+      clarinet.onerror = undefined;
       
       clarinet.close();            
    };
@@ -1401,11 +1404,7 @@ var oboe = (function(){
       
       var nodeList = ancestors.concat([node]);
 
-      for (var i = 0; i < listenerList.length; i++) {
-         // each item in the listener list is already a function that will test if the callback needs to be 
-         // called and call it if it does. So all we have to do here is execute.
-         listenerList[i].call(this, node, path, ancestors, nodeList);         
-      }      
+      callAll( listenerList, this, node, path, ancestors, nodeList );
    };
    
    /**
@@ -1427,9 +1426,9 @@ var oboe = (function(){
     * @param error
     */
    oboeProto.notifyErrors = function(error) {
-      callAll(this._errorListeners, [error]);            
+      callAll( this._errorListeners, undefined, error );            
    };
-
+   
 
    /**
     * Create a new function that tests if something found in the json matches the pattern and, if it does,
@@ -1467,7 +1466,7 @@ var oboe = (function(){
          //    undefined: like above, but we don't have the node yet. ie, we know there is a
          //       node that matches but we don't know if it is an array, object, string
          //       etc yet so we can't say anything about it. Null isn't used here because
-         //       that would be indistinguishable from us finding a node with a value of
+         //       undefinedthat would be indistinguishable from us finding a node with a value of
          //       null.
          //                      
          if( foundNode !== false ) {                                 

@@ -109,7 +109,7 @@ var oboe = (function(){
       clarinet.onend = 
       clarinet.oncloseobject =                         
       clarinet.onclosearray = 
-      clarinet.onerror = null;
+      clarinet.onerror = undefined;
       
       clarinet.close();            
    };
@@ -121,11 +121,7 @@ var oboe = (function(){
       
       var nodeList = ancestors.concat([node]);
 
-      for (var i = 0; i < listenerList.length; i++) {
-         // each item in the listener list is already a function that will test if the callback needs to be 
-         // called and call it if it does. So all we have to do here is execute.
-         listenerList[i].call(this, node, path, ancestors, nodeList);         
-      }      
+      callAll( listenerList, this, node, path, ancestors, nodeList );
    };
    
    /**
@@ -147,9 +143,9 @@ var oboe = (function(){
     * @param error
     */
    oboeProto.notifyErrors = function(error) {
-      callAll(this._errorListeners, [error]);            
+      callAll( this._errorListeners, undefined, error );            
    };
-
+   
 
    /**
     * Create a new function that tests if something found in the json matches the pattern and, if it does,
@@ -187,7 +183,7 @@ var oboe = (function(){
          //    undefined: like above, but we don't have the node yet. ie, we know there is a
          //       node that matches but we don't know if it is an array, object, string
          //       etc yet so we can't say anything about it. Null isn't used here because
-         //       that would be indistinguishable from us finding a node with a value of
+         //       undefinedthat would be indistinguishable from us finding a node with a value of
          //       null.
          //                      
          if( foundNode !== false ) {                                 
