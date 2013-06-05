@@ -18,7 +18,7 @@
 
             // in practice, since we're running on an internal network and this is a small file,
             // we'll probably only get one callback         
-            streamingXhr.fetch(
+            streamingXhr(
                '/test/test/json/smallestPossible.json', 
                callbacks.add(function(nextDrip){
                   combinedResult += nextDrip;                                                                                     
@@ -38,7 +38,7 @@
          queue.call("ask the streaming xhr to fetch", function(callbacks){
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
-            streamingXhr.fetch(
+            streamingXhr(
                '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
@@ -66,7 +66,7 @@
          queue.call("ask the streaming xhr to fetch", function(callbacks){
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
-            streamingXhr.fetch(
+            streamingXhr(
                '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
@@ -90,7 +90,7 @@
          queue.call("ask the streaming xhr to fetch", function(callbacks){
          
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
-            streamingXhr.fetch(
+            streamingXhr(
                '/test/test/json/twentyThousandRecords.json',
                 
                function onProgress(){ numberOfProgressCallbacks++; },

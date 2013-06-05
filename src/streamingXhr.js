@@ -71,48 +71,47 @@ var streamingXhr = (function () {
     *    A callback to be called when the request is complete.
     *    Will be passed the total response
     */
-   return { 
-      fetch: function(url, progressCallback, doneCallback){
-      
-         doneCallback = doneCallback || always;
-      
-         var xhr = new XMLHttpRequest();
-         var numberOfCharsGivenToCallback = 0;
+   return function(url, progressCallback, doneCallback) {
+      // TODO: in if in node, use require('http') instead of ajax
    
-         xhr.open("GET", url, true);
-         xhr.send(null);
+      doneCallback = doneCallback || always;
    
-         function handleProgress() {
-            
-            try{
-               var textSoFar = xhr.responseText;
-            } catch(e) {
-               // ie sometimes errors if you try to get the responseText too early but just
-               // ignore it when this happens.
-               return;
-            }
-   
-            if( textSoFar.length > numberOfCharsGivenToCallback ) {
-   
-               var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
-   
-               progressCallback( latestText );
-   
-               numberOfCharsGivenToCallback = textSoFar.length;
-            }
-         }
+      var xhr = new XMLHttpRequest();
+      var numberOfCharsGivenToCallback = 0;
+
+      xhr.open("GET", url, true);
+      xhr.send(null);
+
+      function handleProgress() {
          
-         function handleDone() {
-            // in case the xhr doesn't support partial loading, by registering the same callback
-            // onload, we at least get the whole response. This shouldn't be necessary once
-            // polling is implemented in lieu of onprogress.      
-            handleProgress();
-            
-            doneCallback( xhr.responseText );
-         }      
-            
-         listenToXhr( xhr, handleProgress, handleDone);
+         try{
+            var textSoFar = xhr.responseText;
+         } catch(e) {
+            // ie sometimes errors if you try to get the responseText too early but just
+            // ignore it when this happens.
+            return;
+         }
+
+         if( textSoFar.length > numberOfCharsGivenToCallback ) {
+
+            var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
+
+            progressCallback( latestText );
+
+            numberOfCharsGivenToCallback = textSoFar.length;
+         }
       }
-   };   
+      
+      function handleDone() {
+         // in case the xhr doesn't support partial loading, by registering the same callback
+         // onload, we at least get the whole response. This shouldn't be necessary once
+         // polling is implemented in lieu of onprogress.      
+         handleProgress();
+         
+         doneCallback( xhr.responseText );
+      }      
+         
+      listenToXhr( xhr, handleProgress, handleDone);
+   };
 
 })();

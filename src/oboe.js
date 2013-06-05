@@ -54,9 +54,7 @@ var oboe = (function(){
     */      
    oboeProto.fetch = function(url, doneCallback) {
 
-      // TODO: in if in node, use require('http') instead of ajax
-
-      streamingXhr.fetch(
+      streamingXhr(
          url, 
          this.read.bind(this),
          function( _wholeResponseText ) {
