@@ -44,18 +44,23 @@
          }
       }
       
-      // TODO: where onprogress isn't supported, poll the responseText.      
-      xhr.onprogress = handleInput;         
-      
-
-      xhr.onload = function() {
+      function handleDone() {
          // in case the xhr doesn't support partial loading, by registering the same callback
          // onload, we at least get the whole response. This shouldn't be necessary once
          // polling is implemented in lieu of onprogress.      
          handleInput();
          
          doneCallback( xhr.responseText );
-      }
+      }      
+         
+      listenToXhr( xhr, handleInput, handleDone);
    };
+   
+   /* little abstration to get XHRs working sensibly in IE */
+   function listenToXhr(xhr, progressListener, completeListener) {
+      
+      xhr.onprogress = progressListener;
+      xhr.onload = completeListener;
+   }
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
