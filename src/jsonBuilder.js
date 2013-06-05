@@ -1,15 +1,16 @@
 /**
  * Listen to the given clarinet instance and progressively build up the json based on the callbacks it provides.
  * 
- * Notify the oboeInstance when interesting things happen.
+ * Notify the given callbacks when interesting things happen.
  * 
  * @param clarinet
- * @param oboeInstance
+ * @param {Function} nodeFoundCallback
+ * @param {Function} pathFoundCallback
  */
-function jsonBuilder( clarinet, oboeInstance ) {
+function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
-   // this state and notify the oboeInstance 
+   // this state and notify the callbacks 
     
    var   
          // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
@@ -92,7 +93,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       
       var fullPath = key === undefined? pathStack : pathStack.concat(key);
    
-      oboeInstance.pathFound(value, fullPath, nodeStack);
+      pathFoundCallback(value, fullPath, nodeStack);
       curKey = key;      
    }
 
@@ -109,7 +110,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      oboeInstance.nodeFound( completeNode, pathStack, nodeStack );      
+      nodeFoundCallback( completeNode, pathStack, nodeStack );      
             
       pathStack.pop();   
          

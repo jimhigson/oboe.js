@@ -26,20 +26,27 @@ var oboe = (function(){
     */      
    function OboeParser(options) {
    
-      var clarinetParser = clarinet.parser(options);
+      var clarinetParser = clarinet.parser(options),
+          nodeFoundListeners     = [],
+          pathMatchedListeners   = [];
    
-      this._nodeFoundListeners = [];
-      this._pathMatchedListeners = [];
-      this._errorListeners = [];
-      this._clarinet = clarinetParser;               
-      this._jsonBuilder = jsonBuilder(clarinetParser, this);
-            
-      clarinetParser.onerror = function(e) {
-         this.notifyErrors(e);
-         
-         // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-         this.close();
-      }.bind(this);
+      this._nodeFoundListeners   = nodeFoundListeners;
+      this._pathMatchedListeners = pathMatchedListeners;
+      
+      this._errorListeners       = [];
+      this._clarinet             = clarinetParser;               
+      this._jsonBuilder          = jsonBuilder(
+                                       clarinetParser, 
+                                       this._notifyListeners.bind(this, nodeFoundListeners), 
+                                       this._notifyListeners.bind(this, pathMatchedListeners)
+                                   );
+                                               
+      clarinetParser.onerror     = function(e) {
+                                       this.notifyErrors(e);
+                                       
+                                       // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
+                                       this.close();
+                                   }.bind(this);
    }
    
    var oboeProto = OboeParser.prototype;
@@ -115,7 +122,9 @@ var oboe = (function(){
    };
    
    /**
-    * Notify any of the listeners in a list that are interested in the path.       
+    * Notify any of the listeners in a list that are interested in the path.
+    * 
+    * @param {Array} listenerList one of this._nodeFoundListeners or this._pathMatchedListeners
     */  
    oboeProto._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
@@ -124,20 +133,6 @@ var oboe = (function(){
       callAll( listenerList, this, node, path, ancestors, nodeList );
    };
    
-   /**
-    * Something has been found. Notify matching listeners.
-    */
-   oboeProto.nodeFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
-   };
-   
-   /**
-    * A path has been found. Notify matching listeners.
-    */
-   oboeProto.pathFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
-   };
-
    /**
     * 
     * @param error

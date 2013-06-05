@@ -1107,15 +1107,16 @@ var jsonPathCompiler = (function () {
 /**
  * Listen to the given clarinet instance and progressively build up the json based on the callbacks it provides.
  * 
- * Notify the oboeInstance when interesting things happen.
+ * Notify the given callbacks when interesting things happen.
  * 
  * @param clarinet
- * @param oboeInstance
+ * @param {Function} nodeFoundCallback
+ * @param {Function} pathFoundCallback
  */
-function jsonBuilder( clarinet, oboeInstance ) {
+function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
-   // this state and notify the oboeInstance 
+   // this state and notify the callbacks 
     
    var   
          // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
@@ -1198,7 +1199,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       
       var fullPath = key === undefined? pathStack : pathStack.concat(key);
    
-      oboeInstance.pathFound(value, fullPath, nodeStack);
+      pathFoundCallback(value, fullPath, nodeStack);
       curKey = key;      
    }
 
@@ -1215,7 +1216,7 @@ function jsonBuilder( clarinet, oboeInstance ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      oboeInstance.nodeFound( completeNode, pathStack, nodeStack );      
+      nodeFoundCallback( completeNode, pathStack, nodeStack );      
             
       pathStack.pop();   
          
@@ -1309,20 +1310,27 @@ var oboe = (function(){
     */      
    function OboeParser(options) {
    
-      var clarinetParser = clarinet.parser(options);
+      var clarinetParser = clarinet.parser(options),
+          nodeFoundListeners     = [],
+          pathMatchedListeners   = [];
    
-      this._nodeFoundListeners = [];
-      this._pathMatchedListeners = [];
-      this._errorListeners = [];
-      this._clarinet = clarinetParser;               
-      this._jsonBuilder = jsonBuilder(clarinetParser, this);
-            
-      clarinetParser.onerror = function(e) {
-         this.notifyErrors(e);
-         
-         // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-         this.close();
-      }.bind(this);
+      this._nodeFoundListeners   = nodeFoundListeners;
+      this._pathMatchedListeners = pathMatchedListeners;
+      
+      this._errorListeners       = [];
+      this._clarinet             = clarinetParser;               
+      this._jsonBuilder          = jsonBuilder(
+                                       clarinetParser, 
+                                       this._notifyListeners.bind(this, nodeFoundListeners), 
+                                       this._notifyListeners.bind(this, pathMatchedListeners)
+                                   );
+                                               
+      clarinetParser.onerror     = function(e) {
+                                       this.notifyErrors(e);
+                                       
+                                       // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
+                                       this.close();
+                                   }.bind(this);
    }
    
    var oboeProto = OboeParser.prototype;
@@ -1398,7 +1406,9 @@ var oboe = (function(){
    };
    
    /**
-    * Notify any of the listeners in a list that are interested in the path.       
+    * Notify any of the listeners in a list that are interested in the path.
+    * 
+    * @param {Array} listenerList one of this._nodeFoundListeners or this._pathMatchedListeners
     */  
    oboeProto._notifyListeners = function ( listenerList, node, path, ancestors ) {
       
@@ -1407,20 +1417,6 @@ var oboe = (function(){
       callAll( listenerList, this, node, path, ancestors, nodeList );
    };
    
-   /**
-    * Something has been found. Notify matching listeners.
-    */
-   oboeProto.nodeFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._nodeFoundListeners, node, path, ancestors);
-   };
-   
-   /**
-    * A path has been found. Notify matching listeners.
-    */
-   oboeProto.pathFound = function( node, path, ancestors ) {   
-      this._notifyListeners(this._pathMatchedListeners, node, path, ancestors);
-   };
-
    /**
     * 
     * @param error
