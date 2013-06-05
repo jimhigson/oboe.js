@@ -25,8 +25,8 @@ module.exports = function (grunt) {
             dest: '.',
             wrapper: [
                // having a local undefined allows slightly better minification:
-               '(function (undefined) {' 
-            ,  'window.oboe = oboe; })();'
+               '(function (window, undefined) {' 
+            ,  'window.oboe = oboe; })(window);'
             ]
          }
       }      
