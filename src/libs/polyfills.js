@@ -4,28 +4,7 @@
  * 
  * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
  * to make a custom build without this.
- * 
- * Why am I supporting IE8? Because the only Windows CD I could find in my box of old junk 
- * had XP on it. That's why.
  */
-
-if( !Array.prototype.filter ) {
-
-   /* Array.filter has to be a polyfill, clarinet expects it.
-    *  Ignoring all but function argument since not needed, eg can't take a context  */ 
-   Array.prototype.filter = function( func ){
-      var out = [];
-   
-      for( var i = 0 ; i < this.length ; i++ ) {
-      
-         if( func( this[i] ) ) {
-            out.push(this[i]);                                                            
-         }                  
-      }
-      
-      return out;
-   };         
-}
 
 if( !Array.prototype.forEach ) {
 
@@ -37,6 +16,25 @@ if( !Array.prototype.forEach ) {
          func( this[i] );    
       }      
    };         
+}
+
+if( !Array.prototype.filter ) {
+
+   /* Array.filter has to be a polyfill, clarinet expects it.
+    *  Ignoring all but function argument since not needed, eg can't take a context  */ 
+   Array.prototype.filter = function( func ){
+         
+      var out = [];
+   
+      // let's use the .forEach we just declared above to implement .filter
+      this.forEach(function(item){      
+         if( func( item ) ) {
+            out.push(item);                                                            
+         }                  
+      });
+      
+      return out;
+   };
 }
 
 if( !Function.prototype.bind ) {
