@@ -7,7 +7,7 @@
 
       // shorten the waiting time before a test fails. Default 30s is too long:
       setUp: function(){
-         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 1000; //1 second
+         jstestdriver.plugins.async.CallbackPool.TIMEOUT = 2000; //2 seconds
       },
    
       testCanAjaxInASmallKnownFile: function(queue) {
@@ -18,9 +18,12 @@
 
             // in practice, since we're running on an internal network and this is a small file,
             // we'll probably only get one callback         
-            streamingXhr.fetch('/test/test/json/smallestPossible.json', callbacks.add(function(nextDrip){
-               combinedResult += nextDrip;                                                                                     
-            }));            
+            streamingXhr.fetch(
+               '/test/test/json/smallestPossible.json', 
+               callbacks.add(function(nextDrip){
+                  combinedResult += nextDrip;                                                                                     
+               })
+            );            
          });
 
          queue.call("check we got the json back", function(){
@@ -28,20 +31,24 @@
          });      
       },
       
-      testCanAjaxInAVeryLargeFile: function(queue) {
+      testCanAjaxInAVeryLargeFileWithoutMissingAny: function(queue) {
       
          var combinedResult = '';
       
          queue.call("ask the streaming xhr to fetch", function(callbacks){
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
-            streamingXhr.fetch('/test/test/json/tenThousandRecords.json', function(nextDrip){
-               console.log('got a bit of json');
-               combinedResult += nextDrip;                                                                                     
-            },
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // when to move onto the next queuer            
-            callbacks.add(function(){}));            
+            streamingXhr.fetch(
+               '/test/test/json/tenThousandRecords.json',
+                
+               function(nextDrip){            
+                  combinedResult += nextDrip;                                                                                     
+               },
+               
+               // callback for when the stream is complete. we register this just so that jstd knows
+               // when to move onto the next queuer            
+               callbacks.noop()
+            )         
          });
 
          queue.call("check we got the correct json back", function(){
@@ -52,7 +59,36 @@
             // should have 10,000 records:                     
             assertEquals(10000, parsedResult.result.length);
          });      
-      }      
+      },
+      
+      testAjaxingInAVeryLargeFileGivesMoreThanOneCallback: function(queue) {
+      
+         var numberOfProgressCallbacks = 0;
+      
+         queue.call("ask the streaming xhr to fetch", function(callbacks){
+         
+            // since this is a large file, even serving locally we're going to get multiple callbacks:       
+            streamingXhr.fetch(
+               '/test/test/json/tenThousandRecords.json',
+                
+               function(nextDrip){            
+                  numberOfProgressCallbacks++;                                                                                     
+               },
+               
+               // callback for when the stream is complete. we register this just so that jstd knows
+               // when to move onto the next queuer            
+               callbacks.noop()
+            )                     
+         });
+
+         queue.call("check we got multiple callbacks", function(){
+                                        
+            if( numberOfProgressCallbacks < 2)(
+               fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
+                   "had multiple")                
+            );
+         });      
+      }            
    });
    
 

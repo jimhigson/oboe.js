@@ -16,14 +16,14 @@
     * Fetch something over ajax, calling back as often as new data is available.
     * 
     * @param {String} url
-    * @param {Function(String nextResponseDrip)} streamCallback
+    * @param {Function(String nextResponseDrip)} progressCallback
     *    A callback to be called repeatedly as the input comes in.
     *    Will be passed the new string since the last call.
     * @param {Function(String wholeResponse)} doneCallback
     *    A callback to be called when the request is complete.
     *    Will be passed the total response
     */
-   streamingXhr.fetch = function(url, streamCallback, doneCallback){
+   streamingXhr.fetch = function(url, progressCallback, doneCallback){
       doneCallback = doneCallback || always;
    
       var xhr = new XMLHttpRequest();
@@ -32,7 +32,7 @@
       xhr.open("GET", url, true);
       xhr.send(null);
 
-      function handleInput() {
+      function handleProgress() {
 
          if( xhr.responseText.length > charsSent ) {
 
@@ -40,7 +40,7 @@
 
             charsSent = xhr.responseText.length;
 
-            streamCallback( newResponseText );
+            progressCallback( newResponseText );
          }
       }
       
@@ -48,21 +48,22 @@
          // in case the xhr doesn't support partial loading, by registering the same callback
          // onload, we at least get the whole response. This shouldn't be necessary once
          // polling is implemented in lieu of onprogress.      
-         handleInput();
+         handleProgress();
          
          doneCallback( xhr.responseText );
       }      
          
-      listenToXhr( xhr, handleInput, handleDone);
+      listenToXhr( xhr, handleProgress, handleDone);
    };
    
-   /* little abstration to get XHRs working sensibly in IE */
-   function listenToNiceXhr(xhr, progressListener, completeListener) {      
+   /* xhr2 already supports everything that we need so very little abstraction required */
+   function listenToXhr2(xhr, progressListener, completeListener) {      
       xhr.onprogress = progressListener;
       xhr.onload = completeListener;
    }
-           
-   function listenToLegacyXhr(xhr, progressListener, completeListener){
+
+   /* xhr1 supports little so a bit more work is needed */           
+   function listenToXhr1(xhr, progressListener, completeListener){
    
       /* handle the resuest being complete */
       xhr.onreadystatechange = function() {
@@ -72,9 +73,13 @@
          }               
       };
       
-      
+            
    }
       
-   var listenToXhr = window.ActiveXObject? listenToLegacyXhr : listenToNiceXhr;   
+   function supportsXhr2(){
+      return ('onprogress' in new XMLHttpRequest());
+   }      
+      
+   var listenToXhr = supportsXhr2()? listenToXhr2 : listenToXhr1;   
 
 })(typeof exports === "undefined" ? streamingXhr = {} : exports);
