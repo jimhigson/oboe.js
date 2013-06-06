@@ -52,7 +52,7 @@ a neat way to route different parts of a json response to different parts of his
 # Browser support
 
 * IE8 and up
-* Good browsers
+* Good browsers. Chrome, Firefox, Safari etc.
 
 # Examples
 
