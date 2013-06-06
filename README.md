@@ -309,8 +309,9 @@ Unfortunately, IE before version 10
 While streaming is possible to work into older Internet Explorers, it requires the server-side to write
 out script tags which goes against Oboe's ethos of very simple streaming over standard REST semantics.
 
-In these older versions of IE Oboe gracefully degrades, it'll just fall back to waiting for the
-whole response to return, then fire all the events. A bit more like standard Ajax.
+In these older versions of IE Oboe gracefully degrades,
+it'll just fall back to waiting for the whole response to return, then fire all the events together.
+You don't have to change your code for the older browsers and it'll work like standard Ajax.
 
 
 ## Running the tests
@@ -358,6 +359,70 @@ Finally, to run the tests, from a second terminal run:
 
 If all goes well, you should get something like:
 
+```
+jimhigson ~/Sites/progressivejson ./build
+no tests specified, will run all
+building at Thu  6 Jun 2013 16:27:19 BST
+Will run oboe json tests( all ) against dev
+setting runnermode QUIET
+Firefox: Reset
+Firefox: Reset
+Microsoft Internet Explorer: Reset
+Microsoft Internet Explorer: Reset
+Chrome: Reset
+Chrome: Reset
+......................................................................
+......................................................................
+......................................................................
+......................................................................
+........................................................
+Total 336 tests (Passed: 335; Fails: 1; Errors: 0) (27284.00 ms)
+  Microsoft Internet Explorer 10.0 Windows: Run 112 tests (Passed: 112; Fails: 0; Errors 0) (27284.00 ms)
+  Chrome 28.0.1500.37 Mac OS: Run 112 tests (Passed: 112; Fails: 0; Errors 0) (6437.00 ms)
+  Firefox 21.0 Mac OS: Run 112 tests (Passed: 112; Fails: 0; Errors 0) (6130.00 ms)
+Running "concat:oboe" (concat) task
+File "dist/oboe.concat.js" created.
+
+Running "wrap:export" (wrap) task
+Wrapped files created in ".".
+
+Running "uglify:build" (uglify) task
+File "dist/oboe.min.js" created.
+
+Done, without errors.
+Will run oboe json tests( all ) against concat
+setting runnermode QUIET
+Firefox: Reset
+Firefox: Reset
+Chrome: Reset
+Chrome: Reset
+......................................................................
+......................................................................
+......................Microsoft Internet Explorer: Reset
+Microsoft Internet Explorer: Reset
+................................................
+.................................
+Total 243 tests (Passed: 243; Fails: 0; Errors: 0) (1007.00 ms)
+  Microsoft Internet Explorer 10.0 Windows: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (1007.00 ms)
+  Chrome 28.0.1500.37 Mac OS: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (683.00 ms)
+  Firefox 21.0 Mac OS: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (357.00 ms)
+Will run oboe json tests( all ) against minified
+setting runnermode QUIET
+Firefox: Reset
+Firefox: Reset
+Chrome: Reset
+Chrome: Reset
+Microsoft Internet Explorer: Reset
+Microsoft Internet Explorer: Reset
+......................................................................
+......................................................................
+......................................................................
+.................................
+Total 243 tests (Passed: 243; Fails: 0; Errors: 0) (1079.00 ms)
+  Microsoft Internet Explorer 10.0 Windows: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (1079.00 ms)
+  Chrome 28.0.1500.37 Mac OS: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (696.00 ms)
+  Firefox 21.0 Mac OS: Run 81 tests (Passed: 81; Fails: 0; Errors 0) (402.00 ms)
+```
 
 ## Use as a stream in node.js
 
