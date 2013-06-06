@@ -369,4 +369,3 @@ Oboe but it should be quite easy to do.
 * Oboe should also use standard js promises
 * Support for http request params when fetching via ajax
 * More error handling
-* Better support for Internet Explorer (I'm sure I have a Windows CD somewhere...)
