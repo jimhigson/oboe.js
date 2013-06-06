@@ -87,7 +87,10 @@
             try{
                var parsedResult = JSON.parse(combinedResult);
             } catch(e) {
-               fail('could not parse json "' + combinedResult + '" because ' + e);
+               fail('could not parse json "' + combinedResult + '" because ' + e
+                   + ' this might happen if the browsers are connecting directly' 
+                   + ' to jstd instead of through the proxy'
+                   );
             }
             
             // as per the name, should have 20,000 records in that file:                     
