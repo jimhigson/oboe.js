@@ -11,10 +11,6 @@ JSTD_JAR=~/dev/jstestdriver/JsTestDriver-1.3.5.jar
 SERVER=http://localhost:4224
 BASEPATH=~/Sites/progressivejson/
 
-# We need to start a simple node server to do end-to-end testing with streaming http:
-node test/slowserver/tenSlowNumbers.js &
-SLOW_NUMBER_JSON_HTTP_SERVER_PROCESS=$! 
-
 # We need the slow number server we just created to be available on the same domain as the 
 # jstd server to get around the browser's same origin policy.
 #
@@ -46,6 +42,4 @@ runjstd concat
 runjstd minified 
 
 mv dist/oboe.concat.js dist/oboe.js 
-
-# shut down our number json server
-kill $SLOW_NUMBER_JSON_HTTP_SERVER_PROCESS 
+ 
