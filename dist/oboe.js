@@ -717,7 +717,7 @@ var streamingXhr = (function () {
       // We are recieving the content, check for progress as often as the browser allows. 
       // The progress listener makes sure there is something to report so just call it as often 
       // as possible regardless of if something happened to the xhr1 object.
-      var interval = window.setInterval(progressListener, 0);      
+      var interval = window.setInterval(progressListener, 50);      
    
       // handle the request being complete: 
       xhr.onreadystatechange = function() {
@@ -734,7 +734,7 @@ var streamingXhr = (function () {
       };
    }
       
-   function supportsXhr2(){
+   function browserSupportsXhr2(){
       return ('onprogress' in new XMLHttpRequest());
    }      
    
@@ -747,8 +747,8 @@ var streamingXhr = (function () {
     * @param {Function} progressListener
     * @param {Function} completeListener
     */
-   var listenToXhr = supportsXhr2()? listenToXhr2 : listenToXhr1;   
-   
+   var listenToXhr = browserSupportsXhr2()? listenToXhr2 : listenToXhr1;
+      
    /**
     * Fetch something over ajax, calling back as often as new data is available.
     * 
@@ -780,7 +780,7 @@ var streamingXhr = (function () {
             // ignore it when this happens.
             return;
          }
-
+         
          if( len(textSoFar) > numberOfCharsGivenToCallback ) {
 
             var latestText = textSoFar.substr(numberOfCharsGivenToCallback);

@@ -61,6 +61,36 @@
          });      
       },
       
+      testCanAjaxInAStreamingFileWithoutMissingAny: function(queue) {
+      
+         var combinedResult = '';
+      
+         queue.call("ask the streaming xhr to fetch", function(callbacks){
+
+            // since this is a large file, even serving locally we're going to get multiple callbacks:       
+            streamingXhr(
+               '/stream/tenSlowNumbers.json',
+                
+               function(nextDrip){            
+                  combinedResult += nextDrip;                                                                                     
+               },
+               
+               // callback for when the stream is complete. we register this just so that jstd knows
+               // when to move onto the next queuer            
+               callbacks.noop()
+            )         
+         });
+
+         queue.call("check we got the correct json back", function(){
+         
+            // should have given valid json;
+            var parsedResult = JSON.parse(combinedResult);
+            
+            // as per the name, should have 20,000 records in that file:                     
+            assertEquals([0,1,2,3,4,5,6,7,8,9], parsedResult);
+         });      
+      },      
+      
       testDoesntCallbackWithoutNewData: function(queue) {
             
          queue.call("ask the streaming xhr to fetch", function(callbacks){
@@ -83,7 +113,9 @@
       
       },      
       
-      testAjaxingInAVeryLargeFileGivesMoreThanOneCallback: function(queue) {
+      testAjaxingOverStreamingHttpGivesMultipleCallbacks: function(queue) {
+      
+         document.domain = 'localhost';
       
          var numberOfProgressCallbacks = 0;
       
@@ -91,9 +123,12 @@
          
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               '/test/test/json/twentyThousandRecords.json',
+               '/stream/tenSlowNumbers.json',
                 
-               function onProgress(){ numberOfProgressCallbacks++; },
+               function onProgress( drip ){
+                  console.log('I got a drip', drip, numberOfProgressCallbacks); 
+                  numberOfProgressCallbacks++; 
+               },
                
                // callback for when the stream is complete. we register this just so that jstd knows
                // when to move onto the next queuer            
@@ -103,9 +138,9 @@
 
          queue.call("check we got multiple callbacks", function(){
                                         
-            if( numberOfProgressCallbacks < 2)(
+            if( numberOfProgressCallbacks < 10)(
                fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
-                   " had multiple")                
+                   " had at least 10")                
             );
          });      
       }            

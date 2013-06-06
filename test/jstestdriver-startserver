@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# convenient script to start a persistent jstd server fronted by a proxy. The proxy allows the 
+# tests to make requests to asynchronous json resources not managed by jstd.
+
+cd slowserver
+node jstdProxy.js &
+
+# We need to run jstd though a proxy. See /test/slowserver/tenSlowNumbers.js
+# and /build shell script.
+
+cd ~/dev/jstestdriver
+java -jar JsTestDriver-1.3.5.jar --port 4224
+
