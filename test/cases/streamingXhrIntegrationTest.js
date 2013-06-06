@@ -121,9 +121,7 @@
       },      
       
       testAjaxingOverStreamingHttpGivesMultipleCallbacks: function(queue) {
-      
-         document.domain = 'localhost';
-      
+            
          var numberOfProgressCallbacks = 0;
       
          queue.call("ask the streaming xhr to fetch", function(callbacks){
