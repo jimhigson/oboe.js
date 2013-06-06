@@ -1,22 +1,34 @@
-**Oboe.js** is an asynchronous, progressive json parser for ajax built on top of
-[clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read a streaming ajax response while the request is still
-ongoing. Oboe is pure transport layer; it doesn't care if you are using jQuery, Angular, d3.js or
-raw Javascript and integrates neatly with any of those appraoches.
+**Oboe.js** is an asynchronous, progressive json parser for web applications built on top of
+[clarinet](https://github.com/dscape/clarinet) and streaming AJAX. 
+It is pure transport layer without any external dependencies;
+it doesn't care if you are using jQuery, Angular, d3.js or raw Javascript and integrates neatly 
+with any of those appraoches.
 
-Oboe is like progressive html rendering but for your ajax requests.
+# Why I made it
 
-# Purpose
+Early in 2013 I was working on an applicatin for html5 financial charting, replacing some legacy charts implemented in 
+Flash. The old charts made huuuuge requests to the server side to get their initial data. It was a trade-of. They took
+an overly long time to load but once loaded the client was so full of data that the app rarely needed to get more.
 
-Developers put a lot of effort into making faster scripts. However, your web application probably waits
-arround longer for io than it spends executing javascript. For most of this waiting there is probably 
-already enough data recieved to get started. This is doubly so on mobile networks where requests can sporadically stall
-or cut out halfway. 
+Naturally, I wanted my html5 version light and nimble so I set about making lots of smaller requests.
+This went ok but with so many small requests there is an increased http overhead and not having so much data early on means
+the user is more likely to need more quite soon, so they see a spinner. It was a compromise either way.
 
-By using the available data earlier you can create faster, more robust interfaces. You can ajax in more
-data while at the same time start showing it earlier.
+I made Oboe to break out of the big-small compromise. We got the app requesting relatively large data but 
+starting rendering when only a screenfull is loaded. 'A screenfull' roughly equates to the response being about 10% 
+downloaded. The chart was already fully interactive as the remaining 90% flowed into the client in the background.
 
-# Use cases
+Sure, I could have implemented this using some kind of streaming framework like socket.io but then we'd have 
+to rewrite the server-side and the legacy charts wouldn't know how to connect to the new server. It is nice to just have
+one service for everything. Streaming servers are also more complex to write than standard request-response ones and, 
+anyway, we didn't really need fully featured streaming, just progressive version of request-response.
+
+Oboe works over standard AJAX, no server-side changes were needed to get the streaming magic going. I made it into
+a generic library and put it here on Github.
+    
+# More use cases
+
+As well as my use case above, here are some more I can think of:
 
 **Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
 inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
@@ -70,14 +82,13 @@ Let's say we have this file, things.json, to be fetched over ajax (In reality yo
 ```
 
 In our webapp we want to load the json and write the foods out
-but we don't want to wait for the non_foods to load before we show them
-since we're going to ignore them anyway:
+but since we're ignoring the non-foods we'll show the foods as soon as we have them: 
 
 ``` js
 oboe.fetch('/myapp/things.json')
    .onFind('foods.*', function( foodThing ){
       // this callback will be called everytime a new object is found in the 
-      // foods array. In this example we just use jQuery to set up some simple DOM:
+      // foods array. Use jQuery to set up some simple DOM:
       jQuery('#foods')
          .append('<div>')
             .text('it is safe to eat ' + foodThing.name)
@@ -87,7 +98,7 @@ oboe.fetch('/myapp/things.json')
 
 ## listening for strings in the json stream
 
-Want to listen to strings instead of objects? The syntax is just the same:
+Want to find the strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
 
 ``` js
 oboe.fetch('/myapp/things.json')
@@ -99,15 +110,25 @@ oboe.fetch('/myapp/things.json')
 ## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
 
 Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
-It is easier to integrate with libraries like Angular if you're passed the containing array 
-again whenever a new element is added to it. 
-Oboe supports css4-style selectors and gives them much the same meaning as in the 
+It is easier to integrate with libraries like Angular if you're passed an array of data 
+over again whenever a new element is appended to it.
+ 
+For this reason Oboe supports css4-style selectors and gives them much the same meaning as in the 
 [proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
-Prefixing a term with dollar means the callback receives the object matching that term rather than the usual implicit 
-arrangement of receiving the object matched by the last term of the jsonPath.
+
+If a term is prefixed with a dollor, instead of the element that matched, an element further up the json tree can be
+passed instead to the callback. 
 
 ``` js
 
+// the json from the server side looks like this:
+{people: [
+   {name:'Baz', age:34, email: 'baz@example.com'}
+   {name:'Boz', age:24}
+   {name:'Bax', age:98, email: 'bax@example.com'}}
+]}
+
+// we are using Angular and have a controller:
 function PeopleListCtrl($scope) {
 
    oboe.fetch('/myapp/things.json')
@@ -115,7 +136,7 @@ function PeopleListCtrl($scope) {
          
          // This callback will be called with a 1-length array, a 2-length array, a 3-length array
          // etc until the whole thing is loaded (actually, the same array with extra people objects
-         // pushed onto it) You can put this on the scope object if you're using Angular etc and it will
+         // pushed onto it) You can put this array on the scope object if you're using Angular and it will
          // nicely re-render your list of people.
          
          $scope.people = peopleLoadedSoFar;
@@ -123,21 +144,48 @@ function PeopleListCtrl($scope) {
 }      
 ```
 
+Like css4, this can also be used to form a 'containing' operator.
+
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('people.$*.email', function( objectForAPersonWithAnEmailAddress ){
+   .onFind('people.$*.email', function( personWithAnEmailAddress ){
       
-      // Here we have an alternative use of css4-style syntax. The callback will be called only for the 
-      // people objects when we know the person's email address, and won't be called at all if the person
-      // object doesn't have an email field. 
+      // here we'll be called back with baz and bax but not Boz.
       
    });
 ```
   
+## Listening for paths when they are first found without waiting for the objects to be parsed
 
-## providing some feedback as a page is updating
+As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
+know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
+page as soon as possible.
 
-Let's provide some visual feedback that one area of the page is loading and remove it when we have just that json,
+``` js
+var currentPersonDiv;
+oboe.fetch('//people.json')
+   .onPath('people.*', function(){
+      // we don't have the person's details yet but we know we found someone in the json stream, we can
+      // use this to eagerly add their div to the page:
+      personDiv = jQuery('<div class="person">');
+      jQuery('#people').append(personDiv);
+   })
+   .onPath('people.*.name', function( name ){
+      // we just found out that person's name, lets add it to their div:
+      currentPersonDiv.append('<span class="name"> + name + </span>');
+   })
+   .onPath('people.*.email', function( email ){
+      // we just found out that person's email, lets add it to their div:
+      currentPersonDiv.append('<span class="email"> + email + </span>');
+   })
+```
+
+## providing some visual feedback as a page is updating
+
+If we're doing progressive rendering to go to a new page in a single-page web app, we probably want to put some kind of
+indication on the page as the parts load.
+
+Let's provide some visual feedback that one area of the page is loading and remove it when we have that json,
 no matter what else we get at the same time 
 
 I'll assume you already implemented a spinner
@@ -158,40 +206,13 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Listening for paths when they are first found without waiting for the objects to be parsed
-
-As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first matched but we don't yet know what will
-be there. We might want to eagerly create elements before we have all the content to get them on the page as soon as \
-possible.
-``` js
-var currentPersonDiv;
-oboe.fetch('//people.json')
-   .onPath('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the json stream, we can
-      // use this to eagerly add them to the page:
-      personDiv = jQuery('<div class="person">');
-      jQuery('#people').append(personDiv);
-   })
-   .onPath('people.*.name', function( name ){
-      // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="name"> + name + </span>');
-   })
-   .onPath('people.*.email', function( email ){
-      // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="email"> + email + </span>');
-   })
-```
-
 ## Using the path passback
 
-The callback is also given the path the match was found at. It is sometimes preferable to
+The callback is also given the path to the node that it found in the json. It is sometimes preferable to
 register a wide-matching pattern and use the path parameter to decide what to do instead of
-registering a separate callback for every possible json path that we might have an interest in.
-
-Say we're making some kind of social site that puts the json for a page into one response and
-the top level objects in the json response can arrive in any order:
 
 ``` js
+// json from the server side. Each top-level object is for a different module on the page.
 {  'notifications':{
       'newNotifications': 5,
       'totalNotifications': 4
@@ -208,8 +229,11 @@ the top level objects in the json response can arrive in any order:
    // ... other modules ...
 }
 
+// code to use this json:
 oboe.fetch('http://mysocialsite.example.com/homepage.json')
+   // note: the bang operator refers to the root object.
    .onFind('!.*', function( moduleJson, path ){
+   
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
       // is a single-element array with the module name like ['messages'] or ['photos']
@@ -246,9 +270,7 @@ oboe.fetch('people.json')
 
 # Pattern matching
 
-Oboe's pattern matching is a subset of [JSONPath](https://code.google.com/p/json-path/)
-and closely resembles the normal syntax for descending into sub-objects parsed
-from Json.
+Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
 
 `!` root json object   
 `.`  path separator   
@@ -258,17 +280,9 @@ from Json.
 `[*]`  equivalent to .*  
 `..` any number of intermediate nodes (non-greedy)
 
-## CSS-4 style selectors
-
 **Oboe**'s pattern matching engine also supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar ```$``` symbol, with much the same meaning as in css4. 
-
-Like css, by default, a selector like ```foo.bar``` applies to the last node in the chain
-(in this case bar). Using ```$```, the selector ```$foo.bar``` matches the same elements, but
-replaces the element at foo rather than bar. This is useful especially when selecting array
-elements ```!.$someArray[*]``` because often it is useful to be repeatedly given the same
-array as it is added to rather than the individual elements.   
+using the dollar (```$```) symbol.    
 
 ## Some example patterns:
 
@@ -277,7 +291,7 @@ array as it is added to rather than the individual elements.
 `person.emails[*]` any element in the email array for each person  
 `person.$emails[*]` any element in the email array for each person, but the callback will be
    passed the array so far rather than the array elements as they are found.  
-`person` all people in the json  
+`person` all people in the json, nested at any depth  
 `person.friends.*.name` detecting friend names in a social network  
 `person..email` email addresses anywhere as descendent of a person object  
 `$person..email` any person in the json stream with an email address  
