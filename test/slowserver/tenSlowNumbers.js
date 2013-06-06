@@ -15,7 +15,7 @@ var maxNumber = 9;
 function writeTenNumbersAsJson(req, res) {
    console.log('slow number server: will write numbers 0 ..', String(maxNumber).blue, 'out as a json array at a rate of one per', String(numberInterval).blue, 'ms');
 
-   var JSON_MIME_TYPE = "application/json";
+   var JSON_MIME_TYPE = "application/octet-stream";
    res.setHeader("Content-Type", JSON_MIME_TYPE);
    res.writeHead(200);
 

@@ -69,7 +69,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               '/stream/tenSlowNumbers.json',
+               cacheBustUrl('/stream/tenSlowNumbers'),
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -128,7 +128,7 @@
          
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               '/stream/tenSlowNumbers.json',
+               cacheBustUrl('/stream/tenSlowNumbers'),
                 
                function onProgress( drip ){
                   console.log('I got a drip', drip, numberOfProgressCallbacks); 
@@ -151,5 +151,10 @@
       }            
    });
    
+   function cacheBustUrl(url) {
+      var now = Date.now? Date.now() : new Date().valueOf();
+   
+      return url + '/cacheBusted/' + now + '.txt';
+   }
 
 })();

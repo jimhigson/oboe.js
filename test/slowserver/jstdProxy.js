@@ -25,10 +25,12 @@ http.createServer(
     function (req, res) {
     
        var url = req.url,
-           destinationPort = (url.indexOf('/stream') === 0) ? STREAM_PORT : JSTD_PORT;
+           stream = (url.indexOf('/stream') === 0),
+           destinationPort = stream ? STREAM_PORT : JSTD_PORT;
 
        console.log('proxy got request for'.yellow, url.blue, 
-                    'will redirect to'.green, 'localhost:'.yellow, String(destinationPort).blue);
+                    'will redirect to'.green, 'localhost:'.yellow, 
+                     String(destinationPort)[stream? 'cyan' : 'magenta'].inverse );
 
        proxy.proxyRequest(req, res, {
           host:'localhost',
