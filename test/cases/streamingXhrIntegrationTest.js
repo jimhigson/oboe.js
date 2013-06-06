@@ -84,7 +84,11 @@
          queue.call("check we got the correct json back", function(){
          
             // should have given valid json;
-            var parsedResult = JSON.parse(combinedResult);
+            try{
+               var parsedResult = JSON.parse(combinedResult);
+            } catch(e) {
+               fail('could not parse json "' + combinedResult + '" because ' + e);
+            }
             
             // as per the name, should have 20,000 records in that file:                     
             assertEquals([0,1,2,3,4,5,6,7,8,9], parsedResult);
