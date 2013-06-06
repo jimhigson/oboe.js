@@ -12,19 +12,17 @@ an overly long time to load but once loaded the client was so full of data that 
 
 Naturally, I wanted my html5 version light and nimble so I set about making lots of smaller requests.
 This went ok but with so many small requests there is an increased http overhead and not having so much data early on means
-the user is more likely to need more quite soon, so they see a spinner. It was a compromise either way.
+the user is more likely to need more quite soon, so they see a spinner. As much as people don't like waiting for their
+charts to load, they dislike seeing spinners when they scroll even more.
 
 I made Oboe to break out of the big-small compromise. We got the app requesting relatively large data but 
-starting rendering when only a screenfull is loaded. 'A screenfull' roughly equates to the response being about 10% 
-downloaded. The chart was already fully interactive as the remaining 90% flowed into the client in the background.
+kicked in with the rendering when just a screenfull was delivered. 'A screenfull' roughly equates to about 10% 
+of the response. The chart was already fully interactive while the remaining 90% continued to flow in the background.
 
 Sure, I could have implemented this using some kind of streaming framework like socket.io but then we'd have 
 to rewrite the server-side and the legacy charts wouldn't know how to connect to the new server. It is nice to just have
-one service for everything. Streaming servers are also more complex to write than standard request-response ones and, 
-anyway, we didn't really need fully featured streaming, just progressive version of request-response.
-
-Oboe works over standard AJAX, no server-side changes were needed to get the streaming magic going. I made it into
-a generic library and put it here on Github.
+one service for everything. Streaming servers are also more complex to write than standard request-response ones and 
+anyway, we didn't really need fully featured streaming, just a progressive version of plain old request-response.
     
 # More use cases
 
