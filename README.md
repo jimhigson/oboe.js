@@ -49,11 +49,6 @@ be waiting.
 **John** is developing internally on a fast network so he doesn't really care about progressive parsing. Oboe.js provides 
 a neat way to route different parts of a json response to different parts of his application. One less thing to write.
 
-# Browser support
-
-* IE8 and up
-* Good browsers. Chrome, Firefox, Safari etc.
-
 # Examples
 
 ## listening for json objects
@@ -295,6 +290,74 @@ Asynchronous parsing is better if the data is written out progressively from the
 (think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're sending
 and parsing everything at the earliest possible opportunity. If you can, send small bits of the
 json as soon as it is ready instead of waiting before everything is ready to start sending.
+
+# Browser support
+
+Browsers with Full support are:
+
+* Recent Chrome
+* Recent Firefoxes
+* Internet Explorer 10
+* Recent Safaris
+
+Browsers with partial support:
+
+* Internet explorer 8 and 9
+ 
+Unfortunately, IE before version 10 
+[doesn't provide any convenient way to read an http request while it is in progress](http://blogs.msdn.com/b/ieinternals/archive/2010/04/06/comet-streaming-in-internet-explorer-with-xmlhttprequest-and-xdomainrequest.aspx).
+While streaming is possible to work into older Internet Explorers, it requires the server-side to write
+out script tags which goes against Oboe's ethos of very simple streaming over standard REST semantics.
+
+In these older versions of IE Oboe gracefully degrades, it'll just fall back to waiting for the
+whole response to return, then fire all the events. A bit more like standard Ajax.
+
+
+## Running the tests
+
+If you want to do hack on Oboe you can build by just running Grunt but sooner or later you'll have to run the tests.
+
+To build and run the tests you'll need:
+
+* The [JsTestDriver](https://code.google.com/p/js-test-driver/) jar installed somewhere 
+* [Grunt](http://gruntjs.com/) installed globally on your system
+* Node
+* Some kind of unix-like environment. On OSX or Linux you've got this already. On Windows, [cygwin](http://www.cygwin.com/) should do.
+
+An (test/slowserver/tenSlowNumbers.js)[example streaming http server] to test against can be found in the [test dir](/test). Unfortunately,
+JSTestDriver's proxying doesn't support streaming HTTP. To get arround this there is 
+(test/slowserver/jstdProxy.js)[a small proxy] written in node that sits in front of JSTD.
+
+To start the proxy, streaming server and jstd itself, run:
+
+``` bash
+cd test
+./jstestdriver-serverstart
+```
+
+You should see output like this:
+```
+jstd will be started on port 4224 but connect browsers via the proxy on port 2442 eg by going to http://localhost:2442 and clicking capture 
+The proxy is necessary for asynchronous http testing which will fail otherwise
+creating proxy server on port 2442
+routing table for proxy is {"localhost/stream":"127.0.0.1:4567","localhost/":"127.0.0.1:4224"}
+slow number server started on port 4567
+proxy started now capture some browsers!
+setting runnermode QUIET
+```
+
+Then capture some browsers by going to http://localhost:2442 and clicking capture. If you aren't running
+Windows and want some IEs to test try 
+(http://osxdaily.com/2011/09/04/internet-explorer-for-mac-ie7-ie8-ie-9-free/)[here].  
+  
+Finally, to run the tests, from a second terminal run:
+
+``` bash
+./build
+```
+
+If all goes well, you should get something like:
+
 
 ## Use as a stream in node.js
 
