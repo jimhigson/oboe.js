@@ -1,13 +1,13 @@
-**Oboe.js** is an asynchronous, progressive json parser for web applications built on top of
-[clarinet](https://github.com/dscape/clarinet) and streaming AJAX. 
+**Oboe.js** is an asynchronous, progressive json parser for web applications Combining
+[clarinet](https://github.com/dscape/clarinet), streaming AJAX and an intuitive pattern matching interface. 
 It is pure transport layer without any external dependencies;
 it doesn't care if you are using jQuery, Angular, d3.js or raw Javascript and integrates neatly 
 with any of those appraoches.
 
 # Why I made it
 
-Early in 2013 I was working on an applicatin for html5 financial charting, replacing some legacy charts implemented in 
-Flash. The old charts made huuuuge requests to the server side to get their initial data. It was a trade-of. They took
+Early in 2013 I was working on an html5 web application for financial charting, replacing some legacy Flash charts.
+The old charts made ***huuuuge*** requests to the server side to get their initial data. It was a trade-of. They took
 an overly long time to load but once loaded the client was so full of data that the app rarely needed to get more.
 
 Naturally, I wanted my html5 version light and nimble so I set about making lots of smaller requests.
