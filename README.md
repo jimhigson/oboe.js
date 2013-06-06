@@ -1,20 +1,20 @@
 **Oboe.js** is an asynchronous, progressive json parser for ajax built on top of
 [clarinet](https://github.com/dscape/clarinet).
-It provides an intuitive interface to read the ajax response while the request is still
-ongoing and gzips down to about **3.8k**.
+It provides an intuitive interface to read a streaming ajax response while the request is still
+ongoing. Oboe is pure transport layer; it doesn't care if you are using jQuery, Angular, d3.js or
+raw Javascript and integrates neatly with any of those appraoches.
+
+Oboe is like progressive html rendering but for your ajax requests.
 
 # Purpose
 
-The aim of Oboe is to let you start using your data as early as possible with as simple
-an interface as is possible. It works with jQuery, Angular, d3 or any other library you might
-happen to be using.
+Developers put a lot of effort into making faster scripts. However, your web application probably waits
+arround longer for io than it spends executing javascript. For most of this waiting there is probably 
+already enough data recieved to get started. This is doubly so on mobile networks where requests can sporadically stall
+or cut out halfway. 
 
-Your web application probably makes the user wait longer for io than anything else. However,
-during much of the waiting there will already be enough data loaded in the browser to show
-things on the page. This is especially true on mobile networks where requests can sporadically stall
-or cut out halfway.
-
-Think of it as progressive html rendering for the ajax age.
+By using the available data earlier you can create faster, more robust interfaces. You can ajax in more
+data while at the same time start showing it earlier.
 
 # Use cases
 
