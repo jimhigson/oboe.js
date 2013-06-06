@@ -130,8 +130,7 @@
             streamingXhr(
                cacheBustUrl('/stream/tenSlowNumbers'),
                 
-               function onProgress( drip ){
-                  console.log('I got a drip', drip, numberOfProgressCallbacks); 
+               function onProgress(){ 
                   numberOfProgressCallbacks++; 
                },
                
@@ -148,7 +147,8 @@
             if( numberOfProgressCallbacks < 3)(
                fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
                    " had at least 3. If this doesn't test the browser's XHR might not support" +
-                   " reading partial responses")                
+                   " reading partial responses. Unfortunately this is inevitable in IE less than" +
+                   " version 10.")                
             );
          });      
       }            

@@ -712,25 +712,17 @@ var streamingXhr = (function () {
    /* xhr1 supports little so a bit more work is needed 
     * listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(xhr, progressListener, completeListener){
+   function listenToXhr1(xhr, _progressListener, completeListener){
    
-      // We are recieving the content, check for progress as often as the browser allows. 
-      // The progress listener makes sure there is something to report so just call it as often 
-      // as possible regardless of if something happened to the xhr1 object.
-      var interval = window.setInterval(progressListener, 50);      
+      // unfortunately there is no point polling the responsetext, these bad old browsers rarely make
+      // that possible. Instead, we'll just have to wait for the request to be complete, degrading gracefully
+      // to standard Ajax.      
    
       // handle the request being complete: 
-      xhr.onreadystatechange = function() {
-
-         if(this.readyState == 4 ) {
-         
-            // XHR is complete. Notify of completeness and stop notifying of progress:
-            if( this.status == 200 ) {             
-               completeListener();
-            }
-            
-            window.clearInterval(interval);
-         }               
+      xhr.onreadystatechange = function() {     
+         if(this.readyState == 4 && this.status == 200 ) {             
+            completeListener();
+         }                           
       };
    }
       
