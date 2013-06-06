@@ -142,10 +142,13 @@
          });
 
          queue.call("check we got multiple callbacks", function(){
-                                        
-            if( numberOfProgressCallbacks < 10)(
+                                   
+            // realistically, should have had 10 or 20, but this isn't deterministic so
+            // 3 is enough to indicate the results didn't all arrive in one big blob.                                               
+            if( numberOfProgressCallbacks < 3)(
                fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
-                   " had at least 10")                
+                   " had at least 3. If this doesn't test the browser's XHR might not support" +
+                   " reading partial responses")                
             );
          });      
       }            
