@@ -1,5 +1,7 @@
 **Oboe.js** is an asynchronous, progressive json parser for web applications Combining
-[clarinet](https://github.com/dscape/clarinet), streaming AJAX and an intuitive pattern matching interface. 
+[clarinet](https://github.com/dscape/clarinet), streaming AJAX and a [JSONPath](https://code.google.com/p/json-path/)-based
+pattern matching interface.
+ 
 It is pure transport layer without any external dependencies;
 it doesn't care if you are using jQuery, Angular, d3.js or raw Javascript and integrates neatly 
 with any of those appraoches.
@@ -23,6 +25,10 @@ Sure, I could have implemented this using some kind of streaming framework like 
 to rewrite the server-side and the legacy charts wouldn't know how to connect to the new server. It is nice to just have
 one service for everything. Streaming servers are also more complex to write than standard request-response ones and 
 anyway, we didn't really need fully featured streaming, just a progressive version of plain old request-response.
+
+Oboe isn't a replacement for full-blown streaming. But for many cases it combines the simplicity of downloading 
+with the progressiveness of streaming. Debugging is easier than full-blown streaming because everything is visible the REST
+way: just point a browser at a URL to check what's there.
     
 # More use cases
 
@@ -31,13 +37,6 @@ As well as my use case above, here are some more I can think of:
 **Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
 inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
 she can still read most of her emails.
-
-**Jack** has a RESTFUL JSON data service and wants to implement some streaming to his webpage. ***Oboe.js*** isn't a full blown 
-streaming solution but for short-lived streams (streams that don't continue indefinately) it does the same thing.
-Oboe streaming has the advantage that the http traffic is still valid REST so he can provide just one endpoint and the rest of his 
-technology stack can use the service as a normal download without understanding how to stream.
-Debugging is easier than with a full-blown streaming framework too, just like any other REST service he can check out the 
-data by visiting the URL in his browser and checking out what he gets.
 
 **Arnold** is using a programmable stock screener.
 The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
