@@ -43,17 +43,17 @@ using the dollar (```$```) symbol. See the [css4 example below](#css4-style-patt
 
 # Why I made this
 
-Early in 2013 I was working on replacing some legacy Flash financial charts with a similar html5/d3 based web 
-application.
-The old charts made requests to the server side to get a very large set of initial data. It took
-a long time to load but once it got going the client-side model was so completely primed that it wouldn't need to 
-request again until the user scrolled waaaay into the past.
+Early in 2013 I was working on complementing some Flash financial charts with a more modern 
+html5/[d3](http://d3js.org) based web application.
+The Flash app started by making http requests for a very large set of initial data. It took
+a long time to load but once it was started the client-side model was so completely primed that it wouldn't need to 
+request again unless the user scrolled **waaaay** into the past.
 
-People hate waiting on the web so *naturally* I want my html5 app to be *light and nimble* and 
-*load in the merest blink of an eye*. 
-So instead of starting with one huge request I set about making lots of smaller ones that are requested just-in-time
-in response to the user scrolling.
-This brought a big improvement in load times but brought with it some new challenges.
+People hate waiting on the web so *naturally* I want my html5 app to be **light and nimble** and 
+**load in the merest blink of an eye**. 
+Instead of starting with one huge request I set about making lots of smaller ones just-in-time
+as the user moves throughout the data.
+This gave a big improvement in load times but also some new challenges.
  
 Firstly, with so many small requests there is an increased http overhead. Worse, not having a model full of data 
 early means the user is likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
