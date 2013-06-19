@@ -37,7 +37,7 @@ Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/j
 
 The pattern engine also supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (```$```) symbol. See the [css4 example below](#using-css4-patterns) or take a look at 
+using the dollar (```$```) symbol. See the [css4 example below](#css4-style-patterns) or take a look at 
 [more example patterns](#more-example-patterns).  
 
 # Why I made this
@@ -101,7 +101,7 @@ a neat way to route different parts of a json response to different parts of his
 
 # Examples
 
-## listening for json objects
+## Using objects from the JSON stream
 
 Say we have a resource called things.json that we need to fetch over AJAX:
 ``` js
@@ -136,7 +136,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## listening for strings in the json stream
+## Listening for strings
 
 Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
 
@@ -147,7 +147,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Listening for paths when they are first found without waiting for the objects to be parsed
+## Reacting before we have the whole object
 
 As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
 know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
@@ -172,7 +172,7 @@ oboe.fetch('//people.json')
    })
 ```
 
-## providing some visual feedback as a page is updating
+## Giving some visual feedback as a page is updating
 
 If we're doing progressive rendering to go to a new page in a single-page web app, we probably want to put some kind of
 indication on the page as the parts load.
@@ -198,7 +198,7 @@ oboe.fetch('/myapp/things.json')
    });
 ```
 
-## Using the path passback
+## The path passback
 
 The callback is also given the path to the node that it found in the json. It is sometimes preferable to
 register a wide-matching pattern and use the path parameter to decide what to do instead of
@@ -236,7 +236,7 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
 
 ```
 
-## Using Css4 style patterns
+## Css4 style patterns
 
 Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
 It is easier to integrate with libraries like [Angular](http://angularjs.org/) if you're given an array 
