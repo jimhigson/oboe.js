@@ -1,11 +1,15 @@
-**Oboe.js** takes a fresh appraoch to AJAX for web applications by providing a progressive version
-of http's request-response pattern. It provides a transport that sits 
-somewhere between streaming and downloading and a JSON parser that sits somewhere between SAX and
-DOM. It doesn't have any external dependencies and doesn't care which other libraries you need it to speak to.
+**Oboe.js** takes a fresh appraoch to AJAX for web applications by wrapping a progressive interface
+arround https's standard request-response model. It glues a transport that sits 
+**somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
+DOM**. It is small enough to be a [http://microjs.com/#](Micro-library), doesn't have any external dependencies and 
+doesn't care which other libraries you need it to speak to.
+
+Oboe makes it really easy to start using json from a response before the ajax request completes; 
+or even if it never completes.
 
 # API
 
-**Oboe** exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
+Oboe exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
 instance by calling:
 
 ```oboe.fetch(String url)```   
