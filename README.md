@@ -223,7 +223,7 @@ register a wide-matching pattern and use the path parameter to decide what to do
 
 // code to use this json:
 oboe.fetch('http://mysocialsite.example.com/homepage.json')
-   // note: the bang operator refers to the root object.
+   // note: bang means the root object so this pattern matches any children of the root
    .onFind('!.*', function( moduleJson, path ){
    
       // This callback will be called with every direct child of the root object but not
