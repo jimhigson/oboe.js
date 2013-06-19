@@ -45,27 +45,28 @@ using the dollar (```$```) symbol. See the [css4 example below](#css4-style-patt
 
 Early in 2013 I was working on replacing some legacy Flash financial charts with a similar html5/d3 based web 
 application.
-The old charts made ***huuuuge*** requests to the server side to get their initial data. It was a trade-of. It took
-a long time to load but once it was going the client was so primed with data that it would rarely needed to request
-again.
+The old charts made requests to the server side to get a very large set of initial data. It took
+a long time to load but once it got going the client-side model was so completely primed that it wouldn't need to 
+request again until the user scrolled waaaay into the past.
 
-This is the web so *naturally* I want my html5 app to be *light and nimble* and *load in the merest blink of an eye*. 
-So instead of commiting myself to waiting for one huge request I set about making lots of smaller ones.
-An improvement, no doubt, but not without its downsides.
+People hate waiting on the web so *naturally* I want my html5 app to be *light and nimble* and 
+*load in the merest blink of an eye*. 
+So instead of starting with one huge request I set about making lots of smaller ones that are requested just-in-time
+in response to the user scrolling.
+This brought a big improvement in load times but brought with it some new challenges.
  
-Firstly, with so many small requests there is an increased http overhead. More importantly, not having a lot of data 
-early on means the user is more likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
-*'when you no longer have a good connection'*
+Firstly, with so many small requests there is an increased http overhead. Worse, not having a model full of data 
+early means the user is likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
+*'when you no longer have a good connection'*.
 
 I made Oboe to break out of this big-small compromise. We requested relatively large data but 
-started rendering as soon as the first datum arrived over the network. We had a screenfull showing when the request was 
-only about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
-steams silently into our javascript model.
+started rendering as soon as the first datum arrived. We have enough for a screenfull when the request is 
+about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
+steams silently in the background.
 
-Sure, I could have implemented this using some kind of streaming framework (socket.io perhaps?) but then we'd have 
-to rewrite the server-side and the legacy charts have no idea how to connect to the new server. It is nice to just have
-one service for everything. Streaming servers are also more complex to write than standard request-response ones and 
-anyway, we didn't really need fully featured streaming for historic data - it never changes.
+Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
+but then we'd have to rewrite the server-side and the legacy charts have no idea how to connect to the new server.
+It is nice to just have one, simple service for everything.
 
 # Status
 
