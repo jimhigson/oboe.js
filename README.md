@@ -1,64 +1,66 @@
-**Oboe.js** is a fresh appraoch to AJAX for web applications. It provides a transport that sits 
+**Oboe.js** takes a fresh appraoch to AJAX for web applications by providing a progressive version
+of http's request-response pattern. It provides a transport that sits 
 somewhere between streaming and downloading and a JSON parser that sits somewhere between SAX and
 DOM. It doesn't have any external dependencies and doesn't care which other libraries you need it to speak to.
 
 # Why I made this
 
-Early in 2013 I was working on an html5 web application for financial charting, replacing some legacy Flash charts.
-The old charts made ***huuuuge*** requests to the server side to get their initial data. It was a trade-of. They took
-an overly long time to load but once loaded the client was so full of data that the app rarely needed to get more.
+Early in 2013 I was working on replacing some legacy Flash financial charts with a similar html5/d3 based web 
+application.
+The old charts made ***huuuuge*** requests to the server side to get their initial data. It was a trade-of. It took
+a long time to load but once it was going the client was so primed with data that it would rarely needed to request
+again.
 
-Naturally, I wanted my html5 version light and nimble so I set about making lots of smaller requests.
-This went ok but with so many small requests there is an increased http overhead and not having so much data early on means
-the user is more likely to need more quite soon, so they see a spinner. As much as people don't like waiting for their
-charts to load, they dislike seeing spinners when they scroll even more.
+This is the web so *naturally* I want my html5 app to be *light and nimble* and *load in the merest blink of an eye*. 
+So instead of commiting myself to waiting for one huge request I set about making lots of smaller ones.
+An improvement, no doubt, but not without its downsides.
+ 
+Firstly, with so many small requests there is an increased http overhead. More importantly, not having a lot of data 
+early on means the user is more likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
+*'when you no longer have a good connection'*
 
-I made Oboe to break out of the big-small compromise. We got the app requesting relatively large data but 
-kicked in with the rendering when just a screenfull was delivered. 'A screenfull' roughly equates to about 10% 
-of the response. The chart was already fully interactive while the remaining 90% continued to flow in the background.
+I made Oboe to break out of this big-small compromise. We requested relatively large data but 
+started rendering as soon as the first datum arrived over the network. We had a screenfull showing when the request was 
+only about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
+steams silently into our javascript model.
 
-Sure, I could have implemented this using some kind of streaming framework like socket.io but then we'd have 
-to rewrite the server-side and the legacy charts wouldn't know how to connect to the new server. It is nice to just have
+Sure, I could have implemented this using some kind of streaming framework (socket.io perhaps?) but then we'd have 
+to rewrite the server-side and the legacy charts have no idea how to connect to the new server. It is nice to just have
 one service for everything. Streaming servers are also more complex to write than standard request-response ones and 
-anyway, we didn't really need fully featured streaming, just a progressive version of plain old request-response.
-
-Oboe isn't a replacement for full-blown streaming. But for many cases it combines the simplicity of downloading 
-with the progressiveness of streaming. Debugging is easier than full-blown streaming because everything is visible the REST
-way: just point a browser at a URL to check what's there.
+anyway, we didn't really need fully featured streaming for historic data - it never changes.
 
 # Status
 
 Just hitting v1.0.0. Project is still quite fluid but an API is settling down. Patches and suggestions most welcome.
+The project is designed in for easy testability and has [over 100 unit tests](/test/cases).
 
 BSD licenced.
     
 # More use cases
 
-As well as my use case above, here are some more I can think of:
+Oboe.js isn't specific to my application domain, or even to solving the big-small download compromise. Here are some
+more use cases that I can think of: 
 
 **Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
-inbox when her train leaves reception. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
-she can still read most of her emails.
+inbox when her train goes under a tunnel. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
+she can still read most of her emails. When the connection comes back again later the webapp is smart enough to just 
+re-request the part that failed. 
 
 **Arnold** is using a programmable stock screener.
 The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
-means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. Unlike other methods 
-of streaming, Oboe's ajax-based stream is compatible with his browser cache so now he sees the same results straight away.
+means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. 
+Since Oboe isn't true streaming it plays nice with the browser cache so now he see the same results instantly from cache.
 
 **Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, aggregated json 
 for all of her modules.
 Unfortunately, one of the services being aggregated is slower than the others and under traditional
-ajax she is forced to wait for the slowest module to load before she can update any of the page. 
-After switching to **Oboe.js**, the fast modules load quickly and the slow modules load later. 
+ajax she is forced to wait for the slowest module to load before she can show any of them. 
+**Oboe.js** is better, the fast modules load quickly and the slow modules load later. 
 Her users are happy because they can navigate page-to-page more fluidly and not all of them cared about the slow module anyway.
 
-**Michael** is writing a scrollable timeline data visualisation using [d3](http://d3js.org/). His json contains data for 
-200 events but until the user scrolls only the most recent 20 are visible. He doesn't want to wait for all 200 to load 
-before showing the starting 20. With **Oboe.js** the data takes 90% less time to display and his users are happy to not 
-be waiting.
+**John** is developing internally on a fast network so he doesn't really care about progressive loading. Oboe.js provides 
+a neat way to route different parts of a json response to different parts of his application. One less bit to write.
 
-**John** is developing internally on a fast network so he doesn't really care about progressive parsing. Oboe.js provides 
-a neat way to route different parts of a json response to different parts of his application. One less thing to write.
 
 # Examples
 
@@ -80,80 +82,34 @@ Say we have a resource called things.json that we need to fetch over AJAX:
 }
 ```
 
-In our webapp we want to load the json and write the foods out
-but since we're ignoring the non-foods we'll show the foods as soon as we have them: 
+In our webapp we want to download the foods and show them in a webpage. We aren't showing the non-foods here so
+we won't wait for them to be loaded: 
 
 ``` js
 oboe.fetch('/myapp/things.json')
-   .onFind('foods.*', function( foodThing ){
+   .onFind('foods.*', function( foodObject ){
       // this callback will be called everytime a new object is found in the 
-      // foods array. Use jQuery to set up some simple DOM:
-      jQuery('#foods')
-         .append('<div>')
-            .text('it is safe to eat ' + foodThing.name)
-            .style('color', foodThing.colour)
+      // foods array. We probably should put this in a js model ala MVC but for
+      // simplicity let's just use jQuery to show it in the DOM:
+      var newFoodElement = $('<div>')
+                              .text('it is safe to eat ' + foodObject.name)
+                              .css('color', foodObject.colour)
+                                    
+      $('#foods').append(newFoodElement);
    });
 ```
 
 ## listening for strings in the json stream
 
-Want to find the strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
+Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
 
 ``` js
 oboe.fetch('/myapp/things.json')
    .onFind('name', function( name ){
-      jQuery('#things').append('<li>').text(name);
+      jQuery('ul#names').append( $('<li>').text(name) );
    });
 ```
 
-## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
-
-Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
-It is easier to integrate with libraries like Angular if you're passed an array of data 
-over again whenever a new element is appended to it.
- 
-For this reason Oboe supports css4-style selectors and gives them much the same meaning as in the 
-[proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
-
-If a term is prefixed with a dollor, instead of the element that matched, an element further up the json tree can be
-passed instead to the callback. 
-
-``` js
-
-// the json from the server side looks like this:
-{people: [
-   {name:'Baz', age:34, email: 'baz@example.com'}
-   {name:'Boz', age:24}
-   {name:'Bax', age:98, email: 'bax@example.com'}}
-]}
-
-// we are using Angular and have a controller:
-function PeopleListCtrl($scope) {
-
-   oboe.fetch('/myapp/things.json')
-      .onFind('$people[*]', function( peopleLoadedSoFar ){
-         
-         // This callback will be called with a 1-length array, a 2-length array, a 3-length array
-         // etc until the whole thing is loaded (actually, the same array with extra people objects
-         // pushed onto it) You can put this array on the scope object if you're using Angular and it will
-         // nicely re-render your list of people.
-         
-         $scope.people = peopleLoadedSoFar;
-      });
-}      
-```
-
-Like css4, this can also be used to form a 'containing' operator.
-
-``` js
-oboe.fetch('/myapp/things.json')
-   .onFind('people.$*.email', function( personWithAnEmailAddress ){
-      
-      // here we'll be called back with baz and bax but not Boz.
-      
-   });
-```
-  
 ## Listening for paths when they are first found without waiting for the objects to be parsed
 
 As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
@@ -164,8 +120,8 @@ page as soon as possible.
 var currentPersonDiv;
 oboe.fetch('//people.json')
    .onPath('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the json stream, we can
-      // use this to eagerly add their div to the page:
+      // we don't have the person's details yet but we know we found someone in the json stream. We can
+      // eagerly put their div to the page and then fill it with whatever other data we find:
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
@@ -174,7 +130,7 @@ oboe.fetch('//people.json')
       currentPersonDiv.append('<span class="name"> + name + </span>');
    })
    .onPath('people.*.email', function( email ){
-      // we just found out that person's email, lets add it to their div:
+      // we just found out this person has email, lets add it to their div:
       currentPersonDiv.append('<span class="email"> + email + </span>');
    })
 ```
@@ -189,7 +145,7 @@ no matter what else we get at the same time
 
 I'll assume you already implemented a spinner
 ``` js
-My.App.showSpinner('#foods');
+MyApp.showSpinner('#foods');
 
 oboe.fetch('/myapp/things.json')
    .onFind('!.foods.*', function( foodThing ){
@@ -198,7 +154,7 @@ oboe.fetch('/myapp/things.json')
    .onFind('!.foods', function(){
       // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
       // above so we don't need to use the items anymore, just hide the spinner:
-      My.App.hideSpinner('#foods');
+      MyApp.hideSpinner('#foods');
       // even though we just hid the spinner, the json might not have completely loaded. That's fine because we
       // don't need the non-foods to remove the spinner from the #foods part of the page. The food bit already has
       // the data that we need
@@ -243,6 +199,54 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
 
 ```
 
+## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
+
+Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
+It is easier to integrate with libraries like Angular if you're given an array 
+repeatedly whenever a new element is concatenated onto it.
+ 
+Oboe supports css4-style selectors and gives them much the same meaning as in the 
+[proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
+
+If a term is prefixed with a dollor, instead of the element that matched, an element further up the json tree will be
+given instead to the callback. 
+
+``` js
+
+// the json from the server side looks like this:
+{people: [
+   {name:'Baz', age:34, email: 'baz@example.com'}
+   {name:'Boz', age:24}
+   {name:'Bax', age:98, email: 'bax@example.com'}}
+]}
+
+// we are using Angular and have a controller:
+function PeopleListCtrl($scope) {
+
+   oboe.fetch('/myapp/things.json')
+      .onFind('$people[*]', function( peopleLoadedSoFar ){
+         
+         // This callback will be called with a 1-length array, a 2-length array, a 3-length array
+         // etc until the whole thing is loaded (actually, the same array with extra people objects
+         // pushed onto it) You can put this array on the scope object if you're using Angular and it will
+         // nicely re-render your list of people.
+         
+         $scope.people = peopleLoadedSoFar;
+      });
+}      
+```
+
+Like css4 stylesheets, this can also be used to express a 'containing' operator.
+
+``` js
+oboe.fetch('/myapp/things.json')
+   .onFind('people.$*.email', function( personWithAnEmailAddress ){
+      
+      // here we'll be called back with baz and bax but not Boz.
+      
+   });
+```  
+
 ## Error handling
 
 You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
@@ -267,7 +271,27 @@ oboe.fetch('people.json')
    })
 ```
 
-# Pattern matching
+# API
+
+Oboe exposes only one globally available object, ```window.oboe```.
+
+```oboe.fetch(String url)```   
+   returns a new Oboe object and starts fetching the URL given.
+
+The Oboe object exposes two chainable methods:
+
+```.onFind(String pattern, callback(thingFound, String[] path))```   
+```.onPath(String pattern, callback(thingFound, String[] path))```
+
+```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching the pattern
+that we just gave it. The patterns are forthe most part standard [JSONPath](https://code.google.com/p/json-path/) but
+see the exceptions below. When the pattern is matched the callback is found with the thing that matched and all the
+keys from the top of the document describing where it was found in the JSON.
+
+```onPath()``` Is just the same, except you get the callback when the *path* matches, not when we have the object
+here. For the same pattern this will always fire before ```.onFind()``` and might be used to get ready for that call. 
+
+# JSONPath-like pattern matching
 
 Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
 
