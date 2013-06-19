@@ -25,6 +25,8 @@ module.exports = function (grunt) {
             dest: '.',
             wrapper: [
                // having a local undefined and window, Object etc allows slightly better minification:
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src ' +
+                   'for the unconcatenated source\n' + 
                '(function (window, Object, Array, undefined) {' 
             ,  'window.oboe = oboe; })(window, Object, Array);'
             ]
