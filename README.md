@@ -12,12 +12,13 @@ instance by calling:
 
 The returned instance exposes two chainable methods:
 
-```.onFind(String pattern, callback(thingFound, String[] path))```   
-```.onPath(String pattern, callback(thingFound, String[] path))```
+```.onFind(String pattern, callback(thingFound, String[] path))```
 
 ```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
 The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
 When the pattern is matched you're called back with the thing that was found and where in the document Oboe found it.
+   
+```.onPath(String pattern, callback(thingFound, String[] path))```
 
 ```onPath()``` Is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
 thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call. 
