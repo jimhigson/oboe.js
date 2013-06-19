@@ -14,13 +14,13 @@ The returned instance exposes two chainable methods:
 
 ```.onFind(String pattern, callback(thingFound, String[] path))```
 
-```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
+```.onFind()``` lets our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
 The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
 When the pattern is matched the callback is fired with the matching object and the path where it was found.
    
 ```.onPath(String pattern, callback(thingFound, String[] path))```
 
-```onPath()``` Is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
+```onPath()``` is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
 thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call. 
 
 ## Pattern matching
