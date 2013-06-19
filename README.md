@@ -1,7 +1,7 @@
 **Oboe.js** takes a fresh appraoch to AJAX for web applications by wrapping a progressive interface
 arround https's standard request-response model. It glues a transport that sits 
 **somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
-DOM**. It is small enough to be a [http://microjs.com/#](Micro-library), doesn't have any external dependencies and 
+DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any external dependencies and 
 doesn't care which other libraries you need it to speak to.
 
 Oboe makes it really easy to start using json from a response before the ajax request completes; 
