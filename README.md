@@ -156,21 +156,21 @@ know what will be found there. We might want to eagerly create elements before w
 page as soon as possible.
 
 ``` js
-var currentPersonDiv;
+var currentPersonElement;
 oboe.fetch('//people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream. We can
       // eagerly put their div to the page and then fill it with whatever other data we find:
-      personDiv = jQuery('<div class="person">');
+      currentPersonElement = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
    .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="name"> + name + </span>');
+      currentPersonElement.append('<span class="name"> + name + </span>');
    })
    .onPath('people.*.email', function( email ){
       // we just found out this person has email, lets add it to their div:
-      currentPersonDiv.append('<span class="email"> + email + </span>');
+      currentPersonElement.append('<span class="email"> + email + </span>');
    })
 ```
 
@@ -292,7 +292,7 @@ You use the error handler to roll back if there is an error in the json. Once th
 give any further callbacks no matter what is in the rest of the json.
  
 ``` js
-var currentPersonDiv;
+var currentPersonElement;
 oboe.fetch('people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
@@ -302,11 +302,11 @@ oboe.fetch('people.json')
    })
    .onPath('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
-      currentPersonDiv.append('<span class="name"> + name + </span>');
+      currentPersonElement.append('<span class="name"> + name + </span>');
    })
    .onError(function( email ){
       // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
-      currentPersonDiv.remove();
+      currentPersonElement.remove();
    })
 ```
     
