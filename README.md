@@ -311,7 +311,7 @@ oboe.fetch('people.json')
 ```
     
 ## More example patterns:
-
+  
 `!.foods.colour` the colours of the foods  
 `person.emails[1]` the first element in the email array for each person  
 `person.emails[*]` any element in the email array for each person  
@@ -347,11 +347,11 @@ Browsers with partial support:
 Unfortunately, IE before version 10 
 [doesn't provide any convenient way to read an http request while it is in progress](http://blogs.msdn.com/b/ieinternals/archive/2010/04/06/comet-streaming-in-internet-explorer-with-xmlhttprequest-and-xdomainrequest.aspx).
 While streaming is possible to work into older Internet Explorers, it requires the server-side to write
-out script tags which goes against Oboe's ethos of very simple streaming over standard REST semantics.
+out script tags which goes against Oboe's ethos of very simple streaming from standard REST services.
 
-In these older versions of IE Oboe gracefully degrades,
+The good news is that in older versions of IE Oboe gracefully degrades,
 it'll just fall back to waiting for the whole response to return, then fire all the events together.
-You don't have to change your code for the older browsers and it'll work like standard Ajax.
+You don't get streaming but it isn't any worse than if you'd have designed your code to non-streaming AJAX.
 
 
 ## Running the tests
@@ -363,7 +363,7 @@ To build and run the tests you'll need:
 * The [JsTestDriver](https://code.google.com/p/js-test-driver/) jar installed somewhere 
 * [Grunt](http://gruntjs.com/) installed globally on your system
 * Node
-* Some kind of unix-like environment. On OSX or Linux you've got this already. On Windows, [cygwin](http://www.cygwin.com/) should do.
+* Some kind of unix-like environment. On Windows, [cygwin](http://www.cygwin.com/) should do.
 
 An (test/slowserver/tenSlowNumbers.js)[example streaming http server] to test against can be found in the [test dir](/test). Unfortunately,
 JSTestDriver's proxying doesn't support streaming HTTP. To get arround this there is 
