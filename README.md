@@ -3,6 +3,43 @@ of http's request-response pattern. It provides a transport that sits
 somewhere between streaming and downloading and a JSON parser that sits somewhere between SAX and
 DOM. It doesn't have any external dependencies and doesn't care which other libraries you need it to speak to.
 
+# API
+
+**Oboe** exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
+instance by calling:
+
+```oboe.fetch(String url)```   
+
+The returned instance exposes two chainable methods:
+
+```.onFind(String pattern, callback(thingFound, String[] path))```   
+```.onPath(String pattern, callback(thingFound, String[] path))```
+
+```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
+The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
+When the pattern is matched you're called back with the thing that was found and where in the document Oboe found it.
+
+```onPath()``` Is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
+thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call. 
+
+## Pattern matching
+
+Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
+
+`!` root json object   
+`.`  path separator   
+`foo` an element at name foo  
+`*`  any element at any name  
+`[2]`  the second element (of an array)  
+`['foo']`  equivalent to .foo  
+`[*]`  equivalent to .*  
+`..` any number of intermediate nodes (non-greedy)
+
+The pattern engine also supports 
+[CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
+using the dollar (```$```) symbol. See the [css4 example below](#using-css4-patterns) or take a look at 
+[more example patterns](#more-example-patterns).  
+
 # Why I made this
 
 Early in 2013 I was working on replacing some legacy Flash financial charts with a similar html5/d3 based web 
@@ -199,10 +236,10 @@ oboe.fetch('http://mysocialsite.example.com/homepage.json')
 
 ```
 
-## Using Css4 style matching to combine with engines like [Angular](http://angularjs.org/) or [Soma](http://soundstep.github.io/soma-template/)
+## Using Css4 style patterns
 
 Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
-It is easier to integrate with libraries like Angular if you're given an array 
+It is easier to integrate with libraries like [Angular](http://angularjs.org/) if you're given an array 
 repeatedly whenever a new element is concatenated onto it.
  
 Oboe supports css4-style selectors and gives them much the same meaning as in the 
@@ -270,44 +307,8 @@ oboe.fetch('people.json')
       currentPersonDiv.remove();
    })
 ```
-
-# API
-
-Oboe exposes only one globally available object, ```window.oboe```.
-
-```oboe.fetch(String url)```   
-   returns a new Oboe object and starts fetching the URL given.
-
-The Oboe object exposes two chainable methods:
-
-```.onFind(String pattern, callback(thingFound, String[] path))```   
-```.onPath(String pattern, callback(thingFound, String[] path))```
-
-```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching the pattern
-that we just gave it. The patterns are forthe most part standard [JSONPath](https://code.google.com/p/json-path/) but
-see the exceptions below. When the pattern is matched the callback is found with the thing that matched and all the
-keys from the top of the document describing where it was found in the JSON.
-
-```onPath()``` Is just the same, except you get the callback when the *path* matches, not when we have the object
-here. For the same pattern this will always fire before ```.onFind()``` and might be used to get ready for that call. 
-
-# JSONPath-like pattern matching
-
-Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
-
-`!` root json object   
-`.`  path separator   
-`foo` an element at name foo  
-`*`  any element at any name  
-`[2]`  the second element (of an array)  
-`[*]`  equivalent to .*  
-`..` any number of intermediate nodes (non-greedy)
-
-**Oboe**'s pattern matching engine also supports 
-[CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (```$```) symbol.    
-
-## Some example patterns:
+    
+## More example patterns:
 
 `!.foods.colour` the colours of the foods  
 `person.emails[1]` the first element in the email array for each person  
