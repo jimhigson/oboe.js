@@ -16,7 +16,7 @@ The returned instance exposes two chainable methods:
 
 ```.onFind()``` let's our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
 The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
-When the pattern is matched you're called back with the thing that was found and where in the document Oboe found it.
+When the pattern is matched the callback is fired with the matching object and the path where it was found.
    
 ```.onPath(String pattern, callback(thingFound, String[] path))```
 
