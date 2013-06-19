@@ -65,7 +65,7 @@ about 10% complete. 10% into the download and the app is already fully interacti
 steams silently in the background.
 
 Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
-but then we'd have to rewrite the server-side and the legacy charts have no idea how to connect to the new server.
+but then we'd have to rewrite the server-side and the legacy charts would have no idea how to connect to the new server.
 It is nice to just have one, simple service for everything.
 
 # Status
