@@ -4,7 +4,9 @@
 # shell script to do the same. Usage is:
 #
 #   build.sh            # run all tests
-#   build.sh foo.bar    # build but only run test foo.bar
+#   build.sh foo.bar    # build but only run test(s) foo.bar
+#
+# Once JSTD is happy, passes onto Grunt to do the Grunt work :-)
 
 # Edit these variables to suit your install:
 JSTD_JAR=~/dev/jstestdriver/JsTestDriver-1.3.5.jar
