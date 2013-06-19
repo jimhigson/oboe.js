@@ -1,22 +1,4 @@
 
-/**
- * Welcome to the oboe.js source.
- * 
- * This codebase is made out of a few components.
- * 
- *    * oboe:         Really just a shell with some event dispatching
- *    * jsonBuilder:  A wrapper around clarinet that progressively builds up the parsed json based on clarinet's
- *                    callbacks and provides higher-level callbacks into oboe
- *    * jsonPath:     Pure functional javascript. Parses the jsonpath specs for matches.
- *    * streamingXhr: A very basic Ajax wrapper that provides a streaming interface
- *    * util:         Things that didn't fit anywhere else.
- *    
- * When the source is built into the distributable js, a single object is exposed at window.oboe    
- * 
- * Happy hacking!
- */
-
-
 var oboe = (function(){
    "use strict";
 
