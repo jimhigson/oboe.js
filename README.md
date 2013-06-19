@@ -1,12 +1,8 @@
-**Oboe.js** is an asynchronous, progressive json parser for web applications Combining
-[clarinet](https://github.com/dscape/clarinet), streaming AJAX and a [JSONPath](https://code.google.com/p/json-path/)-based
-pattern matching interface.
- 
-It is pure transport layer without any external dependencies;
-it doesn't care if you are using jQuery, Angular, d3.js or raw Javascript and integrates neatly 
-with any of those appraoches.
+**Oboe.js** is a fresh appraoch to AJAX for web applications. It provides a transport that sits 
+somewhere between streaming and downloading and a JSON parser that sits somewhere between SAX and
+DOM. It doesn't have any external dependencies and doesn't care which other libraries you need it to speak to.
 
-# Why I made it
+# Why I made this
 
 Early in 2013 I was working on an html5 web application for financial charting, replacing some legacy Flash charts.
 The old charts made ***huuuuge*** requests to the server side to get their initial data. It was a trade-of. They took
@@ -29,6 +25,12 @@ anyway, we didn't really need fully featured streaming, just a progressive versi
 Oboe isn't a replacement for full-blown streaming. But for many cases it combines the simplicity of downloading 
 with the progressiveness of streaming. Debugging is easier than full-blown streaming because everything is visible the REST
 way: just point a browser at a URL to check what's there.
+
+# Status
+
+Just hitting v1.0.0. Project is still quite fluid but an API is settling down. Patches and suggestions most welcome.
+
+BSD licenced.
     
 # More use cases
 
@@ -62,7 +64,7 @@ a neat way to route different parts of a json response to different parts of his
 
 ## listening for json objects
 
-Let's say we have this file, things.json, to be fetched over ajax (In reality your json is probably bigger than this :-)
+Say we have a resource called things.json that we need to fetch over AJAX:
 ``` js
 {
    foods: [
@@ -440,8 +442,3 @@ Total 243 tests (Passed: 243; Fails: 0; Errors: 0) (1079.00 ms)
 **Clarinet** supports use as a node stream. This hasn't been implemented in
 Oboe but it should be quite easy to do.
 
-# TODO
-* For Node, this should work with standard node streams
-* Oboe should also use standard js promises
-* Support for http request params when fetching via ajax
-* More error handling
