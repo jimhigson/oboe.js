@@ -19,7 +19,7 @@
             // in practice, since we're running on an internal network and this is a small file,
             // we'll probably only get one callback         
             streamingXhr(
-               '/test/test/json/smallestPossible.json', 
+               'GET', '/test/test/json/smallestPossible.json', 
                callbacks.add(function(nextDrip){
                   combinedResult += nextDrip;                                                                                     
                })
@@ -39,7 +39,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               '/test/test/json/twentyThousandRecords.json',
+               'GET', '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -69,7 +69,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               cacheBustUrl('/stream/tenSlowNumbers'),
+               'GET', cacheBustUrl('/stream/tenSlowNumbers'),
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -104,7 +104,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               '/test/test/json/twentyThousandRecords.json',
+               'GET', '/test/test/json/twentyThousandRecords.json',
                 
                function(nextDrip){            
                   if( nextDrip.length === 0 ) {
@@ -128,7 +128,7 @@
          
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               cacheBustUrl('/stream/tenSlowNumbers'),
+               'GET', cacheBustUrl('/stream/tenSlowNumbers'),
                 
                function onProgress(){ 
                   numberOfProgressCallbacks++; 

@@ -54,7 +54,7 @@ function firstMatching( fns, args, onFail ) {
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
    var args = toArray(arguments);
-   args[0] = undefined; // the first argument to bind should be null since we
+   args[0] = undefined; // the first argument to bind should be undefined since we
                         // wish to specify no context
 
    return fn.bind.apply(fn, args); 

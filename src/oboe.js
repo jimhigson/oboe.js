@@ -41,9 +41,10 @@ var oboe = (function(){
     *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
     *    works in a very similar to normal ajax.
     */      
-   oboeProto.fetch = function(url, doneCallback) {
+   oboeProto._fetch = function(method, url, doneCallback) {
 
       streamingXhr(
+         method,
          url, 
          this.read.bind(this),
          function( _wholeResponseText ) {
@@ -55,7 +56,7 @@ var oboe = (function(){
          }.bind(this) );
                
       return this;
-   };
+   };      
 
    /**
     * called when there is new text to parse
@@ -255,26 +256,38 @@ var oboe = (function(){
    };
 
    /* finally, let's export factory methods for making a new oboe instance */ 
-   return {
+   var api = {
+   
       /**
       * @param {Object} options an object of options. Passed though
       * directly to clarinet.js but oboe.js does not
       * currently provide options.
       */
-      parser:function(options){
+      create:function(options){
          return new OboeParser(options);
-      }
-   
-   
-      /**
-       * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
-       * ready to call .onPath() or .onFind() to register some callbacks
-       * 
-       * @param url
-       */
-   ,  fetch: function(url, doneCallback){
-         return new OboeParser({}).fetch(url, doneCallback);
-      }     
+      }   
    };
+   
+   function addHttpMethod(methodName, mayHaveContent) {
+      var apiName = methodName.toLowerCase();
+      
+      oboeProto[apiName] = function(url, doneCallback) {      
+         return this._fetch(methodName, url, doneCallback);         
+      };   
+      
+      api[apiName] = function(url, doneCallback){
+         return new OboeParser({}).get(url, doneCallback);         
+      };
+   }
+      
+   /* for each of the http methods, add a corresponding method to 
+      the public api and Oboe.prototype:
+    */
+   addHttpMethod('GET');   
+   addHttpMethod('DELETE');   
+   addHttpMethod('POST', true);   
+   addHttpMethod('PUT', true);   
+   
+   return api;
 
 })();

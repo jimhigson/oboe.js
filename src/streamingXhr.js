@@ -55,6 +55,7 @@ var streamingXhr = (function () {
    /**
     * Fetch something over ajax, calling back as often as new data is available.
     * 
+    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
     * @param {Function(String nextResponseDrip)} progressCallback
     *    A callback to be called repeatedly as the input comes in.
@@ -62,8 +63,10 @@ var streamingXhr = (function () {
     * @param {Function(String wholeResponse)} doneCallback
     *    A callback to be called when the request is complete.
     *    Will be passed the total response
+    * @param {String} data some content to be sent with the request. Only valid
+    *                 if method is POST or PUT.
     */
-   return function(url, progressCallback, doneCallback) {
+   return function(method, url, progressCallback, doneCallback, data) {
       // TODO: in if in node, use require('http') instead of ajax
    
       doneCallback = doneCallback || always;
@@ -71,8 +74,8 @@ var streamingXhr = (function () {
       var xhr = new XMLHttpRequest();
       var numberOfCharsGivenToCallback = 0;
 
-      xhr.open("GET", url, true);
-      xhr.send(null);
+      xhr.open(method, url, true);
+      xhr.send(data || null);
 
       function handleProgress() {
          

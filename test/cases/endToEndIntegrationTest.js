@@ -23,7 +23,7 @@
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAParser()
+            asserter = givenAnOboeInstance()
                .andWeAreListeningForThingsFoundAtPattern('![*]')
                .whenFinishedFetching(
                   'firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks)                  
@@ -48,14 +48,14 @@
       }
       
    ,  testGetsJsonPathCallbacksBeforeRequestFinishesWhenStartedViaOboeFetch: function( queue ) {
-         // the above test uses oboe.parser().fetch(), whereas this one uses oboe.fetch()
+         // the above test uses oboe.parser().get(), whereas this one uses oboe.get()
          // otherwise they are the same.
       
          var asserter;
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAParserFetching('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
+            asserter = givenAnOboeInstanceGettingUrl('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
                .andWeAreListeningForThingsFoundAtPattern('![*]');         
          });
 
@@ -80,7 +80,7 @@
             
          queue.call("request the numbers json", function(jstdCallbacks){
                   
-            givenAParser()
+            givenAnOboeInstance()
                .whenFinishedFetching(               
                   'firstTenNaturalNumbers.json',
                   syncingWith(jstdCallbacks),

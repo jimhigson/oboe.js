@@ -6,13 +6,13 @@
 
  */
 
-var givenAParserFetching = givenAParser; // givenAParserFetching is a synonym for givenAParser
+var givenAnOboeInstanceGettingUrl = givenAnOboeInstance; // givenAParserFetching is a synonym for givenAParser
 
-function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
+function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
 
    function Asserter() {
 
-      var oboeParser,
+      var oboeInstance,
 
           expectingErrors = false,
 
@@ -21,12 +21,12 @@ function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
           
       /* we might be testing creation of the oboe via .fetch or .parser */          
       if( jsonFileName ) {
-         oboeParser = oboe.fetch(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
+         oboeInstance = oboe.get(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
       } else {
-         oboeParser = oboe.parser()
+         oboeInstance = oboe.create()
       }          
           
-      oboeParser.onError(function(e) {
+      oboeInstance.onError(function(e) {
          // Unless stated, the test isn't expecting errors. Fail the test on error: 
          if(!expectingErrors){ 
             fail('unexpected error: ' + e);
@@ -62,21 +62,21 @@ function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         oboeParser.onFind(pattern, argumentClone(spiedCallback), scope);
+         oboeInstance.onFind(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
-         oboeParser.onPath(pattern, argumentClone(spiedCallback), scope);
+         oboeInstance.onPath(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
       
       this.andWeHaveAFaultyCallbackListeningFor = function(pattern) {
          spiedCallback = sinon.stub().throws();      
       
-         oboeParser.onPath(pattern, argumentClone(spiedCallback));
+         oboeInstance.onPath(pattern, argumentClone(spiedCallback));
          return this;
       };      
       
@@ -85,7 +85,7 @@ function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
       
          spiedCallback = sinon.stub();
          
-         oboeParser.onError(argumentClone(spiedCallback));
+         oboeInstance.onError(argumentClone(spiedCallback));
          return this;
       };
                  
@@ -94,7 +94,7 @@ function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
             json = JSON.stringify(json);
          }
 
-         oboeParser.read(json);
+         oboeInstance.read(json);
          return this;
       };
 
@@ -114,7 +114,7 @@ function givenAParser(jsonFileName, jstdCallbacksListForJsonComplete) {
          var callback = jstdCallbacksList.add(callbackFromTest || noop);
       
 
-         oboeParser.fetch(urlForJsonTestFile(jsonFilename), callback);
+         oboeInstance.get(urlForJsonTestFile(jsonFilename), callback);
          
          return this;
       };      
