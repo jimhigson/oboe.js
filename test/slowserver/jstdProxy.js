@@ -40,4 +40,7 @@ http.createServer(
     }).listen(PROXY_PORT);
 
 
-console.log('proxy started'.green, 'now capture some browsers!');
+console.log(
+      'proxy started'.green, 
+      'now capture some browsers by pointing them at:',
+      'http://localhost:2442/capture'.green);
