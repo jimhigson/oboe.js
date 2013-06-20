@@ -12,7 +12,10 @@ or even if it never completes.
 Oboe exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
 instance by calling:
 
-```oboe.fetch(String url)```   
+```oboe.fetch(String url, [Function doneCallback(wholeResponse)])```   
+
+If you give one, the doneCallback is fired when the response is complete and is used to pass you the whole json.
+Usually it is better to use the json a bit at a time than waiting for the whole thing so this parameter is optional.
 
 The returned instance exposes two chainable methods:
 
