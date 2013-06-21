@@ -93,7 +93,7 @@ It is nice to just have one, simple service for everything.
 
 # Status
 
-Just hitting v1.0.0. Project is still quite fluid but an API is settling down. Patches and suggestions most welcome.
+Just hitting v1.1.0 after some API changes. Patches and suggestions most welcome.
 The project is designed in for easy testability and has [over 100 unit tests](/test/cases).
 
 BSD licenced.
