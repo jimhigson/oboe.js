@@ -4,9 +4,9 @@
 # tests to make requests to asynchronous json resources not managed by jstd.
 
 cd slowserver
-node tenSlowNumbers.js &
+node-supervisor tenSlowNumbers.js &
  
-node jstdProxy.js &
+node-supervisor jstdProxy.js &
 
 # We need to run jstd though a proxy. See /test/slowserver/tenSlowNumbers.js
 # and /build shell script.
