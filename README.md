@@ -419,7 +419,7 @@ setting runnermode QUIET
 
 Then capture some browsers by going to http://localhost:2442 and clicking capture. If you aren't running
 Windows and want some IEs to test try 
-(http://osxdaily.com/2011/09/04/internet-explorer-for-mac-ie7-ie8-ie-9-free/)[here].  
+[here](http://osxdaily.com/2011/09/04/internet-explorer-for-mac-ie7-ie8-ie-9-free/).  
   
 Finally, to run the tests, from a second terminal run:
 
