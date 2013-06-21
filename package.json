@@ -1,6 +1,6 @@
 {
   "name": "Oboe.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Oboe.js ajaxes in json, giving you the objects that you care about without waiting for the whole request to finish",
   "main": "index.js",
   "scripts": {
