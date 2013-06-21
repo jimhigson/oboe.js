@@ -302,7 +302,7 @@ var oboe = (function(){
                } else {
                   // parameters specified as options object:
                   url = firstArg.url;
-                  data = firstArg.data;
+                  data = firstArg.body;
                   doneCallback = firstArg.complete;
                }
 

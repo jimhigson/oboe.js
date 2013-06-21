@@ -152,7 +152,7 @@ TestCase("oboeTestHttp", {
    testPostViaOptionsObject:function(){   
       var doneCallback = sinon.stub();
    
-      oboe.doPost({url: 'http://example.com/oboez', data:'my_data', success: doneCallback});
+      oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: doneCallback});
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',

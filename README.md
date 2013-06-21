@@ -17,6 +17,13 @@ instance by calling one of these methods:
    oboe.doPut(    String url, String data, [Function doneCallback(wholeResponse)])
    oboe.doPost(   String url, String data, [Function doneCallback(wholeResponse)])
    oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
+   
+// methods also accept an options object:
+   oboe.doPost({
+      url: String
+      body: Object|String
+      complete: Function
+   })   
 ```   
 
 If you give one, the doneCallback is passed the entire json when the response is complete.
