@@ -55,7 +55,7 @@ function firstMatching( fns, args, onFail ) {
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
    var args = toArray(arguments);
-   args[0] = undefined; // the first argument to bind should be null since we
+   args[0] = undefined; // the first argument to bind should be undefined since we
                         // wish to specify no context
 
    return fn.bind.apply(fn, args); 
@@ -745,6 +745,7 @@ var streamingXhr = (function () {
    /**
     * Fetch something over ajax, calling back as often as new data is available.
     * 
+    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
     * @param {Function(String nextResponseDrip)} progressCallback
     *    A callback to be called repeatedly as the input comes in.
@@ -752,8 +753,10 @@ var streamingXhr = (function () {
     * @param {Function(String wholeResponse)} doneCallback
     *    A callback to be called when the request is complete.
     *    Will be passed the total response
+    * @param {String} data some content to be sent with the request. Only valid
+    *                 if method is POST or PUT.
     */
-   return function(url, progressCallback, doneCallback) {
+   return function(method, url, data, progressCallback, doneCallback) {
       // TODO: in if in node, use require('http') instead of ajax
    
       doneCallback = doneCallback || always;
@@ -761,8 +764,8 @@ var streamingXhr = (function () {
       var xhr = new XMLHttpRequest();
       var numberOfCharsGivenToCallback = 0;
 
-      xhr.open("GET", url, true);
-      xhr.send(null);
+      xhr.open(method, url, true);
+      xhr.send(data || null);
 
       function handleProgress() {
          
@@ -1318,10 +1321,12 @@ var oboe = (function(){
     *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
     *    works in a very similar to normal ajax.
     */      
-   oboeProto.fetch = function(url, doneCallback) {
+   oboeProto._fetch = function(method, url, data, doneCallback) {
 
       streamingXhr(
+         method,
          url, 
+         data,
          this.read.bind(this),
          function( _wholeResponseText ) {
             
@@ -1332,7 +1337,7 @@ var oboe = (function(){
          }.bind(this) );
                
       return this;
-   };
+   };      
 
    /**
     * called when there is new text to parse
@@ -1532,26 +1537,53 @@ var oboe = (function(){
    };
 
    /* finally, let's export factory methods for making a new oboe instance */ 
-   return {
+   var api = {
+   
       /**
       * @param {Object} options an object of options. Passed though
       * directly to clarinet.js but oboe.js does not
       * currently provide options.
       */
-      parser:function(options){
+      create:function(options){
          return new OboeParser(options);
-      }
-   
-   
-      /**
-       * Convenient alias. Creates a new parser, starts an ajax request and returns the parser
-       * ready to call .onPath() or .onFind() to register some callbacks
-       * 
-       * @param url
-       */
-   ,  fetch: function(url, doneCallback){
-         return new OboeParser({}).fetch(url, doneCallback);
-      }     
+      }   
    };
+   
+   function addHttpMethod(httpMethodName, mayHaveContent) {
+      var apiMethodName = httpMethodName.toLowerCase(),
+      
+      // put the method on the oboe prototype so that it can be called from oboe instances:
+          method = oboeProto[apiMethodName] =
+      
+            /* 
+               if mayHaveContext, signature is:
+                  .method( url, content, callback )
+               else it is:
+                  .method( url, callback )            
+            */       
+            function(url) {
+            
+               var dataIndex =    mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+                   callbackIndex = mayHaveContent? 2 : 1;                        
+                     
+               return this._fetch(httpMethodName, url, arguments[dataIndex], arguments[callbackIndex]);         
+            };   
+      
+      // make the above method available without creating an oboe instance first via
+      // the public api:
+      api[apiMethodName] = function(){
+         return method.apply(new OboeParser({}), arguments)         
+      };
+   }
+      
+   /* for each of the http methods, add a corresponding method to 
+      the public api and Oboe.prototype:
+    */
+   addHttpMethod('GET');   
+   addHttpMethod('DELETE');   
+   addHttpMethod('POST', true);   
+   addHttpMethod('PUT', true);   
+   
+   return api;
 
 })();window.oboe = oboe; })(window, Object, Array);
