@@ -31,7 +31,7 @@ The returned instance exposes three chainable methods:
 
 ```.onFind()``` lets our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
 The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
-When the pattern is matched the callback is fired with the matching object and the path where it was found.
+When the pattern is matched the callback is fired with the matching object and a path describing where it was found.
    
 ```js
    .onPath(String pattern, Function callback(thingFound, String[] path))
@@ -44,7 +44,7 @@ thing. For the same pattern this will always fire before ```.onFind()``` and mig
    .onError(callback(Error e))
 ```
 
-```onError()``` lets you give a callback for when something goes wrong 
+supply a callback for when something goes wrong 
 
 ## Pattern matching
 
