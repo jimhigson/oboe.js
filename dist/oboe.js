@@ -700,7 +700,7 @@ if(typeof FastList === 'function') {
  *    allow setting of request params and other such options
  *    x-browser testing, compatibility
  */
-var streamingXhr = (function () {
+var streamingXhr = (function (XHR) {
    
    /* xhr2 already supports everything that we need so very little abstraction required.\
    *  listenToXhr2 is one of two possible values to use as listenToXhr  
@@ -713,7 +713,7 @@ var streamingXhr = (function () {
    /* xhr1 supports little so a bit more work is needed 
     * listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(xhr, _progressListener, completeListener){
+   function listenToXhr1(xhr, progressListener, completeListener){
    
       // unfortunately there is no point polling the responsetext, these bad old browsers rarely make
       // that possible. Instead, we'll just have to wait for the request to be complete, degrading gracefully
@@ -721,14 +721,15 @@ var streamingXhr = (function () {
    
       // handle the request being complete: 
       xhr.onreadystatechange = function() {     
-         if(this.readyState == 4 && this.status == 200 ) {             
+         if(xhr.readyState == 4 && xhr.status == 200) {
+            progressListener();             
             completeListener();
          }                           
       };
    }
       
    function browserSupportsXhr2(){
-      return ('onprogress' in new XMLHttpRequest());
+      return ('onprogress' in new XHR());
    }      
    
    /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
@@ -745,6 +746,8 @@ var streamingXhr = (function () {
    /**
     * Fetch something over ajax, calling back as often as new data is available.
     * 
+    * None of the parameters are optional.
+    * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
     * @param {Function(String nextResponseDrip)} progressCallback
@@ -758,48 +761,30 @@ var streamingXhr = (function () {
     */
    return function(method, url, data, progressCallback, doneCallback) {
       // TODO: in if in node, use require('http') instead of ajax
-   
-      doneCallback = doneCallback || always;
-   
-      var xhr = new XMLHttpRequest();
-      var numberOfCharsGivenToCallback = 0;
+      
+      var xhr = new XHR(),
+          numberOfCharsGivenToCallback = 0;
 
       xhr.open(method, url, true);
       xhr.send(data || null);
 
       function handleProgress() {
          
-         try{
-            var textSoFar = xhr.responseText;
-         } catch(e) {
-            // ie sometimes errors if you try to get the responseText too early but just
-            // ignore it when this happens.
-            return;
-         }
+         var textSoFar = xhr.responseText,
          
-         if( len(textSoFar) > numberOfCharsGivenToCallback ) {
+             // on older browsers, newText will be the whole response. One better ones,
+             // it'll be just the sliver of test we got since last time:         
+             newText = textSoFar.substr(numberOfCharsGivenToCallback);
 
-            var latestText = textSoFar.substr(numberOfCharsGivenToCallback);
+         progressCallback( newText );
 
-            progressCallback( latestText );
-
-            numberOfCharsGivenToCallback = len(textSoFar);
-         }
+         numberOfCharsGivenToCallback = len(textSoFar);
       }
-      
-      function handleDone() {
-         // in case the xhr doesn't support partial loading, by registering the same callback
-         // onload, we at least get the whole response. This shouldn't be necessary once
-         // polling is implemented in lieu of onprogress.      
-         handleProgress();
-         
-         doneCallback( xhr.responseText );
-      }      
-         
-      listenToXhr( xhr, handleProgress, handleDone);
+               
+      listenToXhr( xhr, handleProgress, doneCallback);
    };
 
-})();
+})(XMLHttpRequest);
 
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
@@ -1328,7 +1313,7 @@ var oboe = (function(){
          url, 
          data,
          this.read.bind(this),
-         function( _wholeResponseText ) {
+         function() {
             
             this.close();
             
@@ -1549,24 +1534,43 @@ var oboe = (function(){
       }   
    };
    
+   
+   
    function addHttpMethod(httpMethodName, mayHaveContent) {
-      var apiMethodName = httpMethodName.toLowerCase(),
-      
+         
+      var 
+          // make name like 'doGet' out of name like 'GET'
+          apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
+          dataArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+          callbackArgumentIndex = mayHaveContent? 2 : 1,
+         
       // put the method on the oboe prototype so that it can be called from oboe instances:
           method = oboeProto[apiMethodName] =
-      
-            /* 
-               if mayHaveContext, signature is:
-                  .method( url, content, callback )
-               else it is:
-                  .method( url, callback )            
-            */       
-            function(url) {
+             
+            function(firstArg) {
             
-               var dataIndex =    mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
-                   callbackIndex = mayHaveContent? 2 : 1;                        
-                     
-               return this._fetch(httpMethodName, url, arguments[dataIndex], arguments[callbackIndex]);         
+               var url, data, doneCallback;
+            
+               if( typeof firstArg == 'object' ) {
+                  // parameters specified as options object:
+                  url = firstArg.url;
+                  data = firstArg.data;
+                  doneCallback = firstArg.complete; 
+                  
+               } else {
+                  // parameters specified as arguments
+                  //
+                  //  if mayHaveContext, signature is:
+                  //     .method( url, content, callback )
+                  //  else it is:
+                  //     .method( url, callback )            
+                  //                                
+                  url = firstArg;
+                  data = arguments[dataArgumentIndex];
+                  doneCallback =  arguments[callbackArgumentIndex]
+               }
+               
+               return this._fetch(httpMethodName, url, data, doneCallback );         
             };   
       
       // make the above method available without creating an oboe instance first via
