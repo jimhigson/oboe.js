@@ -1266,7 +1266,12 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
    /* export public API */ 
    var api = 
-       window.oboe = {};
+       window.oboe = {       
+         doGet: httpApiMethod('GET'),   
+         doDelete: httpApiMethod('DELETE'),   
+         doPost: httpApiMethod('POST', true),   
+         doPut: httpApiMethod('PUT', true)              
+       };
 
    /**
     * @constructor 
@@ -1532,17 +1537,16 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    };
    
    /** add an http method to the public api */
-   function httpMethod(httpMethodName, mayHaveContent) {
+   function httpApiMethod(httpMethodName, mayHaveContent) {
          
       var 
           // make name like 'doGet' out of name like 'GET'
-          apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
           bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
           callbackArgumentIndex = mayHaveContent? 2 : 1;           
       
       // make the above method available without creating an oboe instance first via
       // the public api:
-      api[apiMethodName] = function(firstArg){
+      return function(firstArg){
          var url, body, doneCallback;
 
          if (isString(firstArg)) {
@@ -1566,13 +1570,5 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
          return new Oboe()._fetch(httpMethodName, url, body, doneCallback);         
       };
    }
-      
-   /* for each of the http methods, add a corresponding method to 
-      the public api and Oboe.prototype:
-    */
-   httpMethod('GET');   
-   httpMethod('DELETE');   
-   httpMethod('POST', true);   
-   httpMethod('PUT', true);   
-   
+           
 })();})(window, Object, Array, Error);
