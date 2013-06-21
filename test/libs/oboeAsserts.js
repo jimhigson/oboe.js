@@ -21,7 +21,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
           
       /* we might be testing creation of the oboe via .fetch or .parser */          
       if( jsonFileName ) {
-         oboeInstance = oboe.get(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
+         oboeInstance = oboe.doGet(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
       } else {
          oboeInstance = oboe.create()
       }          
@@ -114,7 +114,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
          var callback = jstdCallbacksList.add(callbackFromTest || noop);
       
 
-         oboeInstance.get(urlForJsonTestFile(jsonFilename), callback);
+         oboeInstance.doGet(urlForJsonTestFile(jsonFilename), callback);
          
          return this;
       };      
