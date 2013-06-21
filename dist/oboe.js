@@ -1307,21 +1307,20 @@ var oboe = (function(){
     *    works in a very similar to normal ajax.
     */      
    oboeProto._fetch = function(method, url, data, doneCallback) {
+      var self = this;
 
       streamingXhr(
          method,
          url, 
          data,
-         this.read.bind(this),
-         function() {
+         self.read.bind(self),
+         function() {            
+            self.close();
             
-            this.close();
-            
-            (doneCallback || always)(this._jsonBuilder.getRoot());
-                                          
-         }.bind(this) );
+            (doneCallback || always)(self._jsonBuilder.getRoot());                                          
+         });
                
-      return this;
+      return self;
    };      
 
    /**
