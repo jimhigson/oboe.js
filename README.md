@@ -19,7 +19,7 @@ instance by calling one of these methods:
    oboe.delete(String url, [Function doneCallback(wholeResponse)])
 ```   
 
-If you give one, the doneCallback is fired when the response is complete and is passed you the whole json.
+If you give one, the doneCallback is passed the entire json when the response is complete.
 Usually it is better to use the json one bit at a time rather than waiting for the whole lot so this parameter 
 is optional.
 
