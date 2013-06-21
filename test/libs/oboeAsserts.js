@@ -6,9 +6,9 @@
 
  */
 
-var givenAnOboeInstanceGettingUrl = givenAnOboeInstance; // givenAParserFetching is a synonym for givenAParser
+var givenAnOboeInstanceGetting = givenAnOboeInstance; // givenAParserFetching is a synonym for givenAParser
 
-function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
+function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, callbackFromTest) {
 
    function Asserter() {
 
@@ -19,13 +19,33 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
           
           
+      jsonFileName = jsonFileName || 'invalid://xhr_should_be_stubbed.org/if/not/thats/bad';
+       
       /* we are testing with real http if a filename was given. Generally this is a bad thing
-      *  but is useful for component tests. Where possible we shouldn't do this.  */          
-      if( jsonFileName ) {
-         oboeInstance = oboe.doGet(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
-      } else {
-         oboeInstance = oboe.create()
-      }          
+      *  but is useful for component tests. Where possible we shouldn't do this.  */
+      var requestCompleteCallback = jstdCallbacksListForJsonComplete? 
+                                          jstdCallbacksListForJsonComplete.add(callbackFromTest || noop) 
+                                       :  undefined;
+
+      oboeInstance = oboe.doGet( urlForJsonTestFile(jsonFileName), 
+                                 requestCompleteCallback
+                               );      
+      
+      /**
+       * Fetch the given test json file.
+       * 
+       * Unless the browser's xhr or streamingXhr has been stubbed, this will make an actual
+       * ajax call. In which case this is for end-to-end testing only.
+       * 
+       * @param {String} jsonFilename
+       * @param {Function} [callbackFromTest] a callback for when all the json has been read
+       */
+      this.makeRequestFor = function(jsonFilename, jstdCallbacksList, callbackFromTest) {
+            
+         oboeInstance.doGet(urlForJsonTestFile(jsonFilename), callback);
+         
+         return this;
+      };                
           
       oboeInstance.onError(function(e) {
          // Unless stated, the test isn't expecting errors. Fail the test on error: 
@@ -33,32 +53,6 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
             fail('unexpected error: ' + e);
          }
       });
-
-
-      /** sinon stub is only really used to record arguments given.
-       *  However, we want to preserve the arguments given at the time of calling, because they might subsequently
-       *  be changed inside the parser so everything gets cloned before going to the stub 
-       */
-      function argumentClone(delegateCallback) {
-         return function(){
-         
-            function clone(original){
-               // Note: window.eval being used here instead of JSON.parse because
-               // eval can handle 'undefined' in the string but JSON.parse cannot.
-               // This isn't wholy ideal since this means we're relying on JSON.
-               // stringify to create invalid JSON. But at least there are no
-               // security concerns with this being a test. 
-               return window.eval( '(' + JSON.stringify( original ) + ')' );
-            }
-            function toArray(args) {
-               return Array.prototype.slice.call(args);
-            }
-            
-            var cloneArguments = toArray(arguments).map(clone);
-            
-            delegateCallback.apply( this, cloneArguments );
-         };
-      }
 
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
@@ -100,26 +94,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
       };
 
       function noop(){}
-
-      /**
-       * Fetch the given test json file.
-       * 
-       * Unless the browser's xhr or streamingXhr has been stubbed, this will make an actual
-       * ajax call. In which case this is for end-to-end testing only.
-       * 
-       * @param {String} jsonFilename
-       * @param {Function} [callbackFromTest] a callback for when all the json has been read
-       */
-      this.whenFinishedFetching = function(jsonFilename, jstdCallbacksList, callbackFromTest) {
       
-         var callback = jstdCallbacksList.add(callbackFromTest || noop);
-      
-
-         oboeInstance.doGet(urlForJsonTestFile(jsonFilename), callback);
-         
-         return this;
-      };      
-
       /**
        * Assert any number of conditions were met on the spied callback
        */
@@ -131,6 +106,31 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
 
          return this;
       }
+      
+      /** sinon stub is only really used to record arguments given.
+       *  However, we want to preserve the arguments given at the time of calling, because they might subsequently
+       *  be changed inside the parser so everything gets cloned before going to the stub 
+       */
+      function argumentClone(delegateCallback) {
+         return function(){
+         
+            function clone(original){
+               // Note: window.eval being used here instead of JSON.parse because
+               // eval can handle 'undefined' in the string but JSON.parse cannot.
+               // This isn't wholy ideal since this means we're relying on JSON.
+               // stringify to create invalid JSON. But at least there are no
+               // security concerns with this being a test. 
+               return window.eval( '(' + JSON.stringify( original ) + ')' );
+            }
+            function toArray(args) {
+               return Array.prototype.slice.call(args);
+            }
+            
+            var cloneArguments = toArray(arguments).map(clone);
+            
+            delegateCallback.apply( this, cloneArguments );
+         };
+      }      
    }
    return new Asserter();
 }

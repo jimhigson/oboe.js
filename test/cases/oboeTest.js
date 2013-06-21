@@ -12,9 +12,27 @@
 
  */
 
+var streamingStub;
+
 TestCase("oboeTest", {
 
-
+   setUp: function() {
+      streamingStub = sinon.stub(window, 'streamingXhr');      
+   },
+   
+   tearDown: function() {
+      streamingStub.restore();   
+   },
+   
+   testOboeIsChainableWhenGottenViaShortcut: function() {
+      // very basic test that nothing forgot to return 'this':
+      
+      function noop(){}
+      
+      oboe.doGet('http://example.com/oboez')
+         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
+   },
+   
    testHandlesEmptyObjectDetectedWithBang: function() {
 
       givenAnOboeInstance()

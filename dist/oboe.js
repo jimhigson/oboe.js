@@ -1264,6 +1264,9 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
 (function(){
 
+   /* export public API */ 
+   var api = 
+       window.oboe = {};
 
    /**
     * @constructor 
@@ -1527,23 +1530,6 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
       this._errorListeners.push(callback);
       return this; // chaining
-   };
-
-   /* finally, let's export factory methods for making a new oboe instance */ 
-   var api = 
-       window.oboe = {
-   
-      /**
-      * @param {Object} options an object of options. Passed though
-      * directly to clarinet.js but oboe.js does not
-      * currently provide options.
-      * 
-      * //TODO .create should probably go away in favour of http method based
-      *  factory functions 
-      */
-      create:function(options){
-         return new Oboe(options);
-      }   
    };
    
    /** add an http method to the public api */

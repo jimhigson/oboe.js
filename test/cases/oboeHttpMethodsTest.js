@@ -15,25 +15,7 @@ TestCase("oboeTestHttp", {
    tearDown: function() {
       streamingStub.restore();   
    },
-   
-   testOboeIsChainableWhenGottenViaShortcut: function() {
-      // while we've got the transport stubed, let's sneak in a chainability test:
-      
-      function noop(){}
-      
-      oboe.doGet('http://example.com/oboez')
-         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
-   },
-   
-   testOboeIsChainableWhenGottenViaCreate: function() {
-      // while we've got the transport stubed, let's sneak in a chainability test:
-      
-      function noop(){}
-      
-      oboe.create().doGet('http://example.com/oboez')
-         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
-   },   
-   
+        
    // GET
    testGetViaShortcut:function(){   
       var doneCallback = sinon.stub();
@@ -48,21 +30,7 @@ TestCase("oboeTestHttp", {
          sinon.match.func
       ));   
    },
-   
-   testGetViaInstantiationFirst:function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.create().doGet('http://example.com/oboez', doneCallback);
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
-         'GET',
-         'http://example.com/oboez',
-         null,
-         sinon.match.func,
-         sinon.match.func
-      ));   
-   },
-   
    testGetViaOptionsObject:function(){   
       var doneCallback = sinon.stub();
    
@@ -81,7 +49,7 @@ TestCase("oboeTestHttp", {
    testDeleteViaShortcut:function(){
       var doneCallback = sinon.stub();
    
-      oboe.create().doDelete('http://example.com/oboez', doneCallback);
+      oboe.doDelete('http://example.com/oboez', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
@@ -91,26 +59,13 @@ TestCase("oboeTestHttp", {
          sinon.match.func
       ));   
    },
-   
-   testDeleteViaInstantiationFirst:function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.create().doDelete('http://example.com/oboez', doneCallback);
-      
-      assertTrue( streamingStub.alwaysCalledWithMatch(
-         'DELETE',
-         'http://example.com/oboez',
-         null,
-         sinon.match.func,
-         sinon.match.func
-      ));   
-   },   
+     
          
    // POST
    testPostViaShortcut:function(){
       var doneCallback = sinon.stub();
    
-      oboe.create().doPost('http://example.com/oboez', 'my_data', doneCallback);
+      oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
@@ -124,7 +79,7 @@ TestCase("oboeTestHttp", {
    testCanPostAnObject:function(){
       var doneCallback = sinon.stub();
    
-      oboe.create().doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
+      oboe.doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
@@ -138,7 +93,7 @@ TestCase("oboeTestHttp", {
    testPostViaInstantiationFirst:function(){
       var doneCallback = sinon.stub();
    
-      oboe.create().doPost('http://example.com/oboez', 'my_data', doneCallback);
+      oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
@@ -164,24 +119,11 @@ TestCase("oboeTestHttp", {
    },   
    
    // PUT
-   testPutViaShortcut:function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.create().doPut('http://example.com/oboez', 'my_data', doneCallback);
-      
-      assertTrue( streamingStub.alwaysCalledWithMatch(
-         'PUT',
-         'http://example.com/oboez',
-         'my_data',
-         sinon.match.func,
-         sinon.match.func
-      ));   
-   },
    
    testPutViaInstantiationFirst:function(){
       var doneCallback = sinon.stub();
    
-      oboe.create().doPut('http://example.com/oboez', 'my_data', doneCallback);
+      oboe.doPut('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'PUT',

@@ -23,11 +23,8 @@
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAnOboeInstance()
-               .andWeAreListeningForThingsFoundAtPattern('![*]')
-               .whenFinishedFetching(
-                  'firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks)                  
-               );         
+            asserter = givenAnOboeInstance('firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks))
+               .andWeAreListeningForThingsFoundAtPattern('![*]');         
          });
 
          queue.call("should have gotten all the numbers", function( _queue ){
@@ -55,7 +52,7 @@
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAnOboeInstanceGettingUrl('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
+            asserter = givenAnOboeInstanceGetting('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
                .andWeAreListeningForThingsFoundAtPattern('![*]');         
          });
 
@@ -80,15 +77,15 @@
             
          queue.call("request the numbers json", function(jstdCallbacks){
                   
-            givenAnOboeInstance()
-               .whenFinishedFetching(               
-                  'firstTenNaturalNumbers.json',
-                  syncingWith(jstdCallbacks),
-                  function ajaxFinished(wholeJsonFromOboe) {
-                                       
-                     assertEquals([0,1,2,3,4,5,6,7,8,9], wholeJsonFromOboe);
-                  }
-               );         
+            givenAnOboeInstance(
+                          
+               'firstTenNaturalNumbers.json',
+               syncingWith(jstdCallbacks),
+               function ajaxFinished(wholeJsonFromOboe) {
+                                    
+                  assertEquals([0,1,2,3,4,5,6,7,8,9], wholeJsonFromOboe);
+               }
+            );
          });         
       }
         
