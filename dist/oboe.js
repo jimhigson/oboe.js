@@ -1270,12 +1270,11 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
    /**
     * @constructor 
-    * @param {Object} options
     */      
-   function Oboe(options) {
+   function Oboe() {
    
       var me = this,
-          clarinetParser = clarinet.parser(options),
+          clarinetParser = clarinet.parser(),
           nodeListeners  = [],
           pathListeners  = [];
    
@@ -1539,40 +1538,32 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
           // make name like 'doGet' out of name like 'GET'
           apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
           bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
-          callbackArgumentIndex = mayHaveContent? 2 : 1,
-         
-      // put the method on the oboe prototype so that it can be called from oboe instances:
-          method = oboeProto[apiMethodName] =
-             
-            function(firstArg) {
-
-               var url, body, doneCallback;
-
-               if (isString(firstArg)) {
-                  // parameters specified as arguments
-                  //
-                  //  if mayHaveContext, signature is:
-                  //     .method( url, content, callback )
-                  //  else it is:
-                  //     .method( url, callback )            
-                  //                                
-                  url = firstArg;
-                  body = arguments[bodyArgumentIndex];
-                  doneCallback = arguments[callbackArgumentIndex]
-               } else {
-                  // parameters specified as options object:
-                  url = firstArg.url;
-                  body = firstArg.body;
-                  doneCallback = firstArg.complete;
-               }
-
-               return this._fetch(httpMethodName, url, body, doneCallback);
-            };   
+          callbackArgumentIndex = mayHaveContent? 2 : 1;           
       
       // make the above method available without creating an oboe instance first via
       // the public api:
-      api[apiMethodName] = function(){
-         return method.apply(new Oboe({}), arguments)         
+      api[apiMethodName] = function(firstArg){
+         var url, body, doneCallback;
+
+         if (isString(firstArg)) {
+            // parameters specified as arguments
+            //
+            //  if mayHaveContext, signature is:
+            //     .method( url, content, callback )
+            //  else it is:
+            //     .method( url, callback )            
+            //                                
+            url = firstArg;
+            body = arguments[bodyArgumentIndex];
+            doneCallback = arguments[callbackArgumentIndex]
+         } else {
+            // parameters specified as options object:
+            url = firstArg.url;
+            body = firstArg.body;
+            doneCallback = firstArg.complete;
+         }
+
+         return new Oboe()._fetch(httpMethodName, url, body, doneCallback);         
       };
    }
       
