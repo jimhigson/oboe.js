@@ -20,7 +20,7 @@ instance by calling one of these methods:
 ```   
 
 If you give one, the doneCallback is passed the entire json when the response is complete.
-Usually it is better to use the json one bit at a time rather than waiting for the whole lot so this parameter 
+Usually it is better to use the json one bit at a time rather than waiting for it to download completely so this parameter 
 is optional.
 
 The returned instance exposes three chainable methods:
