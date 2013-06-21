@@ -12,7 +12,8 @@ or even if it never completes.
 Oboe exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
 instance by calling one of these methods:
 
-```oboe.get(String url, [Function doneCallback(wholeResponse)])
+```js
+   oboe.get(String url, [Function doneCallback(wholeResponse)])
    oboe.put(String url, String data, [Function doneCallback(wholeResponse)])
    oboe.post(String url, String data, [Function doneCallback(wholeResponse)])
    oboe.delete(String url, [Function doneCallback(wholeResponse)])
@@ -25,7 +26,7 @@ is optional.
 The returned instance exposes three chainable methods:
 
 ```js
-.onFind(String pattern, callback(thingFound, String[] path))
+   .onFind(String pattern, callback(thingFound, String[] path))
 ```
 
 ```.onFind()``` lets our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
@@ -33,14 +34,14 @@ The patterns are for the most part standard [JSONPath](https://code.google.com/p
 When the pattern is matched the callback is fired with the matching object and the path where it was found.
    
 ```js
-.onPath(String pattern, callback(thingFound, String[] path))
+   .onPath(String pattern, callback(thingFound, String[] path))
 ```
 
 ```onPath()``` is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
 thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call.
 
 ```js
-.onError(callback(Error e))
+   .onError(callback(Error e))
 ```
 
 ```onError()``` lets you give a callback for when something goes wrong 
