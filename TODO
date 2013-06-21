@@ -1,5 +1,0 @@
-
-
-
-Remove .read from public API. This is only relaly useful for testing. Stub sXHR instead to fake 
-input.
