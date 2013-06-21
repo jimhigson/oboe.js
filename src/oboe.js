@@ -269,24 +269,43 @@ var oboe = (function(){
       }   
    };
    
+   
+   
    function addHttpMethod(httpMethodName, mayHaveContent) {
-      var apiMethodName = httpMethodName.toLowerCase(),
-      
+         
+      var 
+          // make name like 'doGet' out of name like 'GET'
+          apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
+          dataArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+          callbackArgumentIndex = mayHaveContent? 2 : 1,
+         
       // put the method on the oboe prototype so that it can be called from oboe instances:
           method = oboeProto[apiMethodName] =
-      
-            /* 
-               if mayHaveContext, signature is:
-                  .method( url, content, callback )
-               else it is:
-                  .method( url, callback )            
-            */       
-            function(url) {
+             
+            function(firstArg) {
             
-               var dataIndex =    mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
-                   callbackIndex = mayHaveContent? 2 : 1;                        
-                     
-               return this._fetch(httpMethodName, url, arguments[dataIndex], arguments[callbackIndex]);         
+               var url, data, doneCallback;
+            
+               if( typeof firstArg == 'object' ) {
+                  // parameters specified as options object:
+                  url = firstArg.url;
+                  data = firstArg.data;
+                  doneCallback = firstArg.complete; 
+                  
+               } else {
+                  // parameters specified as arguments
+                  //
+                  //  if mayHaveContext, signature is:
+                  //     .method( url, content, callback )
+                  //  else it is:
+                  //     .method( url, callback )            
+                  //                                
+                  url = firstArg;
+                  data = arguments[dataArgumentIndex];
+                  doneCallback =  arguments[callbackArgumentIndex]
+               }
+               
+               return this._fetch(httpMethodName, url, data, doneCallback );         
             };   
       
       // make the above method available without creating an oboe instance first via

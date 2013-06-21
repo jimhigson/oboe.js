@@ -1,6 +1,6 @@
 (function(){
 /*
-   Tests that calling .get(), .post(), .put(), .delete() pass through to streamingXhr
+   Tests that calling .doGet(), .doPost(), .doPut(), .doDelete() pass through to streamingXhr
    correctly. streamingXhr is a stub so no actual calls are made. 
  */
 
@@ -17,28 +17,28 @@ TestCase("oboeTestHttp", {
    },
    
    testOboeIsChainableWhenGottenViaShortcut: function() {
-      // while we've got the transport stubed, let's sneak in a few extra tests:
+      // while we've got the transport stubed, let's sneak in a chainability test:
       
       function noop(){}
       
-      oboe.get('http://example.com/oboez')
-         .onPath('*', noop).onFind('*', noop).onError('*', noop).onPath('!', noop);
+      oboe.doGet('http://example.com/oboez')
+         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
    },
    
    testOboeIsChainableWhenGottenViaCreate: function() {
-      // while we've got the transport stubed, let's sneak in a few extra tests:
+      // while we've got the transport stubed, let's sneak in a chainability test:
       
       function noop(){}
       
-      oboe.create().get('http://example.com/oboez')
-         .onPath('*', noop).onFind('*', noop).onError('*', noop).onPath('!', noop);
+      oboe.create().doGet('http://example.com/oboez')
+         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
    },   
    
    // GET
    testGetViaShortcut:function(){   
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.get('http://example.com/oboez', callback);
+      oboe.doGet('http://example.com/oboez', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
@@ -50,9 +50,9 @@ TestCase("oboeTestHttp", {
    },
    
    testGetViaInstantiationFirst:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().get('http://example.com/oboez', callback);
+      oboe.create().doGet('http://example.com/oboez', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
@@ -63,11 +63,25 @@ TestCase("oboeTestHttp", {
       ));   
    },
    
+   testGetViaOptionsObject:function(){   
+      var doneCallback = sinon.stub();
+   
+      oboe.doGet({url: 'http://example.com/oboez', success: doneCallback});
+      
+      assertTrue( streamingStub.alwaysCalledWithMatch(
+         'GET',
+         'http://example.com/oboez',
+         sinon.match.typeOf('undefined'),
+         sinon.match.func,
+         sinon.match.func
+      ));   
+   },   
+   
    // DELETE
    testDeleteViaShortcut:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().delete('http://example.com/oboez', callback);
+      oboe.create().doDelete('http://example.com/oboez', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
@@ -79,9 +93,9 @@ TestCase("oboeTestHttp", {
    },
    
    testDeleteViaInstantiationFirst:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().delete('http://example.com/oboez', callback);
+      oboe.create().doDelete('http://example.com/oboez', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
@@ -94,9 +108,9 @@ TestCase("oboeTestHttp", {
          
    // POST
    testPostViaShortcut:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().post('http://example.com/oboez', 'my_data', callback);
+      oboe.create().doPost('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
@@ -108,9 +122,9 @@ TestCase("oboeTestHttp", {
    },
    
    testPostViaInstantiationFirst:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().post('http://example.com/oboez', 'my_data', callback);
+      oboe.create().doPost('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
@@ -121,11 +135,25 @@ TestCase("oboeTestHttp", {
       ));   
    },
    
+   testPostViaOptionsObject:function(){   
+      var doneCallback = sinon.stub();
+   
+      oboe.doPost({url: 'http://example.com/oboez', data:'my_data', success: doneCallback});
+      
+      assertTrue( streamingStub.alwaysCalledWithMatch(
+         'POST',
+         'http://example.com/oboez',
+         'my_data',
+         sinon.match.func,
+         sinon.match.func
+      ));   
+   },   
+   
    // PUT
    testPutViaShortcut:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().put('http://example.com/oboez', 'my_data', callback);
+      oboe.create().doPut('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'PUT',
@@ -137,9 +165,9 @@ TestCase("oboeTestHttp", {
    },
    
    testPutViaInstantiationFirst:function(){
-      var callback = function callback(){};
+      var doneCallback = sinon.stub();
    
-      oboe.create().put('http://example.com/oboez', 'my_data', callback);
+      oboe.create().doPut('http://example.com/oboez', 'my_data', doneCallback);
       
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'PUT',

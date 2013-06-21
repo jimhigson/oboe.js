@@ -13,10 +13,10 @@ Oboe exposes only one globally available object, ```window.oboe```. You can star
 instance by calling one of these methods:
 
 ```js
-   oboe.get(String url, [Function doneCallback(wholeResponse)])
-   oboe.put(String url, String data, [Function doneCallback(wholeResponse)])
-   oboe.post(String url, String data, [Function doneCallback(wholeResponse)])
-   oboe.delete(String url, [Function doneCallback(wholeResponse)])
+   oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
+   oboe.doPut(    String url, String data, [Function doneCallback(wholeResponse)])
+   oboe.doPost(   String url, String data, [Function doneCallback(wholeResponse)])
+   oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
 ```   
 
 If you give one, the doneCallback is passed the entire json when the response is complete.
@@ -148,7 +148,7 @@ In our webapp we want to download the foods and show them in a webpage. We aren'
 we won't wait for them to be loaded: 
 
 ``` js
-oboe.get('/myapp/things.json')
+oboe.doGet('/myapp/things.json')
    .onFind('foods.*', function( foodObject ){
       // this callback will be called everytime a new object is found in the 
       // foods array. We probably should put this in a js model ala MVC but for
@@ -166,7 +166,7 @@ oboe.get('/myapp/things.json')
 Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
 
 ``` js
-oboe.get('/myapp/things.json')
+oboe.doGet('/myapp/things.json')
    .onFind('name', function( name ){
       jQuery('ul#names').append( $('<li>').text(name) );
    });
@@ -180,7 +180,7 @@ page as soon as possible.
 
 ``` js
 var currentPersonElement;
-oboe.get('//people.json')
+oboe.doGet('//people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream. We can
       // eagerly put their div to the page and then fill it with whatever other data we find:
@@ -209,7 +209,7 @@ I'll assume you already implemented a spinner
 ``` js
 MyApp.showSpinner('#foods');
 
-oboe.get('/myapp/things.json')
+oboe.doGet('/myapp/things.json')
    .onFind('!.foods.*', function( foodThing ){
       jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
    })
@@ -247,7 +247,7 @@ register a wide-matching pattern and use the path parameter to decide what to do
 }
 
 // code to use this json:
-oboe.get('http://mysocialsite.example.com/homepage.json')
+oboe.doGet('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
    .onFind('!.*', function( moduleJson, path ){
    
@@ -285,7 +285,7 @@ given instead to the callback.
 // we are using Angular and have a controller:
 function PeopleListCtrl($scope) {
 
-   oboe.get('/myapp/things.json')
+   oboe.doGet('/myapp/things.json')
       .onFind('$people[*]', function( peopleLoadedSoFar ){
          
          // This callback will be called with a 1-length array, a 2-length array, a 3-length array
@@ -301,7 +301,7 @@ function PeopleListCtrl($scope) {
 Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
-oboe.get('/myapp/things.json')
+oboe.doGet('/myapp/things.json')
    .onFind('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
@@ -316,7 +316,7 @@ give any further callbacks no matter what is in the rest of the json.
  
 ``` js
 var currentPersonElement;
-oboe.get('people.json')
+oboe.doGet('people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the json stream, we can
       // use this to eagerly add them to the page:
