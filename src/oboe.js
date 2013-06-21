@@ -1,46 +1,45 @@
 
 (function(){
 
-   /* export public API */ 
-   var api = 
-       window.oboe = {       
-         doGet: httpApiMethod('GET'),   
-         doDelete: httpApiMethod('DELETE'),   
-         doPost: httpApiMethod('POST', true),   
-         doPut: httpApiMethod('PUT', true)              
-       };
+   /* export public API */
+   window.oboe = {
+      doGet:httpApiMethod('GET'),
+      doDelete:httpApiMethod('DELETE'),
+      doPost:httpApiMethod('POST', true),
+      doPut:httpApiMethod('PUT', true)
+   };
 
    /**
     * @constructor 
     */      
    function Oboe() {
    
-      var me = this,
+      var self = this,
           clarinetParser = clarinet.parser(),
           nodeListeners  = [],
           pathListeners  = [];
    
-      me._nodeListeners        = nodeListeners;
-      me._pathListeners        = pathListeners;
+      self._nodeListeners        = nodeListeners;
+      self._pathListeners        = pathListeners;
       
-      me._errorListeners       = [];
-      me._clarinet             = clarinetParser;
+      self._errorListeners       = [];
+      self._clarinet             = clarinetParser;
       
       // create a json builder and store a function that can be used to get the
       // root of the json later:               
-      me._root                 = jsonBuilder(
+      self._root                 = jsonBuilder(
                                        clarinetParser, 
                                        // when a node is found, notify matching node listeners:
-                                       me._notify.bind(me, nodeListeners),
+                                       self._notify.bind(self, nodeListeners),
                                        // when a node is found, notify matching path listeners:                                        
-                                       me._notify.bind(me, pathListeners)
+                                       self._notify.bind(self, pathListeners)
                                    );
                                                
       clarinetParser.onerror     = function(e) {
-                                       me._notifyErr(e);
+                                       self._notifyErr(e);
                                        
                                        // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-                                       me.close();
+                                       self.close();
                                    };
    }
    
@@ -55,7 +54,7 @@
     *    works in a very similar to normal ajax.
     */      
    oboeProto._fetch = function(method, url, data, doneCallback) {
-      var me = this;
+      var self = this;
 
       // data must either be a string or null to give to streamingXhr as the request body:
       data = data? (isString(data)? data: JSON.stringify(data)) : null;      
@@ -64,37 +63,30 @@
          method,
          url, 
          data,
-         me.read.bind(me),
-         function() {            
-            me.close();
+         function (nextDrip) {
+            // callback for when a bit more data arrives from the streaming XHR
             
-            doneCallback && doneCallback(me._root());                                          
+            if( self.closed ) {
+               throw Error('closed');
+            }
+             
+            try {
+               self._clarinet.write(nextDrip);
+            } catch(e) {
+               // we don't have to do anything here because we always assign a .onerror
+               // to clarinet which will have already been called by the time this 
+               // exception is thrown.                
+            }
+         },
+         function() {
+            // callback for when the response is complete                     
+            self.close();
+            
+            doneCallback && doneCallback(self._root());                                          
          });
                
-      return me;
+      return self;
    };      
-
-   /**
-    * called when there is new text to parse
-    * 
-    * // TODO: currently this is used for testing. Get testing via a stubbed sXHR instead and 
-    * // make this private.
-    * 
-    * @param {String} nextDrip
-    */
-   oboeProto.read = function (nextDrip) {
-      if( this.closed ) {
-         throw Error('closed');
-      }
-   
-      try {
-         this._clarinet.write(nextDrip);
-      } catch(e) {
-         // we don't have to do anything here because we always assign a .onerror
-         // to clarinet which will have already been called by the time this 
-         // exception is thrown.                
-      }
-   };
             
    /**
     * called when the input is done

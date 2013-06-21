@@ -89,7 +89,10 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
             json = JSON.stringify(json);
          }
 
-         oboeInstance.read(json);
+         // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
+         // progress callback and give the string to that.
+         var progressCallback = streamingXhr.firstCall.args[3];
+         progressCallback(json);
          return this;
       };
 
