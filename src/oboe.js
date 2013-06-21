@@ -265,6 +265,9 @@ var oboe = (function(){
       * @param {Object} options an object of options. Passed though
       * directly to clarinet.js but oboe.js does not
       * currently provide options.
+      * 
+      * //TODO .create should probably go away in favour of http method based
+      *  factory functions 
       */
       create:function(options){
          return new OboeParser(options);
