@@ -1,5 +1,5 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src for the unconcatenated source
-(function (window, Object, Array, undefined) {function lastOf(array) {
+(function  (window, Object, Array, Error, undefined ) {function lastOf(array) {
    return array[len(array)-1];
 }
 
@@ -730,11 +730,7 @@ var streamingXhr = (function (XHR) {
          }                           
       };
    }
-      
-   function browserSupportsXhr2(){
-      return ('onprogress' in new XHR());
-   }      
-   
+         
    /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
     * supports
     * 
@@ -744,7 +740,8 @@ var streamingXhr = (function (XHR) {
     * @param {Function} progressListener
     * @param {Function} completeListener
     */
-   var listenToXhr = browserSupportsXhr2()? listenToXhr2 : listenToXhr1;
+   var browserSupportsXhr2 = ('onprogress' in new XHR()),    
+       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1;
       
    /**
     * Fetch something over ajax, calling back as often as new data is available.
@@ -767,22 +764,21 @@ var streamingXhr = (function (XHR) {
       // TODO: in if in node, use require('http') instead of ajax
       
       var xhr = new XHR(),
-          numberOfCharsGivenToCallback = 0;
+          numberOfCharsAlreadyGivenToCallback = 0;
 
       xhr.open(method, url, true);
       xhr.send(data);
 
       function handleProgress() {
          
-         var textSoFar = xhr.responseText,
+         var textSoFar = xhr.responseText;
          
-             // on older browsers, newText will be the whole response. One better ones,
-             // it'll be just the sliver of test we got since last time:         
-             newText = textSoFar.substr(numberOfCharsGivenToCallback);
+         // give the new text to the callback.
+         // on older browsers, the new text will alwasys be the whole response. 
+         // On newer/better ones it'll be just the little bit that we got since last time:         
+         progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
 
-         progressCallback( newText );
-
-         numberOfCharsGivenToCallback = len(textSoFar);
+         numberOfCharsAlreadyGivenToCallback = len(textSoFar);
       }
                
       listenToXhr( xhr, handleProgress, doneCallback);
@@ -1260,47 +1256,51 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    clarinet.onclosearray =       
       curNodeFinished;      
       
-   return {
-      getRoot: function() {
-         return root;
-      }
-   };      
-         
+   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
+   return function() {
+      return root;
+   }           
 }
 
-var oboe = (function(){
-   "use strict";
+(function(){
+
 
    /**
     * @constructor 
     * @param {Object} options
     */      
-   function OboeParser(options) {
+   function Oboe(options) {
    
-      var clarinetParser = clarinet.parser(options),
-          nodeFoundListeners     = [],
-          pathMatchedListeners   = [];
+      var me = this,
+          clarinetParser = clarinet.parser(options),
+          nodeListeners  = [],
+          pathListeners  = [];
    
-      this._nodeFoundListeners   = nodeFoundListeners;
-      this._pathMatchedListeners = pathMatchedListeners;
+      me._nodeListeners        = nodeListeners;
+      me._pathListeners        = pathListeners;
       
-      this._errorListeners       = [];
-      this._clarinet             = clarinetParser;               
-      this._jsonBuilder          = jsonBuilder(
+      me._errorListeners       = [];
+      me._clarinet             = clarinetParser;
+      
+      // create a json builder and store a function that can be used to get the
+      // root of the json later:               
+      me._root                 = jsonBuilder(
                                        clarinetParser, 
-                                       this._notifyListeners.bind(this, nodeFoundListeners), 
-                                       this._notifyListeners.bind(this, pathMatchedListeners)
+                                       // when a node is found, notify matching node listeners:
+                                       me._notify.bind(me, nodeListeners),
+                                       // when a node is found, notify matching path listeners:                                        
+                                       me._notify.bind(me, pathListeners)
                                    );
                                                
       clarinetParser.onerror     = function(e) {
-                                       this.notifyErrors(e);
+                                       me._notifyErr(e);
                                        
                                        // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-                                       this.close();
-                                   }.bind(this);
+                                       me.close();
+                                   };
    }
    
-   var oboeProto = OboeParser.prototype;
+   var oboeProto = Oboe.prototype;
 
    /**
     * Ask this oboe instance to fetch the given url. Called via one of the public api methods.
@@ -1311,7 +1311,7 @@ var oboe = (function(){
     *    works in a very similar to normal ajax.
     */      
    oboeProto._fetch = function(method, url, data, doneCallback) {
-      var self = this;
+      var me = this;
 
       // data must either be a string or null to give to streamingXhr as the request body:
       data = data? (isString(data)? data: JSON.stringify(data)) : null;      
@@ -1320,18 +1320,21 @@ var oboe = (function(){
          method,
          url, 
          data,
-         self.read.bind(self),
+         me.read.bind(me),
          function() {            
-            self.close();
+            me.close();
             
-            doneCallback && doneCallback(self._jsonBuilder.getRoot());                                          
+            doneCallback && doneCallback(me._root());                                          
          });
                
-      return self;
+      return me;
    };      
 
    /**
     * called when there is new text to parse
+    * 
+    * // TODO: currently this is used for testing. Get testing via a stubbed sXHR instead and 
+    * // make this private.
     * 
     * @param {String} nextDrip
     */
@@ -1354,15 +1357,15 @@ var oboe = (function(){
     * 
     */
    oboeProto.close = function () {
+      var clarinet = this._clarinet.close();   
+   
       this.closed = true;
       
       // we won't fire any more events again so forget our listeners:
-      this._nodeFoundListeners = [];
-      this._pathMatchedListeners = [];
+      this._nodeListeners = [];
+      this._pathListeners = [];
       this._errorListeners = [];
-      
-      var clarinet = this._clarinet;
-      
+            
       // quit listening to clarinet as well. We've done with this stream:
       clarinet.onkey = 
       clarinet.onvalue = 
@@ -1371,17 +1374,16 @@ var oboe = (function(){
       clarinet.onend = 
       clarinet.oncloseobject =                         
       clarinet.onclosearray = 
-      clarinet.onerror = undefined;
-      
-      clarinet.close();            
+      clarinet.onerror = undefined;      
    };
    
    /**
-    * Notify any of the listeners in a list that are interested in the path.
+    * Notify any of the listeners in a list that are interested in the path or node that was
+    * just found.
     * 
-    * @param {Array} listenerList one of this._nodeFoundListeners or this._pathMatchedListeners
+    * @param {Array} listenerList one of this._nodeListeners or this._pathListeners
     */  
-   oboeProto._notifyListeners = function ( listenerList, node, path, ancestors ) {
+   oboeProto._notify = function ( listenerList, node, path, ancestors ) {
       
       var nodeList = ancestors.concat([node]);
 
@@ -1392,7 +1394,7 @@ var oboe = (function(){
     * 
     * @param error
     */
-   oboeProto.notifyErrors = function(error) {
+   oboeProto._notifyErr = function(error) {
       callAll( this._errorListeners, undefined, error );            
    };
    
@@ -1415,7 +1417,7 @@ var oboe = (function(){
        * A function which when called with the details of something called in the parsed json, calls the listener
        * if it matches.
        * 
-       * Will be called in the context of the current oboe instance from OboeParser#notifyListeners.
+       * Will be called in the context of the current oboe instance from Oboe#_notify.
        */ 
      return function( node, path, ancestors, nodeList ) {
      
@@ -1433,7 +1435,7 @@ var oboe = (function(){
          //    undefined: like above, but we don't have the node yet. ie, we know there is a
          //       node that matches but we don't know if it is an array, object, string
          //       etc yet so we can't say anything about it. Null isn't used here because
-         //       undefinedthat would be indistinguishable from us finding a node with a value of
+         //       it would be indistinguishable from us finding a node with a value of
          //       null.
          //                      
          if( foundNode !== false ) {                                 
@@ -1442,7 +1444,7 @@ var oboe = (function(){
             try{
                callback.call(context, foundNode, path, ancestors );
             } catch(e) {
-               this.notifyErrors(Error('Error thrown by callback ' + e.message));
+               this._notifyErr(Error('Error thrown by callback ' + e.message));
             }
          }
       }   
@@ -1498,7 +1500,7 @@ var oboe = (function(){
     */
    oboeProto.onPath = function (jsonPath, callback, context) {
    
-      on(this._pathMatchedListeners, jsonPath, callback, context);
+      on(this._pathListeners, jsonPath, callback, context);
       return this; // chaining
    };
 
@@ -1512,7 +1514,7 @@ var oboe = (function(){
     */
    oboeProto.onFind = function (jsonPath, callback, context) {
    
-      on(this._nodeFoundListeners, jsonPath, callback, context);
+      on(this._nodeListeners, jsonPath, callback, context);
       return this; // chaining
    };
    
@@ -1528,7 +1530,8 @@ var oboe = (function(){
    };
 
    /* finally, let's export factory methods for making a new oboe instance */ 
-   var api = {
+   var api = 
+       window.oboe = {
    
       /**
       * @param {Object} options an object of options. Passed though
@@ -1539,18 +1542,17 @@ var oboe = (function(){
       *  factory functions 
       */
       create:function(options){
-         return new OboeParser(options);
+         return new Oboe(options);
       }   
    };
    
-   
-   
-   function addHttpMethod(httpMethodName, mayHaveContent) {
+   /** add an http method to the public api */
+   function httpMethod(httpMethodName, mayHaveContent) {
          
       var 
           // make name like 'doGet' out of name like 'GET'
           apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
-          dataArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+          bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
           callbackArgumentIndex = mayHaveContent? 2 : 1,
          
       // put the method on the oboe prototype so that it can be called from oboe instances:
@@ -1558,7 +1560,7 @@ var oboe = (function(){
              
             function(firstArg) {
 
-               var url, data, doneCallback;
+               var url, body, doneCallback;
 
                if (isString(firstArg)) {
                   // parameters specified as arguments
@@ -1569,33 +1571,31 @@ var oboe = (function(){
                   //     .method( url, callback )            
                   //                                
                   url = firstArg;
-                  data = arguments[dataArgumentIndex];
+                  body = arguments[bodyArgumentIndex];
                   doneCallback = arguments[callbackArgumentIndex]
                } else {
                   // parameters specified as options object:
                   url = firstArg.url;
-                  data = firstArg.body;
+                  body = firstArg.body;
                   doneCallback = firstArg.complete;
                }
 
-               return this._fetch(httpMethodName, url, data, doneCallback);
+               return this._fetch(httpMethodName, url, body, doneCallback);
             };   
       
       // make the above method available without creating an oboe instance first via
       // the public api:
       api[apiMethodName] = function(){
-         return method.apply(new OboeParser({}), arguments)         
+         return method.apply(new Oboe({}), arguments)         
       };
    }
       
    /* for each of the http methods, add a corresponding method to 
       the public api and Oboe.prototype:
     */
-   addHttpMethod('GET');   
-   addHttpMethod('DELETE');   
-   addHttpMethod('POST', true);   
-   addHttpMethod('PUT', true);   
+   httpMethod('GET');   
+   httpMethod('DELETE');   
+   httpMethod('POST', true);   
+   httpMethod('PUT', true);   
    
-   return api;
-
-})();window.oboe = oboe; })(window, Object, Array);
+})();})(window, Object, Array, Error);

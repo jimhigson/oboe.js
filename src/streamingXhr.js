@@ -36,11 +36,7 @@ var streamingXhr = (function (XHR) {
          }                           
       };
    }
-      
-   function browserSupportsXhr2(){
-      return ('onprogress' in new XHR());
-   }      
-   
+         
    /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
     * supports
     * 
@@ -50,7 +46,8 @@ var streamingXhr = (function (XHR) {
     * @param {Function} progressListener
     * @param {Function} completeListener
     */
-   var listenToXhr = browserSupportsXhr2()? listenToXhr2 : listenToXhr1;
+   var browserSupportsXhr2 = ('onprogress' in new XHR()),    
+       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1;
       
    /**
     * Fetch something over ajax, calling back as often as new data is available.
@@ -73,22 +70,21 @@ var streamingXhr = (function (XHR) {
       // TODO: in if in node, use require('http') instead of ajax
       
       var xhr = new XHR(),
-          numberOfCharsGivenToCallback = 0;
+          numberOfCharsAlreadyGivenToCallback = 0;
 
       xhr.open(method, url, true);
       xhr.send(data);
 
       function handleProgress() {
          
-         var textSoFar = xhr.responseText,
+         var textSoFar = xhr.responseText;
          
-             // on older browsers, newText will be the whole response. One better ones,
-             // it'll be just the sliver of test we got since last time:         
-             newText = textSoFar.substr(numberOfCharsGivenToCallback);
+         // give the new text to the callback.
+         // on older browsers, the new text will alwasys be the whole response. 
+         // On newer/better ones it'll be just the little bit that we got since last time:         
+         progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
 
-         progressCallback( newText );
-
-         numberOfCharsGivenToCallback = len(textSoFar);
+         numberOfCharsAlreadyGivenToCallback = len(textSoFar);
       }
                
       listenToXhr( xhr, handleProgress, doneCallback);

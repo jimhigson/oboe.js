@@ -19,7 +19,8 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete) {
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
           
           
-      /* we might be testing creation of the oboe via .fetch or .parser */          
+      /* we are testing with real http if a filename was given. Generally this is a bad thing
+      *  but is useful for component tests. Where possible we shouldn't do this.  */          
       if( jsonFileName ) {
          oboeInstance = oboe.doGet(urlForJsonTestFile(jsonFileName), jstdCallbacksListForJsonComplete.add(function(){}));
       } else {

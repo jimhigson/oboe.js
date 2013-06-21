@@ -169,10 +169,8 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    clarinet.onclosearray =       
       curNodeFinished;      
       
-   return {
-      getRoot: function() {
-         return root;
-      }
-   };      
-         
+   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
+   return function() {
+      return root;
+   }           
 }
