@@ -43,7 +43,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
          'http://example.com/oboez',
-         sinon.match.typeOf('undefined'),
+         null,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -57,7 +57,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
          'http://example.com/oboez',
-         sinon.match.typeOf('undefined'),
+         null,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -71,7 +71,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
          'http://example.com/oboez',
-         sinon.match.typeOf('undefined'),
+         null,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -86,7 +86,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
          'http://example.com/oboez',
-         sinon.match.typeOf('undefined'),
+         null,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -100,7 +100,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
          'http://example.com/oboez',
-         sinon.match.typeOf('undefined'),
+         null,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -120,6 +120,20 @@ TestCase("oboeTestHttp", {
          sinon.match.func
       ));   
    },
+   
+   testCanPostAnObject:function(){
+      var doneCallback = sinon.stub();
+   
+      oboe.create().doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
+      
+      assertTrue( streamingStub.alwaysCalledWithMatch(
+         'POST',
+         'http://example.com/oboez',
+         '[1,2,3,4,5]', // oboe should have encoded as json before it got to streamingXhr
+         sinon.match.func,
+         sinon.match.func
+      ));   
+   },   
    
    testPostViaInstantiationFirst:function(){
       var doneCallback = sinon.stub();

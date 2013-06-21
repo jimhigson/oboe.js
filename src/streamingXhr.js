@@ -7,8 +7,7 @@
  *
  * TODO:
  *    error handling
- *    allow setting of request params and other such options
- *    x-browser testing, compatibility
+ *    allow setting of request params
  */
 var streamingXhr = (function (XHR) {
    
@@ -60,6 +59,7 @@ var streamingXhr = (function (XHR) {
     * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
+    * @param {String|null} data
     * @param {Function(String nextResponseDrip)} progressCallback
     *    A callback to be called repeatedly as the input comes in.
     *    Will be passed the new string since the last call.
@@ -76,7 +76,7 @@ var streamingXhr = (function (XHR) {
           numberOfCharsGivenToCallback = 0;
 
       xhr.open(method, url, true);
-      xhr.send(data || null);
+      xhr.send(data);
 
       function handleProgress() {
          

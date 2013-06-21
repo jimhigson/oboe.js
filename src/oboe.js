@@ -34,7 +34,7 @@ var oboe = (function(){
    var oboeProto = OboeParser.prototype;
 
    /**
-    * Ask this oboe instance to fetch the given url
+    * Ask this oboe instance to fetch the given url. Called via one of the public api methods.
     * 
     * @param {String} url
     * @param {Function (String|Array wholeParsedJson)} doneCallback a callback for when the request is
@@ -44,6 +44,9 @@ var oboe = (function(){
    oboeProto._fetch = function(method, url, data, doneCallback) {
       var self = this;
 
+      // data must either be a string or null to give to streamingXhr as the request body:
+      data = data? (isString(data)? data: JSON.stringify(data)) : null;      
+
       streamingXhr(
          method,
          url, 
@@ -52,7 +55,7 @@ var oboe = (function(){
          function() {            
             self.close();
             
-            (doneCallback || always)(self._jsonBuilder.getRoot());                                          
+            doneCallback && doneCallback(self._jsonBuilder.getRoot());                                          
          });
                
       return self;
@@ -197,7 +200,7 @@ var oboe = (function(){
    /** implementation behind .onPath() and .onFind 
     */
    function on(listenerList, jsonPath, callback, context) {
-      if( typeof jsonPath === 'string' ) {
+      if( isString(jsonPath) ) {
          pushListener(listenerList, jsonPath, callback, context);
       } else {
          pushListeners(listenerList, jsonPath);
@@ -282,16 +285,10 @@ var oboe = (function(){
           method = oboeProto[apiMethodName] =
              
             function(firstArg) {
-            
+
                var url, data, doneCallback;
-            
-               if( typeof firstArg == 'object' ) {
-                  // parameters specified as options object:
-                  url = firstArg.url;
-                  data = firstArg.data;
-                  doneCallback = firstArg.complete; 
-                  
-               } else {
+
+               if (isString(firstArg)) {
                   // parameters specified as arguments
                   //
                   //  if mayHaveContext, signature is:
@@ -301,10 +298,15 @@ var oboe = (function(){
                   //                                
                   url = firstArg;
                   data = arguments[dataArgumentIndex];
-                  doneCallback =  arguments[callbackArgumentIndex]
+                  doneCallback = arguments[callbackArgumentIndex]
+               } else {
+                  // parameters specified as options object:
+                  url = firstArg.url;
+                  data = firstArg.data;
+                  doneCallback = firstArg.complete;
                }
-               
-               return this._fetch(httpMethodName, url, data, doneCallback );         
+
+               return this._fetch(httpMethodName, url, data, doneCallback);
             };   
       
       // make the above method available without creating an oboe instance first via

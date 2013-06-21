@@ -14,6 +14,10 @@ function toArray(arrayLikeThing, startIndex) {
    return Array.prototype.slice.call(arrayLikeThing, startIndex);
 }
 
+function isString(thing) {
+   return typeof thing == 'string';
+}
+
 /*
    Call each of a list of functions with the same arguments, ignoring any return
    values.

@@ -32,7 +32,7 @@
             assertEquals('{}', combinedResult);
          });      
       },
-      
+                 
       testCanAjaxInAVeryLargeFileWithoutMissingAny: function(queue) {
       
          var combinedResult = '';
@@ -70,7 +70,7 @@
       
          queue.call("ask the streaming xhr to fetch", function(callbacks){
 
-            // since this is a large file, even serving locally we're going to get multiple callbacks:       
+            // since this is a slowly, asynchronously written resource, we're going to get multiple callbacks:       
             streamingXhr(
                'GET', cacheBustUrl('/stream/tenSlowNumbers'),
                 null, // this is a get: no data to send               
@@ -100,7 +100,45 @@
             // as per the name, should have 20,000 records in that file:                     
             assertEquals([0,1,2,3,4,5,6,7,8,9], parsedResult);
          });      
-      },      
+      },
+      
+      testCanMakeAPostRequest: function(queue) {
+      
+         var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+         var combinedResult = '';
+      
+         queue.call("ask the streaming xhr to fetch", function(callbacks){
+       
+            streamingXhr(
+               'POST', cacheBustUrl('/stream/echoBack.json'),
+               JSON.stringify( payload ),               
+                
+               function(nextDrip){            
+                  combinedResult += nextDrip;                                                                                     
+               },
+               
+               // callback for when the stream is complete. we register this just so that jstd knows
+               // when to move onto the next queuer            
+               callbacks.noop()
+            )         
+         });
+
+         queue.call("check we got the correct json back", function(){
+         
+            // should have given valid json;
+            try{
+               var parsedResult = JSON.parse(combinedResult);
+            } catch(e) {
+               fail('could not parse json "' + combinedResult + '" because ' + e
+                   + ' this might happen if the browsers are connecting directly' 
+                   + ' to jstd instead of through the proxy'
+                   );
+            }
+            
+            // as per the name, should have 20,000 records in that file:                     
+            assertEquals(payload, parsedResult);
+         });      
+      },
       
       testDoesntCallbackWithoutNewData: function(queue) {
             

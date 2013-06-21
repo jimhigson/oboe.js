@@ -13,32 +13,54 @@ var numberInterval = 250;
 var maxNumber = 9;
 
 function writeTenNumbersAsJson(req, res) {
-   console.log('slow number server: will write numbers 0 ..', String(maxNumber).blue, 'out as a json array at a rate of one per', String(numberInterval).blue, 'ms');
+   console.log('got', req.method.blue , 'request with body', req.body);
 
-   var JSON_MIME_TYPE = "application/octet-stream";
-   res.setHeader("Content-Type", JSON_MIME_TYPE);
-   res.writeHead(200);
+   if( req.method == 'POST' ) {
+   
+      // if we get a POST, this service just acts as an echo:
+      console.log('will just echo the same back'.green);      
 
-   res.write('[\n');
+      req.on('readable', function() {
+         var reqBody = req.read().toString();
+         console.log('echoing back', reqBody.blue);
+         res.write(reqBody);      
+      });
+   
+      req.on('end', function() {
+         console.log('done echoing back'.green);      
+         res.end(req.body);      
+      });
+   
+   } else {
 
-   var curNumber = 0;
+      // otherwise, write ten numbers out slowly:
+      console.log('slow number server: will write numbers 0 ..', String(maxNumber).blue, 'out as a json array at a rate of one per', String(numberInterval).blue, 'ms');
    
-   var inervalId = setInterval(function () {
+      var JSON_MIME_TYPE = "application/octet-stream";
+      res.setHeader("Content-Type", JSON_MIME_TYPE);
+      res.writeHead(200);
    
-      res.write(String(curNumber));
+      res.write('[\n');
    
-      if( curNumber == maxNumber ) {
-            
-         res.end(']');
-         clearInterval(inervalId);
-         console.log('slow number server: finished writing out'.green);        
-      } else {      
-         res.write(',\n');         
-      }
+      var curNumber = 0;
       
-      curNumber++;
-   
-   }, numberInterval);
+      var inervalId = setInterval(function () {
+      
+         res.write(String(curNumber));
+      
+         if( curNumber == maxNumber ) {
+               
+            res.end(']');
+            clearInterval(inervalId);
+            console.log('slow number server: finished writing out'.green);        
+         } else {      
+            res.write(',\n');         
+         }
+         
+         curNumber++;
+      
+      }, numberInterval);      
+   }
 
 }
 
