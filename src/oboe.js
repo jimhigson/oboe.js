@@ -48,7 +48,7 @@ var oboe = (function(){
          url, 
          data,
          this.read.bind(this),
-         function( _wholeResponseText ) {
+         function() {
             
             this.close();
             
