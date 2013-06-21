@@ -1,32 +1,5 @@
-* Backup
-   - ongoing
 
-* Why are new tabs opening?
-   - not sure, just prevented optning for now
 
-* MSIE
-   - need windows xp cd to do this
 
-* Grunt
-   X install
-   X uglify
-   * run tests?
-      * jasmine?
-         - jstd is ok for first try. it works.
-X Require.js
-* Github it
-
-* Work in Node.js
-   - allow stream mode: .on etc like in clarinet
-
-* port some of the samples over from clarinet's git repo
-   * eg twitter.js
-
-1 allow to be connected to ajax
-   * can we see an ajax call in-progress?
-
-* detect on entry and on exit
-   *  eg, fire one notification when a path is found, another when it is
-      completely parsed
-
-* Throw away objects that could never be matched by any patterns
+Remove .read from public API. This is only relaly useful for testing. Stub sXHR instead to fake 
+input.

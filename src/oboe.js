@@ -41,11 +41,12 @@ var oboe = (function(){
     *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
     *    works in a very similar to normal ajax.
     */      
-   oboeProto._fetch = function(method, url, doneCallback) {
+   oboeProto._fetch = function(method, url, data, doneCallback) {
 
       streamingXhr(
          method,
          url, 
+         data,
          this.read.bind(this),
          function( _wholeResponseText ) {
             
@@ -268,15 +269,30 @@ var oboe = (function(){
       }   
    };
    
-   function addHttpMethod(methodName, mayHaveContent) {
-      var apiName = methodName.toLowerCase();
+   function addHttpMethod(httpMethodName, mayHaveContent) {
+      var apiMethodName = httpMethodName.toLowerCase(),
       
-      oboeProto[apiName] = function(url, doneCallback) {      
-         return this._fetch(methodName, url, doneCallback);         
-      };   
+      // put the method on the oboe prototype so that it can be called from oboe instances:
+          method = oboeProto[apiMethodName] =
       
-      api[apiName] = function(url, doneCallback){
-         return new OboeParser({}).get(url, doneCallback);         
+            /* 
+               if mayHaveContext, signature is:
+                  .method( url, content, callback )
+               else it is:
+                  .method( url, callback )            
+            */       
+            function(url) {
+            
+               var dataIndex =    mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+                   callbackIndex = mayHaveContent? 2 : 1;                        
+                     
+               return this._fetch(httpMethodName, url, arguments[dataIndex], arguments[callbackIndex]);         
+            };   
+      
+      // make the above method available without creating an oboe instance first via
+      // the public api:
+      api[apiMethodName] = function(){
+         return method.apply(new OboeParser({}), arguments)         
       };
    }
       

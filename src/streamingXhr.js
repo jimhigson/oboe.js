@@ -66,7 +66,7 @@ var streamingXhr = (function () {
     * @param {String} data some content to be sent with the request. Only valid
     *                 if method is POST or PUT.
     */
-   return function(method, url, progressCallback, doneCallback, data) {
+   return function(method, url, data, progressCallback, doneCallback) {
       // TODO: in if in node, use require('http') instead of ajax
    
       doneCallback = doneCallback || always;

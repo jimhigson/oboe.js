@@ -19,7 +19,9 @@
             // in practice, since we're running on an internal network and this is a small file,
             // we'll probably only get one callback         
             streamingXhr(
-               'GET', '/test/test/json/smallestPossible.json', 
+               'GET', '/test/test/json/smallestPossible.json',
+               null, // this is a get: no data to send               
+                
                callbacks.add(function(nextDrip){
                   combinedResult += nextDrip;                                                                                     
                })
@@ -40,6 +42,7 @@
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
                'GET', '/test/test/json/twentyThousandRecords.json',
+               null, // this is a get: no data to send                
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -70,6 +73,7 @@
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
                'GET', cacheBustUrl('/stream/tenSlowNumbers'),
+                null, // this is a get: no data to send               
                 
                function(nextDrip){            
                   combinedResult += nextDrip;                                                                                     
@@ -105,6 +109,7 @@
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
                'GET', '/test/test/json/twentyThousandRecords.json',
+               null, // this is a get: no data to send               
                 
                function(nextDrip){            
                   if( nextDrip.length === 0 ) {
@@ -129,6 +134,7 @@
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
                'GET', cacheBustUrl('/stream/tenSlowNumbers'),
+               null, // this is a get: no data to send               
                 
                function onProgress(){ 
                   numberOfProgressCallbacks++; 
