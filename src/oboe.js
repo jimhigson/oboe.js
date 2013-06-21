@@ -281,7 +281,7 @@ var oboe = (function(){
       var 
           // make name like 'doGet' out of name like 'GET'
           apiMethodName = 'do' + httpMethodName.charAt(0) + httpMethodName.substr(1).toLowerCase(),
-          dataArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
+          bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
           callbackArgumentIndex = mayHaveContent? 2 : 1,
          
       // put the method on the oboe prototype so that it can be called from oboe instances:
@@ -289,7 +289,7 @@ var oboe = (function(){
              
             function(firstArg) {
 
-               var url, data, doneCallback;
+               var url, body, doneCallback;
 
                if (isString(firstArg)) {
                   // parameters specified as arguments
@@ -300,16 +300,16 @@ var oboe = (function(){
                   //     .method( url, callback )            
                   //                                
                   url = firstArg;
-                  data = arguments[dataArgumentIndex];
+                  body = arguments[bodyArgumentIndex];
                   doneCallback = arguments[callbackArgumentIndex]
                } else {
                   // parameters specified as options object:
                   url = firstArg.url;
-                  data = firstArg.body;
+                  body = firstArg.body;
                   doneCallback = firstArg.complete;
                }
 
-               return this._fetch(httpMethodName, url, data, doneCallback);
+               return this._fetch(httpMethodName, url, body, doneCallback);
             };   
       
       // make the above method available without creating an oboe instance first via

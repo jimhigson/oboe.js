@@ -14,8 +14,8 @@ instance by calling one of these methods:
 
 ```js
    oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
-   oboe.doPut(    String url, String data, [Function doneCallback(wholeResponse)])
-   oboe.doPost(   String url, String data, [Function doneCallback(wholeResponse)])
+   oboe.doPut(    String url, String body, [Function doneCallback(wholeResponse)])
+   oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
    oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
    
 // methods also accept an options object:
