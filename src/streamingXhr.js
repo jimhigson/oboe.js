@@ -8,8 +8,24 @@
  * TODO:
  *    error handling
  *    allow setting of request params
+ *    
+ * Fetch something over ajax, calling back as often as new data is available.
+ * 
+ * None of the parameters are optional.
+ * 
+ * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+ * @param {String} url
+ * @param {String|null} data
+ * @param {Function(String nextResponseDrip)} progressCallback
+ *    A callback to be called repeatedly as the input comes in.
+ *    Will be passed the new string since the last call.
+ * @param {Function(String wholeResponse)} doneCallback
+ *    A callback to be called when the request is complete.
+ *    Will be passed the total response
+ * @param {String} data some content to be sent with the request. Only valid
+ *                 if method is POST or PUT.
  */
-var streamingXhr = (function (XHR) {
+function streamingXhr(method, url, data, progressCallback, doneCallback) {
    
    /* xhr2 already supports everything that we need so very little abstraction required.\
    *  listenToXhr2 is one of two possible values to use as listenToXhr  
@@ -37,57 +53,25 @@ var streamingXhr = (function (XHR) {
       };
    }
          
-   /* listenToXhr will be set to the appropriate function for XHR1 or XHR2 depending on what the browser
-    * supports
-    * 
-    * @function
-    * 
-    * @param {XmlHttpRequest} xhr
-    * @param {Function} progressListener
-    * @param {Function} completeListener
-    */
-   var browserSupportsXhr2 = ('onprogress' in new XHR()),    
-       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1;
+   var xhr = new XMLHttpRequest(),
+       browserSupportsXhr2 = ('onprogress' in xhr),    
+       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
+       numberOfCharsAlreadyGivenToCallback = 0;
+
+   function handleProgress() {
       
-   /**
-    * Fetch something over ajax, calling back as often as new data is available.
-    * 
-    * None of the parameters are optional.
-    * 
-    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
-    * @param {String} url
-    * @param {String|null} data
-    * @param {Function(String nextResponseDrip)} progressCallback
-    *    A callback to be called repeatedly as the input comes in.
-    *    Will be passed the new string since the last call.
-    * @param {Function(String wholeResponse)} doneCallback
-    *    A callback to be called when the request is complete.
-    *    Will be passed the total response
-    * @param {String} data some content to be sent with the request. Only valid
-    *                 if method is POST or PUT.
-    */
-   return function(method, url, data, progressCallback, doneCallback) {
-      // TODO: in if in node, use require('http') instead of ajax
+      var textSoFar = xhr.responseText;
       
-      var xhr = new XHR(),
-          numberOfCharsAlreadyGivenToCallback = 0;
+      // give the new text to the callback.
+      // on older browsers, the new text will alwasys be the whole response. 
+      // On newer/better ones it'll be just the little bit that we got since last time:         
+      progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
 
-      xhr.open(method, url, true);
-      xhr.send(data);
-
-      function handleProgress() {
-         
-         var textSoFar = xhr.responseText;
-         
-         // give the new text to the callback.
-         // on older browsers, the new text will alwasys be the whole response. 
-         // On newer/better ones it'll be just the little bit that we got since last time:         
-         progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
-
-         numberOfCharsAlreadyGivenToCallback = len(textSoFar);
-      }
-               
-      listenToXhr( xhr, handleProgress, doneCallback);
-   };
-
-})(XMLHttpRequest);
+      numberOfCharsAlreadyGivenToCallback = len(textSoFar);
+   }
+            
+   listenToXhr( xhr, handleProgress, doneCallback);
+   
+   xhr.open(method, url, true);
+   xhr.send(data);   
+}
