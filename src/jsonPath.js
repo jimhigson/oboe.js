@@ -10,8 +10,12 @@
  * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
  * unfortunately Javascript doesn't have currying so this is done via Function.bind() with null as the scope.
  * 
- */
-var jsonPathCompiler = (function () {
+ *    String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
+ *    
+ * The returned function returns false if there was no match, the node which was captured (using $)
+ * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
+ */  
+function jsonPathCompiler(jsonPath) {
    
    /**
     * Expression for:
@@ -274,25 +278,16 @@ var jsonPathCompiler = (function () {
       return firstMatching( tokenMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
-   /**
-    * A function that, given a jsonPath string, returns a function that tests against that
-    * jsonPath.
-    * 
-    *    String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
-    *    
-    * The returned function returns false if there was no match, the node which was captured (using $)
-    * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
-    */
-   return function (jsonPath) {        
-      try {
-         // Kick off the recursive parsing of the jsonPath with a function which always returns true.
-         // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
-         // in the tree. So long as they match the part specified, they don't care what the ancestors of the
-         // matched part are.         
-         return compileJsonPathToFunction(jsonPath, always);
-      } catch( e ) {
-         throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
-      }
-   };
    
-})();
+   // we've declared everything, let's do the compilation:     
+   try {
+      // Kick off the recursive parsing of the jsonPath with a function which always returns true.
+      // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
+      // in the tree. So long as they match the part specified, they don't care what the ancestors of the
+      // matched part are.         
+      return compileJsonPathToFunction(jsonPath, always);
+   } catch( e ) {
+      throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+   }
+
+}
