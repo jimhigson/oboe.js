@@ -1377,22 +1377,25 @@ var Oboe = (function(){
       var self = this,
           evnts = events(self),
           clarinetParser = clarinet.parser(),
-          body = data? (isString(data)? data: JSON.stringify(data)) : null;          
+          body = data? (isString(data)? data: JSON.stringify(data)) : null,
+          
+          // create a json builder and store a function that can be used to get the
+          // root of the json later:
+          /**
+           * @type {Function}
+           */          
+          root =  jsonBuilder(
+                      clarinetParser,
+                       
+                      // when a node is found, notify matching node listeners:
+                      partialComplete(evnts.notify, NODE_FOUND_EVENT),
+   
+                      // when a node is found, notify matching path listeners:                                        
+                      partialComplete(evnts.notify, PATH_FOUND_EVENT)
+                  );          
       
       self._errorListeners       = [];
-      self._clarinet             = clarinetParser;
       
-      // create a json builder and store a function that can be used to get the
-      // root of the json later:               
-      self._root                 = jsonBuilder(
-                                       clarinetParser,
-                                        
-                                       // when a node is found, notify matching node listeners:
-                                       partialComplete(evnts.notify, NODE_FOUND_EVENT),
-
-                                       // when a node is found, notify matching path listeners:                                        
-                                       partialComplete(evnts.notify, PATH_FOUND_EVENT)
-                                   );
 
       /**
        * Add a new json path to the parser, to be called as soon as the path is found, but before we know
@@ -1428,12 +1431,31 @@ var Oboe = (function(){
        */
       self.onFind = partialComplete(evnts.on, NODE_FOUND_EVENT);
 
-      clarinetParser.onerror     = function(e) {
-                                       self.notifyErr(e);
+      function stop() {
+         clarinetParser.close();   
+      
+         self.closed = true;
+         
+         // we won't fire any more events again so forget our listeners:
+         self._errorListeners = [];
+               
+         // quit listening to clarinet as well. We've done with this stream:
+         clarinetParser.onkey = 
+         clarinetParser.onvalue = 
+         clarinetParser.onopenobject = 
+         clarinetParser.onopenarray = 
+         clarinetParser.onend = 
+         clarinetParser.oncloseobject =                         
+         clarinetParser.onclosearray = 
+         clarinetParser.onerror = undefined;       
+      }
+
+      clarinetParser.onerror  =  function(e) {
+                                    self.notifyErr(e);
                                        
-                                       // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-                                       self.close();
-                                   };
+                                    // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
+                                    stop();
+                                 };
                                    
       streamingXhr(
          httpMethodName,
@@ -1447,7 +1469,7 @@ var Oboe = (function(){
             }
              
             try {
-               self._clarinet.write(nextDrip);
+               clarinetParser.write(nextDrip);
             } catch(e) {
                // we don't have to do anything here because we always assign a .onerror
                // to clarinet which will have already been called by the time this 
@@ -1456,9 +1478,9 @@ var Oboe = (function(){
          },
          function() {
             // callback for when the response is complete                     
-            self.close();
+            stop();
             
-            doneCallback && doneCallback(self._root());
+            doneCallback && doneCallback(root());
          });
                
       return self;                                   
@@ -1466,30 +1488,7 @@ var Oboe = (function(){
    
    var oboeProto = Oboe.prototype;
 
-               
-   /**
-    * called when the input is done
-    *    TODO: take out of public API
-    */
-   oboeProto.close = function () {
-      var clarinet = this._clarinet.close();   
-   
-      this.closed = true;
-      
-      // we won't fire any more events again so forget our listeners:
-      this._errorListeners = [];
-            
-      // quit listening to clarinet as well. We've done with this stream:
-      clarinet.onkey = 
-      clarinet.onvalue = 
-      clarinet.onopenobject = 
-      clarinet.onopenarray = 
-      clarinet.onend = 
-      clarinet.oncloseobject =                         
-      clarinet.onclosearray = 
-      clarinet.onerror = undefined;      
-   };
-      
+                     
    /**
     * 
     * @param error
