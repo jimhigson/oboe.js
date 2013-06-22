@@ -1262,15 +1262,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    }           
 }
 
-(function(){
-
-   /* export public API */
-   window.oboe = {
-      doGet:httpApiMethod('GET'),
-      doDelete:httpApiMethod('DELETE'),
-      doPost:httpApiMethod('POST', true),
-      doPut:httpApiMethod('PUT', true)
-   };
+var Oboe = (function(){
 
    /**
     * @constructor 
@@ -1528,6 +1520,19 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       return this; // chaining
    };
    
+   return Oboe;
+              
+})();
+(function(){
+
+   /* export public API */
+   window.oboe = {
+      doGet:httpApiMethod('GET'),
+      doDelete:httpApiMethod('DELETE'),
+      doPost:httpApiMethod('POST', true),
+      doPut:httpApiMethod('PUT', true)
+   };
+   
    /** add an http method to the public api */
    function httpApiMethod(httpMethodName, mayHaveContent) {
          
@@ -1561,6 +1566,6 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 
          return new Oboe()._fetch(httpMethodName, url, body, doneCallback);         
       };
-   }
-           
+   }   
+
 })();})(window, Object, Array, Error);
