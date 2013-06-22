@@ -23,7 +23,7 @@ function events(context){
        * 
        * Will be called in the context of the current oboe instance from Oboe#_notify.
        */ 
-     return function( node, path, ancestors, nodeList ) {
+     return function( path, ancestors, nodeList ) {
      
          var foundNode = test( path, nodeList );
         
@@ -86,7 +86,7 @@ function events(context){
          var nodeList = ancestors.concat([node]),
              listenerList = listeners[eventId];
    
-         callAll( listenerList, node, path, ancestors, nodeList );
+         callAll( listenerList, path, ancestors, nodeList );
       },
       on:function( eventId, jsonPath, callback, callbackContext ) {
       
