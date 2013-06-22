@@ -1261,7 +1261,110 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       return root;
    }           
 }
+var NODE_FOUND_EVENT = 'n',
+    PATH_FOUND_EVENT = 'p';
 
+function events(context){
+
+   var listeners = {};
+   listeners[NODE_FOUND_EVENT] = [];
+   listeners[PATH_FOUND_EVENT] = [];
+
+   /**
+    * Create a new function that tests if something found in the json matches the pattern and, if it does,
+    * calls the callback.
+    * 
+    * @param pattern
+    * @param callback
+    * @param callbackContext
+    */
+   function callConditionally( test, callback, callbackContext ) {
+   
+      /**
+       * A function which when called with the details of something called in the parsed json, calls the listener
+       * if it matches.
+       * 
+       * Will be called in the context of the current oboe instance from Oboe#_notify.
+       */ 
+     return function( node, path, ancestors, nodeList ) {
+     
+         var foundNode = test( path, nodeList );
+        
+         // Possible values for foundNode are now:
+         //
+         //    false: 
+         //       we did not match
+         //
+         //    an object/array/string/number/null: 
+         //       that node is the one that matched. Because json can have nulls, this can 
+         //       be null.
+         //
+         //    undefined: like above, but we don't have the node yet. ie, we know there is a
+         //       node that matches but we don't know if it is an array, object, string
+         //       etc yet so we can't say anything about it. Null isn't used here because
+         //       it would be indistinguishable from us finding a node with a value of
+         //       null.
+         //                      
+         if( foundNode !== false ) {                                 
+           
+            // change curNode to foundNode when it stops breaking tests
+            try{
+               callback.call(callbackContext, foundNode, path, ancestors );
+            } catch(e) {
+               this._notifyErr(Error('Error thrown by callback ' + e.message));
+            }
+         }
+      }   
+   }
+                 
+   /**
+    * Notify any of the listeners in a list that are interested in the path or node that was
+    * just found.
+    * 
+    * @param {Array} listenerList one of this._nodeListeners or this._pathListeners
+    */  
+   /**
+    * @returns {*} an identifier that can later be used to de-register this listener
+    */
+   function pushListener(listenerList, pattern, callback, callbackContext) {
+         
+      listenerList.push( callConditionally( jsonPathCompiler(pattern), callback, callbackContext || window) );            
+   }
+
+   /**
+    * implementation behind .onPath() and .onFind: add several listeners in one call  
+    * @param listenerMap
+    */
+   function pushListeners(listenerList, listenerMap) {
+      for( var path in listenerMap ) {
+         pushListener(listenerList, path, listenerMap[path]);
+      }
+   }    
+   
+   return {
+      notify:function ( eventId, node, path, ancestors ) {
+            
+         var nodeList = ancestors.concat([node]),
+             listenerList = listeners[eventId];
+   
+         callAll( listenerList, context, node, path, ancestors, nodeList );
+      },
+      on:function( eventId, jsonPath, callback, callbackContext ) {
+      
+         var listenerList = listeners[eventId];
+         
+         if( isString(jsonPath) ) {
+            pushListener(listenerList, jsonPath, callback, callbackContext);
+         } else {
+            pushListeners(listenerList, jsonPath);
+         }
+         return context; // chaining                                 
+      }
+   };
+}
+/**
+ * @constructor
+ */
 var Oboe = (function(){
 
    /**
@@ -1270,12 +1373,8 @@ var Oboe = (function(){
    function Oboe() {
    
       var self = this,
-          clarinetParser = clarinet.parser(),
-          nodeListeners  = [],
-          pathListeners  = [];
-   
-      self._nodeListeners        = nodeListeners;
-      self._pathListeners        = pathListeners;
+          evnts = events(self),
+          clarinetParser = clarinet.parser();
       
       self._errorListeners       = [];
       self._clarinet             = clarinetParser;
@@ -1283,13 +1382,49 @@ var Oboe = (function(){
       // create a json builder and store a function that can be used to get the
       // root of the json later:               
       self._root                 = jsonBuilder(
-                                       clarinetParser, 
+                                       clarinetParser,
+                                        
                                        // when a node is found, notify matching node listeners:
-                                       self._notify.bind(self, nodeListeners),
+                                       partialComplete(evnts.notify, NODE_FOUND_EVENT),
+
                                        // when a node is found, notify matching path listeners:                                        
-                                       self._notify.bind(self, pathListeners)
+                                       partialComplete(evnts.notify, PATH_FOUND_EVENT)
                                    );
-                                               
+
+      /**
+       * Add a new json path to the parser, to be called as soon as the path is found, but before we know
+       * what value will be in there.
+       *
+       * @param {String} jsonPath
+       *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
+       *    See http://goessner.net/articles/JsonPath/
+       *          !                - root json object
+       *          .                - path separator
+       *          foo              - path node 'foo'
+       *          ['foo']          - paFth node 'foo'
+       *          [1]              - path node '1' (only for numbers indexes, usually arrays)
+       *          *                - wildcard - all objects/properties
+       *          ..               - any number of intermediate nodes (non-greedy)
+       *          [*]              - equivalent to .*
+       *
+       * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+       *
+       * @param {Object} [context] the context ('this') for the callback
+       */
+      self.onPath = partialComplete(evnts.on, PATH_FOUND_EVENT);
+
+      /**
+       * Add a new json path to the parser, which will be called when a value is found at the given path
+       *
+       * @param {String} jsonPath supports the same syntax as .onPath.
+       *
+       * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
+       * @param {Object} [context] the context ('this') for the callback
+       * 
+       * TODO: rename to onNode
+       */
+      self.onFind = partialComplete(evnts.on, NODE_FOUND_EVENT);
+
       clarinetParser.onerror     = function(e) {
                                        self._notifyErr(e);
                                        
@@ -1337,7 +1472,7 @@ var Oboe = (function(){
             // callback for when the response is complete                     
             self.close();
             
-            doneCallback && doneCallback(self._root());                                          
+            doneCallback && doneCallback(self._root());
          });
                
       return self;
@@ -1345,7 +1480,7 @@ var Oboe = (function(){
             
    /**
     * called when the input is done
-    * 
+    *    TODO: take out of public API
     */
    oboeProto.close = function () {
       var clarinet = this._clarinet.close();   
@@ -1353,8 +1488,6 @@ var Oboe = (function(){
       this.closed = true;
       
       // we won't fire any more events again so forget our listeners:
-      this._nodeListeners = [];
-      this._pathListeners = [];
       this._errorListeners = [];
             
       // quit listening to clarinet as well. We've done with this stream:
@@ -1367,20 +1500,7 @@ var Oboe = (function(){
       clarinet.onclosearray = 
       clarinet.onerror = undefined;      
    };
-   
-   /**
-    * Notify any of the listeners in a list that are interested in the path or node that was
-    * just found.
-    * 
-    * @param {Array} listenerList one of this._nodeListeners or this._pathListeners
-    */  
-   oboeProto._notify = function ( listenerList, node, path, ancestors ) {
       
-      var nodeList = ancestors.concat([node]);
-
-      callAll( listenerList, this, node, path, ancestors, nodeList );
-   };
-   
    /**
     * 
     * @param error
@@ -1389,125 +1509,6 @@ var Oboe = (function(){
       callAll( this._errorListeners, undefined, error );            
    };
    
-
-   /**
-    * Create a new function that tests if something found in the json matches the pattern and, if it does,
-    * calls the callback.
-    * 
-    * @param pattern
-    * @param callback
-    * @param context
-    */
-   function callIfPatternMatches( pattern, callback, context ) {
-   
-      context = context || window;   
-   
-      var test = jsonPathCompiler(pattern);
-         
-      /**
-       * A function which when called with the details of something called in the parsed json, calls the listener
-       * if it matches.
-       * 
-       * Will be called in the context of the current oboe instance from Oboe#_notify.
-       */ 
-     return function( node, path, ancestors, nodeList ) {
-     
-         var foundNode = test( path, nodeList );
-        
-         // Possible values for foundNode are now:
-         //
-         //    false: 
-         //       we did not match
-         //
-         //    an object/array/string/number/null: 
-         //       that node is the one that matched. Because json can have nulls, this can 
-         //       be null.
-         //
-         //    undefined: like above, but we don't have the node yet. ie, we know there is a
-         //       node that matches but we don't know if it is an array, object, string
-         //       etc yet so we can't say anything about it. Null isn't used here because
-         //       it would be indistinguishable from us finding a node with a value of
-         //       null.
-         //                      
-         if( foundNode !== false ) {                                 
-           
-            // change curNode to foundNode when it stops breaking tests
-            try{
-               callback.call(context, foundNode, path, ancestors );
-            } catch(e) {
-               this._notifyErr(Error('Error thrown by callback ' + e.message));
-            }
-         }
-      }   
-   }
-   
-   /**
-    * @returns {*} an identifier that can later be used to de-register this listener
-    */
-   function pushListener(listenerList, pattern, callback, context) {
-         
-      listenerList.push( callIfPatternMatches(pattern, callback, context) );            
-   }
-
-   /**
-    * implementation behind .onPath() and .onFind: add several listeners in one call  
-    * @param listenerMap
-    */
-   function pushListeners(listenerList, listenerMap) {
-      for( var path in listenerMap ) {
-         pushListener(listenerList, path, listenerMap[path]);
-      }
-   }
-   
-   /** implementation behind .onPath() and .onFind 
-    */
-   function on(listenerList, jsonPath, callback, context) {
-      if( isString(jsonPath) ) {
-         pushListener(listenerList, jsonPath, callback, context);
-      } else {
-         pushListeners(listenerList, jsonPath);
-      }      
-   }
-   
-   /**
-    * Add a new json path to the parser, to be called as soon as the path is found, but before we know
-    * what value will be in there.
-    *
-    * @param {String} jsonPath
-    *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
-    *    See http://goessner.net/articles/JsonPath/
-    *          !                - root json object
-    *          .                - path separator
-    *          foo              - path node 'foo'
-    *          ['foo']          - paFth node 'foo'
-    *          [1]              - path node '1' (only for numbers indexes, usually arrays)
-    *          *                - wildcard - all objects/properties
-    *          ..               - any number of intermediate nodes (non-greedy)
-    *          [*]              - equivalent to .*         
-    *
-    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
-    * 
-    * @param {Object} [context] the context ('this') for the callback
-    */
-   oboeProto.onPath = function (jsonPath, callback, context) {
-   
-      on(this._pathListeners, jsonPath, callback, context);
-      return this; // chaining
-   };
-
-   /**
-    * Add a new json path to the parser, which will be called when a value is found at the given path
-    *
-    * @param {String} jsonPath supports the same syntax as .onPath.
-    *
-    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
-    * @param {Object} [context] the context ('this') for the callback
-    */
-   oboeProto.onFind = function (jsonPath, callback, context) {
-   
-      on(this._nodeListeners, jsonPath, callback, context);
-      return this; // chaining
-   };
    
    /**
     * Add a new json path to the parser, which will be called when a value is found at the given path

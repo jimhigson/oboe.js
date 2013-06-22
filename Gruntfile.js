@@ -13,6 +13,7 @@ module.exports = function (grunt) {
             ,  'src/streamingXhr.js'
             ,  'src/jsonPath.js'
             ,  'src/jsonBuilder.js'
+            ,  'src/events.js'
             ,  'src/oboe.js'
             ,  'src/api.js'
             ],
