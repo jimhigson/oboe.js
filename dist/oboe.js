@@ -1266,9 +1266,7 @@ var NODE_FOUND_EVENT = 'n',
 
 function events(context){
 
-   var listeners = {};
-   listeners[NODE_FOUND_EVENT] = [];
-   listeners[PATH_FOUND_EVENT] = [];
+   var listeners = {n:[], p:[]};
 
    /**
     * Test if something found in the json matches the pattern and, if it does,
