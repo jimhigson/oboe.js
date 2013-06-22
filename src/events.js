@@ -50,7 +50,8 @@ function events(context){
     * Notify any of the listeners in a list that are interested in the path or node that was
     * just found.
     * 
-    * @param {Array} listenerList one of this._nodeListeners or this._pathListeners
+    * @param {Array} listenerList one of listenerMap[NODE_FOUND_EVENT] or 
+    *                listenerMap[PATH_FOUND_EVENT]
     */  
    /**
     * @returns {*} an identifier that can later be used to de-register this listener
