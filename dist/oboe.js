@@ -1264,7 +1264,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 var NODE_FOUND_EVENT = 'n',
     PATH_FOUND_EVENT = 'p';
 
-function pubSub(context){
+function pubSub(controller){
 
    var listeners = {n:[], p:[]},
        errorListeners = [];
@@ -1365,7 +1365,7 @@ function pubSub(context){
          } else {
             pushListeners(listenerList, jsonPath);
          }
-         return context; // chaining                                 
+         return controller; // chaining                                 
       },
       
       /**
@@ -1387,12 +1387,10 @@ function pubSub(context){
    };
 }
 
-/**
- * @constructor 
- */      
-function Oboe(httpMethodName, url, data, doneCallback) {
 
-   var self = this,
+function controller(httpMethodName, url, data, doneCallback) {
+
+   var self = {},
        events = pubSub(self),
        clarinetParser = clarinet.parser(),
        body = data? (isString(data)? data: JSON.stringify(data)) : null,
@@ -1411,7 +1409,8 @@ function Oboe(httpMethodName, url, data, doneCallback) {
                    // when a node is found, notify matching path listeners:                                        
                    partialComplete(events.notify, PATH_FOUND_EVENT)
                );          
-   clarinetParser.onerror  =  
+               
+   clarinetParser.onerror =  
       function(e) {
          events.notifyErr(e);
             
@@ -1475,7 +1474,9 @@ function Oboe(httpMethodName, url, data, doneCallback) {
          clarinetParser.close();
          
          doneCallback && doneCallback(root());
-      });                                   
+      });
+      
+   return self;                                         
 }
 (function(){
 
@@ -1518,7 +1519,7 @@ function Oboe(httpMethodName, url, data, doneCallback) {
             doneCallback = firstArg.complete;
          }
 
-         return new Oboe(httpMethodName, url, body, doneCallback);         
+         return controller(httpMethodName, url, body, doneCallback);         
       };
    }   
 

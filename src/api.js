@@ -39,7 +39,7 @@
             doneCallback = firstArg.complete;
          }
 
-         return new Oboe(httpMethodName, url, body, doneCallback);         
+         return controller(httpMethodName, url, body, doneCallback);         
       };
    }   
 

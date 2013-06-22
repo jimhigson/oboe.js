@@ -1,7 +1,7 @@
 var NODE_FOUND_EVENT = 'n',
     PATH_FOUND_EVENT = 'p';
 
-function pubSub(context){
+function pubSub(controller){
 
    var listeners = {n:[], p:[]},
        errorListeners = [];
@@ -102,7 +102,7 @@ function pubSub(context){
          } else {
             pushListeners(listenerList, jsonPath);
          }
-         return context; // chaining                                 
+         return controller; // chaining                                 
       },
       
       /**

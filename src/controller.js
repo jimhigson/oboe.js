@@ -1,11 +1,11 @@
 
-/**
- * @constructor 
- */      
-function Oboe(httpMethodName, url, data, doneCallback) {
 
-   var self = this,
-       events = pubSub(self),
+function controller(httpMethodName, url, data, doneCallback) {
+
+   var 
+       // the api available on an oboe instance. Will expose 3 methods, onPath, onFind and onError               
+       instanceApi = {},
+       events = pubSub(instanceApi),
        clarinetParser = clarinet.parser(),
        body = data? (isString(data)? data: JSON.stringify(data)) : null,
               
@@ -23,7 +23,8 @@ function Oboe(httpMethodName, url, data, doneCallback) {
                    // when a node is found, notify matching path listeners:                                        
                    partialComplete(events.notify, PATH_FOUND_EVENT)
                );          
-   clarinetParser.onerror  =  
+               
+   clarinetParser.onerror =  
       function(e) {
          events.notifyErr(e);
             
@@ -51,7 +52,7 @@ function Oboe(httpMethodName, url, data, doneCallback) {
     *
     * @param {Object} [context] the context ('this') for the callback
     */
-   self.onPath = partialComplete(events.on, PATH_FOUND_EVENT);
+   instanceApi.onPath = partialComplete(events.on, PATH_FOUND_EVENT);
 
    /**
     * Add a new json path to the parser, which will be called when a value is found at the given path
@@ -63,9 +64,9 @@ function Oboe(httpMethodName, url, data, doneCallback) {
     * 
     * TODO: rename to onNode
     */
-   self.onFind = partialComplete(events.on, NODE_FOUND_EVENT);
+   instanceApi.onFind = partialComplete(events.on, NODE_FOUND_EVENT);
    
-   self.onError = events.onError;
+   instanceApi.onError = events.onError;
                                                                                               
    streamingXhr(
       httpMethodName,
@@ -87,5 +88,7 @@ function Oboe(httpMethodName, url, data, doneCallback) {
          clarinetParser.close();
          
          doneCallback && doneCallback(root());
-      });                                   
+      });
+      
+   return instanceApi;                                         
 }
