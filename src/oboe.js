@@ -8,7 +8,7 @@ function Oboe(httpMethodName, url, data, doneCallback) {
        events = pubSub(self),
        clarinetParser = clarinet.parser(),
        body = data? (isString(data)? data: JSON.stringify(data)) : null,
-       
+              
        // create a json builder and store a function that can be used to get the
        // root of the json later:
        /**
@@ -23,10 +23,14 @@ function Oboe(httpMethodName, url, data, doneCallback) {
                    // when a node is found, notify matching path listeners:                                        
                    partialComplete(events.notify, PATH_FOUND_EVENT)
                );          
+   clarinetParser.onerror  =  
+      function(e) {
+         events.notifyErr(e);
+            
+         // the json is invalid, give up and close the parser to prevent getting any more:
+         clarinetParser.close();
+      };               
    
-   self._errorListeners       = [];
-   
-
    /**
     * Add a new json path to the parser, to be called as soon as the path is found, but before we know
     * what value will be in there.
@@ -62,43 +66,13 @@ function Oboe(httpMethodName, url, data, doneCallback) {
    self.onFind = partialComplete(events.on, NODE_FOUND_EVENT);
    
    self.onError = events.onError;
-
-   clarinetParser.onerror  =  function(e) {
-                                 events.notifyErr(e);
-                                    
-                                 // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-                                 stop();
-                              };
-                              
-   function stop() {
-      clarinetParser.close();   
-   
-      self.closed = true;
-      
-      // we won't fire any more events again so forget our listeners:
-      self._errorListeners = [];
-            
-      // quit listening to clarinet as well. We've done with this stream:
-      clarinetParser.onkey = 
-      clarinetParser.onvalue = 
-      clarinetParser.onopenobject = 
-      clarinetParser.onopenarray = 
-      clarinetParser.onend = 
-      clarinetParser.oncloseobject =                         
-      clarinetParser.onclosearray = 
-      clarinetParser.onerror = undefined;       
-   }                                 
-                                
+                                                                                              
    streamingXhr(
       httpMethodName,
       url, 
       body,
       function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR
-         
-         if( self.closed ) {
-            throw Error('closed');
-         }
+         // callback for when a bit more data arrives from the streaming XHR         
           
          try {
             clarinetParser.write(nextDrip);
@@ -110,7 +84,7 @@ function Oboe(httpMethodName, url, data, doneCallback) {
       },
       function() {
          // callback for when the response is complete                     
-         stop();
+         clarinetParser.close();
          
          doneCallback && doneCallback(root());
       });                                   
