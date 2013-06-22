@@ -57,11 +57,15 @@ function firstMatching( fns, args, onFail ) {
  */
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
-   var args = toArray(arguments);
-   args[0] = undefined; // the first argument to bind should be undefined since we
-                        // wish to specify no context
+   var boundArgs = toArray(arguments, 1);
 
-   return fn.bind.apply(fn, args); 
+   return function() {
+      var callArgs = boundArgs.concat(toArray(arguments));            
+         
+      return fn.apply(this, callArgs);
+   };
+
+ 
 }
 
 function always(){return true}

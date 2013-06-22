@@ -34,17 +34,5 @@
       
       return out;
    };
-   
-    
-   functionProto.bind = functionProto.bind || function( context /*, arg1, arg2 ... */ ){
-      var f = this,
-          boundArgs = toArray(arguments, 1);
-   
-      return function( /* yet more arguments */ ) {
-         var callArgs = boundArgs.concat(toArray(arguments));            
-            
-         return f.apply(context, callArgs);
-      }
-   };
 
 })(Array.prototype, Function.prototype);

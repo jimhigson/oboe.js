@@ -8,9 +8,8 @@
  * 
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
  * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
- * unfortunately Javascript doesn't have currying so this is done via Function.bind() with null as the scope.
  * 
- *    String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
+ *   String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.

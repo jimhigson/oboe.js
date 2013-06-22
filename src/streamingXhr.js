@@ -15,11 +15,11 @@
  * 
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
- * @param {String|null} data
- * @param {Function(String nextResponseDrip)} progressCallback
+ * @param {String|Null} data
+ * @param {Function} progressCallback in form Function(String nextResponseDrip)
  *    A callback to be called repeatedly as the input comes in.
  *    Will be passed the new string since the last call.
- * @param {Function(String wholeResponse)} doneCallback
+ * @param {Function} doneCallback in form Function(String wholeResponse)
  *    A callback to be called when the request is complete.
  *    Will be passed the total response
  * @param {String} data some content to be sent with the request. Only valid

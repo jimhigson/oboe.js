@@ -58,11 +58,15 @@ function firstMatching( fns, args, onFail ) {
  */
 function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 
-   var args = toArray(arguments);
-   args[0] = undefined; // the first argument to bind should be undefined since we
-                        // wish to specify no context
+   var boundArgs = toArray(arguments, 1);
 
-   return fn.bind.apply(fn, args); 
+   return function() {
+      var callArgs = boundArgs.concat(toArray(arguments));            
+         
+      return fn.apply(this, callArgs);
+   };
+
+ 
 }
 
 function always(){return true}
@@ -101,18 +105,6 @@ function always(){return true}
       });
       
       return out;
-   };
-   
-    
-   functionProto.bind = functionProto.bind || function( context /*, arg1, arg2 ... */ ){
-      var f = this,
-          boundArgs = toArray(arguments, 1);
-   
-      return function( /* yet more arguments */ ) {
-         var callArgs = boundArgs.concat(toArray(arguments));            
-            
-         return f.apply(context, callArgs);
-      }
    };
 
 })(Array.prototype, Function.prototype);
@@ -709,11 +701,11 @@ if(typeof FastList === 'function') {
  * 
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
- * @param {String|null} data
- * @param {Function(String nextResponseDrip)} progressCallback
+ * @param {String|Null} data
+ * @param {Function} progressCallback in form Function(String nextResponseDrip)
  *    A callback to be called repeatedly as the input comes in.
  *    Will be passed the new string since the last call.
- * @param {Function(String wholeResponse)} doneCallback
+ * @param {Function} doneCallback in form Function(String wholeResponse)
  *    A callback to be called when the request is complete.
  *    Will be passed the total response
  * @param {String} data some content to be sent with the request. Only valid
@@ -752,9 +744,6 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
        listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
        numberOfCharsAlreadyGivenToCallback = 0;
 
-   xhr.open(method, url, true);
-   xhr.send(data);
-
    function handleProgress() {
       
       var textSoFar = xhr.responseText;
@@ -768,6 +757,9 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    }
             
    listenToXhr( xhr, handleProgress, doneCallback);
+   
+   xhr.open(method, url, true);
+   xhr.send(data);   
 }
 
 /**
@@ -780,9 +772,8 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
  * 
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
  * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
- * unfortunately Javascript doesn't have currying so this is done via Function.bind() with null as the scope.
  * 
- *    String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
+ *   String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
@@ -1243,7 +1234,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 var NODE_FOUND_EVENT = 'n',
     PATH_FOUND_EVENT = 'p';
 
-function pubSub(controller){
+function pubSub(){
 
    var listeners = {n:[], p:[]},
        errorListeners = [];
@@ -1344,7 +1335,7 @@ function pubSub(controller){
          } else {
             pushListeners(listenerList, jsonPath);
          }
-         return controller; // chaining                                 
+         return this; // chaining                                 
       },
       
       /**
@@ -1371,8 +1362,7 @@ function controller(httpMethodName, url, data, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onFind and onError               
-       instanceApi = {},
-       events = pubSub(instanceApi),
+       events = pubSub(),
        clarinetParser = clarinet.parser(),
        body = data? (isString(data)? data: JSON.stringify(data)) : null,
               
@@ -1398,43 +1388,7 @@ function controller(httpMethodName, url, data, doneCallback) {
          // the json is invalid, give up and close the parser to prevent getting any more:
          clarinetParser.close();
       };               
-   
-   /**
-    * Add a new json path to the parser, to be called as soon as the path is found, but before we know
-    * what value will be in there.
-    *
-    * @param {String} jsonPath
-    *    The jsonPath is a variant of JSONPath patterns and supports these special meanings.
-    *    See http://goessner.net/articles/JsonPath/
-    *          !                - root json object
-    *          .                - path separator
-    *          foo              - path node 'foo'
-    *          ['foo']          - paFth node 'foo'
-    *          [1]              - path node '1' (only for numbers indexes, usually arrays)
-    *          *                - wildcard - all objects/properties
-    *          ..               - any number of intermediate nodes (non-greedy)
-    *          [*]              - equivalent to .*
-    *
-    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
-    *
-    * @param {Object} [context] the context ('this') for the callback
-    */
-   instanceApi.onPath = partialComplete(events.on, PATH_FOUND_EVENT);
-
-   /**
-    * Add a new json path to the parser, which will be called when a value is found at the given path
-    *
-    * @param {String} jsonPath supports the same syntax as .onPath.
-    *
-    * @param {Function} callback({Object}foundNode, {String[]}path, {Object[]}ancestors)
-    * @param {Object} [context] the context ('this') for the callback
-    * 
-    * TODO: rename to onNode
-    */
-   instanceApi.onFind = partialComplete(events.on, NODE_FOUND_EVENT);
-   
-   instanceApi.onError = events.onError;
-                                                                                              
+                                                                                                 
    streamingXhr(
       httpMethodName,
       url, 
@@ -1457,7 +1411,13 @@ function controller(httpMethodName, url, data, doneCallback) {
          doneCallback && doneCallback(root());
       });
       
-   return instanceApi;                                         
+   return {      
+      onPath: partialComplete(events.on, PATH_FOUND_EVENT),
+      
+      onFind: partialComplete(events.on, NODE_FOUND_EVENT),
+      
+      onError: events.onError
+   };                                         
 }
 (function(){
 
