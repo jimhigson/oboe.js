@@ -6,11 +6,12 @@ var Oboe = (function(){
    /**
     * @constructor 
     */      
-   function Oboe() {
+   function Oboe(httpMethodName, url, data, doneCallback) {
    
       var self = this,
           evnts = events(self),
-          clarinetParser = clarinet.parser();
+          clarinetParser = clarinet.parser(),
+          body = data? (isString(data)? data: JSON.stringify(data)) : null;          
       
       self._errorListeners       = [];
       self._clarinet             = clarinetParser;
@@ -62,33 +63,16 @@ var Oboe = (function(){
       self.onFind = partialComplete(evnts.on, NODE_FOUND_EVENT);
 
       clarinetParser.onerror     = function(e) {
-                                       self._notifyErr(e);
+                                       self.notifyErr(e);
                                        
                                        // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
                                        self.close();
                                    };
-   }
-   
-   var oboeProto = Oboe.prototype;
-
-   /**
-    * Ask this oboe instance to fetch the given url. Called via one of the public api methods.
-    * 
-    * @param {String} url
-    * @param {Function (String|Array wholeParsedJson)} doneCallback a callback for when the request is
-    *    complete. Will be passed the whole parsed json object (or array). Using this callback, oboe
-    *    works in a very similar to normal ajax.
-    */      
-   oboeProto._fetch = function(method, url, data, doneCallback) {
-      var self = this;
-
-      // data must either be a string or null to give to streamingXhr as the request body:
-      data = data? (isString(data)? data: JSON.stringify(data)) : null;      
-
+                                   
       streamingXhr(
-         method,
+         httpMethodName,
          url, 
-         data,
+         body,
          function (nextDrip) {
             // callback for when a bit more data arrives from the streaming XHR
             
@@ -111,9 +95,12 @@ var Oboe = (function(){
             doneCallback && doneCallback(self._root());
          });
                
-      return self;
-   };      
-            
+      return self;                                   
+   }
+   
+   var oboeProto = Oboe.prototype;
+
+               
    /**
     * called when the input is done
     *    TODO: take out of public API
@@ -141,7 +128,7 @@ var Oboe = (function(){
     * 
     * @param error
     */
-   oboeProto._notifyErr = function(error) {
+   oboeProto.notifyErr = function(error) {
       callAll( this._errorListeners, error );            
    };
    

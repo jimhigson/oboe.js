@@ -41,7 +41,7 @@ function events(context){
          try{
             callback.call(callbackContext, foundNode, path, ancestors );
          } catch(e) {
-            context._notifyErr(Error('Error thrown by callback ' + e.message));
+            context.notifyErr(Error('Error thrown by callback ' + e.message));
          }
       }   
    }

@@ -39,7 +39,7 @@
             doneCallback = firstArg.complete;
          }
 
-         return new Oboe()._fetch(httpMethodName, url, body, doneCallback);         
+         return new Oboe(httpMethodName, url, body, doneCallback);         
       };
    }   
 
