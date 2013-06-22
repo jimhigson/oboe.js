@@ -33,7 +33,7 @@ is optional.
 The returned instance exposes three chainable methods:
 
 ```js
-   .onFind(String pattern, Function callback(thingFound, String[] path))
+   .onFind(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
 ```.onFind()``` lets our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
@@ -41,11 +41,21 @@ The patterns are for the most part standard [JSONPath](https://code.google.com/p
 When the pattern is matched the callback is fired with the matching object and a path describing where it was found.
    
 ```js
-   .onPath(String pattern, Function callback(thingFound, String[] path))
+   .onPath(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
 ```onPath()``` is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
 thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call.
+
+Alternatively, several paths may be give at once to either ```onPath``` or ```onFind```:
+
+```js
+   .onFind({
+      pattern : callback,
+      pattern : callback,
+      pattern : callback
+   });
+``` 
 
 ```js
    .onError(callback(Error e))
