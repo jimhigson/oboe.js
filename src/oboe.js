@@ -142,7 +142,7 @@ var Oboe = (function(){
     * @param error
     */
    oboeProto._notifyErr = function(error) {
-      callAll( this._errorListeners, undefined, error );            
+      callAll( this._errorListeners, error );            
    };
    
    

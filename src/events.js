@@ -11,7 +11,7 @@ function events(context){
     * Create a new function that tests if something found in the json matches the pattern and, if it does,
     * calls the callback.
     * 
-    * @param pattern
+    * @param test
     * @param callback
     * @param callbackContext
     */
@@ -48,7 +48,7 @@ function events(context){
             try{
                callback.call(callbackContext, foundNode, path, ancestors );
             } catch(e) {
-               this._notifyErr(Error('Error thrown by callback ' + e.message));
+               context._notifyErr(Error('Error thrown by callback ' + e.message));
             }
          }
       }   
@@ -73,6 +73,8 @@ function events(context){
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {
+   
+      // TODO: document this call style
       for( var path in listenerMap ) {
          pushListener(listenerList, path, listenerMap[path]);
       }
@@ -84,7 +86,7 @@ function events(context){
          var nodeList = ancestors.concat([node]),
              listenerList = listeners[eventId];
    
-         callAll( listenerList, context, node, path, ancestors, nodeList );
+         callAll( listenerList, node, path, ancestors, nodeList );
       },
       on:function( eventId, jsonPath, callback, callbackContext ) {
       

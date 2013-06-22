@@ -22,12 +22,12 @@ function isString(thing) {
    Call each of a list of functions with the same arguments, ignoring any return
    values.
  */
-function callAll( fns, scope /*, arg1, arg2, arg3...*/ ) {
+function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 
-   var args = toArray(arguments, 2);
+   var args = toArray(arguments, 1);
 
    fns.forEach(function( fn ){
-      fn.apply(scope, args);
+      fn.apply(undefined, args);
    });
 }
 

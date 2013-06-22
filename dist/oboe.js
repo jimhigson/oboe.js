@@ -23,12 +23,12 @@ function isString(thing) {
    Call each of a list of functions with the same arguments, ignoring any return
    values.
  */
-function callAll( fns, scope /*, arg1, arg2, arg3...*/ ) {
+function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 
-   var args = toArray(arguments, 2);
+   var args = toArray(arguments, 1);
 
    fns.forEach(function( fn ){
-      fn.apply(scope, args);
+      fn.apply(undefined, args);
    });
 }
 
@@ -1274,7 +1274,7 @@ function events(context){
     * Create a new function that tests if something found in the json matches the pattern and, if it does,
     * calls the callback.
     * 
-    * @param pattern
+    * @param test
     * @param callback
     * @param callbackContext
     */
@@ -1311,7 +1311,7 @@ function events(context){
             try{
                callback.call(callbackContext, foundNode, path, ancestors );
             } catch(e) {
-               this._notifyErr(Error('Error thrown by callback ' + e.message));
+               context._notifyErr(Error('Error thrown by callback ' + e.message));
             }
          }
       }   
@@ -1336,6 +1336,8 @@ function events(context){
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {
+   
+      // TODO: document this call style
       for( var path in listenerMap ) {
          pushListener(listenerList, path, listenerMap[path]);
       }
@@ -1347,7 +1349,7 @@ function events(context){
          var nodeList = ancestors.concat([node]),
              listenerList = listeners[eventId];
    
-         callAll( listenerList, context, node, path, ancestors, nodeList );
+         callAll( listenerList, node, path, ancestors, nodeList );
       },
       on:function( eventId, jsonPath, callback, callbackContext ) {
       
@@ -1506,7 +1508,7 @@ var Oboe = (function(){
     * @param error
     */
    oboeProto._notifyErr = function(error) {
-      callAll( this._errorListeners, undefined, error );            
+      callAll( this._errorListeners, error );            
    };
    
    
