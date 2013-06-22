@@ -11,6 +11,7 @@ The codebase is made from a few main components:
    and notifies via further callbacks when intereting things happen.      
 `streamingXhr.js` A basic wrapper around the browser's XHR to provide a streaming interface
 `pubsub.js` A not at all general purpose event handling thing
+`lib/polyfillspubsub.js` Compatability with IE8 and IE9
    
 When the source is built into the distributable js, a single object is exposed at window.oboe    
  
