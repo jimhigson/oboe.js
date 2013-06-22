@@ -1264,9 +1264,10 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
 var NODE_FOUND_EVENT = 'n',
     PATH_FOUND_EVENT = 'p';
 
-function events(context){
+function pubSub(context){
 
-   var listeners = {n:[], p:[]};
+   var listeners = {n:[], p:[]},
+       errorListeners = [];
 
    /**
     * Test if something found in the json matches the pattern and, if it does,
@@ -1304,7 +1305,7 @@ function events(context){
          try{
             callback.call(callbackContext, foundNode, path, ancestors );
          } catch(e) {
-            context.notifyErr(Error('Error thrown by callback ' + e.message));
+            errorHappened(Error('Error thrown by callback ' + e.message));
          }
       }   
    }
@@ -1341,7 +1342,11 @@ function events(context){
       for( var pattern in listenerMap ) {
          pushListener(listenerList, pattern, listenerMap[pattern]);
       }
-   }    
+   }
+   
+   function errorHappened(error) {
+      callAll( errorListeners, error );            
+   }       
    
    return {
       notify:function ( eventId, node, path, ancestors ) {
@@ -1361,7 +1366,24 @@ function events(context){
             pushListeners(listenerList, jsonPath);
          }
          return context; // chaining                                 
-      }
+      },
+      
+      /**
+       * 
+       * @param error
+       */
+      notifyErr: errorHappened,
+         
+      /**
+       * Add a new json path to the parser, which will be called when a value is found at the given path
+       *
+       * @param {Function} callback
+       */
+      onError: function (callback) {   
+         errorListeners.push(callback);
+         return this; // chaining
+      }      
+      
    };
 }
 /**
@@ -1375,7 +1397,7 @@ var Oboe = (function(){
    function Oboe(httpMethodName, url, data, doneCallback) {
    
       var self = this,
-          evnts = events(self),
+          events = pubSub(self),
           clarinetParser = clarinet.parser(),
           body = data? (isString(data)? data: JSON.stringify(data)) : null,
           
@@ -1388,10 +1410,10 @@ var Oboe = (function(){
                       clarinetParser,
                        
                       // when a node is found, notify matching node listeners:
-                      partialComplete(evnts.notify, NODE_FOUND_EVENT),
+                      partialComplete(events.notify, NODE_FOUND_EVENT),
    
                       // when a node is found, notify matching path listeners:                                        
-                      partialComplete(evnts.notify, PATH_FOUND_EVENT)
+                      partialComplete(events.notify, PATH_FOUND_EVENT)
                   );          
       
       self._errorListeners       = [];
@@ -1417,7 +1439,7 @@ var Oboe = (function(){
        *
        * @param {Object} [context] the context ('this') for the callback
        */
-      self.onPath = partialComplete(evnts.on, PATH_FOUND_EVENT);
+      self.onPath = partialComplete(events.on, PATH_FOUND_EVENT);
 
       /**
        * Add a new json path to the parser, which will be called when a value is found at the given path
@@ -1429,8 +1451,17 @@ var Oboe = (function(){
        * 
        * TODO: rename to onNode
        */
-      self.onFind = partialComplete(evnts.on, NODE_FOUND_EVENT);
+      self.onFind = partialComplete(events.on, NODE_FOUND_EVENT);
+      
+      self.onError = events.onError;
 
+      clarinetParser.onerror  =  function(e) {
+                                    events.notifyErr(e);
+                                       
+                                    // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
+                                    stop();
+                                 };
+                                 
       function stop() {
          clarinetParser.close();   
       
@@ -1448,14 +1479,7 @@ var Oboe = (function(){
          clarinetParser.oncloseobject =                         
          clarinetParser.onclosearray = 
          clarinetParser.onerror = undefined;       
-      }
-
-      clarinetParser.onerror  =  function(e) {
-                                    self.notifyErr(e);
-                                       
-                                    // after parse errors the json is invalid so, we won't bother trying to recover, so just give up
-                                    stop();
-                                 };
+      }                                 
                                    
       streamingXhr(
          httpMethodName,
@@ -1488,26 +1512,7 @@ var Oboe = (function(){
    
    var oboeProto = Oboe.prototype;
 
-                     
-   /**
-    * 
-    * @param error
-    */
-   oboeProto.notifyErr = function(error) {
-      callAll( this._errorListeners, error );            
-   };
-   
-   
-   /**
-    * Add a new json path to the parser, which will be called when a value is found at the given path
-    *
-    * @param {Function} callback
-    */
-   oboeProto.onError = function (callback) {
 
-      this._errorListeners.push(callback);
-      return this; // chaining
-   };
    
    return Oboe;
               
