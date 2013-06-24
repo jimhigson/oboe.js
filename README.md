@@ -110,8 +110,11 @@ It is nice to just have one, simple service for everything.
 
 # Status
 
-Just hitting v1.1 after some API changes. Patches and suggestions most welcome.
-The project is designed in for easy testability and has [over 100 unit tests](/test/cases).
+Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
+Patches and suggestions most welcome.
+
+The project is designed in for easy testability and has [over 100 unit tests](/test/cases), including
+a few completely end-to-end tests that rely on a little node server to send some data.
 
 BSD licenced.
     
