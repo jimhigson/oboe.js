@@ -348,9 +348,10 @@ oboe.doGet('/myapp/things.json')
 
 // Oboe works very nicely with d3. http://d3js.org/
 
-// start downloading some data:
+// get a (probably empty) d3 selection:
 var things = d3.select('rect.thing');
 
+// Start downloading some data.
 // Every time we see a new thing in the data stream, get d3 to add an element to our visualisation
 // for it. This basic pattern should work for most visualistions built in d3.
 oboe.doGet('/data/things.json')
