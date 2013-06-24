@@ -1303,7 +1303,7 @@ function pubSub(){
    }
 
    /**
-    * implementation behind .onPath() and .onFind: add several listeners in one call  
+    * implementation behind .onPath() and .onNode(): add several listeners in one call  
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {
@@ -1361,7 +1361,7 @@ function pubSub(){
 function controller(httpMethodName, url, data, doneCallback) {
 
    var 
-       // the api available on an oboe instance. Will expose 3 methods, onPath, onFind and onError               
+       // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),
        clarinetParser = clarinet.parser(),
        body = data? (isString(data)? data: JSON.stringify(data)) : null,
@@ -1414,7 +1414,7 @@ function controller(httpMethodName, url, data, doneCallback) {
    return {      
       onPath: partialComplete(events.on, PATH_FOUND_EVENT),
       
-      onFind: partialComplete(events.on, NODE_FOUND_EVENT),
+      onNode: partialComplete(events.on, NODE_FOUND_EVENT),
       
       onError: events.onError
    };                                         

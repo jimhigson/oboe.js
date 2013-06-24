@@ -70,7 +70,7 @@ function pubSub(){
    }
 
    /**
-    * implementation behind .onPath() and .onFind: add several listeners in one call  
+    * implementation behind .onPath() and .onNode(): add several listeners in one call  
     * @param listenerMap
     */
    function pushListeners(listenerList, listenerMap) {

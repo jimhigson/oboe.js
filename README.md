@@ -33,24 +33,24 @@ is optional.
 The returned instance exposes three chainable methods:
 
 ```js
-   .onFind(String pattern, Function callback(thingFound, String[] path, context))
+   .onNode(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```.onFind()``` lets our Oboe object know that we are interested in knowing when it finds JSON matching ```pattern```.
-The patterns are for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
-When the pattern is matched the callback is fired with the matching object and a path describing where it was found.
+```.onNode()``` registers our interest in nodes in the JSON which match the given ```pattern```.
+Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
+When the pattern is matched the callback is given the matching node and a path describing where it was found.
    
 ```js
    .onPath(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```onPath()``` is the same as ```.onFind()``` except the callback is fired when the *path* matches, not when we have the
-thing. For the same pattern this will always fire before ```.onFind()``` and might be used to get things ready for that call.
+```onPath()``` is the same as ```.onNode()``` except the callback is fired when the *path* matches, not when we have the
+thing. For the same pattern this will always fire before ```.onNode()``` and might be used to get things ready for that call.
 
-Alternatively, several paths may be give at once to either ```onPath``` or ```onFind```:
+Alternatively, several paths may be give at once to either ```onPath``` or ```onNode```:
 
 ```js
-   .onFind({
+   .onNode({
       pattern : callback,
       pattern : callback,
       pattern : callback
@@ -166,7 +166,7 @@ we won't wait for them to be loaded:
 
 ``` js
 oboe.doGet('/myapp/things.json')
-   .onFind('foods.*', function( foodObject ){
+   .onNode('foods.*', function( foodObject ){
       // this callback will be called everytime a new object is found in the 
       // foods array. We probably should put this in a js model ala MVC but for
       // simplicity let's just use jQuery to show it in the DOM:
@@ -184,14 +184,14 @@ Want to detect strings instead of objects? Oboe doesn't care about the types in 
 
 ``` js
 oboe.doGet('/myapp/things.json')
-   .onFind('name', function( name ){
+   .onNode('name', function( name ){
       jQuery('ul#names').append( $('<li>').text(name) );
    });
 ```
 
 ## Reacting before we have the whole object
 
-As well as ```.onFind```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
+As well as ```.onNode```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
 know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
 page as soon as possible.
 
@@ -204,7 +204,7 @@ oboe.doGet('//people.json')
       currentPersonElement = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onFind({
+   .onNode({
       'people.*.name': function( name ){
          // we just found out that person's name, lets add it to their div:
          currentPersonElement.append('<span class="name"> + name + </span>');
@@ -229,7 +229,7 @@ I'll assume you already implemented a spinner
 MyApp.showSpinner('#foods');
 
 oboe.doGet('/myapp/things.json')
-   .onFind({
+   .onNode({
       '!.foods.*': function( foodThing ){
          jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
       },
@@ -267,7 +267,7 @@ register a wide-matching pattern and use the path parameter to decide what to do
 // code to use this json:
 oboe.doGet('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
-   .onFind('!.*', function( moduleJson, path ){
+   .onNode('!.*', function( moduleJson, path ){
    
       // This callback will be called with every direct child of the root object but not
       // the sub-objects therein. Because we're coming off the root, the path argument
@@ -304,7 +304,7 @@ given instead to the callback.
 function PeopleListCtrl($scope) {
 
    oboe.doGet('/myapp/things.json')
-      .onFind('$people[*]', function( peopleLoadedSoFar ){
+      .onNode('$people[*]', function( peopleLoadedSoFar ){
          
          // This callback will be called with a 1-length array, a 2-length array, a 3-length array
          // etc until the whole thing is loaded (actually, the same array with extra people objects
@@ -320,7 +320,7 @@ Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
 oboe.doGet('/myapp/things.json')
-   .onFind('people.$*.email', function( personWithAnEmailAddress ){
+   .onNode('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
       
@@ -331,7 +331,7 @@ Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
 oboe.doGet('/myapp/things.json')
-   .onFind('people.$*.email', function( personWithAnEmailAddress ){
+   .onNode('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
       
@@ -349,9 +349,9 @@ oboe.doGet('/myapp/things.json')
 var things = d3.select('rect.thing');
 
 // Every time we see a new thing in the data stream, get d3 to add an element to our visualisation
-// for it. This basic pattern would work for any visualistion built in d3.
+// for it. This basic pattern should work for most visualistions built in d3.
 oboe.doGet('/data/things.json')
-   .onFind('$things.*', function( things ){
+   .onNode('$things.*', function( things ){
             
       things.data(things)
          .enter().append('svg:rect')
@@ -380,7 +380,7 @@ oboe.doGet('people.json')
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onFind('people.*.name', function( name ){
+   .onNode('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
       currentPersonElement.append('<span class="name"> + name + </span>');
    })

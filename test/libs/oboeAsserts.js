@@ -57,7 +57,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
-         oboeInstance.onFind(pattern, argumentClone(spiedCallback), scope);
+         oboeInstance.onNode(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 

@@ -30,7 +30,7 @@ TestCase("oboeTest", {
       function noop(){}
       
       oboe.doGet('http://example.com/oboez')
-         .onPath('*', noop).onFind('*', noop).onError(noop).onPath('!', noop);
+         .onPath('*', noop).onNode('*', noop).onError(noop).onPath('!', noop);
    },
    
    testHandlesEmptyObjectDetectedWithBang: function() {
