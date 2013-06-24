@@ -360,6 +360,8 @@ oboe.doGet('/data/things.json')
             .attr(y, function(d){ return d.x })
             .attr(width, function(d){ return d.w })
             .attr(height, function(d){ return d.h })
+            
+      // no need to handle update or exit set here since downloading is purely additive
    });
 
 ```
