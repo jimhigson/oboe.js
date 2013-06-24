@@ -327,6 +327,43 @@ oboe.doGet('/myapp/things.json')
    });
 ```  
 
+Like css4 stylesheets, this can also be used to express a 'containing' operator.
+
+``` js
+oboe.doGet('/myapp/things.json')
+   .onFind('people.$*.email', function( personWithAnEmailAddress ){
+      
+      // here we'll be called back with baz and bax but not Boz.
+      
+   });
+``` 
+
+## Using Oboe with d3.js
+
+ 
+``` js
+
+// Oboe works very nicely with d3. http://d3js.org/
+
+// start downloading some data:
+var things = d3.select('rect.thing');
+
+// Every time we see a new thing in the data stream, get d3 to add an element to our visualisation
+// for it. This basic pattern would work for any visualistion built in d3.
+oboe.doGet('/data/things.json')
+   .onFind('$things.*', function( things ){
+            
+      things.data(things)
+         .enter().append('svg:rect')
+            .classed('thing', true)
+            .attr(x, function(d){ return d.x })
+            .attr(y, function(d){ return d.x })
+            .attr(width, function(d){ return d.w })
+            .attr(height, function(d){ return d.h })
+   });
+
+```
+
 ## Error handling
 
 You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
