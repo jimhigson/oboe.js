@@ -198,20 +198,22 @@ page as soon as possible.
 ``` js
 var currentPersonElement;
 oboe.doGet('//people.json')
-   .onPath('people.*', function(){
+   .onPath({'people.*': function(){
       // we don't have the person's details yet but we know we found someone in the json stream. We can
       // eagerly put their div to the page and then fill it with whatever other data we find:
       currentPersonElement = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onPath('people.*.name', function( name ){
-      // we just found out that person's name, lets add it to their div:
-      currentPersonElement.append('<span class="name"> + name + </span>');
-   })
-   .onPath('people.*.email', function( email ){
-      // we just found out this person has email, lets add it to their div:
-      currentPersonElement.append('<span class="email"> + email + </span>');
-   })
+   .onFind({
+      'people.*.name': function( name ){
+         // we just found out that person's name, lets add it to their div:
+         currentPersonElement.append('<span class="name"> + name + </span>');
+      },
+      'people.*.email': function( email ){
+         // we just found out this person has email, lets add it to their div:
+         currentPersonElement.append('<span class="email"> + email + </span>');
+      }
+   });
 ```
 
 ## Giving some visual feedback as a page is updating
@@ -227,16 +229,15 @@ I'll assume you already implemented a spinner
 MyApp.showSpinner('#foods');
 
 oboe.doGet('/myapp/things.json')
-   .onFind('!.foods.*', function( foodThing ){
-      jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
-   })
-   .onFind('!.foods', function(){
-      // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
-      // above so we don't need to use the items anymore, just hide the spinner:
-      MyApp.hideSpinner('#foods');
-      // even though we just hid the spinner, the json might not have completely loaded. That's fine because we
-      // don't need the non-foods to remove the spinner from the #foods part of the page. The food bit already has
-      // the data that we need
+   .onFind({
+      '!.foods.*': function( foodThing ){
+         jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
+      },
+      '!.foods': function(){
+         // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
+         // above so we don't need to use the items anymore, just hide the spinner:
+         MyApp.hideSpinner('#foods');
+      }
    });
 ```
 
@@ -340,7 +341,7 @@ oboe.doGet('people.json')
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onPath('people.*.name', function( name ){
+   .onFind('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
