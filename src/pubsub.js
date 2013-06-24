@@ -53,9 +53,7 @@ function pubSub(){
     * 
     * @param {Array} listenerList one of listenerMap[NODE_FOUND_EVENT] or 
     *                listenerMap[PATH_FOUND_EVENT]
-    */  
-   /**
-    * @returns {*} an identifier that can later be used to de-register this listener
+    *
     */
    function pushListener(listenerList, pattern, callback, callbackContext) {
          
