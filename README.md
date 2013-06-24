@@ -352,8 +352,8 @@ oboe.doGet('/myapp/things.json')
 var things = d3.select('rect.thing');
 
 // Start downloading some data.
-// Every time we see a new thing in the data stream, get d3 to add an element to our visualisation
-// for it. This basic pattern should work for most visualistions built in d3.
+// Every time we see a new thing in the data stream, use d3 to add an element to our 
+// visualisation. This basic pattern should work for most visualistions built in d3.
 oboe.doGet('/data/things.json')
    .onNode('$things.*', function( things ){
             
