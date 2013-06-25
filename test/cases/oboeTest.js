@@ -38,7 +38,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!')
          .whenGivenInput('{}')
-         .thenTheParser(
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
          );
@@ -50,7 +50,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('$!')
          .whenGivenInput('{}')
-         .thenTheParser(
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
          );
@@ -62,7 +62,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!')
          .whenGivenInput('{}')
-         .thenTheParser( calledbackWithContext(window) );
+         .thenTheInstance( calledbackWithContext(window) );
    }
    
 ,  testCallsOnGivenContext: function() {
@@ -71,7 +71,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!', myObject.doSomething, myObject)
          .whenGivenInput('{}')
-         .thenTheParser( calledbackWithContext(myObject) );
+         .thenTheInstance( calledbackWithContext(myObject) );
    }   
 
 ,  testFindOnlyFiresWhenHasWholeObject: function() {
@@ -79,11 +79,11 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!')
          .whenGivenInput('{')
-          .thenTheParser(
+          .thenTheInstance(
             foundNoMatches
           )
          .whenGivenInput('}')
-         .thenTheParser(
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
          );
@@ -99,7 +99,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!')
          .whenGivenInput('{"foo":')
-          .thenTheParser(
+          .thenTheInstance(
             foundNMatches(1),
             matched({}).atRootOfJson()
           );
@@ -115,7 +115,7 @@ TestCase("oboeTest", {
          .andWeAreListeningForMatchesToPattern('!')
          .whenGivenInput('[1') // the minimum string required for clarinet 
                                // to fire onopenarray. Won't fire with '['.
-          .thenTheParser(
+          .thenTheInstance(
             foundNMatches(1),
             matched([]).atRootOfJson()
           );
@@ -127,7 +127,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
-         .thenTheParser(
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
          );
@@ -138,7 +138,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.foo.*')
          .whenGivenInput( {foo:{}} )
-         .thenTheParser(
+         .thenTheInstance(
             foundNoMatches
          );
    }   
@@ -148,7 +148,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('*')
          .whenGivenInput('{}')
-         .thenTheParser(
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
          );
@@ -159,7 +159,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.string')
          .whenGivenInput('{"string":"s"}')
-         .thenTheParser(
+         .thenTheInstance(
             matched("s"),
             foundOneMatch
          );
@@ -174,7 +174,7 @@ TestCase("oboeTest", {
           ,    'b':function(){}
           })
          .whenGivenInput({a:'A', b:'B'})
-         .thenTheParser(
+         .thenTheInstance(
             matched("s"),
             foundOneMatch
          );
@@ -185,7 +185,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.string')
          .whenGivenInput('{"string":')
-         .thenTheParser(
+         .thenTheInstance(
             foundOneMatch
          );
    }
@@ -195,7 +195,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":')
-         .thenTheParser(
+         .thenTheInstance(
             // undefined because the parser hasn't been given the value yet.
             // can't be null because that is an allowed value
             matched(undefined).atPath(['pencils']),
@@ -208,7 +208,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":null}')
-         .thenTheParser(
+         .thenTheInstance(
             // undefined because the parser hasn't been given the value yet.
             // can't be null because that is an allowed value
             matched(null).atPath(['pencils']),
@@ -221,7 +221,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
-         .thenTheParser(
+         .thenTheInstance(
              matched('A').atPath(['a'])
          ,   matched('B').atPath(['b'])
          ,   matched('C').atPath(['c'])
@@ -234,7 +234,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('$!.*')
          .whenGivenInput({"a":"A", "b":"B", "c":"C"})
-         .thenTheParser(
+         .thenTheInstance(
             // rather than getting the fully formed objects, we should now see the root object
             // being grown step by step:
              matched({"a":"A"})
@@ -249,7 +249,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.a')
          .whenGivenInput([{a:'a'}])
-         .thenTheParser(foundNoMatches);
+         .thenTheInstance(foundNoMatches);
    }
    
 ,  testDoesNotNotifySpuriouslyOfFoundObject: function() {
@@ -257,7 +257,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.a')
          .whenGivenInput([{a:'a'}])
-         .thenTheParser(foundNoMatches);
+         .thenTheInstance(foundNoMatches);
    }      
 
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
@@ -265,16 +265,16 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput('{"a":')
-         .thenTheParser(
+         .thenTheInstance(
              foundNoMatches
           )
          .whenGivenInput('"A",')
-         .thenTheParser(
+         .thenTheInstance(
              matched('A').atPath(['a'])
          ,   foundOneMatch
          )
          .whenGivenInput('"b":"B"}')
-         .thenTheParser(
+         .thenTheInstance(
              matched('B').atPath(['b'])
          ,   foundNMatches(2)
          );
@@ -284,19 +284,19 @@ TestCase("oboeTest", {
 
       givenAnOboeInstance()
          .whenGivenInput('{"a":')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson({a:undefined})
           )
          .whenGivenInput('"A",')
-         .thenTheParser(
+         .thenTheInstance(
              hasRootJson({a:'A'})
          )
          .whenGivenInput('"b":')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson({a:'A', b:undefined})
          )
          .whenGivenInput('"B"}')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson({a:'A', b:'B'})
          );
    }
@@ -307,27 +307,27 @@ TestCase("oboeTest", {
 
       givenAnOboeInstance()
          .whenGivenInput('[')
-         .thenTheParser(
+         .thenTheInstance(
             // I would like this to be [] but clarinet doesn't fire array found until it has seen
             // the first element
             hasRootJson(undefined)
          )
          .whenGivenInput('1')
-         .thenTheParser(
+         .thenTheInstance(
              // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
              // so nothing can be added to the root json
              hasRootJson([])
          )
          .whenGivenInput('1,')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson([11])
          )
          .whenGivenInput('2')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson([11])
          )
          .whenGivenInput('2]')
-         .thenTheParser(
+         .thenTheInstance(
             hasRootJson([11,22])
          );
    }      
@@ -337,7 +337,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.b')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
-         .thenTheParser(
+         .thenTheInstance(
              matched('B').atPath(['b'])
          ,   foundOneMatch
          );
@@ -348,7 +348,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.testArray.*')
          .whenGivenInput('{"testArray":["a","b","c"]}')
-         .thenTheParser(
+         .thenTheInstance(
              matched('a').atPath(['testArray',0])
          ,   matched('b').atPath(['testArray',1])
          ,   matched('c').atPath(['testArray',2])
@@ -361,7 +361,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.testArray')
          .whenGivenInput('{"testArray":["a"')
-         .thenTheParser(
+         .thenTheInstance(
              foundNMatches(1)
          ,   matched(undefined) // when path is matched, it is not known yet
                                 // that it contains an array. Null should not
@@ -375,7 +375,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('!.array2')
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          ,  matched(undefined) // when path is matched, it is not known yet
                                // that it contains an array. Null should not
@@ -389,7 +389,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![*]')
          .whenGivenInput( [{}, 'b', 2, []] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(4)
          );
    }
@@ -399,7 +399,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [{}, {}, 'this_one'] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }
@@ -409,7 +409,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [[], [], 'this_one'] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }
@@ -427,7 +427,7 @@ TestCase("oboeTest", {
                                  ['this_array']
                               ]
                           ] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }   
@@ -437,7 +437,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( ['', '', 'this_one'] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }
@@ -447,7 +447,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [1, 1, 'this_one'] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }
@@ -457,7 +457,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![2]')
          .whenGivenInput( [null, null, 'this_one'] )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(1)
          );
    }      
@@ -467,7 +467,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForMatchesToPattern('![*]')
          .whenGivenInput( {a:{}, b:'b', c:2, d:[]} )
-         .thenTheParser(
+         .thenTheInstance(
             foundNMatches(4)
          );
    }      
@@ -477,7 +477,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.testArray[2]')
          .whenGivenInput('{"testArray":["a","b","this_one"]}')
-         .thenTheParser(
+         .thenTheInstance(
              matched('this_one').atPath(['testArray',2])
          ,   foundOneMatch
          );
@@ -493,7 +493,7 @@ TestCase("oboeTest", {
                               ]
                           }
                         )
-         .thenTheParser(
+         .thenTheInstance(
              matched('this_one')
                .atPath(['testArray',2,2])
                .withParent( ["x","y","this_one"] )
@@ -512,7 +512,7 @@ TestCase("oboeTest", {
                               ]
                           }
                         )
-         .thenTheParser(
+         .thenTheInstance(
              matched(   ["a","b",
                            ["x","y","this_one"]
                         ])
@@ -525,7 +525,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('..')
          .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
-         .thenTheParser(
+         .thenTheInstance(
              matched('e')
                .atPath(['a', 'b', 'c', 'd'])
                .withParent({d:'e'})
@@ -557,7 +557,7 @@ TestCase("oboeTest", {
                ]
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
              matched('should_find_this')
                .atPath(['array',1,'find'])
          );
@@ -573,7 +573,7 @@ TestCase("oboeTest", {
             ,  a:'but_should_find_this'
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched('but_should_find_this')
          ,  foundOneMatch
          );
@@ -589,7 +589,7 @@ TestCase("oboeTest", {
             ,  a:'but_should_find_this'
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched('but_should_find_this')
          ,  foundOneMatch
          );
@@ -603,7 +603,7 @@ TestCase("oboeTest", {
                array : [0,1,2,3,4,5,6,7,8,9,10,11,12]
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched(1)
                .withParent([0,1])
          ,  foundOneMatch
@@ -615,7 +615,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('$![5]')
          .whenGivenInput([0,1,2,3,4,5,6,7,8,9,10,11,12])
-         .thenTheParser(
+         .thenTheInstance(
             matched([0,1,2,3,4,5])
          ,  foundOneMatch
          );
@@ -629,7 +629,7 @@ TestCase("oboeTest", {
                array : ['a','b','c']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched('a')
                .withParent(['a'])
                .withGrandparent({array:['a']})
@@ -650,7 +650,7 @@ TestCase("oboeTest", {
                array : [{'a':1},{'b':2},{'c':3}]
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched({'a':1})
                .withParent([{'a':1}])
          ,  matched({'b':2})
@@ -668,7 +668,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
             matched({'a':1})
                .withParent([{'a':1}])         
          );
@@ -682,7 +682,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
          
             matched('b')
                .withParent([{'a':1},'b'])
@@ -698,7 +698,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
                
             matched({'c':3})
                .withParent([{'a':1},'b',{'c':3}])
@@ -714,7 +714,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
          
             matched({})
                .withParent([{'a':1},'b',{'c':3}, {}])
@@ -730,7 +730,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(  
+         .thenTheInstance(  
                                      
             matched(['d'])            
                .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
@@ -746,7 +746,7 @@ TestCase("oboeTest", {
                array : [['d']]
             }
          )
-         .thenTheParser(  
+         .thenTheInstance(  
                                      
             matched(['d'])            
                .withParent([['d']])
@@ -762,7 +762,7 @@ TestCase("oboeTest", {
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
          )
-         .thenTheParser(
+         .thenTheInstance(
          
             matched('e')
                .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
@@ -777,7 +777,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
          
             matched({'a':1})
                .withParent([{'a':1}])
@@ -790,7 +790,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
 
             matched('b')
                .withParent([{'a':1},'b'])               
@@ -803,7 +803,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
                
             matched({'c':3})
                .withParent([{'a':1},'b',{'c':3}])
@@ -816,7 +816,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
 
             matched({})
                .withParent([{'a':1},'b',{'c':3}, {}])                              
@@ -829,7 +829,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
                               
             matched(['d'])
                .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
@@ -843,7 +843,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([['d']])
-         .thenTheParser(
+         .thenTheInstance(
                               
             matched(['d'])
                .withParent([['d']])
@@ -857,7 +857,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          .andWeAreListeningForThingsFoundAtPattern('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheParser(
+         .thenTheInstance(
 
             matched('e')
                .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
@@ -879,7 +879,7 @@ TestCase("oboeTest", {
             }
 
          })
-         .thenTheParser(
+         .thenTheInstance(
              matched('first_find').atPath(['array',0,'find'])
          ,   matched('second_find').atPath(['array',1,'padding','find'])
          ,   matched('third_find').atPath(['array',1,'find'])
@@ -905,7 +905,7 @@ TestCase("oboeTest", {
             }
 
          })
-         .thenTheParser(
+         .thenTheInstance(
              matched('first_find')
                .withParent( {find:'first_find'} )
                .withGrandparent( [{find:'first_find'}] )
@@ -938,7 +938,7 @@ TestCase("oboeTest", {
             }
 
          })
-         .thenTheParser(
+         .thenTheInstance(
              matched('first_find').atPath(['array',0,'find'])
          ,   matched('second_find').atPath(['array',1,'padding','find'])
          ,   matched('third_find').atPath(['array',1,'find'])
@@ -966,7 +966,7 @@ TestCase("oboeTest", {
                {name:'broken_glass', colour:'green'}
             ]
          })
-         .thenTheParser
+         .thenTheInstance
                (   matched('purple')
                ,   matched('red')
                ,   foundNMatches(2)
@@ -990,7 +990,7 @@ TestCase("oboeTest", {
                {name:'broken_glass', colour:'green'}
             ]
          })
-         .thenTheParser
+         .thenTheInstance
                (   matched('aubergine')
                ,   matched('apple')
                ,   matched('nuts')
@@ -1010,7 +1010,7 @@ TestCase("oboeTest", {
                {name:'nuts'}
             ]
          })
-         .thenTheParser
+         .thenTheInstance
                (   foundNMatches(3)
                ,   matched({name:'aubergine'})
                ,   matched({name:'apple'})
@@ -1031,7 +1031,7 @@ TestCase("oboeTest", {
          })
          // essentially, the parser should have been called three times with the same object, but each time
          // an additional item should have been added
-         .thenTheParser
+         .thenTheInstance
                (   foundNMatches(3)
                ,   matched([{name:'aubergine'}])
                ,   matched([{name:'aubergine'},{name:'apple'}])
@@ -1057,7 +1057,7 @@ TestCase("oboeTest", {
                {name:{en:'broken_glass'}, colour:'green'}
             ]
          })
-         .thenTheParser
+         .thenTheInstance
                (   matched('aubergine')
                ,   matched('pomme')
                ,   matched('noix')
@@ -1071,7 +1071,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
         .andWeAreExpectingSomeErrors()
         .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
-        .thenTheParser
+        .thenTheInstance
            (   calledCallbackOnce
            ,   wasPassedAnErrorObject
            );
@@ -1082,7 +1082,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
         .andWeAreExpectingSomeErrors()
         .whenGivenInput('{{') // invalid!
-        .thenTheParser
+        .thenTheInstance
            (   calledCallbackOnce
            ,   wasPassedAnErrorObject
            );
@@ -1094,7 +1094,7 @@ TestCase("oboeTest", {
         .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
         .andWeAreExpectingSomeErrors()
         .whenGivenInput('{}') // valid json, should provide callback
-        .thenTheParser
+        .thenTheInstance
            (   calledCallbackOnce
            ,   wasPassedAnErrorObject
            );

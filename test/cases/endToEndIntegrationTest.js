@@ -29,7 +29,7 @@
 
          queue.call("should have gotten all the numbers", function( _queue ){
                   
-            asserter.thenTheParser(
+            asserter.thenTheInstance(
                 matched(0).atPath([0])
             ,   matched(1).atPath([1])
             ,   matched(2).atPath([2])
@@ -58,7 +58,7 @@
 
          queue.call("should have gotten all the numbers", function( _queue ){
                   
-            asserter.thenTheParser(
+            asserter.thenTheInstance(
                 matched(0).atPath([0])
             ,   matched(1).atPath([1])
             ,   matched(2).atPath([2])

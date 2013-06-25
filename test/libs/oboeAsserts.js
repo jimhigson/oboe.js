@@ -101,7 +101,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       /**
        * Assert any number of conditions were met on the spied callback
        */
-      this.thenTheParser = function( /* ... functions ... */ ){
+      this.thenTheInstance = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
             var assertion = arguments[i];
             assertion.testAgainst(spiedCallback, oboeInstance);
@@ -155,7 +155,7 @@ var wasPassedAnErrorObject = {
 };
 
 
-// higher-order function to create assertions. Pass output to Asserter#thenTheParser.
+// higher-order function to create assertions. Pass output to Asserter#thenTheInstance.
 // test how many matches were found
 function foundNMatches(n){
    return {
