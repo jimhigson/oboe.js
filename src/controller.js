@@ -37,7 +37,7 @@ function controller(httpMethodName, url, body, doneCallback) {
       that is suitable to sending over the wire. Which is, either a string or
       null.                     
     */
-   function validatedBody( body ) {
+   function validatedRequestBody( body ) {
       if( !body )
          return null;
    
@@ -47,7 +47,7 @@ function controller(httpMethodName, url, body, doneCallback) {
    streamingXhr(
       httpMethodName,
       url, 
-      validatedBody(body),
+      validatedRequestBody(body),
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
