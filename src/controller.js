@@ -5,32 +5,34 @@ function controller(httpMethodName, url, data, doneCallback) {
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),
-       clarinetParser = clarinet.parser(),
-       body = data? (isString(data)? data: JSON.stringify(data)) : null,
-              
+       
+       clarinetParser = clarinet.parser(),           
+                                      
        // create a json builder and store a function that can be used to get the
        // root of the json later:
        /**
         * @type {Function}
         */          
-       root =  jsonBuilder(
-                   clarinetParser,
-                    
-                   // when a node is found, notify matching node listeners:
-                   partialComplete(events.notify, NODE_FOUND_EVENT),
-
-                   // when a node is found, notify matching path listeners:                                        
-                   partialComplete(events.notify, PATH_FOUND_EVENT)
-               );          
+       jsonSoFar =   jsonBuilder(
+                         clarinetParser,
+                          
+                         // when a node is found, notify matching node listeners:
+                         partialComplete(events.notify, NODE_FOUND_EVENT),
+      
+                         // when a node is found, notify matching path listeners:                                        
+                         partialComplete(events.notify, PATH_FOUND_EVENT)
+                     ),
                
+       body = data? (isString(data)? data: JSON.stringify(data)) : null;
+   
    clarinetParser.onerror =  
-      function(e) {
-         events.notifyErr(e);
+       function(e) {
+          events.notifyErr(e);
             
-         // the json is invalid, give up and close the parser to prevent getting any more:
-         clarinetParser.close();
-      };               
-                                                                                                 
+          // the json is invalid, give up and close the parser to prevent getting any more:
+          clarinetParser.close();
+       };
+                                                                                                                            
    streamingXhr(
       httpMethodName,
       url, 
@@ -50,7 +52,7 @@ function controller(httpMethodName, url, data, doneCallback) {
          // callback for when the response is complete                     
          clarinetParser.close();
          
-         doneCallback && doneCallback(root());
+         doneCallback && doneCallback(jsonSoFar());
       });
       
    return {      
