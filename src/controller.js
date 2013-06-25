@@ -6,6 +6,8 @@ function controller(httpMethodName, url, body, doneCallback) {
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),
        
+       notify = events.notify, // shortcut
+       
        clarinetParser = clarinet.parser(),           
                                       
        // create a json builder and store a function that can be used to get the
@@ -17,10 +19,10 @@ function controller(httpMethodName, url, body, doneCallback) {
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
-                         partialComplete(events.notify, NODE_FOUND_EVENT),
+                         partialComplete(notify, NODE_FOUND_EVENT),
       
                          // when a node is found, notify matching path listeners:                                        
-                         partialComplete(events.notify, PATH_FOUND_EVENT)
+                         partialComplete(notify, PATH_FOUND_EVENT)
                      );
    
    clarinetParser.onerror =  
