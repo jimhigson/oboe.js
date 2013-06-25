@@ -24,7 +24,7 @@ TestCase("oboeTest", {
       streamingStub.restore();   
    },
    
-   testOboeIsChainableWhenGottenViaShortcut: function() {
+   testMethodsAreChainable: function() {
       // very basic test that nothing forgot to return 'this':
       
       function noop(){}
