@@ -15,7 +15,7 @@ module.exports = function (grunt) {
             ,  'src/jsonBuilder.js'
             ,  'src/pubsub.js'
             ,  'src/controller.js'
-            ,  'src/api.js'
+            ,  'src/browser-api.js'
             ],
             dest: 'dist/oboe.concat.js'
          }
