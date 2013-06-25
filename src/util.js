@@ -18,6 +18,15 @@ function isString(thing) {
    return typeof thing == 'string';
 }
 
+/** I don't like saying foo !=== undefined very much because of the double-negative. I find
+ *  defined(foo) easier to read.
+ *  
+ * @param {*} value anything
+ */ 
+function defined( value ) {
+   return value !== undefined;
+}
+
 /*
    Call each of a list of functions with the same arguments, ignoring any return
    values.

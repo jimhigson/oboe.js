@@ -19,6 +19,15 @@ function isString(thing) {
    return typeof thing == 'string';
 }
 
+/** I don't like saying foo !=== undefined very much because of the double-negative. I find
+ *  defined(foo) easier to read.
+ *  
+ * @param {*} value anything
+ */ 
+function defined( value ) {
+   return value !== undefined;
+}
+
 /*
    Call each of a list of functions with the same arguments, ignoring any return
    values.
@@ -1155,11 +1164,11 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
     **/  
    function keyDiscovered(key, value) {
       
-      var fullPath = key === undefined? pathStack : pathStack.concat(key);
+      var fullPath = defined(key)? pathStack.concat(key) : pathStack;
 
       // if we have the key but no known value yet, at least put that key in the output 
       // but against no defined value:
-      if( key && value === undefined ) {
+      if( key && !defined(value) ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
@@ -1205,7 +1214,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       
       // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
       // so can't do !firstKey here, have to compare against undefined
-      if( firstKey !== undefined ) {
+      if( defined(firstKey) ) {
       
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
          // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
@@ -1369,7 +1378,7 @@ function pubSub(){
 }
 
 
-function controller(httpMethodName, url, data, doneCallback) {
+function controller(httpMethodName, url, body, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
@@ -1390,9 +1399,7 @@ function controller(httpMethodName, url, data, doneCallback) {
       
                          // when a node is found, notify matching path listeners:                                        
                          partialComplete(events.notify, PATH_FOUND_EVENT)
-                     ),
-               
-       body = data? (isString(data)? data: JSON.stringify(data)) : null;
+                     );
    
    clarinetParser.onerror =  
        function(e) {
@@ -1401,11 +1408,22 @@ function controller(httpMethodName, url, data, doneCallback) {
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
        };
+                     
+   /* Given a value from the user to send as the request body, return in a form
+      that is suitable to sending over the wire. Which is, either a string or
+      null.                     
+    */
+   function validatedBody( body ) {
+      if( !body )
+         return null;
+   
+      return isString(body)? body: JSON.stringify(body);
+   }                        
                                                                                                                             
    streamingXhr(
       httpMethodName,
       url, 
-      body,
+      validatedBody(body),
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           

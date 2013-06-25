@@ -1,6 +1,6 @@
 
 
-function controller(httpMethodName, url, data, doneCallback) {
+function controller(httpMethodName, url, body, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
@@ -21,9 +21,7 @@ function controller(httpMethodName, url, data, doneCallback) {
       
                          // when a node is found, notify matching path listeners:                                        
                          partialComplete(events.notify, PATH_FOUND_EVENT)
-                     ),
-               
-       body = data? (isString(data)? data: JSON.stringify(data)) : null;
+                     );
    
    clarinetParser.onerror =  
        function(e) {
@@ -32,11 +30,22 @@ function controller(httpMethodName, url, data, doneCallback) {
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
        };
+                     
+   /* Given a value from the user to send as the request body, return in a form
+      that is suitable to sending over the wire. Which is, either a string or
+      null.                     
+    */
+   function validatedBody( body ) {
+      if( !body )
+         return null;
+   
+      return isString(body)? body: JSON.stringify(body);
+   }                        
                                                                                                                             
    streamingXhr(
       httpMethodName,
       url, 
-      body,
+      validatedBody(body),
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           

@@ -91,11 +91,11 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
     **/  
    function keyDiscovered(key, value) {
       
-      var fullPath = key === undefined? pathStack : pathStack.concat(key);
+      var fullPath = defined(key)? pathStack.concat(key) : pathStack;
 
       // if we have the key but no known value yet, at least put that key in the output 
       // but against no defined value:
-      if( key && value === undefined ) {
+      if( key && !defined(value) ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
@@ -141,7 +141,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       
       // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
       // so can't do !firstKey here, have to compare against undefined
-      if( firstKey !== undefined ) {
+      if( defined(firstKey) ) {
       
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
          // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
