@@ -26,6 +26,38 @@
             .then([1,2,3,4,5,6,7,8,9])
       }
             
+   ,  testBindCallsOriginalFunction: function() {
+         
+         var callCount = 0;
+         
+         var bound = (function(){ 
+            callCount++; 
+         }).bind({});
+         
+         bound();
+         
+         assertEquals(1, callCount);
+      }      
+      
+   ,  testBindPreservesContext: function() {
+         
+         var bound = (function(){ 
+            assertEquals('a', this) 
+         }).bind('a');
+         
+         bound(); 
+      }
+            
+   ,  testBindPropagatesCallTimeArguments: function() {
+         
+         var bound = (function(arg1, arg2){ 
+            assertEquals('b', arg1 ); 
+            assertEquals('c', arg2 ); 
+         }).bind('a');
+         
+         bound('b', 'c'); 
+      }
+                  
    ,  testForEachCallsTheCorrectNumberOftimes: function() {
          
          var func = sinon.spy();
