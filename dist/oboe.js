@@ -1248,9 +1248,8 @@ function pubSub(){
     * 
     * @param test
     * @param callback
-    * @param callbackContext
     */
-   function callConditionally( test, callback, callbackContext, path, ancestors, nodeList ) {
+   function callConditionally( test, callback, path, ancestors, nodeList ) {
      
       var foundNode = test( path, nodeList );
      
@@ -1273,7 +1272,7 @@ function pubSub(){
         
          // change curNode to foundNode when it stops breaking tests
          try{
-            callback.call(callbackContext, foundNode, path, ancestors );
+            callback( foundNode, path, ancestors );
          } catch(e) {
             errorHappened(Error('Error thrown by callback ' + e.message));
          }
@@ -1286,18 +1285,15 @@ function pubSub(){
     * 
     * @param {Array} listenerList one of listenerMap[NODE_FOUND_EVENT] or 
     *                listenerMap[PATH_FOUND_EVENT]
-    */  
-   /**
-    * @returns {*} an identifier that can later be used to de-register this listener
+    *
     */
-   function pushListener(listenerList, pattern, callback, callbackContext) {
+   function pushListener(listenerList, pattern, callback) {
          
       listenerList.push( 
          partialComplete(
             callConditionally,
-            jsonPathCompiler(pattern),
-            callback, 
-            callbackContext || window
+            jsonPathCompiler(pattern),            
+            callback
          ) 
       );            
    }
@@ -1331,7 +1327,7 @@ function pubSub(){
          var listenerList = listeners[eventId];
          
          if( isString(jsonPath) ) {
-            pushListener(listenerList, jsonPath, callback, callbackContext);
+            pushListener(listenerList, jsonPath, callback.bind(callbackContext));
          } else {
             pushListeners(listenerList, jsonPath);
          }
@@ -1363,32 +1359,34 @@ function controller(httpMethodName, url, data, doneCallback) {
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),
-       clarinetParser = clarinet.parser(),
-       body = data? (isString(data)? data: JSON.stringify(data)) : null,
-              
+       
+       clarinetParser = clarinet.parser(),           
+                                      
        // create a json builder and store a function that can be used to get the
        // root of the json later:
        /**
         * @type {Function}
         */          
-       root =  jsonBuilder(
-                   clarinetParser,
-                    
-                   // when a node is found, notify matching node listeners:
-                   partialComplete(events.notify, NODE_FOUND_EVENT),
-
-                   // when a node is found, notify matching path listeners:                                        
-                   partialComplete(events.notify, PATH_FOUND_EVENT)
-               );          
+       jsonSoFar =   jsonBuilder(
+                         clarinetParser,
+                          
+                         // when a node is found, notify matching node listeners:
+                         partialComplete(events.notify, NODE_FOUND_EVENT),
+      
+                         // when a node is found, notify matching path listeners:                                        
+                         partialComplete(events.notify, PATH_FOUND_EVENT)
+                     ),
                
+       body = data? (isString(data)? data: JSON.stringify(data)) : null;
+   
    clarinetParser.onerror =  
-      function(e) {
-         events.notifyErr(e);
+       function(e) {
+          events.notifyErr(e);
             
-         // the json is invalid, give up and close the parser to prevent getting any more:
-         clarinetParser.close();
-      };               
-                                                                                                 
+          // the json is invalid, give up and close the parser to prevent getting any more:
+          clarinetParser.close();
+       };
+                                                                                                                            
    streamingXhr(
       httpMethodName,
       url, 
@@ -1408,7 +1406,7 @@ function controller(httpMethodName, url, data, doneCallback) {
          // callback for when the response is complete                     
          clarinetParser.close();
          
-         doneCallback && doneCallback(root());
+         doneCallback && doneCallback(jsonSoFar());
       });
       
    return {      
