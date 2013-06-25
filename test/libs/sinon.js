@@ -1,17 +1,17 @@
 /**
- * Sinon.JS 1.6.0, 2013/02/18
+ * Sinon.JS 1.7.3, 2013/06/20
  *
  * @author Christian Johansen (christian@cjohansen.no)
  * @author Contributors: https://github.com/cjohansen/Sinon.JS/blob/master/AUTHORS
  *
  * (The BSD License)
- *
+ * 
  * Copyright (c) 2010-2013, Christian Johansen, christian@cjohansen.no
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright notice,
  *       this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice,
@@ -20,7 +20,7 @@
  *     * Neither the name of Christian Johansen nor the names of his contributors
  *       may be used to endorse or promote products derived from this software
  *       without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,9 +33,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-var sinon = (function () {
-"use strict";
-
+this.sinon = (function () {
 var buster = (function (setTimeout, B) {
     var isNode = typeof require == "function" && typeof module == "object";
     var div = typeof document != "undefined" && document.createElement("div");
@@ -270,7 +268,7 @@ buster.format.excludeConstructors = ["Object", /^.$/];
 buster.format.quoteStrings = true;
 
 buster.format.ascii = (function () {
-
+    
     var hasOwn = Object.prototype.hasOwnProperty;
 
     var specialObjects = [];
@@ -505,6 +503,10 @@ var sinon = (function (buster) {
         }
     }
 
+    function isRestorable (obj) {
+        return typeof obj === "function" && typeof obj.restore === "function" && obj.restore.sinon;
+    }
+
     var sinon = {
         wrapMethod: function wrapMethod(object, property, method) {
             if (!object) {
@@ -617,6 +619,10 @@ var sinon = (function (buster) {
                 return true;
             }
 
+            if (aString == "[object Date]") {
+                return a.valueOf() === b.valueOf();
+            }
+
             var prop, aLength = 0, bLength = 0;
 
             for (prop in a) {
@@ -631,11 +637,7 @@ var sinon = (function (buster) {
                 bLength += 1;
             }
 
-            if (aLength != bLength) {
-                return false;
-            }
-
-            return true;
+            return aLength == bLength;
         },
 
         functionName: function functionName(func) {
@@ -755,6 +757,19 @@ var sinon = (function (buster) {
                 throw new TypeError("The constructor should be a function.");
             }
             return sinon.stub(sinon.create(constructor.prototype));
+        },
+
+        restore: function (object) {
+            if (object !== null && typeof object === "object") {
+                for (var prop in object) {
+                    if (isRestorable(object[prop])) {
+                        object[prop].restore();
+                    }
+                }
+            }
+            else if (isRestorable(object)) {
+                object.restore();
+            }
         }
     };
 
@@ -1044,6 +1059,200 @@ var sinon = (function (buster) {
 /*jslint eqeqeq: false, onevar: false, plusplus: false*/
 /*global module, require, sinon*/
 /**
+  * Spy calls
+  *
+  * @author Christian Johansen (christian@cjohansen.no)
+  * @author Maximilian Antoni (mail@maxantoni.de)
+  * @license BSD
+  *
+  * Copyright (c) 2010-2013 Christian Johansen
+  * Copyright (c) 2013 Maximilian Antoni
+  */
+
+var commonJSModule = typeof module == "object" && typeof require == "function";
+
+if (!this.sinon && commonJSModule) {
+    var sinon = require("../sinon");
+}
+
+(function (sinon) {
+    function throwYieldError(proxy, text, args) {
+        var msg = sinon.functionName(proxy) + text;
+        if (args.length) {
+            msg += " Received [" + slice.call(args).join(", ") + "]";
+        }
+        throw new Error(msg);
+    }
+
+    var slice = Array.prototype.slice;
+
+    var callProto = {
+        calledOn: function calledOn(thisValue) {
+            if (sinon.match && sinon.match.isMatcher(thisValue)) {
+                return thisValue.test(this.thisValue);
+            }
+            return this.thisValue === thisValue;
+        },
+
+        calledWith: function calledWith() {
+            for (var i = 0, l = arguments.length; i < l; i += 1) {
+                if (!sinon.deepEqual(arguments[i], this.args[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        calledWithMatch: function calledWithMatch() {
+            for (var i = 0, l = arguments.length; i < l; i += 1) {
+                var actual = this.args[i];
+                var expectation = arguments[i];
+                if (!sinon.match || !sinon.match(expectation).test(actual)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
+        calledWithExactly: function calledWithExactly() {
+            return arguments.length == this.args.length &&
+                this.calledWith.apply(this, arguments);
+        },
+
+        notCalledWith: function notCalledWith() {
+            return !this.calledWith.apply(this, arguments);
+        },
+
+        notCalledWithMatch: function notCalledWithMatch() {
+            return !this.calledWithMatch.apply(this, arguments);
+        },
+
+        returned: function returned(value) {
+            return sinon.deepEqual(value, this.returnValue);
+        },
+
+        threw: function threw(error) {
+            if (typeof error === "undefined" || !this.exception) {
+                return !!this.exception;
+            }
+
+            return this.exception === error || this.exception.name === error;
+        },
+
+        calledWithNew: function calledWithNew(thisValue) {
+            return this.thisValue instanceof this.proxy;
+        },
+
+        calledBefore: function (other) {
+            return this.callId < other.callId;
+        },
+
+        calledAfter: function (other) {
+            return this.callId > other.callId;
+        },
+
+        callArg: function (pos) {
+            this.args[pos]();
+        },
+
+        callArgOn: function (pos, thisValue) {
+            this.args[pos].apply(thisValue);
+        },
+
+        callArgWith: function (pos) {
+            this.callArgOnWith.apply(this, [pos, null].concat(slice.call(arguments, 1)));
+        },
+
+        callArgOnWith: function (pos, thisValue) {
+            var args = slice.call(arguments, 2);
+            this.args[pos].apply(thisValue, args);
+        },
+
+        "yield": function () {
+            this.yieldOn.apply(this, [null].concat(slice.call(arguments, 0)));
+        },
+
+        yieldOn: function (thisValue) {
+            var args = this.args;
+            for (var i = 0, l = args.length; i < l; ++i) {
+                if (typeof args[i] === "function") {
+                    args[i].apply(thisValue, slice.call(arguments, 1));
+                    return;
+                }
+            }
+            throwYieldError(this.proxy, " cannot yield since no callback was passed.", args);
+        },
+
+        yieldTo: function (prop) {
+            this.yieldToOn.apply(this, [prop, null].concat(slice.call(arguments, 1)));
+        },
+
+        yieldToOn: function (prop, thisValue) {
+            var args = this.args;
+            for (var i = 0, l = args.length; i < l; ++i) {
+                if (args[i] && typeof args[i][prop] === "function") {
+                    args[i][prop].apply(thisValue, slice.call(arguments, 2));
+                    return;
+                }
+            }
+            throwYieldError(this.proxy, " cannot yield to '" + prop +
+                "' since no callback was passed.", args);
+        },
+
+        toString: function () {
+            var callStr = this.proxy.toString() + "(";
+            var args = [];
+
+            for (var i = 0, l = this.args.length; i < l; ++i) {
+                args.push(sinon.format(this.args[i]));
+            }
+
+            callStr = callStr + args.join(", ") + ")";
+
+            if (typeof this.returnValue != "undefined") {
+                callStr += " => " + sinon.format(this.returnValue);
+            }
+
+            if (this.exception) {
+                callStr += " !" + this.exception.name;
+
+                if (this.exception.message) {
+                    callStr += "(" + this.exception.message + ")";
+                }
+            }
+
+            return callStr;
+        }
+    };
+
+    callProto.invokeCallback = callProto.yield;
+
+    function createSpyCall(spy, thisValue, args, returnValue, exception, id) {
+        if (typeof id !== "number") {
+            throw new TypeError("Call id is not a number");
+        }
+        var proxyCall = sinon.create(callProto);
+        proxyCall.proxy = spy;
+        proxyCall.thisValue = thisValue;
+        proxyCall.args = args;
+        proxyCall.returnValue = returnValue;
+        proxyCall.exception = exception;
+        proxyCall.callId = id;
+
+        return proxyCall;
+    };
+    createSpyCall.toString = callProto.toString; // used by mocks
+
+    sinon.spyCall = createSpyCall;
+}(typeof sinon == "object" && sinon || null));
+
+/**
+  * @depend ../sinon.js
+  */
+/*jslint eqeqeq: false, onevar: false, plusplus: false*/
+/*global module, require, sinon*/
+/**
   * Spy functions
   *
   * @author Christian Johansen (christian@cjohansen.no)
@@ -1054,18 +1263,9 @@ var sinon = (function (buster) {
 
 (function (sinon) {
     var commonJSModule = typeof module == "object" && typeof require == "function";
-    var spyCall;
-    var callId = 0;
-    var push = [].push;
+    var push = Array.prototype.push;
     var slice = Array.prototype.slice;
-
-    if (!sinon && commonJSModule) {
-        sinon = require("../sinon");
-    }
-
-    if (!sinon) {
-        return;
-    }
+    var callId = 0;
 
     function spy(object, property) {
         if (!property && typeof object == "function") {
@@ -1080,523 +1280,347 @@ var sinon = (function (buster) {
         return sinon.wrapMethod(object, property, spy.create(method));
     }
 
-    sinon.extend(spy, (function () {
+    function matchingFake(fakes, args, strict) {
+        if (!fakes) {
+            return;
+        }
 
-        function delegateToCalls(api, method, matchAny, actual, notCalled) {
-            api[method] = function () {
-                if (!this.called) {
-                    if (notCalled) {
-                        return notCalled.apply(this, arguments);
-                    }
-                    return false;
-                }
+        var alen = args.length;
 
-                var currentCall;
-                var matches = 0;
+        for (var i = 0, l = fakes.length; i < l; i++) {
+            if (fakes[i].matches(args, strict)) {
+                return fakes[i];
+            }
+        }
+    }
 
-                for (var i = 0, l = this.callCount; i < l; i += 1) {
-                    currentCall = this.getCall(i);
+    function incrementCallCount() {
+        this.called = true;
+        this.callCount += 1;
+        this.notCalled = false;
+        this.calledOnce = this.callCount == 1;
+        this.calledTwice = this.callCount == 2;
+        this.calledThrice = this.callCount == 3;
+    }
 
-                    if (currentCall[actual || method].apply(currentCall, arguments)) {
-                        matches += 1;
+    function createCallProperties() {
+        this.firstCall = this.getCall(0);
+        this.secondCall = this.getCall(1);
+        this.thirdCall = this.getCall(2);
+        this.lastCall = this.getCall(this.callCount - 1);
+    }
 
-                        if (matchAny) {
-                            return true;
-                        }
-                    }
-                }
-
-                return matches === this.callCount;
+    var vars = "a,b,c,d,e,f,g,h,i,j,k,l";
+    function createProxy(func) {
+        // Retain the function length:
+        var p;
+        if (func.length) {
+            eval("p = (function proxy(" + vars.substring(0, func.length * 2 - 1) +
+                ") { return p.invoke(func, this, slice.call(arguments)); });");
+        }
+        else {
+            p = function proxy() {
+                return p.invoke(func, this, slice.call(arguments));
             };
         }
+        return p;
+    }
 
-        function matchingFake(fakes, args, strict) {
-            if (!fakes) {
-                return;
-            }
+    var uuid = 0;
 
-            var alen = args.length;
-
-            for (var i = 0, l = fakes.length; i < l; i++) {
-                if (fakes[i].matches(args, strict)) {
-                    return fakes[i];
+    // Public API
+    var spyApi = {
+        reset: function () {
+            this.called = false;
+            this.notCalled = true;
+            this.calledOnce = false;
+            this.calledTwice = false;
+            this.calledThrice = false;
+            this.callCount = 0;
+            this.firstCall = null;
+            this.secondCall = null;
+            this.thirdCall = null;
+            this.lastCall = null;
+            this.args = [];
+            this.returnValues = [];
+            this.thisValues = [];
+            this.exceptions = [];
+            this.callIds = [];
+            if (this.fakes) {
+                for (var i = 0; i < this.fakes.length; i++) {
+                    this.fakes[i].reset();
                 }
             }
-        }
+        },
 
-        function incrementCallCount() {
-            this.called = true;
-            this.callCount += 1;
-            this.notCalled = false;
-            this.calledOnce = this.callCount == 1;
-            this.calledTwice = this.callCount == 2;
-            this.calledThrice = this.callCount == 3;
-        }
+        create: function create(func) {
+            var name;
 
-        function createCallProperties() {
-            this.firstCall = this.getCall(0);
-            this.secondCall = this.getCall(1);
-            this.thirdCall = this.getCall(2);
-            this.lastCall = this.getCall(this.callCount - 1);
-        }
-
-        var vars = "a,b,c,d,e,f,g,h,i,j,k,l";
-        function createProxy(func) {
-            // Retain the function length:
-            var p;
-            if (func.length) {
-                eval("p = (function proxy(" + vars.substring(0, func.length * 2 - 1) +
-                    ") { return p.invoke(func, this, slice.call(arguments)); });");
+            if (typeof func != "function") {
+                func = function () { };
+            } else {
+                name = sinon.functionName(func);
             }
-            else {
-                p = function proxy() {
-                    return p.invoke(func, this, slice.call(arguments));
-                };
-            }
-            return p;
-        }
 
-        var uuid = 0;
+            var proxy = createProxy(func);
 
-        // Public API
-        var spyApi = {
-            reset: function () {
-                this.called = false;
-                this.notCalled = true;
-                this.calledOnce = false;
-                this.calledTwice = false;
-                this.calledThrice = false;
-                this.callCount = 0;
-                this.firstCall = null;
-                this.secondCall = null;
-                this.thirdCall = null;
-                this.lastCall = null;
-                this.args = [];
-                this.returnValues = [];
-                this.thisValues = [];
-                this.exceptions = [];
-                this.callIds = [];
-                if (this.fakes) {
-                    for (var i = 0; i < this.fakes.length; i++) {
-                        this.fakes[i].reset();
-                    }
-                }
-            },
+            sinon.extend(proxy, spy);
+            delete proxy.create;
+            sinon.extend(proxy, func);
 
-            create: function create(func) {
-                var name;
+            proxy.reset();
+            proxy.prototype = func.prototype;
+            proxy.displayName = name || "spy";
+            proxy.toString = sinon.functionToString;
+            proxy._create = sinon.spy.create;
+            proxy.id = "spy#" + uuid++;
 
-                if (typeof func != "function") {
-                    func = function () { };
+            return proxy;
+        },
+
+        invoke: function invoke(func, thisValue, args) {
+            var matching = matchingFake(this.fakes, args);
+            var exception, returnValue;
+
+            incrementCallCount.call(this);
+            push.call(this.thisValues, thisValue);
+            push.call(this.args, args);
+            push.call(this.callIds, callId++);
+
+            try {
+                if (matching) {
+                    returnValue = matching.invoke(func, thisValue, args);
                 } else {
-                    name = sinon.functionName(func);
+                    returnValue = (this.func || func).apply(thisValue, args);
                 }
-
-                var proxy = createProxy(func);
-
-                sinon.extend(proxy, spy);
-                delete proxy.create;
-                sinon.extend(proxy, func);
-
-                proxy.reset();
-                proxy.prototype = func.prototype;
-                proxy.displayName = name || "spy";
-                proxy.toString = sinon.functionToString;
-                proxy._create = sinon.spy.create;
-                proxy.id = "spy#" + uuid++;
-
-                return proxy;
-            },
-
-            invoke: function invoke(func, thisValue, args) {
-                var matching = matchingFake(this.fakes, args);
-                var exception, returnValue;
-
-                incrementCallCount.call(this);
-                push.call(this.thisValues, thisValue);
-                push.call(this.args, args);
-                push.call(this.callIds, callId++);
-
-                try {
-                    if (matching) {
-                        returnValue = matching.invoke(func, thisValue, args);
-                    } else {
-                        returnValue = (this.func || func).apply(thisValue, args);
-                    }
-                } catch (e) {
-                    push.call(this.returnValues, undefined);
-                    exception = e;
-                    throw e;
-                } finally {
-                    push.call(this.exceptions, exception);
-                }
-
-                push.call(this.returnValues, returnValue);
-
-                createCallProperties.call(this);
-
-                return returnValue;
-            },
-
-            getCall: function getCall(i) {
-                if (i < 0 || i >= this.callCount) {
-                    return null;
-                }
-
-                return spyCall.create(this, this.thisValues[i], this.args[i],
-                                        this.returnValues[i], this.exceptions[i],
-                                        this.callIds[i]);
-            },
-
-            calledBefore: function calledBefore(spyFn) {
-                if (!this.called) {
-                    return false;
-                }
-
-                if (!spyFn.called) {
-                    return true;
-                }
-
-                return this.callIds[0] < spyFn.callIds[spyFn.callIds.length - 1];
-            },
-
-            calledAfter: function calledAfter(spyFn) {
-                if (!this.called || !spyFn.called) {
-                    return false;
-                }
-
-                return this.callIds[this.callCount - 1] > spyFn.callIds[spyFn.callCount - 1];
-            },
-
-            withArgs: function () {
-                var args = slice.call(arguments);
-
-                if (this.fakes) {
-                    var match = matchingFake(this.fakes, args, true);
-
-                    if (match) {
-                        return match;
-                    }
-                } else {
-                    this.fakes = [];
-                }
-
-                var original = this;
-                var fake = this._create();
-                fake.matchingAguments = args;
-                push.call(this.fakes, fake);
-
-                fake.withArgs = function () {
-                    return original.withArgs.apply(original, arguments);
-                };
-
-                for (var i = 0; i < this.args.length; i++) {
-                    if (fake.matches(this.args[i])) {
-                        incrementCallCount.call(fake);
-                        push.call(fake.thisValues, this.thisValues[i]);
-                        push.call(fake.args, this.args[i]);
-                        push.call(fake.returnValues, this.returnValues[i]);
-                        push.call(fake.exceptions, this.exceptions[i]);
-                        push.call(fake.callIds, this.callIds[i]);
-                    }
-                }
-                createCallProperties.call(fake);
-
-                return fake;
-            },
-
-            matches: function (args, strict) {
-                var margs = this.matchingAguments;
-
-                if (margs.length <= args.length &&
-                    sinon.deepEqual(margs, args.slice(0, margs.length))) {
-                    return !strict || margs.length == args.length;
-                }
-            },
-
-            printf: function (format) {
-                var spy = this;
-                var args = slice.call(arguments, 1);
-                var formatter;
-
-                return (format || "").replace(/%(.)/g, function (match, specifyer) {
-                    formatter = spyApi.formatters[specifyer];
-
-                    if (typeof formatter == "function") {
-                        return formatter.call(null, spy, args);
-                    } else if (!isNaN(parseInt(specifyer), 10)) {
-                        return sinon.format(args[specifyer - 1]);
-                    }
-
-                    return "%" + specifyer;
-                });
+            } catch (e) {
+                push.call(this.returnValues, undefined);
+                exception = e;
+                throw e;
+            } finally {
+                push.call(this.exceptions, exception);
             }
-        };
 
-        delegateToCalls(spyApi, "calledOn", true);
-        delegateToCalls(spyApi, "alwaysCalledOn", false, "calledOn");
-        delegateToCalls(spyApi, "calledWith", true);
-        delegateToCalls(spyApi, "calledWithMatch", true);
-        delegateToCalls(spyApi, "alwaysCalledWith", false, "calledWith");
-        delegateToCalls(spyApi, "alwaysCalledWithMatch", false, "calledWithMatch");
-        delegateToCalls(spyApi, "calledWithExactly", true);
-        delegateToCalls(spyApi, "alwaysCalledWithExactly", false, "calledWithExactly");
-        delegateToCalls(spyApi, "neverCalledWith", false, "notCalledWith",
-            function () { return true; });
-        delegateToCalls(spyApi, "neverCalledWithMatch", false, "notCalledWithMatch",
-            function () { return true; });
-        delegateToCalls(spyApi, "threw", true);
-        delegateToCalls(spyApi, "alwaysThrew", false, "threw");
-        delegateToCalls(spyApi, "returned", true);
-        delegateToCalls(spyApi, "alwaysReturned", false, "returned");
-        delegateToCalls(spyApi, "calledWithNew", true);
-        delegateToCalls(spyApi, "alwaysCalledWithNew", false, "calledWithNew");
-        delegateToCalls(spyApi, "callArg", false, "callArgWith", function () {
-            throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
-        });
-        spyApi.callArgWith = spyApi.callArg;
-        delegateToCalls(spyApi, "callArgOn", false, "callArgOnWith", function () {
-            throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
-        });
-        spyApi.callArgOnWith = spyApi.callArgOn;
-        delegateToCalls(spyApi, "yield", false, "yield", function () {
-            throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
-        });
-        // "invokeCallback" is an alias for "yield" since "yield" is invalid in strict mode.
-        spyApi.invokeCallback = spyApi.yield;
-        delegateToCalls(spyApi, "yieldOn", false, "yieldOn", function () {
-            throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
-        });
-        delegateToCalls(spyApi, "yieldTo", false, "yieldTo", function (property) {
-            throw new Error(this.toString() + " cannot yield to '" + property +
-                "' since it was not yet invoked.");
-        });
-        delegateToCalls(spyApi, "yieldToOn", false, "yieldToOn", function (property) {
-            throw new Error(this.toString() + " cannot yield to '" + property +
-                "' since it was not yet invoked.");
-        });
+            push.call(this.returnValues, returnValue);
 
-        spyApi.formatters = {
-            "c": function (spy) {
-                return sinon.timesInWords(spy.callCount);
-            },
+            createCallProperties.call(this);
 
-            "n": function (spy) {
-                return spy.toString();
-            },
+            return returnValue;
+        },
 
-            "C": function (spy) {
-                var calls = [];
-
-                for (var i = 0, l = spy.callCount; i < l; ++i) {
-                    var stringifiedCall = "    " + spy.getCall(i).toString();
-                    if (/\n/.test(calls[i - 1])) {
-                        stringifiedCall = "\n" + stringifiedCall;
-                    }
-                    push.call(calls, stringifiedCall);
-                }
-
-                return calls.length > 0 ? "\n" + calls.join("\n") : "";
-            },
-
-            "t": function (spy) {
-                var objects = [];
-
-                for (var i = 0, l = spy.callCount; i < l; ++i) {
-                    push.call(objects, sinon.format(spy.thisValues[i]));
-                }
-
-                return objects.join(", ");
-            },
-
-            "*": function (spy, args) {
-                var formatted = [];
-
-                for (var i = 0, l = args.length; i < l; ++i) {
-                    push.call(formatted, sinon.format(args[i]));
-                }
-
-                return formatted.join(", ");
+        getCall: function getCall(i) {
+            if (i < 0 || i >= this.callCount) {
+                return null;
             }
-        };
 
-        return spyApi;
-    }()));
+            return sinon.spyCall(this, this.thisValues[i], this.args[i],
+                                    this.returnValues[i], this.exceptions[i],
+                                    this.callIds[i]);
+        },
 
-    spyCall = (function () {
-
-        function throwYieldError(proxy, text, args) {
-            var msg = sinon.functionName(proxy) + text;
-            if (args.length) {
-                msg += " Received [" + slice.call(args).join(", ") + "]";
+        calledBefore: function calledBefore(spyFn) {
+            if (!this.called) {
+                return false;
             }
-            throw new Error(msg);
+
+            if (!spyFn.called) {
+                return true;
+            }
+
+            return this.callIds[0] < spyFn.callIds[spyFn.callIds.length - 1];
+        },
+
+        calledAfter: function calledAfter(spyFn) {
+            if (!this.called || !spyFn.called) {
+                return false;
+            }
+
+            return this.callIds[this.callCount - 1] > spyFn.callIds[spyFn.callCount - 1];
+        },
+
+        withArgs: function () {
+            var args = slice.call(arguments);
+
+            if (this.fakes) {
+                var match = matchingFake(this.fakes, args, true);
+
+                if (match) {
+                    return match;
+                }
+            } else {
+                this.fakes = [];
+            }
+
+            var original = this;
+            var fake = this._create();
+            fake.matchingAguments = args;
+            push.call(this.fakes, fake);
+
+            fake.withArgs = function () {
+                return original.withArgs.apply(original, arguments);
+            };
+
+            for (var i = 0; i < this.args.length; i++) {
+                if (fake.matches(this.args[i])) {
+                    incrementCallCount.call(fake);
+                    push.call(fake.thisValues, this.thisValues[i]);
+                    push.call(fake.args, this.args[i]);
+                    push.call(fake.returnValues, this.returnValues[i]);
+                    push.call(fake.exceptions, this.exceptions[i]);
+                    push.call(fake.callIds, this.callIds[i]);
+                }
+            }
+            createCallProperties.call(fake);
+
+            return fake;
+        },
+
+        matches: function (args, strict) {
+            var margs = this.matchingAguments;
+
+            if (margs.length <= args.length &&
+                sinon.deepEqual(margs, args.slice(0, margs.length))) {
+                return !strict || margs.length == args.length;
+            }
+        },
+
+        printf: function (format) {
+            var spy = this;
+            var args = slice.call(arguments, 1);
+            var formatter;
+
+            return (format || "").replace(/%(.)/g, function (match, specifyer) {
+                formatter = spyApi.formatters[specifyer];
+
+                if (typeof formatter == "function") {
+                    return formatter.call(null, spy, args);
+                } else if (!isNaN(parseInt(specifyer), 10)) {
+                    return sinon.format(args[specifyer - 1]);
+                }
+
+                return "%" + specifyer;
+            });
         }
+    };
 
-        var callApi = {
-            create: function create(spy, thisValue, args, returnValue, exception, id) {
-                var proxyCall = sinon.create(spyCall);
-                delete proxyCall.create;
-                proxyCall.proxy = spy;
-                proxyCall.thisValue = thisValue;
-                proxyCall.args = args;
-                proxyCall.returnValue = returnValue;
-                proxyCall.exception = exception;
-                proxyCall.callId = typeof id == "number" && id || callId++;
-
-                return proxyCall;
-            },
-
-            calledOn: function calledOn(thisValue) {
-                if (sinon.match && sinon.match.isMatcher(thisValue)) {
-                    return thisValue.test(this.thisValue);
+    function delegateToCalls(method, matchAny, actual, notCalled) {
+        spyApi[method] = function () {
+            if (!this.called) {
+                if (notCalled) {
+                    return notCalled.apply(this, arguments);
                 }
-                return this.thisValue === thisValue;
-            },
-
-            calledWith: function calledWith() {
-                for (var i = 0, l = arguments.length; i < l; i += 1) {
-                    if (!sinon.deepEqual(arguments[i], this.args[i])) {
-                        return false;
-                    }
-                }
-
-                return true;
-            },
-
-            calledWithMatch: function calledWithMatch() {
-                for (var i = 0, l = arguments.length; i < l; i += 1) {
-                    var actual = this.args[i];
-                    var expectation = arguments[i];
-                    if (!sinon.match || !sinon.match(expectation).test(actual)) {
-                        return false;
-                    }
-                }
-                return true;
-            },
-
-            calledWithExactly: function calledWithExactly() {
-                return arguments.length == this.args.length &&
-                    this.calledWith.apply(this, arguments);
-            },
-
-            notCalledWith: function notCalledWith() {
-                return !this.calledWith.apply(this, arguments);
-            },
-
-            notCalledWithMatch: function notCalledWithMatch() {
-                return !this.calledWithMatch.apply(this, arguments);
-            },
-
-            returned: function returned(value) {
-                return sinon.deepEqual(value, this.returnValue);
-            },
-
-            threw: function threw(error) {
-                if (typeof error == "undefined" || !this.exception) {
-                    return !!this.exception;
-                }
-
-                if (typeof error == "string") {
-                    return this.exception.name == error;
-                }
-
-                return this.exception === error;
-            },
-
-            calledWithNew: function calledWithNew(thisValue) {
-                return this.thisValue instanceof this.proxy;
-            },
-
-            calledBefore: function (other) {
-                return this.callId < other.callId;
-            },
-
-            calledAfter: function (other) {
-                return this.callId > other.callId;
-            },
-
-            callArg: function (pos) {
-                this.args[pos]();
-            },
-
-            callArgOn: function (pos, thisValue) {
-                this.args[pos].apply(thisValue);
-            },
-
-            callArgWith: function (pos) {
-                this.callArgOnWith.apply(this, [pos, null].concat(slice.call(arguments, 1)));
-            },
-
-            callArgOnWith: function (pos, thisValue) {
-                var args = slice.call(arguments, 2);
-                this.args[pos].apply(thisValue, args);
-            },
-
-            "yield": function () {
-                this.yieldOn.apply(this, [null].concat(slice.call(arguments, 0)));
-            },
-
-            yieldOn: function (thisValue) {
-                var args = this.args;
-                for (var i = 0, l = args.length; i < l; ++i) {
-                    if (typeof args[i] === "function") {
-                        args[i].apply(thisValue, slice.call(arguments, 1));
-                        return;
-                    }
-                }
-                throwYieldError(this.proxy, " cannot yield since no callback was passed.", args);
-            },
-
-            yieldTo: function (prop) {
-                this.yieldToOn.apply(this, [prop, null].concat(slice.call(arguments, 1)));
-            },
-
-            yieldToOn: function (prop, thisValue) {
-                var args = this.args;
-                for (var i = 0, l = args.length; i < l; ++i) {
-                    if (args[i] && typeof args[i][prop] === "function") {
-                        args[i][prop].apply(thisValue, slice.call(arguments, 2));
-                        return;
-                    }
-                }
-                throwYieldError(this.proxy, " cannot yield to '" + prop +
-                    "' since no callback was passed.", args);
-            },
-
-            toString: function () {
-                var callStr = this.proxy.toString() + "(";
-                var args = [];
-
-                for (var i = 0, l = this.args.length; i < l; ++i) {
-                    push.call(args, sinon.format(this.args[i]));
-                }
-
-                callStr = callStr + args.join(", ") + ")";
-
-                if (typeof this.returnValue != "undefined") {
-                    callStr += " => " + sinon.format(this.returnValue);
-                }
-
-                if (this.exception) {
-                    callStr += " !" + this.exception.name;
-
-                    if (this.exception.message) {
-                        callStr += "(" + this.exception.message + ")";
-                    }
-                }
-
-                return callStr;
+                return false;
             }
+
+            var currentCall;
+            var matches = 0;
+
+            for (var i = 0, l = this.callCount; i < l; i += 1) {
+                currentCall = this.getCall(i);
+
+                if (currentCall[actual || method].apply(currentCall, arguments)) {
+                    matches += 1;
+
+                    if (matchAny) {
+                        return true;
+                    }
+                }
+            }
+
+            return matches === this.callCount;
         };
-        callApi.invokeCallback = callApi.yield;
-        return callApi;
-    }());
+    }
 
-    spy.spyCall = spyCall;
+    delegateToCalls("calledOn", true);
+    delegateToCalls("alwaysCalledOn", false, "calledOn");
+    delegateToCalls("calledWith", true);
+    delegateToCalls("calledWithMatch", true);
+    delegateToCalls("alwaysCalledWith", false, "calledWith");
+    delegateToCalls("alwaysCalledWithMatch", false, "calledWithMatch");
+    delegateToCalls("calledWithExactly", true);
+    delegateToCalls("alwaysCalledWithExactly", false, "calledWithExactly");
+    delegateToCalls("neverCalledWith", false, "notCalledWith",
+        function () { return true; });
+    delegateToCalls("neverCalledWithMatch", false, "notCalledWithMatch",
+        function () { return true; });
+    delegateToCalls("threw", true);
+    delegateToCalls("alwaysThrew", false, "threw");
+    delegateToCalls("returned", true);
+    delegateToCalls("alwaysReturned", false, "returned");
+    delegateToCalls("calledWithNew", true);
+    delegateToCalls("alwaysCalledWithNew", false, "calledWithNew");
+    delegateToCalls("callArg", false, "callArgWith", function () {
+        throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
+    });
+    spyApi.callArgWith = spyApi.callArg;
+    delegateToCalls("callArgOn", false, "callArgOnWith", function () {
+        throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
+    });
+    spyApi.callArgOnWith = spyApi.callArgOn;
+    delegateToCalls("yield", false, "yield", function () {
+        throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
+    });
+    // "invokeCallback" is an alias for "yield" since "yield" is invalid in strict mode.
+    spyApi.invokeCallback = spyApi.yield;
+    delegateToCalls("yieldOn", false, "yieldOn", function () {
+        throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
+    });
+    delegateToCalls("yieldTo", false, "yieldTo", function (property) {
+        throw new Error(this.toString() + " cannot yield to '" + property +
+            "' since it was not yet invoked.");
+    });
+    delegateToCalls("yieldToOn", false, "yieldToOn", function (property) {
+        throw new Error(this.toString() + " cannot yield to '" + property +
+            "' since it was not yet invoked.");
+    });
 
-    // This steps outside the module sandbox and will be removed
-    sinon.spyCall = spyCall;
+    spyApi.formatters = {
+        "c": function (spy) {
+            return sinon.timesInWords(spy.callCount);
+        },
+
+        "n": function (spy) {
+            return spy.toString();
+        },
+
+        "C": function (spy) {
+            var calls = [];
+
+            for (var i = 0, l = spy.callCount; i < l; ++i) {
+                var stringifiedCall = "    " + spy.getCall(i).toString();
+                if (/\n/.test(calls[i - 1])) {
+                    stringifiedCall = "\n" + stringifiedCall;
+                }
+                push.call(calls, stringifiedCall);
+            }
+
+            return calls.length > 0 ? "\n" + calls.join("\n") : "";
+        },
+
+        "t": function (spy) {
+            var objects = [];
+
+            for (var i = 0, l = spy.callCount; i < l; ++i) {
+                push.call(objects, sinon.format(spy.thisValues[i]));
+            }
+
+            return objects.join(", ");
+        },
+
+        "*": function (spy, args) {
+            var formatted = [];
+
+            for (var i = 0, l = args.length; i < l; ++i) {
+                push.call(formatted, sinon.format(args[i]));
+            }
+
+            return formatted.join(", ");
+        }
+    };
+
+    sinon.extend(spy, spyApi);
+
+    spy.spyCall = sinon.spyCall;
 
     if (commonJSModule) {
         module.exports = spy;
@@ -2926,15 +2950,16 @@ if (typeof sinon == "undefined") {
 (function () {
     var push = [].push;
 
-    sinon.Event = function Event(type, bubbles, cancelable) {
-        this.initEvent(type, bubbles, cancelable);
+    sinon.Event = function Event(type, bubbles, cancelable, target) {
+        this.initEvent(type, bubbles, cancelable, target);
     };
 
     sinon.Event.prototype = {
-        initEvent: function(type, bubbles, cancelable) {
+        initEvent: function(type, bubbles, cancelable, target) {
             this.type = type;
             this.bubbles = bubbles;
             this.cancelable = cancelable;
+            this.target = target;
         },
 
         stopPropagation: function () {},
@@ -3037,6 +3062,23 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
         this.requestBody = null;
         this.status = 0;
         this.statusText = "";
+
+        var xhr = this;
+        var events = ["loadstart", "load", "abort", "loadend"];
+
+        function addEventListener(eventName) {
+            xhr.addEventListener(eventName, function (event) {
+                var listener = xhr["on" + eventName];
+
+                if (listener && typeof listener == "function") {
+                    listener(event);
+                }
+            });
+        }
+
+        for (var i = events.length - 1; i >= 0; i--) {
+            addEventListener(events[i]);
+        }
 
         if (typeof FakeXMLHttpRequest.onCreate == "function") {
             FakeXMLHttpRequest.onCreate(this);
@@ -3191,6 +3233,13 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
             }
 
             this.dispatchEvent(new sinon.Event("readystatechange"));
+
+            switch (this.readyState) {
+                case FakeXMLHttpRequest.DONE:
+                    this.dispatchEvent(new sinon.Event("load", false, false, this));
+                    this.dispatchEvent(new sinon.Event("loadend", false, false, this));
+                    break;
+            }
         },
 
         setRequestHeader: function setRequestHeader(header, value) {
@@ -3246,6 +3295,8 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
             if (typeof this.onSend == "function") {
                 this.onSend(this);
             }
+
+            this.dispatchEvent(new sinon.Event("loadstart", false, false, this));
         },
 
         abort: function abort() {
@@ -3260,6 +3311,11 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
             }
 
             this.readyState = sinon.FakeXMLHttpRequest.UNSENT;
+
+            this.dispatchEvent(new sinon.Event("abort", false, false, this));
+            if (typeof this.onerror === "function") {
+                this.onerror();
+            }
         },
 
         getResponseHeader: function getResponseHeader(header) {
@@ -3340,6 +3396,10 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
             this.status = typeof status == "number" ? status : 200;
             this.statusText = FakeXMLHttpRequest.statusCodes[this.status];
             this.setResponseBody(body || "");
+            if (typeof this.onload === "function"){
+                this.onload();
+            }
+
         }
     });
 
@@ -4149,7 +4209,14 @@ if (typeof module == "object" && typeof require == "function") {
             if (!sinon.calledInOrder(arguments)) {
                 try {
                     expected = [].join.call(arguments, ", ");
-                    actual = sinon.orderByFirstCall(slice.call(arguments)).join(", ");
+                    var calls = slice.call(arguments);
+                    var i = calls.length;
+                    while (i) {
+                        if (!calls[--i].called) {
+                            calls.splice(i, 1);
+                        }
+                    }
+                    actual = sinon.orderByFirstCall(calls).join(", ");
                 } catch (e) {
                     // If this fails, we'll just fall back to the blank string
                 }
@@ -4218,6 +4285,6 @@ if (typeof module == "object" && typeof require == "function") {
     } else {
         sinon.assert = assert;
     }
-}(typeof sinon == "object" && sinon || null, typeof window != "undefined" ? window : global));
+}(typeof sinon == "object" && sinon || null, typeof window != "undefined" ? window : (typeof self != "undefined") ? self : global));
 
 return sinon;}.call(typeof window != 'undefined' && window || {}));
