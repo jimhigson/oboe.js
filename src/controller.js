@@ -25,7 +25,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    
    clarinetParser.onerror =  
        function(e) {
-          events.notifyErr(e);
+          events.notify(ERROR_EVENT, e);
             
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
@@ -107,7 +107,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
          try{
             callback.call(callbackContext, foundNode, path, ancestors );
          } catch(e) {
-            events.notifyErr(Error('Error thrown by callback ' + e.message));
+            events.notify(ERROR_EVENT, Error('Error thrown by callback ' + e.message));
          }
       }   
    }
@@ -160,7 +160,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
       
       onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
       
-      onError: events.onError,
+      onError: partialComplete(events.on, ERROR_EVENT),
       
       root: objectSoFar
    };                                         
