@@ -33,8 +33,10 @@ function defined( value ) {
    values.
  */
 function callAll( fns /*, arg1, arg2, arg3...*/ ) {
+   applyAll(fns, toArray(arguments, 1));
+}
 
-   var args = toArray(arguments, 1);
+function applyAll( fns, args ) {
 
    fns.forEach(function( fn ){
       fn.apply(undefined, args);
@@ -1260,7 +1262,111 @@ function pubSub(){
 
    var listeners = {n:[], p:[]},
        errorListeners = [];
+                    
+   function errorHappened(error) {
+      callAll( errorListeners, error );            
+   }       
+   
+   return {
+      notify:function ( eventId /* arguments... */ ) {
+               
+         applyAll( listeners[eventId], toArray(arguments,1) );
+      },
+      on:function( eventId, fn ) {      
+         listeners[eventId].push(fn);                                         
+      },
+      
+      /**
+       * 
+       * @param error
+       */
+      notifyErr: errorHappened,
+         
+      /**
+       * Add a new json path to the parser, which will be called when a value is found at the given path
+       *
+       * @param {Function} callback
+       */
+      onError: function (callback) {   
+         errorListeners.push(callback);
+         return this; // chaining
+      }      
+      
+   };
+}
 
+
+function controller(httpMethodName, url, httpRequestBody, doneCallback) {
+
+   var 
+       // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
+       events = pubSub(),
+              
+       clarinetParser = clarinet.parser(),           
+                                      
+       // create a json builder and store a function that can be used to get the
+       // root of the json later:
+       /**
+        * @type {Function}
+        */          
+       objectSoFar = jsonBuilder(
+                         clarinetParser,
+                          
+                         // when a node is found, notify matching node listeners:
+                         partialComplete(somethingFound, NODE_FOUND_EVENT),
+      
+                         // when a node is found, notify matching path listeners:                                        
+                         partialComplete(somethingFound, PATH_FOUND_EVENT)
+                     );
+   
+   clarinetParser.onerror =  
+       function(e) {
+          events.notifyErr(e);
+            
+          // the json is invalid, give up and close the parser to prevent getting any more:
+          clarinetParser.close();
+       };
+                     
+   /* Given a value from the user to send as the request body, return in a form
+      that is suitable to sending over the wire. Which is, either a string or
+      null.                     
+    */
+   function validatedRequestBody( body ) {
+      // TODO: move to streaming Xhr
+      if( !body )
+         return null;
+   
+      return isString(body)? body: JSON.stringify(body);
+   }                        
+                                                                                                                            
+   streamingXhr(
+      httpMethodName,
+      url, 
+      validatedRequestBody(httpRequestBody),
+      function (nextDrip) {
+         // callback for when a bit more data arrives from the streaming XHR         
+          
+         try {
+            clarinetParser.write(nextDrip);
+         } catch(e) {
+            // we don't have to do anything here because we always assign a .onerror
+            // to clarinet which will have already been called by the time this 
+            // exception is thrown.                
+         }
+      },
+      function() {
+         // callback for when the response is complete                     
+         clarinetParser.close();
+         
+         doneCallback && doneCallback(objectSoFar());
+      });
+              
+   function somethingFound(eventId, node, path, ancestors) {
+      var nodeList = ancestors.concat([node]);
+      
+      events.notify(eventId, path, ancestors, nodeList);   
+   }              
+              
    /**
     * Test if something found in the json matches the pattern and, if it does,
     * calls the callback.
@@ -1297,22 +1403,18 @@ function pubSub(){
          try{
             callback.call(callbackContext, foundNode, path, ancestors );
          } catch(e) {
-            errorHappened(Error('Error thrown by callback ' + e.message));
+            events.notifyErr(Error('Error thrown by callback ' + e.message));
          }
       }   
    }
-                 
-   /**
-    * Notify any of the listeners in a list that are interested in the path or node that was
-    * just found.
-    * 
-    * @param {Array} listenerList one of listenerMap[NODE_FOUND_EVENT] or 
-    *                listenerMap[PATH_FOUND_EVENT]
-    *
+   
+   /** 
+    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
     */
-   function pushListener(listenerList, pattern, callback, callbackContext) {
+   function pushListener(eventId, pattern, callback, callbackContext) {
          
-      listenerList.push( 
+      events.on( 
+         eventId,  
          partialComplete(
             callConditionally,
             jsonPathCompiler(pattern),
@@ -1326,126 +1428,33 @@ function pubSub(){
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
     * @param listenerMap
     */
-   function pushListeners(listenerList, listenerMap) {
+   function pushListeners(eventId, listenerMap) {
    
       // TODO: document this call style
       for( var pattern in listenerMap ) {
-         pushListener(listenerList, pattern, listenerMap[pattern]);
+         pushListener(eventId, pattern, listenerMap[pattern]);
       }
-   }
-   
-   function errorHappened(error) {
-      callAll( errorListeners, error );            
-   }       
-   
-   return {
-      notify:function ( eventId, node, path, ancestors ) {
-            
-         var nodeList = ancestors.concat([node]),
-             listenerList = listeners[eventId];
-   
-         callAll( listenerList, path, ancestors, nodeList );
-      },
-      on:function( eventId, jsonPath, callback, callbackContext ) {
+   }    
       
-         var listenerList = listeners[eventId];
-         
-         if( isString(jsonPath) ) {
-            pushListener(listenerList, jsonPath, callback, callbackContext);
-         } else {
-            pushListeners(listenerList, jsonPath);
-         }
-         return this; // chaining                                 
-      },
-      
-      /**
-       * 
-       * @param error
-       */
-      notifyErr: errorHappened,
-         
-      /**
-       * Add a new json path to the parser, which will be called when a value is found at the given path
-       *
-       * @param {Function} callback
-       */
-      onError: function (callback) {   
-         errorListeners.push(callback);
-         return this; // chaining
-      }      
-      
-   };
-}
-
-
-function controller(httpMethodName, url, body, doneCallback) {
-
-   var 
-       // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
-       events = pubSub(),
-       
-       clarinetParser = clarinet.parser(),           
-                                      
-       // create a json builder and store a function that can be used to get the
-       // root of the json later:
-       /**
-        * @type {Function}
-        */          
-       objectSoFar = jsonBuilder(
-                         clarinetParser,
-                          
-                         // when a node is found, notify matching node listeners:
-                         partialComplete(events.notify, NODE_FOUND_EVENT),
-      
-                         // when a node is found, notify matching path listeners:                                        
-                         partialComplete(events.notify, PATH_FOUND_EVENT)
-                     );
+   /**
+    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
+    * depending on the argument types
+    */       
+   function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
-   clarinetParser.onerror =  
-       function(e) {
-          events.notifyErr(e);
-            
-          // the json is invalid, give up and close the parser to prevent getting any more:
-          clarinetParser.close();
-       };
-                     
-   /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Which is, either a string or
-      null.                     
-    */
-   function validatedBody( body ) {
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }                        
-                                                                                                                            
-   streamingXhr(
-      httpMethodName,
-      url, 
-      validatedBody(body),
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            clarinetParser.write(nextDrip);
-         } catch(e) {
-            // we don't have to do anything here because we always assign a .onerror
-            // to clarinet which will have already been called by the time this 
-            // exception is thrown.                
-         }
-      },
-      function() {
-         // callback for when the response is complete                     
-         clarinetParser.close();
-         
-         doneCallback && doneCallback(objectSoFar());
-      });
+      if( isString(jsonPathOrListenerMap) ) {
+         pushListener(eventId, jsonPathOrListenerMap, callback, callbackContext);
+      } else {
+         pushListeners(eventId, jsonPathOrListenerMap);
+      }
+      
+      return this; // chaining
+   }      
       
    return {      
-      onPath: partialComplete(events.on, PATH_FOUND_EVENT),
+      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
       
-      onNode: partialComplete(events.on, NODE_FOUND_EVENT),
+      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
       
       onError: events.onError,
       

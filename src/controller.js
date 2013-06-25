@@ -5,9 +5,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),
-       
-       notify = events.notify, // shortcut
-       
+              
        clarinetParser = clarinet.parser(),           
                                       
        // create a json builder and store a function that can be used to get the
@@ -19,10 +17,10 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
-                         partialComplete(notify, NODE_FOUND_EVENT),
+                         partialComplete(somethingFound, NODE_FOUND_EVENT),
       
                          // when a node is found, notify matching path listeners:                                        
-                         partialComplete(notify, PATH_FOUND_EVENT)
+                         partialComplete(somethingFound, PATH_FOUND_EVENT)
                      );
    
    clarinetParser.onerror =  
@@ -38,6 +36,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
       null.                     
     */
    function validatedRequestBody( body ) {
+      // TODO: move to streaming Xhr
       if( !body )
          return null;
    
@@ -65,11 +64,101 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
          
          doneCallback && doneCallback(objectSoFar());
       });
+              
+   function somethingFound(eventId, node, path, ancestors) {
+      var nodeList = ancestors.concat([node]);
+      
+      events.notify(eventId, path, ancestors, nodeList);   
+   }              
+              
+   /**
+    * Test if something found in the json matches the pattern and, if it does,
+    * calls the callback.
+    * 
+    * After partial completion of the first three args, we are left with a function which when called with the details 
+    * of something called in the parsed json, calls the listener if it matches.
+    * 
+    * @param test
+    * @param callback
+    * @param callbackContext
+    */
+   function callConditionally( test, callback, callbackContext, path, ancestors, nodeList ) {
+     
+      var foundNode = test( path, nodeList );
+     
+      // Possible values for foundNode are now:
+      //
+      //    false: 
+      //       we did not match
+      //
+      //    an object/array/string/number/null: 
+      //       that node is the one that matched. Because json can have nulls, this can 
+      //       be null.
+      //
+      //    undefined: like above, but we don't have the node yet. ie, we know there is a
+      //       node that matches but we don't know if it is an array, object, string
+      //       etc yet so we can't say anything about it. Null isn't used here because
+      //       it would be indistinguishable from us finding a node with a value of
+      //       null.
+      //                      
+      if( foundNode !== false ) {                                 
+        
+         // change curNode to foundNode when it stops breaking tests
+         try{
+            callback.call(callbackContext, foundNode, path, ancestors );
+         } catch(e) {
+            events.notifyErr(Error('Error thrown by callback ' + e.message));
+         }
+      }   
+   }
+   
+   /** 
+    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
+    */
+   function pushListener(eventId, pattern, callback, callbackContext) {
+         
+      events.on( 
+         eventId,  
+         partialComplete(
+            callConditionally,
+            jsonPathCompiler(pattern),
+            callback, 
+            callbackContext || window
+         ) 
+      );            
+   }
+
+   /**
+    * implementation behind .onPath() and .onNode(): add several listeners in one call  
+    * @param listenerMap
+    */
+   function pushListeners(eventId, listenerMap) {
+   
+      // TODO: document this call style
+      for( var pattern in listenerMap ) {
+         pushListener(eventId, pattern, listenerMap[pattern]);
+      }
+   }    
+      
+   /**
+    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
+    * depending on the argument types
+    */       
+   function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   
+      if( isString(jsonPathOrListenerMap) ) {
+         pushListener(eventId, jsonPathOrListenerMap, callback, callbackContext);
+      } else {
+         pushListeners(eventId, jsonPathOrListenerMap);
+      }
+      
+      return this; // chaining
+   }      
       
    return {      
-      onPath: partialComplete(events.on, PATH_FOUND_EVENT),
+      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
       
-      onNode: partialComplete(events.on, NODE_FOUND_EVENT),
+      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
       
       onError: events.onError,
       

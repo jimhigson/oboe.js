@@ -32,8 +32,10 @@ function defined( value ) {
    values.
  */
 function callAll( fns /*, arg1, arg2, arg3...*/ ) {
+   applyAll(fns, toArray(arguments, 1));
+}
 
-   var args = toArray(arguments, 1);
+function applyAll( fns, args ) {
 
    fns.forEach(function( fn ){
       fn.apply(undefined, args);
