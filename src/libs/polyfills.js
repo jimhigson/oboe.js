@@ -3,8 +3,8 @@
    /** If no implementation of a method called (methodName) exists fill it in with the
     *  implementation given as (filler).
     */ 
-   function fillIn(class, methodName, filler) {
-      var proto = class.prototype;
+   function fillIn(type, methodName, filler) {
+      var proto = type.prototype;
       proto[methodName] = proto[methodName] || filler;
    }
 
@@ -44,7 +44,7 @@
    });
       
    // allow binding context only, not arguments as well
-   fillIn(Function.prototype, 'bind', function( context /*, arg1, arg2 ... */ ){
+   fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
    
       return function( /* yet more arguments */ ) {                        
