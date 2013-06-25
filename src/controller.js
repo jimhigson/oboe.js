@@ -1,6 +1,6 @@
 
 
-function controller(httpMethodName, url, body, doneCallback) {
+function controller(httpMethodName, url, httpRequestBody, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
@@ -47,7 +47,7 @@ function controller(httpMethodName, url, body, doneCallback) {
    streamingXhr(
       httpMethodName,
       url, 
-      validatedRequestBody(body),
+      validatedRequestBody(httpRequestBody),
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
