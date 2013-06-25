@@ -67,8 +67,10 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    }
          
    var xhr = new XMLHttpRequest(),
+   
        browserSupportsXhr2 = ('onprogress' in xhr),    
        listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
+       
        numberOfCharsAlreadyGivenToCallback = 0;
 
    function handleProgress() {
