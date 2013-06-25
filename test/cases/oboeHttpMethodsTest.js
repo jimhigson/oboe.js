@@ -25,7 +25,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
          'http://example.com/oboez',
-         null,
+         undefined,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -39,14 +39,14 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'GET',
          'http://example.com/oboez',
-         null,
+         undefined,
          sinon.match.func,
          sinon.match.func
       ));   
    },   
    
    // DELETE
-   testDeleteViaShortcut:function(){
+   testDelete:function(){
       var doneCallback = sinon.stub();
    
       oboe.doDelete('http://example.com/oboez', doneCallback);
@@ -54,7 +54,7 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'DELETE',
          'http://example.com/oboez',
-         null,
+         undefined,
          sinon.match.func,
          sinon.match.func
       ));   
@@ -62,7 +62,7 @@ TestCase("oboeTestHttp", {
      
          
    // POST
-   testPostViaShortcut:function(){
+   testPost:function(){
       var doneCallback = sinon.stub();
    
       oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
@@ -84,25 +84,11 @@ TestCase("oboeTestHttp", {
       assertTrue( streamingStub.alwaysCalledWithMatch(
          'POST',
          'http://example.com/oboez',
-         '[1,2,3,4,5]', // oboe should have encoded as json before it got to streamingXhr
+         [1,2,3,4,5],
          sinon.match.func,
          sinon.match.func
       ));   
    },   
-   
-   testPostViaInstantiationFirst:function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
-      
-      assertTrue( streamingStub.alwaysCalledWithMatch(
-         'POST',
-         'http://example.com/oboez',
-         'my_data',
-         sinon.match.func,
-         sinon.match.func
-      ));   
-   },
    
    testPostViaOptionsObject:function(){   
       var doneCallback = sinon.stub();
@@ -120,7 +106,7 @@ TestCase("oboeTestHttp", {
    
    // PUT
    
-   testPutViaInstantiationFirst:function(){
+   testPut:function(){
       var doneCallback = sinon.stub();
    
       oboe.doPut('http://example.com/oboez', 'my_data', doneCallback);

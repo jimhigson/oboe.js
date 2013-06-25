@@ -31,22 +31,11 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
           clarinetParser.close();
        };
                      
-   /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Which is, either a string or
-      null.                     
-    */
-   function validatedRequestBody( body ) {
-      // TODO: move to streaming Xhr
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }                        
-                                                                                                                            
+                                                                                                                                                    
    streamingXhr(
       httpMethodName,
       url, 
-      validatedRequestBody(httpRequestBody),
+      httpRequestBody,
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           

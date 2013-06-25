@@ -719,7 +719,7 @@ if(typeof FastList === 'function') {
  * 
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
- * @param {String|Null} data
+ * @param {String|Object|undefined} data
  * @param {Function} progressCallback in form Function(String nextResponseDrip)
  *    A callback to be called repeatedly as the input comes in.
  *    Will be passed the new string since the last call.
@@ -730,6 +730,19 @@ if(typeof FastList === 'function') {
  *                 if method is POST or PUT.
  */
 function streamingXhr(method, url, data, progressCallback, doneCallback) {
+   
+   /* Given a value from the user to send as the request body, return in a form
+      that is suitable to sending over the wire. Which is, either a string or
+      null.   
+      
+      TODO: make a streamingXhrTest to validate this works. Can sinon stub XHRs?
+    */
+   function validatedRequestBody( body ) {
+      if( !body )
+         return null;
+   
+      return isString(body)? body: JSON.stringify(body);
+   }   
    
    /* xhr2 already supports everything that we need so very little abstraction required.\
    *  listenToXhr2 is one of two possible values to use as listenToXhr  
@@ -777,7 +790,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    listenToXhr( xhr, handleProgress, doneCallback);
    
    xhr.open(method, url, true);
-   xhr.send(data);   
+   xhr.send(validatedRequestBody(data));   
 }
 
 /**
@@ -1307,22 +1320,11 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
           clarinetParser.close();
        };
                      
-   /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Which is, either a string or
-      null.                     
-    */
-   function validatedRequestBody( body ) {
-      // TODO: move to streaming Xhr
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }                        
-                                                                                                                            
+                                                                                                                                                    
    streamingXhr(
       httpMethodName,
       url, 
-      validatedRequestBody(httpRequestBody),
+      httpRequestBody,
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
