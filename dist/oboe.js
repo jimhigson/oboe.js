@@ -124,6 +124,15 @@ function always(){return true}
       
       return out;
    });
+      
+   // allow binding context only, not arguments as well
+   fillIn(Function.prototype, 'bind', function( context /*, arg1, arg2 ... */ ){
+      var f = this;
+   
+      return function( /* yet more arguments */ ) {                        
+         return f.apply(context, arguments);
+      }
+   });   
 
 })(Array.prototype);
 ;(function (clarinet) {
@@ -745,8 +754,8 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    }   
    
    /* xhr2 already supports everything that we need so very little abstraction required.\
-   *  listenToXhr2 is one of two possible values to use as listenToXhr  
-   */
+    * listenToXhr2 is one of two possible values to use as listenToXhr  
+    */
    function listenToXhr2(xhr, progressListener, completeListener) {      
       xhr.onprogress = progressListener;
       xhr.onload = completeListener;
@@ -771,8 +780,10 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    }
          
    var xhr = new XMLHttpRequest(),
+   
        browserSupportsXhr2 = ('onprogress' in xhr),    
        listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
+       
        numberOfCharsAlreadyGivenToCallback = 0;
 
    function handleProgress() {
@@ -1358,9 +1369,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
     * 
     * @param test
     * @param callback
-    * @param callbackContext
     */
-   function callConditionally( test, callback, callbackContext, path, ancestors, nodeList ) {
+   function notifyConditionally( test, callback, path, ancestors, nodeList ) {
      
       var foundNode = test( path, nodeList );
      
@@ -1383,7 +1393,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
         
          // change curNode to foundNode when it stops breaking tests
          try{
-            callback.call(callbackContext, foundNode, path, ancestors );
+            callback(foundNode, path, ancestors );
          } catch(e) {
             events.notify(ERROR_EVENT, Error('Error thrown by callback ' + e.message));
          }
@@ -1393,15 +1403,14 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    /** 
     * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
     */
-   function pushListener(eventId, pattern, callback, callbackContext) {
+   function pushListener(eventId, pattern, callback) {
          
       events.on( 
          eventId,  
          partialComplete(
-            callConditionally,
+            notifyConditionally,
             jsonPathCompiler(pattern),
-            callback, 
-            callbackContext || window
+            callback
          ) 
       );            
    }
@@ -1425,7 +1434,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         pushListener(eventId, jsonPathOrListenerMap, callback, callbackContext);
+         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }

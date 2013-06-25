@@ -69,9 +69,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
     * 
     * @param test
     * @param callback
-    * @param callbackContext
     */
-   function callConditionally( test, callback, callbackContext, path, ancestors, nodeList ) {
+   function notifyConditionally( test, callback, path, ancestors, nodeList ) {
      
       var foundNode = test( path, nodeList );
      
@@ -94,7 +93,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
         
          // change curNode to foundNode when it stops breaking tests
          try{
-            callback.call(callbackContext, foundNode, path, ancestors );
+            callback(foundNode, path, ancestors );
          } catch(e) {
             events.notify(ERROR_EVENT, Error('Error thrown by callback ' + e.message));
          }
@@ -104,15 +103,14 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    /** 
     * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
     */
-   function pushListener(eventId, pattern, callback, callbackContext) {
+   function pushListener(eventId, pattern, callback) {
          
       events.on( 
          eventId,  
          partialComplete(
-            callConditionally,
+            notifyConditionally,
             jsonPathCompiler(pattern),
-            callback, 
-            callbackContext || window
+            callback
          ) 
       );            
    }
@@ -136,7 +134,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         pushListener(eventId, jsonPathOrListenerMap, callback, callbackContext);
+         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
