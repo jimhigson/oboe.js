@@ -231,7 +231,7 @@ oboe.doGet('//people.json')
 If we're doing progressive rendering to go to a new page in a single-page web app, we probably want to put some kind of
 indication on the page as the parts load.
 
-Let's provide some visual feedback that one area of the page is loading and remove it when we have that json,
+Let's provide some visual feedback that one area of the page is loading and remove it when we have data,
 no matter what else we get at the same time 
 
 I'll assume you already implemented a spinner
@@ -274,7 +274,6 @@ register a wide-matching pattern and use the path parameter to decide what to do
    // ... other modules ...
 }
 
-// code to use this json:
 oboe.doGet('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
    .onNode('!.*', function( moduleJson, path ){
@@ -298,7 +297,7 @@ repeatedly whenever a new element is concatenated onto it.
 Oboe supports css4-style selectors and gives them much the same meaning as in the 
 [proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
 
-If a term is prefixed with a dollor, instead of the element that matched, an element further up the json tree will be
+If a term is prefixed with a dollor, instead of the element that matched, an element further up the parsed object tree will be
 given instead to the callback. 
 
 ``` js
@@ -379,8 +378,8 @@ oboe.doGet('/data/things.json')
 
 ## Error handling
 
-You use the error handler to roll back if there is an error in the json. Once there is an error, Oboe won't
-give any further callbacks no matter what is in the rest of the json.
+You use the error handler to roll back if there is an error while getting or parsing the json. 
+Oboe stops on error so won't give any further callbacks.
  
 ``` js
 var currentPersonElement;
@@ -413,14 +412,14 @@ oboe.doGet('people.json')
 `person..email` email addresses anywhere as descendent of a person object  
 `$person..email` any person in the json stream with an email address  
 `*` every object, string, number etc found in the json stream  
-`!` the root object (fired when the whole json is available, like JSON.parse())  
+`!` the root object (fired when the whole response is available, like JSON.parse())  
 
 ## Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
 (think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're sending
 and parsing everything at the earliest possible opportunity. If you can, send small bits of the
-json as soon as it is ready instead of waiting before everything is ready to start sending.
+output asynchronously as soon as it is ready instead of waiting before everything is ready to start sending.
 
 # Browser support
 
