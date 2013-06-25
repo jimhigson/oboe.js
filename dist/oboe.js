@@ -72,6 +72,13 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 function always(){return true}
 (function(arrayProto){
 
+   /** If no implementation of a method called (methodName) exists fill it in with the
+    *  implementation given as (filler).
+    */ 
+   function fillIn(baseObject, methodName, filler) {
+      baseObject[methodName] = baseObject[methodName] || filler;
+   }
+
    /**
     * Here we have a minimal set of polyfills needed to let the code run in older browsers such
     * as IE8.
@@ -83,18 +90,18 @@ function always(){return true}
    
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
-   arrayProto.forEach = arrayProto.forEach || function( func ){
+   fillIn(arrayProto, 'forEach', function( func ){
          
       for( var i = 0 ; i < len(this) ; i++ ) {      
          func( this[i] );    
       }      
-   };         
+      
+   });         
    
    
    // Array.filter has to be a polyfill, clarinet expects it.
-   // Ignoring all but function argument since not needed, eg can't take a context   
-   arrayProto.filter = arrayProto.filter || function( func ){
-         
+   // Ignoring all but function argument since not needed, eg can't take a context
+   fillIn(arrayProto, 'filter', function( func ){         
       var out = [];
    
       // let's use the .forEach we just declared above to implement .filter
@@ -105,7 +112,7 @@ function always(){return true}
       });
       
       return out;
-   };
+   });
 
 })(Array.prototype);
 ;(function (clarinet) {
