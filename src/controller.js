@@ -13,7 +13,7 @@ function controller(httpMethodName, url, data, doneCallback) {
        /**
         * @type {Function}
         */          
-       jsonSoFar =   jsonBuilder(
+       objectSoFar = jsonBuilder(
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
@@ -52,7 +52,7 @@ function controller(httpMethodName, url, data, doneCallback) {
          // callback for when the response is complete                     
          clarinetParser.close();
          
-         doneCallback && doneCallback(jsonSoFar());
+         doneCallback && doneCallback(objectSoFar());
       });
       
    return {      
@@ -60,6 +60,8 @@ function controller(httpMethodName, url, data, doneCallback) {
       
       onNode: partialComplete(events.on, NODE_FOUND_EVENT),
       
-      onError: events.onError
+      onError: events.onError,
+      
+      root: objectSoFar
    };                                         
 }

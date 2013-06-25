@@ -30,7 +30,7 @@ instance by calling one of these methods:
 Usually it is better to read the json one bit at a time than waiting for it to completely download so this parameter 
 is optional.
 
-The returned instance exposes three chainable methods:
+The returned instance exposes four chainable methods:
 
 ```js
    .onNode(String pattern, Function callback(thingFound, String[] path, context))
@@ -61,13 +61,20 @@ Alternatively, several paths may be give at once to either ```onPath``` or ```on
    .onError(callback(Error e))
 ```
 
-supply a callback for when something goes wrong 
+Supply a callback for when something goes wrong
+
+```js
+   .root()
+```
+
+At any time, get the output from the parser so far. This will be undefined if nothing has been recieved so far
+else it will be an Object, Array etc as per the json recieved.    
 
 ## Pattern matching
 
 Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
 
-`!` root json object   
+`!` root object   
 `.`  path separator   
 `foo` an element at name foo  
 `*`  any element at any name  

@@ -46,7 +46,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
     
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
          // to finding the root node because non-root nodes will have their paths notified as their keys are 
-         // discovered. Because this is the root, it can't have a key, hence null
+         // discovered. Because this is the root, it can't have a key, hence undefined
          keyDiscovered(undefined, foundNode);                  
          
          // store a reference to the root node (root var declared at top of file)
@@ -92,7 +92,13 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    function keyDiscovered(key, value) {
       
       var fullPath = key === undefined? pathStack : pathStack.concat(key);
-   
+
+      // if we have the key but no known value yet, at least put that key in the output 
+      // but against no defined value:
+      if( key && value === undefined ) {
+         lastOf(nodeStack)[key] = undefined;
+      }   
+      
       pathFoundCallback(value, fullPath, nodeStack);
       curKey = key;      
    }

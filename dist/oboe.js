@@ -1103,7 +1103,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
     
          // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
          // to finding the root node because non-root nodes will have their paths notified as their keys are 
-         // discovered. Because this is the root, it can't have a key, hence null
+         // discovered. Because this is the root, it can't have a key, hence undefined
          keyDiscovered(undefined, foundNode);                  
          
          // store a reference to the root node (root var declared at top of file)
@@ -1149,7 +1149,13 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
    function keyDiscovered(key, value) {
       
       var fullPath = key === undefined? pathStack : pathStack.concat(key);
-   
+
+      // for where we have the key but no known value yet, at least record in the object we are
+      // building up that the key is there but there is no defined value yet:
+      if( key && value === undefined ) {
+         lastOf(nodeStack)[key] = undefined;
+      }   
+      
       pathFoundCallback(value, fullPath, nodeStack);
       curKey = key;      
    }
@@ -1248,8 +1254,9 @@ function pubSub(){
     * 
     * @param test
     * @param callback
+    * @param callbackContext
     */
-   function callConditionally( test, callback, path, ancestors, nodeList ) {
+   function callConditionally( test, callback, callbackContext, path, ancestors, nodeList ) {
      
       var foundNode = test( path, nodeList );
      
@@ -1272,7 +1279,7 @@ function pubSub(){
         
          // change curNode to foundNode when it stops breaking tests
          try{
-            callback( foundNode, path, ancestors );
+            callback.call(callbackContext, foundNode, path, ancestors );
          } catch(e) {
             errorHappened(Error('Error thrown by callback ' + e.message));
          }
@@ -1287,13 +1294,14 @@ function pubSub(){
     *                listenerMap[PATH_FOUND_EVENT]
     *
     */
-   function pushListener(listenerList, pattern, callback) {
+   function pushListener(listenerList, pattern, callback, callbackContext) {
          
       listenerList.push( 
          partialComplete(
             callConditionally,
-            jsonPathCompiler(pattern),            
-            callback
+            jsonPathCompiler(pattern),
+            callback, 
+            callbackContext || window
          ) 
       );            
    }
@@ -1327,7 +1335,7 @@ function pubSub(){
          var listenerList = listeners[eventId];
          
          if( isString(jsonPath) ) {
-            pushListener(listenerList, jsonPath, callback.bind(callbackContext));
+            pushListener(listenerList, jsonPath, callback, callbackContext);
          } else {
             pushListeners(listenerList, jsonPath);
          }
@@ -1367,7 +1375,7 @@ function controller(httpMethodName, url, data, doneCallback) {
        /**
         * @type {Function}
         */          
-       jsonSoFar =   jsonBuilder(
+       objectSoFar = jsonBuilder(
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
@@ -1406,7 +1414,7 @@ function controller(httpMethodName, url, data, doneCallback) {
          // callback for when the response is complete                     
          clarinetParser.close();
          
-         doneCallback && doneCallback(jsonSoFar());
+         doneCallback && doneCallback(objectSoFar());
       });
       
    return {      
@@ -1414,7 +1422,9 @@ function controller(httpMethodName, url, data, doneCallback) {
       
       onNode: partialComplete(events.on, NODE_FOUND_EVENT),
       
-      onError: events.onError
+      onError: events.onError,
+      
+      root: objectSoFar
    };                                         
 }
 (function(){

@@ -279,6 +279,58 @@ TestCase("oboeTest", {
          ,   foundNMatches(2)
          );
    }
+   
+,  testCanGetRootJsonAsJsonObjectIsBuiltUp: function() {
+
+      givenAnOboeInstance()
+         .whenGivenInput('{"a":')
+         .thenTheParser(
+            hasRootJson({a:undefined})
+          )
+         .whenGivenInput('"A",')
+         .thenTheParser(
+             hasRootJson({a:'A'})
+         )
+         .whenGivenInput('"b":')
+         .thenTheParser(
+            hasRootJson({a:'A', b:undefined})
+         )
+         .whenGivenInput('"B"}')
+         .thenTheParser(
+            hasRootJson({a:'A', b:'B'})
+         );
+   }
+   
+,  testCanGetRootJsonAsJsonArrayIsBuiltUp: function() {
+
+      // let's feed it the array [11,22] in drips of one or two chars at a time:
+
+      givenAnOboeInstance()
+         .whenGivenInput('[')
+         .thenTheParser(
+            // I would like this to be [] but clarinet doesn't fire array found until it has seen
+            // the first element
+            hasRootJson(undefined)
+         )
+         .whenGivenInput('1')
+         .thenTheParser(
+             // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
+             // so nothing can be added to the root json
+             hasRootJson([])
+         )
+         .whenGivenInput('1,')
+         .thenTheParser(
+            hasRootJson([11])
+         )
+         .whenGivenInput('2')
+         .thenTheParser(
+            hasRootJson([11])
+         )
+         .whenGivenInput('2]')
+         .thenTheParser(
+            hasRootJson([11,22])
+         );
+   }      
 
 ,  testNotifiesOfNamedChildOfRoot: function() {
 

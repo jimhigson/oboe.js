@@ -104,11 +104,11 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       this.thenTheParser = function( /* ... functions ... */ ){
          for (var i = 0; i < arguments.length; i++) {
             var assertion = arguments[i];
-            assertion.testAgainst(spiedCallback);
+            assertion.testAgainst(spiedCallback, oboeInstance);
          }
 
          return this;
-      }
+      };
       
       /** sinon stub is only really used to record arguments given.
        *  However, we want to preserve the arguments given at the time of calling, because they might subsequently
@@ -145,7 +145,7 @@ function urlForJsonTestFile(jsonFilename) {
 
 
 var wasPassedAnErrorObject = {
-   testAgainst: function failIfNotPassedAnError(callback) {
+   testAgainst: function failIfNotPassedAnError(callback, oboeInstance) {
    
       if( !callback.args[0][0] instanceof Error ) {
          fail("Callback should have been given an error but was given" + callback.constructor.name);
@@ -155,12 +155,12 @@ var wasPassedAnErrorObject = {
 };
 
 
-// higher-level function to create assertions. Pass output to Asserter#thenTheParser.
+// higher-order function to create assertions. Pass output to Asserter#thenTheParser.
 // test how many matches were found
 function foundNMatches(n){
    return {
       testAgainst:
-      function(callback) {
+      function(callback, oboeInstance) {
          if( n != callback.callCount ) {
             fail('expected to have been called ' + n + ' times but has been called ' +
                callback.callCount + ' times. \n' +
@@ -172,6 +172,16 @@ function foundNMatches(n){
    }
 }
 
+// To test the json at oboe#json() is as expected.
+function hasRootJson(json){
+   return {
+      testAgainst:
+      function(callback, oboeInstance) { 
+         assertEquals(json, oboeInstance.root());         
+      }
+   }
+}
+
 var foundOneMatch = foundNMatches(1),
     calledCallbackOnce = foundNMatches(1),    
     foundNoMatches = foundNMatches(0);
@@ -179,7 +189,7 @@ var foundOneMatch = foundNMatches(1),
 function calledbackWithContext(callbackScope) {
    return { 
       testAgainst:
-      function(callbackStub) {
+      function(callbackStub, oboeInstance) {
          if(!callbackStub.calledOn(callbackScope)){
             fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
                callbackStub.getCall(0).thisValue);
