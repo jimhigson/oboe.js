@@ -70,7 +70,7 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 }
 
 function always(){return true}
-(function(arrayProto, functionProto){
+(function(arrayProto){
 
    /**
     * Here we have a minimal set of polyfills needed to let the code run in older browsers such
@@ -107,7 +107,7 @@ function always(){return true}
       return out;
    };
 
-})(Array.prototype, Function.prototype);
+})(Array.prototype);
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
@@ -1150,8 +1150,8 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       
       var fullPath = key === undefined? pathStack : pathStack.concat(key);
 
-      // for where we have the key but no known value yet, at least record in the object we are
-      // building up that the key is there but there is no defined value yet:
+      // if we have the key but no known value yet, at least put that key in the output 
+      // but against no defined value:
       if( key && value === undefined ) {
          lastOf(nodeStack)[key] = undefined;
       }   

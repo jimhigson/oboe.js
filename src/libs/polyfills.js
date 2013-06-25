@@ -1,4 +1,4 @@
-(function(arrayProto, functionProto){
+(function(arrayProto){
 
    /**
     * Here we have a minimal set of polyfills needed to let the code run in older browsers such
@@ -35,4 +35,4 @@
       return out;
    };
 
-})(Array.prototype, Function.prototype);
+})(Array.prototype);
