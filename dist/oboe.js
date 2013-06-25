@@ -81,13 +81,14 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
 }
 
 function always(){return true}
-(function(arrayProto){
+(function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the
     *  implementation given as (filler).
     */ 
-   function fillIn(baseObject, methodName, filler) {
-      baseObject[methodName] = baseObject[methodName] || filler;
+   function fillIn(type, methodName, filler) {
+      var proto = type.prototype;
+      proto[methodName] = proto[methodName] || filler;
    }
 
    /**
@@ -101,7 +102,7 @@ function always(){return true}
    
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
-   fillIn(arrayProto, 'forEach', function( func ){
+   fillIn(Array, 'forEach', function( func ){
          
       for( var i = 0 ; i < len(this) ; i++ ) {      
          func( this[i] );    
@@ -112,7 +113,7 @@ function always(){return true}
    
    // Array.filter has to be a polyfill, clarinet expects it.
    // Ignoring all but function argument since not needed, eg can't take a context
-   fillIn(arrayProto, 'filter', function( func ){         
+   fillIn(Array, 'filter', function( func ){         
       var out = [];
    
       // let's use the .forEach we just declared above to implement .filter
@@ -126,7 +127,7 @@ function always(){return true}
    });
       
    // allow binding context only, not arguments as well
-   fillIn(Function.prototype, 'bind', function( context /*, arg1, arg2 ... */ ){
+   fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
    
       return function( /* yet more arguments */ ) {                        
@@ -134,7 +135,7 @@ function always(){return true}
       }
    });   
 
-})(Array.prototype);
+})();
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
@@ -754,8 +755,8 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    }   
    
    /* xhr2 already supports everything that we need so very little abstraction required.\
-    * listenToXhr2 is one of two possible values to use as listenToXhr  
-    */
+   *  listenToXhr2 is one of two possible values to use as listenToXhr  
+   */
    function listenToXhr2(xhr, progressListener, completeListener) {      
       xhr.onprogress = progressListener;
       xhr.onload = completeListener;
@@ -1298,13 +1299,64 @@ function pubSub(){
       }            
    };
 }
+function instanceApi(listen, objectSoFar, notifyIfMatches){
+   
+   /** 
+    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
+    */
+   function pushListener(eventId, pattern, callback) {
+         
+      listen( 
+         eventId,  
+         notifyIfMatches( pattern, callback) 
+      );            
+   }
+
+   /**
+    * implementation behind .onPath() and .onNode(): add several listeners in one call  
+    * @param listenerMap
+    */
+   function pushListeners(eventId, listenerMap) {
+   
+      // TODO: document this call style
+      for( var pattern in listenerMap ) {
+         pushListener(eventId, pattern, listenerMap[pattern]);
+      }
+   }    
+      
+   /**
+    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
+    * depending on the argument types
+    */       
+   function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   
+      if( isString(jsonPathOrListenerMap) ) {
+         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+      } else {
+         pushListeners(eventId, jsonPathOrListenerMap);
+      }
+      
+      return this; // chaining
+   }         
+
+   return {      
+      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
+      
+      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
+      
+      onError: partialComplete(listen, ERROR_EVENT),
+      
+      root: objectSoFar
+   };   
+
+}
 
 
 function controller(httpMethodName, url, httpRequestBody, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
-       events = pubSub(),
+       events = pubSub(),  notify = events.notify,
               
        clarinetParser = clarinet.parser(),           
                                       
@@ -1324,8 +1376,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                      );
    
    clarinetParser.onerror =  
-       function(e) {
-          events.notify(ERROR_EVENT, e);
+       function(e) {          
+          notify(ERROR_EVENT, e);
             
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
@@ -1357,100 +1409,48 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    function somethingFound(eventId, node, path, ancestors) {
       var nodeList = ancestors.concat([node]);
       
-      events.notify(eventId, path, ancestors, nodeList);   
-   }              
-              
+      notify(eventId, path, ancestors, nodeList);   
+   }
+   
    /**
     * Test if something found in the json matches the pattern and, if it does,
-    * calls the callback.
-    * 
-    * After partial completion of the first three args, we are left with a function which when called with the details 
-    * of something called in the parsed json, calls the listener if it matches.
-    * 
-    * @param test
-    * @param callback
+    * calls the callback. 
     */
-   function notifyConditionally( test, callback, path, ancestors, nodeList ) {
-     
-      var foundNode = test( path, nodeList );
-     
-      // Possible values for foundNode are now:
-      //
-      //    false: 
-      //       we did not match
-      //
-      //    an object/array/string/number/null: 
-      //       that node is the one that matched. Because json can have nulls, this can 
-      //       be null.
-      //
-      //    undefined: like above, but we don't have the node yet. ie, we know there is a
-      //       node that matches but we don't know if it is an array, object, string
-      //       etc yet so we can't say anything about it. Null isn't used here because
-      //       it would be indistinguishable from us finding a node with a value of
-      //       null.
-      //                      
-      if( foundNode !== false ) {                                 
+   function notifyIfMatches( pattern, callback ) {
+      var test = jsonPathCompiler( pattern );
+   
+      return function(path, ancestors, nodeList){
         
-         // change curNode to foundNode when it stops breaking tests
-         try{
-            callback(foundNode, path, ancestors );
-         } catch(e) {
-            events.notify(ERROR_EVENT, Error('Error thrown by callback ' + e.message));
+         var foundNode = test( path, nodeList );
+        
+         // Possible values for foundNode are now:
+         //
+         //    false: 
+         //       we did not match
+         //
+         //    an object/array/string/number/null: 
+         //       that node is the one that matched. Because json can have nulls, this can 
+         //       be null.
+         //
+         //    undefined: like above, but we don't have the node yet. ie, we know there is a
+         //       node that matches but we don't know if it is an array, object, string
+         //       etc yet so we can't say anything about it. Null isn't used here because
+         //       it would be indistinguishable from us finding a node with a value of
+         //       null.
+         //                      
+         if( foundNode !== false ) {                                 
+           
+            // change curNode to foundNode when it stops breaking tests
+            try{
+               callback(foundNode, path, ancestors );
+            } catch(e) {
+               notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
+            }
          }
-      }   
-   }
-   
-   /** 
-    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
-    */
-   function pushListener(eventId, pattern, callback) {
-         
-      events.on( 
-         eventId,  
-         partialComplete(
-            notifyConditionally,
-            jsonPathCompiler(pattern),
-            callback
-         ) 
-      );            
-   }
-
-   /**
-    * implementation behind .onPath() and .onNode(): add several listeners in one call  
-    * @param listenerMap
-    */
-   function pushListeners(eventId, listenerMap) {
-   
-      // TODO: document this call style
-      for( var pattern in listenerMap ) {
-         pushListener(eventId, pattern, listenerMap[pattern]);
-      }
-   }    
-      
-   /**
-    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
-    * depending on the argument types
-    */       
-   function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
-   
-      if( isString(jsonPathOrListenerMap) ) {
-         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
-      } else {
-         pushListeners(eventId, jsonPathOrListenerMap);
-      }
-      
-      return this; // chaining
-   }      
-      
-   return {      
-      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
-      
-      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
-      
-      onError: partialComplete(events.on, ERROR_EVENT),
-      
-      root: objectSoFar
-   };                                         
+      };   
+   }   
+                                          
+   return instanceApi(events.on, objectSoFar, notifyIfMatches);                                                         
 }
 (function(){
 
