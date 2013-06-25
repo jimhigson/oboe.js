@@ -20,7 +20,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                          // when a node is found, notify matching node listeners:
                          partialComplete(somethingFound, NODE_FOUND_EVENT),
       
-                         // when a node is found, notify matching path listeners:                                        
+                         // when a path is found, notify matching path listeners:                                        
                          partialComplete(somethingFound, PATH_FOUND_EVENT)
                      );
    

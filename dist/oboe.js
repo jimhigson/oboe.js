@@ -1356,7 +1356,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
-       events = pubSub(),  notify = events.notify,
+       events = pubSub(),  
+       notify = events.notify, // shortcut
               
        clarinetParser = clarinet.parser(),           
                                       
@@ -1371,7 +1372,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                          // when a node is found, notify matching node listeners:
                          partialComplete(somethingFound, NODE_FOUND_EVENT),
       
-                         // when a node is found, notify matching path listeners:                                        
+                         // when a path is found, notify matching path listeners:                                        
                          partialComplete(somethingFound, PATH_FOUND_EVENT)
                      );
    
@@ -1414,7 +1415,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    
    /**
     * Test if something found in the json matches the pattern and, if it does,
-    * calls the callback. 
+    * propagates the found thing to the callback. 
     */
    function notifyIfMatches( pattern, callback ) {
       var test = jsonPathCompiler( pattern );
