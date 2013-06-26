@@ -1,17 +1,12 @@
 
 
-function controller(httpMethodName, url, httpRequestBody, doneCallback) {
+function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBody, doneCallback) {
 
    var 
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
-       events = pubSub(),  
-       notify = events.notify, // shortcut
-       on = events.on,
-              
-       clarinetParser = clarinet.parser(),           
-                                      
-       // create a json builder and store a function that can be used to get the
-       // root of the json later:
+       notify = eventBus.notify, // shortcut
+       on = eventBus.on,
+                                                    
        /**
         * @type {Function}
         */          

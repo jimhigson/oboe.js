@@ -39,7 +39,7 @@
             doneCallback = firstArg.complete;
          }
 
-         return controller(httpMethodName, url, body, doneCallback);         
+         return controller( pubSub(), clarinet.parser(), httpMethodName, url, body, doneCallback);         
       };
    }   
 
