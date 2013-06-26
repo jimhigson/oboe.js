@@ -1,13 +1,12 @@
 /**
  * Listen to the given clarinet instance and progressively build up the json based on the callbacks it provides.
  * 
- * Notify the given callbacks when interesting things happen.
+ * Notify on the given event bus when interesting things happen.
  * 
- * @param clarinet
- * @param {Function} nodeAddedCallback
- * @param {Function} newPathCallback
+ * @param clarinet our source of low-level events
+ * @param {pubSub} events the event bus to fire higher level events on when a new node or path is found  
  */
-function jsonBuilder( clarinet, nodeAddedCallback, newPathCallback ) {
+function jsonBuilder( clarinet, events ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 
@@ -99,7 +98,7 @@ function jsonBuilder( clarinet, nodeAddedCallback, newPathCallback ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
-      newPathCallback(fullPath, nodeStack.concat([value]) );
+      events.notify(PATH_FOUND_EVENT, fullPath, nodeStack.concat([value]) );
       curKey = key;      
    }
 
@@ -116,7 +115,7 @@ function jsonBuilder( clarinet, nodeAddedCallback, newPathCallback ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      nodeAddedCallback( pathStack, nodeStack.concat([completeNode]) );      
+      events.notify(NODE_FOUND_EVENT, pathStack, nodeStack.concat([completeNode]) );      
             
       pathStack.pop();   
          

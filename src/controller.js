@@ -15,15 +15,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
        /**
         * @type {Function}
         */          
-       objectSoFar = jsonBuilder(
-                         clarinetParser,
-                          
-                         // when a node is found, notify matching node listeners:
-                         partialComplete(notify, NODE_FOUND_EVENT),
-      
-                         // when a path is found, notify matching path listeners:                                        
-                         partialComplete(notify, PATH_FOUND_EVENT)
-                     );
+       objectSoFar = jsonBuilder(clarinetParser, events);
    
    clarinetParser.onerror =  
        function(e) {          
