@@ -1,16 +1,5 @@
-function instanceApi(listen, objectSoFar, notifyIfMatches){
+function instanceApi(listen, objectSoFar, addNewCallback){
    
-   /** 
-    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
-    */
-   function pushListener(eventId, pattern, callback) {
-         
-      listen( 
-         eventId,  
-         notifyIfMatches( pattern, callback) 
-      );            
-   }
-
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
     * @param listenerMap
@@ -18,7 +7,7 @@ function instanceApi(listen, objectSoFar, notifyIfMatches){
    function pushListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         pushListener(eventId, pattern, listenerMap[pattern]);
+         addNewCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -29,7 +18,7 @@ function instanceApi(listen, objectSoFar, notifyIfMatches){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }

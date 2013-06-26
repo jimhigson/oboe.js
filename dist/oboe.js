@@ -1104,10 +1104,10 @@ function jsonPathCompiler(jsonPath) {
  * Notify the given callbacks when interesting things happen.
  * 
  * @param clarinet
- * @param {Function} nodeFoundCallback
- * @param {Function} pathFoundCallback
+ * @param {Function} nodeAddedCallback
+ * @param {Function} newPathCallback
  */
-function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
+function jsonBuilder( clarinet, nodeAddedCallback, newPathCallback ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 
@@ -1199,7 +1199,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
-      pathFoundCallback(fullPath, nodeStack.concat([value]) );
+      newPathCallback(fullPath, nodeStack.concat([value]) );
       curKey = key;      
    }
 
@@ -1216,7 +1216,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      nodeFoundCallback( pathStack, nodeStack.concat([completeNode]) );      
+      nodeAddedCallback( pathStack, nodeStack.concat([completeNode]) );      
             
       pathStack.pop();   
          
@@ -1299,28 +1299,16 @@ function pubSub(){
       }            
    };
 }
-function instanceApi(listen, objectSoFar, notifyIfMatches){
+function instanceApi(listen, objectSoFar, addNewCallback){
    
-   /** 
-    * @param {String} eventId one of NODE_FOUND_EVENT or PATH_FOUND_EVENT
-    */
-   function pushListener(eventId, pattern, callback) {
-         
-      listen( 
-         eventId,  
-         notifyIfMatches( pattern, callback) 
-      );            
-   }
-
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
     * @param listenerMap
     */
    function pushListeners(eventId, listenerMap) {
    
-      // TODO: document this call style
       for( var pattern in listenerMap ) {
-         pushListener(eventId, pattern, listenerMap[pattern]);
+         addNewCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -1331,7 +1319,7 @@ function instanceApi(listen, objectSoFar, notifyIfMatches){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         pushListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
@@ -1358,6 +1346,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),  
        notify = events.notify, // shortcut
+       on = events.on,
               
        clarinetParser = clarinet.parser(),           
                                       
@@ -1408,13 +1397,16 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
       });
                  
    /**
-    * Test if something found in the json matches the pattern and, if it does,
-    * propagates the found thing to the callback. 
+    *  
     */
-   function notifyIfMatches( pattern, callback ) {
+   function addNewCallback( eventId, pattern, callback ) {
+   
       var test = jsonPathCompiler( pattern );
    
-      return function(path, nodeList){ 
+      // Add a new listener to the eventBus.
+      // This listener first checks that he pattern matches then if it does, 
+      // passes it onto the callback. 
+      on( eventId, function(path, nodeList){ 
       
          var foundNode = test( path, nodeList );
         
@@ -1442,10 +1434,10 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
          }
-      };   
+      });   
    }   
                                           
-   return instanceApi(events.on, objectSoFar, notifyIfMatches);                                                         
+   return instanceApi(on, objectSoFar, addNewCallback);                                                         
 }
 (function(){
 

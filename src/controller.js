@@ -6,6 +6,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
        // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
        events = pubSub(),  
        notify = events.notify, // shortcut
+       on = events.on,
               
        clarinetParser = clarinet.parser(),           
                                       
@@ -56,13 +57,16 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
       });
                  
    /**
-    * Test if something found in the json matches the pattern and, if it does,
-    * propagates the found thing to the callback. 
+    *  
     */
-   function notifyIfMatches( pattern, callback ) {
+   function addNewCallback( eventId, pattern, callback ) {
+   
       var test = jsonPathCompiler( pattern );
    
-      return function(path, nodeList){ 
+      // Add a new listener to the eventBus.
+      // This listener first checks that he pattern matches then if it does, 
+      // passes it onto the callback. 
+      on( eventId, function(path, nodeList){ 
       
          var foundNode = test( path, nodeList );
         
@@ -90,8 +94,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
          }
-      };   
+      });   
    }   
                                           
-   return instanceApi(events.on, objectSoFar, notifyIfMatches);                                                         
+   return instanceApi(on, objectSoFar, addNewCallback);                                                         
 }
