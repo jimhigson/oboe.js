@@ -1,3 +1,10 @@
+/* 
+   The API that is given out when a new Oboe instance is created.
+    
+   This file handles the peculiarities of being able to add listeners in a couple of different syntaxes
+   and returns the object that exposes a small number of methods.
+ */
+
 function instanceApi(listen, objectSoFar, addNewCallback){
    
    /**
