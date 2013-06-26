@@ -2,8 +2,7 @@
 
 function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBody, doneCallback) {
 
-   var 
-       // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
+   var                
        notify = eventBus.notify, // shortcut
        on = eventBus.on,
                                                     

@@ -1299,6 +1299,13 @@ function pubSub(){
       }            
    };
 }
+/* 
+   The API that is given out when a new Oboe instance is created.
+    
+   This file handles the peculiarities of being able to add listeners in a couple of different syntaxes
+   and returns the object that exposes a small number of methods.
+ */
+
 function instanceApi(listen, objectSoFar, addNewCallback){
    
    /**
@@ -1342,8 +1349,7 @@ function instanceApi(listen, objectSoFar, addNewCallback){
 
 function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBody, doneCallback) {
 
-   var 
-       // the api available on an oboe instance. Will expose 3 methods, onPath, onNode and onError               
+   var                
        notify = eventBus.notify, // shortcut
        on = eventBus.on,
                                                     
