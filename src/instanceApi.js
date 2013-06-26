@@ -17,7 +17,6 @@ function instanceApi(listen, objectSoFar, notifyIfMatches){
     */
    function pushListeners(eventId, listenerMap) {
    
-      // TODO: document this call style
       for( var pattern in listenerMap ) {
          pushListener(eventId, pattern, listenerMap[pattern]);
       }
