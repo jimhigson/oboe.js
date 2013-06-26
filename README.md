@@ -67,8 +67,10 @@ Supply a callback for when something goes wrong
    .root()
 ```
 
-At any time, get the output from the parser so far. This will be undefined if nothing has been recieved so far
-else it will be an Object, Array etc as per the json recieved.    
+At any time, call .root() on the oboe instance to get the json recieved so far. 
+If nothing has been recieved yet this will return undefined, otherwise it will give the root Object.
+Technically, this could also return an Array but it is unusual for a json file to not have an Object at the
+top level.
 
 ## Pattern matching
 
