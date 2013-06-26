@@ -15,7 +15,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
        /**
         * @type {Function}
         */          
-       objectSoFar = jsonBuilder(clarinetParser, events);
+       objectSoFar = jsonBuilder(clarinetParser, notify);
    
    clarinetParser.onerror =  
        function(e) {          

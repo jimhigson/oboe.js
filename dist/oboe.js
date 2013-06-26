@@ -1104,9 +1104,10 @@ function jsonPathCompiler(jsonPath) {
  * Notify on the given event bus when interesting things happen.
  * 
  * @param clarinet our source of low-level events
- * @param {pubSub} events the event bus to fire higher level events on when a new node or path is found  
+ * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
+ *    or path is found  
  */
-function jsonBuilder( clarinet, events ) {
+function jsonBuilder( clarinet, notify ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 
@@ -1198,7 +1199,7 @@ function jsonBuilder( clarinet, events ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
-      events.notify(PATH_FOUND_EVENT, fullPath, nodeStack.concat([value]) );
+      notify(PATH_FOUND_EVENT, fullPath, nodeStack.concat([value]) );
       curKey = key;      
    }
 
@@ -1215,7 +1216,7 @@ function jsonBuilder( clarinet, events ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      events.notify(NODE_FOUND_EVENT, pathStack, nodeStack.concat([completeNode]) );      
+      notify(NODE_FOUND_EVENT, pathStack, nodeStack.concat([completeNode]) );      
             
       pathStack.pop();   
          
@@ -1354,7 +1355,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
        /**
         * @type {Function}
         */          
-       objectSoFar = jsonBuilder(clarinetParser, events);
+       objectSoFar = jsonBuilder(clarinetParser, notify);
    
    clarinetParser.onerror =  
        function(e) {          
