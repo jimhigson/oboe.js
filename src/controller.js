@@ -1,20 +1,15 @@
 
 
 function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
-
-   var                
-       notify = eventBus.notify, // shortcut
-       on = eventBus.on;
-                                                       
+   
    clarinetParser.onerror =  
        function(e) {          
-          notify(ERROR_EVENT, e);
+          eventBus.notify(ERROR_EVENT, e);
             
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
        };
-                     
-         
+                              
    function start(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
       streamingXhr(
          httpMethodName,
@@ -49,7 +44,7 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function(path, nodeList){ 
+      eventBus.on( eventId, function(path, nodeList){ 
       
          var foundNode = test( path, nodeList );
         
@@ -74,7 +69,7 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
             try{
                callback(foundNode, path, nodeList );
             } catch(e) {
-               notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
+               eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
          }
       });   
