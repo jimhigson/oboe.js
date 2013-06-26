@@ -1199,7 +1199,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
          lastOf(nodeStack)[key] = undefined;
       }   
       
-      pathFoundCallback(value, fullPath, nodeStack);
+      pathFoundCallback(fullPath, nodeStack.concat([value]) );
       curKey = key;      
    }
 
@@ -1216,7 +1216,7 @@ function jsonBuilder( clarinet, nodeFoundCallback, pathFoundCallback ) {
       // notify of the found node now that we don't have the curNode on the nodeStack anymore
       // but we still want the
       // pathstack to contain everything for this call: 
-      nodeFoundCallback( completeNode, pathStack, nodeStack );      
+      nodeFoundCallback( pathStack, nodeStack.concat([completeNode]) );      
             
       pathStack.pop();   
          
@@ -1370,10 +1370,10 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
-                         partialComplete(somethingFound, NODE_FOUND_EVENT),
+                         partialComplete(notify, NODE_FOUND_EVENT),
       
                          // when a path is found, notify matching path listeners:                                        
-                         partialComplete(somethingFound, PATH_FOUND_EVENT)
+                         partialComplete(notify, PATH_FOUND_EVENT)
                      );
    
    clarinetParser.onerror =  
@@ -1406,13 +1406,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
          
          doneCallback && doneCallback(objectSoFar());
       });
-              
-   function somethingFound(eventId, node, path, ancestors) {
-      var nodeList = ancestors.concat([node]);
-      
-      notify(eventId, path, ancestors, nodeList);   
-   }
-   
+                 
    /**
     * Test if something found in the json matches the pattern and, if it does,
     * propagates the found thing to the callback. 
@@ -1420,8 +1414,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    function notifyIfMatches( pattern, callback ) {
       var test = jsonPathCompiler( pattern );
    
-      return function(path, ancestors, nodeList){
-        
+      return function(path, nodeList){ 
+      
          var foundNode = test( path, nodeList );
         
          // Possible values for foundNode are now:
@@ -1443,7 +1437,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
            
             // change curNode to foundNode when it stops breaking tests
             try{
-               callback(foundNode, path, ancestors );
+               callback(foundNode, path, nodeList );
             } catch(e) {
                notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }

@@ -204,6 +204,9 @@ function lastOf(array){
 function penultimateOf(array){
    return array[array.length-2];
 }
+function prepenultimateOf(array){
+   return array[array.length-3];
+}
 
 /**
  * Make a string version of the callback arguments given from oboe
@@ -265,24 +268,25 @@ function matched(obj) {
          return this;   
       }
       
-   ,  withParent: function( parentObject ) {
+   ,  withParent: function( expectedParent ) {
          var oldAssertion = this.testAgainst;
          
          this.testAgainst = function( callbackStub ){
             oldAssertion.apply(this, arguments);
             
             var parentMatcher = sinon.match(function (array) {
-                try{
-                  assertEquals( parentObject, lastOf(array) );
-                } catch(_e){
+               try{
+                  var foundParent = penultimateOf(array);                    
+                  assertEquals( expectedParent, foundParent );
+               } catch(_e){
                   return false;
-                }
-                return true;
+               }
+               return true;
             }, "had the right parent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
                fail( "was not called with the object" + JSON.stringify(obj) + 
-                        " and parent object " +  JSON.stringify(parentObject) +
+                        " and parent object " +  JSON.stringify(expectedParent) +
                         "all calls were with:" +
                         reportArgumentsToCallback(callbackStub.args));
             }            
@@ -291,24 +295,25 @@ function matched(obj) {
          return this;
       }
       
-   ,  withGrandparent: function( grandparentObject ) {
+   ,  withGrandparent: function( expectedGrandparent ) {
          var oldAssertion = this.testAgainst;
          
          this.testAgainst = function( callbackStub ){
             oldAssertion.apply(this, arguments);
             
-            var parentMatcher = sinon.match(function (array) {
-                try{
-                  assertEquals( grandparentObject, penultimateOf(array) );
-                } catch(_e){
+            var grandparentMatcher = sinon.match(function (array) {
+               try{
+                  var foundGrandparent = prepenultimateOf(array);                
+                  assertEquals( expectedGrandparent, foundGrandparent );
+               } catch(_e){
                   return false;
-                }
-                return true;
+               }
+               return true;
             }, "had the right grandparent");
             
-            if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
+            if(!callbackStub.calledWithMatch(obj, sinon.match.any, grandparentMatcher)) {
                fail( "was not called with the object" + JSON.stringify(obj) + 
-                        " and garndparent object " +  JSON.stringify(grandparentObject) +
+                        " and garndparent object " +  JSON.stringify(expectedGrandparent) +
                         "all calls were with:" +
                         reportArgumentsToCallback(callbackStub.args));
             }            

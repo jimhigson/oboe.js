@@ -18,10 +18,10 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
                          clarinetParser,
                           
                          // when a node is found, notify matching node listeners:
-                         partialComplete(somethingFound, NODE_FOUND_EVENT),
+                         partialComplete(notify, NODE_FOUND_EVENT),
       
                          // when a path is found, notify matching path listeners:                                        
-                         partialComplete(somethingFound, PATH_FOUND_EVENT)
+                         partialComplete(notify, PATH_FOUND_EVENT)
                      );
    
    clarinetParser.onerror =  
@@ -54,13 +54,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
          
          doneCallback && doneCallback(objectSoFar());
       });
-              
-   function somethingFound(eventId, node, path, ancestors) {
-      var nodeList = ancestors.concat([node]);
-      
-      notify(eventId, path, ancestors, nodeList);   
-   }
-   
+                 
    /**
     * Test if something found in the json matches the pattern and, if it does,
     * propagates the found thing to the callback. 
@@ -68,8 +62,8 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
    function notifyIfMatches( pattern, callback ) {
       var test = jsonPathCompiler( pattern );
    
-      return function(path, ancestors, nodeList){
-        
+      return function(path, nodeList){ 
+      
          var foundNode = test( path, nodeList );
         
          // Possible values for foundNode are now:
@@ -91,7 +85,7 @@ function controller(httpMethodName, url, httpRequestBody, doneCallback) {
            
             // change curNode to foundNode when it stops breaking tests
             try{
-               callback(foundNode, path, ancestors );
+               callback(foundNode, path, nodeList );
             } catch(e) {
                notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
