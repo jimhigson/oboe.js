@@ -1,13 +1,15 @@
 /**
- * Listen to the given clarinet instance and progressively build up the json based on the callbacks it provides.
+ * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
  * 
  * Notify on the given event bus when interesting things happen.
+ * 
+ * Returns a function which gives access to the content built up so far
  * 
  * @param clarinet our source of low-level events
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */
-function jsonBuilder( clarinet, notify ) {
+function incrementalParsedContent( clarinet, notify ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 

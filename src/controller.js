@@ -9,7 +9,7 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
        /**
         * @type {Function}
         */          
-       objectSoFar = jsonBuilder(clarinetParser, notify);
+       objectSoFar = incrementalParsedContent(clarinetParser, notify);
    
    clarinetParser.onerror =  
        function(e) {          
