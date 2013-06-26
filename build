@@ -28,5 +28,12 @@ fi
 echo "building at $(date)"
 
 runjstd dev
+ 
+env grunt 
 
+runjstd concat 
+
+runjstd minified 
+
+mv dist/oboe.concat.js dist/oboe.js 
  
