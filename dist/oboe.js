@@ -1308,7 +1308,7 @@ function pubSub(){
    and returns the object that exposes a small number of methods.
  */
 
-function instanceApi(listen, objectSoFar, addNewCallback){
+function instanceApi(controller, eventBus, incrementalParsedContent){
    
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
@@ -1317,7 +1317,7 @@ function instanceApi(listen, objectSoFar, addNewCallback){
    function pushListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addNewCallback(eventId, pattern, listenerMap[pattern]);
+         controller.addNewCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -1328,7 +1328,7 @@ function instanceApi(listen, objectSoFar, addNewCallback){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         controller.addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
@@ -1341,25 +1341,20 @@ function instanceApi(listen, objectSoFar, addNewCallback){
       
       onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
       
-      onError: partialComplete(listen, ERROR_EVENT),
+      onError: partialComplete(eventBus.on, ERROR_EVENT),
       
-      root: objectSoFar
+      root: incrementalParsedContent
    };   
 
 }
 
 
-function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBody, doneCallback) {
+function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
 
    var                
        notify = eventBus.notify, // shortcut
-       on = eventBus.on,
-                                                    
-       /**
-        * @type {Function}
-        */          
-       objectSoFar = incrementalParsedContent(clarinetParser, notify);
-   
+       on = eventBus.on;
+                                                       
    clarinetParser.onerror =  
        function(e) {          
           notify(ERROR_EVENT, e);
@@ -1368,28 +1363,30 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
           clarinetParser.close();
        };
                      
-                                                                                                                                                    
-   streamingXhr(
-      httpMethodName,
-      url, 
-      httpRequestBody,
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            clarinetParser.write(nextDrip);
-         } catch(e) {
-            // we don't have to do anything here because we always assign a .onerror
-            // to clarinet which will have already been called by the time this 
-            // exception is thrown.                
-         }
-      },
-      function() {
-         // callback for when the response is complete                     
-         clarinetParser.close();
          
-         doneCallback && doneCallback(objectSoFar());
-      });
+   function start(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
+      streamingXhr(
+         httpMethodName,
+         url, 
+         httpRequestBody,
+         function (nextDrip) {
+            // callback for when a bit more data arrives from the streaming XHR         
+             
+            try {
+               clarinetParser.write(nextDrip);
+            } catch(e) {
+               // we don't have to do anything here because we always assign a .onerror
+               // to clarinet which will have already been called by the time this 
+               // exception is thrown.                
+            }
+         },
+         function() {
+            // callback for when the response is complete                     
+            clarinetParser.close();
+            
+            doneCallback && doneCallback(parsedContentSoFar());
+         });
+   }
                  
    /**
     *  
@@ -1431,31 +1428,41 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
          }
       });   
    }   
-                                          
-   return instanceApi(on, objectSoFar, addNewCallback);                                                         
+       
+   /* the controller only needs to expose two methods: */                                          
+   return { 
+      addNewCallback : addNewCallback, 
+      start          : start
+   };                                                         
 }
 (function(){
 
    /* export public API */
    window.oboe = {
-      doGet:httpApiMethod('GET'),
-      doDelete:httpApiMethod('DELETE'),
-      doPost:httpApiMethod('POST', true),
-      doPut:httpApiMethod('PUT', true)
+      doGet:   apiMethod('GET'),
+      doDelete:apiMethod('DELETE'),
+      doPost:  apiMethod('POST', true),
+      doPut:   apiMethod('PUT', true)
    };
    
-   /** add an http method to the public api */
-   function httpApiMethod(httpMethodName, mayHaveContent) {
+   function apiMethod(httpMethodName, mayHaveRequestBody) {
          
       var 
           // make name like 'doGet' out of name like 'GET'
-          bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
-          callbackArgumentIndex = mayHaveContent? 2 : 1;           
+          bodyArgumentIndex =     mayHaveRequestBody?  1 : -1, // minus one = always undefined - method can't send data
+          callbackArgumentIndex = mayHaveRequestBody? 2 : 1;           
       
-      // make the above method available without creating an oboe instance first via
-      // the public api:
+
       return function(firstArg){
-         var url, body, doneCallback;
+      
+         // wire everything up:
+         var eventBus = pubSub(),
+             clarinetParser = clarinet.parser(),
+             parsedContentSoFar = incrementalParsedContent(clarinetParser, eventBus.notify),             
+             controller = oboeController( eventBus, clarinetParser, parsedContentSoFar),      
+            
+         // now work out what the arguments mean:   
+             url, body, doneCallback;
 
          if (isString(firstArg)) {
             // parameters specified as arguments
@@ -1475,7 +1482,11 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
             doneCallback = firstArg.complete;
          }
 
-         return controller( pubSub(), clarinet.parser(), httpMethodName, url, body, doneCallback);         
+         // start the request:
+         controller.start(httpMethodName, url, body, doneCallback);         
+                  
+         // return an api to control this oboe instance                   
+         return instanceApi(controller, eventBus, parsedContentSoFar)           
       };
    }   
 

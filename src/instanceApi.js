@@ -5,7 +5,7 @@
    and returns the object that exposes a small number of methods.
  */
 
-function instanceApi(listen, objectSoFar, addNewCallback){
+function instanceApi(controller, eventBus, incrementalParsedContent){
    
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
@@ -14,7 +14,7 @@ function instanceApi(listen, objectSoFar, addNewCallback){
    function pushListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addNewCallback(eventId, pattern, listenerMap[pattern]);
+         controller.addNewCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -25,7 +25,7 @@ function instanceApi(listen, objectSoFar, addNewCallback){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         controller.addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
@@ -38,9 +38,9 @@ function instanceApi(listen, objectSoFar, addNewCallback){
       
       onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
       
-      onError: partialComplete(listen, ERROR_EVENT),
+      onError: partialComplete(eventBus.on, ERROR_EVENT),
       
-      root: objectSoFar
+      root: incrementalParsedContent
    };   
 
 }

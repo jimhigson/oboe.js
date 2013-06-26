@@ -1,16 +1,11 @@
 
 
-function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBody, doneCallback) {
+function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
 
    var                
        notify = eventBus.notify, // shortcut
-       on = eventBus.on,
-                                                    
-       /**
-        * @type {Function}
-        */          
-       objectSoFar = incrementalParsedContent(clarinetParser, notify);
-   
+       on = eventBus.on;
+                                                       
    clarinetParser.onerror =  
        function(e) {          
           notify(ERROR_EVENT, e);
@@ -19,28 +14,30 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
           clarinetParser.close();
        };
                      
-                                                                                                                                                    
-   streamingXhr(
-      httpMethodName,
-      url, 
-      httpRequestBody,
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            clarinetParser.write(nextDrip);
-         } catch(e) {
-            // we don't have to do anything here because we always assign a .onerror
-            // to clarinet which will have already been called by the time this 
-            // exception is thrown.                
-         }
-      },
-      function() {
-         // callback for when the response is complete                     
-         clarinetParser.close();
          
-         doneCallback && doneCallback(objectSoFar());
-      });
+   function start(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
+      streamingXhr(
+         httpMethodName,
+         url, 
+         httpRequestBody,
+         function (nextDrip) {
+            // callback for when a bit more data arrives from the streaming XHR         
+             
+            try {
+               clarinetParser.write(nextDrip);
+            } catch(e) {
+               // we don't have to do anything here because we always assign a .onerror
+               // to clarinet which will have already been called by the time this 
+               // exception is thrown.                
+            }
+         },
+         function() {
+            // callback for when the response is complete                     
+            clarinetParser.close();
+            
+            doneCallback && doneCallback(parsedContentSoFar());
+         });
+   }
                  
    /**
     *  
@@ -82,6 +79,10 @@ function controller(eventBus, clarinetParser, httpMethodName, url, httpRequestBo
          }
       });   
    }   
-                                          
-   return instanceApi(on, objectSoFar, addNewCallback);                                                         
+       
+   /* the controller only needs to expose two methods: */                                          
+   return { 
+      addNewCallback : addNewCallback, 
+      start          : start
+   };                                                         
 }

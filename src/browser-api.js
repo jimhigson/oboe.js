@@ -2,24 +2,30 @@
 
    /* export public API */
    window.oboe = {
-      doGet:httpApiMethod('GET'),
-      doDelete:httpApiMethod('DELETE'),
-      doPost:httpApiMethod('POST', true),
-      doPut:httpApiMethod('PUT', true)
+      doGet:   apiMethod('GET'),
+      doDelete:apiMethod('DELETE'),
+      doPost:  apiMethod('POST', true),
+      doPut:   apiMethod('PUT', true)
    };
    
-   /** add an http method to the public api */
-   function httpApiMethod(httpMethodName, mayHaveContent) {
+   function apiMethod(httpMethodName, mayHaveRequestBody) {
          
       var 
           // make name like 'doGet' out of name like 'GET'
-          bodyArgumentIndex =     mayHaveContent?  1 : -1, // minus one = always undefined - method can't send data
-          callbackArgumentIndex = mayHaveContent? 2 : 1;           
+          bodyArgumentIndex =     mayHaveRequestBody?  1 : -1, // minus one = always undefined - method can't send data
+          callbackArgumentIndex = mayHaveRequestBody? 2 : 1;           
       
-      // make the above method available without creating an oboe instance first via
-      // the public api:
+
       return function(firstArg){
-         var url, body, doneCallback;
+      
+         // wire everything up:
+         var eventBus = pubSub(),
+             clarinetParser = clarinet.parser(),
+             parsedContentSoFar = incrementalParsedContent(clarinetParser, eventBus.notify),             
+             controller = oboeController( eventBus, clarinetParser, parsedContentSoFar),      
+            
+         // now work out what the arguments mean:   
+             url, body, doneCallback;
 
          if (isString(firstArg)) {
             // parameters specified as arguments
@@ -39,7 +45,11 @@
             doneCallback = firstArg.complete;
          }
 
-         return controller( pubSub(), clarinet.parser(), httpMethodName, url, body, doneCallback);         
+         // start the request:
+         controller.start(httpMethodName, url, body, doneCallback);         
+                  
+         // return an api to control this oboe instance                   
+         return instanceApi(controller, eventBus, parsedContentSoFar)           
       };
    }   
 
