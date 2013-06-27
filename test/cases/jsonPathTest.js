@@ -278,11 +278,11 @@
          
       try{
          assertFalse( 
-            'pattern ' + this._pattern + ' should not have matched ' + '(' + path.join('.') + ')'
+            'pattern ' + this._pattern + ' should not have matched [' + path.join(',') + ']'
          ,  this._lastResult
          );
       } catch( e ) {
-         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+         fail( 'Error running pattern "' + this._pattern + '" against path ' + '[' + path.join(',') + ']' + "\n" + e );      
       }    
         
       return this;         
