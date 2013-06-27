@@ -173,7 +173,7 @@ function jsonPathCompiler(jsonPath) {
               
    /**
     * Generate a function which parses the pattern in the given regex. If matches, returns a parser
-    * generated from that token that processes the given expr, otherwise returns null.
+    * generated from that token that processes the given expr, otherwise returns no value (undefined).
     * 
     * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
     */
