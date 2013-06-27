@@ -34,9 +34,9 @@ function jsonPathCompiler(jsonPath) {
    function unnamedNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
    
       // a '*' doesn't put any extra criteria on the matching, it just defers to the previous expression:
-      var previous = previousExpr(pathStack, nodeStack, stackIndex-1);                   
+      var previousExprMatch = previousExpr(pathStack, nodeStack, stackIndex-1);                   
                
-      return previous && returnValueForMatch(capturing, previous, nodeStack, stackIndex);
+      return previousExprMatch && returnValueForMatch(capturing, previousExprMatch, nodeStack, stackIndex);
    }
    
    /**
@@ -192,15 +192,15 @@ function jsonPathCompiler(jsonPath) {
    //    For all regular expressions:
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)               
-   var nameInObjectNotation    = /^(\$?)(\w+)/    
-   ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/         
-   ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
-   ,   starInObjectNotation    = /^(\$?)\*/
-   ,   starInArrayNotation     = /^(\$?)\[\*\]/      
-   ,   doubleDot               = /^\.\./
-   ,   dot                     = /^\./      
-   ,   bang                    = /^(\$?)!/
-   ,   emptyString             = /^$/;
+   var nameInObjectNotation    = /^(\$?)(\w+)/             //  foo
+   ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/       //  ["foo"]    
+   ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/         //  [2]
+   ,   starInObjectNotation    = /^(\$?)\*/                //  [*]
+   ,   starInArrayNotation     = /^(\$?)\[\*\]/            //  *
+   ,   doubleDot               = /^\.\./                   //  ..
+   ,   dot                     = /^\./                     //  .
+   ,   bang                    = /^(\$?)!/                 //  !
+   ,   emptyString             = /^$/;                     //  
      
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
