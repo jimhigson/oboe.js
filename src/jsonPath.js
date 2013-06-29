@@ -14,7 +14,7 @@
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
-function jsonPathCompiler(jsonPath) {
+var jsonPathCompiler = (function () {
    
    /**
     * Expression for:
@@ -116,6 +116,32 @@ function jsonPathCompiler(jsonPath) {
       return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
    }
 
+   /**
+    * For when a token match has been found. Compiles the parser for that token.
+    * If called with a zero-length list of 
+    * 
+    * When partially completed with an expression function, can be used as the parserGenerator
+    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.
+    * 
+    * @param {Function} exprs zero or more expressions that parses this token 
+    * @param {Function} parserGeneratedSoFar the parser already found
+    * @param {Array} regexmatch the match given by the regex engine when the token was found
+    */
+   function expressionsReader( exprs, parserGeneratedSoFar, regexmatch ) {
+      
+      // extract meaning from the matched regex subexpressions
+      var capturing = !!regexmatch[1],
+          name = regexmatch[2];            
+                
+      // note that if exprs is zero-lenght, the reduce will pass back 
+      // parserGeneratedSoFar without any special cases required                   
+      return exprs.reduce(function( parserGeneratedSoFar, expr ){
+
+         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
+               
+      }, parserGeneratedSoFar);         
+   }
+
    /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
     *  which is ready to be used as a jsonPath parser. 
     *  
@@ -136,41 +162,18 @@ function jsonPathCompiler(jsonPath) {
     * 
     * @return {*|undefined}
     */
-   function generateClauseReaderIfJsonPathMatchesClause(clauseRegex, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
-      var tokenMatch = clauseRegex.exec(jsonPath);
+   function generateClauseReaderIfJsonPathMatchesRegex(clauseRegex, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
+      var regexMatch = clauseRegex.exec(jsonPath);
 
-      if(tokenMatch) {
-         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, tokenMatch),
-             remaining = jsonPath.substr(len(tokenMatch[0]));                
+      if(regexMatch) {
+         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, regexMatch),
+         
+             unparsedJsonPath = jsonPath.substr(len(regexMatch[0]));                
                                
-         return onSuccess(remaining, compiledParser);
+         return onSuccess(unparsedJsonPath, compiledParser);
       }         
    }
-   
-
-   /**
-    * For when a token match has been found. Compiles the parser for that token.
-    * If called with a zero-length list of 
-    * 
-    * When partially completed with an expression function, can be used as the parserGenerator
-    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.
-    * 
-    * @param {Function} exprs zero or more expressions that parses this token 
-    * @param {Function} parserGeneratedSoFar the parser already found
-    * @param {Array} tokenMatch the match given by the regex engine when the token was found
-    */
-   function expressionsReader( exprs, parserGeneratedSoFar, tokenMatch ) {
-      
-      var capturing = !!tokenMatch[1],
-          name = tokenMatch[2];            
-                
-      return exprs.reduce(function( parserGeneratedSoFar, expr ){
-
-         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
-               
-      }, parserGeneratedSoFar);         
-   }
-              
+                 
    /**
     * Generate a function which parses the pattern in the given regex. If matches, returns a parser
     * generated from that token that processes the given expr, otherwise returns no value (undefined).
@@ -179,7 +182,7 @@ function jsonPathCompiler(jsonPath) {
     */
    function clauseMatcher(clauseRegex, exprs) {
         
-      return partialComplete( generateClauseReaderIfJsonPathMatchesClause, clauseRegex, exprs );
+      return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, clauseRegex, exprs );
    }
               
    // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
@@ -276,16 +279,19 @@ function jsonPathCompiler(jsonPath) {
       return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
-   
-   // we've declared everything, let's do the compilation:     
-   try {
-      // Kick off the recursive parsing of the jsonPath with a function which always returns true.
-      // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
-      // in the tree. So long as they match the part specified, they don't care what the ancestors of the
-      // matched part are.         
-      return compileJsonPathToFunction(jsonPath, always);
-   } catch( e ) {
-      throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+   // all the above is now captured in the closure of this immediately-called function. let's
+   // return the function we wish to expose globally:
+   return function(jsonPath){
+        
+      try {
+         // Kick off the recursive parsing of the jsonPath with a function which always returns true.
+         // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
+         // in the tree. So long as they match the part specified, they don't care what the ancestors of the
+         // matched part are.         
+         return compileJsonPathToFunction(jsonPath, always);
+      } catch( e ) {
+         throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+      }
    }
 
-}
+})();
