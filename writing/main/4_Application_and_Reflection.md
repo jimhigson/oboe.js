@@ -128,7 +128,9 @@ The style of implementation of the generator of functions corresponding to json 
 a traditional parser generator, although rather than generating source, functions are dynamically composed. Reflecting
 on this, parser gens only went to source to break out of the ability to compose the expressive power of the language
 itself from inside the language itself. With a functional approach, assembly from very small pieces gives a similar
-level of expressivity as writing the logic out as source code.   
+level of expressivity as writing the logic out as source code.  
+
+Why could implement Function#partial. Why not going to. Is a shame. 
 
 
 
