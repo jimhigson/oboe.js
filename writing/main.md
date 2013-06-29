@@ -153,7 +153,7 @@ Examples of jsonpath syntax
 
 
 breaking out of big/small tradeoff
--------------------------
+----------------------------------
 
 Best of both modes
 
@@ -171,14 +171,20 @@ styles of programming
 
 some of it is pure functional (jsonPath, controller)
 ie, only semantically different from a Haskell programme
-others, syntaxticaly functional but stateful
+others, syntactically functional but stateful
 to fit in with expected APIs etc
 
-jsonpath implementation allows the compilation of complex expressions into an executable form, but each part implementing
+JsonPath implementation allows the compilation of complex expressions into an executable form, but each part implementing
 the executable form is locally simple. By using recursion, assembling the simple functions into a more function expressing 
 a more complex
 rule also follows as being locally simple but gaining a usefully sophisticated behaviour through composition of simple 
 parts. Each recursive call of the parser identifies one token for non-empty input and then recursively digests the rest.
+
+The style of implementation of the generator of functions corresponding to json path expressions is reminiscent of
+a traditional parser generator, although rather than generating source, functions are dynamically composed. Reflecting
+on this, parser gens only went to source to break out of the ability to compose the expressive power of the language
+itself from inside the language itself. With a functional approach, assembly from very small pieces gives a similar
+level of expressivity as writing the logic out as source code.   
 
 
 
@@ -190,7 +196,7 @@ automated testing
 testing via node - slowserver. Proxy.
 why jstd's built in proxy isn't sufficient
 
-testing pyramid
+![testing pyramid](images/pyramid)
 
 
 Could implement a resume function for if transmission stops halfway 
