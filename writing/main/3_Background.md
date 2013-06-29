@@ -38,6 +38,28 @@ Writing script tags
 All require server to have a special mode. Encoding is specific to get arround restrictions.
 
 
+JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.
+
+```javascript
+
+// an in-memory person with a multi-line address:
+let person = {
+   name: "...",
+   address: [
+      "line1",
+      "line2",
+      "line3"
+   ]
+};
+
+
+// in javascript we can get line two of the address as such:
+let addresss = person.address[2]
+
+// the equivalent jsonpath expression is identical:
+let jsonPath = "person.address[2]"
+
+``` 
 
 
 

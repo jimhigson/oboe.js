@@ -16,6 +16,24 @@
 <p>Dichotamy between streaming and downloading in the browser for downloading data. But not for html (progressive rendering) or images (progressive PNGs and progressive JPEGs)</p>
 <p>Lack of support in browser Long poll - for infrequent push messages. Must be read Writing script tags</p>
 <p>All require server to have a special mode. Encoding is specific to get arround restrictions.</p>
+<p>JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">
+<span class="co">// an in-memory person with a multi-line address:</span>
+<span class="kw">let</span> person = {
+   <span class="dt">name</span>: <span class="st">&quot;...&quot;</span>,
+   <span class="dt">address</span>: [
+      <span class="st">&quot;line1&quot;</span>,
+      <span class="st">&quot;line2&quot;</span>,
+      <span class="st">&quot;line3&quot;</span>
+   ]
+};
+
+
+<span class="co">// in javascript we can get line two of the address as such:</span>
+<span class="kw">let</span> addresss = <span class="ot">person</span>.<span class="fu">address</span>[<span class="dv">2</span>]
+
+<span class="co">// the equivalent jsonpath expression is identical:</span>
+<span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
 <h2 id="xmlhttprequest"><a href="#xmlhttprequest"><span class="header-section-number">3.3</span> XmlHttpRequest</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback</p>
@@ -47,9 +65,25 @@
 </div>
 <p>By sensible convention, even in a serialisation format with only a loose definition of lists, lists contain only items of the same type. This gives way to a sister convention, that for lists of items, the key immediately linking to the</p>
 <p>Essentially two ways to identify an interesting node - by location (covered by existing jsonpath)</p>
-<p>Why duck typing is desirable in absense of genuine types in the json standard (ala tag names in XML). or by a loose concept of type which is not well supported by existing jsonpath spec. Object syntax for listing fields.</p>
+<p>Why duck typing is desirable in absense of genuine types in the json standard (ala tag names in XML). or by a loose concept of type which is not well supported by existing jsonpath spec.</p>
+<p>To extend JsonPath to support a concise expression of duck typing, I chose a syntax which is similar to fields in jsonFormat:</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">
-Examples of jsonpath syntax</code></pre>
+<span class="co">// the curly braces are my extension to jsonpath&quot;</span>
+<span class="kw">let</span> jsonPath = <span class="fu">jsonPathCompiler</span>(<span class="st">&quot;{name, address, email}&quot;</span>);
+
+<span class="co">// the above jsonPath expression would match this object in json expression and </span>
+<span class="co">// like all json path expressions the pattern is quite similar to the object that</span>
+<span class="co">// it matches. The object below matches because it contains all the fields listed</span>
+<span class="co">// in between the curly braces in the above json path expresson.</span>
+
+<span class="kw">let</span> matchingObject = {
+   <span class="st">&quot;name&quot;</span>: <span class="st">&quot;...&quot;</span>,
+   <span class="st">&quot;address&quot;</span>: <span class="st">&quot;...&quot;</span>,
+   <span class="st">&quot;email&quot;</span>: <span class="st">&quot;...:</span>
+}
+
+<span class="fu">jsonPath</span>(matchingObject); <span class="co">// evaluates to true</span></code></pre>
+<p>When we aer searching</p>
 <h2 id="breaking-out-of-bigsmall-tradeoff"><a href="#breaking-out-of-bigsmall-tradeoff"><span class="header-section-number">4.4</span> breaking out of big/small tradeoff</a></h2>
 <p>Best of both modes</p>
 <p>Granularity: only need read as far as necessary. Services could be designed to write the big picture first. Alternatively, where resources link to one another, can stop reading at the link. Eg, looking for a person's publications, start with an index of people but no need to read whole list of people.</p>
@@ -58,6 +92,7 @@ Examples of jsonpath syntax</code></pre>
 <p>some of it is pure functional (jsonPath, controller) ie, only semantically different from a Haskell programme others, syntactically functional but stateful to fit in with expected APIs etc</p>
 <p>JsonPath implementation allows the compilation of complex expressions into an executable form, but each part implementing the executable form is locally simple. By using recursion, assembling the simple functions into a more function expressing a more complex rule also follows as being locally simple but gaining a usefully sophisticated behaviour through composition of simple parts. Each recursive call of the parser identifies one token for non-empty input and then recursively digests the rest.</p>
 <p>The style of implementation of the generator of functions corresponding to json path expressions is reminiscent of a traditional parser generator, although rather than generating source, functions are dynamically composed. Reflecting on this, parser gens only went to source to break out of the ability to compose the expressive power of the language itself from inside the language itself. With a functional approach, assembly from very small pieces gives a similar level of expressivity as writing the logic out as source code.</p>
+<p>Why could implement Function#partial. Why not going to. Is a shame.</p>
 <h2 id="composition-of-several-source-files-into-a-distributable-binary-like-text-file"><a href="#composition-of-several-source-files-into-a-distributable-binary-like-text-file"><span class="header-section-number">4.6</span> composition of several source files into a distributable binary-like text file</a></h2>
 <p>Why distributed javascript is more like a binary than a source file. Licencing implications?</p>
 <p>Inherent hiding by wrapping in a scope.</p>
