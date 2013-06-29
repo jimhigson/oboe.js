@@ -90,8 +90,22 @@ can justify why js as:
 
 Most widely deployable.
 
-asynchronous model built into language already, no 'concurrent' library needed
-compare to Erlang.
+Node: asynchronous model built into language already, no 'concurrent' library needed. Closures convenient for picking
+up again where left off.
+
+Node programs often so asynchronous and callback based they become unclear in structure.
+Promises approach to avoid pyramid-shaped code and callback spaghetti. 
+
+```javascript
+// example of pyramid code
+```  
+
+In comparison to typical Tomcat-style threading model. Threaded model is powerful for genuine parallel computation but
+Wasteful of resources where the tasks are more io-bound than cpu-bound. Resources consumed by threads while doing nothing
+but waiting. 
+  
+Compare to Erlang. Waiter model. Node resturaunt much more efficient use of expensive resources.
+
 
 funcitonal, pure functional possible [FPR] but not as nicely as in a pure functional language, ie function caches
 although can be implemented, not universal on all functions.  
@@ -120,16 +134,16 @@ way of associating the nodes of interest with their targetted callbacks.
 First way to identify an interesting thing is by its location in the document. In the absense of node typing beyond
 the categorisation as objects, arrays and various primative types, the key immediately mapping to the object is often
 taken as a lose concept of the type of the object. Quite fortunately, rather than because of a well considered object 
-design, this tends to play well with automaticly marshalling of domain objects expressed in a Java-style OO language
+design, this tends to play well with automatically marshaling of domain objects expressed in a Java-style OO language
 because there is a stong tendency for field names -- and by extension, 'get' methods -- to be named after the *type*
 of the field, the name of the type also serving as a rough summary of the relationship between two objects. See figure
 \ref{marshallTypeFig} below.
 
 ![
    UML class diagram showing a person class in relationship with an address class. In implementation as
-   Java the 'hasAdress' relationship would typically be reified as a getAddress method. This co-incidence of 
-   object type and the name of the field refering to the type lends itself well to the tendency for the immediate
-   key before an object to be taken as the type when Java models are marshalled into json \label{marshallTypeFig}
+   Java the 'hasAddress' relationship would typically be reified as a getAddress method. This co-incidence of 
+   object type and the name of the field referring to the type lends itself well to the tendency for the immediate
+   key before an object to be taken as the type when Java models are marshaled into json \label{marshallTypeFig}
 ](images/marshall)      
 
 By sensible convention, even in a serialisation format with only a loose definition of lists, lists contain only items 
@@ -188,15 +202,59 @@ level of expressivity as writing the logic out as source code.
 
 
 
+composition of several source files into a distributable binary-like text file
+-------------------------------------------------
 
+Why distributed javascript is more like a binary than a source file. Licencing implications?
+
+Inherent hiding by wrapping in a scope.
+
+Names of functions and variable names which are provably not possible to reference are lost for the sake of reduction
+of size of the source. 
+
+Packaging for node or browser. No need to minify for node but concatenation still done for ease of inclusion in projects
+
+
+```javascript
+typical pattern for packaging to work in either a node.js server or a web browser
+```
 
 automated testing
 -----------------
 
-testing via node - slowserver. Proxy.
-why jstd's built in proxy isn't sufficient
+How automated testing improves what can be written, not just making what is written more reliable.
 
-![testing pyramid](images/pyramid)
+![ 
+   The testing pyramid is a common concept, relying on the assumption that verification of small parts provides
+   a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components
+   of the system, whereas for the high-level tests only smoke tests are provided. \label{testingPyramidFig}
+](images/pyramid)
+
+Jstd can serve example files but need to write out slowly which it has no concept of. Customistation is via configuration
+rather than by plug-in, but even if it were, the threading model is not suitable to create this kind of timed output.
+
+Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading
+in which threads wait for a while response to be received.
+
+Testing via node - slowserver. Proxy.
+
+The test pyramid concept \ref{testingPyramidFig} fits in well with the hiding that is provided. Under the testing pyramid only very high level
+behaviours are tested as ??? tests. While this is a lucky co-incidence, it is also an unavoidable restriction.
+Once compiled into a single source file, the
+individual components are hidden, callable only from withing their closure. Hence, it would not be possible to test
+the composed parts individually post-concatenation into a single javascript file, not even via a workarround for data
+hiding such as found in Java's reflection. Whereas in Java the protection is a means of protecting otherwise addressable
+resources, once a function is trapped inside a javascript closure without external exposure it is not just protected 
+but, appearing in no namespaces, inherently unreferenceable.
+
+TDD fits well into an object pattern because the software is well composed into separate parts. The objects are almost
+tangible in their distinction as separate encapsulated entities. However, the multi-paradigm style of my implementation 
+draws much fainter borders over the implementation's landscape.
+
+
+
+One dilemma in implementing the testing is how far to test the more generic sections of the codebase as generic components.
+A purist approach to TDD would say    
 
 
 Could implement a resume function for if transmission stops halfway 
