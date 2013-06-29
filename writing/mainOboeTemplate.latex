@@ -144,6 +144,9 @@ $if(toc)$
 \tableofcontents
 }
 $endif$
+
+\listoffigures
+
 $body$
 
 $if(natbib)$
