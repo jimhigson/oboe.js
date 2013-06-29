@@ -59,7 +59,8 @@ var jsonPathCompiler = (function () {
    }   
    
    /**
-    * Expression for the .. (double dot) token. Consumes zero or more tokens from the input.
+    * Expression for the .. (double dot) token. Consumes zero or more tokens from the input, the fewest that
+    * are required for the previousExpr to match.
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
@@ -70,9 +71,9 @@ var jsonPathCompiler = (function () {
          return false;
       }
    
-      return rootExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) ||
-                                 // pattern .. equals pattern !.. so if .. reaches the root
-                                 // the match has suceeded.
+               // jsonPath .. is equivalent to !.. so if .. reaches the root
+               // the match has suceeded.
+      return rootExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) ||             
                                   
              previousExpr(pathStack, nodeStack, stackIndex) || 
              consumeMany(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
@@ -133,7 +134,7 @@ var jsonPathCompiler = (function () {
       var capturing = !!regexmatch[1],
           name = regexmatch[2];            
                 
-      // note that if exprs is zero-lenght, the reduce will pass back 
+      // note that if exprs is zero-length, reduce (like fold) will pass back 
       // parserGeneratedSoFar without any special cases required                   
       return exprs.reduce(function( parserGeneratedSoFar, expr ){
 
