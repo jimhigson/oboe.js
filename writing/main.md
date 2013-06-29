@@ -1,5 +1,5 @@
 % Title
-% Jim Higosn
+% Jim Higson
 % 2013
 
 Abstract
