@@ -31,7 +31,7 @@
             .thenShouldMatch(       ['a'])
             .thenShouldMatch(       ['a','b'])
       }
-      
+            
    ,  testMatchingNamedChildOfRootWorks: function() {
          givenAPattern('!.foo')
             .thenShouldMatch(       ['foo'])      
@@ -47,7 +47,7 @@
       
    ,  testMatchingNamedAncestorOfRootWorks: function() {
          givenAPattern('!..foo')
-             .thenShouldNotMatch(   [])         
+            .thenShouldNotMatch(    [])         
             .thenShouldMatch(       ['foo'])      
             .thenShouldMatch(       ['a', 'foo'])
             .thenShouldNotMatch(    ['a', 'foo', 'a'])            
@@ -163,7 +163,17 @@
    ,  testTrickyCase: function() {
          givenAPattern('!..foods..fr')
             .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      
-      }        
+      }
+      
+   ,  testDoubleDotFollowedByStar: function() {      
+         givenAPattern('!..*.bar')         
+             .thenShouldMatch(['anything', 'bar']);1
+      }
+      
+   ,  testDoubleDotFollowedByArrayStyleStar: function() {      
+         givenAPattern('!..[*].bar')         
+             .thenShouldMatch(['anything', 'bar']);1
+      }                    
 
    // now several tests for css4-style pattern matching
    
@@ -260,11 +270,11 @@
 
       try{   
          assertTrue( 
-            'pattern ' + this._pattern + ' should have matched ' + '(' + path.join('.') + ')'
+            'pattern ' + this._pattern + ' should have matched [' + path.join(',') + ']'
          ,   !!this._lastResult 
          );
       } catch( e ) {
-         fail( 'Error running pattern "' + this._pattern + '" against path ' + '(' + path.join('.') + ')' + "\n" + e );      
+         fail( 'Error running pattern "' + this._pattern + '" against path [' + path.join(',') + ']' + "\n" + e );      
       }      
       
       return this;
