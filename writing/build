@@ -1,9 +1,9 @@
 #!/bin/sh
 
-pandoc main.md --toc --default-image-extension=png -o main.html
+pandoc main.md --toc --default-image-extension=png --number-sections -o main.html
 pandoc proposal.md -o proposal.html
 
-pandoc main.md --toc --default-image-extension=png --template=mainOboeTemplate -o main.pdf
+pandoc main.md --toc --default-image-extension=png --number-sections --template=mainOboeTemplate -o main.pdf
 pandoc proposal.md -o proposal.pdf
 
 echo "word count:" `wc -w main.md`
