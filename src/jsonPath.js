@@ -51,7 +51,7 @@ var jsonPathCompiler = (function () {
                                             
       // in implementation, is like unnamednodeExpr except that we need the name to match.
       // Once name matches, defer to unnamedNodeExpr:                                                                  
-      return (pathStack[stackIndex] == name) && unnamedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex );               
+      return (pathStack[stackIndex] == name) && apply(unnamedNodeExpr, arguments);               
    }      
    
    function consume1(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ){
@@ -73,7 +73,7 @@ var jsonPathCompiler = (function () {
    
                // jsonPath .. is equivalent to !.. so if .. reaches the root
                // the match has suceeded.
-      return rootExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex) ||             
+      return apply(rootExpr, arguments) ||             
                                   
              previousExpr(pathStack, nodeStack, stackIndex) || 
              consumeMany(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         

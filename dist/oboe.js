@@ -29,19 +29,34 @@ function defined( value ) {
 }
 
 /*
-   Call each of a list of functions with the same arguments, ignoring any return
-   values.
+   Call a single function with the given arguments.
+   Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
+   the context of the call
+ */
+function apply(fn, arguments) {
+   return fn.apply(undefined, arguments);
+}
+
+/*
+   Call each of a list of functions with the same arguments, where the arguments are given as an
+   array. Ignores any return values from the functions.
+ */
+function applyAll( fns, args ) {
+
+   fns.forEach(function( fn ){
+      apply(fn, args);
+   });
+}
+
+/*
+   Call each of a list of functions with the same arguments, where the arguments are given using varargs
+   array. Ignores any return values from the functions.
  */
 function callAll( fns /*, arg1, arg2, arg3...*/ ) {
    applyAll(fns, toArray(arguments, 1));
 }
 
-function applyAll( fns, args ) {
 
-   fns.forEach(function( fn ){
-      fn.apply(undefined, args);
-   });
-}
 
 /* call a list of functions with the same args until one returns truthy.
 
@@ -109,24 +124,34 @@ function always(){return true}
       }      
       
    });         
+         
+   // A similarly minimalist implementation of .reduce. Array.reduce in Javascript is
+   // similar to fold in other languages.
+   fillIn(Array, 'reduce', function( func, curValue ){         
    
+      // let's use the .forEach we just declared above to implement .filter
+      this.forEach(function(item){               
+         curValue = func(curValue, item);
+      });
+      
+      return curValue;
+   });
    
    // Array.filter has to be a polyfill, clarinet expects it.
    // Ignoring all but function argument since not needed, eg can't take a context
-   fillIn(Array, 'filter', function( func ){         
-      var out = [];
+   fillIn(Array, 'filter', function( filterCondition ){         
    
-      // let's use the .forEach we just declared above to implement .filter
-      this.forEach(function(item){      
-         if( func( item ) ) {
-            out.push(item);
-         }                  
-      });
+      // let's use the .reduce we declared above to implement .filter:
+      return this.reduce(function(matchesSoFar, item){      
+         if( filterCondition( item ) ) {
+            matchesSoFar.push(item);
+         }
+         return matchesSoFar;                  
+      }, []);
       
-      return out;
-   });
+   });      
       
-   // allow binding context only, not arguments as well
+   // allow binding. Minimal version which includes binding of context only, not arguments as well
    fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
    
@@ -821,7 +846,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
-function jsonPathCompiler(jsonPath) {
+var jsonPathCompiler = (function () {
    
    /**
     * Expression for:
@@ -841,9 +866,9 @@ function jsonPathCompiler(jsonPath) {
    function unnamedNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
    
       // a '*' doesn't put any extra criteria on the matching, it just defers to the previous expression:
-      var previous = previousExpr(pathStack, nodeStack, stackIndex-1);                   
+      var previousExprMatch = previousExpr(pathStack, nodeStack, stackIndex);                   
                
-      return previous && returnValueForMatch(capturing, previous, nodeStack, stackIndex);
+      return previousExprMatch && returnValueForMatch(capturing, previousExprMatch, nodeStack, stackIndex);
    }
    
    /**
@@ -858,24 +883,32 @@ function jsonPathCompiler(jsonPath) {
                                             
       // in implementation, is like unnamednodeExpr except that we need the name to match.
       // Once name matches, defer to unnamedNodeExpr:                                                                  
-      return (pathStack[stackIndex] == name) && unnamedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex );               
+      return (pathStack[stackIndex] == name) && apply(unnamedNodeExpr, arguments);               
    }      
    
+   function consume1(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ){
+      return previousExpr(pathStack, nodeStack, stackIndex-1);                                                                                                      
+   }   
+   
    /**
-    * Expression for .. (double dot) token              
+    * Expression for the .. (double dot) token. Consumes zero or more tokens from the input, the fewest that
+    * are required for the previousExpr to match.
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
-   function multipleUnnamedNodesExpr(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ) {
+   function consumeMany(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ) {
             
       // past the start, not a match:
       if( stackIndex < -1 ) {
          return false;
       }
    
-      return stackIndex == -1 || // -1 is the root 
+               // jsonPath .. is equivalent to !.. so if .. reaches the root
+               // the match has suceeded.
+      return apply(rootExpr, arguments) ||             
+                                  
              previousExpr(pathStack, nodeStack, stackIndex) || 
-             multipleUnnamedNodesExpr(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
+             consumeMany(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
    }      
    
    /**
@@ -916,6 +949,32 @@ function jsonPathCompiler(jsonPath) {
       return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
    }
 
+   /**
+    * For when a token match has been found. Compiles the parser for that token.
+    * If called with a zero-length list of 
+    * 
+    * When partially completed with an expression function, can be used as the parserGenerator
+    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.
+    * 
+    * @param {Function} exprs zero or more expressions that parses this token 
+    * @param {Function} parserGeneratedSoFar the parser already found
+    * @param {Array} regexmatch the match given by the regex engine when the token was found
+    */
+   function expressionsReader( exprs, parserGeneratedSoFar, regexmatch ) {
+      
+      // extract meaning from the matched regex subexpressions
+      var capturing = !!regexmatch[1],
+          name = regexmatch[2];            
+                
+      // note that if exprs is zero-length, reduce (like fold) will pass back 
+      // parserGeneratedSoFar without any special cases required                   
+      return exprs.reduce(function( parserGeneratedSoFar, expr ){
+
+         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
+               
+      }, parserGeneratedSoFar);         
+   }
+
    /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
     *  which is ready to be used as a jsonPath parser. 
     *  
@@ -925,7 +984,7 @@ function jsonPathCompiler(jsonPath) {
     *  
     *  Returns undefined on no match
     *  
-    * @param {RegExp} pattern
+    * @param {RegExp} clauseRegex
     * @param {Function} parserGenerator a function which knows how to generate a parser. Either a partial completion of
     *    exprParserGenerator with the expr given, or passthroughParserGenerator.
     * @param {String} jsonPath
@@ -936,61 +995,27 @@ function jsonPathCompiler(jsonPath) {
     * 
     * @return {*|undefined}
     */
-   function generateTokenParserIfJsonPathMatchesPattern(pattern, parserGenerator, jsonPath, parserGeneratedSoFar, onSuccess) {
-      var tokenMatch = pattern.exec(jsonPath);
+   function generateClauseReaderIfJsonPathMatchesRegex(clauseRegex, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
+      var regexMatch = clauseRegex.exec(jsonPath);
 
-      if(tokenMatch) {
-         var compiledParser = parserGenerator(parserGeneratedSoFar, tokenMatch),
-             remaining = jsonPath.substr(len(tokenMatch[0]));                
+      if(regexMatch) {
+         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, regexMatch),
+         
+             unparsedJsonPath = jsonPath.substr(len(regexMatch[0]));                
                                
-         return onSuccess(remaining, compiledParser);
+         return onSuccess(unparsedJsonPath, compiledParser);
       }         
    }
-   
-
-   /**
-    * For when a token match has been found. Compiles the parser for that token.
-    * 
-    * When partially completed with an expression function, can be used as the parserGenerator
-    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.
-    * 
-    * @param {Function} expr the expression that parses this token 
-    * @param {Function} parserGeneratedSoFar the parser already found
-    * @param {Array} tokenMatch the match given by the regex engine when the token was found
-    */
-   function exprParserGenerator( expr, parserGeneratedSoFar, tokenMatch ) {
-      var capturing = !!tokenMatch[1],
-          name = tokenMatch[2];      
-         
-      return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
-   }
-
-   /**
-    * Similar to exprParserGenerator but does not compile any new parser. Simply returns the parser so far.
-    * This is useful for generating the parser when matching the '.' (dot) token. This token is a separator and 
-    * because the generated jsonPath parser receives already separated input, there is nothing to do. 
-    *  
-    * @param {Function} parserGeneratedSoFar
-    * @param {Array} _tokenMatch the found regular expression when this token was matched. Since we are not
-    *    going to be using any expression function, this is ignored.
-    */
-   function passthroughParserGenerator(parserGeneratedSoFar, _tokenMatch) {
-      return parserGeneratedSoFar;
-   }   
-              
+                 
    /**
     * Generate a function which parses the pattern in the given regex. If matches, returns a parser
-    * generated from that token that processes the given expr, otherwise returns null.
+    * generated from that token that processes the given expr, otherwise returns no value (undefined).
     * 
     * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
     */
-   function tokenMatcher(pattern, expr) {
-   
-      // most tokens generate their parser using exprParserGenerator, but if no expr is given, use 
-      // passthroughParserGenerator instead
-      var parserGenerator = expr? partialComplete( exprParserGenerator, expr) : passthroughParserGenerator;
-       
-      return partialComplete( generateTokenParserIfJsonPathMatchesPattern, pattern, parserGenerator );
+   function clauseMatcher(clauseRegex, exprs) {
+        
+      return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, clauseRegex, exprs );
    }
               
    // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
@@ -999,29 +1024,32 @@ function jsonPathCompiler(jsonPath) {
    //    For all regular expressions:
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)               
-   var nameInObjectNotation    = /^(\$?)(\w+)/    
-   ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/         
-   ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/
-   ,   starInObjectNotation    = /^(\$?)\*/
-   ,   starInArrayNotation     = /^(\$?)\[\*\]/      
-   ,   doubleDot               = /^\.\./
-   ,   dot                     = /^\./      
-   ,   bang                    = /^(\$?)!/
-   ,   emptyString             = /^$/;
+   var nameInObjectNotation    = /^(\$?)(\w+)/             //  foo
+   ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/       //  ["foo"]    
+   ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/         //  [2]
+   ,   starInObjectNotation    = /^(\$?)\*/                //  [*]
+   ,   starInArrayNotation     = /^(\$?)\[\*\]/            //  *
+   ,   doubleDot               = /^\.\./                   //  ..
+   ,   dot                     = /^\./                     //  .
+   ,   bang                    = /^(\$?)!/                 //  !
+   ,   emptyString             = /^$/;                     //  
      
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
-   var tokenMatchers = [
-       tokenMatcher(nameInObjectNotation   , namedNodeExpr)
-   ,   tokenMatcher(nameInArrayNotation    , namedNodeExpr)         
-   ,   tokenMatcher(numberInArrayNotation  , namedNodeExpr)
-   ,   tokenMatcher(starInObjectNotation   , unnamedNodeExpr)
-   ,   tokenMatcher(starInArrayNotation    , unnamedNodeExpr)         
-   ,   tokenMatcher(doubleDot              , multipleUnnamedNodesExpr)
-   ,   tokenMatcher(dot)                     // dot is just a separator so no expression given, it will not appear 
-                                             // in the generated parser    
-   ,   tokenMatcher(bang                   , rootExpr)             
-   ,   tokenMatcher(emptyString            , statementExpr)
+   var clauseMatchers = [
+       clauseMatcher(nameInObjectNotation   , [consume1, namedNodeExpr])
+   ,   clauseMatcher(nameInArrayNotation    , [consume1, namedNodeExpr])         
+   ,   clauseMatcher(numberInArrayNotation  , [consume1, namedNodeExpr])
+   ,   clauseMatcher(starInObjectNotation   , [consume1, unnamedNodeExpr])
+   ,   clauseMatcher(starInArrayNotation    , [consume1, unnamedNodeExpr])         
+   ,   clauseMatcher(doubleDot              , [consumeMany])
+       
+       // dot is a separator only (like whitespace in other languages) but rather than special case
+       // it, the expressions can be an empty array.
+   ,   clauseMatcher(dot                    , [] )  
+                                                 
+   ,   clauseMatcher(bang                   , [rootExpr])             
+   ,   clauseMatcher(emptyString            , [statementExpr])
    ];
 
 
@@ -1081,22 +1109,25 @@ function jsonPathCompiler(jsonPath) {
          throw Error('"' + jsonPath + '" could not be tokenised')      
       }
       
-      return firstMatching( tokenMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
-   
-   // we've declared everything, let's do the compilation:     
-   try {
-      // Kick off the recursive parsing of the jsonPath with a function which always returns true.
-      // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
-      // in the tree. So long as they match the part specified, they don't care what the ancestors of the
-      // matched part are.         
-      return compileJsonPathToFunction(jsonPath, always);
-   } catch( e ) {
-      throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+   // all the above is now captured in the closure of this immediately-called function. let's
+   // return the function we wish to expose globally:
+   return function(jsonPath){
+        
+      try {
+         // Kick off the recursive parsing of the jsonPath with a function which always returns true.
+         // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
+         // in the tree. So long as they match the part specified, they don't care what the ancestors of the
+         // matched part are.         
+         return compileJsonPathToFunction(jsonPath, always);
+      } catch( e ) {
+         throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+      }
    }
 
-}
+})();
 
 /**
  * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.

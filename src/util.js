@@ -28,19 +28,34 @@ function defined( value ) {
 }
 
 /*
-   Call each of a list of functions with the same arguments, ignoring any return
-   values.
+   Call a single function with the given arguments.
+   Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
+   the context of the call
+ */
+function apply(fn, arguments) {
+   return fn.apply(undefined, arguments);
+}
+
+/*
+   Call each of a list of functions with the same arguments, where the arguments are given as an
+   array. Ignores any return values from the functions.
+ */
+function applyAll( fns, args ) {
+
+   fns.forEach(function( fn ){
+      apply(fn, args);
+   });
+}
+
+/*
+   Call each of a list of functions with the same arguments, where the arguments are given using varargs
+   array. Ignores any return values from the functions.
  */
 function callAll( fns /*, arg1, arg2, arg3...*/ ) {
    applyAll(fns, toArray(arguments, 1));
 }
 
-function applyAll( fns, args ) {
 
-   fns.forEach(function( fn ){
-      fn.apply(undefined, args);
-   });
-}
 
 /* call a list of functions with the same args until one returns truthy.
 
