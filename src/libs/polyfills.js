@@ -26,24 +26,34 @@
       }      
       
    });         
+         
+   // A similarly minimalist implementation of .reduce. Array.reduce in Javascript is
+   // similar to fold in other languages.
+   fillIn(Array, 'reduce', function( func, curValue ){         
    
+      // let's use the .forEach we just declared above to implement .filter
+      this.forEach(function(item){               
+         curValue = func(curValue, item);
+      });
+      
+      return curValue;
+   });
    
    // Array.filter has to be a polyfill, clarinet expects it.
    // Ignoring all but function argument since not needed, eg can't take a context
-   fillIn(Array, 'filter', function( func ){         
-      var out = [];
+   fillIn(Array, 'filter', function( filterCondition ){         
    
-      // let's use the .forEach we just declared above to implement .filter
-      this.forEach(function(item){      
-         if( func( item ) ) {
-            out.push(item);
-         }                  
-      });
+      // let's use the .reduce we declared above to implement .filter:
+      return this.reduce(function(matchesSoFar, item){      
+         if( filterCondition( item ) ) {
+            matchesSoFar.push(item);
+         }
+         return matchesSoFar;                  
+      }, []);
       
-      return out;
-   });
+   });      
       
-   // allow binding context only, not arguments as well
+   // allow binding. Minimal version which includes binding of context only, not arguments as well
    fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
    
