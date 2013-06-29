@@ -4,6 +4,11 @@
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \usepackage{fixltx2e} % provides \textsubscript
+
+%put a newpage before sections http://blog.dreasgrech.com/2010/01/starting-new-page-with-every-section-in.html
+\let\stdsection\section
+\renewcommand\section{\newpage\stdsection}
+
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
@@ -139,13 +144,17 @@ $endfor$
 
 $if(toc)$
 {
+\clearpage
 \hypersetup{linkcolor=black}
 \setcounter{tocdepth}{$toc-depth$}
 \tableofcontents
 }
 $endif$
 
+\clearpage
 \listoffigures
+
+\clearpage
 
 $body$
 
