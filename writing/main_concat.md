@@ -13,6 +13,15 @@ Introduction
 
 **introduction should be 2-5 pages**
 
+Increasing the perception of speed.
+   Source that doing things early makes page feel faster.
+   Also actually faster as well as being perceived as such since useful things can often be done before whole
+   content is loaded.
+   
+When connections fail, apps are left with non of the content. Happens a lot on mobile networks.     
+
+What a Micro-library is
+
 Background
 ==========
 
@@ -141,6 +150,13 @@ Also very simple. Easy to parse.
 identifying interesting objects in the stream
 ---------------------------------------------
 
+Why an existing jsonPath implmentation couldn't be used: need to add new features and need to be able to check
+against a path expressed as a stack of nodes.
+
+
+
+More important to efficiently detect or efficiently compile the patterns?
+
 The failure of sax: requires programmer to do a lot of work to identify interesting things. Eg, to find tag address
 inside tag person with a given name, have to recognise three things while reieving a callback for every single element
 and attribute in the document. As a principle, the programmer should only have to handle the cases which are interesting
@@ -214,6 +230,14 @@ Aborting http request may not stop processing on the server. Why this is perhaps
 resources in a half-complete state.
 
 
+program design
+--------------
+
+![
+   Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has
+   been split into different files.
+](images/overallDesign)
+
 
 styles of programming
 ---------------------
@@ -235,7 +259,8 @@ on this, parser gens only went to source to break out of the ability to compose 
 itself from inside the language itself. With a functional approach, assembly from very small pieces gives a similar
 level of expressivity as writing the logic out as source code.  
 
-Why could implement Function#partial. Why not going to. Is a shame. 
+Why could implement Function#partial via prototype. Why not going to. Is a shame.
+However, are using prototype for minimal set of polyfills. Not general purpose. 
 
 
 
@@ -287,6 +312,16 @@ but, appearing in no namespaces, inherently unreferenceable.
 TDD fits well into an object pattern because the software is well composed into separate parts. The objects are almost
 tangible in their distinction as separate encapsulated entities. However, the multi-paradigm style of my implementation 
 draws much fainter borders over the implementation's landscape.
+
+Approach has been to the test the intricate code, then
+for wiring don't have tests to check that things are plumbed together correctly, rather rely on this being
+obvious enough to be detected via a smoke test.
+
+A good test should be able to go unchanged as the source under test is refactored. Indeed, the test will be
+how we know that the code under test still works as intended.
+Experince tells me that testing that A listens to B (ie that the controller wires the jsonbuilder up to clarinet) 
+produces the kind of test that 'follows the code arround' meaning that because it is testing implementation details
+rather than behaviours, whenever the implementation is updated the tests have to be updated too.   
 
 
 
@@ -352,7 +387,8 @@ Conclusion
 
 **1 to 5 pages**
 
-
+Invalid jsonpaths made from otherwise valid clauses (for example two roots) perhaps could fail early, 
+at compile time. Instead, get a jsonPath that couldn't match anything 
 
 Bibliography
 ============
