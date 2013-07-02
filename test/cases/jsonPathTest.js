@@ -29,8 +29,15 @@
          givenAPattern('!..*')
             .thenShouldNotMatch(    [])
             .thenShouldMatch(       ['a'])
-            .thenShouldMatch(       ['a','b'])
+            .thenShouldMatch(       ['a','b']);                                  
       }
+      
+   ,  testMatchingForAllDescendantsOfAnImplicitRootMatchAnythingExceptTheRoot: function() {
+         givenAPattern('..*')
+            .thenShouldNotMatch(    [])
+            .thenShouldMatch(       ['a'])
+            .thenShouldMatch(       ['a','b']);                                  
+      }      
             
    ,  testMatchingNamedChildOfRootWorks: function() {
          givenAPattern('!.foo')
@@ -58,6 +65,18 @@
       }
       
    ,  testAncestorOfRootRelationshipCanBeImplicit: function() {
+         givenAPattern('..foo')
+             .thenShouldNotMatch(   [])         
+            .thenShouldMatch(       ['foo'])      
+            .thenShouldMatch(       ['a', 'foo'])
+            .thenShouldNotMatch(    ['a', 'foo', 'a'])            
+            .thenShouldMatch(       ['a', 'foo', 'foo'])
+            .thenShouldMatch(       ['a', 'a', 'foo'])
+            .thenShouldNotMatch(    ['a', 'a', 'foot'])            
+            .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
+      }
+      
+   ,  testAncestorOfRootRelationshipCanBeEvenMoreImplicit: function() {
          givenAPattern('foo')
              .thenShouldNotMatch(   [])         
             .thenShouldMatch(       ['foo'])      
@@ -67,7 +86,7 @@
             .thenShouldMatch(       ['a', 'a', 'foo'])
             .thenShouldNotMatch(    ['a', 'a', 'foot'])            
             .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
-      }      
+      }            
       
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
          givenAPattern('!..foo.bar')
@@ -176,6 +195,15 @@
       }                    
 
    // now several tests for css4-style pattern matching
+   
+   ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
+         // let's start with a counter-example without $ syntax   
+         givenAPattern('foo.*')                     
+            .thenShouldMatch( 
+                  [        'a',       'foo',     'a'], 
+                  ['root', 'gparent', 'parent',  'target'])
+                     .returning('target');
+      }   
    
    ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
          givenAPattern('$foo.*')                     

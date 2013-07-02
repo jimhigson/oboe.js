@@ -32,8 +32,8 @@ function defined( value ) {
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
    the context of the call
  */
-function apply(fn, arguments) {
-   return fn.apply(undefined, arguments);
+function apply(fn, args) {
+   return fn.apply(undefined, args);
 }
 
 /*
@@ -57,13 +57,18 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 
 
 
-/* call a list of functions with the same args until one returns truthy.
-
-   Returns the first return value that is given that is non-truthy.
-   
-   If none are found, calls onFail and returns whatever that gives    
+/** Call a list of functions with the same args until one returns a defined result.
+ *
+ *  Returns the first return value that is given that is not undefined.
+ * 
+ *  If none are found, calls onFail and returns whatever that gives, or if no onFail is given,
+ *  returns undefined
+ * 
+ *  @param {Function[]} fns
+ *  @param {*} args
+ *  @param {Function} [onFail]
  */
-function firstMatching( fns, args, onFail ) {
+function firstReturningSomething( fns, args, onFail ) {
 
    var rtn;
 
@@ -74,7 +79,7 @@ function firstMatching( fns, args, onFail ) {
       }      
    }  
    
-   return onFail();
+   return onFail && onFail();
 }
 
 

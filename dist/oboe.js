@@ -33,8 +33,8 @@ function defined( value ) {
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
    the context of the call
  */
-function apply(fn, arguments) {
-   return fn.apply(undefined, arguments);
+function apply(fn, args) {
+   return fn.apply(undefined, args);
 }
 
 /*
@@ -58,13 +58,18 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 
 
 
-/* call a list of functions with the same args until one returns truthy.
-
-   Returns the first return value that is given that is non-truthy.
-   
-   If none are found, calls onFail and returns whatever that gives    
+/** Call a list of functions with the same args until one returns a defined result.
+ *
+ *  Returns the first return value that is given that is not undefined.
+ * 
+ *  If none are found, calls onFail and returns whatever that gives, or if no onFail is given,
+ *  returns undefined
+ * 
+ *  @param {Function[]} fns
+ *  @param {*} args
+ *  @param {Function} [onFail]
  */
-function firstMatching( fns, args, onFail ) {
+function firstReturningSomething( fns, args, onFail ) {
 
    var rtn;
 
@@ -75,7 +80,7 @@ function firstMatching( fns, args, onFail ) {
       }      
    }  
    
-   return onFail();
+   return onFail && onFail();
 }
 
 
@@ -857,18 +862,24 @@ var jsonPathCompiler = (function () {
     *    previousExpr, capturing, name to give a function which takes just the particularities
     *    of the path being evaluated: pathStack, nodeStack, stackIndex. 
     *    
-    *    All other fooExpr functions follow this same signature. My means of partial completion, we end up with a parser
+    *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
     *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
-    *    matches, it delegates the remaining matching to the next function in the chain.
-    * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found         
+    *    matches, it delegates the remaining matching to the next function in the chain.       
+    *    
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
     */
-   function unnamedNodeExpr(previousExpr, capturing, _nameless, pathStack, nodeStack, stackIndex ){
-   
-      // a '*' doesn't put any extra criteria on the matching, it just defers to the previous expression:
-      var previousExprMatch = previousExpr(pathStack, nodeStack, stackIndex);                   
-               
-      return previousExprMatch && returnValueForMatch(capturing, previousExprMatch, nodeStack, stackIndex);
+   function unconditionallyMatch(previousExpr, capturing ){
+
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */
+      return function(pathStack, nodeStack, stackIndex) {   
+         // a '*' doesn't put any extra criteria on the matching, it just defers to the previous expression:
+         var previousExprMatch = previousExpr(pathStack, nodeStack, stackIndex);                   
+                  
+         return previousExprMatch && returnValueForMatch(capturing, previousExprMatch, nodeStack, stackIndex);
+      };
    }
    
    /**
@@ -877,38 +888,77 @@ var jsonPathCompiler = (function () {
     *    ["foo"]
     *    [2]
     * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
     */
-   function namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex ) {
-                                            
-      // in implementation, is like unnamednodeExpr except that we need the name to match.
-      // Once name matches, defer to unnamedNodeExpr:                                                                  
-      return (pathStack[stackIndex] == name) && apply(unnamedNodeExpr, arguments);               
-   }      
+   function exprWithNameSpecified(previousExpr, capturing, name ) {
+        
+      // Once we have the name confirmed, we can just pass through to the unconditional expression
+      // because the condition has been met:         
+      var unconditional = unconditionallyMatch(previousExpr, capturing);        
+         
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */                                            
+      return function( pathStack, nodeStack, stackIndex ) {                                             
+         // in implementation, is like unnamednodeExpr except that we need the name to match.
+         // Once name matches, defer to unnamedNodeExpr:                                                                  
+         return (pathStack[stackIndex] == name) && unconditional(pathStack, nodeStack, stackIndex);
+      };                        
+   }
+
+   /**
+    * Moves onto the next item on the stack. Doesn't map neatly onto any particular language feature but
+    * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)
+    * 
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
+    */
+   function consume1(previousExpr) {
    
-   function consume1(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ){
-      return previousExpr(pathStack, nodeStack, stackIndex-1);                                                                                                      
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */   
+      return function( pathStack, nodeStack, stackIndex ){
+                 
+         return previousExpr(pathStack, nodeStack, stackIndex-1);
+      };                                                                                                            
    }   
    
    /**
     * Expression for the .. (double dot) token. Consumes zero or more tokens from the input, the fewest that
     * are required for the previousExpr to match.
     * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found         
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
     */   
-   function consumeMany(previousExpr, _neverCaptures, _nameless, pathStack, nodeStack, stackIndex ) {
+   function consumeMany(previousExpr) {
             
-      // past the start, not a match:
-      if( stackIndex < -1 ) {
-         return false;
+      var 
+            // jsonPath .. is equivalent to !.. so if .. reaches the root
+            // the match has suceeded.
+          terminalCaseWhenArrivingAtRoot = rootExpr(),
+          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
+          recursiveCase = consume1(consumeManyPartiallyCompleted),
+          
+          cases = [ terminalCaseWhenArrivingAtRoot, 
+                    terminalCaseWhenPreviousExpressionIsSatisfied, 
+                    recursiveCase
+                  ];                        
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */            
+      function consumeManyPartiallyCompleted(pathStack, nodeStack, stackIndex) {
+      
+         if( stackIndex < -1 ) {
+            // have gone past the start, not a match:         
+            return false;
+         }      
+                                                        
+         return firstReturningSomething(cases, arguments);
       }
-   
-               // jsonPath .. is equivalent to !.. so if .. reaches the root
-               // the match has suceeded.
-      return apply(rootExpr, arguments) ||             
-                                  
-             previousExpr(pathStack, nodeStack, stackIndex) || 
-             consumeMany(previousExpr, undefined, undefined, pathStack, nodeStack, stackIndex-1);         
+      
+      return consumeManyPartiallyCompleted;
    }      
    
    /**
@@ -916,8 +966,14 @@ var jsonPathCompiler = (function () {
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
-   function rootExpr(_cantHaveExprsBeforeRoot, capturing, _nameless, _pathStack, nodeStack, stackIndex ){
-      return stackIndex == -1 && returnValueForMatch(capturing, true, nodeStack, stackIndex);
+   function rootExpr(_cantHaveExprsBeforeRoot, capturing) {
+   
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */   
+      return function(_pathStack, nodeStack, stackIndex ){
+         return stackIndex == -1 && returnValueForMatch(capturing, true, nodeStack, stackIndex);
+      };
    }   
          
    /**
@@ -926,19 +982,28 @@ var jsonPathCompiler = (function () {
     * 
     * Initialises the stackIndex and kicks off the other expressions.   
     * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found         
+    * @returns {Object|false} either the object that was found, or false if nothing was found
+    * 
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
     */   
-   function statementExpr(startingExpr, _neverCaptures, _nameless, pathStack, nodeStack){
+   function statementExpr(startingExpr) {
    
-      // kick off the parsing by passing through to the first expression with the stackIndex set to the
-      // top of the stack:
-      var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
-                            
-      // Returning exactly true indicates that there has been a match but no node is captured. 
-      // By default, the node at the top of the stack gets returned. Just like in css4 selector 
-      // spec, if there is no $, the last node in the selector is the one being styled.                      
-                      
-      return exprMatch === true ? lastOf(nodeStack) : exprMatch;
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */   
+      return function(pathStack, nodeStack) {
+   
+         // kick off the parsing by passing through to the first expression with the stackIndex set to the
+         // top of the stack:
+         var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
+                               
+         // Returning exactly true indicates that there has been a match but no node is captured. 
+         // By default, the node at the top of the stack gets returned. Just like in css4 selector 
+         // spec, if there is no $, the last node in the selector is the one being styled.                      
+                         
+         return exprMatch === true ? lastOf(nodeStack) : exprMatch;
+      };
    }      
               
    /** extraction of some common logic used by expression when they have matched.
@@ -970,7 +1035,7 @@ var jsonPathCompiler = (function () {
       // parserGeneratedSoFar without any special cases required                   
       return exprs.reduce(function( parserGeneratedSoFar, expr ){
 
-         return partialComplete( expr, parserGeneratedSoFar, capturing, name);      
+         return expr(parserGeneratedSoFar, capturing, name);      
                
       }, parserGeneratedSoFar);         
    }
@@ -1037,11 +1102,11 @@ var jsonPathCompiler = (function () {
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
    var clauseMatchers = [
-       clauseMatcher(nameInObjectNotation   , [consume1, namedNodeExpr])
-   ,   clauseMatcher(nameInArrayNotation    , [consume1, namedNodeExpr])         
-   ,   clauseMatcher(numberInArrayNotation  , [consume1, namedNodeExpr])
-   ,   clauseMatcher(starInObjectNotation   , [consume1, unnamedNodeExpr])
-   ,   clauseMatcher(starInArrayNotation    , [consume1, unnamedNodeExpr])         
+       clauseMatcher(nameInObjectNotation   , [consume1, exprWithNameSpecified])
+   ,   clauseMatcher(nameInArrayNotation    , [consume1, exprWithNameSpecified])         
+   ,   clauseMatcher(numberInArrayNotation  , [consume1, exprWithNameSpecified])
+   ,   clauseMatcher(starInObjectNotation   , [consume1, unconditionallyMatch])
+   ,   clauseMatcher(starInArrayNotation    , [consume1, unconditionallyMatch])         
    ,   clauseMatcher(doubleDot              , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
@@ -1109,7 +1174,7 @@ var jsonPathCompiler = (function () {
          throw Error('"' + jsonPath + '" could not be tokenised')      
       }
       
-      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+      return firstReturningSomething( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's
