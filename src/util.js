@@ -2,9 +2,18 @@ function lastOf(array) {
    return array[len(array)-1];
 }
 
-function isArray(a) {
-   return a && a.constructor === Array;
+/**
+ * Returns true if the given candidate is of type T
+ * 
+ * @param {Function} T
+ * @param {*} maybeSomething
+ */
+function isOfType(T, maybeSomething){
+   return maybeSomething && maybeSomething.constructor === T;
 }
+
+var isArray = partialComplete(isOfType, Array);
+var isString = partialComplete(isOfType, String);
 
 function len(array){
    return array.length;
@@ -12,10 +21,6 @@ function len(array){
 
 function toArray(arrayLikeThing, startIndex) {
    return Array.prototype.slice.call(arrayLikeThing, startIndex);
-}
-
-function isString(thing) {
-   return typeof thing == 'string';
 }
 
 /** I don't like saying foo !=== undefined very much because of the double-negative. I find

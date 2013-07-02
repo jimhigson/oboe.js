@@ -1,35 +1,5 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src for the unconcatenated source
-(function  (window, Object, Array, Error, undefined ) {function lastOf(array) {
-   return array[len(array)-1];
-}
-
-function isArray(a) {
-   return a && a.constructor === Array;
-}
-
-function len(array){
-   return array.length;
-}
-
-function toArray(arrayLikeThing, startIndex) {
-   return Array.prototype.slice.call(arrayLikeThing, startIndex);
-}
-
-function isString(thing) {
-   return typeof thing == 'string';
-}
-
-/** I don't like saying foo !=== undefined very much because of the double-negative. I find
- *  defined(foo) easier to read.
- *  
- * @param {*} value anything
- */ 
-function defined( value ) {
-   return value !== undefined;
-}
-
-function always(){return true}
-/*
+(function  (window, Object, Array, Error, undefined ) {/*
    Call a single function with the given arguments.
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
    the context of the call
@@ -98,6 +68,41 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
       return fn.apply(this, callArgs);
    }; 
 }
+function lastOf(array) {
+   return array[len(array)-1];
+}
+
+/**
+ * Returns true if the given candidate is of type T
+ * 
+ * @param {Function} T
+ * @param candiate
+ */
+function isOfType(T, candiate){
+   return candiate && candiate.constructor === T;
+}
+
+var isArray = partialComplete(isOfType, Array);
+var isString = partialComplete(isOfType, String);
+
+function len(array){
+   return array.length;
+}
+
+function toArray(arrayLikeThing, startIndex) {
+   return Array.prototype.slice.call(arrayLikeThing, startIndex);
+}
+
+/** I don't like saying foo !=== undefined very much because of the double-negative. I find
+ *  defined(foo) easier to read.
+ *  
+ * @param {*} value anything
+ */ 
+function defined( value ) {
+   return value !== undefined;
+}
+
+function always(){return true}
 (function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the

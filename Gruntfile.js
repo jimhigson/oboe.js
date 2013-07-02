@@ -7,8 +7,8 @@ module.exports = function (grunt) {
    ,  concat: {
          oboe:{         
             src: [
-               'src/util.js'            
-            ,  'src/functional.js'            
+               'src/functional.js'                
+            ,  'src/util.js'                    
             ,  'src/libs/polyfills.js'
             ,  'src/libs/clarinet.js'               
             ,  'src/streamingXhr.js'
