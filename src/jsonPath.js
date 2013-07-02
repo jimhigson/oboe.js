@@ -118,7 +118,7 @@ var jsonPathCompiler = (function () {
             return false;
          }      
                                                         
-         return firstReturningSomething(cases, arguments);
+         return firstMatching(cases, arguments);
       }
       
       return consumeManyPartiallyCompleted;
@@ -337,7 +337,7 @@ var jsonPathCompiler = (function () {
          throw Error('"' + jsonPath + '" could not be tokenised')      
       }
       
-      return firstReturningSomething( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's

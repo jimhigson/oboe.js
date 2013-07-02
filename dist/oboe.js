@@ -58,9 +58,9 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 
 
 
-/** Call a list of functions with the same args until one returns a defined result.
+/** Call a list of functions with the same args until one returns a truthy result.
  *
- *  Returns the first return value that is given that is not undefined.
+ *  Returns the first return value that is given that is truthy.
  * 
  *  If none are found, calls onFail and returns whatever that gives, or if no onFail is given,
  *  returns undefined
@@ -69,14 +69,16 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
  *  @param {*} args
  *  @param {Function} [onFail]
  */
-function firstReturningSomething( fns, args, onFail ) {
+function firstMatching( fns, args, onFail ) {
 
-   var rtn;
+   var maybeMatch;
 
    for (var i = 0; i < len(fns); i++) {
+      
+      maybeMatch = apply(fns[i], args);            
             
-      if( rtn = fns[i].apply(undefined, args) ) {
-         return rtn;
+      if( maybeMatch ) {
+         return maybeMatch;
       }      
    }  
    
@@ -955,7 +957,7 @@ var jsonPathCompiler = (function () {
             return false;
          }      
                                                         
-         return firstReturningSomething(cases, arguments);
+         return firstMatching(cases, arguments);
       }
       
       return consumeManyPartiallyCompleted;
@@ -1174,7 +1176,7 @@ var jsonPathCompiler = (function () {
          throw Error('"' + jsonPath + '" could not be tokenised')      
       }
       
-      return firstReturningSomething( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's
