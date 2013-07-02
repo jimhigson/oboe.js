@@ -11,7 +11,8 @@ The codebase is made from a few main components:
    things happen.      
 `streamingXhr.js` A basic wrapper around the browser's XHR to provide a streaming interface
 `pubsub.js` A nano event handling thing
-`instance-api.js` Defines the interface that is available on Oboe instances 
+`instance-api.js` Defines the interface that is available on Oboe instances
+`functional.js` Higher-order functions for programming javascript in a functional style 
 `lib/polyfillspubsub.js` Compatability with IE8 and IE9
    
 When the source is built into the distributable js, a single object is exposed at window.oboe    

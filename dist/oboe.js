@@ -28,6 +28,7 @@ function defined( value ) {
    return value !== undefined;
 }
 
+function always(){return true}
 /*
    Call a single function with the given arguments.
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
@@ -57,7 +58,6 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 }
 
 
-
 /** Call a list of functions with the same args until one returns a truthy result.
  *
  *  Returns the first return value that is given that is truthy.
@@ -85,7 +85,6 @@ function firstMatching( fns, args, onFail ) {
    return onFail && onFail();
 }
 
-
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
  */
@@ -97,12 +96,8 @@ function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
       var callArgs = boundArgs.concat(toArray(arguments));            
          
       return fn.apply(this, callArgs);
-   };
-
- 
+   }; 
 }
-
-function always(){return true}
 (function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the
