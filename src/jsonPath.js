@@ -246,38 +246,24 @@ var jsonPathCompiler = (function () {
       return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, clauseRegex, exprs );
    }
               
-   // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
-   // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, allowing
-   // new token regexes to match.
-   //    For all regular expressions:
-   //       The first subexpression is the $ (if the token is eligible to capture)
-   //       The second subexpression is the name of the expected path node (if the token may have a name)               
-   var nameInObjectNotation    = /^(\$?)(\w+)/             //  foo
-   ,   nameInArrayNotation     = /^(\$?)\["(\w+)"\]/       //  ["foo"]    
-   ,   numberInArrayNotation   = /^(\$?)\[(\d+)\]/         //  [2]
-   ,   starInObjectNotation    = /^(\$?)\*/                //  [*]
-   ,   starInArrayNotation     = /^(\$?)\[\*\]/            //  *
-   ,   doubleDot               = /^\.\./                   //  ..
-   ,   dot                     = /^\./                     //  .
-   ,   bang                    = /^(\$?)!/                 //  !
-   ,   emptyString             = /^$/;                     //  
+
      
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
    var clauseMatchers = [
-       clauseMatcher(nameInObjectNotation   , [consume1, exprWithNameSpecified])
-   ,   clauseMatcher(nameInArrayNotation    , [consume1, exprWithNameSpecified])         
-   ,   clauseMatcher(numberInArrayNotation  , [consume1, exprWithNameSpecified])
-   ,   clauseMatcher(starInObjectNotation   , [consume1, unconditionallyMatch])
-   ,   clauseMatcher(starInArrayNotation    , [consume1, unconditionallyMatch])         
-   ,   clauseMatcher(doubleDot              , [consumeMany])
+       clauseMatcher(jsonPathNamedNodeInObjectNotation   , [consume1, exprWithNameSpecified])
+   ,   clauseMatcher(jsonPathNamedNodeInArrayNotation    , [consume1, exprWithNameSpecified])         
+   ,   clauseMatcher(jsonPathNumberedNodeInArrayNotation , [consume1, exprWithNameSpecified])
+   ,   clauseMatcher(jsonPathStarInObjectNotation        , [consume1, unconditionallyMatch])
+   ,   clauseMatcher(jsonPathStarInArrayNotation         , [consume1, unconditionallyMatch])         
+   ,   clauseMatcher(jsonPathDoubleDot                   , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(dot                    , [] )  
+   ,   clauseMatcher(jsonPathDot                         , [] )  
                                                  
-   ,   clauseMatcher(bang                   , [rootExpr])             
-   ,   clauseMatcher(emptyString            , [statementExpr])
+   ,   clauseMatcher(jsonPathBang                        , [rootExpr])             
+   ,   clauseMatcher(emptyString                         , [statementExpr])
    ];
 
 
