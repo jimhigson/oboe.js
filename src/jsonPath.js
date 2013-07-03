@@ -33,7 +33,10 @@ var jsonPathCompiler = (function () {
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function matchAgainstName(previousExpr, capturing, name ) {
+   function matchAgainstName(previousExpr, detection ) {
+            
+      // extract meaning from the detection      
+      var name      = detection[NAME_INDEX];                        
             
       if( name ) {                                  
          /**
@@ -58,7 +61,10 @@ var jsonPathCompiler = (function () {
     * @param previousExpr
     * @param capturing
     */
-   function capture( previousExpr, capturing ) {
+   function capture( previousExpr, detection ) {
+   
+      // extract meaning from the detection      
+      var capturing = !!detection[CAPTURING_INDEX];   
 
       if (capturing) {
          return function (pathStack, nodeStack, stackIndex) {
@@ -183,17 +189,12 @@ var jsonPathCompiler = (function () {
     * @param {Array} detection the match given by the regex engine when the feature was found
     */
    function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
-      
-      // extract meaning from the matched regex subexpressions      
-      var capturing = !!detection[CAPTURING_INDEX],
-          name      = detection[NAME_INDEX],            
-          fieldList = detection[FIELD_LIST_INDEX];            
-                
+                               
       // note that if exprs is zero-length, reduce (like fold) will pass back 
       // parserGeneratedSoFar without any special cases required                   
       return exprs.reduce(function( parserGeneratedSoFar, expr ){
 
-         return expr(parserGeneratedSoFar, capturing, name, fieldList);      
+         return expr(parserGeneratedSoFar, detection);      
                
       }, parserGeneratedSoFar);         
    }

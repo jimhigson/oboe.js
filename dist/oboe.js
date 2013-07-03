@@ -873,8 +873,8 @@ var possiblyCapturing =           /(\$?)/
 ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
 ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
 ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+,   fieldList =                      /{([\w ]*?)}/
 ,   optionalFieldList =           /(?:{([\w ]*?)})?/
-,   fieldList =                   /{([\w ]*?)}/
 ;    
                
 var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
@@ -940,8 +940,11 @@ function jsonPathNodeDescription( candidate ) {
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
 var jsonPathCompiler = (function () {
-   
-  
+
+   var CAPTURING_INDEX = 1;
+   var NAME_INDEX = 2;
+   var FIELD_LIST_INDEX = 3;
+     
    /**
     * Expression for a named path node, expressed as:
     *    foo
@@ -955,7 +958,10 @@ var jsonPathCompiler = (function () {
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function matchAgainstName(previousExpr, capturing, name ) {
+   function matchAgainstName(previousExpr, detection ) {
+            
+      // extract meaning from the detection      
+      var name      = detection[NAME_INDEX];                        
             
       if( name ) {                                  
          /**
@@ -971,8 +977,8 @@ var jsonPathCompiler = (function () {
       } 
    }
    
-// function matchAgainstDuckType(previousExpr) {
-// }
+//   function matchAgainstDuckType(previousExpr) {
+//   }
 
    /**
     * Expression for $
@@ -980,7 +986,10 @@ var jsonPathCompiler = (function () {
     * @param previousExpr
     * @param capturing
     */
-   function capture( previousExpr, capturing ) {
+   function capture( previousExpr, detection ) {
+   
+      // extract meaning from the detection      
+      var capturing = !!detection[CAPTURING_INDEX];   
 
       if (capturing) {
          return function (pathStack, nodeStack, stackIndex) {
@@ -1102,20 +1111,15 @@ var jsonPathCompiler = (function () {
     * 
     * @param {Function} exprs zero or more expressions that parses this token 
     * @param {Function} parserGeneratedSoFar the parser already found
-    * @param {Array} regexmatch the match given by the regex engine when the token was found
+    * @param {Array} detection the match given by the regex engine when the feature was found
     */
-   function expressionsReader( exprs, parserGeneratedSoFar, regexmatch ) {
-      
-      // extract meaning from the matched regex subexpressions
-      var capturing = !!regexmatch[1],
-          name = regexmatch[2],            
-          fieldList = regexmatch[3];            
-                
+   function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
+                               
       // note that if exprs is zero-length, reduce (like fold) will pass back 
       // parserGeneratedSoFar without any special cases required                   
       return exprs.reduce(function( parserGeneratedSoFar, expr ){
 
-         return expr(parserGeneratedSoFar, capturing, name, fieldList);      
+         return expr(parserGeneratedSoFar, detection);      
                
       }, parserGeneratedSoFar);         
    }

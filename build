@@ -34,9 +34,9 @@ runjstd dev
  
 env grunt 
 
-runjstd concat 
+#runjstd concat 
 
-runjstd minified 
+#runjstd minified 
 
 mv dist/oboe.concat.js dist/oboe.js 
  
