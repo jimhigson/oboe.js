@@ -30,17 +30,24 @@ var jsonPathCompiler = (function () {
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function exprWithNameSpecified(previousExpr, capturing, name ) {
-                       
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */                                            
-      return function( pathStack, nodeStack, stackIndex ) {                                             
-         // in implementation, is like unnamednodeExpr except that we need the name to match.
-         // Once name matches, defer to unnamedNodeExpr:                                                                  
-         return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
-      };                        
+   function matchAgainstName(previousExpr, capturing, name ) {
+            
+      if( name ) {                                  
+         /**
+          * @returns {Object|false} either the object that was found, or false if nothing was found
+          */                                            
+         return function( pathStack, nodeStack, stackIndex ) {                                             
+            // in implementation, is like unnamednodeExpr except that we need the name to match.
+            // Once name matches, defer to unnamedNodeExpr:                                                                  
+            return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
+         };
+      } else {
+         return previousExpr;
+      } 
    }
+   
+// function matchAgainstDuckType(previousExpr) {
+// }
 
    /**
     * Expression for $
@@ -176,13 +183,14 @@ var jsonPathCompiler = (function () {
       
       // extract meaning from the matched regex subexpressions
       var capturing = !!regexmatch[1],
-          name = regexmatch[2];            
+          name = regexmatch[2],            
+          fieldList = regexmatch[3];            
                 
       // note that if exprs is zero-length, reduce (like fold) will pass back 
       // parserGeneratedSoFar without any special cases required                   
       return exprs.reduce(function( parserGeneratedSoFar, expr ){
 
-         return expr(parserGeneratedSoFar, capturing, name);      
+         return expr(parserGeneratedSoFar, capturing, name, fieldList);      
                
       }, parserGeneratedSoFar);         
    }
@@ -196,10 +204,12 @@ var jsonPathCompiler = (function () {
     *  
     *  Returns undefined on no match
     *  
-    * @param {RegExp} clauseRegex
-    * @param {Function} parserGenerator a function which knows how to generate a parser. Either a partial completion of
-    *    exprParserGenerator with the expr given, or passthroughParserGenerator.
+    * @param {Function} detector a function which can examine a jsonPath and returns an object describing the match
+    *                   if there is a match for our particular feature at the start of the jsonPath.
+    * @param {Function[]} exprs
+    * 
     * @param {String} jsonPath
+    * 
     * @param {Function} parserGeneratedSoFar
     * 
     * @param {Function(Function, String)} onSuccess a function to pass the generated parser to if one can be made,
@@ -207,13 +217,13 @@ var jsonPathCompiler = (function () {
     * 
     * @return {*|undefined}
     */
-   function generateClauseReaderIfJsonPathMatchesRegex(clauseRegex, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
-      var regexMatch = clauseRegex.exec(jsonPath);
+   function generateClauseReaderIfJsonPathMatchesRegex(detector, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
+      var detected = detector(jsonPath);
 
-      if(regexMatch) {
-         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, regexMatch),
+      if(detected) {
+         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, detected),
          
-             unparsedJsonPath = jsonPath.substr(len(regexMatch[0]));                
+             unparsedJsonPath = jsonPath.substr(len(detected[0]));                
                                
          return onSuccess(unparsedJsonPath, compiledParser);
       }         
@@ -225,29 +235,24 @@ var jsonPathCompiler = (function () {
     * 
     * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
     */
-   function clauseMatcher(clauseRegex, exprs) {
+   function clauseMatcher(detector, exprs) {
         
-      return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, clauseRegex, exprs );
+      return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, detector, exprs );
    }
-              
-
-     
+                   
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
    var clauseMatchers = [
-       clauseMatcher(jsonPathNamedNodeInObjectNotation   , [consume1, exprWithNameSpecified, capture])
-   ,   clauseMatcher(jsonPathNamedNodeInArrayNotation    , [consume1, exprWithNameSpecified, capture])         
-   ,   clauseMatcher(jsonPathNumberedNodeInArrayNotation , [consume1, exprWithNameSpecified, capture])
-   ,   clauseMatcher(jsonPathStarInObjectNotation        , [consume1, capture])
-   ,   clauseMatcher(jsonPathStarInArrayNotation         , [consume1, capture])         
-   ,   clauseMatcher(jsonPathDoubleDot                   , [consumeMany])
+
+       clauseMatcher(jsonPathNodeDescription             , [consume1, matchAgainstName, capture])        
+   ,   clauseMatcher(regexDescriptor(jsonPathDoubleDot)  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(jsonPathDot                         , [] )  
+   ,   clauseMatcher(regexDescriptor(jsonPathDot)        , [] )  
                                                  
-   ,   clauseMatcher(jsonPathBang                        , [rootExpr, capture])             
-   ,   clauseMatcher(emptyString                         , [statementExpr])
+   ,   clauseMatcher(regexDescriptor(jsonPathBang)       , [rootExpr, capture])             
+   ,   clauseMatcher(regexDescriptor(emptyString)        , [statementExpr])
    ];
 
 

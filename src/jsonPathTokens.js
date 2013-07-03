@@ -28,35 +28,57 @@ function unquotedArrayNotation(contents) {
 
 var possiblyCapturing =           /(\$?)/
 ,   namedNode =                   /(\w+)/
+,   namePlaceholder =             /()/
 ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
 ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
 ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+,   fieldList =                   /(?:{([\w ]*?)})?/
 ;    
                
-var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode)
-//                                           /^(\$?)(\w+)/             //   foo
+var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, fieldList)
+                                                                                    //   foo
 
-,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation)
-//                                           /^(\$?)\["(\w+)"\]/       //   ["foo"]
+,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, fieldList)
+                                                                                    //   ["foo"]
     
-,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation)
-//                                           /^(\$?)\[(\d+)\]/         //   [2]
+,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, fieldList)
+                                                                                    //   [2]
 
-,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/)
-//                                           /^(\$?)\*/                //   *
+,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, fieldList)
+                                                                                    //   *
 
-,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation)
-//                                           /^(\$?)\[\*\]/            //   [*]
+,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, fieldList)
+                                                                                    //   [*]
 
-,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)
-//                                           /^\.\./                   //   ..
+//, jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
 
-,   jsonPathDot                           = jsonPathClause(/\./)
-//                                           /^\./                     //   .
 
-,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)
-//                                           /^(\$?)!/                 //   !
+,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
 
-,   emptyString                           = jsonPathClause(/$/)
-//                                           /^$/                      //   nada!
-;  
+,   jsonPathDot                           = jsonPathClause(/\./)                    //   .
+
+,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)  //   !
+
+,   emptyString                           = jsonPathClause(/$/)                     //   nada!
+;
+
+function regexDescriptor(regex) {
+   return function(candidate){
+      return regex.exec(candidate);
+   }
+}
+
+var nodeDescriptors = [
+         jsonPathNamedNodeInObjectNotation
+      ,  jsonPathNamedNodeInArrayNotation
+      ,  jsonPathNumberedNodeInArrayNotation
+      ,  jsonPathStarInObjectNotation
+      ,  jsonPathStarInArrayNotation
+      //,jsonPathPureDuckTyping 
+      ].map(regexDescriptor);
+
+
+function jsonPathNodeDescription( candidate ) {
+
+   return firstMatching(nodeDescriptors, [candidate]);
+}
