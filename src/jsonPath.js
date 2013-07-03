@@ -15,8 +15,11 @@
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
 var jsonPathCompiler = (function () {
-   
-  
+
+   var CAPTURING_INDEX = 1;
+   var NAME_INDEX = 2;
+   var FIELD_LIST_INDEX = 3;
+     
    /**
     * Expression for a named path node, expressed as:
     *    foo
@@ -46,8 +49,8 @@ var jsonPathCompiler = (function () {
       } 
    }
    
-// function matchAgainstDuckType(previousExpr) {
-// }
+//   function matchAgainstDuckType(previousExpr) {
+//   }
 
    /**
     * Expression for $
@@ -177,14 +180,14 @@ var jsonPathCompiler = (function () {
     * 
     * @param {Function} exprs zero or more expressions that parses this token 
     * @param {Function} parserGeneratedSoFar the parser already found
-    * @param {Array} regexmatch the match given by the regex engine when the token was found
+    * @param {Array} detection the match given by the regex engine when the feature was found
     */
-   function expressionsReader( exprs, parserGeneratedSoFar, regexmatch ) {
+   function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
       
-      // extract meaning from the matched regex subexpressions
-      var capturing = !!regexmatch[1],
-          name = regexmatch[2],            
-          fieldList = regexmatch[3];            
+      // extract meaning from the matched regex subexpressions      
+      var capturing = !!detection[CAPTURING_INDEX],
+          name      = detection[NAME_INDEX],            
+          fieldList = detection[FIELD_LIST_INDEX];            
                 
       // note that if exprs is zero-length, reduce (like fold) will pass back 
       // parserGeneratedSoFar without any special cases required                   
