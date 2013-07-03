@@ -15,9 +15,11 @@ function isOfType(T, maybeSomething){
 var isArray = partialComplete(isOfType, Array);
 var isString = partialComplete(isOfType, String);
 
-function len(array){
-   return array.length;
+function pluck(key, object){
+   return object[key];
 }
+
+var len = partialComplete(pluck, 'length');
 
 function toArray(arrayLikeThing, startIndex) {
    return Array.prototype.slice.call(arrayLikeThing, startIndex);
