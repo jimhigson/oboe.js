@@ -337,6 +337,17 @@
                    [          'women',          'betty'                 ], 
                    [rootJson, rootJson.women,   rootJson.women.betty    ]);
       }
+      
+   ,  testDuckMatchFailsWhenAppliedToNonObject: function() {
+   
+         var rootJson = [ 1, 2, 3 ];    
+         
+         givenAPattern('{spin taste}')         
+             .thenShouldNotMatch( 
+                   [         '0'           ], 
+                   [rootJson, rootJson[0]  ]);
+                   
+      }      
 
    });
    
