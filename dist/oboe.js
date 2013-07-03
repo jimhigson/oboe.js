@@ -993,6 +993,7 @@ var jsonPathCompiler = (function () {
              targetNode = nodeStack[stackIndex + 1],
 
              targetNodeHasRequiredFields =
+                 (targetNode instanceof Object) &&
                  requiredFields.reduce(function (soFar, field) {
 
                     return soFar && (field in targetNode);

@@ -1065,6 +1065,59 @@ TestCase("oboeTest", {
                ,   foundNMatches(3)
                );
    }
+   
+,  testCanExtractByDuckTypes: function() {
+
+      givenAnOboeInstance()
+         // we want the bi-lingual objects
+         .andWeAreListeningForThingsFoundAtPattern('{en fr}')
+         .whenGivenInput({
+
+            foods: [
+               {name:{en:'aubergine',  fr:'aubergine' }, colour:'purple'},
+               {name:{en:'apple',      fr:'pomme'     }, colour:'red'   },
+               {name:{en:'nuts',       fr:'noix'      }, colour:'brown' }
+            ],
+            non_foods: [
+               {name:{en:'brick'       }, colour:'red'   },
+               {name:{en:'poison'      }, colour:'pink'  },
+               {name:{en:'broken_glass'}, colour:'green' }
+            ]
+         })
+         .thenTheInstance
+               (   matched({en:'aubergine',  fr:'aubergine' })
+               ,   matched({en:'apple',      fr:'pomme'     })
+               ,   matched({en:'nuts',       fr:'noix'      })
+               ,   foundNMatches(3)
+               );
+   }
+   
+,  testCanExtractByPartialDuckTypes: function() {
+
+      givenAnOboeInstance()
+         // we want the bi-lingual English and German words, but we still want the ones that have
+         // French as well
+         .andWeAreListeningForThingsFoundAtPattern('{en de}')
+         .whenGivenInput({
+
+            foods: [
+               {name:{en:'aubergine',  fr:'aubergine',   de: 'aubergine' }, colour:'purple'},
+               {name:{en:'apple',      fr:'pomme',       de: 'apfel'     }, colour:'red'   },
+               {name:{en:'nuts',                         de: 'eier'      }, colour:'brown' }
+            ],
+            non_foods: [
+               {name:{en:'brick'       }, colour:'red'  },
+               {name:{en:'poison'      }, colour:'pink' },
+               {name:{en:'broken_glass'}, colour:'green'}
+            ]
+         })
+         .thenTheInstance
+               (   matched({en:'aubergine',  fr:'aubergine',   de:'aubergine' })
+               ,   matched({en:'apple',      fr:'pomme',       de: 'apfel'    })
+               ,   matched({en:'nuts',                         de: 'eier'     })
+               ,   foundNMatches(3)
+               );
+   }      
 
    
 ,  testErrorsOnJsonWithUnquotedKeys: function() {
