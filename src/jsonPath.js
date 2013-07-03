@@ -16,60 +16,52 @@
  */  
 var jsonPathCompiler = (function () {
    
-   /**
-    * Expression for:
-    *    *
-    *    [*]
-    *    
-    * Normally, this would be compiled into a jsonPath parser by partially completing
-    *    previousExpr, capturing, name to give a function which takes just the particularities
-    *    of the path being evaluated: pathStack, nodeStack, stackIndex. 
-    *    
-    *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
-    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
-    *    matches, it delegates the remaining matching to the next function in the chain.       
-    *    
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
-    */
-   function unconditionallyMatch(previousExpr, capturing ){
-
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */
-      return function(pathStack, nodeStack, stackIndex) {   
-         // a '*' doesn't put any extra criteria on the matching, it just defers to the previous expression:
-         var previousExprMatch = previousExpr(pathStack, nodeStack, stackIndex);                   
-                  
-         return previousExprMatch && returnValueForMatch(capturing, previousExprMatch, nodeStack, stackIndex);
-      };
-   }
-   
+  
    /**
     * Expression for a named path node, expressed as:
     *    foo
     *    ["foo"]
     *    [2]
+    *    
+    *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
+    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
+    *    matches, it delegates the remaining matching to the next function in the chain.       
     * 
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
    function exprWithNameSpecified(previousExpr, capturing, name ) {
-        
-      // Once we have the name confirmed, we can just pass through to the unconditional expression
-      // because the condition has been met:         
-      var unconditional = unconditionallyMatch(previousExpr, capturing);        
-         
+                       
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */                                            
       return function( pathStack, nodeStack, stackIndex ) {                                             
          // in implementation, is like unnamednodeExpr except that we need the name to match.
          // Once name matches, defer to unnamedNodeExpr:                                                                  
-         return (pathStack[stackIndex] == name) && unconditional(pathStack, nodeStack, stackIndex);
+         return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
       };                        
    }
 
+   /**
+    * Expression for $
+    * 
+    * @param previousExpr
+    * @param capturing
+    */
+   function capture( previousExpr, capturing ) {
+
+      if (capturing) {
+         return function (pathStack, nodeStack, stackIndex) {
+
+            return previousExpr(pathStack, nodeStack, stackIndex) && (nodeStack[stackIndex + 1]);
+         }
+      } else {
+         // don't wrap at all:
+         return previousExpr;
+      }
+   }            
+   
+   
    /**
     * Moves onto the next item on the stack. Doesn't map neatly onto any particular language feature but
     * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)
@@ -129,13 +121,13 @@ var jsonPathCompiler = (function () {
     * 
     * @returns {Object|false} either the object that was found, or false if nothing was found         
     */   
-   function rootExpr(_cantHaveExprsBeforeRoot, capturing) {
+   function rootExpr() {
    
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
       return function(_pathStack, nodeStack, stackIndex ){
-         return stackIndex == -1 && returnValueForMatch(capturing, true, nodeStack, stackIndex);
+         return stackIndex == -1;
       };
    }   
          
@@ -168,15 +160,7 @@ var jsonPathCompiler = (function () {
          return exprMatch === true ? lastOf(nodeStack) : exprMatch;
       };
    }      
-              
-   /** extraction of some common logic used by expression when they have matched.
-    *  If is a capturing node, will return it's item on the nodestack. Otherwise, will return the item
-    *  from the nodestack given by the previous expression, or true if none
-    */
-   function returnValueForMatch(capturing, previousExprEvaluation, nodeStack, stackIndex) {
-      return capturing? nodeStack[stackIndex+1] : (previousExprEvaluation || true);
-   }
-
+                          
    /**
     * For when a token match has been found. Compiles the parser for that token.
     * If called with a zero-length list of 
@@ -251,18 +235,18 @@ var jsonPathCompiler = (function () {
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
    var clauseMatchers = [
-       clauseMatcher(jsonPathNamedNodeInObjectNotation   , [consume1, exprWithNameSpecified])
-   ,   clauseMatcher(jsonPathNamedNodeInArrayNotation    , [consume1, exprWithNameSpecified])         
-   ,   clauseMatcher(jsonPathNumberedNodeInArrayNotation , [consume1, exprWithNameSpecified])
-   ,   clauseMatcher(jsonPathStarInObjectNotation        , [consume1, unconditionallyMatch])
-   ,   clauseMatcher(jsonPathStarInArrayNotation         , [consume1, unconditionallyMatch])         
+       clauseMatcher(jsonPathNamedNodeInObjectNotation   , [consume1, exprWithNameSpecified, capture])
+   ,   clauseMatcher(jsonPathNamedNodeInArrayNotation    , [consume1, exprWithNameSpecified, capture])         
+   ,   clauseMatcher(jsonPathNumberedNodeInArrayNotation , [consume1, exprWithNameSpecified, capture])
+   ,   clauseMatcher(jsonPathStarInObjectNotation        , [consume1, capture])
+   ,   clauseMatcher(jsonPathStarInArrayNotation         , [consume1, capture])         
    ,   clauseMatcher(jsonPathDoubleDot                   , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
    ,   clauseMatcher(jsonPathDot                         , [] )  
                                                  
-   ,   clauseMatcher(jsonPathBang                        , [rootExpr])             
+   ,   clauseMatcher(jsonPathBang                        , [rootExpr, capture])             
    ,   clauseMatcher(emptyString                         , [statementExpr])
    ];
 
