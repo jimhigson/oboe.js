@@ -32,26 +32,26 @@ var possiblyCapturing =           /(\$?)/
 ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
 ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
 ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
-,   fieldList =                   /(?:{([\w ]*?)})?/
+,   optionalFieldList =           /(?:{([\w ]*?)})?/
+,   fieldList =                   /{([\w ]*?)}/
 ;    
                
-var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, fieldList)
+var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
                                                                                     //   foo
 
-,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, fieldList)
+,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
                                                                                     //   ["foo"]
     
-,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, fieldList)
+,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
                                                                                     //   [2]
 
-,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, fieldList)
+,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
                                                                                     //   *
 
-,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, fieldList)
+,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
                                                                                     //   [*]
 
-//, jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
-
+,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
 
 ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
 
@@ -74,7 +74,7 @@ var nodeDescriptors = [
       ,  jsonPathNumberedNodeInArrayNotation
       ,  jsonPathStarInObjectNotation
       ,  jsonPathStarInArrayNotation
-      //,jsonPathPureDuckTyping 
+      ,  jsonPathPureDuckTyping 
       ].map(regexDescriptor);
 
 

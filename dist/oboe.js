@@ -873,26 +873,26 @@ var possiblyCapturing =           /(\$?)/
 ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
 ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
 ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
-,   fieldList =                   /(?:{([\w ]*?)})?/
+,   optionalFieldList =           /(?:{([\w ]*?)})?/
+,   fieldList =                   /{([\w ]*?)}/
 ;    
                
-var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, fieldList)
+var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
                                                                                     //   foo
 
-,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, fieldList)
+,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
                                                                                     //   ["foo"]
     
-,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, fieldList)
+,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
                                                                                     //   [2]
 
-,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, fieldList)
+,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
                                                                                     //   *
 
-,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, fieldList)
+,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
                                                                                     //   [*]
 
-//, jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
-
+,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
 
 ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
 
@@ -915,7 +915,7 @@ var nodeDescriptors = [
       ,  jsonPathNumberedNodeInArrayNotation
       ,  jsonPathStarInObjectNotation
       ,  jsonPathStarInArrayNotation
-      //,jsonPathPureDuckTyping 
+      ,  jsonPathPureDuckTyping 
       ].map(regexDescriptor);
 
 
@@ -957,8 +957,7 @@ var jsonPathCompiler = (function () {
     */
    function matchAgainstName(previousExpr, capturing, name ) {
             
-      if( name ) {            
-                       
+      if( name ) {                                  
          /**
           * @returns {Object|false} either the object that was found, or false if nothing was found
           */                                            
@@ -972,8 +971,8 @@ var jsonPathCompiler = (function () {
       } 
    }
    
-   function matchAgainstDuckType(previousExpr) {
-   }
+// function matchAgainstDuckType(previousExpr) {
+// }
 
    /**
     * Expression for $
@@ -1130,10 +1129,12 @@ var jsonPathCompiler = (function () {
     *  
     *  Returns undefined on no match
     *  
-    * @param {Function} detector
-    * @param {Function} parserGenerator a function which knows how to generate a parser. Either a partial completion of
-    *    exprParserGenerator with the expr given, or passthroughParserGenerator.
+    * @param {Function} detector a function which can examine a jsonPath and returns an object describing the match
+    *                   if there is a match for our particular feature at the start of the jsonPath.
+    * @param {Function[]} exprs
+    * 
     * @param {String} jsonPath
+    * 
     * @param {Function} parserGeneratedSoFar
     * 
     * @param {Function(Function, String)} onSuccess a function to pass the generated parser to if one can be made,
