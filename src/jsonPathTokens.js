@@ -32,8 +32,8 @@ var possiblyCapturing =           /(\$?)/
 ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
 ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
 ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+,   fieldList =                      /{([\w ]*?)}/
 ,   optionalFieldList =           /(?:{([\w ]*?)})?/
-,   fieldList =                   /{([\w ]*?)}/
 ;    
                
 var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)

@@ -259,8 +259,84 @@
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
                       .returning('target');
-      }          
+      }
       
+      
+      
+   ,  testCanDuckMatchSuccessfully: function() {
+   
+         var rootJson = {  
+                           people:{                           
+                              jack:{                               
+                                 name:  'Jack'
+                              ,  email: 'jack@example.com'
+                              }
+                           }
+                        };    
+         
+         givenAPattern('{name email}')         
+             .thenShouldMatch( 
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ])
+                   
+                      .returning({name:  'Jack',  email: 'jack@example.com'});
+      }
+      
+   ,  testCanDuckMatchSuccessOnSeveralLevelsOfAPath: function() {
+   
+         var rootJson = {  
+                           people:{                           
+                              jack:{                               
+                                 name:  'Jack'
+                              ,  email: 'jack@example.com'
+                              }
+                           }
+                        };    
+         
+         givenAPattern('{people}.{jack}.{name email}')         
+             .thenShouldMatch( 
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ])
+                   
+                      .returning({name:  'Jack',  email: 'jack@example.com'});
+      }      
+      
+   ,  testCanDuckMatchUnsuccessfullyWhenAFieldIsMissing: function() {
+   
+         var rootJson = {  
+                           people:{                           
+                              jack:{
+                                 // no name here!
+                                 email: 'jack@example.com'
+                              }
+                           }
+                        };    
+         
+         givenAPattern('{name email}')         
+             .thenShouldNotMatch( 
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]);
+      }
+      
+   ,  testCanFailADuckMatchExpressionBecauseUpstreamPathIsWrong: function() {
+   
+         var rootJson = {  
+                           women:{                           
+                              betty:{
+                                 name:'Betty' 
+                              ,  email: 'betty@example.com'
+                              }
+                           },
+                           men:{
+                              // we don't have non here!
+                           }
+                        };    
+         
+         givenAPattern('men.{name email}')         
+             .thenShouldNotMatch( 
+                   [          'women',          'betty'                 ], 
+                   [rootJson, rootJson.women,   rootJson.women.betty    ]);
+      }
 
    });
    
@@ -294,16 +370,18 @@
 
       nodeStack = nodeStack || fakeNodeStack(path);
       
-      this._lastResult = this._compiledPattern(path, nodeStack);
 
       try{   
-         assertTrue( 
-            'pattern ' + this._pattern + ' should have matched [' + path.join(',') + ']'
-         ,   !!this._lastResult 
-         );
+         this._lastResult = this._compiledPattern(path, nodeStack);
       } catch( e ) {
-         fail( 'Error running pattern "' + this._pattern + '" against path [' + path.join(',') + ']' + "\n" + e );      
-      }      
+         fail( 'Error thrown running pattern "' + this._pattern + 
+                  '" against path [' + path.join(',') + ']' + "\n" + e );      
+      }
+      
+      assertTrue( 
+         'pattern ' + this._pattern + ' should have matched [' + path.join(',') + ']'
+      ,   !!this._lastResult 
+      );            
       
       return this;
    };
@@ -312,16 +390,19 @@
 
       nodeStack = nodeStack || fakeNodeStack(path);
       
-      this._lastResult = this._compiledPattern(path, nodeStack);      
-         
+               
       try{
-         assertFalse( 
-            'pattern ' + this._pattern + ' should not have matched [' + path.join(',') + ']'
-         ,  this._lastResult
-         );
+         this._lastResult = this._compiledPattern(path, nodeStack);
       } catch( e ) {
-         fail( 'Error running pattern "' + this._pattern + '" against path ' + '[' + path.join(',') + ']' + "\n" + e );      
-      }    
+         fail( 'Error thrown running pattern "' + this._pattern + 
+                  '" against path ' + '[' + path.join(',') + ']' + "\n" + e );      
+      }
+      
+      assertFalse( 
+         'pattern ' + this._pattern + ' should not have matched [' + path.join(',') + '] but ' +
+             'did, returning ' + JSON.stringify(this._lastResult)
+      ,  !!this._lastResult
+      );          
         
       return this;         
    };

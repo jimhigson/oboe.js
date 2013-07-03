@@ -959,26 +959,49 @@ var jsonPathCompiler = (function () {
     *                     and decides if there is a match or not
     */
    function matchAgainstName(previousExpr, detection ) {
-            
+
       // extract meaning from the detection      
-      var name      = detection[NAME_INDEX];                        
-            
-      if( name ) {                                  
-         /**
-          * @returns {Object|false} either the object that was found, or false if nothing was found
-          */                                            
-         return function( pathStack, nodeStack, stackIndex ) {                                             
-            // in implementation, is like unnamednodeExpr except that we need the name to match.
-            // Once name matches, defer to unnamedNodeExpr:                                                                  
-            return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
-         };
-      } else {
-         return previousExpr;
-      } 
+      var name = detection[NAME_INDEX];
+
+      if (!name) {
+         return previousExpr; // don't wrap at all, return given expr as-is
+      }
+      
+      /**
+       * @returns {Object|false} either the object that was found, or false if nothing was found
+       */
+      return function (pathStack, nodeStack, stackIndex) {
+         // in implementation, is like unnamednodeExpr except that we need the name to match.
+         // Once name matches, defer to unnamedNodeExpr:                                                                  
+         return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
+      };      
    }
    
-//   function matchAgainstDuckType(previousExpr) {
-//   }
+   function matchAgainstDuckType(previousExpr, detection) {
+
+      var fieldListStr = detection[FIELD_LIST_INDEX];
+
+      if (!fieldListStr) {
+         return previousExpr; // don't wrap at all, return given expr as-is
+      }
+
+      var requiredFields = fieldListStr.split(/\W+/);
+
+      return function (pathStack, nodeStack, stackIndex) {
+
+         var
+             targetNode = nodeStack[stackIndex + 1],
+
+             targetNodeHasRequiredFields =
+                 requiredFields.reduce(function (soFar, field) {
+
+                    return soFar && (field in targetNode);
+
+                 }, true);
+
+         return targetNodeHasRequiredFields && previousExpr(pathStack, nodeStack, stackIndex);
+      }
+   }
 
    /**
     * Expression for $
@@ -987,19 +1010,18 @@ var jsonPathCompiler = (function () {
     * @param capturing
     */
    function capture( previousExpr, detection ) {
-   
+
       // extract meaning from the detection      
-      var capturing = !!detection[CAPTURING_INDEX];   
+      var capturing = !!detection[CAPTURING_INDEX];
 
-      if (capturing) {
-         return function (pathStack, nodeStack, stackIndex) {
-
-            return previousExpr(pathStack, nodeStack, stackIndex) && (nodeStack[stackIndex + 1]);
-         }
-      } else {
-         // don't wrap at all:
-         return previousExpr;
+      if (!capturing) {         
+         return previousExpr; // don't wrap at all, return given expr as-is
       }
+      
+      return function (pathStack, nodeStack, stackIndex) {
+         return previousExpr(pathStack, nodeStack, stackIndex) && (nodeStack[stackIndex + 1]);
+      }
+      
    }            
    
    
@@ -1173,15 +1195,15 @@ var jsonPathCompiler = (function () {
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(jsonPathNodeDescription             , [consume1, matchAgainstName, capture])        
-   ,   clauseMatcher(regexDescriptor(jsonPathDoubleDot)  , [consumeMany])
+       clauseMatcher(jsonPathNodeDescription           , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+   ,   clauseMatcher(regexDescriptor(jsonPathDoubleDot), [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(regexDescriptor(jsonPathDot)        , [] )  
+   ,   clauseMatcher(regexDescriptor(jsonPathDot)      , [] )  
                                                  
-   ,   clauseMatcher(regexDescriptor(jsonPathBang)       , [rootExpr, capture])             
-   ,   clauseMatcher(regexDescriptor(emptyString)        , [statementExpr])
+   ,   clauseMatcher(regexDescriptor(jsonPathBang)     , [rootExpr, capture])             
+   ,   clauseMatcher(regexDescriptor(emptyString)      , [statementExpr])
    ];
 
 
