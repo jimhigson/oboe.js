@@ -6,6 +6,19 @@ Applicaiton and Reflection
 **40 to 60 pages**
 
 
+Under the heading [Anatomy of a SOA client] I deconstructed the way in which programming logic is often
+used to identify the parts of a model which are currently interesting and started to look at some 
+declarative ways in which these parts can be obtained.
+
+Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general
+logic of the program, declaritively define
+the interesting parts and have these parts delivered to the language logic. Once we make the shift to
+thinking in this way, it is no longer necessary to have the whole resource locally before the interesting
+sub-parts are delivered.
+
+
+
+
 Focus on replacing ajax, rather than streaming. In older browsers, getting the whole message
 at once is no worse than it is now.
 
@@ -193,6 +206,10 @@ program design
 
 styles of programming
 ---------------------
+
+The code presented is the result of the development many prior versions, it has never been rewritten in the
+sense of starting again. Nontheless, every part has been complely renewed several times. I am reviewing only
+the final version. Git promotes regular commits, there have been more than 500.
 
 some of it is pure functional (jsonPath, controller)
 ie, only semantically different from a Haskell programme

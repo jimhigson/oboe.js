@@ -5,7 +5,27 @@
 Abstract
 ========
 
-**100-200 words**
+A project which incorporates techniques including progressive parsing and http streaming
+to the programming of REST clients, with the aim of a significant improvement in performance, 
+fault tolerance and encouraging a greater degree of loose coupling between systems. Particularly, 
+loose coupling is considered in light of the application of Agile methodologies to SOA, under which 
+resources can be expected to change as programs are constantly refactored. A study is made of a real-world
+situation in which SOA is used extensively to create many small systems but problems arise from a 
+tight coupling to versions encouraged by the programmer's chosen tool set.
+
+Performance is considered dually: in terms of an increasing the perceived responsiveness to programs presenting an
+interactive interface, and also the absolute completion time for a task undertaken by a system which
+connects to rest resources for data.
+
+A critique is made of imperative methods under which items of interest are programmatically 
+extracted from a resource once 
+retrieved. Following from this critique, a
+ddeclarative alternative is presented under which the identification 
+of items of interest is possible prior to a resource having been retrieved in its 
+entirety. The declarative syntax is integrated into a javascript framework which ties this method of identification into
+a wider scheme of object detection within streaming resources.
+
+
 
 
 Introduction 
@@ -67,7 +87,21 @@ Anecdote: test environment finds an issue. One system can't be released. Contagi
  
 How to cope with software that changes every week.
 
-Because of the contagion problem, need to be able to create loosely-coupled systems. 
+Because of the contagion problem, need to be able to create loosely-coupled systems.
+
+Inside systems also, even with automatic refactoring tools, only automate and therefoer lessen but do not 
+remove the problem that coupling causes changes in one place of a codebase to cause knock-on changes in
+remote other parts of the code. A method of programming which was truly compatible with extreme programming
+would involve designing for constant change without disparate parts having to be modified as structural
+refactoring occurs. 
+
+I propose that in a changing system, readability of code's changelog is as important as readability of 
+the code itself. Extraneous changes dilute the changelog, making it less easily defined by code changes which
+are intrinsically linked to the actual change in the logic being expressed by the program.
+
+It is often stated
+that understandability is the number once most important concern in a codebase (CITE) - if the code is suitably
+dynamic it is important that changes are axiomic and clarity of the changelog is equally important.
 
 Background
 ==========
@@ -75,6 +109,7 @@ Background
 **background should be 2-10 pages**
 
 SOA
+---
 
 REST/WebServices (WSDL etc)
 
@@ -86,6 +121,105 @@ Allows one model to be written out to XML or JSON
 Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.
 
 Javascript as mis-understood language (CITE: Crockford) - list features available.
+
+Anatomy of a SOA client
+------------------------
+
+First stage after getting a resource is usually to programmatically extract the interesting part from it.
+This is usually done via calls in the programming language itself, for example by de-marshaling the stream
+to domain objects and then calling a series of getters to narrow down to the interesting parts.
+
+This part has become such a natural component of a workflow that it is barely noticed that it is happening.
+In an OO language, the extraction of small parts of a model which, in the scope of the current concern are of 
+interest is so universal that it could be considered the sole reason that getters exist.
+
+However subtly incorporated it has become in the thinking of the programmer, we should note that this is a 
+construct and only one possible way of thinking regarding identifying the areas of current interest in a 
+wider model.
+
+```java
+// an example programmatic approach to a domain model interrogation under Java
+
+List<Person> people = myModel.getPeople();
+String firstPersonsSurname = people.get(0).getSurname();
+
+```
+
+One weakness of this imperative, programatic inspection model is that, once much code is written to 
+interogate models in this way,
+the interface of the model becomes increasingly expensive to change as the code making the inspections
+becomes more tightly coupled with the thing that it is inspecting. Taking the above example, if the
+model were later refactored such that the concepts of firstName and surName were pulled from the Person
+class into an extracted Name class, because the inspection relies on a sequence of calls made directly 
+into domain objects, the code making the query would also have to change. 
+
+I believe that this coupling defies Agile methods of programming. Many Java IDEs provide tools that would
+offer to automate the above extraction into a Name class, creating the new class and altering the existing
+calls. While reducing the pain, if we accept the concept as I stated in the [Introduction] that the code
+should not be seen as a static thing in which understanding is 
+
+More declarative syntaxes exist which are flexible enough that
+the declarative expressions may still apply as the underlying model is refactored. Whilst not applicable
+to use in general purpose programming, XPATH is an example of this. As an analogue of the Java situation above,
+Given the following XML:
+
+```xml
+<people>
+   <person>
+      <surname>Bond</surname>
+   </person>
+</people>
+```
+
+The XPath //person[0]//surname//text() (JIM/ME - CHECK THIS!) would continue to identify the correct part of the
+resource without being updated after the xml analogue of the above Java Name refactor:
+
+```xml
+<people>
+   <person>
+      <name>
+         <surname>Bond</surname>
+      </name>
+   </person>
+</people>
+```
+
+A few models exist which do not follow this pattern such as XPATH. However, these are useful
+in only a small domain.
+
+Xpath is able to express identifiers which often survive refactoring because XML represents a tree, hence we
+can consider relationships between entities to be that of contains/contained in (also siblings?). 
+In application of XML, in the languages that we build on top of XML, it is very natural to consider all
+elements to belong to their ancestors. Examples are myriad, for example consider a word count in a book
+written in DOCBook format - it should be calculable without knowing if the book is split into chapters 
+or not since this is
+a concept internal to the oranisation of the book itserlf nd not soemthing that a querier is likely
+to find interesting - if this must be considered the structure acts as barrier to information 
+rather than enabling the information's delivery. Therefore, in many cases the exact location of a piece of information
+is not as important as a more general location of x being in some way under y.
+
+This may not always hold. A slightly contrived example might be if we were representing a model of partial
+knowledge:
+
+```xml
+<people>
+   <person>
+      <name>
+         <isNot><surname>Bond</surname></isNot>
+      </name>
+   </person>
+</people>
+```  
+  
+CSS. Meant for presentation of HTML, but where HTML markup is semantic it is a selector of the *meaning
+of elements* for the sake of applying a meaningful presentation more so than a selector of arbitrary
+colours and positions on a screen.
+  
+Unlike XML, in the model created by most general programming languages, there is no requirement for the
+data to be tree shaped. Graph is ok. This make this slighlty harder but nontheless attempts have been made.
+
+Linq. (CITEME) 
+ 
 
 Parsing: SAX and Dom
 --------------------
@@ -182,6 +316,19 @@ Applicaiton and Reflection
 **40 to 60 pages**
 
 
+Under the heading [Anatomy of a SOA client] I deconstructed the way in which programming logic is often
+used to identify the parts of a model which are currently interesting and started to look at some 
+declarative ways in which these parts can be obtained.
+
+Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general
+logic of the program, declaritively define
+the interesting parts and have these parts delivered to the language logic. Once we make the shift to
+thinking in this way, it is no longer necessary to have the whole resource locally before the interesting
+sub-parts are delivered.
+
+
+
+
 Focus on replacing ajax, rather than streaming. In older browsers, getting the whole message
 at once is no worse than it is now.
 
@@ -272,7 +419,8 @@ the
 A third injection of type into json comes in the form of taking the first property of an object as being the tagname.
 Unsatisfactory, objects have an order while serialised as json but once deserialised typically have no further order.
 Clarinet.js seems to follow this pattern, notifying of new objects only once the first property's key is known so that
-it may be used to infer type. Not very good, won't persue further.   
+it may be used to infer type. Can't be used with a general-purpose JSON writer tool, nor any JSON writer tool that
+reads from common objects.   
  
 
 Design not just for now, design to be stable over future iterations of the software. Agile etc.           
@@ -476,6 +624,18 @@ Why uglify
 * Covers whole language, not just a well-advised subset.
 * In truth, Closure compiler works over a subset of javascript rather than the whole language.
 
+Why not require
+* What it is
+* Why so popular
+** Why a loader is necessary - js doesn't come with an import statement
+** How it can be done in the language itself without an import statement
+* Meant more for AMD than for single-load code
+** Situations AMD is good for - large site, most visitors don't need all the code loaded
+** Depends on run-time component to be loaded even after code has been optimised
+** Small compatible versions exist that just do loading (almond)  
+** Why ultimately not suitable for a library like this
+
+Why testing post-concatenation is good idea.
 
 polyfilling
 -----------
@@ -513,6 +673,8 @@ was exposed.
 
 Jstd can serve example files but need to write out slowly which it has no concept of. Customistation is via configuration
 rather than by plug-in, but even if it were, the threading model is not suitable to create this kind of timed output.
+
+Tests include an extremely large file twentyThousandRecords.js to test under stress
 
 Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading
 in which threads wait for a while response to be received.
