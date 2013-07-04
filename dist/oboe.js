@@ -849,7 +849,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    xhr.send(validatedRequestBody(data));   
 }
 
-var jsonPathTokens = (function() {
+var jsonPathSyntax = (function() {
 
    // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
    // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
@@ -970,7 +970,8 @@ var jsonPathTokens = (function() {
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
-var jsonPathCompiler = jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
+// the call to jsonPathSyntax injects the syntaxes that are needed inside the compiler
+var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax, dotSyntax, bangSyntax, emptySyntax ) {
 
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
@@ -1237,15 +1238,15 @@ var jsonPathCompiler = jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dot
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(pathNodeDesc   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
-   ,   clauseMatcher(doubleDotDesc  , [consumeMany])
+       clauseMatcher(pathNodeSyntax   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+   ,   clauseMatcher(doubleDotSyntax  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(dotDesc        , [] )  
+   ,   clauseMatcher(dotSyntax        , [] )  
                                                  
-   ,   clauseMatcher(bangDesc       , [rootExpr, capture])             
-   ,   clauseMatcher(emptyDesc      , [statementExpr])
+   ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
+   ,   clauseMatcher(emptySyntax      , [statementExpr])
    ];
 
 
