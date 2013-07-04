@@ -11,7 +11,7 @@ pandoc main_concat.md --toc --default-image-extension=png --number-sections --te
 pandoc proposal.md -o proposal.html
 pandoc proposal.md -o proposal.pdf
 
-echo "word count:" `wc -w main_concat.md`
+wc -w main/*
 
 
 
