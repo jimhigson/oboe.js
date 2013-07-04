@@ -74,21 +74,24 @@ top level.
 
 ## Pattern matching
 
-Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these tokens:
+Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these clauses:
 
 `!` root object   
 `.`  path separator   
-`foo` an element at name foo  
+`person` an element under the key 'person'  
+`{name email}` an element with attributes name and email  
 `*`  any element at any name  
 `[2]`  the second element (of an array)  
 `['foo']`  equivalent to .foo  
 `[*]`  equivalent to .*  
 `..` any number of intermediate nodes (non-greedy)
+`$` explicitly specify an intermediate clause in the jsonpath spec the callback should be applied to
 
-The pattern engine also supports 
+The pattern engine supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (```$```) symbol. See the [css4 example below](#css4-style-patterns) or take a look at 
-[more example patterns](#more-example-patterns).  
+using the dollar (```$```) symbol.
+
+There are also **[some example patterns](#more-example-patterns)** below. 
 
 # Why I made this
 
@@ -195,11 +198,24 @@ oboe.doGet('/myapp/things.json')
 Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
 
 ``` js
-oboe.doGet('/myapp/things.json')
-   .onNode('name', function( name ){
+   oboeInstance.onNode('name', function( name ){
       jQuery('ul#names').append( $('<li>').text(name) );
    });
 ```
+
+## Duck typing
+
+Sometimes it is more useful to say *what you are trying to find* than *where you'd like to find it*. In these cases,
+[duck typing](http://en.wikipedia.org/wiki/Duck_typing) is more useful than a specifier based on paths.
+ 
+
+``` js
+   oboeInstance.onNode('{name colour}', function( foodObject ) {
+   
+      // here we'll be given a callback for every object found that has both a name and a colour   
+   };
+```   
+
 
 ## Reacting before we have the whole object
 
@@ -405,13 +421,16 @@ oboe.doGet('people.json')
 ## More example patterns:
   
 `!.foods.colour` the colours of the foods  
-`person.emails[1]` the first element in the email array for each person  
+`person.emails[1]` the first element in the email array for each person
+`{name email}` any object with a name and an email property, regardless of where it is in the document  
 `person.emails[*]` any element in the email array for each person  
 `person.$emails[*]` any element in the email array for each person, but the callback will be
    passed the array so far rather than the array elements as they are found.  
 `person` all people in the json, nested at any depth  
 `person.friends.*.name` detecting friend names in a social network  
+`person.friends..{name}` detecting friends with names in a social network  
 `person..email` email addresses anywhere as descendent of a person object  
+`person..{email}` any object with an email address relating to a person in the stream  
 `$person..email` any person in the json stream with an email address  
 `*` every object, string, number etc found in the json stream  
 `!` the root object (fired when the whole response is available, like JSON.parse())  
