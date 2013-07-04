@@ -487,12 +487,4 @@ cd test
 ./jstestdriver-serverstart
 ```
 
-If all goes well you should see output similar to in the [latest buildInfo](dist/buildInfo):
-
-```
-
-## Use as a stream in node.js
-
-**Clarinet** supports use as a node stream. This hasn't been implemented in
-Oboe but it should be quite easy to do.
-
+If all goes well you should see output similar to in the [latest buildInfo](dist/buildInfo).
