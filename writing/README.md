@@ -1,0 +1,1 @@
+Oboe.js is being presented as an academic dissertation. This directory contains my main ramblings.
