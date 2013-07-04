@@ -61,8 +61,39 @@ let jsonPath = "person.address[2]"
 
 ```
 
-What 'this' (context) is in javascript. Why not calling it scope. 
+What 'this' (context) is in javascript. Why not calling it scope.
 
+The web browser as REST client
+-----------------------------
+
+Browser incompatability mostly in presentation layer rather than in scripting languages.
+
+Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs
+presented to the scripting language rather than the language itself. 
+   
+
+State of rest: Json and XML
+------------
+
+Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!
+
+
+
+Node
+----
+
+What Node is
+V8. Fast. Near-native. JIT.
+Why Node perhaps is mis-placed in its current usage as a purely web platform "the aim is absolutely fast io".
+This happened because web specialist programmers took it up first
+ 
+Why Node is significant
+
+How Node is different
+
+Criticisms of Node. Esp from Erlang etc devs. 
+
+Node's standard stream mechanisms
 
 
 XmlHttpRequest

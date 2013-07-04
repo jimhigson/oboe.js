@@ -24,3 +24,11 @@ Would be nice to:
  * discard patterns that can't match any further parts of the tree
  * discard branches of the tree that can't match any patterns
  * just over the parsing of branches of the tree that provably can't match any of the patterns
+ 
+Community reaction
+------------------
+
+Built into Dojo
+Followers on Github
+Being posted in forums (hopefully also listed on blogs)
+No homepage as of yet other than the Github page 

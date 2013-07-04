@@ -133,6 +133,22 @@ let jsonPath = "person.address[2]"
 What 'this' (context) is in javascript. Why not calling it scope. 
 
 
+Node
+----
+
+What Node is
+V8. Fast. Near-native. JIT.
+Why Node perhaps is mis-placed in its current usage as a purely web platform "the aim is absolutely fast io".
+This happened because web specialist programmers took it up first
+ 
+Why Node is significant
+
+How Node is different
+
+Criticisms of Node. Esp from Erlang etc devs. 
+
+Node's standard stream mechanisms
+
 
 XmlHttpRequest
 --------------
@@ -399,6 +415,13 @@ though, for example no way to clear out the cache if memory becomes scarce.
 Functional programming tends to lend better to minification than OO-style because of untyped record objects (can
 have any keys).
 
+Lack of consistency in coding (don't write too much, leave to the conclusion)
+
+Final consideration of coding: packaging up each unit to export a minimal interface.
+* Why minimal interfaces are better for minification 
+
+
+
 composition of several source files into a distributable binary-like text file
 -------------------------------------------------
 
@@ -411,15 +434,49 @@ of size of the source.
 
 Packaging for node or browser. No need to minify for node but concatenation still done for ease of inclusion in projects
 
-
 ```javascript
 typical pattern for packaging to work in either a node.js server or a web browser
 ```
+
+Packaging for use in frameworks.
+* Many frameworks already come with a wrapper arround the browser's inbuilt ajax capabilities
+** they don't add to the capabilities but present a nicer interface
+ 
+* I'm not doing it but others are
+** browser-packaged version should be use agnostic and therefore amenable to packaging in this way
+
+Why uglify
+* Covers whole language, not just a well-advised subset.
+* In truth, Closure compiler works over a subset of javascript rather than the whole language.
+
+
+polyfilling
+-----------
+
+The decline of bad browsers. Incompatability less of a concern than it was.
+
+Node doesn't require, built on v8.
+
+http://www.jimmycuadra.com/posts/ecmascript-5-array-methods
+Unlike the new methods discussed in the first two parts, the methods here are all reproducible using JavaScript itself. Native implementations are simply faster and more convenient. Having a uniform API for these operations also promotes their usage, making code clearer when shared between developers.
+
+Even when only used once, preferable to polyfill as a generic solution rather than offer a one-time implementation
+because it better splits the intention of the logic being presented from the mechanisms that that logic sits on
+and, by providing abstraction, elucidates the code. 
+
 
 automated testing
 -----------------
 
 How automated testing improves what can be written, not just making what is written more reliable.
+
+TDD drives development by influencing the design - good design is taken as that which is amenable to testing
+rather than which describes the problem domain accurately or solves a problem with minimum resources. Amenable
+to testing often means split into many co-operating parts so that each part may be tested via a simple test. 
+
+Bt encourageing splitting into co-operating objects, TDD to a certain degree is anti-encapsulation. The public
+object that was extracted as a new concern from a larger object now needs public methods whereas before nothing
+was exposed.
 
 ![ 
    The testing pyramid is a common concept, relying on the assumption that verification of small parts provides
@@ -467,7 +524,11 @@ a lot more logic than directly. For example, a regex which matches "{a,b}" or "{
 not trivial.
 
 Can test less exhaustively on higher levels if lower ones are well tested, testing where it is easier to do
-whilst giving good guarantees 
+whilst giving good guarantees.
+
+Genuine data hiding gets in the way sometimes. Eg, token regexes are built from the combination of smaller regualar
+expressions for clarity (long regular expressions are concise but hard to read). However, because the components are
+hidden in a scope, they are not addressable by the tests and therefore cannot be directly tested. Reluctantly 
 
 
 
