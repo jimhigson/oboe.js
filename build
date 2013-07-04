@@ -40,3 +40,4 @@ runjstd minified
 
 mv dist/oboe.concat.js dist/oboe.js 
  
+echo Size after gzip is `gzip --stdout dist/oboe.min.js | wc -c` bytes
