@@ -14,7 +14,7 @@
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
-var jsonPathCompiler = (function () {
+var jsonPathCompiler = jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
 
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
@@ -79,11 +79,11 @@ var jsonPathCompiler = (function () {
 
              targetNodeHasRequiredFields =
                  (targetNode instanceof Object) &&
-                 requiredFields.reduce(function (soFar, field) {
+                 requiredFields.every(function (field) {
 
-                    return soFar && (field in targetNode);
+                    return (field in targetNode);
 
-                 }, true);
+                 });
 
          return targetNodeHasRequiredFields && previousExpr(pathStack, nodeStack, stackIndex);
       }
@@ -281,15 +281,15 @@ var jsonPathCompiler = (function () {
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(jsonPathNodeDescription           , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
-   ,   clauseMatcher(regexDescriptor(jsonPathDoubleDot), [consumeMany])
+       clauseMatcher(pathNodeDesc   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+   ,   clauseMatcher(doubleDotDesc  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(regexDescriptor(jsonPathDot)      , [] )  
+   ,   clauseMatcher(dotDesc        , [] )  
                                                  
-   ,   clauseMatcher(regexDescriptor(jsonPathBang)     , [rootExpr, capture])             
-   ,   clauseMatcher(regexDescriptor(emptyString)      , [statementExpr])
+   ,   clauseMatcher(bangDesc       , [rootExpr, capture])             
+   ,   clauseMatcher(emptyDesc      , [statementExpr])
    ];
 
 
@@ -367,4 +367,4 @@ var jsonPathCompiler = (function () {
       }
    }
 
-})();
+});

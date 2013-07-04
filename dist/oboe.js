@@ -124,13 +124,22 @@ function always(){return true}
     * 
     */
    
+   fillIn(Array, 'every', function(func) {
+      for( var i = 0 ; i < len(this) ; i++ ) {      
+         if( !func( this[i] ) ) {
+            return false;
+         }    
+      }   
+      return true;   
+   });   
+   
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
    fillIn(Array, 'forEach', function( func ){
-         
-      for( var i = 0 ; i < len(this) ; i++ ) {      
-         func( this[i] );    
-      }      
+        
+      this.every(function(item){
+         func(item); return true;
+      });        
       
    });         
          
@@ -158,8 +167,9 @@ function always(){return true}
          return matchesSoFar;                  
       }, []);
       
-   });      
-      
+   });
+   
+           
    // allow binding. Minimal version which includes binding of context only, not arguments as well
    fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
@@ -839,90 +849,111 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    xhr.send(validatedRequestBody(data));   
 }
 
+var jsonPathTokens = (function() {
 
-// The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
-// spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
-// allowing new token regexes to match.
-//    For all regular expressions:
-//       The first subexpression is the $ (if the token is eligible to capture)
-//       The second subexpression is the name of the expected path node (if the token may have a name)
-
-var regexSource = partialComplete(pluck, 'source');
-
-function r(componentRegexes) {
-
-   return RegExp( componentRegexes.map(regexSource).join('') );
-}
-
-function jsonPathClause() {
+   // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
+   // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
+   // allowing new token regexes to match.
+   //    For all regular expressions:
+   //       The first subexpression is the $ (if the token is eligible to capture)
+   //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var strings = toArray(arguments);
+   var regexSource = partialComplete(pluck, 'source');
    
-   strings.unshift(/^/);
+   function r(componentRegexes) {
    
-   return r(strings);
-}
-
-function unquotedArrayNotation(contents) {
-   return r([/\[/, contents, /\]/]);
-}
-
-var possiblyCapturing =           /(\$?)/
-,   namedNode =                   /(\w+)/
-,   namePlaceholder =             /()/
-,   namedNodeInArrayNotation =    /\["(\w+)"\]/
-,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
-,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
-,   fieldList =                      /{([\w ]*?)}/
-,   optionalFieldList =           /(?:{([\w ]*?)})?/
-;    
-               
-var jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                    //   foo
-
-,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
-                                                                                    //   ["foo"]
-    
-,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                    //   [2]
-
-,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
-                                                                                    //   *
-
-,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
-                                                                                    //   [*]
-
-,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
-
-,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
-
-,   jsonPathDot                           = jsonPathClause(/\./)                    //   .
-
-,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)  //   !
-
-,   emptyString                           = jsonPathClause(/$/)                     //   nada!
-;
-
-function regexDescriptor(regex) {
-   return function(candidate){
-      return regex.exec(candidate);
+      return RegExp( componentRegexes.map(regexSource).join('') );
    }
-}
+   
+   function jsonPathClause() {
+      
+      var strings = toArray(arguments);
+      
+      strings.unshift(/^/);
+      
+      return r(strings);
+   }
+   
+   function unquotedArrayNotation(contents) {
+      return r([/\[/, contents, /\]/]);
+   }
+   
+   var possiblyCapturing =           /(\$?)/
+   ,   namedNode =                   /(\w+)/
+   ,   namePlaceholder =             /()/
+   ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
+   ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
+   ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+   ,   fieldList =                      /{([\w ]*?)}/
+   ,   optionalFieldList =           /(?:{([\w ]*?)})?/
+    
+                  
+   ,   jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
+                                                                                       //   foo
+   
+   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
+                                                                                       //   ["foo"]
+       
+   ,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
+                                                                                       //   [2]
+   
+   ,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
+                                                                                       //   *
+   
+   ,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
+                                                                                       //   [*]
+   
+   ,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
+   
+   ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
+   
+   ,   jsonPathDot                           = jsonPathClause(/\./)                    //   .
+   
+   ,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)  //   !
+   
+   ,   emptyString                           = jsonPathClause(/$/)                     //   nada!
+   
+   ,   
+   //  see jsonPathNodeDescription below
+       nodeDescriptors = [
+            jsonPathNamedNodeInObjectNotation
+         ,  jsonPathNamedNodeInArrayNotation
+         ,  jsonPathNumberedNodeInArrayNotation
+         ,  jsonPathStarInObjectNotation
+         ,  jsonPathStarInArrayNotation
+         ,  jsonPathPureDuckTyping 
+         ].map(regexDescriptor)
+   ;      
 
-var nodeDescriptors = [
-         jsonPathNamedNodeInObjectNotation
-      ,  jsonPathNamedNodeInArrayNotation
-      ,  jsonPathNumberedNodeInArrayNotation
-      ,  jsonPathStarInObjectNotation
-      ,  jsonPathStarInArrayNotation
-      ,  jsonPathPureDuckTyping 
-      ].map(regexDescriptor);
+   /** allows exporting of a regular expression under a generified function interface
+    * @param regex
+    */
+   function regexDescriptor(regex) {
+      return function(candidate){
+         return regex.exec(candidate);
+      }
+   }
 
+   /** export several regular expressions under a single function, presenting the same interface
+    *  as regexDescriptor above.
+    */
+   function jsonPathNodeDescription( candidate ) {   
+      return firstMatching(nodeDescriptors, [candidate]);
+   }
+   
+   /* we export only a single function. When called, this function injects into a scope the
+      descriptor functions from this scope which we want to make available elsewhere. 
+    */
+   return function (fn){      
+      return fn( 
+          jsonPathNodeDescription,
+          regexDescriptor(jsonPathDoubleDot),
+          regexDescriptor(jsonPathDot),
+          regexDescriptor(jsonPathBang),
+          regexDescriptor(emptyString) );
+   }; 
 
-function jsonPathNodeDescription( candidate ) {
-
-   return firstMatching(nodeDescriptors, [candidate]);
-}
+}());
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
  * paths for matches. The candidate paths are arrays of strings representing the path from the root of the parsed json to
@@ -939,7 +970,7 @@ function jsonPathNodeDescription( candidate ) {
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
  */  
-var jsonPathCompiler = (function () {
+var jsonPathCompiler = jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
 
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
@@ -1004,11 +1035,11 @@ var jsonPathCompiler = (function () {
 
              targetNodeHasRequiredFields =
                  (targetNode instanceof Object) &&
-                 requiredFields.reduce(function (soFar, field) {
+                 requiredFields.every(function (field) {
 
-                    return soFar && (field in targetNode);
+                    return (field in targetNode);
 
-                 }, true);
+                 });
 
          return targetNodeHasRequiredFields && previousExpr(pathStack, nodeStack, stackIndex);
       }
@@ -1206,15 +1237,15 @@ var jsonPathCompiler = (function () {
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(jsonPathNodeDescription           , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
-   ,   clauseMatcher(regexDescriptor(jsonPathDoubleDot), [consumeMany])
+       clauseMatcher(pathNodeDesc   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+   ,   clauseMatcher(doubleDotDesc  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(regexDescriptor(jsonPathDot)      , [] )  
+   ,   clauseMatcher(dotDesc        , [] )  
                                                  
-   ,   clauseMatcher(regexDescriptor(jsonPathBang)     , [rootExpr, capture])             
-   ,   clauseMatcher(regexDescriptor(emptyString)      , [statementExpr])
+   ,   clauseMatcher(bangDesc       , [rootExpr, capture])             
+   ,   clauseMatcher(emptyDesc      , [statementExpr])
    ];
 
 
@@ -1292,7 +1323,7 @@ var jsonPathCompiler = (function () {
       }
    }
 
-})();
+});
 
 /**
  * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.

@@ -17,13 +17,22 @@
     * 
     */
    
+   fillIn(Array, 'every', function(func) {
+      for( var i = 0 ; i < len(this) ; i++ ) {      
+         if( !func( this[i] ) ) {
+            return false;
+         }    
+      }   
+      return true;   
+   });   
+   
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context       
    fillIn(Array, 'forEach', function( func ){
-         
-      for( var i = 0 ; i < len(this) ; i++ ) {      
-         func( this[i] );    
-      }      
+        
+      this.every(function(item){
+         func(item); return true;
+      });        
       
    });         
          
@@ -51,8 +60,9 @@
          return matchesSoFar;                  
       }, []);
       
-   });      
-      
+   });
+   
+           
    // allow binding. Minimal version which includes binding of context only, not arguments as well
    fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;

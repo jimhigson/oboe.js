@@ -1,77 +1,68 @@
-(function(){
+jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
 
    TestCase("jsonPathTokensTest", {
    
       
       testFieldListMatchesCorrectly: function() {
       
-         givenTheRegex(optionalFieldList)
-            .shouldMatch(   '{}'        ).finding('')
-            .shouldMatch(   '{a}'       ).finding('a')
-            .shouldMatch(   '{r2 d2}'   ).finding('r2 d2')
-            .shouldMatch(   '{1 2}'     ).finding('1 2')
-            .shouldMatch(   '{a b}'     ).finding('a b')  
-            .shouldMatch(   '{a  b}'    ).finding('a  b')
-            .shouldMatch(   '{a   b}'   ).finding('a   b')
-            .shouldMatch(   '{a  b  c}' ).finding('a  b  c')
+         givenDescriptor(pathNodeDesc)
+            .whenDescribing(   '{}'        ).shouldFind({fieldList:''       })
+            .whenDescribing(   '{a}'       ).shouldFind({fieldList:'a'      })
+            .whenDescribing(   '{r2 d2}'   ).shouldFind({fieldList:'r2 d2'  })
+            .whenDescribing(   '{1 2}'     ).shouldFind({fieldList:'1 2'    })
+            .whenDescribing(   '{a b}'     ).shouldFind({fieldList:'a b'    })  
+            .whenDescribing(   '{a  b}'    ).shouldFind({fieldList:'a  b'   })
+            .whenDescribing(   '{a   b}'   ).shouldFind({fieldList:'a   b'  })
+            .whenDescribing(   '{a  b  c}' ).shouldFind({fieldList:'a  b  c'})
             
-            .shouldNotMatch('a'       )
-            .shouldNotMatch('a b'     )
-            .shouldNotMatch('{a'      )
-            .shouldNotMatch('a}'      )
-            .shouldNotMatch('.a'      )
+            .whenDescribing('{a'           ).shouldFind({})
       },
       
       testObjectNotation: function() {
       
-         givenTheRegex(jsonPathNamedNodeInObjectNotation)
-            .shouldMatch(    'aaa'              )
-            .shouldMatch(    '$aaa'             )
-            .shouldMatch(    'aaa{a b c}'       )
-            .shouldMatch(    '$aaa{a b c}'      )
+         givenDescriptor(pathNodeDesc)
+            .whenDescribing(    'aaa'              ).shouldFind({name:'aaa'})
+            .whenDescribing(    '$aaa'             ).shouldFind({name:'aaa', capturing:true})
+            .whenDescribing(    'aaa{a b c}'       ).shouldFind({name:'aaa', fieldList:'a b c'})
+            .whenDescribing(    '$aaa{a b c}'      ).shouldFind({name:'aaa', capturing:true, fieldList:'a b c'})
             
-            .shouldNotMatch( '.a'      )
-            .shouldNotMatch( 'a.b'      )
-            .shouldNotMatch( '$$a'      )
-            .shouldNotMatch( '.a{'      )
+            .whenDescribing( '.a'             ).shouldFind({})
+            .whenDescribing( 'a.b'            ).shouldFind({name: 'a'})
+            .whenDescribing( '$$a'            ).shouldFind({})
+            .whenDescribing( '.a{'            ).shouldFind({})
       },
       
       testNamedArrayNotation: function() {
       
-         givenTheRegex(jsonPathNamedNodeInArrayNotation)
-            .shouldMatch(    '["foo"]'          )
-            .shouldMatch(    '$["foo"]'         )
-            .shouldMatch(    '["foo"]{a b c}'   )
-            .shouldMatch(    '$["foo"]{a b c}'  )
+         givenDescriptor(pathNodeDesc)
+            .whenDescribing(    '["foo"]'          ).shouldFind({name: 'foo'})
+            .whenDescribing(    '$["foo"]'         ).shouldFind({name: 'foo', capturing:true})
+            .whenDescribing(    '["foo"]{a b c}'   ).shouldFind({name: 'foo', fieldList:'a b c'})
+            .whenDescribing(    '$["foo"]{a b c}'  ).shouldFind({name: 'foo', capturing:true, fieldList:'a b c'})
             
-            .shouldNotMatch( '[]' )            
-            .shouldNotMatch( '[2]' )            
-            .shouldNotMatch( '[foo]' )            
-            .shouldNotMatch( '[""]' )            
-            .shouldNotMatch( '["foo"]["bar"]' )            
-            .shouldNotMatch( '[".foo"]' )            
-            .shouldNotMatch( '.foo' )            
+            .whenDescribing( '[]'             ).shouldFind({})                      
+            .whenDescribing( '[foo]'          ).shouldFind({})            
+            .whenDescribing( '[""]'           ).shouldFind({})            
+            .whenDescribing( '["foo"]["bar"]' ).shouldFind({name:'foo'})            
+            .whenDescribing( '[".foo"]'       ).shouldFind({})                        
       },
       
       testNumberedArrayNotation: function() {
       
-         givenTheRegex(jsonPathNumberedNodeInArrayNotation)
-            .shouldMatch(    '[2]'              )
-            .shouldMatch(    '[123]'            )
-            .shouldMatch(    '$[2]'             )
-            .shouldMatch(    '[2]{a b c}'       )
-            .shouldMatch(    '$[2]{a b c}'      )
+         givenDescriptor(pathNodeDesc)
+            .whenDescribing(    '[2]'              ).shouldFind({name:2})
+            .whenDescribing(    '[123]'            ).shouldFind({name:123})
+            .whenDescribing(    '$[2]'             ).shouldFind({name:2, capturing:true})
+            .whenDescribing(    '[2]{a b c}'       ).shouldFind({name:2, fieldList:'a b c'})
+            .whenDescribing(    '$[2]{a b c}'      ).shouldFind({name:2, capturing:true, fieldList:'a b c'})
             
-            .shouldNotMatch( '[]' )            
-            .shouldNotMatch( '["foo"]' )            
-            .shouldNotMatch( '[foo]' )            
-            .shouldNotMatch( '[""]' )            
-            .shouldNotMatch( '.foo' )            
+            .whenDescribing( '[]' ).shouldFind({})            
+            .whenDescribing( '[""]' ).shouldFind({})            
       }
       
    ,  testCanParseNodeDescriptionWithNameAndFieldList: function() {
       
-         givenDescriptor(jsonPathNodeDescription)
+         givenDescriptor(pathNodeDesc)
             .whenDescribing('foo{a b}')
             .shouldFind({  capturing:  false,
                            name:       'foo',
@@ -82,7 +73,7 @@
       
    ,  testCanParseNodeDescriptionWithNameOnly: function() {
       
-         givenDescriptor(jsonPathNodeDescription)
+         givenDescriptor(pathNodeDesc)
             .whenDescribing('foo')
             .shouldFind({  capturing:  false,
                            name:       'foo',
@@ -93,7 +84,7 @@
       
    ,  testCanParseCapturingNodeDescriptionWithNameAndFieldList: function() {
       
-         givenDescriptor(jsonPathNodeDescription)
+         givenDescriptor(pathNodeDesc)
             .whenDescribing('$foo{a b}')
             .shouldFind({  capturing:  true,
                            name:       'foo',
@@ -103,7 +94,7 @@
       }      
       
    ,  testCanParseNodeDescriptionWithNameOnlyInArrayNotation: function() {      
-         givenDescriptor(jsonPathNodeDescription)
+         givenDescriptor(pathNodeDesc)
             .whenDescribing('["foo"]')
             .shouldFind({  capturing:  false,
                            name:       'foo',
@@ -113,7 +104,7 @@
       }
       
      ,  testCanParseNodeDescriptionInPureDuckTypeNotation: function() {      
-         givenDescriptor(jsonPathNodeDescription)
+         givenDescriptor(pathNodeDesc)
             .whenDescribing('{a b c}')
             .shouldFind({  capturing:  false,
                            name:       '',
@@ -140,12 +131,16 @@
    NodeDescriptionAsserter.prototype.shouldFind = function( expected ){
    
       if( expected && !this._found ) {
+         if( !expected.capturing && !expected.name && !expected.fieldList ) {
+            return this; // wasn't expecting to find anything
+         }
+      
          throw new Error('wanted to find ' + JSON.stringify(expected) + ' but did not find any matches');
       }
-   
-      assertEquals( expected.capturing,   !!this._found[1] );   
-      assertEquals( expected.name,          this._found[2] );
-      assertEquals( expected.fieldList,     this._found[3] );
+            
+      assertEquals( 'capturing not found correctly' , !!expected.capturing     , !!this._found[1] );   
+      assertEquals( 'name not found correctly'      , expected.name || ''      , this._found[2]   );
+      assertEquals( 'fieldList not found correctly' , expected.fieldList || '' , this._found[3] || '' );
       return this;      
    };  
   
@@ -207,4 +202,4 @@
       return this;
    };      
 
-})();
+});
