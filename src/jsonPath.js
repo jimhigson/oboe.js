@@ -73,20 +73,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (pathStack, nodeStack, stackIndex) {
+      return function (pathList, nodeList) {
 
-         var
-             targetNode = nodeStack[stackIndex + 1],
-
-             targetNodeHasRequiredFields =
-                 (targetNode instanceof Object) &&
-                 requiredFields.every(function (field) {
-
-                    return (field in targetNode);
-
-                 });
-
-         return targetNodeHasRequiredFields && previousExpr(pathStack, nodeStack, stackIndex);
+         return hasAllProperties(requiredFields, head(nodeList)) && 
+                previousExpr(pathList, nodeList);
       }
    }
 

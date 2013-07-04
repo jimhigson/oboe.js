@@ -35,3 +35,19 @@ function defined( value ) {
 }
 
 function always(){return true}
+
+/**
+ * Returns true if object o has a key named like every property in the properties array.
+ * Will give false if any are missing, or if o is not an object.
+ * 
+ * @param {Object} o
+ * @param {String[]} properties
+ */
+function hasAllProperties(o, properties) {
+
+   return      (o instanceof Object) 
+            &&
+               properties.every(function (field) {         
+                  return (field in o);         
+               });
+}
