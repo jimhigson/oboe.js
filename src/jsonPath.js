@@ -73,10 +73,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (pathList, nodeList) {
+      return function (pathStack, nodeStack, stackIndex) {
 
-         return hasAllProperties(requiredFields, head(nodeList)) && 
-                previousExpr(pathList, nodeList);
+         return hasAllProperties(requiredFields, nodeStack[stackIndex + 1]) && 
+                previousExpr(pathStack, nodeStack, stackIndex);
       }
    }
 
@@ -96,7 +96,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       }
       
       return function (pathStack, nodeStack, stackIndex) {
-         return previousExpr(pathStack, nodeStack, stackIndex) && (nodeStack[stackIndex + 1]);
+         return previousExpr(pathStack, nodeStack, stackIndex) && nodeStack[stackIndex + 1];
       }
       
    }            

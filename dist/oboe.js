@@ -105,6 +105,22 @@ function defined( value ) {
 }
 
 function always(){return true}
+
+/**
+ * Returns true if object o has a key named like every property in the properties array.
+ * Will give false if any are missing, or if o is not an object.
+ * 
+ * @param {Object} o
+ * @param {String[]} properties
+ */
+function hasAllProperties(properties, o) {
+
+   return      (o instanceof Object) 
+            &&
+               properties.every(function (field) {         
+                  return (field in o);         
+               });
+}
 (function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the
@@ -1031,18 +1047,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       return function (pathStack, nodeStack, stackIndex) {
 
-         var
-             targetNode = nodeStack[stackIndex + 1],
-
-             targetNodeHasRequiredFields =
-                 (targetNode instanceof Object) &&
-                 requiredFields.every(function (field) {
-
-                    return (field in targetNode);
-
-                 });
-
-         return targetNodeHasRequiredFields && previousExpr(pathStack, nodeStack, stackIndex);
+         return hasAllProperties(requiredFields, nodeStack[stackIndex + 1]) && 
+                previousExpr(pathStack, nodeStack, stackIndex);
       }
    }
 
@@ -1062,7 +1068,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       }
       
       return function (pathStack, nodeStack, stackIndex) {
-         return previousExpr(pathStack, nodeStack, stackIndex) && (nodeStack[stackIndex + 1]);
+         return previousExpr(pathStack, nodeStack, stackIndex) && nodeStack[stackIndex + 1];
       }
       
    }            

@@ -43,7 +43,7 @@ function always(){return true}
  * @param {Object} o
  * @param {String[]} properties
  */
-function hasAllProperties(o, properties) {
+function hasAllProperties(properties, o) {
 
    return      (o instanceof Object) 
             &&
