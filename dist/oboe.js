@@ -976,7 +976,17 @@ var jsonPathCompiler = (function () {
          return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
       };      
    }
-   
+
+   /**
+    * Expression for a duck-typed node, expressed like:
+    * 
+    *    {spin, taste, colour}
+    *    .particle{spin, taste, colour}
+    *    *{spin, taste, colour}
+    * 
+    * @param {Function} previousExpr
+    * @param {Array} detection
+    */
    function matchAgainstDuckType(previousExpr, detection) {
 
       var fieldListStr = detection[FIELD_LIST_INDEX];
