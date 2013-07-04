@@ -52,13 +52,46 @@ a common bridge between languages
 
 Also very simple. Easy to parse.
 
+creating a losely coupled reader
+-------------------------------
+
+Programming to identify a certain interesting part of a resource today should with a high probability
+still work when applied to future releases. 
+
+Requires a small amount of discipline on behalf of the service provider: Upgrade by adding of semantics only 
+most of the time rather than changing existing semantics.
+
+Adding of semantics should could include adding new fields to objects (which could themselves contain large sub-trees)
+or a "push-down" refactor in which what was a root node is pushed down a level by being suspended from a new parent. 
+See \ref{enhancingrest}
+  
+![extended json rest service that still works - maybe do a table instead \label{enhancingrest}](images/placeholder)   
+  
+(CITE: re-read citations from SOA)
+
+
+
 identifying interesting objects in the stream
 ---------------------------------------------
 
+Xml comes with a strong concept of the *type* of an element, the tag name is taken as a more immediate fundamental property
+of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is
+always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) 
+there is no further concept of type. If we wish to build a further understanding of the type of the objects
+then the realtionship with the parent object, expressed by the attribute name, is more likely to indicate the type.
+A second approach is to use duck typing in which the relationship of the object to its ancestors is not examined but
+the properties of the object are used instead to communicate an enhanced concept of type. For example, we might
+say that any object with an isbn and a title is a book.
+
+Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects
+co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness.
+Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document,
+the 
+
+Design not just for now, design to be stable over future iterations of the software. Agile etc.           
+
 Why an existing jsonPath implmentation couldn't be used: need to add new features and need to be able to check
 against a path expressed as a stack of nodes.
-
-
 
 More important to efficiently detect or efficiently compile the patterns?
 
@@ -91,6 +124,8 @@ Essentially two ways to identify an interesting node - by location (covered by e
 
 Why duck typing is desirable in absense of genuine types in the json standard (ala tag names in XML).  or by a loose concept of type
 which is not well supported by existing jsonpath spec. 
+
+Compare duck typing to the tag name in 
 
 To extend JsonPath to support a concise expression of duck typing, I chose a syntax which is similar to fields
 in jsonFormat:
@@ -168,6 +203,57 @@ Why could implement Function#partial via prototype. Why not going to. Is a shame
 However, are using prototype for minimal set of polyfills. Not general purpose. 
 
 
+Different ways to do currying below:
+
+```javascript
+
+// function factory pattern (CITEME)
+function foo(a,b,c) {
+   return function partiallyCompleted(d,e,f) {
+   
+      // may refer to partiallyCompleted in here
+   }
+}
+
+function fooBar(a,b,c,d,e,f) {
+}
+
+partial(fooBar, a,b);
+```
+
+Partial completion is implemented using the language itself, not provided by the language.
+
+Why would we choose 1 over the other? First simpler from caller side, second more flexible. Intuitive to
+call as a single call and can call self more easily.
+
+In same cases, first form makes it easier to communicate that the completion comes in two parts, for
+example:
+
+```javascript
+ namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
+```
+
+There is a construction part (first 3 args) and a usage part (last three). Comsume many can only be
+constructed to ues consume 1 in second style because may refer to its own paritally completed version.
+
+In first case, can avoid this:
+```
+   consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);
+```
+because function factory can have optional arguments so don't have to give all of them
+
+Function factory easier to debug. 'Step in' works. With partialCompletion have an awkward proxy
+function that breaks the programmer's train of thought as stepping through the code.
+
+Why it is important to consider the frame of mind of the coder (CITEME: Hackers and Painters)
+and not just the elegance of the possible language expressions.
+
+If implementing own functional caching, functional cache allows two levels of caching. Problematic
+though, for example no way to clear out the cache if memory becomes scarce.
+
+
+Functional programming tends to lend better to minification than OO-style because of untyped record objects (can
+have any keys).
 
 composition of several source files into a distributable binary-like text file
 -------------------------------------------------
@@ -226,7 +312,18 @@ A good test should be able to go unchanged as the source under test is refactore
 how we know that the code under test still works as intended.
 Experince tells me that testing that A listens to B (ie that the controller wires the jsonbuilder up to clarinet) 
 produces the kind of test that 'follows the code arround' meaning that because it is testing implementation details
-rather than behaviours, whenever the implementation is updated the tests have to be updated too.   
+rather than behaviours, whenever the implementation is updated the tests have to be updated too.
+
+By testing individual tokens are correct and the use of those tokens as a wider expression, am testing
+the same thing twice. Arguably, redundant effort. But may simply be easier to write in that way - software
+is written by a human in a certain order and if we take a bottom-up approach to some of that design, each
+layer is easier to create if we first know the layers that it sits on are sound. Writing complex regular
+expressions is still programming and it is more difficult to test them completely when wrapped in rather
+a lot more logic than directly. For example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is
+not trivial.
+
+Can test less exhaustively on higher levels if lower ones are well tested, testing where it is easier to do
+whilst giving good guarantees 
 
 
 

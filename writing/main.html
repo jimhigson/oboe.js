@@ -2,9 +2,23 @@
 <p><strong>100-200 words</strong></p>
 <h1 id="introduction"><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
 <p><strong>introduction should be 2-5 pages</strong></p>
-<p>Increasing the perception of speed. Source that doing things early makes page feel faster. Also actually faster as well as being perceived as such since useful things can often be done before whole content is loaded.</p>
+<p>Increasing the perception of speed: * Source that doing things early makes page feel faster. * Also actually faster as well as being perceived as such since useful things can often be done before whole content is loaded.</p>
 <p>When connections fail, apps are left with non of the content. Happens a lot on mobile networks.</p>
 <p>What a Micro-library is</p>
+<h2 id="inefficiencies-in-performing-a-fairly-simple-task"><a href="#inefficiencies-in-performing-a-fairly-simple-task"><span class="header-section-number">2.1</span> Inefficiencies in performing a fairly simple task</a></h2>
+<p>Despite the enthusiasm for which SOA and REST in particular has been adapted, I believe this model isn't being used to its fullest potential. Consider a fairly simple task of retrieving all the images used on a web page.</p>
+<p>Grab all the images mentioned in a web page Images may be on another subdomain * DNS lookup only after got whole page Dynamically generated pages can often load slowly, even when there is plenty of bandwidth But images could load quickly.</p>
+<p>Diagram of timeline to get images from a webpage.</p>
+<p>In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired into the browser engines rather than exposing an API suitable for general use and as such is treated as something of a special case specific to web browsers and has not so far seen a more general application. I wish to argue that a general application of this technique is viable and offers a worthwhile improvement over current common methods.</p>
+<p>The above problem has many analogues and because REST uses standard web semantics applies to much more than just automated web surfing. Indeed, as the machine readability of the data increases, access early can be all the more beneficial since decisions to terminate the connection may be made. Example: academic's list of publications, then downloading all the new ones.</p>
+<div class="figure">
+<img src="images/placeholder.png" alt="Potential differences in overall time taken to download a list of publications and then download any ones newer than a certain date. Assuming the publications are ordered newest first, the first connection may be terminated as soon as an older publication is found." /><p class="caption">Potential differences in overall time taken to download a list of publications and then download any ones newer than a certain date. Assuming the publications are ordered newest first, the first connection may be terminated as soon as an older publication is found.</p>
+</div>
+<h2 id="agile-methodologies-and-future-versioning"><a href="#agile-methodologies-and-future-versioning"><span class="header-section-number">2.2</span> Agile methodologies and future versioning</a></h2>
+<p>SOA has been adapted widely but versioning remains a common challenge in industry.</p>
+<p>Anecdote: test environment finds an issue. One system can't be released. Contagion.</p>
+<p>How to cope with software that changes every week.</p>
+<p>Because of the contagion problem, need to be able to create loosely-coupled systems.</p>
 <h1 id="background"><a href="#background"><span class="header-section-number">3</span> Background</a></h1>
 <p><strong>background should be 2-10 pages</strong></p>
 <p>SOA</p>
@@ -12,6 +26,7 @@
 <p>What is a rest client in this context (a client library)</p>
 <p>Marshalling/ de-marshalling. Benefits and the problems that it causes. Allows one model to be written out to XML or JSON</p>
 <p>Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.</p>
+<p>Javascript as mis-understood language (CITE: Crockford) - list features available.</p>
 <h2 id="parsing-sax-and-dom"><a href="#parsing-sax-and-dom"><span class="header-section-number">3.1</span> Parsing: SAX and Dom</a></h2>
 <p>Why sax is difficult</p>
 <p>DOM parser can be built on a SAX parser</p>
@@ -37,6 +52,7 @@
 
 <span class="co">// the equivalent jsonpath expression is identical:</span>
 <span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
+<p>What 'this' (context) is in javascript. Why not calling it scope.</p>
 <h2 id="xmlhttprequest"><a href="#xmlhttprequest"><span class="header-section-number">3.3</span> XmlHttpRequest</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback</p>
@@ -60,7 +76,18 @@
 <p>Why json?</p>
 <p>A bridge between languages that isn't too different from the common types in the languages themselves a common bridge between languages</p>
 <p>Also very simple. Easy to parse.</p>
-<h2 id="identifying-interesting-objects-in-the-stream"><a href="#identifying-interesting-objects-in-the-stream"><span class="header-section-number">4.3</span> identifying interesting objects in the stream</a></h2>
+<h2 id="creating-a-losely-coupled-reader"><a href="#creating-a-losely-coupled-reader"><span class="header-section-number">4.3</span> creating a losely coupled reader</a></h2>
+<p>Programming to identify a certain interesting part of a resource today should with a high probability still work when applied to future releases.</p>
+<p>Requires a small amount of discipline on behalf of the service provider: Upgrade by adding of semantics only most of the time rather than changing existing semantics.</p>
+<p>Adding of semantics should could include adding new fields to objects (which could themselves contain large sub-trees) or a &quot;push-down&quot; refactor in which what was a root node is pushed down a level by being suspended from a new parent. See </p>
+<div class="figure">
+<img src="images/placeholder.png" alt="extended json rest service that still works - maybe do a table instead " /><p class="caption">extended json rest service that still works - maybe do a table instead </p>
+</div>
+<p>(CITE: re-read citations from SOA)</p>
+<h2 id="identifying-interesting-objects-in-the-stream"><a href="#identifying-interesting-objects-in-the-stream"><span class="header-section-number">4.4</span> identifying interesting objects in the stream</a></h2>
+<p>Xml comes with a strong concept of the <em>type</em> of an element, the tag name is taken as a more immediate fundamental property of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) there is no further concept of type. If we wish to build a further understanding of the type of the objects then the realtionship with the parent object, expressed by the attribute name, is more likely to indicate the type. A second approach is to use duck typing in which the relationship of the object to its ancestors is not examined but the properties of the object are used instead to communicate an enhanced concept of type. For example, we might say that any object with an isbn and a title is a book.</p>
+<p>Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness. Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document, the</p>
+<p>Design not just for now, design to be stable over future iterations of the software. Agile etc.</p>
 <p>Why an existing jsonPath implmentation couldn't be used: need to add new features and need to be able to check against a path expressed as a stack of nodes.</p>
 <p>More important to efficiently detect or efficiently compile the patterns?</p>
 <p>The failure of sax: requires programmer to do a lot of work to identify interesting things. Eg, to find tag address inside tag person with a given name, have to recognise three things while reieving a callback for every single element and attribute in the document. As a principle, the programmer should only have to handle the cases which are interesting to them, not wade manually through a haystack in search of a needle, which means the library should provide an expressive way of associating the nodes of interest with their targetted callbacks.</p>
@@ -71,6 +98,7 @@
 <p>By sensible convention, even in a serialisation format with only a loose definition of lists, lists contain only items of the same type. This gives way to a sister convention, that for lists of items, the key immediately linking to the</p>
 <p>Essentially two ways to identify an interesting node - by location (covered by existing jsonpath)</p>
 <p>Why duck typing is desirable in absense of genuine types in the json standard (ala tag names in XML). or by a loose concept of type which is not well supported by existing jsonpath spec.</p>
+<p>Compare duck typing to the tag name in</p>
 <p>To extend JsonPath to support a concise expression of duck typing, I chose a syntax which is similar to fields in jsonFormat:</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">
 <span class="co">// the curly braces are my extension to jsonpath&quot;</span>
@@ -89,49 +117,75 @@
 
 <span class="fu">jsonPath</span>(matchingObject); <span class="co">// evaluates to true</span></code></pre>
 <p>When we aer searching</p>
-<h2 id="breaking-out-of-bigsmall-tradeoff"><a href="#breaking-out-of-bigsmall-tradeoff"><span class="header-section-number">4.4</span> breaking out of big/small tradeoff</a></h2>
+<h2 id="breaking-out-of-bigsmall-tradeoff"><a href="#breaking-out-of-bigsmall-tradeoff"><span class="header-section-number">4.5</span> breaking out of big/small tradeoff</a></h2>
 <p>Best of both modes</p>
 <p>Granularity: only need read as far as necessary. Services could be designed to write the big picture first. Alternatively, where resources link to one another, can stop reading at the link. Eg, looking for a person's publications, start with an index of people but no need to read whole list of people.</p>
 <p>Aborting http request may not stop processing on the server. Why this is perhaps desirable - transactions, leaving resources in a half-complete state.</p>
-<h2 id="program-design"><a href="#program-design"><span class="header-section-number">4.5</span> program design</a></h2>
+<h2 id="program-design"><a href="#program-design"><span class="header-section-number">4.6</span> program design</a></h2>
 <div class="figure">
 <img src="images/overallDesign.png" alt="Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has been split into different files." /><p class="caption">Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has been split into different files.</p>
 </div>
-<h2 id="styles-of-programming"><a href="#styles-of-programming"><span class="header-section-number">4.6</span> styles of programming</a></h2>
+<h2 id="styles-of-programming"><a href="#styles-of-programming"><span class="header-section-number">4.7</span> styles of programming</a></h2>
 <p>some of it is pure functional (jsonPath, controller) ie, only semantically different from a Haskell programme others, syntactically functional but stateful to fit in with expected APIs etc</p>
 <p>JsonPath implementation allows the compilation of complex expressions into an executable form, but each part implementing the executable form is locally simple. By using recursion, assembling the simple functions into a more function expressing a more complex rule also follows as being locally simple but gaining a usefully sophisticated behaviour through composition of simple parts. Each recursive call of the parser identifies one token for non-empty input and then recursively digests the rest.</p>
 <p>The style of implementation of the generator of functions corresponding to json path expressions is reminiscent of a traditional parser generator, although rather than generating source, functions are dynamically composed. Reflecting on this, parser gens only went to source to break out of the ability to compose the expressive power of the language itself from inside the language itself. With a functional approach, assembly from very small pieces gives a similar level of expressivity as writing the logic out as source code.</p>
 <p>Why could implement Function#partial via prototype. Why not going to. Is a shame. However, are using prototype for minimal set of polyfills. Not general purpose.</p>
-<h2 id="composition-of-several-source-files-into-a-distributable-binary-like-text-file"><a href="#composition-of-several-source-files-into-a-distributable-binary-like-text-file"><span class="header-section-number">4.7</span> composition of several source files into a distributable binary-like text file</a></h2>
+<p>Different ways to do currying below:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">
+<span class="co">// function factory pattern (CITEME)</span>
+<span class="kw">function</span> <span class="fu">foo</span>(a,b,c) {
+   <span class="kw">return</span> <span class="kw">function</span> <span class="fu">partiallyCompleted</span>(d,e,f) {
+   
+      <span class="co">// may refer to partiallyCompleted in here</span>
+   }
+}
+
+<span class="kw">function</span> <span class="fu">fooBar</span>(a,b,c,d,e,f) {
+}
+
+<span class="fu">partial</span>(fooBar, a,b);</code></pre>
+<p>Partial completion is implemented using the language itself, not provided by the language.</p>
+<p>Why would we choose 1 over the other? First simpler from caller side, second more flexible. Intuitive to call as a single call and can call self more easily.</p>
+<p>In same cases, first form makes it easier to communicate that the completion comes in two parts, for example:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"> <span class="fu">namedNodeExpr</span>(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )</code></pre>
+<p>There is a construction part (first 3 args) and a usage part (last three). Comsume many can only be constructed to ues consume 1 in second style because may refer to its own paritally completed version.</p>
+<p>In first case, can avoid this: <code>consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);</code> because function factory can have optional arguments so don't have to give all of them</p>
+<p>Function factory easier to debug. 'Step in' works. With partialCompletion have an awkward proxy function that breaks the programmer's train of thought as stepping through the code.</p>
+<p>Why it is important to consider the frame of mind of the coder (CITEME: Hackers and Painters) and not just the elegance of the possible language expressions.</p>
+<p>If implementing own functional caching, functional cache allows two levels of caching. Problematic though, for example no way to clear out the cache if memory becomes scarce.</p>
+<p>Functional programming tends to lend better to minification than OO-style because of untyped record objects (can have any keys).</p>
+<h2 id="composition-of-several-source-files-into-a-distributable-binary-like-text-file"><a href="#composition-of-several-source-files-into-a-distributable-binary-like-text-file"><span class="header-section-number">4.8</span> composition of several source files into a distributable binary-like text file</a></h2>
 <p>Why distributed javascript is more like a binary than a source file. Licencing implications?</p>
 <p>Inherent hiding by wrapping in a scope.</p>
 <p>Names of functions and variable names which are provably not possible to reference are lost for the sake of reduction of size of the source.</p>
 <p>Packaging for node or browser. No need to minify for node but concatenation still done for ease of inclusion in projects</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">typical pattern <span class="kw">for</span> packaging to work <span class="kw">in</span> either a <span class="ot">node</span>.<span class="fu">js</span> <span class="fu">server</span> <span class="fu">or</span> <span class="fu">a</span> <span class="fu">web</span> <span class="fu">browser</span></code></pre>
-<h2 id="automated-testing"><a href="#automated-testing"><span class="header-section-number">4.8</span> automated testing</a></h2>
+<h2 id="automated-testing"><a href="#automated-testing"><span class="header-section-number">4.9</span> automated testing</a></h2>
 <p>How automated testing improves what can be written, not just making what is written more reliable.</p>
 <div class="figure">
 <img src="images/pyramid.png" alt="The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. " /><p class="caption">The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. </p>
 </div>
 <p>Jstd can serve example files but need to write out slowly which it has no concept of. Customistation is via configuration rather than by plug-in, but even if it were, the threading model is not suitable to create this kind of timed output.</p>
 <p>Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading in which threads wait for a while response to be received.</p>
-<p>Testing via node - slowserver. Proxy.</p>
+<p>Testing via node to give something to test against - slowserver. Proxy.</p>
 <p>The test pyramid concept  fits in well with the hiding that is provided. Under the testing pyramid only very high level behaviours are tested as ??? tests. While this is a lucky co-incidence, it is also an unavoidable restriction. Once compiled into a single source file, the individual components are hidden, callable only from withing their closure. Hence, it would not be possible to test the composed parts individually post-concatenation into a single javascript file, not even via a workarround for data hiding such as found in Java's reflection. Whereas in Java the protection is a means of protecting otherwise addressable resources, once a function is trapped inside a javascript closure without external exposure it is not just protected but, appearing in no namespaces, inherently unreferenceable.</p>
 <p>TDD fits well into an object pattern because the software is well composed into separate parts. The objects are almost tangible in their distinction as separate encapsulated entities. However, the multi-paradigm style of my implementation draws much fainter borders over the implementation's landscape.</p>
 <p>Approach has been to the test the intricate code, then for wiring don't have tests to check that things are plumbed together correctly, rather rely on this being obvious enough to be detected via a smoke test.</p>
 <p>A good test should be able to go unchanged as the source under test is refactored. Indeed, the test will be how we know that the code under test still works as intended. Experince tells me that testing that A listens to B (ie that the controller wires the jsonbuilder up to clarinet) produces the kind of test that 'follows the code arround' meaning that because it is testing implementation details rather than behaviours, whenever the implementation is updated the tests have to be updated too.</p>
+<p>By testing individual tokens are correct and the use of those tokens as a wider expression, am testing the same thing twice. Arguably, redundant effort. But may simply be easier to write in that way - software is written by a human in a certain order and if we take a bottom-up approach to some of that design, each layer is easier to create if we first know the layers that it sits on are sound. Writing complex regular expressions is still programming and it is more difficult to test them completely when wrapped in rather a lot more logic than directly. For example, a regex which matches &quot;{a,b}&quot; or &quot;{a}&quot; but not &quot;{a,}&quot; is not trivial.</p>
+<p>Can test less exhaustively on higher levels if lower ones are well tested, testing where it is easier to do whilst giving good guarantees</p>
 <p>One dilemma in implementing the testing is how far to test the more generic sections of the codebase as generic components. A purist approach to TDD would say</p>
 <p>Could implement a resume function for if transmission stops halfway</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">   .<span class="fu">onError</span>( error ) {
       <span class="kw">this</span>.<span class="fu">resume</span>();
    }</code></pre>
-<h2 id="stability-over-upgrades"><a href="#stability-over-upgrades"><span class="header-section-number">4.9</span> stability over upgrades</a></h2>
+<h2 id="stability-over-upgrades"><a href="#stability-over-upgrades"><span class="header-section-number">4.10</span> stability over upgrades</a></h2>
 <p>why jsonpath-like syntax allows upgrading message semantics without causing problems [SOA] how to guarantee non-breakages? could publish 'supported queries' that are guaranteed to work</p>
-<h2 id="support-for-older-browsers"><a href="#support-for-older-browsers"><span class="header-section-number">4.10</span> support for older browsers</a></h2>
+<h2 id="support-for-older-browsers"><a href="#support-for-older-browsers"><span class="header-section-number">4.11</span> support for older browsers</a></h2>
 <p>Still works as well as non-progressive json Could be used for content that is inherently streaming (wouldn't make sense without streaming)</p>
-<h2 id="suitability-for-databases"><a href="#suitability-for-databases"><span class="header-section-number">4.11</span> suitability for databases</a></h2>
+<h2 id="suitability-for-databases"><a href="#suitability-for-databases"><span class="header-section-number">4.12</span> suitability for databases</a></h2>
 <p>Databases offer data one row at a time, not as a big lump.</p>
-<h2 id="weaknesses"><a href="#weaknesses"><span class="header-section-number">4.12</span> weaknesses</a></h2>
+<h2 id="weaknesses"><a href="#weaknesses"><span class="header-section-number">4.13</span> weaknesses</a></h2>
 <p>implementation keeps 'unreachable' listeners difficult decidability/proof type problem to get completely right but could cover most of the easy cases</p>
 <p>Parse time for large files spread out over a long time. Reaction to parsed content spread out over a long time, for example de-marshalling to domain objects. For UX may be preferable to have many small delays rather than one large one.</p>
 <p>Doesn't support all of jsonpath. Not a strict subset of the language.</p>
@@ -140,6 +194,11 @@
 <p>Would benefit from a stateless language where everything is stateless at all times to avoid having to program defensively.</p>
 <h1 id="conclusion"><a href="#conclusion"><span class="header-section-number">5</span> Conclusion</a></h1>
 <p><strong>1 to 5 pages</strong></p>
-<p>Invalid jsonpaths made from otherwise valid clauses (for example two roots) perhaps could fail early, at compile time. Instead, get a jsonPath that couldn't match anything</p>
+<p>Invalid jsonpaths made from otherwise valid clauses (for example two roots) perhaps could fail early, at compile time. Instead, get a jsonPath that couldn't match anything. Invalid syntax is picked up.</p>
+<p>Same pattern could be extended to XML. Or any tree-based format. Text is easier but no reason why not binary applications.</p>
+<p>Not particularly useful reading from local files.</p>
+<p>Does not save memory over DOM parsing since the same DOM tree is built. May slightly increase memory usage by utilising memory earlier that would otherwise be dept dormant until the whole transmission is received but worst case more often a concern than mean.</p>
+<p>Implementation in a purely functional language with lazy evaluation: could it mean that only the necessary parts are computed? Could I have implemented the same in javascript?</p>
+<p>Would be nice to: * discard patterns that can't match any further parts of the tree * discard branches of the tree that can't match any patterns * just over the parsing of branches of the tree that provably can't match any of the patterns</p>
 <h1 id="bibliography"><a href="#bibliography"><span class="header-section-number">6</span> Bibliography</a></h1>
 <h1 id="appendix"><a href="#appendix"><span class="header-section-number">7</span> Appendix</a></h1>

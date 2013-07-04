@@ -16,6 +16,7 @@ Allows one model to be written out to XML or JSON
 
 Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.
 
+Javascript as mis-understood language (CITE: Crockford) - list features available.
 
 Parsing: SAX and Dom
 --------------------
@@ -36,7 +37,6 @@ Long poll - for infrequent push messages. Must be read
 Writing script tags
 
 All require server to have a special mode. Encoding is specific to get arround restrictions.
-
 
 JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.
 
@@ -59,7 +59,9 @@ let addresss = person.address[2]
 // the equivalent jsonpath expression is identical:
 let jsonPath = "person.address[2]"
 
-``` 
+```
+
+What 'this' (context) is in javascript. Why not calling it scope. 
 
 
 

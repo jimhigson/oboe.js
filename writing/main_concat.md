@@ -13,14 +13,61 @@ Introduction
 
 **introduction should be 2-5 pages**
 
-Increasing the perception of speed.
-   Source that doing things early makes page feel faster.
-   Also actually faster as well as being perceived as such since useful things can often be done before whole
-   content is loaded.
+Increasing the perception of speed:
+*   Source that doing things early makes page feel faster.
+*   Also actually faster as well as being perceived as such since useful things can often be done before whole
+    content is loaded.
    
 When connections fail, apps are left with non of the content. Happens a lot on mobile networks.     
 
 What a Micro-library is
+
+
+
+Inefficiencies in performing a fairly simple task
+--------------------
+
+Despite the enthusiasm for which SOA and REST in particular has been adapted, I believe this model
+isn't being used to its fullest potential. Consider a fairly simple task of retrieving all the
+images used on a web page.  
+
+Grab all the images mentioned in a web page
+Images may be on another subdomain
+* DNS lookup only after got whole page
+Dynamically generated pages can often load slowly, even when there is plenty of bandwidth
+But images could load quickly.
+
+Diagram of timeline to get images from a webpage.
+
+In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired
+into the browser engines rather than exposing an API suitable for general use and as such is treated as 
+something of a special case specific to web browsers and has not so far seen a more general application.
+I wish to argue that a general application of this technique is viable and offers a worthwhile improvement
+over current common methods.
+
+The above problem has many analogues and because REST uses standard web semantics applies
+to much more than just automated web surfing. Indeed, as the machine readability of the data increases,
+access early can be all the more beneficial since decisions to terminate the connection may be made.
+Example: academic's list of publications, then downloading all the new ones.    
+
+![
+   Potential differences in overall time taken to download a list of publications and then download
+   any ones newer than a certain date.
+   Assuming the publications are ordered newest first, the first connection may be terminated
+   as soon as an older publication is found. 
+](images/placeholder) 
+
+
+Agile methodologies and future versioning
+-----------------------------------------
+
+SOA has been adapted widely but versioning remains a common challenge in industry.
+
+Anecdote: test environment finds an issue. One system can't be released. Contagion.
+ 
+How to cope with software that changes every week.
+
+Because of the contagion problem, need to be able to create loosely-coupled systems. 
 
 Background
 ==========
@@ -38,6 +85,7 @@ Allows one model to be written out to XML or JSON
 
 Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.
 
+Javascript as mis-understood language (CITE: Crockford) - list features available.
 
 Parsing: SAX and Dom
 --------------------
@@ -58,7 +106,6 @@ Long poll - for infrequent push messages. Must be read
 Writing script tags
 
 All require server to have a special mode. Encoding is specific to get arround restrictions.
-
 
 JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.
 
@@ -81,7 +128,9 @@ let addresss = person.address[2]
 // the equivalent jsonpath expression is identical:
 let jsonPath = "person.address[2]"
 
-``` 
+```
+
+What 'this' (context) is in javascript. Why not calling it scope. 
 
 
 
@@ -147,13 +196,46 @@ a common bridge between languages
 
 Also very simple. Easy to parse.
 
+creating a losely coupled reader
+-------------------------------
+
+Programming to identify a certain interesting part of a resource today should with a high probability
+still work when applied to future releases. 
+
+Requires a small amount of discipline on behalf of the service provider: Upgrade by adding of semantics only 
+most of the time rather than changing existing semantics.
+
+Adding of semantics should could include adding new fields to objects (which could themselves contain large sub-trees)
+or a "push-down" refactor in which what was a root node is pushed down a level by being suspended from a new parent. 
+See \ref{enhancingrest}
+  
+![extended json rest service that still works - maybe do a table instead \label{enhancingrest}](images/placeholder)   
+  
+(CITE: re-read citations from SOA)
+
+
+
 identifying interesting objects in the stream
 ---------------------------------------------
 
+Xml comes with a strong concept of the *type* of an element, the tag name is taken as a more immediate fundamental property
+of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is
+always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) 
+there is no further concept of type. If we wish to build a further understanding of the type of the objects
+then the realtionship with the parent object, expressed by the attribute name, is more likely to indicate the type.
+A second approach is to use duck typing in which the relationship of the object to its ancestors is not examined but
+the properties of the object are used instead to communicate an enhanced concept of type. For example, we might
+say that any object with an isbn and a title is a book.
+
+Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects
+co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness.
+Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document,
+the 
+
+Design not just for now, design to be stable over future iterations of the software. Agile etc.           
+
 Why an existing jsonPath implmentation couldn't be used: need to add new features and need to be able to check
 against a path expressed as a stack of nodes.
-
-
 
 More important to efficiently detect or efficiently compile the patterns?
 
@@ -186,6 +268,8 @@ Essentially two ways to identify an interesting node - by location (covered by e
 
 Why duck typing is desirable in absense of genuine types in the json standard (ala tag names in XML).  or by a loose concept of type
 which is not well supported by existing jsonpath spec. 
+
+Compare duck typing to the tag name in 
 
 To extend JsonPath to support a concise expression of duck typing, I chose a syntax which is similar to fields
 in jsonFormat:
@@ -263,6 +347,57 @@ Why could implement Function#partial via prototype. Why not going to. Is a shame
 However, are using prototype for minimal set of polyfills. Not general purpose. 
 
 
+Different ways to do currying below:
+
+```javascript
+
+// function factory pattern (CITEME)
+function foo(a,b,c) {
+   return function partiallyCompleted(d,e,f) {
+   
+      // may refer to partiallyCompleted in here
+   }
+}
+
+function fooBar(a,b,c,d,e,f) {
+}
+
+partial(fooBar, a,b);
+```
+
+Partial completion is implemented using the language itself, not provided by the language.
+
+Why would we choose 1 over the other? First simpler from caller side, second more flexible. Intuitive to
+call as a single call and can call self more easily.
+
+In same cases, first form makes it easier to communicate that the completion comes in two parts, for
+example:
+
+```javascript
+ namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
+```
+
+There is a construction part (first 3 args) and a usage part (last three). Comsume many can only be
+constructed to ues consume 1 in second style because may refer to its own paritally completed version.
+
+In first case, can avoid this:
+```
+   consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);
+```
+because function factory can have optional arguments so don't have to give all of them
+
+Function factory easier to debug. 'Step in' works. With partialCompletion have an awkward proxy
+function that breaks the programmer's train of thought as stepping through the code.
+
+Why it is important to consider the frame of mind of the coder (CITEME: Hackers and Painters)
+and not just the elegance of the possible language expressions.
+
+If implementing own functional caching, functional cache allows two levels of caching. Problematic
+though, for example no way to clear out the cache if memory becomes scarce.
+
+
+Functional programming tends to lend better to minification than OO-style because of untyped record objects (can
+have any keys).
 
 composition of several source files into a distributable binary-like text file
 -------------------------------------------------
@@ -298,7 +433,7 @@ rather than by plug-in, but even if it were, the threading model is not suitable
 Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading
 in which threads wait for a while response to be received.
 
-Testing via node - slowserver. Proxy.
+Testing via node to give something to test against - slowserver. Proxy.
 
 The test pyramid concept \ref{testingPyramidFig} fits in well with the hiding that is provided. Under the testing pyramid only very high level
 behaviours are tested as ??? tests. While this is a lucky co-incidence, it is also an unavoidable restriction.
@@ -321,7 +456,18 @@ A good test should be able to go unchanged as the source under test is refactore
 how we know that the code under test still works as intended.
 Experince tells me that testing that A listens to B (ie that the controller wires the jsonbuilder up to clarinet) 
 produces the kind of test that 'follows the code arround' meaning that because it is testing implementation details
-rather than behaviours, whenever the implementation is updated the tests have to be updated too.   
+rather than behaviours, whenever the implementation is updated the tests have to be updated too.
+
+By testing individual tokens are correct and the use of those tokens as a wider expression, am testing
+the same thing twice. Arguably, redundant effort. But may simply be easier to write in that way - software
+is written by a human in a certain order and if we take a bottom-up approach to some of that design, each
+layer is easier to create if we first know the layers that it sits on are sound. Writing complex regular
+expressions is still programming and it is more difficult to test them completely when wrapped in rather
+a lot more logic than directly. For example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is
+not trivial.
+
+Can test less exhaustively on higher levels if lower ones are well tested, testing where it is easier to do
+whilst giving good guarantees 
 
 
 
@@ -388,7 +534,24 @@ Conclusion
 **1 to 5 pages**
 
 Invalid jsonpaths made from otherwise valid clauses (for example two roots) perhaps could fail early, 
-at compile time. Instead, get a jsonPath that couldn't match anything 
+at compile time. Instead, get a jsonPath that couldn't match anything. Invalid syntax is picked up.
+
+Same pattern could be extended to XML. Or any tree-based format. Text is easier but no reason why not
+binary applications.
+
+Not particularly useful reading from local files.
+
+Does not save memory over DOM parsing since the same DOM tree is built. May slightly increase memory
+usage by utilising memory earlier that would otherwise be dept dormant until the whole transmission
+is received but worst case more often a concern than mean.
+
+Implementation in a purely functional language with lazy evaluation: could it mean that only the
+necessary parts are computed? Could I have implemented the same in javascript?
+
+Would be nice to:
+ * discard patterns that can't match any further parts of the tree
+ * discard branches of the tree that can't match any patterns
+ * just over the parsing of branches of the tree that provably can't match any of the patterns
 
 Bibliography
 ============
