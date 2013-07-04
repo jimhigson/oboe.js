@@ -301,6 +301,18 @@ Why uglify
 * Covers whole language, not just a well-advised subset.
 * In truth, Closure compiler works over a subset of javascript rather than the whole language.
 
+Why not require
+* What it is
+* Why so popular
+** Why a loader is necessary - js doesn't come with an import statement
+** How it can be done in the language itself without an import statement
+* Meant more for AMD than for single-load code
+** Situations AMD is good for - large site, most visitors don't need all the code loaded
+** Depends on run-time component to be loaded even after code has been optimised
+** Small compatible versions exist that just do loading (almond)  
+** Why ultimately not suitable for a library like this
+
+Why testing post-concatenation is good idea.
 
 polyfilling
 -----------
@@ -338,6 +350,8 @@ was exposed.
 
 Jstd can serve example files but need to write out slowly which it has no concept of. Customistation is via configuration
 rather than by plug-in, but even if it were, the threading model is not suitable to create this kind of timed output.
+
+Tests include an extremely large file twentyThousandRecords.js to test under stress
 
 Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading
 in which threads wait for a while response to be received.
