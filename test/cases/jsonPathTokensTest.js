@@ -1,4 +1,4 @@
-jsonPathTokens(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
+jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
 
    TestCase("jsonPathTokensTest", {
    

@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             ,  'src/libs/polyfills.js'
             ,  'src/libs/clarinet.js'               
             ,  'src/streamingXhr.js'
-            ,  'src/jsonPathTokens.js'
+            ,  'src/jsonPathSyntax.js'
             ,  'src/jsonPath.js'
             ,  'src/incrementalParsedContent.js'
             ,  'src/pubsub.js'

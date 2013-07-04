@@ -1,4 +1,4 @@
-var jsonPathTokens = (function() {
+var jsonPathSyntax = (function() {
 
    // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
    // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
