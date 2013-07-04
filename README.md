@@ -403,8 +403,8 @@ Oboe stops on error so won't give any further callbacks.
 var currentPersonElement;
 oboe.doGet('people.json')
    .onPath('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the json stream, we can
-      // use this to eagerly add them to the page:
+      // we don't have the person's details yet but we know we found someone in the 
+      // json stream, we can use this to eagerly add them to the page:
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
@@ -413,7 +413,8 @@ oboe.doGet('people.json')
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
    .onError(function( email ){
-      // oops, that didn't go so well. instead of leaving this dude half on the page, remove them altogether
+      // oops, that didn't go so well. instead of leaving this dude half on the page,
+      // remove them altogether
       currentPersonElement.remove();
    })
 ```
