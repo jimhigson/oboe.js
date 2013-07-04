@@ -88,6 +88,7 @@ Why Node perhaps is mis-placed in its current usage as a purely web platform "th
 This happened because web specialist programmers took it up first
  
 Why Node is significant
+* Recognises that most tasks are io-bound rather than CPU bound. Threaded models good for CPU-bound in the main.
 
 How Node is different
 

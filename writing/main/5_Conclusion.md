@@ -25,6 +25,19 @@ Would be nice to:
  * discard branches of the tree that can't match any patterns
  * just over the parsing of branches of the tree that provably can't match any of the patterns
  
+Comparative usages
+------------------
+
+In terms of syntax: compare to SAX (clarinet) for getting the same job done.
+Draw examples from github project README. Or from reimplementing Clarinet's examples.
+
+Consider:
+* Difficulty to program
+* Ease of reading the program / clarity of code
+* Resources consumed
+* Performance (time) taken -- about the same. Can react equally quickly to io in progress, both largely io bound. 
+ 
+ 
 Community reaction
 ------------------
 

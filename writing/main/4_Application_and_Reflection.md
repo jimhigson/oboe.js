@@ -74,6 +74,8 @@ See \ref{enhancingrest}
 identifying interesting objects in the stream
 ---------------------------------------------
 
+NB: This consideration of type in json could be in the Background section. 
+
 Xml comes with a strong concept of the *type* of an element, the tag name is taken as a more immediate fundamental property
 of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is
 always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) 
@@ -86,7 +88,17 @@ say that any object with an isbn and a title is a book.
 Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects
 co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness.
 Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document,
+the 'isa' relationship between a 'class' tagname and it's 'sub-tabname' may be difficult to track. It is likely that if
+I'm unaware of this, I'm not interested in the extended capabilities of the subclass and would rather just continue
+to recieve the base superclass capabilities as before. Under duck typing this is easy - becase the data consumer lists
 the 
+
+A third injection of type into json comes in the form of taking the first property of an object as being the tagname.
+Unsatisfactory, objects have an order while serialised as json but once deserialised typically have no further order.
+Clarinet.js seems to follow this pattern, notifying of new objects only once the first property's key is known so that
+it may be used to infer type. Can't be used with a general-purpose JSON writer tool, nor any JSON writer tool that
+reads from common objects.   
+ 
 
 Design not just for now, design to be stable over future iterations of the software. Agile etc.           
 

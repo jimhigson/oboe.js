@@ -53,13 +53,18 @@
 <span class="co">// the equivalent jsonpath expression is identical:</span>
 <span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
 <p>What 'this' (context) is in javascript. Why not calling it scope.</p>
-<h2 id="node"><a href="#node"><span class="header-section-number">3.3</span> Node</a></h2>
+<h2 id="the-web-browser-as-rest-client"><a href="#the-web-browser-as-rest-client"><span class="header-section-number">3.3</span> The web browser as REST client</a></h2>
+<p>Browser incompatability mostly in presentation layer rather than in scripting languages.</p>
+<p>Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs presented to the scripting language rather than the language itself.</p>
+<h2 id="state-of-rest-json-and-xml"><a href="#state-of-rest-json-and-xml"><span class="header-section-number">3.4</span> State of rest: Json and XML</a></h2>
+<p>Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!</p>
+<h2 id="node"><a href="#node"><span class="header-section-number">3.5</span> Node</a></h2>
 <p>What Node is V8. Fast. Near-native. JIT. Why Node perhaps is mis-placed in its current usage as a purely web platform &quot;the aim is absolutely fast io&quot;. This happened because web specialist programmers took it up first</p>
-<p>Why Node is significant</p>
+<p>Why Node is significant * Recognises that most tasks are io-bound rather than CPU bound. Threaded models good for CPU-bound in the main.</p>
 <p>How Node is different</p>
 <p>Criticisms of Node. Esp from Erlang etc devs.</p>
 <p>Node's standard stream mechanisms</p>
-<h2 id="xmlhttprequest"><a href="#xmlhttprequest"><span class="header-section-number">3.4</span> XmlHttpRequest</a></h2>
+<h2 id="xmlhttprequest"><a href="#xmlhttprequest"><span class="header-section-number">3.6</span> XmlHttpRequest</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback</p>
 <h1 id="applicaiton-and-reflection"><a href="#applicaiton-and-reflection"><span class="header-section-number">4</span> Applicaiton and Reflection</a></h1>
@@ -91,8 +96,10 @@
 </div>
 <p>(CITE: re-read citations from SOA)</p>
 <h2 id="identifying-interesting-objects-in-the-stream"><a href="#identifying-interesting-objects-in-the-stream"><span class="header-section-number">4.4</span> identifying interesting objects in the stream</a></h2>
+<p>NB: This consideration of type in json could be in the Background section.</p>
 <p>Xml comes with a strong concept of the <em>type</em> of an element, the tag name is taken as a more immediate fundamental property of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) there is no further concept of type. If we wish to build a further understanding of the type of the objects then the realtionship with the parent object, expressed by the attribute name, is more likely to indicate the type. A second approach is to use duck typing in which the relationship of the object to its ancestors is not examined but the properties of the object are used instead to communicate an enhanced concept of type. For example, we might say that any object with an isbn and a title is a book.</p>
-<p>Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness. Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document, the</p>
+<p>Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness. Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document, the 'isa' relationship between a 'class' tagname and it's 'sub-tabname' may be difficult to track. It is likely that if I'm unaware of this, I'm not interested in the extended capabilities of the subclass and would rather just continue to recieve the base superclass capabilities as before. Under duck typing this is easy - becase the data consumer lists the</p>
+<p>A third injection of type into json comes in the form of taking the first property of an object as being the tagname. Unsatisfactory, objects have an order while serialised as json but once deserialised typically have no further order. Clarinet.js seems to follow this pattern, notifying of new objects only once the first property's key is known so that it may be used to infer type. Not very good, won't persue further.</p>
 <p>Design not just for now, design to be stable over future iterations of the software. Agile etc.</p>
 <p>Why an existing jsonPath implmentation couldn't be used: need to add new features and need to be able to check against a path expressed as a stack of nodes.</p>
 <p>More important to efficiently detect or efficiently compile the patterns?</p>
@@ -194,7 +201,7 @@
 <p>A good test should be able to go unchanged as the source under test is refactored. Indeed, the test will be how we know that the code under test still works as intended. Experince tells me that testing that A listens to B (ie that the controller wires the jsonbuilder up to clarinet) produces the kind of test that 'follows the code arround' meaning that because it is testing implementation details rather than behaviours, whenever the implementation is updated the tests have to be updated too.</p>
 <p>By testing individual tokens are correct and the use of those tokens as a wider expression, am testing the same thing twice. Arguably, redundant effort. But may simply be easier to write in that way - software is written by a human in a certain order and if we take a bottom-up approach to some of that design, each layer is easier to create if we first know the layers that it sits on are sound. Writing complex regular expressions is still programming and it is more difficult to test them completely when wrapped in rather a lot more logic than directly. For example, a regex which matches &quot;{a,b}&quot; or &quot;{a}&quot; but not &quot;{a,}&quot; is not trivial.</p>
 <p>Can test less exhaustively on higher levels if lower ones are well tested, testing where it is easier to do whilst giving good guarantees.</p>
-<p>Genuine data hiding gets in the way sometimes. Eg, token regexes are built from the combination of smaller regualar expressions for clarity (long regular expressions are concise but hard to read). However, because the components are hidden in a scope, they are not addressable by the tests and therefore cannot be directly tested. Reluctantly</p>
+<p>Genuine data hiding gets in the way sometimes. Eg, token regexes are built from the combination of smaller regualar expressions for clarity (long regular expressions are concise but hard to read), and then wrapped in functions (why? - explain to generify interface) before being exposed. Because the components are hidden in a scope, they are not addressable by the tests and therefore cannot be directly tested. Reluctantly</p>
 <p>One dilemma in implementing the testing is how far to test the more generic sections of the codebase as generic components. A purist approach to TDD would say</p>
 <p>Could implement a resume function for if transmission stops halfway</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">   .<span class="fu">onError</span>( error ) {
@@ -221,5 +228,10 @@
 <p>Does not save memory over DOM parsing since the same DOM tree is built. May slightly increase memory usage by utilising memory earlier that would otherwise be dept dormant until the whole transmission is received but worst case more often a concern than mean.</p>
 <p>Implementation in a purely functional language with lazy evaluation: could it mean that only the necessary parts are computed? Could I have implemented the same in javascript?</p>
 <p>Would be nice to: * discard patterns that can't match any further parts of the tree * discard branches of the tree that can't match any patterns * just over the parsing of branches of the tree that provably can't match any of the patterns</p>
+<h2 id="comparative-usages"><a href="#comparative-usages"><span class="header-section-number">5.1</span> Comparative usages</a></h2>
+<p>In terms of syntax: compare to SAX (clarinet) for getting the same job done. Draw examples from github project README. Or from reimplementing Clarinet's examples.</p>
+<p>Consider: * Difficulty to program * Ease of reading the program / clarity of code * Resources consumed * Performance (time) taken -- about the same. Can react equally quickly to io in progress, both largely io bound.</p>
+<h2 id="community-reaction"><a href="#community-reaction"><span class="header-section-number">5.2</span> Community reaction</a></h2>
+<p>Built into Dojo Followers on Github Being posted in forums (hopefully also listed on blogs) No homepage as of yet other than the Github page</p>
 <h1 id="bibliography"><a href="#bibliography"><span class="header-section-number">6</span> Bibliography</a></h1>
 <h1 id="appendix"><a href="#appendix"><span class="header-section-number">7</span> Appendix</a></h1>

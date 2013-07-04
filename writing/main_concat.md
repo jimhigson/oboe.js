@@ -130,7 +130,22 @@ let jsonPath = "person.address[2]"
 
 ```
 
-What 'this' (context) is in javascript. Why not calling it scope. 
+What 'this' (context) is in javascript. Why not calling it scope.
+
+The web browser as REST client
+-----------------------------
+
+Browser incompatability mostly in presentation layer rather than in scripting languages.
+
+Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs
+presented to the scripting language rather than the language itself. 
+   
+
+State of rest: Json and XML
+------------
+
+Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!
+
 
 
 Node
@@ -142,6 +157,7 @@ Why Node perhaps is mis-placed in its current usage as a purely web platform "th
 This happened because web specialist programmers took it up first
  
 Why Node is significant
+* Recognises that most tasks are io-bound rather than CPU bound. Threaded models good for CPU-bound in the main.
 
 How Node is different
 
@@ -234,6 +250,8 @@ See \ref{enhancingrest}
 identifying interesting objects in the stream
 ---------------------------------------------
 
+NB: This consideration of type in json could be in the Background section. 
+
 Xml comes with a strong concept of the *type* of an element, the tag name is taken as a more immediate fundamental property
 of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is
 always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) 
@@ -246,7 +264,16 @@ say that any object with an isbn and a title is a book.
 Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects
 co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness.
 Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document,
+the 'isa' relationship between a 'class' tagname and it's 'sub-tabname' may be difficult to track. It is likely that if
+I'm unaware of this, I'm not interested in the extended capabilities of the subclass and would rather just continue
+to recieve the base superclass capabilities as before. Under duck typing this is easy - becase the data consumer lists
 the 
+
+A third injection of type into json comes in the form of taking the first property of an object as being the tagname.
+Unsatisfactory, objects have an order while serialised as json but once deserialised typically have no further order.
+Clarinet.js seems to follow this pattern, notifying of new objects only once the first property's key is known so that
+it may be used to infer type. Not very good, won't persue further.   
+ 
 
 Design not just for now, design to be stable over future iterations of the software. Agile etc.           
 
@@ -527,7 +554,8 @@ Can test less exhaustively on higher levels if lower ones are well tested, testi
 whilst giving good guarantees.
 
 Genuine data hiding gets in the way sometimes. Eg, token regexes are built from the combination of smaller regualar
-expressions for clarity (long regular expressions are concise but hard to read). However, because the components are
+expressions for clarity (long regular expressions are concise but hard to read), and then wrapped in functions
+(why? - explain to generify interface) before being exposed. Because the components are
 hidden in a scope, they are not addressable by the tests and therefore cannot be directly tested. Reluctantly 
 
 
@@ -613,6 +641,27 @@ Would be nice to:
  * discard patterns that can't match any further parts of the tree
  * discard branches of the tree that can't match any patterns
  * just over the parsing of branches of the tree that provably can't match any of the patterns
+ 
+Comparative usages
+------------------
+
+In terms of syntax: compare to SAX (clarinet) for getting the same job done.
+Draw examples from github project README. Or from reimplementing Clarinet's examples.
+
+Consider:
+* Difficulty to program
+* Ease of reading the program / clarity of code
+* Resources consumed
+* Performance (time) taken -- about the same. Can react equally quickly to io in progress, both largely io bound. 
+ 
+ 
+Community reaction
+------------------
+
+Built into Dojo
+Followers on Github
+Being posted in forums (hopefully also listed on blogs)
+No homepage as of yet other than the Github page 
 
 Bibliography
 ============
