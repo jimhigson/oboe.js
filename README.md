@@ -125,7 +125,7 @@ It is nice to just have one, simple service for everything.
 Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
 Patches and suggestions most welcome.
 
-The project is designed in for easy testability and has [about 140 unit tests](/test/cases), including
+The project is designed in for easy testability and has [about 150 unit tests](/test/cases), including
 a few completely end-to-end tests that rely on a little node server to sends the data in drips.
 
 BSD licenced.
