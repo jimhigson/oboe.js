@@ -193,7 +193,6 @@ function incrementalParsedContent( clarinet, notify ) {
       curNodeFinished();
    };         
    
-   clarinet.onend =
    clarinet.oncloseobject =
    clarinet.onclosearray =       
       curNodeFinished;      
