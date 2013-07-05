@@ -210,9 +210,9 @@ Sometimes it is more useful to say *what you are trying to find* than *where you
  
 
 ``` js
-   oboeInstance.onNode('{name colour}', function( foodObject ) {
-   
-      // here we'll be given a callback for every object found that has both a name and a colour   
+   oboeInstance.onNode('{name colour}', function( foodObject ) {   
+      // I'll get called for every object found that 
+      // has both a name and a colour   
    };
 ```   
 
@@ -227,8 +227,9 @@ page as soon as possible.
 var currentPersonElement;
 oboe.doGet('//people.json')
    .onPath({'people.*': function(){
-      // we don't have the person's details yet but we know we found someone in the json stream. We can
-      // eagerly put their div to the page and then fill it with whatever other data we find:
+      // we don't have the person's details yet but we know we found someone 
+      // in the json stream. We can eagerly put their div to the page and 
+      // then fill it with whatever other data we find:
       currentPersonElement = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
@@ -262,8 +263,9 @@ oboe.doGet('/myapp/things.json')
          jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
       },
       '!.foods': function(){
-         // Will be called when the whole foods array has loaded. We've already wrote the DOM for each item in this array
-         // above so we don't need to use the items anymore, just hide the spinner:
+         // Will be called when the whole foods array has loaded. We've already
+         // wrote the DOM for each item in this array above so we don't need to 
+         // use the items anymore, just hide the spinner:
          MyApp.hideSpinner('#foods');
       }
    });
@@ -296,9 +298,10 @@ oboe.doGet('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
    .onNode('!.*', function( moduleJson, path ){
    
-      // This callback will be called with every direct child of the root object but not
-      // the sub-objects therein. Because we're coming off the root, the path argument
-      // is a single-element array with the module name like ['messages'] or ['photos']
+      // This callback will be called with every direct child of the root
+      // object but not the sub-objects therein. Because we're coming off
+      // the root, the path argument is a single-element array with the 
+      // module name like ['messages'] or ['photos']
       var moduleName = path[0];
       
       My.App.getModuleCalled(moduleName).showNewData(moduleJson);
@@ -333,10 +336,11 @@ function PeopleListCtrl($scope) {
    oboe.doGet('/myapp/things.json')
       .onNode('$people[*]', function( peopleLoadedSoFar ){
          
-         // This callback will be called with a 1-length array, a 2-length array, a 3-length array
-         // etc until the whole thing is loaded (actually, the same array with extra people objects
-         // pushed onto it) You can put this array on the scope object if you're using Angular and it will
-         // nicely re-render your list of people.
+         // This callback will be called with a 1-length array, a 2-length
+         // array, a 3-length array etc until the whole thing is loaded 
+         // (actually, the same array with extra people objects pushed onto
+         // it) You can put this array on the scope object if you're using 
+         // Angular and it will nicely re-render your list of people.
          
          $scope.people = peopleLoadedSoFar;
       });
