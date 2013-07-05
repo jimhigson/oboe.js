@@ -83,6 +83,40 @@ See \ref{enhancingrest}
 (CITE: re-read citations from SOA)
 
 
+Design of the jsonpath parser
+-----------------------
+
+Explain why Haskel/lisp style lists are used rather than arrays
+* In parser clauses, lots of 'do this then go to the next function with the rest'.
+* Normal arrays extremely inefficient to make a copy with one item popped off the start
+* Link to FastList on github
+** For sake of micro-library, implemented tiny list code with very bare needed
+* Alternative (first impl) was to pass an index around
+** But clause fns don't really care about indexes, they care about top of the list.
+** Slight advantage to index: allows going past the start for the root path (which doesn't have any index)
+   instead, have to use a special value to keep node and path list of the same length
+** Special token for root, takes advantage of object identity to make certain that cannot clash with something
+   from the json. Better than '__root__' or similar which could clash. String in js not considered distinct,
+   any two strings with identical character sequences are indistinguishable.
+   
+![Diagram showing why list is more memory efficient - multiple handles into same structure with
+different starts, contrast with same as an array](images/placeholder)
+     
+* For recognisably with existing code, use lists internally but transform into array on the boundary 
+between Oboe.js and the outside world (at same time, strip off special 'root path' token)  
+
+jsonPath parser gets the output from the incrementalParsedContent, minimally routed there by the controller.
+
+![Show a call into a compiled jsonPath to explain coming from incrementalParsedContent with two lists, ie
+the paths and the objects and how they relate to each other. Can use links to show that object list contains
+objects that contain others on the list. Aubergine etc example might be a good one](images/placeholder)
+
+Explain match starting from end of candidate path
+
+![Some kind of diagram showing jsonPath expressions and functions partially completed to link back to the
+previous function. Include the statementExpr pointing to the last clause](images/placeholder)
+
+
 
 identifying interesting objects in the stream
 ---------------------------------------------
@@ -291,6 +325,44 @@ Final consideration of coding: packaging up each unit to export a minimal interf
 
 
 
+
+
+
+
+The mutability problem
+----------------------
+
+Javascript provides no way to decalre an object with 'cohorts' who are allowed to change it whereas 
+others cannot - vars may be hidden via use of scope and closures (CITE: crockford) but attributes 
+are either mutable or immutable. 
+
+Why this is a problem.
+
+* bugs likely to be attributied to oboe because they'll be in a future *frame of execution*. But user
+error.
+
+Potential solutions: 
+
+* full functional-style imutability. Don't change the objects, just have a function that returns a new
+  one with one extra property. Problem - language not optimised for this. A lot of copying. Still doesn't
+  stop callback receiver from changing the state of hte object given.
+  (CITE: optimisations other languages use) 
+* immutable wrappers.
+* defensive cloning
+* defining getter properties
+
+
+targeting node and the browser
+------------------------------
+
+Node+browser
+To use Node.js and
+
+Need to build an abstraction layer over xhr/xhr2/node
+
+Use best of the capabilities of each. 
+ 
+
 composition of several source files into a distributable binary-like text file
 -------------------------------------------------
 
@@ -427,6 +499,20 @@ Could implement a resume function for if transmission stops halfway
       this.resume();
    }
 ```      
+
+Inversion of Control
+-------------------
+
+Aim of creating a micro-library rules out building in a general-purpose IoC library.
+
+However, can still follow the general principles.
+
+Why the Observer pattern (cite: des patterns) lends itself well to MVC and inversion of control.
+
+What the central controller does; acts as a plumber connecting the various parts up. Since oboe
+is predominantly event/stream based, once wired up little intervention is needed from the 
+controller. Ie, A knows how to listen for ??? events but is unintested who fired them. 
+
 
 stability over upgrades
 -----------------------

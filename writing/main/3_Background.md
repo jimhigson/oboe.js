@@ -5,6 +5,20 @@ Background
 
 **background should be 2-10 pages**
 
+Some high-level stuff about webapps and where processing is done
+-----------------------------------------
+
+Ie, front-end client-side, front-end server-side.
+
+[!A webapp running with a front end generated partially on server and partially on client side](images/placeholder)
+
+Separated from services by http calls regardless.
+
+Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE: get from old dis)
+
+Next is closest pre-runner to current web architecture.
+
+
 SOA
 ---
 
@@ -18,6 +32,10 @@ Allows one model to be written out to XML or JSON
 Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.
 
 Javascript as mis-understood language (CITE: Crockford) - list features available.
+
+(correctly, ECMAScript) Misleadingly named after Java as a marketing ploy when Java was a new technology
+(CITE) - in true more similar to Scheme or Lisp but with Java or C inspired syntax.  
+
 
 Anatomy of a SOA client
 ------------------------
@@ -182,6 +200,29 @@ Json is very simple, only a few CFGs required to describe the language (json.org
 Node
 ----
 
+> Streams in node are one of the rare occasions when doing something the fast way is actually easier. 
+> SO USE THEM. not since bash has streaming been introduced into a high level language as nicely as 
+> it is in node."
+[high level node style guide](https://gist.github.com/2401787)
+
+> node Stream API, which is the core I/O abstraction in Node.js (which is a tool for I/O) is 
+> essentially an abstract in/out interface that can handle any protocol/stream that also happens to 
+> be written in JavaScript.
+[http://maxogden.com/a-proposal-for-streaming-xhr.html]
+
+Bash streams a powerful abstraction easily programmed for linear streaming. Node more powerful, allows
+a powerful streaming abstraction which is no more complex to program than a javascript webapp front end.
+Essentially a low-level interface to streaming such as unix sockets or tcp connections. 
+
+Streams in node are the observer pattern. Readable streams emit 'readable' events when they have some data
+to be read and 'end' events when they are finished. Apart from error handling, so far as reading is concerned,
+that is the extent of the API.
+
+Although the streams themselves are stateful, because they are based on callbacks it is entirely possible to 
+use them from a component of a javascript program which is wholly stateless.
+
+Using Node's http module provides a stream but handles setting headers, putting the method otu etc.
+
 What Node is
 V8. Fast. Near-native. JIT.
 Why Node perhaps is mis-placed in its current usage as a purely web platform "the aim is absolutely fast io".
@@ -196,12 +237,27 @@ Criticisms of Node. Esp from Erlang etc devs.
 
 Node's standard stream mechanisms
 
-
-XmlHttpRequest
---------------
+Browser
+-------
 
 *XmlHttpRequest* (XHR)
 
-Xhr2 and the .onprogress callback
+Xhr2 and the .onprogress callback.
+polling responseText while in progress
+* why doesn't work in IE (built on an activeX object that provides buffering)
+
+Older style of javascript callback. Assign a listener to onprogress, not call an add listener method
+means can only have one listener.
+
+> While the request entity body is being transmitted and the upload complete flag is unset, queue a task 
+> to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every 
+> byte transmitted, whichever is least frequent.
+[w3c, XHR Working Draft](http://www.w3.org/TR/XMLHttpRequest/)
+
+Websockets
+More like node
+Can connect to any protocol (as always, easier to program if text based but can do binary)
+Can use to do http but not sufficient advantage over using 
+ 
 
 

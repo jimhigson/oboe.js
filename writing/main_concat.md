@@ -108,6 +108,20 @@ Background
 
 **background should be 2-10 pages**
 
+Some high-level stuff about webapps and where processing is done
+-----------------------------------------
+
+Ie, front-end client-side, front-end server-side.
+
+[!A webapp running with a front end generated partially on server and partially on client side](images/placeholder)
+
+Separated from services by http calls regardless.
+
+Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE: get from old dis)
+
+Next is closest pre-runner to current web architecture.
+
+
 SOA
 ---
 
@@ -121,6 +135,10 @@ Allows one model to be written out to XML or JSON
 Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.
 
 Javascript as mis-understood language (CITE: Crockford) - list features available.
+
+(correctly, ECMAScript) Misleadingly named after Java as a marketing ploy when Java was a new technology
+(CITE) - in true more similar to Scheme or Lisp but with Java or C inspired syntax.  
+
 
 Anatomy of a SOA client
 ------------------------
@@ -285,6 +303,29 @@ Json is very simple, only a few CFGs required to describe the language (json.org
 Node
 ----
 
+> Streams in node are one of the rare occasions when doing something the fast way is actually easier. 
+> SO USE THEM. not since bash has streaming been introduced into a high level language as nicely as 
+> it is in node."
+[high level node style guide](https://gist.github.com/2401787)
+
+> node Stream API, which is the core I/O abstraction in Node.js (which is a tool for I/O) is 
+> essentially an abstract in/out interface that can handle any protocol/stream that also happens to 
+> be written in JavaScript.
+[http://maxogden.com/a-proposal-for-streaming-xhr.html]
+
+Bash streams a powerful abstraction easily programmed for linear streaming. Node more powerful, allows
+a powerful streaming abstraction which is no more complex to program than a javascript webapp front end.
+Essentially a low-level interface to streaming such as unix sockets or tcp connections. 
+
+Streams in node are the observer pattern. Readable streams emit 'readable' events when they have some data
+to be read and 'end' events when they are finished. Apart from error handling, so far as reading is concerned,
+that is the extent of the API.
+
+Although the streams themselves are stateful, because they are based on callbacks it is entirely possible to 
+use them from a component of a javascript program which is wholly stateless.
+
+Using Node's http module provides a stream but handles setting headers, putting the method otu etc.
+
 What Node is
 V8. Fast. Near-native. JIT.
 Why Node perhaps is mis-placed in its current usage as a purely web platform "the aim is absolutely fast io".
@@ -299,13 +340,28 @@ Criticisms of Node. Esp from Erlang etc devs.
 
 Node's standard stream mechanisms
 
-
-XmlHttpRequest
---------------
+Browser
+-------
 
 *XmlHttpRequest* (XHR)
 
-Xhr2 and the .onprogress callback
+Xhr2 and the .onprogress callback.
+polling responseText while in progress
+* why doesn't work in IE (built on an activeX object that provides buffering)
+
+Older style of javascript callback. Assign a listener to onprogress, not call an add listener method
+means can only have one listener.
+
+> While the request entity body is being transmitted and the upload complete flag is unset, queue a task 
+> to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every 
+> byte transmitted, whichever is least frequent.
+[w3c, XHR Working Draft](http://www.w3.org/TR/XMLHttpRequest/)
+
+Websockets
+More like node
+Can connect to any protocol (as always, easier to program if text based but can do binary)
+Can use to do http but not sufficient advantage over using 
+ 
 
 
 
@@ -391,6 +447,40 @@ See \ref{enhancingrest}
 ![extended json rest service that still works - maybe do a table instead \label{enhancingrest}](images/placeholder)   
   
 (CITE: re-read citations from SOA)
+
+
+Design of the jsonpath parser
+-----------------------
+
+Explain why Haskel/lisp style lists are used rather than arrays
+* In parser clauses, lots of 'do this then go to the next function with the rest'.
+* Normal arrays extremely inefficient to make a copy with one item popped off the start
+* Link to FastList on github
+** For sake of micro-library, implemented tiny list code with very bare needed
+* Alternative (first impl) was to pass an index around
+** But clause fns don't really care about indexes, they care about top of the list.
+** Slight advantage to index: allows going past the start for the root path (which doesn't have any index)
+   instead, have to use a special value to keep node and path list of the same length
+** Special token for root, takes advantage of object identity to make certain that cannot clash with something
+   from the json. Better than '__root__' or similar which could clash. String in js not considered distinct,
+   any two strings with identical character sequences are indistinguishable.
+   
+![Diagram showing why list is more memory efficient - multiple handles into same structure with
+different starts, contrast with same as an array](images/placeholder)
+     
+* For recognisably with existing code, use lists internally but transform into array on the boundary 
+between Oboe.js and the outside world (at same time, strip off special 'root path' token)  
+
+jsonPath parser gets the output from the incrementalParsedContent, minimally routed there by the controller.
+
+![Show a call into a compiled jsonPath to explain coming from incrementalParsedContent with two lists, ie
+the paths and the objects and how they relate to each other. Can use links to show that object list contains
+objects that contain others on the list. Aubergine etc example might be a good one](images/placeholder)
+
+Explain match starting from end of candidate path
+
+![Some kind of diagram showing jsonPath expressions and functions partially completed to link back to the
+previous function. Include the statementExpr pointing to the last clause](images/placeholder)
 
 
 
@@ -517,6 +607,10 @@ program design
 styles of programming
 ---------------------
 
+The code presented is the result of the development many prior versions, it has never been rewritten in the
+sense of starting again. Nontheless, every part has been complely renewed several times. I am reviewing only
+the final version. Git promotes regular commits, there have been more than 500.
+
 some of it is pure functional (jsonPath, controller)
 ie, only semantically different from a Haskell programme
 others, syntactically functional but stateful
@@ -596,6 +690,44 @@ Final consideration of coding: packaging up each unit to export a minimal interf
 * Why minimal interfaces are better for minification 
 
 
+
+
+
+
+
+The mutability problem
+----------------------
+
+Javascript provides no way to decalre an object with 'cohorts' who are allowed to change it whereas 
+others cannot - vars may be hidden via use of scope and closures (CITE: crockford) but attributes 
+are either mutable or immutable. 
+
+Why this is a problem.
+
+* bugs likely to be attributied to oboe because they'll be in a future *frame of execution*. But user
+error.
+
+Potential solutions: 
+
+* full functional-style imutability. Don't change the objects, just have a function that returns a new
+  one with one extra property. Problem - language not optimised for this. A lot of copying. Still doesn't
+  stop callback receiver from changing the state of hte object given.
+  (CITE: optimisations other languages use) 
+* immutable wrappers.
+* defensive cloning
+* defining getter properties
+
+
+targeting node and the browser
+------------------------------
+
+Node+browser
+To use Node.js and
+
+Need to build an abstraction layer over xhr/xhr2/node
+
+Use best of the capabilities of each. 
+ 
 
 composition of several source files into a distributable binary-like text file
 -------------------------------------------------
@@ -734,6 +866,20 @@ Could implement a resume function for if transmission stops halfway
    }
 ```      
 
+Inversion of Control
+-------------------
+
+Aim of creating a micro-library rules out building in a general-purpose IoC library.
+
+However, can still follow the general principles.
+
+Why the Observer pattern (cite: des patterns) lends itself well to MVC and inversion of control.
+
+What the central controller does; acts as a plumber connecting the various parts up. Since oboe
+is predominantly event/stream based, once wired up little intervention is needed from the 
+controller. Ie, A knows how to listen for ??? events but is unintested who fired them. 
+
+
 stability over upgrades
 -----------------------
 
@@ -806,6 +952,9 @@ Would be nice to:
  
 Comparative usages
 ------------------
+
+Interesting article from Clarinet:
+http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
 
 In terms of syntax: compare to SAX (clarinet) for getting the same job done.
 Draw examples from github project README. Or from reimplementing Clarinet's examples.

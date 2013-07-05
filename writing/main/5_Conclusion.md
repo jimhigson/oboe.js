@@ -28,6 +28,9 @@ Would be nice to:
 Comparative usages
 ------------------
 
+Interesting article from Clarinet:
+http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+
 In terms of syntax: compare to SAX (clarinet) for getting the same job done.
 Draw examples from github project README. Or from reimplementing Clarinet's examples.
 
