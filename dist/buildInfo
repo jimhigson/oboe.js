@@ -2,23 +2,16 @@ I have grunt at  /usr/local/bin/grunt
 grunt-cli v0.1.6
 grunt v0.4.0
 no tests specified, will run all
-building at Thu  4 Jul 2013 12:46:23 BST
+building at Fri  5 Jul 2013 20:36:34 BST
 Will run oboe json tests( all ) against dev
 setting runnermode QUIET
 Chrome: Reset
 Chrome: Reset
-Microsoft Internet Explorer: Reset
-Microsoft Internet Explorer: Reset
 ......................................................................
 ......................................................................
-......................................................................
-......................................................................
-......F...
-Total 290 tests (Passed: 289; Fails: 1; Errors: 0) (49996.00 ms)
-  Chrome 27.0.1453.116 Mac OS: Run 145 tests (Passed: 145; Fails: 0; Errors 0) (5756.00 ms)
-  Microsoft Internet Explorer 8.0 Windows: Run 145 tests (Passed: 144; Fails: 1; Errors 0) (49996.00 ms)
-    testStreamingXhr.testAjaxingOverStreamingHttpGivesMultipleCallbacks failed (2886.00 ms): AssertError: I had 1 progress callback(s), should have had at least 3. If this doesn't test the browser's XHR might not support reading partial responses. Unfortunately this is inevitable in IE less than version 10.
-
+.............
+Total 153 tests (Passed: 153; Fails: 0; Errors: 0) (5658.00 ms)
+  Chrome 27.0.1453.116 Mac OS: Run 153 tests (Passed: 153; Fails: 0; Errors 0) (5658.00 ms)
 [4mRunning "concat:oboe" (concat) task[24m
 File "dist/oboe.concat.js" created.
 
@@ -33,19 +26,15 @@ Will run oboe json tests( all ) against concat
 setting runnermode QUIET
 Chrome: Reset
 Chrome: Reset
-............Microsoft Internet Explorer: Reset
-Microsoft Internet Explorer: Reset
 ............
-Total 24 tests (Passed: 24; Fails: 0; Errors: 0) (97.00 ms)
-  Chrome 27.0.1453.116 Mac OS: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (70.00 ms)
-  Microsoft Internet Explorer 8.0 Windows: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (97.00 ms)
+Total 12 tests (Passed: 12; Fails: 0; Errors: 0) (96.00 ms)
+  Chrome 27.0.1453.116 Mac OS: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (96.00 ms)
 Will run oboe json tests( all ) against minified
 setting runnermode QUIET
 Chrome: Reset
 Chrome: Reset
-Microsoft Internet Explorer: Reset
-Microsoft Internet Explorer: Reset
-........................
-Total 24 tests (Passed: 24; Fails: 0; Errors: 0) (570.00 ms)
-  Chrome 27.0.1453.116 Mac OS: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (78.00 ms)
-  Microsoft Internet Explorer 8.0 Windows: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (570.00 ms)
+............
+Total 12 tests (Passed: 12; Fails: 0; Errors: 0) (45.00 ms)
+  Chrome 27.0.1453.116 Mac OS: Run 12 tests (Passed: 12; Fails: 0; Errors 0) (45.00 ms)
+Minified size is 13339 bytes
+Size after gzip is 4868 bytes

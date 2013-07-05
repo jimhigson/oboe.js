@@ -1402,7 +1402,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
  * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
  * distinct, therefore no other object can possibly clash with this one.
  */
-var ROOT_PATH = {r:0};
+var ROOT_PATH = {}; 
 
 
 /**
