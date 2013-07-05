@@ -121,6 +121,46 @@ function hasAllProperties(properties, o) {
                   return (field in o);         
                });
 }
+
+function cons(x, xs) {
+   return [x, xs];
+}
+
+var head = partialComplete(pluck, 0);
+var tail = partialComplete(pluck, 1);
+var emptyList = null;
+
+function reverseList(list){
+
+   // js re-implementation of 3rd solution from:
+   //    http://www.haskell.org/haskellwiki/99_questions/Solutions/5
+   function reverseInner( list, reversed ) {
+      if( !list ) {
+         return reversed;
+      }
+      
+      return reverseInner(tail(list), cons(head(list), reversed))
+   }
+
+   return reverseInner(list, emptyList);
+}
+
+function listAsArray(list){
+   if( !list ) {
+      return [];
+   } else {
+      var array = listAsArray(tail(list));
+      array.unshift(head(list)); 
+      return array;
+   }
+}
+
+/*function lastInList(list) {
+   if( !tail(list) ) {
+      return head(list);
+   }
+   return lastInList(tail(list));
+}*/
 (function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the
@@ -981,7 +1021,7 @@ var jsonPathSyntax = (function() {
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
  * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
  * 
- *   String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
+ *   String jsonPath -> (List pathList, List nodeList) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
@@ -1006,22 +1046,24 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function matchAgainstName(previousExpr, detection ) {
+   function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX];
-
-      if (!name) {
-         return previousExpr; // don't wrap at all, return given expr as-is
-      }
+      var name = detection[NAME_INDEX],
       
+          condition = name ? function(a){return a == name} : always; 
+     
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (pathStack, nodeStack, stackIndex) {
-         // in implementation, is like unnamednodeExpr except that we need the name to match.
-         // Once name matches, defer to unnamedNodeExpr:                                                                  
-         return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
+      return function (pathList, nodeList) {
+         // for jsonPath:
+         //    .foo
+         //    ["foo"]
+         //    [2]                                       
+                                                                  
+         return condition(head(pathList)) && 
+                previousExpr(pathList, nodeList);
       };      
    }
 
@@ -1035,7 +1077,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @param {Function} previousExpr
     * @param {Array} detection
     */
-   function matchAgainstDuckType(previousExpr, detection) {
+   function duckTypeClause(previousExpr, detection) {
 
       var fieldListStr = detection[FIELD_LIST_INDEX];
 
@@ -1045,10 +1087,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (pathStack, nodeStack, stackIndex) {
+      return function (pathList, nodeList) {
 
-         return hasAllProperties(requiredFields, nodeStack[stackIndex + 1]) && 
-                previousExpr(pathStack, nodeStack, stackIndex);
+         return hasAllProperties(requiredFields, head(nodeList)) && 
+                previousExpr(pathList, nodeList);
       }
    }
 
@@ -1056,7 +1098,6 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Expression for $
     * 
     * @param previousExpr
-    * @param capturing
     */
    function capture( previousExpr, detection ) {
 
@@ -1067,15 +1108,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (pathStack, nodeStack, stackIndex) {
-         return previousExpr(pathStack, nodeStack, stackIndex) && nodeStack[stackIndex + 1];
+      return function (pathList, nodeList) {
+         return previousExpr(pathList, nodeList) &&
+                head(nodeList);
       }
       
    }            
-   
-   
+      
    /**
-    * Moves onto the next item on the stack. Doesn't map neatly onto any particular language feature but
+    * Moves onto the next item on the lists. Doesn't map neatly onto any particular language feature but
     * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)
     * 
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
@@ -1083,12 +1124,32 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     */
    function consume1(previousExpr) {
    
+   
+      if( previousExpr == always ) {
+         // If there is no previous expression, this consume command is at the start of the jsonPath.
+         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
+         // it, we default to true. 
+         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
+         // '..*'            
+         return always;
+      }
+   
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function( pathStack, nodeStack, stackIndex ){
+      return function( pathList, nodeList ){
+      
+         if( head(pathList) === ROOT_PATH ) {
+            // if we're already at the root but there are more expressions to satisfy,
+            // can't consume any more. No match.
+            
+            // NOTE: this is why none of the other exprs have to be able to handle empty lists;
+            // only consume1 moves onto the next token and it refuses to do so once it reaches
+            // the list item in the list.                     
+            return false;
+         }                
                  
-         return previousExpr(pathStack, nodeStack, stackIndex-1);
+         return previousExpr(tail(pathList), tail(nodeList));
       };                                                                                                            
    }   
    
@@ -1100,7 +1161,16 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     *                     and decides if there is a match or not
     */   
    function consumeMany(previousExpr) {
-            
+
+      if( previousExpr == always ) {
+         // If there is no previous expression, this consume command is at the start of the jsonPath.
+         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
+         // it, we default to true. 
+         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
+         // '..*'            
+         return always;
+      }
+          
       var 
             // jsonPath .. is equivalent to !.. so if .. reaches the root
             // the match has suceeded.
@@ -1115,9 +1185,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
-      function consumeManyPartiallyCompleted(pathStack, nodeStack, stackIndex) {
+      function consumeManyPartiallyCompleted(pathList, nodeList) {
       
-         if( stackIndex < -1 ) {
+         if( !nodeList ) {
             // have gone past the start, not a match:         
             return false;
          }      
@@ -1138,8 +1208,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(_pathStack, nodeStack, stackIndex ){
-         return stackIndex == -1;
+      return function(pathList){
+         return head(pathList) == ROOT_PATH;
       };
    }   
          
@@ -1147,29 +1217,24 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Expression for the empty string. As the jsonPath parser generates the path parser, it will eventually
     * run out of tokens and get to the empty string. So, all generated parsers will be wrapped in this function.
     * 
-    * Initialises the stackIndex and kicks off the other expressions.   
-    * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found
-    * 
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */   
-   function statementExpr(startingExpr) {
+   function statementExpr(lastClause) {
    
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathStack, nodeStack) {
+      return function(pathList, nodeList) {
    
-         // kick off the parsing by passing through to the first expression with the stackIndex set to the
-         // top of the stack:
-         var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
+         // kick off the parsing by passing through to the lastExpression
+         var exprMatch = lastClause(pathList, nodeList);
                                
          // Returning exactly true indicates that there has been a match but no node is captured. 
-         // By default, the node at the top of the stack gets returned. Just like in css4 selector 
+         // By default, the node at the start of the lists gets returned. Just like in css4 selector 
          // spec, if there is no $, the last node in the selector is the one being styled.                      
                          
-         return exprMatch === true ? lastOf(nodeStack) : exprMatch;
+         return exprMatch === true ? head(nodeList) : exprMatch;
       };
    }      
                           
@@ -1244,13 +1309,13 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(pathNodeSyntax   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+       clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
    ,   clauseMatcher(doubleDotSyntax  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
    ,   clauseMatcher(dotSyntax        , [] )  
-                                                 
+                                                                                      
    ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
    ,   clauseMatcher(emptySyntax      , [statementExpr])
    ];
@@ -1320,10 +1385,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    return function(jsonPath){
         
       try {
-         // Kick off the recursive parsing of the jsonPath with a function which always returns true.
-         // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
-         // in the tree. So long as they match the part specified, they don't care what the ancestors of the
-         // matched part are.         
+         // Kick off the recursive parsing of the jsonPath 
          return compileJsonPathToFunction(jsonPath, always);
       } catch( e ) {
          throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
@@ -1331,6 +1393,17 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    }
 
 });
+
+/**
+ * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
+ * have any path). This prevents the need for special-casing detection of the root object and allows it
+ * to be treated like any other object.
+ * 
+ * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
+ * distinct, therefore no other object can possibly clash with this one.
+ */
+var ROOT_PATH = {r:0};
+
 
 /**
  * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
@@ -1342,101 +1415,81 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
  * @param clarinet our source of low-level events
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
- */
+ */ 
 function incrementalParsedContent( clarinet, notify ) {
 
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 
     
-   var   
-         // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
-         // of curNode that we are currently parsing
-         curKey
+   var            
          // array of nodes from curNode up to the root of the document.
-   ,     nodeStack = [] // TODO: use fastlist? https://github.com/isaacs/fast-list
+         // the root is at the far end of the list, the current node is at the close end (the head) 
+         nodeList
+   
          // array of strings - the path from the root of the dom to the node currently being parsed
-   ,     pathStack = []
+         // the root is at the far end of the list, the current node is at the close end (the head)
+   ,     pathList
    
-         // the root node. This is not always the same as nodeStack[0], for example after finishing parsing
-         // the nodeStack will be empty but this will preserve a reference to the root element after parsing is
-         // finished
    ,     root;
-   
+
+
+
+   function addChildToParent(child, parent) {
+
+      if (isArray(parent)) {
+         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
+         // is for objects)
+         // so we need to notify of the paths when we find the items:
+         pathDiscovered(parent.length, child);
+      }
+
+      // add the newly found node to its parent
+      parent[head(pathList)] = child;
+   }
+
    /**
     * Manage the state and notifications for when a new node is found.
-    * 
-    * Valid values are either rootNodeFound or nonRootNodeFound. Will initially be rootNodeFound, 
-    * but reassigned to nonRootNodeFound after the first call.
-    * 
+    *  
     * @param {*} foundNode the thing that has been found in the json
     * @function
-    */   
-   var nodeFound =
-      /**
-       * This function is one of the possible values of nodeFound, for the sub-case where we have never found
-       * a node before
-       * 
-       * @param {*} foundNode
-       */   
-      function rootNodeFound( foundNode ) {
-    
-         // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
-         // to finding the root node because non-root nodes will have their paths notified as their keys are 
-         // discovered. Because this is the root, it can't have a key, hence undefined
-         keyDiscovered(undefined, foundNode);                  
-         
-         // store a reference to the root node (root var declared at top of file)
+    */                 
+   function nodeFound( foundNode ) {
+   
+      if( !nodeList ) {
+           
+         // we discovered the root node
          root = foundNode;
-            
-         // nodeStack will be empty, let's give it its first value            
-         nodeStack.push(foundNode);
-         
-         // the next node to be found won't be the root. Reassign this function:
-         nodeFound = nonRootNodeFound;      
-      };
-      
-   /**
-    * This function is one of the possible values of nodeFound, for the sub-case where we have found
-    * a node before
-    * 
-    * @param {*} foundNode
-    */              
-   function nonRootNodeFound( foundNode ) {
-   
-      var parentOfFoundNode = lastOf(nodeStack);
-            
-      if( isArray(parentOfFoundNode) ) {
-         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
-         // so we need to notify of the paths when we find the items: 
-         keyDiscovered(curKey, foundNode);
+         pathDiscovered(ROOT_PATH, foundNode);
+                           
+      } else {
+         // we discovered a node with a parent      
+         addChildToParent(foundNode, head(nodeList));
       }
-      
-      // add the newly found node to its parent
-      parentOfFoundNode[curKey] = foundNode;
-      pathStack.push(curKey);
-   
-      nodeStack.push(foundNode);                        
+                             
+      // and add it to our list:                                    
+      nodeList = cons(foundNode, nodeList);                                  
    }   
   
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number} key the key. If we are in an array will be a number, otherwise a string. 
+    * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
+    *    take the special value ROOT_PATH if the root node has just been found
     * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function keyDiscovered(key, value) {
+   function pathDiscovered(key, value) {
       
-      var fullPath = defined(key)? pathStack.concat(key) : pathStack;
-
       // if we have the key but no known value yet, at least put that key in the output 
       // but against no defined value:
-      if( key && !defined(value) ) {
-         lastOf(nodeStack)[key] = undefined;
+      if( !defined(value) ) {
+         head(nodeList)[key] = undefined;
       }   
-      
-      notify(PATH_FOUND_EVENT, fullPath, nodeStack.concat([value]) );
-      curKey = key;      
+
+      pathList = cons(key, pathList);
+     
+      notify(PATH_FOUND_EVENT, pathList, cons(value, nodeList) );
+ 
    }
 
 
@@ -1444,27 +1497,12 @@ function incrementalParsedContent( clarinet, notify ) {
     * manages the state and notifications for when the current node has ended
     */
    function curNodeFinished( ) {
-      
-      // we need to go up one level in the parsed json's tree
-      var completeNode = nodeStack.pop(),
-          parentOfCompleteNode = lastOf(nodeStack);
-      
-      // notify of the found node now that we don't have the curNode on the nodeStack anymore
-      // but we still want the
-      // pathstack to contain everything for this call: 
-      notify(NODE_FOUND_EVENT, pathStack, nodeStack.concat([completeNode]) );      
-            
-      pathStack.pop();   
-         
-      if( isArray(parentOfCompleteNode) ) {
-         // we're going back to an array, the curKey (the key the next item will be given) needs to match
-         // the length of that array:
-         curKey = len(parentOfCompleteNode);
-      } else {
-         // we're in an object, curKey has been used now and we don't know what the next key will 
-         // be so mark as unknown:
-         curKey = undefined;
-      }            
+
+      notify(NODE_FOUND_EVENT, pathList, nodeList );
+                          
+      // pop the complete node and its path off the lists:                
+      nodeList = tail(nodeList);                           
+      pathList = tail(pathList);
    }      
     
    /* 
@@ -1480,21 +1518,18 @@ function incrementalParsedContent( clarinet, notify ) {
       if( defined(firstKey) ) {
       
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-         // perminantly onto pathStack yet because we haven't identified what is at that key yet. Give null as the
+         // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
          // value because we haven't seen that far into the json yet          
-         keyDiscovered(firstKey);
+         pathDiscovered(firstKey);
       }
    };
    
    clarinet.onopenarray = function () {
       nodeFound([]);
-      // We haven't discovered a key in the json because we don't know if the array is empty or not. So, set 
-      // curKey in case there are contents
-      curKey = 0;
    };
 
    // called by Clarinet when keys are found in objects               
-   clarinet.onkey = keyDiscovered;   
+   clarinet.onkey = pathDiscovered;   
                
    clarinet.onvalue = function (value) {
    
@@ -1506,7 +1541,6 @@ function incrementalParsedContent( clarinet, notify ) {
       curNodeFinished();
    };         
    
-   clarinet.onend =
    clarinet.oncloseobject =
    clarinet.onclosearray =       
       curNodeFinished;      
@@ -1627,9 +1661,15 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function(path, nodeList){ 
+      eventBus.on( eventId, function(pathList, nodeList){ 
       
-         var foundNode = test( path, nodeList );
+         try{
+            var foundNode = test( pathList, nodeList );
+         } catch(e) {
+            // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
+            // want to catch as early as possible:
+            eventBus.notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
+         }
         
          // Possible values for foundNode are now:
          //
@@ -1648,9 +1688,18 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //                      
          if( foundNode !== false ) {                                 
            
-            // change curNode to foundNode when it stops breaking tests
             try{
-               callback(foundNode, path, nodeList );
+               // We're now calling back to outside of oboe where there is no concept of the
+               // functional-style lists that we are using internally so convert into standard
+               // arrays. Reverse the order because it is more natural to receive in order 
+               // "root to leaf" than "leaf to root"             
+            
+               callback(   foundNode,  
+                           // for the path list, also need to remove the last item which is the special
+                           // token for the 'path' to the root node
+                           listAsArray(tail(reverseList(pathList))), 
+                           listAsArray(reverseList(nodeList)) 
+               );
             } catch(e) {
                eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }

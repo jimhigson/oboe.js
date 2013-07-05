@@ -8,6 +8,7 @@
  */
 var ROOT_PATH = {}; 
 
+
 /**
  * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
  * 
@@ -24,78 +25,52 @@ function incrementalParsedContent( clarinet, notify ) {
    // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
    // this state and notify the callbacks 
     
-   var   
-         // If we're in an object, curKey will be a string. If in an array, a number. It is the name of the attribute 
-         // of curNode that we are currently parsing
-         curKey
-         
+   var            
          // array of nodes from curNode up to the root of the document.
          // the root is at the far end of the list, the current node is at the close end (the head) 
-   ,     nodeList
+         nodeList
    
          // array of strings - the path from the root of the dom to the node currently being parsed
          // the root is at the far end of the list, the current node is at the close end (the head)
    ,     pathList
    
-         // the root node. This is not always the same as nodeList[0], for example after finishing parsing
-         // the nodeList will be empty but this will preserve a reference to the root element after parsing is
-         // finished
    ,     root;
 
 
+
+   function addChildToParent(child, parent) {
+
+      if (isArray(parent)) {
+         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
+         // is for objects)
+         // so we need to notify of the paths when we find the items:
+         pathDiscovered(parent.length, child);
+      }
+
+      // add the newly found node to its parent
+      parent[head(pathList)] = child;
+   }
+
    /**
     * Manage the state and notifications for when a new node is found.
-    * 
-    * Valid values are either rootNodeFound or nonRootNodeFound. Will initially be rootNodeFound, 
-    * but reassigned to nonRootNodeFound after the first call.
-    * 
+    *  
     * @param {*} foundNode the thing that has been found in the json
     * @function
-    */   
-   var nodeFound =
-      /**
-       * This function is one of the possible values of nodeFound, for the sub-case where we have never found
-       * a node before
-       * 
-       * @param {*} foundNode
-       */   
-      function rootNodeFound( foundNode ) {
-    
-         // Notify path listeners (eg to '!' or '*') that the root path has been satisfied. This callback is specific
-         // to finding the root node because non-root nodes will have their paths notified as their keys are 
-         // discovered. Because this is the root, it can't have a key, hence undefined
-         pathDiscovered(ROOT_PATH, foundNode);                  
-         
-         // store a reference to the root node (root var declared at top of file)
-         root = foundNode;
-         
-         pathList = cons(ROOT_PATH, pathList);
-         nodeList = cons(foundNode, nodeList);
-         
-         // the next node to be found won't be the root. Reassign this function:
-         nodeFound = nonRootNodeFound;      
-      };
-      
-   /**
-    * This function is one of the possible values of nodeFound, for the sub-case where we have found
-    * a node before
-    * 
-    * @param {*} foundNode
-    */              
-   function nonRootNodeFound( foundNode ) {
+    */                 
+   function nodeFound( foundNode ) {
    
-      var parentOfFoundNode = head(nodeList);
-            
-      if( isArray(parentOfFoundNode) ) {
-         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there is for objects)
-         // so we need to notify of the paths when we find the items: 
-         pathDiscovered(curKey, foundNode);
+      if( !nodeList ) {
+           
+         // we discovered the root node
+         root = foundNode;
+         pathDiscovered(ROOT_PATH, foundNode);
+                           
+      } else {
+         // we discovered a node with a parent      
+         addChildToParent(foundNode, head(nodeList));
       }
-      
-      // add the newly found node to its parent
-      parentOfFoundNode[curKey] = foundNode;
-
-      pathList = cons(curKey,   pathList);                                    
+                             
+      // and add it to our list:                                    
       nodeList = cons(foundNode, nodeList);                                  
    }   
   
@@ -115,12 +90,10 @@ function incrementalParsedContent( clarinet, notify ) {
          head(nodeList)[key] = undefined;
       }   
 
-      // TODO: note the 2 cons. could this modify pathList? whenever called it is getting added to anyway
-      //    if we have the value, but why not build up path list ahead of having the value?
-      // that would only work if were possible to remove curKey altogether and always use head(pathList) 
-      // instead because would involve      
-      notify(PATH_FOUND_EVENT, cons(key, pathList), cons(value, nodeList) );
-      curKey = key;      
+      pathList = cons(key, pathList);
+     
+      notify(PATH_FOUND_EVENT, pathList, cons(value, nodeList) );
+ 
    }
 
 
@@ -130,28 +103,10 @@ function incrementalParsedContent( clarinet, notify ) {
    function curNodeFinished( ) {
 
       notify(NODE_FOUND_EVENT, pathList, nodeList );
-            
-      if( head( pathList ) == ROOT_PATH ) {
-         // The root node has finished so no more parsing will happen.
-         // We've notified of the complete node already so let's finish it here.
-         return;
-      }
-                
+                          
       // pop the complete node and its path off the lists:                
       nodeList = tail(nodeList);                           
       pathList = tail(pathList);
-      
-      var parentOfCompleteNode = head(nodeList);         
-         
-      if( isArray(parentOfCompleteNode) ) {
-         // we're going back to an array, the curKey (the key the next item will be given) needs to match
-         // the length of that array:
-         curKey = len(parentOfCompleteNode);
-      } else {
-         // we're in an object, curKey has been used now and we don't know what the next key will 
-         // be so mark as unknown:
-         curKey = undefined;
-      }            
    }      
     
    /* 
@@ -175,9 +130,6 @@ function incrementalParsedContent( clarinet, notify ) {
    
    clarinet.onopenarray = function () {
       nodeFound([]);
-      // We haven't discovered a key in the json because we don't know if the array is empty or not. So, set 
-      // curKey in case there are contents
-      curKey = 0;
    };
 
    // called by Clarinet when keys are found in objects               

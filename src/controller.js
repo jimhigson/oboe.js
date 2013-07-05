@@ -44,9 +44,15 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function(path, nodeList){ 
+      eventBus.on( eventId, function(pathList, nodeList){ 
       
-         var foundNode = test( path, nodeList );
+         try{
+            var foundNode = test( pathList, nodeList );
+         } catch(e) {
+            // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
+            // want to catch as early as possible:
+            eventBus.notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
+         }
         
          // Possible values for foundNode are now:
          //
@@ -65,9 +71,18 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //                      
          if( foundNode !== false ) {                                 
            
-            // change curNode to foundNode when it stops breaking tests
             try{
-               callback(foundNode, path, nodeList );
+               // We're now calling back to outside of oboe where there is no concept of the
+               // functional-style lists that we are using internally so convert into standard
+               // arrays. Reverse the order because it is more natural to receive in order 
+               // "root to leaf" than "leaf to root"             
+            
+               callback(   foundNode,  
+                           // for the path list, also need to remove the last item which is the special
+                           // token for the 'path' to the root node
+                           listAsArray(tail(reverseList(pathList))), 
+                           listAsArray(reverseList(nodeList)) 
+               );
             } catch(e) {
                eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }

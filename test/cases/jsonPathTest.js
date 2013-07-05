@@ -32,8 +32,8 @@
             .thenShouldMatch(       ['a','b']);                                  
       }
       
-   ,  testMatchingForAllDescendantsOfAnImplicitRootMatchAnythingExceptTheRoot: function() {
-         givenAPattern('..*')
+   ,  testMatchingForAllDescendantsOfAUniversallyMatchedRootMatchAnythingExceptTheRoot: function() {
+         givenAPattern('*..*')
             .thenShouldNotMatch(    [])
             .thenShouldMatch(       ['a'])
             .thenShouldMatch(       ['a','b']);                                  
@@ -373,44 +373,61 @@
       try {
          this._compiledPattern = jsonPathCompiler(pattern);
       } catch( e ) {
-         fail( 'problem parsing:' + pattern + "\n" + e );
+         fail( 'problem parsing:' + pattern + "\n" + (e.stack || e.message) );
       }          
    }
    
-   Asserter.prototype.thenShouldMatch = function(path, nodeStack) {
-
-      nodeStack = nodeStack || fakeNodeStack(path);
+   function convertParams(pathStack, nodeStack){
+      // change the two parameters into the test from  arrays (which are easy to write as in-line js) to
+      // lists (which is what the code under test needs) 
+   
+      nodeStack = nodeStack || fakeNodeStack(pathStack);
       
+      pathStack.unshift(ROOT_PATH);
+      
+      // convert both to lists:
+      var pathList = emptyList;
+      var nodeList = emptyList;
+      while(pathStack.length) {
+         pathList = cons( pathStack.shift(), pathList );
+         nodeList = cons( nodeStack.shift(), nodeList );
+      }   
+      
+      return { pathList: pathList, nodeList: nodeList };
+   }
+   
+   Asserter.prototype.thenShouldMatch = function(pathStack, nodeStack) {
 
+      var params = convertParams(pathStack, nodeStack);
+      
       try{   
-         this._lastResult = this._compiledPattern(path, nodeStack);
+         this._lastResult = this._compiledPattern(params.pathList, params.nodeList);
       } catch( e ) {
          fail( 'Error thrown running pattern "' + this._pattern + 
-                  '" against path [' + path.join(',') + ']' + "\n" + e );      
+                  '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
       }
       
       assertTrue( 
-         'pattern ' + this._pattern + ' should have matched [' + path.join(',') + ']'
+         'pattern ' + this._pattern + ' should have matched [' + pathStack.join(',') + ']'
       ,   !!this._lastResult 
       );            
       
       return this;
    };
    
-   Asserter.prototype.thenShouldNotMatch = function(path, nodeStack) {
+   Asserter.prototype.thenShouldNotMatch = function(pathStack, nodeStack) {
 
-      nodeStack = nodeStack || fakeNodeStack(path);
-      
-               
+      var params = convertParams(pathStack, nodeStack);
+
       try{
-         this._lastResult = this._compiledPattern(path, nodeStack);
+         this._lastResult = this._compiledPattern(params.pathList, params.nodeList);
       } catch( e ) {
          fail( 'Error thrown running pattern "' + this._pattern + 
-                  '" against path ' + '[' + path.join(',') + ']' + "\n" + e );      
+                  '" against path ' + '[' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
       }
       
       assertFalse( 
-         'pattern ' + this._pattern + ' should not have matched [' + path.join(',') + '] but ' +
+         'pattern ' + this._pattern + ' should not have matched [' + pathStack.join(',') + '] but ' +
              'did, returning ' + JSON.stringify(this._lastResult)
       ,  !!this._lastResult
       );          

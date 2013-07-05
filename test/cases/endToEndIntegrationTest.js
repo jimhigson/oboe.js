@@ -24,7 +24,7 @@
          queue.call("request the numbers json", function(jstdCallbacks){
          
             asserter = givenAnOboeInstance('firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks))
-               .andWeAreListeningForThingsFoundAtPattern('![*]');         
+               .andWeAreListeningForNodes('![*]');         
          });
 
          queue.call("should have gotten all the numbers", function( _queue ){
@@ -53,7 +53,7 @@
          queue.call("request the numbers json", function(jstdCallbacks){
          
             asserter = givenAnOboeInstanceGetting('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
-               .andWeAreListeningForThingsFoundAtPattern('![*]');         
+               .andWeAreListeningForNodes('![*]');         
          });
 
          queue.call("should have gotten all the numbers", function( _queue ){

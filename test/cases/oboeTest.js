@@ -37,7 +37,7 @@ TestCase("oboeTest", {
    testHandlesEmptyObjectDetectedWithBang: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!')
+         .andWeAreListeningForNodes('!')
          .whenGivenInput('{}')
          .thenTheInstance(
             matched({}).atRootOfJson(),
@@ -49,7 +49,7 @@ TestCase("oboeTest", {
 ,  testHandlesEmptyObjectDetectedWithBangWhenExplicitlySelected: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('$!')
+         .andWeAreListeningForNodes('$!')
          .whenGivenInput('{}')
          .thenTheInstance(
             matched({}).atRootOfJson(),
@@ -61,7 +61,7 @@ TestCase("oboeTest", {
 ,  testGivesWindowAsContextWhenNothingGivenExplicitly: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!')
+         .andWeAreListeningForNodes('!')
          .whenGivenInput('{}')
          .thenTheInstance( calledbackWithContext(window) );
    }
@@ -70,7 +70,7 @@ TestCase("oboeTest", {
       var myObject = { doSomething: function(){} };
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!', myObject.doSomething, myObject)
+         .andWeAreListeningForNodes('!', myObject.doSomething, myObject)
          .whenGivenInput('{}')
          .thenTheInstance( calledbackWithContext(myObject) );
    }   
@@ -78,7 +78,7 @@ TestCase("oboeTest", {
 ,  testFindOnlyFiresWhenHasWholeObject: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!')
+         .andWeAreListeningForNodes('!')
          .whenGivenInput('{')
           .thenTheInstance(
             foundNoMatches
@@ -98,7 +98,7 @@ TestCase("oboeTest", {
       // input.
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!')
+         .andWeAreListeningForPaths('!')
          .whenGivenInput('{"foo":')
           .thenTheInstance(
             foundNMatches(1),
@@ -113,7 +113,7 @@ TestCase("oboeTest", {
       // input.
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!')
+         .andWeAreListeningForPaths('!')
          .whenGivenInput('[1') // the minimum string required for clarinet 
                                // to fire onopenarray. Won't fire with '['.
           .thenTheInstance(
@@ -124,9 +124,9 @@ TestCase("oboeTest", {
    
      
 ,  testHandlesEmptyObjectDetectedWithSingleStar: function() {
-
+      // *
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('*')
+         .andWeAreListeningForNodes('*')
          .whenGivenInput('{}')
          .thenTheInstance(
             matched({}).atRootOfJson(),
@@ -137,7 +137,7 @@ TestCase("oboeTest", {
 ,  testDoesntDetectSpuriousPathOffEmptyObject: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.foo.*')
+         .andWeAreListeningForPaths('!.foo.*')
          .whenGivenInput( {foo:{}} )
          .thenTheInstance(
             foundNoMatches
@@ -145,9 +145,9 @@ TestCase("oboeTest", {
    }   
 
 ,  testHandlesEmptyObjectDetectedWithDoubleDot: function() {
-
+      // *
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('*')
+         .andWeAreListeningForNodes('*')
          .whenGivenInput('{}')
          .thenTheInstance(
             matched({}).atRootOfJson(),
@@ -158,7 +158,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfStringsWhenListenedTo: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.string')
+         .andWeAreListeningForNodes('!.string')
          .whenGivenInput('{"string":"s"}')
          .thenTheInstance(
             matched("s"),
@@ -169,7 +169,7 @@ TestCase("oboeTest", {
 /*,  testAllowsMultiplePathsToBeListenedToInOneCall: function() {
 
       givenAParser()
-         .andWeAreListeningForThingsFoundAtPattern(
+         .andWeAreListeningForNodes(
           {
                'a':function(){}
           ,    'b':function(){}
@@ -184,7 +184,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathForOfPropertyNameWithIncompleteJson: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.string')
+         .andWeAreListeningForPaths('!.string')
          .whenGivenInput('{"string":')
          .thenTheInstance(
             foundOneMatch
@@ -194,7 +194,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfSecondPropertyNameWithIncompleteJson: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.pencils')
+         .andWeAreListeningForPaths('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":')
          .thenTheInstance(
             // undefined because the parser hasn't been given the value yet.
@@ -207,7 +207,7 @@ TestCase("oboeTest", {
 ,  testIsAbleToNotifyOfNull: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.pencils')
+         .andWeAreListeningForNodes('!.pencils')
          .whenGivenInput('{"pens":4, "pencils":null}')
          .thenTheInstance(
             // undefined because the parser hasn't been given the value yet.
@@ -220,7 +220,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfMultipleChildrenOfRoot: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheInstance(
              matched('A').atPath(['a'])
@@ -233,7 +233,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfMultipleChildrenOfRootWhenSelectingTheRoot: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('$!.*')
+         .andWeAreListeningForNodes('$!.*')
          .whenGivenInput({"a":"A", "b":"B", "c":"C"})
          .thenTheInstance(
             // rather than getting the fully formed objects, we should now see the root object
@@ -248,7 +248,7 @@ TestCase("oboeTest", {
 ,  testDoesNotNotifySpuriouslyOfFoundPath: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.a')
+         .andWeAreListeningForPaths('!.a')
          .whenGivenInput([{a:'a'}])
          .thenTheInstance(foundNoMatches);
    }
@@ -256,7 +256,7 @@ TestCase("oboeTest", {
 ,  testDoesNotNotifySpuriouslyOfFoundObject: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.a')
+         .andWeAreListeningForNodes('!.a')
          .whenGivenInput([{a:'a'}])
          .thenTheInstance(foundNoMatches);
    }      
@@ -264,7 +264,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput('{"a":')
          .thenTheInstance(
              foundNoMatches
@@ -298,7 +298,11 @@ TestCase("oboeTest", {
          )
          .whenGivenInput('"B"}')
          .thenTheInstance(
-            hasRootJson({a:'A', b:'B'})
+            hasRootJson({a:'A', b:'B'})         
+         )
+         .whenInputFinishes()
+         .thenTheInstance(         
+            gaveFinalCallbackWithRootJson({a:'A', b:'B'})
          );
    }
    
@@ -329,14 +333,18 @@ TestCase("oboeTest", {
          )
          .whenGivenInput('2]')
          .thenTheInstance(
-            hasRootJson([11,22])
+            hasRootJson([11,22])         
+         )
+         .whenInputFinishes()
+         .thenTheInstance(         
+            gaveFinalCallbackWithRootJson([11,22])
          );
    }      
 
 ,  testNotifiesOfNamedChildOfRoot: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.b')
+         .andWeAreListeningForNodes('!.b')
          .whenGivenInput('{"a":"A","b":"B","c":"C"}')
          .thenTheInstance(
              matched('B').atPath(['b'])
@@ -347,7 +355,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfArrayElements: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.testArray.*')
+         .andWeAreListeningForNodes('!.testArray.*')
          .whenGivenInput('{"testArray":["a","b","c"]}')
          .thenTheInstance(
              matched('a').atPath(['testArray',0])
@@ -360,7 +368,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathMatchWhenArrayStarts: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.testArray')
+         .andWeAreListeningForPaths('!.testArray')
          .whenGivenInput('{"testArray":["a"')
          .thenTheInstance(
              foundNMatches(1)
@@ -374,7 +382,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathMatchWhenSecondArrayStarts: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('!.array2')
+         .andWeAreListeningForPaths('!.array2')
          .whenGivenInput('{"array1":["a","b"], "array2":["a"')
          .thenTheInstance(
             foundNMatches(1)
@@ -388,7 +396,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathsInsideArrays: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![*]')
+         .andWeAreListeningForPaths('![*]')
          .whenGivenInput( [{}, 'b', 2, []] )
          .thenTheInstance(
             foundNMatches(4)
@@ -398,7 +406,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingObjectsInArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2]')
+         .andWeAreListeningForPaths('![2]')
          .whenGivenInput( [{}, {}, 'this_one'] )
          .thenTheInstance(
             foundNMatches(1)
@@ -408,7 +416,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingArraysInsideArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2]')
+         .andWeAreListeningForPaths('![2]')
          .whenGivenInput( [[], [], 'this_one'] )
          .thenTheInstance(
             foundNMatches(1)
@@ -418,7 +426,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingArraysInsideArraysEtc: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2][2]')
+         .andWeAreListeningForPaths('![2][2]')
          .whenGivenInput( [   
                               [], 
                               [], 
@@ -436,7 +444,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingStringsInsideArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2]')
+         .andWeAreListeningForPaths('![2]')
          .whenGivenInput( ['', '', 'this_one'] )
          .thenTheInstance(
             foundNMatches(1)
@@ -446,7 +454,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingNumbersInsideArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2]')
+         .andWeAreListeningForPaths('![2]')
          .whenGivenInput( [1, 1, 'this_one'] )
          .thenTheInstance(
             foundNMatches(1)
@@ -456,7 +464,7 @@ TestCase("oboeTest", {
 ,  testCorrectlyGivesIndexWhenFindingNullsInsideArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![2]')
+         .andWeAreListeningForPaths('![2]')
          .whenGivenInput( [null, null, 'this_one'] )
          .thenTheInstance(
             foundNMatches(1)
@@ -466,7 +474,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfPathsInsideObjects: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForMatchesToPattern('![*]')
+         .andWeAreListeningForPaths('![*]')
          .whenGivenInput( {a:{}, b:'b', c:2, d:[]} )
          .thenTheInstance(
             foundNMatches(4)
@@ -476,7 +484,7 @@ TestCase("oboeTest", {
 ,  testNotifiesOfArrayElementsSelectedByIndex: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.testArray[2]')
+         .andWeAreListeningForNodes('!.testArray[2]')
          .whenGivenInput('{"testArray":["a","b","this_one"]}')
          .thenTheInstance(
              matched('this_one').atPath(['testArray',2])
@@ -487,7 +495,7 @@ TestCase("oboeTest", {
 ,  testNotifiesNestedArrayElementsSelectedByIndex: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.testArray[2][2]')
+         .andWeAreListeningForNodes('!.testArray[2][2]')
          .whenGivenInput( {"testArray":
                               ["a","b",
                                  ["x","y","this_one"]
@@ -506,7 +514,7 @@ TestCase("oboeTest", {
 ,  testCanNotifyNestedArrayElementsSelectedByIndexByPassingTheRootArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.$testArray[2][2]')
+         .andWeAreListeningForNodes('!.$testArray[2][2]')
          .whenGivenInput( {"testArray":
                               ["a","b",
                                  ["x","y","this_one"]
@@ -521,10 +529,10 @@ TestCase("oboeTest", {
          );
    }        
 
-,  testNotifiesOfDeeplyNestedObjects: function() {
+,  testNotifiesOfDeeplyNestedObjectsWithStar: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('..')
+         .andWeAreListeningForNodes('*')
          .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
          .thenTheInstance(
              matched('e')
@@ -541,6 +549,84 @@ TestCase("oboeTest", {
          ,   foundNMatches(5)
          );
    }
+   
+,  testNotifiesOfDeeplyNestedObjectsWithDoubleDot: function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('..')
+         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+         .thenTheInstance(
+             matched('e')
+               .atPath(['a', 'b', 'c', 'd'])
+               .withParent({d:'e'})
+         ,   matched({d:"e"})
+               .atPath(['a', 'b', 'c'])
+         ,   matched({c:{d:"e"}})
+               .atPath(['a', 'b'])
+         ,   matched({b:{c:{d:"e"}}})
+               .atPath(['a'])
+         ,   matched({a:{b:{c:{d:"e"}}}})
+               .atRootOfJson()
+         ,   foundNMatches(5)
+         );
+   }
+   
+,  testNotifiesOfDeeplyNestedObjectsWithDoubleDotStar: function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('..*')
+         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+         .thenTheInstance(
+             matched('e')
+               .atPath(['a', 'b', 'c', 'd'])
+               .withParent({d:'e'})
+         ,   matched({d:"e"})
+               .atPath(['a', 'b', 'c'])
+         ,   matched({c:{d:"e"}})
+               .atPath(['a', 'b'])
+         ,   matched({b:{c:{d:"e"}}})
+               .atPath(['a'])
+         ,   matched({a:{b:{c:{d:"e"}}}})
+               .atRootOfJson()
+         ,   foundNMatches(5)
+         );
+   }
+   
+,  testCanDetectAllButRoot: function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('*..*')
+         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+         .thenTheInstance(
+             matched('e')
+               .atPath(['a', 'b', 'c', 'd'])
+               .withParent({d:'e'})
+         ,   matched({d:"e"})
+               .atPath(['a', 'b', 'c'])
+         ,   matched({c:{d:"e"}})
+               .atPath(['a', 'b'])
+         ,   matched({b:{c:{d:"e"}}})
+               .atPath(['a'])
+               
+         ,   foundNMatches(4)
+         );
+   }
+   
+,  testCanDetectSimilarAncestors: function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('foo..foo')
+         
+         .whenGivenInput({"foo":{"foo":{"foo":{"foo":"foo"}}}})
+         .thenTheInstance(
+             matched("foo")
+         ,   matched({"foo":"foo"})
+         ,   matched({"foo":{"foo":"foo"}})
+         ,   matched({"foo":{"foo":{"foo":"foo"}}})   
+         ,   foundNMatches(4)
+         );
+   }
+   
 
 ,  testCanDetectInsideTheSecondObjectElementOfAnArray: function() {
 
@@ -549,7 +635,7 @@ TestCase("oboeTest", {
       // was an array
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..find')
+         .andWeAreListeningForNodes('!..find')
          .whenGivenInput(
             {
                array:[
@@ -567,7 +653,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresIfOnlyStartOfPatternMatches: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..a')
+         .andWeAreListeningForNodes('!..a')
          .whenGivenInput({
                ab:'should_not_find_this'
             ,  a0:'nor this'
@@ -583,7 +669,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresIfOnlyEndOfPatternMatches: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..a')
+         .andWeAreListeningForNodes('!..a')
          .whenGivenInput({
                aa:'should_not_find_this'
             ,  ba:'nor this'
@@ -599,7 +685,7 @@ TestCase("oboeTest", {
 ,  testDetectionIgnoresPartialPathMatchesInArrayIndices: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..[1]')
+         .andWeAreListeningForNodes('!..[1]')
          .whenGivenInput({
                array : [0,1,2,3,4,5,6,7,8,9,10,11,12]
             }
@@ -614,7 +700,7 @@ TestCase("oboeTest", {
 ,  testCanGiveAnArrayBackWhenJustPartiallyDone: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('$![5]')
+         .andWeAreListeningForNodes('$![5]')
          .whenGivenInput([0,1,2,3,4,5,6,7,8,9,10,11,12])
          .thenTheInstance(
             matched([0,1,2,3,4,5])
@@ -625,7 +711,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentAndGrandparentForEveryItemOfAnArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : ['a','b','c']
             }
@@ -646,7 +732,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForEveryObjectItemOfAnArrayOfObjects: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},{'b':2},{'c':3}]
             }
@@ -664,7 +750,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForObjectInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -678,7 +764,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForStringInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -694,7 +780,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForSecondObjectInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -710,7 +796,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForEmptyObjectInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -726,7 +812,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForSingletonStringArrayInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -742,7 +828,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForSingletonStringArrayInSingletonArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [['d']]
             }
@@ -758,7 +844,7 @@ TestCase("oboeTest", {
 ,  testGivesCorrectParentForLastStringInAMixedArray: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.array.*')
+         .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
                array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
             }
@@ -776,7 +862,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
          
@@ -789,7 +875,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
 
@@ -802,7 +888,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
                
@@ -815,7 +901,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
 
@@ -828,7 +914,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
                               
@@ -842,7 +928,7 @@ TestCase("oboeTest", {
       // non-mixed array, easier version:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([['d']])
          .thenTheInstance(
                               
@@ -856,7 +942,7 @@ TestCase("oboeTest", {
       // same test as above but without the object wrapper around the array:
       
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!.*')
+         .andWeAreListeningForNodes('!.*')
          .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
          .thenTheInstance(
 
@@ -868,7 +954,7 @@ TestCase("oboeTest", {
 ,  testCanDetectAtMultipleDepthsUsingDoubleDot: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..find')
+         .andWeAreListeningForNodes('!..find')
          .whenGivenInput({
 
             array:[
@@ -894,7 +980,7 @@ TestCase("oboeTest", {
 ,  testPassesAncestorsOfFoundObjectCorrectly: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..find')
+         .andWeAreListeningForNodes('!..find')
          .whenGivenInput({
 
             array:[
@@ -927,7 +1013,7 @@ TestCase("oboeTest", {
 ,  testCanDetectAtMultipleDepthsUsingImpliedAncestorOfRootRelationship: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('find')
+         .andWeAreListeningForNodes('find')
          .whenGivenInput({
 
             array:[
@@ -953,16 +1039,20 @@ TestCase("oboeTest", {
 ,  testMatchesNestedAdjacentSelector: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..[0].colour')
+         .andWeAreListeningForNodes('!..[0].colour')
          .whenGivenInput({
 
             foods: [
-               {name:'aubergine', colour:'purple'},
+               {  name:'aubergine', 
+                  colour:'purple' // match this
+               },
                {name:'apple', colour:'red'},
                {name:'nuts', colour:'brown'}
             ],
             non_foods: [
-               {name:'brick', colour:'red'},
+               {  name:'brick', 
+                  colour:'red'    // and this
+               },
                {name:'poison', colour:'pink'},
                {name:'broken_glass', colour:'green'}
             ]
@@ -977,7 +1067,7 @@ TestCase("oboeTest", {
 ,  testMatchesNestedSelectorSeparatedByASingleStarSelector: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('!..foods.*.name')
+         .andWeAreListeningForNodes('!..foods.*.name')
          .whenGivenInput({
 
             foods: [
@@ -1003,7 +1093,7 @@ TestCase("oboeTest", {
 
       // this test is similar to the following one, except it does not use ! in the pattern
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('foods.*')
+         .andWeAreListeningForNodes('foods.*')
          .whenGivenInput({
             foods: [
                {name:'aubergine'},
@@ -1022,7 +1112,7 @@ TestCase("oboeTest", {
 ,  testGetsSameObjectRepeatedlyUsingCss4Syntax: function() {
 
       givenAnOboeInstance()
-         .andWeAreListeningForThingsFoundAtPattern('$foods.*')
+         .andWeAreListeningForNodes('$foods.*')
          .whenGivenInput({        
             foods: [
                {name:'aubergine'},
@@ -1044,7 +1134,7 @@ TestCase("oboeTest", {
 
       givenAnOboeInstance()
          // we just want the French names of foods:
-         .andWeAreListeningForThingsFoundAtPattern('!..foods..fr')
+         .andWeAreListeningForNodes('!..foods..fr')
          .whenGivenInput({
 
             foods: [
@@ -1070,7 +1160,7 @@ TestCase("oboeTest", {
 
       givenAnOboeInstance()
          // we want the bi-lingual objects
-         .andWeAreListeningForThingsFoundAtPattern('{en fr}')
+         .andWeAreListeningForNodes('{en fr}')
          .whenGivenInput({
 
             foods: [
@@ -1097,7 +1187,7 @@ TestCase("oboeTest", {
       givenAnOboeInstance()
          // we want the bi-lingual English and German words, but we still want the ones that have
          // French as well
-         .andWeAreListeningForThingsFoundAtPattern('{en de}')
+         .andWeAreListeningForNodes('{en de}')
          .whenGivenInput({
 
             foods: [

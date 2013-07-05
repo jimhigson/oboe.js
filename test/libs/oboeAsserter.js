@@ -15,17 +15,29 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       var oboeInstance,
 
           expectingErrors = false,
+          
+          givenErrors = [],
+          
+          completeJson, // assigned in the requestCompleteCallback
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
           
           
       jsonFileName = jsonFileName || 'invalid://xhr_should_be_stubbed.org/if/not/thats/bad';
        
+      function storeCompleteJson(completeJsonFromJsonCompleteCall){
+         completeJson = completeJsonFromJsonCompleteCall;
+         
+         if( callbackFromTest ) {
+            callbackFromTest.apply(this, arguments);
+         }
+      } 
+       
       /* we are testing with real http if a filename was given. Generally this is a bad thing
       *  but is useful for component tests. Where possible we shouldn't do this.  */
       var requestCompleteCallback = jstdCallbacksListForJsonComplete? 
-                                          jstdCallbacksListForJsonComplete.add(callbackFromTest || noop) 
-                                       :  undefined;
+                                          jstdCallbacksListForJsonComplete.add(storeCompleteJson) 
+                                       :  storeCompleteJson;
 
       oboeInstance = oboe.doGet( urlForJsonTestFile(jsonFileName), 
                                  requestCompleteCallback
@@ -50,18 +62,20 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       oboeInstance.onError(function(e) {
          // Unless stated, the test isn't expecting errors. Fail the test on error: 
          if(!expectingErrors){ 
+            givenErrors.push(e);
+         
             fail('unexpected error: ' + e);
          }
       });
 
-      this.andWeAreListeningForThingsFoundAtPattern = function(pattern, callback, scope) {
+      this.andWeAreListeningForNodes = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
          oboeInstance.onNode(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
-      this.andWeAreListeningForMatchesToPattern = function(pattern, callback, scope) {
+      this.andWeAreListeningForPaths = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
       
          oboeInstance.onPath(pattern, argumentClone(spiedCallback), scope);
@@ -92,8 +106,25 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
          // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
          // progress callback and give the string to that.
          var progressCallback = streamingXhr.firstCall.args[3];
-         progressCallback(json);
+         
+         // giving the content one char at a time makes debugging easier when
+         // wanting to know how much has been written into the stream.
+         for( var i = 0; i< json.length; i++) { 
+            progressCallback(json.charAt(i));          
+         }                  
+
          return this;
+      };
+      
+      this.whenInputFinishes = function() {
+
+         // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
+         // done callback
+         var doneCallback = streamingXhr.firstCall.args[4];
+         
+         doneCallback();                  
+
+         return this;         
       };
 
       function noop(){}
@@ -102,9 +133,14 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
        * Assert any number of conditions were met on the spied callback
        */
       this.thenTheInstance = function( /* ... functions ... */ ){
+      
+         if( givenErrors.length > 0 ) {
+            fail('error found during previous stages\n' + givenErrors[0].stack);
+         }      
+      
          for (var i = 0; i < arguments.length; i++) {
             var assertion = arguments[i];
-            assertion.testAgainst(spiedCallback, oboeInstance);
+            assertion.testAgainst(spiedCallback, oboeInstance, completeJson);
          }
 
          return this;
@@ -173,12 +209,23 @@ function foundNMatches(n){
 }
 
 // To test the json at oboe#json() is as expected.
-function hasRootJson(json){
+function hasRootJson(expected){
    return {
       testAgainst:
       function(callback, oboeInstance) { 
-         assertEquals(json, oboeInstance.root());         
+         assertEquals(expected, oboeInstance.root());         
       }
+   }
+}
+
+// To test the json given as the call .onGet(url, callback(completeJson))
+// is correct
+function gaveFinalCallbackWithRootJson(expected) {
+   return {
+      testAgainst:
+         function(callback, oboeInstance, completeJson) { 
+            assertEquals(expected, completeJson);         
+         }
    }
 }
 

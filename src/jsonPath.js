@@ -9,7 +9,7 @@
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
  * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
  * 
- *   String jsonPath -> (String[] pathStack, Object[] nodeStack) -> Boolean|Object
+ *   String jsonPath -> (List pathList, List nodeList) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
@@ -34,22 +34,24 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function matchAgainstName(previousExpr, detection ) {
+   function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX];
-
-      if (!name) {
-         return previousExpr; // don't wrap at all, return given expr as-is
-      }
+      var name = detection[NAME_INDEX],
       
+          condition = name ? function(a){return a == name} : always; 
+     
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (pathStack, nodeStack, stackIndex) {
-         // in implementation, is like unnamednodeExpr except that we need the name to match.
-         // Once name matches, defer to unnamedNodeExpr:                                                                  
-         return (pathStack[stackIndex] == name) && previousExpr(pathStack, nodeStack, stackIndex);
+      return function (pathList, nodeList) {
+         // for jsonPath:
+         //    .foo
+         //    ["foo"]
+         //    [2]                                       
+                                                                  
+         return condition(head(pathList)) && 
+                previousExpr(pathList, nodeList);
       };      
    }
 
@@ -63,7 +65,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @param {Function} previousExpr
     * @param {Array} detection
     */
-   function matchAgainstDuckType(previousExpr, detection) {
+   function duckTypeClause(previousExpr, detection) {
 
       var fieldListStr = detection[FIELD_LIST_INDEX];
 
@@ -73,10 +75,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (pathStack, nodeStack, stackIndex) {
+      return function (pathList, nodeList) {
 
-         return hasAllProperties(requiredFields, nodeStack[stackIndex + 1]) && 
-                previousExpr(pathStack, nodeStack, stackIndex);
+         return hasAllProperties(requiredFields, head(nodeList)) && 
+                previousExpr(pathList, nodeList);
       }
    }
 
@@ -84,7 +86,6 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Expression for $
     * 
     * @param previousExpr
-    * @param capturing
     */
    function capture( previousExpr, detection ) {
 
@@ -95,15 +96,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (pathStack, nodeStack, stackIndex) {
-         return previousExpr(pathStack, nodeStack, stackIndex) && nodeStack[stackIndex + 1];
+      return function (pathList, nodeList) {
+         return previousExpr(pathList, nodeList) &&
+                head(nodeList);
       }
       
    }            
-   
-   
+      
    /**
-    * Moves onto the next item on the stack. Doesn't map neatly onto any particular language feature but
+    * Moves onto the next item on the lists. Doesn't map neatly onto any particular language feature but
     * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)
     * 
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
@@ -111,12 +112,32 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     */
    function consume1(previousExpr) {
    
+   
+      if( previousExpr == always ) {
+         // If there is no previous expression, this consume command is at the start of the jsonPath.
+         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
+         // it, we default to true. 
+         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
+         // '..*'            
+         return always;
+      }
+   
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function( pathStack, nodeStack, stackIndex ){
+      return function( pathList, nodeList ){
+      
+         if( head(pathList) === ROOT_PATH ) {
+            // if we're already at the root but there are more expressions to satisfy,
+            // can't consume any more. No match.
+            
+            // NOTE: this is why none of the other exprs have to be able to handle empty lists;
+            // only consume1 moves onto the next token and it refuses to do so once it reaches
+            // the list item in the list.                     
+            return false;
+         }                
                  
-         return previousExpr(pathStack, nodeStack, stackIndex-1);
+         return previousExpr(tail(pathList), tail(nodeList));
       };                                                                                                            
    }   
    
@@ -128,7 +149,16 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     *                     and decides if there is a match or not
     */   
    function consumeMany(previousExpr) {
-            
+
+      if( previousExpr == always ) {
+         // If there is no previous expression, this consume command is at the start of the jsonPath.
+         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
+         // it, we default to true. 
+         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
+         // '..*'            
+         return always;
+      }
+          
       var 
             // jsonPath .. is equivalent to !.. so if .. reaches the root
             // the match has suceeded.
@@ -143,9 +173,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
-      function consumeManyPartiallyCompleted(pathStack, nodeStack, stackIndex) {
+      function consumeManyPartiallyCompleted(pathList, nodeList) {
       
-         if( stackIndex < -1 ) {
+         if( !nodeList ) {
             // have gone past the start, not a match:         
             return false;
          }      
@@ -166,8 +196,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(_pathStack, nodeStack, stackIndex ){
-         return stackIndex == -1;
+      return function(pathList){
+         return head(pathList) == ROOT_PATH;
       };
    }   
          
@@ -175,29 +205,24 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Expression for the empty string. As the jsonPath parser generates the path parser, it will eventually
     * run out of tokens and get to the empty string. So, all generated parsers will be wrapped in this function.
     * 
-    * Initialises the stackIndex and kicks off the other expressions.   
-    * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found
-    * 
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */   
-   function statementExpr(startingExpr) {
+   function statementExpr(lastClause) {
    
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathStack, nodeStack) {
+      return function(pathList, nodeList) {
    
-         // kick off the parsing by passing through to the first expression with the stackIndex set to the
-         // top of the stack:
-         var exprMatch = startingExpr(pathStack, nodeStack, len(pathStack)-1);
+         // kick off the parsing by passing through to the lastExpression
+         var exprMatch = lastClause(pathList, nodeList);
                                
          // Returning exactly true indicates that there has been a match but no node is captured. 
-         // By default, the node at the top of the stack gets returned. Just like in css4 selector 
+         // By default, the node at the start of the lists gets returned. Just like in css4 selector 
          // spec, if there is no $, the last node in the selector is the one being styled.                      
                          
-         return exprMatch === true ? lastOf(nodeStack) : exprMatch;
+         return exprMatch === true ? head(nodeList) : exprMatch;
       };
    }      
                           
@@ -272,13 +297,13 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    // a generated parser for that expression     
    var clauseMatchers = [
 
-       clauseMatcher(pathNodeSyntax   , [consume1, matchAgainstName, matchAgainstDuckType, capture])        
+       clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
    ,   clauseMatcher(doubleDotSyntax  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
    ,   clauseMatcher(dotSyntax        , [] )  
-                                                 
+                                                                                      
    ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
    ,   clauseMatcher(emptySyntax      , [statementExpr])
    ];
@@ -348,10 +373,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    return function(jsonPath){
         
       try {
-         // Kick off the recursive parsing of the jsonPath with a function which always returns true.
-         // This means that jsonPaths which don't start with the root specifier ('!') can match at any depth
-         // in the tree. So long as they match the part specified, they don't care what the ancestors of the
-         // matched part are.         
+         // Kick off the recursive parsing of the jsonPath 
          return compileJsonPathToFunction(jsonPath, always);
       } catch( e ) {
          throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
