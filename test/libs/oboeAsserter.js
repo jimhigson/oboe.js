@@ -238,6 +238,11 @@ function calledbackWithContext(callbackScope) {
       testAgainst:
       function(callbackStub, oboeInstance) {
          if(!callbackStub.calledOn(callbackScope)){
+         
+            if( !callbackStub.called ) {
+               fail('Expected to be called with context ' + callbackScope + ' but has not been called at all');
+            }
+         
             fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
                callbackStub.getCall(0).thisValue);
          }   
