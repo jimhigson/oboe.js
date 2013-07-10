@@ -194,7 +194,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
             return false;
          }      
                                                         
-         return firstMatching(cases, arguments);
+         return lazyUnion(cases, arguments);
       }
       
       return consumeManyPartiallyCompleted;
@@ -319,6 +319,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                                                                                       
    ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
    ,   clauseMatcher(emptySyntax      , [statementExpr])
+   
+   ,   // if none of the above worked, we need to fail by throwing an error
+         function (jsonPath) {
+            throw Error('"' + jsonPath + '" could not be tokenised')      
+         }
    ];
 
 
@@ -371,14 +376,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        * valid to recur past that point. 
        */
       var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
-             
-      // to be called by firstMatching if no match could be found. Report the input
-      // that could not be tokenized and leave to handlers up-stack to work out what to do.
-      function onFail() {
-         throw Error('"' + jsonPath + '" could not be tokenised')      
-      }
-      
-      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+                   
+      return lazyUnion( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind] );                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's

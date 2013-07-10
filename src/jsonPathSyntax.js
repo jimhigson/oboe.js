@@ -87,7 +87,7 @@ var jsonPathSyntax = (function() {
     *  as regexDescriptor above.
     */
    function jsonPathNodeDescription( candidate ) {   
-      return firstMatching(nodeDescriptors, [candidate]);
+      return lazyUnion(nodeDescriptors, [candidate]);
    }
    
    /* we export only a single function. When called, this function injects into a scope the

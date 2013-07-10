@@ -27,31 +27,32 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
 }
 
 
-/** Call a list of functions with the same args until one returns a truthy result.
- *
- *  Returns the first return value that is given that is truthy.
- * 
- *  If none are found, calls onFail and returns whatever that gives, or if no onFail is given,
- *  returns undefined
+/** 
+ *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ *  
+ *  So:
+ *       lazyUnion([f1,f2,f3 ... fn], args)
+ *       
+ *  Is equivalent to: 
+ *       lazyUnion(f1, args) || apply(f2, args) || apply(f3, args) ... apply(fn, args)  
  * 
  *  @param {Function[]} fns
  *  @param {*} args
- *  @param {Function} [onFail]
+ *  
+ *  @returns the first return value that is given that is truthy.
  */
-function firstMatching( fns, args, onFail ) {
+function lazyUnion( fns, args ) {
 
-   var maybeMatch;
+   var maybeValue;
 
    for (var i = 0; i < len(fns); i++) {
       
-      maybeMatch = apply(fns[i], args);            
+      maybeValue = apply(fns[i], args);            
             
-      if( maybeMatch ) {
-         return maybeMatch;
+      if( maybeValue ) {
+         return maybeValue;
       }      
-   }  
-   
-   return onFail && onFail();
+   }    
 }
 
 /** Partially complete the given function by filling it in with all arguments given
