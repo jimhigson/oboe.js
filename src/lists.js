@@ -1,6 +1,6 @@
 
 function cons(x, xs) {
-   return [x, xs];
+   return Object.freeze([x, xs]);
 }
 
 var head = partialComplete(pluck, 0);
@@ -23,12 +23,22 @@ function reverseList(list){
 }
 
 function listAsArray(list){
+   // could be done as a reduce
+
    if( !list ) {
       return [];
    } else {
       var array = listAsArray(tail(list));
       array.unshift(head(list)); 
       return array;
+   }
+}
+
+function map(fn, list) {
+   if( !list ) {
+      return emptyList;
+   } else {
+      return cons(fn(head(list)), map(fn,tail(list)));
    }
 }
 

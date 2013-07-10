@@ -42,6 +42,15 @@
          
          assertEquals(['a','b','c'], listAsArray(reverseList(listCBA)));
       }
+      
+   ,  testMap: function() {
+         var naturals = cons(1, cons(2, cons(3, emptyList)));
+         var evens = cons(2, cons(4, cons(6, emptyList)));
+         
+         function doubleIt(n){return n * 2}
+         
+         assertEquals(evens, map(doubleIt, naturals));
+      }      
       /*
    ,      
       testLastInList: function() {
