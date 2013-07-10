@@ -64,14 +64,16 @@ var jsonPathSyntax = (function() {
    
    ,   
    //  see jsonPathNodeDescription below
-       nodeDescriptors = [
+       nodeExpressions = [
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation
          ,  jsonPathNumberedNodeInArrayNotation
          ,  jsonPathStarInObjectNotation
          ,  jsonPathStarInArrayNotation
          ,  jsonPathPureDuckTyping 
-         ].map(regexDescriptor)
+         ]
+         
+   ,   jsonPathNodeDescription = apply(lazyUnion, nodeExpressions.map(regexDescriptor))         
    ;      
 
    /** allows exporting of a regular expression under a generified function interface
@@ -82,14 +84,7 @@ var jsonPathSyntax = (function() {
          return regex.exec(candidate);
       }
    }
-
-   /** export several regular expressions under a single function, presenting the same interface
-    *  as regexDescriptor above.
-    */
-   function jsonPathNodeDescription( candidate ) {   
-      return lazyUnion(nodeDescriptors, [candidate]);
-   }
-   
+  
    /* we export only a single function. When called, this function injects into a scope the
       descriptor functions from this scope which we want to make available elsewhere. 
     */

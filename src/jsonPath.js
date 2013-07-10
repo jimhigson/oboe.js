@@ -21,27 +21,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
 
-   /**
-    * Apply a an arbitrary condition
-    * 
-    * @param {Function} condition
-    * @param {Function} returnValueOnSuccess
-    * 
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
-    */
-   function filterClause(condition, returnValueOnSuccess) {
-   
-      return function (ascent) {
-         // for jsonPath:
-         //    .foo
-         //    ["foo"]
-         //    [2]                                       
-                                                                  
-         return condition(ascent) && returnValueOnSuccess(ascent);
-      };   
-   }     
-              
+                   
    /**
     * Expression for a named path node, expressed as:
     *    foo
@@ -70,7 +50,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return filterClause(condition, previousExpr);
+      return lazyIntersection(condition, previousExpr);
    }
 
    /**
@@ -93,7 +73,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/));
 
-      return filterClause(function (ascent) {
+      return lazyIntersection(function (ascent) {
          return hasAllrequiredFields( nodeOf(head(ascent)) )
       }, previousExpr);
    }
@@ -112,7 +92,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return filterClause(previousExpr, head);
+      return lazyIntersection(previousExpr, head);
             
    }            
       
@@ -180,10 +160,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
           terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
           recursiveCase = consume1(consumeManyPartiallyCompleted),
           
-          cases = [ terminalCaseWhenArrivingAtRoot, 
-                    terminalCaseWhenPreviousExpressionIsSatisfied, 
-                    recursiveCase
-                  ];                        
+          cases = lazyUnion(
+                     terminalCaseWhenArrivingAtRoot
+                  ,  terminalCaseWhenPreviousExpressionIsSatisfied
+                  ,  recursiveCase
+                  );                        
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
@@ -194,7 +175,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
             return false;
          }      
                                                         
-         return lazyUnion(cases, arguments);
+         return cases(ascent);
       }
       
       return consumeManyPartiallyCompleted;
@@ -308,23 +289,23 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                    
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
-   var clauseMatchers = [
+   var clause = lazyUnion(
 
-       clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
-   ,   clauseMatcher(doubleDotSyntax  , [consumeMany])
+      clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
+   ,  clauseMatcher(doubleDotSyntax  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(dotSyntax        , [] )  
+   ,  clauseMatcher(dotSyntax        , [] )  
                                                                                       
-   ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
-   ,   clauseMatcher(emptySyntax      , [statementExpr])
+   ,  clauseMatcher(bangSyntax       , [rootExpr, capture])             
+   ,  clauseMatcher(emptySyntax      , [statementExpr])
    
    ,   // if none of the above worked, we need to fail by throwing an error
-         function (jsonPath) {
-            throw Error('"' + jsonPath + '" could not be tokenised')      
-         }
-   ];
+      function (jsonPath) {
+         throw Error('"' + jsonPath + '" could not be tokenised')      
+      }
+   );
 
 
    /**
@@ -377,7 +358,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        */
       var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
                    
-      return lazyUnion( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind] );                              
+      return clause(jsonPath, parserGeneratedSoFar, onFind);                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's
