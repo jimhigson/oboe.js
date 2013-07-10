@@ -18,7 +18,7 @@
       }
       
    ,      
-      testToArray: function() {
+      testListAsArray: function() {
       
          var listCBA = cons('c', cons('b', cons('a', emptyList)));
          
@@ -26,7 +26,7 @@
       }
       
    ,      
-      testToArrayCanHandleEmptyList: function() {
+      testListAsArrayCanHandleEmptyList: function() {
                
          assertEquals([], listAsArray(emptyList));
       }      

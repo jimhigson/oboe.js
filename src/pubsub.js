@@ -7,7 +7,7 @@ function pubSub(){
    var listeners = {n:[], p:[], e:[]};
                              
    return {
-      notify:varArgs(1, function ( eventId, parameters ) {
+      notify:varArgs(function ( eventId, parameters ) {
                
          applyAll( listeners[eventId], parameters );
       }),

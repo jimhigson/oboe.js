@@ -19,22 +19,14 @@ function applyAll( fns, args ) {
 }
 
 
-function varArgs(){
+function varArgs(fn){
 
    function sliceArray(arrayLikeThing, startIndex, endIndex) {
       return Array.prototype.slice.call(arrayLikeThing, startIndex, endIndex);
    }
 
-   var numberOfFixedArguments, fn;
-   
-   if( arguments.length == 2 ) {
-      numberOfFixedArguments = arguments[0];
-      fn = arguments[1];
-   } else {
-      numberOfFixedArguments = 0;
-      fn = arguments[0];   
-   }
-       
+   var numberOfFixedArguments = fn.length -1;
+         
    return function(){
    
       // make an array of the fixed arguments
@@ -91,7 +83,7 @@ function lazyIntersection(fn1, fn2) {
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
  */
-var partialComplete = varArgs(1, function( fn, boundArgs ) {
+var partialComplete = varArgs(function( fn, boundArgs ) {
 
    return varArgs(function( callArgs ) {
             
