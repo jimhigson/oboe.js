@@ -15,7 +15,7 @@ module.exports = function (grunt) {
             ,  'src/streamingXhr.js'
             ,  'src/jsonPathSyntax.js'
             ,  'src/jsonPath.js'
-            ,  'src/incrementalParsedContent.js'
+            ,  'src/incrementalContentBuilder.js'
             ,  'src/pubsub.js'
             ,  'src/instanceApi.js'
             ,  'src/controller.js'
