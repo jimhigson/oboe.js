@@ -21,6 +21,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
      
+              
    /**
     * Expression for a named path node, expressed as:
     *    foo
@@ -44,14 +45,14 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (pathList, nodeList) {
+      return function (list) {
          // for jsonPath:
          //    .foo
          //    ["foo"]
          //    [2]                                       
                                                                   
-         return condition(head(pathList)) && 
-                previousExpr(pathList, nodeList);
+         return condition(keyOf(head(list))) && 
+                previousExpr(list);
       };      
    }
 
@@ -75,10 +76,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (pathList, nodeList) {
+      return function (list) {
 
-         return hasAllProperties(requiredFields, head(nodeList)) && 
-                previousExpr(pathList, nodeList);
+         return hasAllProperties(requiredFields, nodeOf(head(list))) && 
+                previousExpr(list);
       }
    }
 
@@ -96,9 +97,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (pathList, nodeList) {
-         return previousExpr(pathList, nodeList) &&
-                head(nodeList);
+      return function (list) {
+         return previousExpr(list) && head(list);
       }
       
    }            
@@ -125,9 +125,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function( pathList, nodeList ){
+      return function( list ){
       
-         if( head(pathList) === ROOT_PATH ) {
+         if( keyOf(head(list)) === ROOT_PATH ) {
             // if we're already at the root but there are more expressions to satisfy,
             // can't consume any more. No match.
             
@@ -137,7 +137,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
             return false;
          }                
                  
-         return previousExpr(tail(pathList), tail(nodeList));
+         return previousExpr(tail(list));
       };                                                                                                            
    }   
    
@@ -173,9 +173,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
-      function consumeManyPartiallyCompleted(pathList, nodeList) {
+      function consumeManyPartiallyCompleted(list) {
       
-         if( !nodeList ) {
+         if( !list ) {
             // have gone past the start, not a match:         
             return false;
          }      
@@ -196,8 +196,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathList){
-         return head(pathList) == ROOT_PATH;
+      return function(list){
+         return keyOf(head(list)) == ROOT_PATH;
       };
    }   
          
@@ -213,16 +213,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathList, nodeList) {
+      return function(list) {
    
          // kick off the parsing by passing through to the lastExpression
-         var exprMatch = lastClause(pathList, nodeList);
+         var exprMatch = lastClause(list);
                                
          // Returning exactly true indicates that there has been a match but no node is captured. 
          // By default, the node at the start of the lists gets returned. Just like in css4 selector 
          // spec, if there is no $, the last node in the selector is the one being styled.                      
-                         
-         return exprMatch === true ? head(nodeList) : exprMatch;
+         return exprMatch === true ? head(list) : exprMatch;
       };
    }      
                           

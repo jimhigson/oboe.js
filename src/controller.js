@@ -39,15 +39,15 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
     */
    function addNewCallback( eventId, pattern, callback ) {
    
-      var test = jsonPathCompiler( pattern );
+      var matchesJsonPath = jsonPathCompiler( pattern );
    
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function(pathList, nodeList){ 
+      eventBus.on( eventId, function( ascent ){ 
       
          try{
-            var foundNode = test( pathList, nodeList );
+            var maybeMatchingMapping = matchesJsonPath( ascent );
          } catch(e) {
             // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
             // want to catch as early as possible:
@@ -69,26 +69,34 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
          //                      
-         if( foundNode !== false ) {                                 
+         if( maybeMatchingMapping !== false ) {                                 
            
             try{
-               // We're now calling back to outside of oboe where there is no concept of the
-               // functional-style lists that we are using internally so convert into standard
-               // arrays. Reverse the order because it is more natural to receive in order 
-               // "root to leaf" than "leaf to root"             
-            
-               callback(   foundNode,  
-                           // for the path list, also need to remove the last item which is the special
-                           // token for the 'path' to the root node
-                           listAsArray(tail(reverseList(pathList))), 
-                           listAsArray(reverseList(nodeList)) 
-               );
+               notifyCallback(callback, maybeMatchingMapping, ascent);
+               
             } catch(e) {
                eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
          }
       });   
    }   
+   
+   function notifyCallback(callback, matchingMapping, ascent) {
+      // We're now calling back to outside of oboe where there is no concept of the
+      // functional-style lists that we are using internally so convert into standard
+      // arrays. Reverse the order because it is more natural to receive in order 
+      // "root to leaf" than "leaf to root"             
+            
+      var descent     = reverseList(ascent),
+      
+            // for the path list, also need to remove the last item which is the special
+            // token for the 'path' to the root node
+          path       = listAsArray(tail(map(keyOf,descent))),
+          ancestors  = listAsArray(map(nodeOf, descent)); 
+      
+      callback( nodeOf(matchingMapping), path, ancestors );  
+   }
+   
        
    /* the controller only needs to expose two methods: */                                          
    return { 

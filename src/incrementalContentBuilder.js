@@ -1,3 +1,7 @@
+var keyOf = partialComplete(pluck, 'key');
+var nodeOf = partialComplete(pluck, 'node');
+
+
 /**
  * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
  * have any path). This prevents the need for special-casing detection of the root object and allows it
@@ -6,7 +10,7 @@
  * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
  * distinct, therefore no other object can possibly clash with this one.
  */
-var ROOT_PATH = {}; 
+var ROOT_PATH = {r:1}; 
 
 
 /**
@@ -20,79 +24,102 @@ var ROOT_PATH = {};
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalParsedContent( clarinet, notify ) {
-
-   // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
-   // this state and notify the callbacks 
-    
+function incrementalContentBuilder( clarinet, notify ) {
+   
    var            
          // array of nodes from curNode up to the root of the document.
          // the root is at the far end of the list, the current node is at the close end (the head) 
-         nodeList
+         ascent
+      
+   ,     rootNode;
+
+
+
+   function checkForMissedArrayKey(ascent, newLeafNode) {
    
-         // array of strings - the path from the root of the dom to the node currently being parsed
-         // the root is at the far end of the list, the current node is at the close end (the head)
-   ,     pathList
-   
-   ,     root;
+      // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
+      // is for objects)
+      // so we need to notify of the paths when we find the items:
 
+      var parentNode = nodeOf(head(ascent));
+      
+      if (isArray(parentNode)) {
 
-
-   function addChildToParent(child, parent) {
-
-      if (isArray(parent)) {
-         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
-         // is for objects)
-         // so we need to notify of the paths when we find the items:
-         pathDiscovered(parent.length, child);
+         pathFound(len(parentNode), newLeafNode);
       }
-
-      // add the newly found node to its parent
-      parent[head(pathList)] = child;
    }
 
    /**
     * Manage the state and notifications for when a new node is found.
     *  
-    * @param {*} foundNode the thing that has been found in the json
+    * @param {*} newLeafNode the thing that has been found in the json
     * @function
     */                 
-   function nodeFound( foundNode ) {
-   
-      if( !nodeList ) {
+   function nodeFound( newLeafNode ) {
+      
+      if( !ascent ) {
            
-         // we discovered the root node
-         root = foundNode;
-         pathDiscovered(ROOT_PATH, foundNode);
-                           
-      } else {
-         // we discovered a node with a parent      
-         addChildToParent(foundNode, head(nodeList));
-      }
-                             
-      // and add it to our list:                                    
-      nodeList = cons(foundNode, nodeList);                                  
-   }   
-  
+         // we discovered the root node, it has a special path
+         rootNode = newLeafNode;
+         pathFound(ROOT_PATH, newLeafNode);
+         
+         return;            
+      } 
+      
+      checkForMissedArrayKey(ascent, newLeafNode);
+      
+      // the node is a non-root node
+      var branches = tail(ascent),           
+          parentBranch = head(branches),   
+          oldLeaf = head(ascent),
+          newLeaf = mapping(keyOf(oldLeaf), newLeafNode);      
+   
+      appendBuiltContent( parentBranch, newLeaf );
+                                                                                                         
+      ascent = cons(newLeaf, branches);                                                                          
+   }
+
+
+   /**
+    * Add a new value to the top-level object which has been already output   
+    */
+   function appendBuiltContent( branch, leaf ){
+      
+      nodeOf(branch)[keyOf(leaf)] = nodeOf(leaf);
+   }
+
+   /**
+    * Get a new key->node mapping
+    * 
+    * @param {String|Number} key
+    * @param {Object|Array|String|Number|null} node a value found in the json
+    */
+   function mapping(key, node) {
+      return Object.freeze( {key:key, node:node} );
+   }
+     
    /**
     * For when we find a new key in the json.
     * 
     * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
     *    take the special value ROOT_PATH if the root node has just been found
-    * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
+    * @param {String|Number|Object|Array|Null|undefined} [maybeNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathDiscovered(key, value) {
+   function pathFound(key, maybeNode) {
       
-      // if we have the key but no known value yet, at least put that key in the output 
-      // but against no defined value:
-      if( !defined(value) ) {
-         head(nodeList)[key] = undefined;
-      }   
-
-      pathList = cons(key, pathList);
+      var newLeaf = mapping(key, maybeNode);
+      
+      if( ascent ) { // if not root
+      
+         // if we have the key but (unless adding to an array) no known value yet, at least put 
+         // that key in the output but against no defined value:      
+         appendBuiltContent( head(ascent), newLeaf );
+      }
+   
+      ascent = cons(newLeaf, ascent);
      
-      notify(PATH_FOUND_EVENT, pathList, cons(value, nodeList) );
+      notify(PATH_FOUND_EVENT, ascent);
  
    }
 
@@ -102,17 +129,16 @@ function incrementalParsedContent( clarinet, notify ) {
     */
    function curNodeFinished( ) {
 
-      notify(NODE_FOUND_EVENT, pathList, nodeList );
+      notify(NODE_FOUND_EVENT, ascent);
                           
-      // pop the complete node and its path off the lists:                
-      nodeList = tail(nodeList);                           
-      pathList = tail(pathList);
+      // pop the complete node and its path off the lists:                                    
+      ascent = tail(ascent);
    }      
     
    /* 
-    * Finally, assign listeners to clarinet. Mostly these are just wrappers and pass-throughs for the higher
-    * level functions above. 
+    * Assign listeners to clarinet.
     */     
+    
    clarinet.onopenobject = function (firstKey) {
 
       nodeFound({});
@@ -124,7 +150,7 @@ function incrementalParsedContent( clarinet, notify ) {
          // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
          // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
          // value because we haven't seen that far into the json yet          
-         pathDiscovered(firstKey);
+         pathFound(firstKey);
       }
    };
    
@@ -133,7 +159,7 @@ function incrementalParsedContent( clarinet, notify ) {
    };
 
    // called by Clarinet when keys are found in objects               
-   clarinet.onkey = pathDiscovered;   
+   clarinet.onkey = pathFound;   
                
    clarinet.onvalue = function (value) {
    
@@ -151,6 +177,6 @@ function incrementalParsedContent( clarinet, notify ) {
       
    /* finally, return a function to get the root of the json (or undefined if not yet found) */      
    return function() {
-      return root;
+      return rootNode;
    }           
 }
