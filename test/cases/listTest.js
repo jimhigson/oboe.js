@@ -1,7 +1,3 @@
-/** These tests test the functionality of polyfills used for old and low-quality browsers
- *  such as IE8. On better browsers they are just testing the browser's inbuilt 
- *  methods but it is nice to have some consistency
- */
 
 (function(){
 
