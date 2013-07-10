@@ -7,9 +7,9 @@
  * This is usually where several functions need to keep the same signature but not all use all of the parameters.
  * 
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
- * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
+ * same value for the same arguments and no variables are reassigned.
  * 
- *   String jsonPath -> (List pathList, List nodeList) -> Boolean|Object
+ *   String jsonPath -> (List ascent) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
@@ -45,14 +45,14 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (list) {
+      return function (ascent) {
          // for jsonPath:
          //    .foo
          //    ["foo"]
          //    [2]                                       
                                                                   
-         return condition(keyOf(head(list))) && 
-                previousExpr(list);
+         return condition(keyOf(head(ascent))) && 
+                previousExpr(ascent);
       };      
    }
 
@@ -76,10 +76,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
       var requiredFields = fieldListStr.split(/\W+/);
 
-      return function (list) {
+      return function (ascent) {
 
-         return hasAllProperties(requiredFields, nodeOf(head(list))) && 
-                previousExpr(list);
+         return hasAllProperties(requiredFields, nodeOf(head(ascent))) && 
+                previousExpr(ascent);
       }
    }
 
@@ -97,8 +97,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (list) {
-         return previousExpr(list) && head(list);
+      return function (ascent) {
+         return previousExpr(ascent) && head(ascent);
       }
       
    }            
@@ -125,9 +125,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function( list ){
+      return function( ascent ){
       
-         if( keyOf(head(list)) === ROOT_PATH ) {
+         if( keyOf(head(ascent)) === ROOT_PATH ) {
             // if we're already at the root but there are more expressions to satisfy,
             // can't consume any more. No match.
             
@@ -137,7 +137,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
             return false;
          }                
                  
-         return previousExpr(tail(list));
+         return previousExpr(tail(ascent));
       };                                                                                                            
    }   
    
@@ -173,9 +173,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
-      function consumeManyPartiallyCompleted(list) {
+      function consumeManyPartiallyCompleted(ascent) {
       
-         if( !list ) {
+         if( !ascent ) {
             // have gone past the start, not a match:         
             return false;
          }      
@@ -196,8 +196,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(list){
-         return keyOf(head(list)) == ROOT_PATH;
+      return function(ascent){
+         return keyOf(head(ascent)) == ROOT_PATH;
       };
    }   
          
@@ -213,15 +213,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(list) {
+      return function(ascent) {
    
          // kick off the parsing by passing through to the lastExpression
-         var exprMatch = lastClause(list);
+         var exprMatch = lastClause(ascent);
                                
          // Returning exactly true indicates that there has been a match but no node is captured. 
          // By default, the node at the start of the lists gets returned. Just like in css4 selector 
          // spec, if there is no $, the last node in the selector is the one being styled.                      
-         return exprMatch === true ? head(list) : exprMatch;
+         return exprMatch === true ? head(ascent) : exprMatch;
       };
    }      
                           
