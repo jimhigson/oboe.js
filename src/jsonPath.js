@@ -20,7 +20,27 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
-     
+
+   /**
+    * Apply a an arbitrary condition
+    * 
+    * @param {Function} condition
+    * @param {Function} returnValueOnSuccess
+    * 
+    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
+    *                     and decides if there is a match or not
+    */
+   function filterClause(condition, returnValueOnSuccess) {
+   
+      return function (ascent) {
+         // for jsonPath:
+         //    .foo
+         //    ["foo"]
+         //    [2]                                       
+                                                                  
+         return condition(ascent) && returnValueOnSuccess(ascent);
+      };   
+   }     
               
    /**
     * Expression for a named path node, expressed as:
@@ -38,22 +58,19 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX],
-      
-          condition = name ? function(a){return a == name} : always; 
+      var name = detection[NAME_INDEX],      
+          condition;
+          
+      if( name ){
+         condition = function(ascent){return keyOf(head(ascent)) == name}
+      } else {
+         condition = always;
+      } 
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (ascent) {
-         // for jsonPath:
-         //    .foo
-         //    ["foo"]
-         //    [2]                                       
-                                                                  
-         return condition(keyOf(head(ascent))) && 
-                previousExpr(ascent);
-      };      
+      return filterClause(condition, previousExpr);
    }
 
    /**
@@ -74,13 +91,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var requiredFields = fieldListStr.split(/\W+/);
+      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/));
 
-      return function (ascent) {
-
-         return hasAllProperties(requiredFields, nodeOf(head(ascent))) && 
-                previousExpr(ascent);
-      }
+      return filterClause(function (ascent) {
+         return hasAllrequiredFields( nodeOf(head(ascent)) )
+      }, previousExpr);
    }
 
    /**
@@ -97,10 +112,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (ascent) {
-         return previousExpr(ascent) && head(ascent);
-      }
-      
+      return filterClause(previousExpr, head);
+            
    }            
       
    /**
@@ -127,17 +140,18 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        */   
       return function( ascent ){
       
-         if( keyOf(head(ascent)) === ROOT_PATH ) {
+         return (
             // if we're already at the root but there are more expressions to satisfy,
             // can't consume any more. No match.
             
             // NOTE: this is why none of the other exprs have to be able to handle empty lists;
             // only consume1 moves onto the next token and it refuses to do so once it reaches
-            // the list item in the list.                     
-            return false;
-         }                
-                 
-         return previousExpr(tail(ascent));
+            // the list item in the list.          
+            keyOf(head(ascent)) != ROOT_PATH ) &&
+            
+            // consider the next bit of hte ascent by passing only the tail to the previous
+            // expression
+            previousExpr(tail(ascent));
       };                                                                                                            
    }   
    
