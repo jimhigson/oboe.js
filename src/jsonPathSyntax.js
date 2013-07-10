@@ -14,14 +14,12 @@ var jsonPathSyntax = (function() {
       return RegExp( componentRegexes.map(regexSource).join('') );
    }
    
-   function jsonPathClause() {
-      
-      var strings = toArray(arguments);
-      
+   var jsonPathClause = varArgs(function( strings ) {
+           
       strings.unshift(/^/);
       
       return r(strings);
-   }
+   });
    
    function unquotedArrayNotation(contents) {
       return r([/\[/, contents, /\]/]);

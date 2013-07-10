@@ -18,12 +18,33 @@ function applyAll( fns, args ) {
    });
 }
 
-/*
-   Call each of a list of functions with the same arguments, where the arguments are given using varargs
-   array. Ignores any return values from the functions.
- */
-function callAll( fns /*, arg1, arg2, arg3...*/ ) {
-   applyAll(fns, toArray(arguments, 1));
+
+function varArgs(){
+
+   function sliceArray(arrayLikeThing, startIndex, endIndex) {
+      return Array.prototype.slice.call(arrayLikeThing, startIndex, endIndex);
+   }
+
+   var numberOfFixedArguments, fn;
+   
+   if( arguments.length == 2 ) {
+      numberOfFixedArguments = arguments[0];
+      fn = arguments[1];
+   } else {
+      numberOfFixedArguments = 0;
+      fn = arguments[0];   
+   }
+       
+   return function(){
+   
+      // make an array of the fixed arguments
+      var argumentsToFunction = sliceArray( arguments, 0, numberOfFixedArguments );
+      
+      // push on the varargs bit as a sub-array:
+      argumentsToFunction.push( sliceArray( arguments, numberOfFixedArguments ) );   
+      
+      return fn.apply( this, argumentsToFunction );
+   }       
 }
 
 
@@ -38,13 +59,9 @@ function callAll( fns /*, arg1, arg2, arg3...*/ ) {
  *   
  *  @returns the first return value that is given that is truthy.
  */
-function lazyUnion( /* f1, f2, f2 ... fn */ ) {
+var lazyUnion = varArgs(function(fns) {
 
-   var fns = toArray(arguments);
-
-   return function( /* p1, p2, p3 ... pn */ ){
-
-      var params = toArray(arguments);
+   return varArgs(function(params){
 
       var maybeValue;
    
@@ -56,8 +73,8 @@ function lazyUnion( /* f1, f2, f2 ... fn */ ) {
             return maybeValue;
          }      
       }
-   }    
-}
+   });    
+});
 
 /**
  * Apply a an arbitrary condition
@@ -74,13 +91,10 @@ function lazyIntersection(fn1, fn2) {
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
  */
-function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
+var partialComplete = varArgs(1, function( fn, boundArgs ) {
 
-   var boundArgs = toArray(arguments, 1);
-
-   return function() {
-      var callArgs = boundArgs.concat(toArray(arguments));            
-         
-      return fn.apply(this, callArgs);
-   }; 
-}
+   return varArgs(function( callArgs ) {
+            
+      return fn.apply(this, boundArgs.concat(callArgs));
+   }); 
+});

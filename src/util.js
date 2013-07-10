@@ -21,9 +21,6 @@ function pluck(key, object){
 
 var len = partialComplete(pluck, 'length');
 
-function toArray(arrayLikeThing, startIndex) {
-   return Array.prototype.slice.call(arrayLikeThing, startIndex);
-}
 
 /** I don't like saying foo !=== undefined very much because of the double-negative. I find
  *  defined(foo) easier to read.

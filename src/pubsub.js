@@ -7,10 +7,10 @@ function pubSub(){
    var listeners = {n:[], p:[], e:[]};
                              
    return {
-      notify:function ( eventId /* arguments... */ ) {
+      notify:varArgs(1, function ( eventId, parameters ) {
                
-         applyAll( listeners[eventId], toArray(arguments,1) );
-      },
+         applyAll( listeners[eventId], parameters );
+      }),
       on:function( eventId, fn ) {      
          listeners[eventId].push(fn);
          return this; // chaining                                         
