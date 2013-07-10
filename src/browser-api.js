@@ -21,7 +21,7 @@
          // wire everything up:
          var eventBus = pubSub(),
              clarinetParser = clarinet.parser(),
-             parsedContentSoFar = incrementalParsedContent(clarinetParser, eventBus.notify),             
+             parsedContentSoFar = incrementalContentBuilder(clarinetParser, eventBus.notify),             
              controller = oboeController( eventBus, clarinetParser, parsedContentSoFar),      
             
          // now work out what the arguments mean:   
