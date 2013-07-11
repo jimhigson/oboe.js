@@ -45,7 +45,24 @@
          var varargsTestFn = varArgs(function(){ return 'expected' });
                   
          assertEquals('expected', varargsTestFn());
-      }            
+      }
+      
+   ,  'testCompose': function() {
+         function dub(n){ return n*2 }
+         function inc(n){ return n+1 }
+         function half(n){ return n/2 }
+         
+         var composed = compose(dub, inc, half);
+         
+         assertEquals( 4 , composed(2));
+      }
+      
+   ,  'testComposeWithZeroFunctions': function() {
+         
+         var id = compose();
+         
+         assertEquals( 2 , id(2));
+      }                                          
    
    });
 
