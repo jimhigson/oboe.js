@@ -20,6 +20,7 @@ function applyAll( fns, args ) {
 
 
 function varArgs(fn){
+   // TODO: if demand needs it, a version which gives a list instead of an array
 
    function sliceArray(arrayLikeThing, startIndex, endIndex) {
       return Array.prototype.slice.call(arrayLikeThing, startIndex, endIndex);
@@ -90,4 +91,19 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
             
       return fn.apply(this, boundArgs.concat(callArgs));
    }); 
+});
+
+
+var compose = varArgs(function(fns) {
+
+   var functionList = reverseList( asList(fns) );
+   
+   function next(curFn, valueSoFar) {  
+      return curFn(valueSoFar);   
+   }
+   
+   return function(startValue){
+     
+      return foldList(next, startValue, functionList);
+   }
 });

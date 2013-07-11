@@ -42,6 +42,22 @@ function map(fn, list) {
    }
 }
 
+function foldList(fn, startValue, list) {
+   
+   if( !list ) {
+      return startValue;
+   }
+    
+   return fn(head(list), foldList(fn, startValue, tail(list)));
+}
+
+function asList(array){
+
+   return array.reduce( function(listSoFar, nextItem) {
+      return cons(nextItem, listSoFar);
+   }, emptyList );   
+}
+
 /*function lastInList(list) {
    if( !tail(list) ) {
       return head(list);

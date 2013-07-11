@@ -8,7 +8,7 @@ TestCase('incrementalParsedContentTest', {
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')
             .thenShouldHaveFired(
-                  PATH_FOUND_EVENT
+                  TYPE_PATH
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{}}
                         )
@@ -22,7 +22,7 @@ TestCase('incrementalParsedContentTest', {
          .whenClarinetFires('onopenobject')      
          .whenClarinetFires('onkey', 'flavour')
             .thenShouldHaveFired(
-                  PATH_FOUND_EVENT
+                  TYPE_PATH
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:undefined}}
                         ,  {key:'flavour', node:undefined}
@@ -36,7 +36,7 @@ TestCase('incrementalParsedContentTest', {
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject', 'flavour')      
             .thenShouldHaveFired(
-                  PATH_FOUND_EVENT
+                  TYPE_PATH
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:undefined}}
                         ,  {key:'flavour', node:undefined}
@@ -51,7 +51,7 @@ TestCase('incrementalParsedContentTest', {
          .whenClarinetFires('onkey'    ,  'flavour')
          .whenClarinetFires('onvalue'  ,  'strawberry')
             .thenShouldHaveFired(
-                  NODE_FOUND_EVENT
+                  TYPE_NODE
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:'strawberry'}}
                         ,  {key:'flavour', node:'strawberry'}
@@ -68,7 +68,7 @@ TestCase('incrementalParsedContentTest', {
          .whenClarinetFires('onvalue', 'strawberry')
          .whenClarinetFires('oncloseobject')
             .thenShouldHaveFired(
-                  NODE_FOUND_EVENT
+                  TYPE_NODE
                ,  anAscentContaining(  
                           {key:ROOT_PATH, node:{flavour:'strawberry'}}
                         )
@@ -84,7 +84,7 @@ TestCase('incrementalParsedContentTest', {
           .whenClarinetFires('onopenarray')
           .whenClarinetFires('onvalue', 'a')
           .thenShouldHaveFired(
-             PATH_FOUND_EVENT
+             TYPE_PATH
              , anAscentContaining(
                    {key:ROOT_PATH,  node:{'alphabet':['a']}    }
                  , {key:'alphabet', node:['a']                 }
@@ -103,7 +103,7 @@ TestCase('incrementalParsedContentTest', {
           .whenClarinetFires('onvalue', 'a')
           .whenClarinetFires('onvalue', 'b')
           .thenShouldHaveFired(
-             PATH_FOUND_EVENT
+             TYPE_PATH
              , anAscentContaining(
                    {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
                  , {key:'alphabet', node:['a','b']                }
@@ -121,7 +121,7 @@ TestCase('incrementalParsedContentTest', {
          .whenClarinetFires('onopenarray')
          .whenClarinetFires('onvalue'    ,  'a')                  
             .thenShouldHaveFired(
-                  NODE_FOUND_EVENT
+                  TYPE_NODE
                ,  anAscentContaining(  
                      {key:ROOT_PATH,      node:{'alphabet':['a']} }
                   ,  {key:'alphabet',     node:['a']              }

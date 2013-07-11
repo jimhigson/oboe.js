@@ -21,6 +21,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
 
+   var headKey = compose(keyOf, head);
                    
    /**
     * Expression for a named path node, expressed as:
@@ -42,7 +43,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
           condition;
           
       if( name ){
-         condition = function(ascent){return keyOf(head(ascent)) == name}
+         condition = function(ascent){return headKey(ascent) == name}
       } else {
          condition = always;
       } 
@@ -71,11 +72,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/));
+      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/)),
+          isMatch = compose( hasAllrequiredFields, nodeOf, head );
 
-      return lazyIntersection(function (ascent) {
-         return hasAllrequiredFields( nodeOf(head(ascent)) )
-      }, previousExpr);
+      return lazyIntersection(isMatch, previousExpr);
    }
 
    /**
@@ -114,25 +114,25 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          // '..*'            
          return always;
       }
-   
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */   
-      return function( ascent ){
+
+      function notAtRoot(ascent){
+         return headKey(ascent) != ROOT_PATH;
+      }
       
-         return (
-            // if we're already at the root but there are more expressions to satisfy,
-            // can't consume any more. No match.
-            
-            // NOTE: this is why none of the other exprs have to be able to handle empty lists;
-            // only consume1 moves onto the next token and it refuses to do so once it reaches
-            // the list item in the list.          
-            keyOf(head(ascent)) != ROOT_PATH ) &&
-            
-            // consider the next bit of hte ascent by passing only the tail to the previous
-            // expression
-            previousExpr(tail(ascent));
-      };                                                                                                            
+      return lazyIntersection(
+               // If we're already at the root but there are more expressions to satisfy,
+               // can't consume any more. No match.
+               
+               // This check is why none of the other exprs have to be able to handle empty lists;
+               // only consume1 moves onto the next token and it refuses to do so once it reaches
+               // the list item in the list.       
+               notAtRoot,
+               
+               // consider the next bit of the ascent by passing only the tail to the previous
+               // expression 
+               compose(previousExpr, tail) 
+      );
+                                                                                                               
    }   
    
    /**
@@ -192,7 +192,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
       return function(ascent){
-         return keyOf(head(ascent)) == ROOT_PATH;
+         return headKey(ascent) == ROOT_PATH;
       };
    }   
          
