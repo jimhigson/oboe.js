@@ -19,58 +19,95 @@ function applyAll( fns, args ) {
    });
 }
 
-/*
-   Call each of a list of functions with the same arguments, where the arguments are given using varargs
-   array. Ignores any return values from the functions.
- */
-function callAll( fns /*, arg1, arg2, arg3...*/ ) {
-   applyAll(fns, toArray(arguments, 1));
+
+function varArgs(fn){
+   // TODO: if demand needs it, a version which gives a list instead of an array
+
+   function sliceArray(arrayLikeThing, startIndex, endIndex) {
+      return Array.prototype.slice.call(arrayLikeThing, startIndex, endIndex);
+   }
+
+   var numberOfFixedArguments = fn.length -1;
+         
+   return function(){
+   
+      // make an array of the fixed arguments
+      var argumentsToFunction = sliceArray( arguments, 0, numberOfFixedArguments );
+      
+      // push on the varargs bit as a sub-array:
+      argumentsToFunction.push( sliceArray( arguments, numberOfFixedArguments ) );   
+      
+      return fn.apply( this, argumentsToFunction );
+   }       
 }
 
 
-/** Call a list of functions with the same args until one returns a truthy result.
- *
- *  Returns the first return value that is given that is truthy.
- * 
- *  If none are found, calls onFail and returns whatever that gives, or if no onFail is given,
- *  returns undefined
- * 
- *  @param {Function[]} fns
- *  @param {*} args
- *  @param {Function} [onFail]
+/** 
+ *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ *  
+ *  So:
+ *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
+ *       
+ *  Is equivalent to: 
+ *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
+ *   
+ *  @returns the first return value that is given that is truthy.
  */
-function firstMatching( fns, args, onFail ) {
+var lazyUnion = varArgs(function(fns) {
 
-   var maybeMatch;
+   return varArgs(function(params){
 
-   for (var i = 0; i < len(fns); i++) {
-      
-      maybeMatch = apply(fns[i], args);            
-            
-      if( maybeMatch ) {
-         return maybeMatch;
-      }      
-   }  
+      var maybeValue;
    
-   return onFail && onFail();
+      for (var i = 0; i < len(fns); i++) {
+         
+         maybeValue = apply(fns[i], params);            
+               
+         if( maybeValue ) {
+            return maybeValue;
+         }      
+      }
+   });    
+});
+
+/**
+ * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
+ * first non-truthy one.
+ * 
+ */
+function lazyIntersection(fn1, fn2) {
+
+   return function (param) {
+                                                              
+      return fn1(param) && fn2(param);
+   };   
 }
 
 /** Partially complete the given function by filling it in with all arguments given
  *  after the function itself. Returns the partially completed version.    
  */
-function partialComplete( fn /* arg1, arg2, arg3 ... */ ) {
+var partialComplete = varArgs(function( fn, boundArgs ) {
 
-   var boundArgs = toArray(arguments, 1);
+   return varArgs(function( callArgs ) {
+            
+      return fn.apply(this, boundArgs.concat(callArgs));
+   }); 
+});
 
-   return function() {
-      var callArgs = boundArgs.concat(toArray(arguments));            
-         
-      return fn.apply(this, callArgs);
-   }; 
-}
-function lastOf(array) {
-   return array[len(array)-1];
-}
+
+var compose = varArgs(function(fns) {
+
+   var functionList = reverseList( asList(fns) );
+   
+   function next(curFn, valueSoFar) {  
+      return curFn(valueSoFar);   
+   }
+   
+   return function(startValue){
+     
+      return foldList(next, startValue, functionList);
+   }
+});
 
 /**
  * Returns true if the given candidate is of type T
@@ -81,19 +118,13 @@ function lastOf(array) {
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
 }
-
-var isArray = partialComplete(isOfType, Array);
-var isString = partialComplete(isOfType, String);
-
 function pluck(key, object){
    return object[key];
 }
 
-var len = partialComplete(pluck, 'length');
-
-function toArray(arrayLikeThing, startIndex) {
-   return Array.prototype.slice.call(arrayLikeThing, startIndex);
-}
+var attr = partialComplete(partialComplete, pluck),
+    len = attr('length'),    
+    isString = partialComplete(isOfType, String);
 
 /** I don't like saying foo !=== undefined very much because of the double-negative. I find
  *  defined(foo) easier to read.
@@ -126,8 +157,8 @@ function cons(x, xs) {
    return [x, xs];
 }
 
-var head = partialComplete(pluck, 0);
-var tail = partialComplete(pluck, 1);
+var head = attr(0);
+var tail = attr(1);
 var emptyList = null;
 
 function reverseList(list){
@@ -146,6 +177,8 @@ function reverseList(list){
 }
 
 function listAsArray(list){
+   // could be done as a reduce
+
    if( !list ) {
       return [];
    } else {
@@ -153,6 +186,30 @@ function listAsArray(list){
       array.unshift(head(list)); 
       return array;
    }
+}
+
+function map(fn, list) {
+   if( !list ) {
+      return emptyList;
+   } else {
+      return cons(fn(head(list)), map(fn,tail(list)));
+   }
+}
+
+function foldList(fn, startValue, list) {
+   
+   if( !list ) {
+      return startValue;
+   }
+    
+   return fn(head(list), foldList(fn, startValue, tail(list)));
+}
+
+function asList(array){
+
+   return array.reduce( function(listSoFar, nextItem) {
+      return cons(nextItem, listSoFar);
+   }, emptyList );   
 }
 
 /*function lastInList(list) {
@@ -914,51 +971,32 @@ var jsonPathSyntax = (function() {
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var regexSource = partialComplete(pluck, 'source');
-   
-   function r(componentRegexes) {
-   
-      return RegExp( componentRegexes.map(regexSource).join('') );
-   }
-   
-   function jsonPathClause() {
-      
-      var strings = toArray(arguments);
-      
+   var jsonPathClause = varArgs(function( strings ) {
+           
       strings.unshift(/^/);
       
-      return r(strings);
-   }
-   
-   function unquotedArrayNotation(contents) {
-      return r([/\[/, contents, /\]/]);
-   }
-   
+      return RegExp(strings.map(attr('source')).join(''));
+   });
+
    var possiblyCapturing =           /(\$?)/
-   ,   namedNode =                   /(\w+)/
+   ,   namedNode =                   /(\w+|\*)/
    ,   namePlaceholder =             /()/
-   ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
-   ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
-   ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+   ,   nodeInArrayNotation =         /\["(\w+)"\]/
+   ,   numberedNodeInArrayNotation = /\[(\d+|\*)\]/
+// ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/
     
                   
    ,   jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                       //   foo
+                                                                                       //   foo or *
    
-   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   ["foo"]
+   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, nodeInArrayNotation, optionalFieldList)
+                                                                                       //   ["foo"]  
        
    ,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [2]
-   
-   ,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
-                                                                                       //   *
-   
-   ,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [*]
-   
+                                                                                       //   [2] or [*]
+      
    ,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
    
    ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
@@ -971,14 +1009,16 @@ var jsonPathSyntax = (function() {
    
    ,   
    //  see jsonPathNodeDescription below
-       nodeDescriptors = [
+       nodeExpressions = [
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation
          ,  jsonPathNumberedNodeInArrayNotation
-         ,  jsonPathStarInObjectNotation
-         ,  jsonPathStarInArrayNotation
+//         ,  jsonPathStarInObjectNotation
+//         ,  jsonPathStarInArrayNotation
          ,  jsonPathPureDuckTyping 
-         ].map(regexDescriptor)
+         ]
+         
+   ,   jsonPathNodeDescription = apply(lazyUnion, nodeExpressions.map(regexDescriptor))         
    ;      
 
    /** allows exporting of a regular expression under a generified function interface
@@ -989,14 +1029,7 @@ var jsonPathSyntax = (function() {
          return regex.exec(candidate);
       }
    }
-
-   /** export several regular expressions under a single function, presenting the same interface
-    *  as regexDescriptor above.
-    */
-   function jsonPathNodeDescription( candidate ) {   
-      return firstMatching(nodeDescriptors, [candidate]);
-   }
-   
+  
    /* we export only a single function. When called, this function injects into a scope the
       descriptor functions from this scope which we want to make available elsewhere. 
     */
@@ -1010,6 +1043,188 @@ var jsonPathSyntax = (function() {
    }; 
 
 }());
+var keyOf = attr('key');
+var nodeOf = attr('node');
+
+
+/**
+ * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
+ * have any path). This prevents the need for special-casing detection of the root object and allows it
+ * to be treated like any other object.
+ * 
+ * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
+ * distinct, therefore no other object can possibly clash with this one.
+ */
+var ROOT_PATH = {r:1}; 
+
+
+/**
+ * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
+ * 
+ * Notify on the given event bus when interesting things happen.
+ * 
+ * Returns a function which gives access to the content built up so far
+ * 
+ * @param clarinet our source of low-level events
+ * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
+ *    or path is found  
+ */ 
+function incrementalContentBuilder( clarinet, notify ) {
+   
+   var            
+         // array of nodes from curNode up to the root of the document.
+         // the root is at the far end of the list, the current node is at the close end (the head) 
+         ascent
+      
+   ,     rootNode;
+
+
+
+   function checkForMissedArrayKey(ascent, newLeafNode) {
+   
+      // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
+      // is for objects)
+      // so we need to notify of the paths when we find the items:
+
+      var parentNode = nodeOf(head(ascent));
+      
+      if (isOfType(Array, parentNode)) {
+
+         pathFound(len(parentNode), newLeafNode);
+      }
+   }
+
+   /**
+    * Manage the state and notifications for when a new node is found.
+    *  
+    * @param {*} newLeafNode the thing that has been found in the json
+    * @function
+    */                 
+   function nodeFound( newLeafNode ) {
+      
+      if( !ascent ) {
+           
+         // we discovered the root node, it has a special path
+         rootNode = newLeafNode;
+         pathFound(ROOT_PATH, newLeafNode);
+         
+         return;            
+      } 
+      
+      checkForMissedArrayKey(ascent, newLeafNode);
+      
+      // the node is a non-root node
+      var branches = tail(ascent),           
+          parentBranch = head(branches),   
+          oldLeaf = head(ascent),
+          newLeaf = mapping(keyOf(oldLeaf), newLeafNode);      
+   
+      appendBuiltContent( parentBranch, newLeaf );
+                                                                                                         
+      ascent = cons(newLeaf, branches);                                                                          
+   }
+
+
+   /**
+    * Add a new value to the top-level object which has been already output   
+    */
+   function appendBuiltContent( branch, leaf ){
+      
+      nodeOf(branch)[keyOf(leaf)] = nodeOf(leaf);
+   }
+
+   /**
+    * Get a new key->node mapping
+    * 
+    * @param {String|Number} key
+    * @param {Object|Array|String|Number|null} node a value found in the json
+    */
+   function mapping(key, node) {
+      return {key:key, node:node};
+   }
+     
+   /**
+    * For when we find a new key in the json.
+    * 
+    * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
+    *    take the special value ROOT_PATH if the root node has just been found
+    * @param {String|Number|Object|Array|Null|undefined} [maybeNode] usually this won't be known so can be undefined.
+    *    can't use null because null is a valid value in some json
+    **/  
+   function pathFound(key, maybeNode) {
+      
+      var newLeaf = mapping(key, maybeNode);
+      
+      if( ascent ) { // if not root
+      
+         // if we have the key but (unless adding to an array) no known value yet, at least put 
+         // that key in the output but against no defined value:      
+         appendBuiltContent( head(ascent), newLeaf );
+      }
+   
+      ascent = cons(newLeaf, ascent);
+     
+      notify(TYPE_PATH, ascent);
+ 
+   }
+
+
+   /**
+    * manages the state and notifications for when the current node has ended
+    */
+   function curNodeFinished( ) {
+
+      notify(TYPE_NODE, ascent);
+                          
+      // pop the complete node and its path off the lists:                                    
+      ascent = tail(ascent);
+   }      
+    
+   /* 
+    * Assign listeners to clarinet.
+    */     
+    
+   clarinet.onopenobject = function (firstKey) {
+
+      nodeFound({});
+      
+      // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
+      // so can't do !firstKey here, have to compare against undefined
+      if( defined(firstKey) ) {
+      
+         // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
+         // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
+         // value because we haven't seen that far into the json yet          
+         pathFound(firstKey);
+      }
+   };
+   
+   clarinet.onopenarray = function () {
+      nodeFound([]);
+   };
+
+   // called by Clarinet when keys are found in objects               
+   clarinet.onkey = pathFound;   
+               
+   clarinet.onvalue = function (value) {
+   
+      // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
+      // can't have descendants.
+   
+      nodeFound(value);
+                        
+      curNodeFinished();
+   };         
+   
+   clarinet.oncloseobject =
+   clarinet.onclosearray =       
+      curNodeFinished;      
+      
+   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
+   return function() {
+      return rootNode;
+   }           
+}
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
  * paths for matches. The candidate paths are arrays of strings representing the path from the root of the parsed json to
@@ -1019,9 +1234,9 @@ var jsonPathSyntax = (function() {
  * This is usually where several functions need to keep the same signature but not all use all of the parameters.
  * 
  * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
- * same value for the same arguments and no variables are reassigned. There is also quite a heavy use of partial completion
+ * same value for the same arguments and no variables are reassigned.
  * 
- *   String jsonPath -> (List pathList, List nodeList) -> Boolean|Object
+ *   String jsonPath -> (List ascent) -> Boolean|Object
  *    
  * The returned function returns false if there was no match, the node which was captured (using $)
  * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
@@ -1032,7 +1247,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
-     
+
+   var headKey = compose(keyOf, head);
+                   
    /**
     * Expression for a named path node, expressed as:
     *    foo
@@ -1049,22 +1266,19 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX],
-      
-          condition = name ? function(a){return a == name} : always; 
+      var name = detection[NAME_INDEX],      
+          condition;
+          
+      if( !name || name == '*' ){
+         condition = always;
+      } else {
+         condition = function(ascent){return headKey(ascent) == name}      
+      } 
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return function (pathList, nodeList) {
-         // for jsonPath:
-         //    .foo
-         //    ["foo"]
-         //    [2]                                       
-                                                                  
-         return condition(head(pathList)) && 
-                previousExpr(pathList, nodeList);
-      };      
+      return lazyIntersection(condition, previousExpr);
    }
 
    /**
@@ -1085,13 +1299,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var requiredFields = fieldListStr.split(/\W+/);
+      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/)),
+          isMatch = compose( hasAllrequiredFields, nodeOf, head );
 
-      return function (pathList, nodeList) {
-
-         return hasAllProperties(requiredFields, head(nodeList)) && 
-                previousExpr(pathList, nodeList);
-      }
+      return lazyIntersection(isMatch, previousExpr);
    }
 
    /**
@@ -1108,11 +1319,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
       
-      return function (pathList, nodeList) {
-         return previousExpr(pathList, nodeList) &&
-                head(nodeList);
-      }
-      
+      return lazyIntersection(previousExpr, head);
+            
    }            
       
    /**
@@ -1133,24 +1341,25 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          // '..*'            
          return always;
       }
-   
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */   
-      return function( pathList, nodeList ){
+
+      function notAtRoot(ascent){
+         return headKey(ascent) != ROOT_PATH;
+      }
       
-         if( head(pathList) === ROOT_PATH ) {
-            // if we're already at the root but there are more expressions to satisfy,
-            // can't consume any more. No match.
-            
-            // NOTE: this is why none of the other exprs have to be able to handle empty lists;
-            // only consume1 moves onto the next token and it refuses to do so once it reaches
-            // the list item in the list.                     
-            return false;
-         }                
-                 
-         return previousExpr(tail(pathList), tail(nodeList));
-      };                                                                                                            
+      return lazyIntersection(
+               // If we're already at the root but there are more expressions to satisfy,
+               // can't consume any more. No match.
+               
+               // This check is why none of the other exprs have to be able to handle empty lists;
+               // only consume1 moves onto the next token and it refuses to do so once it reaches
+               // the list item in the list.       
+               notAtRoot,
+               
+               // consider the next bit of the ascent by passing only the tail to the previous
+               // expression 
+               compose(previousExpr, tail) 
+      );
+                                                                                                               
    }   
    
    /**
@@ -1178,21 +1387,22 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
           terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
           recursiveCase = consume1(consumeManyPartiallyCompleted),
           
-          cases = [ terminalCaseWhenArrivingAtRoot, 
-                    terminalCaseWhenPreviousExpressionIsSatisfied, 
-                    recursiveCase
-                  ];                        
+          cases = lazyUnion(
+                     terminalCaseWhenArrivingAtRoot
+                  ,  terminalCaseWhenPreviousExpressionIsSatisfied
+                  ,  recursiveCase
+                  );                        
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */            
-      function consumeManyPartiallyCompleted(pathList, nodeList) {
+      function consumeManyPartiallyCompleted(ascent) {
       
-         if( !nodeList ) {
+         if( !ascent ) {
             // have gone past the start, not a match:         
             return false;
          }      
                                                         
-         return firstMatching(cases, arguments);
+         return cases(ascent);
       }
       
       return consumeManyPartiallyCompleted;
@@ -1208,8 +1418,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathList){
-         return head(pathList) == ROOT_PATH;
+      return function(ascent){
+         return headKey(ascent) == ROOT_PATH;
       };
    }   
          
@@ -1225,16 +1435,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */   
-      return function(pathList, nodeList) {
+      return function(ascent) {
    
          // kick off the parsing by passing through to the lastExpression
-         var exprMatch = lastClause(pathList, nodeList);
+         var exprMatch = lastClause(ascent);
                                
          // Returning exactly true indicates that there has been a match but no node is captured. 
          // By default, the node at the start of the lists gets returned. Just like in css4 selector 
          // spec, if there is no $, the last node in the selector is the one being styled.                      
-                         
-         return exprMatch === true ? head(nodeList) : exprMatch;
+         return exprMatch === true ? head(ascent) : exprMatch;
       };
    }      
                           
@@ -1307,18 +1516,23 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                    
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
-   var clauseMatchers = [
+   var clause = lazyUnion(
 
-       clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
-   ,   clauseMatcher(doubleDotSyntax  , [consumeMany])
+      clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
+   ,  clauseMatcher(doubleDotSyntax  , [consumeMany])
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,   clauseMatcher(dotSyntax        , [] )  
+   ,  clauseMatcher(dotSyntax        , [] )  
                                                                                       
-   ,   clauseMatcher(bangSyntax       , [rootExpr, capture])             
-   ,   clauseMatcher(emptySyntax      , [statementExpr])
-   ];
+   ,  clauseMatcher(bangSyntax       , [rootExpr, capture])             
+   ,  clauseMatcher(emptySyntax      , [statementExpr])
+   
+   ,   // if none of the above worked, we need to fail by throwing an error
+      function (jsonPath) {
+         throw Error('"' + jsonPath + '" could not be tokenised')      
+      }
+   );
 
 
    /**
@@ -1370,14 +1584,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        * valid to recur past that point. 
        */
       var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
-             
-      // to be called by firstMatching if no match could be found. Report the input
-      // that could not be tokenized and leave to handlers up-stack to work out what to do.
-      function onFail() {
-         throw Error('"' + jsonPath + '" could not be tokenised')      
-      }
-      
-      return firstMatching( clauseMatchers, [jsonPath, parserGeneratedSoFar, onFind], onFail );                              
+                   
+      return clause(jsonPath, parserGeneratedSoFar, onFind);                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's
@@ -1394,164 +1602,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
 });
 
-/**
- * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
- * have any path). This prevents the need for special-casing detection of the root object and allows it
- * to be treated like any other object.
- * 
- * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
- * distinct, therefore no other object can possibly clash with this one.
- */
-var ROOT_PATH = {}; 
-
-
-/**
- * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
- * 
- * Notify on the given event bus when interesting things happen.
- * 
- * Returns a function which gives access to the content built up so far
- * 
- * @param clarinet our source of low-level events
- * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
- *    or path is found  
- */ 
-function incrementalParsedContent( clarinet, notify ) {
-
-   // All of the state of this jsonBuilder is kept isolated in these vars. The remainder of the logic is to maintain
-   // this state and notify the callbacks 
-    
-   var            
-         // array of nodes from curNode up to the root of the document.
-         // the root is at the far end of the list, the current node is at the close end (the head) 
-         nodeList
-   
-         // array of strings - the path from the root of the dom to the node currently being parsed
-         // the root is at the far end of the list, the current node is at the close end (the head)
-   ,     pathList
-   
-   ,     root;
-
-
-
-   function addChildToParent(child, parent) {
-
-      if (isArray(parent)) {
-         // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
-         // is for objects)
-         // so we need to notify of the paths when we find the items:
-         pathDiscovered(parent.length, child);
-      }
-
-      // add the newly found node to its parent
-      parent[head(pathList)] = child;
-   }
-
-   /**
-    * Manage the state and notifications for when a new node is found.
-    *  
-    * @param {*} foundNode the thing that has been found in the json
-    * @function
-    */                 
-   function nodeFound( foundNode ) {
-   
-      if( !nodeList ) {
-           
-         // we discovered the root node
-         root = foundNode;
-         pathDiscovered(ROOT_PATH, foundNode);
-                           
-      } else {
-         // we discovered a node with a parent      
-         addChildToParent(foundNode, head(nodeList));
-      }
-                             
-      // and add it to our list:                                    
-      nodeList = cons(foundNode, nodeList);                                  
-   }   
-  
-   /**
-    * For when we find a new key in the json.
-    * 
-    * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
-    *    take the special value ROOT_PATH if the root node has just been found
-    * @param {String|Number|Object|Array|Null|undefined} [value] usually this won't be known so can be undefined.
-    *    can't use null because null is a valid value in some json
-    **/  
-   function pathDiscovered(key, value) {
-      
-      // if we have the key but no known value yet, at least put that key in the output 
-      // but against no defined value:
-      if( !defined(value) ) {
-         head(nodeList)[key] = undefined;
-      }   
-
-      pathList = cons(key, pathList);
-     
-      notify(PATH_FOUND_EVENT, pathList, cons(value, nodeList) );
- 
-   }
-
-
-   /**
-    * manages the state and notifications for when the current node has ended
-    */
-   function curNodeFinished( ) {
-
-      notify(NODE_FOUND_EVENT, pathList, nodeList );
-                          
-      // pop the complete node and its path off the lists:                
-      nodeList = tail(nodeList);                           
-      pathList = tail(pathList);
-   }      
-    
-   /* 
-    * Finally, assign listeners to clarinet. Mostly these are just wrappers and pass-throughs for the higher
-    * level functions above. 
-    */     
-   clarinet.onopenobject = function (firstKey) {
-
-      nodeFound({});
-      
-      // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
-      // so can't do !firstKey here, have to compare against undefined
-      if( defined(firstKey) ) {
-      
-         // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-         // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
-         // value because we haven't seen that far into the json yet          
-         pathDiscovered(firstKey);
-      }
-   };
-   
-   clarinet.onopenarray = function () {
-      nodeFound([]);
-   };
-
-   // called by Clarinet when keys are found in objects               
-   clarinet.onkey = pathDiscovered;   
-               
-   clarinet.onvalue = function (value) {
-   
-      // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
-      // can't have descendants.
-   
-      nodeFound(value);
-                        
-      curNodeFinished();
-   };         
-   
-   clarinet.oncloseobject =
-   clarinet.onclosearray =       
-      curNodeFinished;      
-      
-   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
-   return function() {
-      return root;
-   }           
-}
-var NODE_FOUND_EVENT = 'n',
-    PATH_FOUND_EVENT = 'p',
+var TYPE_NODE = 'n',
+    TYPE_PATH = 'p',
     ERROR_EVENT = 'e';
 
 function pubSub(){
@@ -1559,10 +1611,10 @@ function pubSub(){
    var listeners = {n:[], p:[], e:[]};
                              
    return {
-      notify:function ( eventId /* arguments... */ ) {
+      notify:varArgs(function ( eventId, parameters ) {
                
-         applyAll( listeners[eventId], toArray(arguments,1) );
-      },
+         applyAll( listeners[eventId], parameters );
+      }),
       on:function( eventId, fn ) {      
          listeners[eventId].push(fn);
          return this; // chaining                                         
@@ -1605,9 +1657,9 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    }         
 
    return {      
-      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
+      onPath: partialComplete(addNodeOrPathListener, TYPE_PATH),
       
-      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
+      onNode: partialComplete(addNodeOrPathListener, TYPE_NODE),
       
       onError: partialComplete(eventBus.on, ERROR_EVENT),
       
@@ -1656,15 +1708,15 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
     */
    function addNewCallback( eventId, pattern, callback ) {
    
-      var test = jsonPathCompiler( pattern );
+      var matchesJsonPath = jsonPathCompiler( pattern );
    
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function(pathList, nodeList){ 
+      eventBus.on( eventId, function( ascent ){ 
       
          try{
-            var foundNode = test( pathList, nodeList );
+            var maybeMatchingMapping = matchesJsonPath( ascent );
          } catch(e) {
             // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
             // want to catch as early as possible:
@@ -1686,26 +1738,34 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
          //                      
-         if( foundNode !== false ) {                                 
+         if( maybeMatchingMapping !== false ) {                                 
            
             try{
-               // We're now calling back to outside of oboe where there is no concept of the
-               // functional-style lists that we are using internally so convert into standard
-               // arrays. Reverse the order because it is more natural to receive in order 
-               // "root to leaf" than "leaf to root"             
-            
-               callback(   foundNode,  
-                           // for the path list, also need to remove the last item which is the special
-                           // token for the 'path' to the root node
-                           listAsArray(tail(reverseList(pathList))), 
-                           listAsArray(reverseList(nodeList)) 
-               );
+               notifyCallback(callback, maybeMatchingMapping, ascent);
+               
             } catch(e) {
                eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
             }
          }
       });   
    }   
+   
+   function notifyCallback(callback, matchingMapping, ascent) {
+      // We're now calling back to outside of oboe where there is no concept of the
+      // functional-style lists that we are using internally so convert into standard
+      // arrays. Reverse the order because it is more natural to receive in order 
+      // "root to leaf" than "leaf to root"             
+            
+      var descent     = reverseList(ascent),
+      
+            // for the path list, also need to remove the last item which is the special
+            // token for the 'path' to the root node
+          path       = listAsArray(tail(map(keyOf,descent))),
+          ancestors  = listAsArray(map(nodeOf, descent)); 
+      
+      callback( nodeOf(matchingMapping), path, ancestors );  
+   }
+   
        
    /* the controller only needs to expose two methods: */                                          
    return { 
@@ -1736,7 +1796,7 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          // wire everything up:
          var eventBus = pubSub(),
              clarinetParser = clarinet.parser(),
-             parsedContentSoFar = incrementalParsedContent(clarinetParser, eventBus.notify),             
+             parsedContentSoFar = incrementalContentBuilder(clarinetParser, eventBus.notify),             
              controller = oboeController( eventBus, clarinetParser, parsedContentSoFar),      
             
          // now work out what the arguments mean:   

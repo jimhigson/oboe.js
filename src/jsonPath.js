@@ -42,10 +42,10 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
       var name = detection[NAME_INDEX],      
           condition;
           
-      if( name ){
-         condition = function(ascent){return headKey(ascent) == name}
-      } else {
+      if( !name || name == '*' ){
          condition = always;
+      } else {
+         condition = function(ascent){return headKey(ascent) == name}      
       } 
      
       /**

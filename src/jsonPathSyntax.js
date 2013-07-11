@@ -7,49 +7,31 @@ var jsonPathSyntax = (function() {
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var regexSource = attr('source');
-   
-   function r(componentRegexes) {
-   
-      return RegExp( componentRegexes.map(regexSource).join('') );
-   }
-   
    var jsonPathClause = varArgs(function( strings ) {
            
       strings.unshift(/^/);
       
-      return r(strings);
+      return RegExp(strings.map(attr('source')).join(''));
    });
-   
-   function unquotedArrayNotation(contents) {
-      return r([/\[/, contents, /\]/]);
-   }
-   
+
    var possiblyCapturing =           /(\$?)/
-   ,   namedNode =                   /(\w+)/
+   ,   namedNode =                   /(\w+|\*)/
    ,   namePlaceholder =             /()/
-   ,   namedNodeInArrayNotation =    /\["(\w+)"\]/
-   ,   numberedNodeInArrayNotation = unquotedArrayNotation( /(\d+)/ )
-   ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
+   ,   nodeInArrayNotation =         /\["(\w+)"\]/
+   ,   numberedNodeInArrayNotation = /\[(\d+|\*)\]/
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/
     
                   
    ,   jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                       //   foo
+                                                                                       //   foo or *
    
-   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, namedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   ["foo"]
+   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, nodeInArrayNotation, optionalFieldList)
+                                                                                       //   ["foo"]  
        
    ,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [2]
-   
-   ,   jsonPathStarInObjectNotation          = jsonPathClause(possiblyCapturing, /\*/, optionalFieldList)
-                                                                                       //   *
-   
-   ,   jsonPathStarInArrayNotation           = jsonPathClause(possiblyCapturing, anyNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [*]
-   
+                                                                                       //   [2] or [*]
+      
    ,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
    
    ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
@@ -66,10 +48,8 @@ var jsonPathSyntax = (function() {
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation
          ,  jsonPathNumberedNodeInArrayNotation
-         ,  jsonPathStarInObjectNotation
-         ,  jsonPathStarInArrayNotation
          ,  jsonPathPureDuckTyping 
-         ]
+       ]
          
    ,   jsonPathNodeDescription = apply(lazyUnion, nodeExpressions.map(regexDescriptor))         
    ;      
