@@ -434,7 +434,7 @@
    };
    
    Asserter.prototype.returning = function(node) {
-      assertEquals(node, this._lastResult);
+      assertEquals(node, nodeOf(this._lastResult));
       
       return this;
    };      
