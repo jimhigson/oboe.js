@@ -146,7 +146,7 @@ function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
 
 IncrementalContentBuilderAsserter.prototype.whenClarinetFires = function(fnName /* args */){
 
-   var args = toArray(arguments, 1);
+   var args = Array.prototype.slice.call(arguments, 1);
 
    this._clarinetStub[fnName].apply( undefined, args );
    return this;
