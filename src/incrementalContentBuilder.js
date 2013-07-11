@@ -1,5 +1,5 @@
-var keyOf = partialComplete(pluck, 'key');
-var nodeOf = partialComplete(pluck, 'node');
+var keyOf = attr('key');
+var nodeOf = attr('node');
 
 
 /**
@@ -43,7 +43,7 @@ function incrementalContentBuilder( clarinet, notify ) {
 
       var parentNode = nodeOf(head(ascent));
       
-      if (isArray(parentNode)) {
+      if (isOfType(Array, parentNode)) {
 
          pathFound(len(parentNode), newLeafNode);
       }
@@ -95,7 +95,7 @@ function incrementalContentBuilder( clarinet, notify ) {
     * @param {Object|Array|String|Number|null} node a value found in the json
     */
    function mapping(key, node) {
-      return Object.freeze( {key:key, node:node} );
+      return {key:key, node:node};
    }
      
    /**
@@ -119,7 +119,7 @@ function incrementalContentBuilder( clarinet, notify ) {
    
       ascent = cons(newLeaf, ascent);
      
-      notify(PATH_FOUND_EVENT, ascent);
+      notify(TYPE_PATH, ascent);
  
    }
 
@@ -129,7 +129,7 @@ function incrementalContentBuilder( clarinet, notify ) {
     */
    function curNodeFinished( ) {
 
-      notify(NODE_FOUND_EVENT, ascent);
+      notify(TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the lists:                                    
       ascent = tail(ascent);

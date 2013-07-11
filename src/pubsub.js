@@ -1,5 +1,5 @@
-var NODE_FOUND_EVENT = 'n',
-    PATH_FOUND_EVENT = 'p',
+var TYPE_NODE = 'n',
+    TYPE_PATH = 'p',
     ERROR_EVENT = 'e';
 
 function pubSub(){

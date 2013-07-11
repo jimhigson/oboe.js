@@ -1,6 +1,3 @@
-function lastOf(array) {
-   return array[len(array)-1];
-}
 
 /**
  * Returns true if the given candidate is of type T
@@ -11,16 +8,13 @@ function lastOf(array) {
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
 }
-
-var isArray = partialComplete(isOfType, Array);
-var isString = partialComplete(isOfType, String);
-
 function pluck(key, object){
    return object[key];
 }
 
-var len = partialComplete(pluck, 'length');
-
+var attr = partialComplete(partialComplete, pluck),
+    len = attr('length'),    
+    isString = partialComplete(isOfType, String);
 
 /** I don't like saying foo !=== undefined very much because of the double-negative. I find
  *  defined(foo) easier to read.

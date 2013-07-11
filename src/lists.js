@@ -1,10 +1,10 @@
 
 function cons(x, xs) {
-   return Object.freeze([x, xs]);
+   return [x, xs];
 }
 
-var head = partialComplete(pluck, 0);
-var tail = partialComplete(pluck, 1);
+var head = attr(0);
+var tail = attr(1);
 var emptyList = null;
 
 function reverseList(list){

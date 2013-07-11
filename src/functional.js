@@ -69,7 +69,8 @@ var lazyUnion = varArgs(function(fns) {
 });
 
 /**
- * Apply a an arbitrary condition
+ * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
+ * first non-truthy one.
  * 
  */
 function lazyIntersection(fn1, fn2) {

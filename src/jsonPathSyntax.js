@@ -7,7 +7,7 @@ var jsonPathSyntax = (function() {
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var regexSource = partialComplete(pluck, 'source');
+   var regexSource = attr('source');
    
    function r(componentRegexes) {
    

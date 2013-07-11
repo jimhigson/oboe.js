@@ -34,9 +34,9 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    }         
 
    return {      
-      onPath: partialComplete(addNodeOrPathListener, PATH_FOUND_EVENT),
+      onPath: partialComplete(addNodeOrPathListener, TYPE_PATH),
       
-      onNode: partialComplete(addNodeOrPathListener, NODE_FOUND_EVENT),
+      onNode: partialComplete(addNodeOrPathListener, TYPE_NODE),
       
       onError: partialComplete(eventBus.on, ERROR_EVENT),
       
