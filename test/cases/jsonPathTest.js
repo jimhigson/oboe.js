@@ -377,7 +377,7 @@
       }          
    }
    
-   function convertParams(pathStack, nodeStack){
+   function convertParamsToAscent(pathStack, nodeStack){
       // change the two parameters into the test from  arrays (which are easy to write as in-line js) to
       // lists (which is what the code under test needs) 
    
@@ -385,23 +385,21 @@
       
       pathStack.unshift(ROOT_PATH);
       
-      // convert both to lists:
-      var pathList = emptyList;
-      var nodeList = emptyList;
-      while(pathStack.length) {
-         pathList = cons( pathStack.shift(), pathList );
-         nodeList = cons( nodeStack.shift(), nodeList );
-      }   
+      return pathStack.reduce( function( ascent, pathItem, i ){
+
+         var mapping = {key: pathStack[i], node:nodeStack[i]};
+               
+         return cons( mapping, ascent ); 
       
-      return { pathList: pathList, nodeList: nodeList };
+      }, emptyList );
    }
    
    Asserter.prototype.thenShouldMatch = function(pathStack, nodeStack) {
 
-      var params = convertParams(pathStack, nodeStack);
+      var ascent = convertParamsToAscent(pathStack, nodeStack);
       
       try{   
-         this._lastResult = this._compiledPattern(params.pathList, params.nodeList);
+         this._lastResult = this._compiledPattern(ascent);
       } catch( e ) {
          fail( 'Error thrown running pattern "' + this._pattern + 
                   '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
@@ -417,10 +415,10 @@
    
    Asserter.prototype.thenShouldNotMatch = function(pathStack, nodeStack) {
 
-      var params = convertParams(pathStack, nodeStack);
+      var ascent = convertParamsToAscent(pathStack, nodeStack);
 
       try{
-         this._lastResult = this._compiledPattern(params.pathList, params.nodeList);
+         this._lastResult = this._compiledPattern(ascent);
       } catch( e ) {
          fail( 'Error thrown running pattern "' + this._pattern + 
                   '" against path ' + '[' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
