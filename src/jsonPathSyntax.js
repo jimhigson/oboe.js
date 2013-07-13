@@ -7,11 +7,11 @@ var jsonPathSyntax = (function() {
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var jsonPathClause = varArgs(function( strings ) {
+   var jsonPathClause = varArgs(function( componentRegexes ) {
            
-      strings.unshift(/^/);
+      componentRegexes.unshift(/^/);
       
-      return RegExp(strings.map(attr('source')).join(''));
+      return RegExp(componentRegexes.map(attr('source')).join(''));
    });
 
    var possiblyCapturing =           /(\$?)/
@@ -42,18 +42,8 @@ var jsonPathSyntax = (function() {
    
    ,   emptyString                           = jsonPathClause(/$/)                     //   nada!
    
-   ,   
-   //  see jsonPathNodeDescription below
-       nodeExpressions = [
-            jsonPathNamedNodeInObjectNotation
-         ,  jsonPathNamedNodeInArrayNotation
-         ,  jsonPathNumberedNodeInArrayNotation
-         ,  jsonPathPureDuckTyping 
-       ]
-         
-   ,   jsonPathNodeDescription = apply(lazyUnion, nodeExpressions.map(regexDescriptor))         
-   ;      
-
+   ;
+   
    /** allows exporting of a regular expression under a generified function interface
     * @param regex
     */
@@ -68,11 +58,17 @@ var jsonPathSyntax = (function() {
     */
    return function (fn){      
       return fn( 
-          jsonPathNodeDescription,
-          regexDescriptor(jsonPathDoubleDot),
-          regexDescriptor(jsonPathDot),
-          regexDescriptor(jsonPathBang),
-          regexDescriptor(emptyString) );
+          lazyUnionOfFunctionArray( [
+               jsonPathNamedNodeInObjectNotation
+            ,  jsonPathNamedNodeInArrayNotation
+            ,  jsonPathNumberedNodeInArrayNotation
+            ,  jsonPathPureDuckTyping 
+          ].map(regexDescriptor) )
+          
+      ,   regexDescriptor(jsonPathDoubleDot)
+      ,   regexDescriptor(jsonPathDot)
+      ,   regexDescriptor(jsonPathBang)
+      ,   regexDescriptor(emptyString) );
    }; 
 
 }());

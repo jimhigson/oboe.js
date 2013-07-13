@@ -47,35 +47,40 @@
          
          assertEquals(evens, map(doubleIt, naturals));
       }      
-      /*
-   ,      
-      testLastInList: function() {
       
-         var listCBA = cons('c', cons('b', cons('a', emptyList)));
-         
-         assertEquals(['a'], lastInList(listCBA));
+   ,  testAsListWithNonEmptyList: function() {
+         assertEquals(['a','b','c'], listAsArray( asList(['a','b','c']) )  );
       }
       
-   ,      
-      testLastInListForSingletonList: function() {
-      
-         var listA = cons('a', emptyList);
+   ,  testAsListWithEmptyList: function() {
+         assertEquals([], listAsArray( asList([]) )  );
+      }            
+
+   ,  testListEvery: function() {
+         var l = list(1,2,3,4,5,6,7,8,9,10);
          
-         assertEquals(['a'], lastInList(listA));
-      }
-      
-   ,      
-      testLastInListForEmptyList: function() {
-      
-         try{            
-            assertEquals(['a'], lastInList(emptyList));
-            
-            fail('should have thrown an exception so shouldn\'t have gotten to here');
-         }catch(e){
-            // expecting failure
+         function isANumber(n) {
+            return typeof n == 'number';
          }
-      }  
-      */                                         
+         
+         function isOdd(n) {
+            return n % 2 == 0;
+         }
+         
+         function isLessThanTen(n) {
+            return n < 10;
+         }
+         
+         function isLessThanOrEqualToTen(n) {
+            return n <= 10;
+         }                           
+         
+         assertTrue(  listEvery(isANumber,                l ));
+         assertFalse( listEvery(isOdd,                    l ));
+         assertFalse( listEvery(isLessThanTen,            l ));
+         assertTrue(  listEvery(isLessThanOrEqualToTen,   l ));
+
+      }                             
       
             
    

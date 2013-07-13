@@ -72,7 +72,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/)),
+      var hasAllrequiredFields = partialComplete(hasAllProperties, asList(fieldListStr.split(/\W+/))),
           isMatch = compose( hasAllrequiredFields, nodeOf, head );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -232,14 +232,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @param {Array} detection the match given by the regex engine when the feature was found
     */
    function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
-                               
-      // note that if exprs is zero-length, reduce (like fold) will pass back 
-      // parserGeneratedSoFar without any special cases required                   
-      return exprs.reduce(function( parserGeneratedSoFar, expr ){
+                     
+      // note that if exprs is zero-length, fold will pass back 
+      // parserGeneratedSoFar so we don't need to treat this as a special case
+      return foldR( function( parserGeneratedSoFar, expr ){
+      
+         return expr(parserGeneratedSoFar, detection);
+                     
+      }, parserGeneratedSoFar, exprs );                     
 
-         return expr(parserGeneratedSoFar, detection);      
-               
-      }, parserGeneratedSoFar);         
    }
 
    /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
@@ -291,15 +292,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    // a generated parser for that expression     
    var clause = lazyUnion(
 
-      clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
-   ,  clauseMatcher(doubleDotSyntax  , [consumeMany])
+      clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, pathEqualClause, consume1 ))        
+   ,  clauseMatcher(doubleDotSyntax  , list(consumeMany))
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,  clauseMatcher(dotSyntax        , [] )  
+   ,  clauseMatcher(dotSyntax        , list() )  
                                                                                       
-   ,  clauseMatcher(bangSyntax       , [rootExpr, capture])             
-   ,  clauseMatcher(emptySyntax      , [statementExpr])
+   ,  clauseMatcher(bangSyntax       , list(capture, rootExpr))             
+   ,  clauseMatcher(emptySyntax      , list(statementExpr))
    
    ,   // if none of the above worked, we need to fail by throwing an error
       function (jsonPath) {

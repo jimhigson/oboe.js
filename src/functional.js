@@ -41,7 +41,24 @@ function varArgs(fn){
 }
 
 
-/** 
+var lazyUnionOfFunctionArray = function(fns) {
+
+   return varArgs(function(params){
+
+      var maybeValue;
+
+      for (var i = 0; i < len(fns); i++) {
+
+         maybeValue = apply(fns[i], params);
+
+         if( maybeValue ) {
+            return maybeValue;
+         }
+      }
+   });
+};
+
+/**
  *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
  *  
  *  So:
@@ -52,22 +69,7 @@ function varArgs(fn){
  *   
  *  @returns the first return value that is given that is truthy.
  */
-var lazyUnion = varArgs(function(fns) {
-
-   return varArgs(function(params){
-
-      var maybeValue;
-   
-      for (var i = 0; i < len(fns); i++) {
-         
-         maybeValue = apply(fns[i], params);            
-               
-         if( maybeValue ) {
-            return maybeValue;
-         }      
-      }
-   });    
-});
+var lazyUnion = varArgs(lazyUnionOfFunctionArray);
 
 /**
  * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
@@ -96,14 +98,14 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   var functionList = reverseList( asList(fns) );
+   var functionList = asList(fns);
    
-   function next(curFn, valueSoFar) {  
+   function next(valueSoFar, curFn) {  
       return curFn(valueSoFar);   
    }
    
    return function(startValue){
      
-      return foldList(next, startValue, functionList);
+      return foldR(next, startValue, functionList);
    }
 });

@@ -35,6 +35,7 @@ function listAsArray(list){
 }
 
 function map(fn, list) {
+
    if( !list ) {
       return emptyList;
    } else {
@@ -42,25 +43,31 @@ function map(fn, list) {
    }
 }
 
-function foldList(fn, startValue, list) {
+/**
+   @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR(fn, startValue, list) {
+      
+   return list 
+            ?  fn(foldR(fn, startValue, tail(list)), head(list))
+            : startValue;
+}
+
+function listEvery(fn, list) {
    
-   if( !list ) {
-      return startValue;
-   }
-    
-   return fn(head(list), foldList(fn, startValue, tail(list)));
+   return !list || 
+          fn(head(list)) && listEvery(fn, tail(list));
 }
 
 function asList(array){
 
-   return array.reduce( function(listSoFar, nextItem) {
-      return cons(nextItem, listSoFar);
-   }, emptyList );   
+   var l = emptyList;
+
+   for( var i = array.length ; i--; ) {
+      l = cons(array[i], l);      
+   }
+
+   return l;   
 }
 
-/*function lastInList(list) {
-   if( !tail(list) ) {
-      return head(list);
-   }
-   return lastInList(tail(list));
-}*/
+var list = varArgs(asList);

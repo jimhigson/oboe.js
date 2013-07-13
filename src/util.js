@@ -32,13 +32,13 @@ function always(){return true}
  * Will give false if any are missing, or if o is not an object.
  * 
  * @param {Object} o
- * @param {String[]} properties
+ * @param {String[]} fieldList
  */
-function hasAllProperties(properties, o) {
+function hasAllProperties(fieldList, o) {
 
    return      (o instanceof Object) 
             &&
-               properties.every(function (field) {         
+               listEvery(function (field) {         
                   return (field in o);         
-               });
+               }, fieldList);
 }

@@ -42,7 +42,24 @@ function varArgs(fn){
 }
 
 
-/** 
+var lazyUnionOfFunctionArray = function(fns) {
+
+   return varArgs(function(params){
+
+      var maybeValue;
+
+      for (var i = 0; i < len(fns); i++) {
+
+         maybeValue = apply(fns[i], params);
+
+         if( maybeValue ) {
+            return maybeValue;
+         }
+      }
+   });
+};
+
+/**
  *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
  *  
  *  So:
@@ -53,22 +70,7 @@ function varArgs(fn){
  *   
  *  @returns the first return value that is given that is truthy.
  */
-var lazyUnion = varArgs(function(fns) {
-
-   return varArgs(function(params){
-
-      var maybeValue;
-   
-      for (var i = 0; i < len(fns); i++) {
-         
-         maybeValue = apply(fns[i], params);            
-               
-         if( maybeValue ) {
-            return maybeValue;
-         }      
-      }
-   });    
-});
+var lazyUnion = varArgs(lazyUnionOfFunctionArray);
 
 /**
  * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
@@ -97,15 +99,15 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   var functionList = reverseList( asList(fns) );
+   var functionList = asList(fns);
    
-   function next(curFn, valueSoFar) {  
+   function next(valueSoFar, curFn) {  
       return curFn(valueSoFar);   
    }
    
    return function(startValue){
      
-      return foldList(next, startValue, functionList);
+      return foldR(next, startValue, functionList);
    }
 });
 
@@ -142,15 +144,15 @@ function always(){return true}
  * Will give false if any are missing, or if o is not an object.
  * 
  * @param {Object} o
- * @param {String[]} properties
+ * @param {String[]} fieldList
  */
-function hasAllProperties(properties, o) {
+function hasAllProperties(fieldList, o) {
 
    return      (o instanceof Object) 
             &&
-               properties.every(function (field) {         
+               listEvery(function (field) {         
                   return (field in o);         
-               });
+               }, fieldList);
 }
 
 function cons(x, xs) {
@@ -189,6 +191,7 @@ function listAsArray(list){
 }
 
 function map(fn, list) {
+
    if( !list ) {
       return emptyList;
    } else {
@@ -196,28 +199,35 @@ function map(fn, list) {
    }
 }
 
-function foldList(fn, startValue, list) {
+/**
+   @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR(fn, startValue, list) {
+      
+   return list 
+            ?  fn(foldR(fn, startValue, tail(list)), head(list))
+            : startValue;
+}
+
+function listEvery(fn, list) {
    
-   if( !list ) {
-      return startValue;
-   }
-    
-   return fn(head(list), foldList(fn, startValue, tail(list)));
+   return !list || 
+          fn(head(list)) && listEvery(fn, tail(list));
 }
 
 function asList(array){
 
-   return array.reduce( function(listSoFar, nextItem) {
-      return cons(nextItem, listSoFar);
-   }, emptyList );   
+   var l = emptyList;
+
+   for( var i = array.length ; i--; ) {
+      l = cons(array[i], l);      
+   }
+
+   return l;   
 }
 
-/*function lastInList(list) {
-   if( !tail(list) ) {
-      return head(list);
-   }
-   return lastInList(tail(list));
-}*/
+var list = varArgs(asList);
+
 (function(){
 
    /** If no implementation of a method called (methodName) exists fill it in with the
@@ -235,53 +245,37 @@ function asList(array){
     * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
     * to make a custom build without this. However, it is as small as it can be to get the job done.
     * 
-    */
-   
-   fillIn(Array, 'every', function(func) {
-      for( var i = 0 ; i < len(this) ; i++ ) {      
-         if( !func( this[i] ) ) {
-            return false;
-         }    
-      }   
-      return true;   
-   });   
-   
+    */   
+
+  
    // Array.forEach has to be a polyfill, clarinet expects it
-   // Ignoring all but function argument since not needed, eg can't take a context       
+   // Ignoring all but function argument since not needed, eg can't take a context
+   //       Clarinet needs this          
    fillIn(Array, 'forEach', function( func ){
         
-      this.every(function(item){
-         func(item); return true;
-      });        
-      
+      for( var i = 0 ; i < len(this) ; i++ ) {      
+         func(this[i]);    
+      }              
    });         
          
-   // A similarly minimalist implementation of .reduce. Array.reduce in Javascript is
-   // similar to fold in other languages.
-   fillIn(Array, 'reduce', function( func, curValue ){         
-   
-      // let's use the .forEach we just declared above to implement .filter
-      this.forEach(function(item){               
-         curValue = func(curValue, item);
-      });
-      
-      return curValue;
-   });
-   
+  
    // Array.filter has to be a polyfill, clarinet expects it.
    // Ignoring all but function argument since not needed, eg can't take a context
+   //       Clarinet needs this
    fillIn(Array, 'filter', function( filterCondition ){         
    
-      // let's use the .reduce we declared above to implement .filter:
-      return this.reduce(function(matchesSoFar, item){      
-         if( filterCondition( item ) ) {
-            matchesSoFar.push(item);
-         }
-         return matchesSoFar;                  
-      }, []);
-      
-   });
+      var passes = [];
    
+      // let's use the .forEach we declared above to implement .filter:
+      this.forEach(function(item){      
+         if( filterCondition( item ) ) {
+            passes.push(item);
+         }                  
+      });
+      
+      return passes;
+      
+   });  
            
    // allow binding. Minimal version which includes binding of context only, not arguments as well
    fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
@@ -971,11 +965,11 @@ var jsonPathSyntax = (function() {
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
    
-   var jsonPathClause = varArgs(function( strings ) {
+   var jsonPathClause = varArgs(function( componentRegexes ) {
            
-      strings.unshift(/^/);
+      componentRegexes.unshift(/^/);
       
-      return RegExp(strings.map(attr('source')).join(''));
+      return RegExp(componentRegexes.map(attr('source')).join(''));
    });
 
    var possiblyCapturing =           /(\$?)/
@@ -983,7 +977,6 @@ var jsonPathSyntax = (function() {
    ,   namePlaceholder =             /()/
    ,   nodeInArrayNotation =         /\["(\w+)"\]/
    ,   numberedNodeInArrayNotation = /\[(\d+|\*)\]/
-// ,   anyNodeInArrayNotation =      unquotedArrayNotation( /\*/ )
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/
     
@@ -1007,20 +1000,8 @@ var jsonPathSyntax = (function() {
    
    ,   emptyString                           = jsonPathClause(/$/)                     //   nada!
    
-   ,   
-   //  see jsonPathNodeDescription below
-       nodeExpressions = [
-            jsonPathNamedNodeInObjectNotation
-         ,  jsonPathNamedNodeInArrayNotation
-         ,  jsonPathNumberedNodeInArrayNotation
-//         ,  jsonPathStarInObjectNotation
-//         ,  jsonPathStarInArrayNotation
-         ,  jsonPathPureDuckTyping 
-         ]
-         
-   ,   jsonPathNodeDescription = apply(lazyUnion, nodeExpressions.map(regexDescriptor))         
-   ;      
-
+   ;
+   
    /** allows exporting of a regular expression under a generified function interface
     * @param regex
     */
@@ -1035,11 +1016,17 @@ var jsonPathSyntax = (function() {
     */
    return function (fn){      
       return fn( 
-          jsonPathNodeDescription,
-          regexDescriptor(jsonPathDoubleDot),
-          regexDescriptor(jsonPathDot),
-          regexDescriptor(jsonPathBang),
-          regexDescriptor(emptyString) );
+          lazyUnionOfFunctionArray( [
+               jsonPathNamedNodeInObjectNotation
+            ,  jsonPathNamedNodeInArrayNotation
+            ,  jsonPathNumberedNodeInArrayNotation
+            ,  jsonPathPureDuckTyping 
+          ].map(regexDescriptor) )
+          
+      ,   regexDescriptor(jsonPathDoubleDot)
+      ,   regexDescriptor(jsonPathDot)
+      ,   regexDescriptor(jsonPathBang)
+      ,   regexDescriptor(emptyString) );
    }; 
 
 }());
@@ -1299,7 +1286,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var hasAllrequiredFields = partialComplete(hasAllProperties, fieldListStr.split(/\W+/)),
+      var hasAllrequiredFields = partialComplete(hasAllProperties, asList(fieldListStr.split(/\W+/))),
           isMatch = compose( hasAllrequiredFields, nodeOf, head );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -1459,14 +1446,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @param {Array} detection the match given by the regex engine when the feature was found
     */
    function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
-                               
-      // note that if exprs is zero-length, reduce (like fold) will pass back 
-      // parserGeneratedSoFar without any special cases required                   
-      return exprs.reduce(function( parserGeneratedSoFar, expr ){
+                     
+      // note that if exprs is zero-length, fold will pass back 
+      // parserGeneratedSoFar so we don't need to treat this as a special case
+      return foldR( function( parserGeneratedSoFar, expr ){
+      
+         return expr(parserGeneratedSoFar, detection);
+                     
+      }, parserGeneratedSoFar, exprs );                     
 
-         return expr(parserGeneratedSoFar, detection);      
-               
-      }, parserGeneratedSoFar);         
    }
 
    /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
@@ -1518,15 +1506,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    // a generated parser for that expression     
    var clause = lazyUnion(
 
-      clauseMatcher(pathNodeSyntax   , [consume1, pathEqualClause, duckTypeClause, capture])        
-   ,  clauseMatcher(doubleDotSyntax  , [consumeMany])
+      clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, pathEqualClause, consume1 ))        
+   ,  clauseMatcher(doubleDotSyntax  , list(consumeMany))
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
-   ,  clauseMatcher(dotSyntax        , [] )  
+   ,  clauseMatcher(dotSyntax        , list() )  
                                                                                       
-   ,  clauseMatcher(bangSyntax       , [rootExpr, capture])             
-   ,  clauseMatcher(emptySyntax      , [statementExpr])
+   ,  clauseMatcher(bangSyntax       , list(capture, rootExpr))             
+   ,  clauseMatcher(emptySyntax      , list(statementExpr))
    
    ,   // if none of the above worked, we need to fail by throwing an error
       function (jsonPath) {
