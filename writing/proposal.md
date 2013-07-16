@@ -1,8 +1,9 @@
-Proposal
-========
+% Dissertation Proposal 
+% Jim Higson
+% 2013
 
 Behaviour Driven Development
-----------------------------
+============================
 
 Behaviour Driven Development, or BDD, is today one of the standard
 methods for developing software, particularly under agile methodologies.
@@ -13,7 +14,7 @@ met, the tests often serve as the sole documentation for the correct
 behaviour of a system's units.
 
 Application of my dissertation
-------------------------------
+==============================
 
 Client-side web scripting via Javascript is a field which at inception
 contributed no more than small, frequently gimmicky, dynamic features
@@ -34,7 +35,7 @@ any language. Particularly of interest at the moment is QuickCheck,
 which I plan to draw some inspiration from.
 
 The existing Javascript BDD technology stack
---------------------------------------------
+============================================
 
 Test runners exist which allow a developer to push tests to several
 platforms simultaneously, returning results within milliseconds. Of the
@@ -57,7 +58,7 @@ to do so in a way that is agnostic as to the context in which the
 assertions are used.
 
 Programming language influences and considerations
---------------------------------------------------
+==================================================
 
 Delivering a BDD framework involves writing software which is used in
 modelling the desired behaviour of software. Because it is code applied
@@ -74,7 +75,7 @@ side effects, the assertions should allow tests that are themselves free
 of side-effects and wholly stateless.
 
 Source code ergonomics and BDD as documentation
------------------------------------------------
+===============================================
 
 With Behavioural tests functioning as documentation, it is desirable
 that the tests be understandable not just by software developers but
@@ -88,7 +89,7 @@ developer ergonomics and iteratively developing a thesis of the factors
 which contribute to a highly usable testing framework.
 
 Self-verification
------------------
+=================
 
 My BDD framework will itself be developed under the advantages that
 BDD-style testing brings. With this in mind, the framework will be used
@@ -101,7 +102,7 @@ BDD assertion framework while myself using BDD, enabling safe
 refactoring of existing code.
 
 Delivery methodology
---------------------
+====================
 
 My thesis will be developed 'in the open' by committing all code and
 writing to a public repository hosted on Github. This should allow
@@ -121,7 +122,7 @@ been written non-sequentially. I plan to manage the Kanban process using
 paper only, with cards on a physical board.
 
 Timescales
-----------
+==========
 
 I am registered on the Software Engineering Program until December.
 While requesting an extension to my time on the course might be sensible
@@ -129,7 +130,7 @@ to cover unforeseen circumstances, I plan to deliver the dissertation
 towards the end of 2012.
 
 Summary of deliverables
------------------------
+=======================
 
 I propose to create a Javascript BDD-style assertion framework which
 borrows heavily from functional programming, particularly QuickCheck.
