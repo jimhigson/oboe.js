@@ -18,6 +18,13 @@ Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE: get from
 
 Next is closest pre-runner to current web architecture.
 
+Twitter: Moving from client to server for performance. Reduce load times to 1 5th of what they were
+previously [https://blog.twitter.com/2012/improving-performance-twittercom]
+
+Give static page (fairly basic but functional), then load js in the background.
+
+However, with Node don't have to reengineer to move from client to server. 
+
 
 SOA
 ---
@@ -189,11 +196,53 @@ Browser incompatability mostly in presentation layer rather than in scripting la
 Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs
 presented to the scripting language rather than the language itself. 
    
+Progressive UI
+-------------   
+   
+Infinitely scrolling webpages. Need a way to 'pull' information, not just push if reacting to scrolling.
+Use oboe with websockets? Eg, ebay home page, Facebook. Adv of infinate scroll is page loads quickly and
+most people won't scroll very far so most of the time have everything needed right away.
 
 State of rest: Json and XML
 ------------
 
 Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!
+
+Javascript
+----------
+
+Javascript: not the greatest for 'final' elegant presentation of programming. Does allow 'messy' first drafts
+which can be refactored into beautiful code. Ie, can write stateful and refactor in small steps towards being
+stateless. An awareness of beautiful languages lets us know the right direction to go in. An ugly language lets
+us find something easy to write that works to get us started.
+Allows a very sketchy program to be written, little more than a programming scratchpad.
+
+Without strict typing, hard to know if program is correct without running it. In theory (decidability) and in 
+practice (often find errors through running and finding errors thrown). Echo FPR: once compiling, good typing
+tends to give a reasonable sureness that the code is correct.
+
+Explain var/function difference, ie construct pluck and explain why var keyOf = partial(pluck)
+is declared with a var and not a function, why some prefer to do always via
+. operator can't be made into a function with (.) or similar and so has to be wrapped in a function is a
+less direct manner.
+Unfortunately, can make it difficult for a reader to know the types involved. For example, on seeing:
+```var matchesJsonPath = jsonPathCompiler( pattern )``` there is no way (other than examining the source or
+doucmentation of the function being called) to know that this is a higher order function and will 
+return another function to be assigned as matchesJsonPath. 
+
+C-style brackets around all function arguments hampers a natural expression of functional style code.
+For example, this requires a lot of arguments and without checking of function airity, it is easy to
+misplace a comma or closing bracket. 
+
+``` 
+function map(fn, list){
+   if( !list ) {
+      return emptyList;
+   } else {
+      return cons(fn(head(list)), map(fn,tail(list)));
+   }
+}
+```
 
 
 
@@ -221,6 +270,8 @@ that is the extent of the API.
 Although the streams themselves are stateful, because they are based on callbacks it is entirely possible to 
 use them from a component of a javascript program which is wholly stateless.
 
+
+
 Using Node's http module provides a stream but handles setting headers, putting the method otu etc.
 
 What Node is
@@ -236,6 +287,9 @@ How Node is different
 Criticisms of Node. Esp from Erlang etc devs. 
 
 Node's standard stream mechanisms
+
+
+
 
 Browser
 -------

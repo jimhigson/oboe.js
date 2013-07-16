@@ -26,6 +26,17 @@ at once is no worse than it is now.
    Over several hops of aggregation, the benefits of finding the interesting parts early 
 ](images/timeline)
 
+breaking out of big/small tradeoff
+----------------------------------
+
+Best of both modes
+
+Granularity: only need read as far as necessary. Services could be designed to write the big picture first.
+Alternatively, where resources link to one another, can stop reading at the link. Eg, looking for a person's
+publications, start with an index of people but no need to read whole list of people.
+
+Aborting http request may not stop processing on the server. Why this is perhaps desirable - transactions, leaving
+resources in a half-complete state.
 
 choice of technologies
 ----------------------
@@ -99,11 +110,22 @@ Explain why Haskel/lisp style lists are used rather than arrays
    from the json. Better than '__root__' or similar which could clash. String in js not considered distinct,
    any two strings with identical character sequences are indistinguishable.
    
+Anti-list: nothing is quite so small when making a mircro-library as using the types built into the language,
+coming as they are for zero bytes.   
+   
 ![Diagram showing why list is more memory efficient - multiple handles into same structure with
 different starts, contrast with same as an array](images/placeholder)
      
 * For recognisably with existing code, use lists internally but transform into array on the boundary 
 between Oboe.js and the outside world (at same time, strip off special 'root path' token)  
+
+Incrementally building up the content
+-----
+
+Like SAX, calls from clarinet are entirely 'context free'. Ie, am told that there is a new object but without the
+preceding calls the root object is indistinguishable from a deeply nested object. 
+Luckily, it should be easy to see that building up this context is a simple matter of maintaining a stack describing
+the descent from the root node to the current node. 
 
 jsonPath parser gets the output from the incrementalParsedContent, minimally routed there by the controller.
 
@@ -115,6 +137,17 @@ Explain match starting from end of candidate path
 
 ![Some kind of diagram showing jsonPath expressions and functions partially completed to link back to the
 previous function. Include the statementExpr pointing to the last clause](images/placeholder)
+
+On first attempt at ICB, had two stacks, both arrays, plus reference to current node, current key and root node.
+After refactorings, just one list was enough. Why single-argument functions are helpful (composition etc)
+
+Stateless makes using a debugger easier - can look back in stack trace and because of no reassignment, can see
+the whole, unchanged state of the parent call. What the params are now are what they always have been, no chance
+of reassignment (some code style guides recommend not to reassign parameters but imperative languages generally
+do not forbid it) No Side effects: can type expressions into debugger to see evaluation
+without risk of changing program execution.
+
+
 
 
 
@@ -211,24 +244,6 @@ jsonPath(matchingObject); // evaluates to true
 
 When we aer searching 
 
-
-
- 
-
-
-breaking out of big/small tradeoff
-----------------------------------
-
-Best of both modes
-
-Granularity: only need read as far as necessary. Services could be designed to write the big picture first.
-Alternatively, where resources link to one another, can stop reading at the link. Eg, looking for a person's
-publications, start with an index of people but no need to read whole list of people.
-
-Aborting http request may not stop processing on the server. Why this is perhaps desirable - transactions, leaving
-resources in a half-complete state.
-
-
 program design
 --------------
 
@@ -236,6 +251,29 @@ program design
    Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has
    been split into different files.
 ](images/overallDesign)
+
+incrementally building up a model
+---------------------------------
+
+A refactoring was used to separate logic and state:
+
+   - Take stateful code
+   - Refactor until there is just one stateful item
+   - This means that that item is reassigned rather than mutated
+   - Make stateless by making all functions take and return an instance of that item   
+   - Replace all assignment of the single stateful var with a return statement 
+   - Create a simple, separate stateful controller that just updates the state to that returned from the calls
+   
+Very testable code because stateless - once correct for params under test, will always be correct. Nowhere for
+bad data to hide in the program.
+
+How do notifications fit into this?
+
+By going to List-style, enforced that functions fail when not able to give an answer. Js default is to return
+the special 'undefined' value. Why this ensured more robustness but also sometimes took more code to write, ie
+couldn't just do if( tail(foo)) if foo could be empty but most of the time that would be correct 
+
+Stateful controller very easy to test - only 1 function.   
 
 
 styles of programming
@@ -352,6 +390,30 @@ Potential solutions:
 * defining getter properties
 
 
+Performance implications of functional javascript
+-------------------------------------------------
+
+(perhaps move to background, or hint at it, eg "although there are still some performance implications
+involved in a functional style, javascript may be used in a non-pure functional style") - with link to
+here
+
+http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html
+9571 ms vs 504 ms
+
+The performance degradation, even with a self-hosted forEach, is due to the JIT’s inability to efficiently 
+inline both the closures passed to forEach
+
+Lambda Lifting, currently not implemented in SpiderMonkey or V8:
+http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
+
+The transformations to enable the above criteria are tedious and are surely the purview of the compiler. 
+All that’s needed are brave compiler hackers
+
+JS is much faster with "monomorphic call sites"
+
+However, js execution time is not much of a problem, 
+
+
 targeting node and the browser
 ------------------------------
 
@@ -444,6 +506,14 @@ Tests include an extremely large file twentyThousandRecords.js to test under str
 
 Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading
 in which threads wait for a while response to be received.
+
+Tests deal with the problem of "irreducible complexity" - when a program is made out of parts whose correct
+behaviour cannot be observed without all of the program. Allows smaller units to be verified before verifying
+the whole.
+
+Conversely, automated testing allows us to write incomprehensible code by making us into more powerful programmers,
+it is possible building up layers of complexity one very small part at a time that we couldn't write in a simple
+stage. Clarity > cleverness but cleverness has its place as well (intriducing new concepts)  
 
 Testing via node to give something to test against - slowserver. Proxy.
 
