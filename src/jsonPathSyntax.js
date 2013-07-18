@@ -17,9 +17,7 @@ var jsonPathSyntax = (function() {
     *  @returns a function which is equivalent to calling exec on that regular expression
     */
    var regexDescriptor =   function regexDescriptor(regex) {
-                              return function(candidate){
-                                 return regex.exec(candidate);
-                              }
+                              return regex.exec.bind(regex);
                            }, 
   
        jsonPathClause =    varArgs(function( componentRegexes ) {
