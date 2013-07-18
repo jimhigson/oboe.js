@@ -16,11 +16,7 @@ console.log("jstd will be started on port".yellow, String(JSTD_PORT).blue,
 
 console.log('creating proxy server on port'.yellow, String(PROXY_PORT).blue);
 
-//console.log('routing table for proxy is'.yellow, JSON.stringify(proxyOptions.router).blue);
-
-//
 // Create a regular http server and proxy its handler
-//
 http.createServer(
     function (req, res) {
     
@@ -38,7 +34,6 @@ http.createServer(
        });
 
     }).listen(PROXY_PORT);
-
 
 console.log(
       'proxy started'.green, 
