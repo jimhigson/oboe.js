@@ -21,21 +21,21 @@ function applyAll( fns, args ) {
 
 
 function varArgs(fn){
-   // TODO: if demand needs it, a version which gives a list instead of an array
 
-   function sliceArray(arrayLikeThing, startIndex, endIndex) {
-      return Array.prototype.slice.call(arrayLikeThing, startIndex, endIndex);
-   }
-
+   // nb: can't use len() here because it is defined using partialComplete which is defined using varargs.
+   // While recursive definition is possible in js, it is a stateful language and at this point there is no way
+   // that len can be defined
    var numberOfFixedArguments = fn.length -1;
          
    return function(){
    
-      // make an array of the fixed arguments
-      var argumentsToFunction = sliceArray( arguments, 0, numberOfFixedArguments );
+      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
       
-      // push on the varargs bit as a sub-array:
-      argumentsToFunction.push( sliceArray( arguments, numberOfFixedArguments ) );   
+          argumentsToFunction = Array.prototype.slice.call(arguments);
+          
+      // remove the end of the array and push it back onto itself as a sub-array (sometimes to implement a functional
+      // machine we have to sit on top of a *very* non-functional one)
+      argumentsToFunction.push( argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments) );   
       
       return fn.apply( this, argumentsToFunction );
    }       
@@ -86,7 +86,7 @@ function lazyIntersection(fn1, fn2) {
 }
 
 /** Partially complete the given function by filling it in with all arguments given
- *  after the function itself. Returns the partially completed version.    
+ *  after the function itself. Returns the partially completed version.
  */
 var partialComplete = varArgs(function( fn, boundArgs ) {
 
@@ -969,7 +969,7 @@ var jsonPathSyntax = (function() {
            
       componentRegexes.unshift(/^/);
       
-      return RegExp(componentRegexes.map(attr('source')).join(''));
+      return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
    });
 
    var possiblyCapturing =           /(\$?)/
@@ -1016,17 +1016,17 @@ var jsonPathSyntax = (function() {
     */
    return function (fn){      
       return fn( 
-          lazyUnionOfFunctionArray( [
-               jsonPathNamedNodeInObjectNotation
-            ,  jsonPathNamedNodeInArrayNotation
-            ,  jsonPathNumberedNodeInArrayNotation
-            ,  jsonPathPureDuckTyping 
-          ].map(regexDescriptor) )
-          
-      ,   regexDescriptor(jsonPathDoubleDot)
-      ,   regexDescriptor(jsonPathDot)
-      ,   regexDescriptor(jsonPathBang)
-      ,   regexDescriptor(emptyString) );
+          lazyUnion(
+            jsonPathNamedNodeInObjectNotation
+          , jsonPathNamedNodeInArrayNotation
+          , jsonPathNumberedNodeInArrayNotation
+          , jsonPathPureDuckTyping 
+          )
+      ,   jsonPathDoubleDot
+      ,   jsonPathDot
+      ,   jsonPathBang
+      ,   emptyString 
+      );
    }; 
 
 }());
