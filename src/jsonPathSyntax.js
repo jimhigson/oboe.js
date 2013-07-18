@@ -11,7 +11,7 @@ var jsonPathSyntax = (function() {
            
       componentRegexes.unshift(/^/);
       
-      return RegExp(componentRegexes.map(attr('source')).join(''));
+      return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
    });
 
    var possiblyCapturing =           /(\$?)/
@@ -58,17 +58,17 @@ var jsonPathSyntax = (function() {
     */
    return function (fn){      
       return fn( 
-          lazyUnionOfFunctionArray( [
-               jsonPathNamedNodeInObjectNotation
-            ,  jsonPathNamedNodeInArrayNotation
-            ,  jsonPathNumberedNodeInArrayNotation
-            ,  jsonPathPureDuckTyping 
-          ].map(regexDescriptor) )
-          
-      ,   regexDescriptor(jsonPathDoubleDot)
-      ,   regexDescriptor(jsonPathDot)
-      ,   regexDescriptor(jsonPathBang)
-      ,   regexDescriptor(emptyString) );
+          lazyUnion(
+            jsonPathNamedNodeInObjectNotation
+          , jsonPathNamedNodeInArrayNotation
+          , jsonPathNumberedNodeInArrayNotation
+          , jsonPathPureDuckTyping 
+          )
+      ,   jsonPathDoubleDot
+      ,   jsonPathDot
+      ,   jsonPathBang
+      ,   emptyString 
+      );
    }; 
 
 }());
