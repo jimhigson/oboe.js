@@ -6,15 +6,30 @@ var jsonPathSyntax = (function() {
    //    For all regular expressions:
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
-   
-   var jsonPathClause = varArgs(function( componentRegexes ) {
-           
-      componentRegexes.unshift(/^/);
-      
-      return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
-   });
 
-   var possiblyCapturing =           /(\$?)/
+
+   /** allows exporting of a regular expression as a generified function interface by encapsulating just the exec
+    *  function
+    *  
+    *  @type {Function}
+    *  
+    *  @param {RegExp} regex the regular expression to export
+    *  @returns a function which is equivalent to calling exec on that regular expression
+    */
+   var regexDescriptor =   function regexDescriptor(regex) {
+                              return function(candidate){
+                                 return regex.exec(candidate);
+                              }
+                           }, 
+  
+       jsonPathClause =    varArgs(function( componentRegexes ) {
+           
+                              componentRegexes.unshift(/^/);
+                           
+                              return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
+                           }),
+
+       possiblyCapturing =           /(\$?)/
    ,   namedNode =                   /(\w+|\*)/
    ,   namePlaceholder =             /()/
    ,   nodeInArrayNotation =         /\["(\w+)"\]/
@@ -44,30 +59,22 @@ var jsonPathSyntax = (function() {
    
    ;
    
-   /** allows exporting of a regular expression under a generified function interface
-    * @param regex
-    */
-   function regexDescriptor(regex) {
-      return function(candidate){
-         return regex.exec(candidate);
-      }
-   }
   
    /* we export only a single function. When called, this function injects into a scope the
       descriptor functions from this scope which we want to make available elsewhere. 
     */
    return function (fn){      
       return fn( 
-          lazyUnion(
+         lazyUnion(
             jsonPathNamedNodeInObjectNotation
-          , jsonPathNamedNodeInArrayNotation
-          , jsonPathNumberedNodeInArrayNotation
-          , jsonPathPureDuckTyping 
-          )
-      ,   jsonPathDoubleDot
-      ,   jsonPathDot
-      ,   jsonPathBang
-      ,   emptyString 
+         ,  jsonPathNamedNodeInArrayNotation
+         ,  jsonPathNumberedNodeInArrayNotation
+         ,  jsonPathPureDuckTyping 
+         )
+      ,  jsonPathDoubleDot
+      ,  jsonPathDot
+      ,  jsonPathBang
+      ,  emptyString 
       );
    }; 
 
