@@ -26,7 +26,7 @@
       
    ,  'testVarargsWithNoFixedArgs': function() {
       
-         var received1;
+         var received1 = 'not yet set';
       
          function f(r1){
             received1 = r1;
@@ -52,8 +52,7 @@
          function inc(n){ return n+1 }
          function half(n){ return n/2 }
          
-         var composed = compose(dub, inc, half);
-         // composed(x) = dub(inc(half(x)))
+         var composed = compose(dub, inc, half);  // composed(x) = dub(inc(half(x)))
          
          assertEquals( 4 , composed(2)); // if this gives 2.5 the order is wrong
       }
