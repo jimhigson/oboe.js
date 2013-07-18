@@ -2,12 +2,20 @@
 
    TestCase("jsonPathTest", {
    
-      testMatchesRoot: function() {
+      testCanCompileBasicPatternWithoutCrashing: function() {
+         givenAPattern('!');
+      }   
+   
+   ,  testMatchesRoot: function() {
          givenAPattern('!')
             .thenShouldMatch(       [])
-             .thenShouldNotMatch(   ['a'])
-             .thenShouldNotMatch(   ['a','b'])
       }
+      
+   ,  testDoesntMatchRootAgainstNonRootPaths: function() {
+         givenAPattern('!')
+            .thenShouldNotMatch(   ['a'])
+            .thenShouldNotMatch(   ['a','b'])
+      }      
       
    ,  testMatchesSingleStarAloneAgainstEveryObject: function() {
          givenAPattern('*')
