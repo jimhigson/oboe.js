@@ -393,13 +393,20 @@
       
       pathStack.unshift(ROOT_PATH);
       
-      return pathStack.reduce( function( ascent, pathItem, i ){
-
-         var mapping = {key: pathStack[i], node:nodeStack[i]};
-               
-         return cons( mapping, ascent ); 
+      // NB: can't use the more functional Array.prototype.reduce here, IE8 doesn't have it and might not 
+      // be polyfilled
       
-      }, emptyList );
+      var ascent = emptyList;
+
+      for (var i = 0; i < pathStack.length; i++) {
+         
+         var mapping = {key: pathStack[i], node:nodeStack[i]};
+                        
+         ascent = cons( mapping, ascent );
+      }
+      
+      return ascent;
+      
    }
    
    Asserter.prototype.thenShouldMatch = function(pathStack, nodeStack) {
