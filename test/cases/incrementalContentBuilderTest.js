@@ -219,9 +219,10 @@ IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( even
 
 function anAscentContaining ( /* descriptors */ ) {
    
-   var ascentList = emptyList;
-   
-   toArray(arguments).forEach( function(ascentNode){
+   var ascentArray = Array.prototype.slice.call(arguments),
+       ascentList = emptyList;
+      
+   ascentArray.forEach( function(ascentNode){
       ascentList = cons(ascentNode, ascentList);
    });
    
