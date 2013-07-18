@@ -187,7 +187,10 @@ IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( even
    function reportArgs(eventName, list) {
    
       var argArray = listAsArray(list);
-      return eventName + ',' + argArray.map(JSON.stringify.bind(JSON)).join(',    \t');
+      
+      var toJson = JSON.stringify.bind(JSON);
+      
+      return eventName + ', [' + argArray.map(toJson).join(',    \t') + ']';
    }
 
    if( !this._notifyStub.called ) {
