@@ -203,15 +203,15 @@ IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( even
 
    if( !this._notifyStub.calledWithMatch( eventName, ascentMatch ) ) {
    
-   fail(     
-            '\n' +
-            'expected a call with : \t' + reportCall(eventName, expectedAscent) +
-            '\n' +  
-            'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
-            '\n' +
-            'all calls were :' +
-            '\n                     \t' +
-            this._notifyStub.args.map( reportArgs ).join('\n                     \t')
+      fail(     
+         '\n' +
+         'expected a call with : \t' + reportCall(eventName, expectedAscent) +
+         '\n' +  
+         'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
+         '\n' +
+         'all calls were :' +
+         '\n                     \t' +
+         this._notifyStub.args.map( reportArgs ).join('\n                     \t')
       );
    }
    return this;   
