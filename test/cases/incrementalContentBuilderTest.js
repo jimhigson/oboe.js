@@ -184,13 +184,17 @@ IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( even
    }, 'ascent match');
 
 
-   function reportArgs(eventName, list) {
+   function reportCall(eventName, ascentList) {
    
-      var argArray = listAsArray(list);
+      var argArray = listAsArray(ascentList);
       
       var toJson = JSON.stringify.bind(JSON);
       
-      return eventName + ', [' + argArray.map(toJson).join(',    \t') + ']';
+      return 'type:' + eventName + ', ascent:[' + argArray.map(toJson).join(',    \t') + ']';
+   }
+   
+   function reportArgs(args){
+      return reportCall(args[0], args[1]);
    }
 
    if( !this._notifyStub.called ) {
@@ -199,12 +203,11 @@ IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( even
 
    if( !this._notifyStub.calledWithMatch( eventName, ascentMatch ) ) {
    
-      var args = this._notifyStub.lastCall.args;
-   
-      fail(     'latest call had :' + 
-                           reportArgs(args[0], args[1])
-            + '\nexpected a call with :  ' + 
-                           reportArgs(eventName, expectedAscent) 
+   fail(     
+            '\n' +
+            'expected a call with : \t' + reportCall(eventName, expectedAscent) +
+            '\n' +  
+            'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) 
       );
    }
    return this;   
