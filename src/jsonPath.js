@@ -39,14 +39,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX],      
-          condition;
-          
-      if( !name || name == '*' ){
-         condition = always;
-      } else {
-         condition = function(ascent){return headKey(ascent) == name}      
-      } 
+      var name = detection[NAME_INDEX],
+            
+          condition = ( !name || name == '*' ) 
+                           ?  always
+                           :  function(ascent){return headKey(ascent) == name};
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
