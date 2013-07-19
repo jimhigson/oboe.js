@@ -1,20 +1,84 @@
-% Dissertation Proposal 
+% Dissertation Proposal
 % Jim Higson
 % 2013
 
-Behaviour Driven Development
-============================
-
-Behaviour Driven Development, or BDD, is today one of the standard
-methods for developing software, particularly under agile methodologies.
-Using BDD, every required behaviour of the system should have a
-corresponding test to demonstrate that this requirement has been met.
-Alongside their use in as demonstrating that the intended behaviours are
-met, the tests often serve as the sole documentation for the correct
-behaviour of a system's units.
-
 Application of my dissertation
 ==============================
+
+In the profession of software engineering, Much attention is focused on
+the speed of execution of a program, often neglecting to acknowledge
+that for a system engineered in a SOA style many of the resources a
+program accesses are resident on a remote machine. Because transmission
+over a network can be as much as 10^6^ times slower than local access,
+the interval in which a program waits for io can be much more
+significant to overall performance than execution time on the CPU. As
+such the efficiency of many modern programs is much more dependant on
+sage use of io than it is on other optimisation considerations. For any
+non-trivial message sent as text over a network, the transmission is
+readable before it is complete but by ignoring the progressive nature of
+the resource availability I propose that today's common REST client
+libraries are failing to make best use of network bandwidth, this most
+precious of resources.
+
+REST today is not solely used for communication between servers, it is
+also widely employed under the AJAX pattern to expose server-side
+resources to clients executing as scripts in web browsers. often sending
+data to mobile devices such as phones and tablets. Once we are operating
+over mobile connections, network bandwidth becomes an even more precious
+resource. However, existing REST clients do not deal well with the
+fallible nature of the mobile internet; if the connection is lost while
+a message is in transit then the potentially valuable data downloaded so
+far is discarded. For many common use cases the incomplete data would be
+complete enough to be useful to the user and by discarding it at a time
+when the network is unreliable we are wasting valuable resources at the
+time when they are most scarce. As a practical example, for a web
+application downloading an email inbox, if the connection is lost during
+transmission the program should be able to display *some* of the emails
+in preference to *none*.
+
+Prior to the web's AJAX age, browser implementations of progressive html
+rendering allowed server-side generated pages to be viewed in parts as
+they arrive over the network. By not allowing the use of a downloaded
+resource before the entire message has been received today's AJAX
+clients have taken a backwards step in terms of the fluid perception of
+performance. I propose that it should be equally possible to program a
+progressive presentation of the data regardless of which side of the
+network the html is generated on.
+
+To improve all of these areas, my thesis is centred on the creation of a
+novel style of REST client library which allows use of interesting parts
+of the resource before the entire resource has been downloaded and even
+if the download is never entirely completed.
+
+Advances over prior art
+=======================
+
+Progressive parsers exist already as a SAX-style but are much less than
+the DOM-style alternative. SAX parsers are little more than tokenizers,
+providing a very low level interface which notifies of tokens as they
+are received. This presents a difficult API, requiring the programmer to
+record state regarding nodes that they have seen and implement their own
+pattern-matching. Whereas for DOM-style parsing there exists a wealth of
+tools to transform structured text into domain model objects based on
+declarative configuration, for SAX-style parsing this is usually done in
+the programming language itself. This logic tends to be difficult to
+read and programmed once per usage rather than assembled from easily
+reusable parts. For this reason, SAX parsing is much less common than
+DOM parding when connecting to REST services. I observe that this trend
+towards DOM style parsing which requires the whole resource to be
+downloaded before inspection can commence hampers the performance of the
+REST paradigm and propose the creation of a third way combining the
+developer ergonomics of DOM with the responsiveness of SAX.
+
+In which a callback call is received not just when the whole resource is
+downloaded but for every interesting part which is seen while the
+transfer is ongoing. The definition of 'interesting' will be generic and
+accommodating enough so as to apply to any data domain and allow any
+granularity of interest, from large object to individual datums. With
+just a few lines of programming
+
+Http libraries feeding into the parser. In browser, generally single
+callback when whole message received.
 
 Client-side web scripting via Javascript is a field which at inception
 contributed no more than small, frequently gimmicky, dynamic features
@@ -22,120 +86,62 @@ added to otherwise static webpages. Today the scope and power of client
 side scripting has increased to the extent that the entire interface for
 large, complex applications is often programmed in this way. These
 applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software. Given the very fast
-expansion the web has seen from a technology based around marked-up
-documents to a full-blown application suite, it is not surprising that
-the tools have lagged behind in comparison to more mature languages.
-While TDD and BDD have been common for a long time, Javascript has only
-recently started to benefit from this more rigorous approach. I believe
-this lateness is not due to problems inherent with the language;
-Javascript is very amenable to automated testing. I propose creating BDD
-assertions for Javascript that are the equal of the best available in
-any language. Particularly of interest at the moment is QuickCheck,
-which I plan to draw some inspiration from.
-
-The existing Javascript BDD technology stack
-============================================
-
-Test runners exist which allow a developer to push tests to several
-platforms simultaneously, returning results within milliseconds. Of the
-numerous runners, a Google project, JS Test Driver, JSTD, is emerging as
-the de facto standard. JSTD comes with a deliberately basic set of
-assertions. However, tests written using these assertions are more of a
-unit-testing form than a behavioural testing style and are not easily
-maintainable by non-programmers. The JSTD web site states that their
-assertion functions are rudimentary because they would rather focus on
-creating the client-server aspects of their application. The JSTD
-project hopes that better assertions will be contributed by the open
-source community. So far, developers providing BDD frameworks for
-Javascript have mostly attempted to deliver full-stack applications
-rather than concentrating on just one part. This approach frequently
-overreaches and fails to take advantage of a considerable body of prior
-work, manifesting itself as a rather defuse effort which tackles many
-areas but excels at none. I propose to focus relatively narrowly,
-creating only a framework for assertions and for maximum compatibility
-to do so in a way that is agnostic as to the context in which the
-assertions are used.
-
-Programming language influences and considerations
-==================================================
-
-Delivering a BDD framework involves writing software which is used in
-modelling the desired behaviour of software. Because it is code applied
-to code, the model of a testing framework exists at a higher level of
-abstraction than developers typically engage. Hence, the design
-considerations will be quite different from programming a model of the
-typical application domain. In order to allow a natural expression of
-bdd-style tests in Javascript, I propose that I will first create a
-functional programming library on which it will depend. This will
-require a large degree of metaprogramming. This library will reproduce
-as closely as possible the necessary features from languages such as
-Haskell. Although the code under test will almost certainly come with
-side effects, the assertions should allow tests that are themselves free
-of side-effects and wholly stateless.
-
-Source code ergonomics and BDD as documentation
-===============================================
-
-With Behavioural tests functioning as documentation, it is desirable
-that the tests be understandable not just by software developers but
-also individuals with little understanding of programming. This
-understandability by non-experts will be gained by providing a framework
-which allows tests that, as well as functioning as running software, may
-be expressed in a form very close to grammatically correct English. The
-ability to program tests in plain English will be a concern throughout
-my dissertation. For every story delivered, I will be considering
-developer ergonomics and iteratively developing a thesis of the factors
-which contribute to a highly usable testing framework.
-
-Self-verification
-=================
-
-My BDD framework will itself be developed under the advantages that
-BDD-style testing brings. With this in mind, the framework will be used
-to test itself. Because it becomes quite 'meta', testing a BDD framework
-is a relatively difficult problem domain to apply BDD to. Hence, if my
-framework is flexible enough to be used in this way I will judge it
-suitable for application to most problem domains. As well as ensuring
-that the framework is capable, self-verification allows me to write the
-BDD assertion framework while myself using BDD, enabling safe
-refactoring of existing code.
+but also include mobile apps and desktop software.
 
 Delivery methodology
 ====================
 
 My thesis will be developed 'in the open' by committing all code and
-writing to a public repository hosted on Github. This should allow
-members of the developer community to contribute comments and
-suggestions as the work progresses. I plan to use Kanban to deliver my
-dissertation, including the written parts. Because Kanban focusses on
-always having a potentially releasable product, it mitigates problems
-which could otherwise lead to non-delivery and allows the direction to
-be changed as necessary. For each unit of work (under Kanban, a card),
-an entire vertical slice of planning, design, implementation and
-reflection must be complete before going onto the next card. Alongside
-each software feature, every written chapter will be expanded and
-refactored in much the same way as the code. Just as for well designed
-software, the order of implementation should not be apparent to a user,
-my plan is that the written work should not feel disjointed for having
-been written non-sequentially. I plan to manage the Kanban process using
-paper only, with cards on a physical board.
+writing to a public Github repository. This should allow members of the
+developer community to contribute comments and suggestions as the work
+progresses. I plan to use Kanban to deliver my dissertation, including
+the written parts. Because Kanban focusses on always having a
+potentially releasable product, it mitigates problems which could
+otherwise lead to non-delivery and allows the direction to be changed as
+necessary. For each unit of work (under Kanban, a card), an entire
+vertical slice of planning, design, implementation and reflection must
+be complete before going onto the next card. Alongside each software
+feature, every written chapter will be expanded and refactored in much
+the same way as the code. Just as for well designed software, the order
+of implementation should not be apparent to a user, my plan is that the
+written work should not feel disjointed for having been written
+non-sequentially. I plan to manage the Kanban process using paper only,
+with cards on a physical board.
+
+Will code using TDD and design code to be easily testable via TDD. This
+includes stateless and separation of programming into many collaborating
+parts. Constant refactoring, emergent design.
 
 Timescales
 ==========
 
-I am registered on the Software Engineering Program until December.
-While requesting an extension to my time on the course might be sensible
-to cover unforeseen circumstances, I plan to deliver the dissertation
-towards the end of 2012.
+I am registered on the Software Engineering Program until December. I
+plan to complete and deliver the dissertation towards the end of Summer
+2013.
 
 Summary of deliverables
 =======================
 
-I propose to create a Javascript BDD-style assertion framework which
-borrows heavily from functional programming, particularly QuickCheck.
-Research and analysis of source code ergonomics should result in a
-framework enabling tests that are easily understandable, maintainable
-and readable as plain English. The tests will be runnable in all
-reasonable contexts using existing test runners. To demonstrate
-correctness, the testing framework will be capable of testing itself.
+In the interest in quality over bloat, I propose to focus tightly on
+creating a small, high-quality piece of code with a narrow feature set
+but no obvious omissions. Hence, only client, not server, tools already
+exist to send asynchronously. Easier to improve REST with a client than
+a server because async clients still bring benefits with existing
+servers but
+
+I propose to deliver a progressive rest client as a javascript
+micro-library which runs on either the server or client side and sits on
+top of existing http libraries. My ambitions for wider usage motivate a
+focus programmer ergonomics, packaging so as to allow drop-in
+replacement of today's commonly used tools but also liberal BSD-style
+licencing so as to encourage inclusion in free and non-free software
+projects. Because web programming is size-conscious I will deliver a
+micro library meaning that the size on the wire when sent to a web
+browser will not exceed 5kib.
+
+Finally, I will evaluate the effectiveness of my solution in terms of
+the compactness of code, ease of programming, fault tolerance and
+performance in comparison with existing tools. Performance will be
+judged both in terms of user perception of speed and in terms of actual
+time required to complete a realistic task such as the aggregation of
+data from several sources.
