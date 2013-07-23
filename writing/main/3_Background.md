@@ -279,6 +279,14 @@ Using Node's http module provides a stream but handles setting headers, putting 
 
 What Node is
 V8. Fast. Near-native. JIT.
+
+V8 is often said to be 'near-native' speed, meaning it runs at close to the speed of a similarly coded C program.
+However, this relies on the programmer also coding in the style of a C programmer, for example with only mono-morphic
+callsites and without a functional style. Once either of those programming techniques is taken up performance drops
+rapidly [http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+
+_Anecdote: SVG engine: one function for xy vs x and xy. Very large speed increase. Add figures etc._ 
+
 Why Node perhaps is mis-placed in its current usage as a purely web platform "the aim is absolutely fast io".
 This happened because web specialist programmers took it up first
  
