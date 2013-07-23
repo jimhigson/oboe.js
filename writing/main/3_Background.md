@@ -283,7 +283,9 @@ V8. Fast. Near-native. JIT.
 V8 is often said to be 'near-native' speed, meaning it runs at close to the speed of a similarly coded C program.
 However, this relies on the programmer also coding in the style of a C programmer, for example with only mono-morphic
 callsites and without a functional style. Once either of those programming techniques is taken up performance drops
-rapidly [http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+rapidly [http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]. When used in a functional
+style, not 'near-native' in the sense that not close to the performance gained by compiling a well designed functional
+language to natively executable code.
 
 _Anecdote: SVG engine: one function for xy vs x and xy. Very large speed increase. Add figures etc._ 
 
