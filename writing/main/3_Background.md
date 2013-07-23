@@ -155,7 +155,10 @@ State of http as a streaming technology
 ---------
 
 Dichotamy between streaming and downloading in the browser for downloading data. But not for html (progressive rendering)
-or images (progressive PNGs and progressive JPEGs) 
+or images (progressive PNGs and progressive JPEGs).
+
+Also progressive SVGs. IE, load this in a recent version of Google Chrome: 
+[https://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_%28Same-Sex_Couples%29_Bill%2C_Second_Reading.svg] 
 
 Lack of support in browser
 Long poll - for infrequent push messages. Must be read 
