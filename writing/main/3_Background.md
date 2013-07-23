@@ -285,7 +285,8 @@ However, this relies on the programmer also coding in the style of a C programme
 callsites and without a functional style. Once either of those programming techniques is taken up performance drops
 rapidly [http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]. When used in a functional
 style, not 'near-native' in the sense that not close to the performance gained by compiling a well designed functional
-language to natively executable code.
+language to natively executable code. Depends on style coded in, comparison to native somewhat takes C as the description of the operation of an
+idealised CPU rather than an abstract machine capable of executing on an actual CPU.
 
 _Anecdote: SVG engine: one function for xy vs x and xy. Very large speed increase. Add figures etc._ 
 
