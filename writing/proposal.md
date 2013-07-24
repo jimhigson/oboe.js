@@ -113,7 +113,8 @@ Timescales
 ==========
 
 I am registered on the Software Engineering Program until December 2013.
-I plan to complete and deliver the dissertation during Autumn 2013.
+I plan to complete and deliver the dissertation in late Summer or Autumn
+2013.
 
 Summary of deliverables
 =======================
