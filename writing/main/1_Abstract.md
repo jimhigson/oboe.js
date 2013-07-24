@@ -19,7 +19,7 @@ by a system which connects to rest resources for data.
 
 A critique is made of imperative methods under which items of interest
 are programmatically extracted from a resource once retrieved. Following
-from this critique, a ddeclarative alternative is presented under which
+from this critique, a declarative alternative is presented under which
 the identification of items of interest is possible prior to a resource
 having been retrieved in its entirety. The declarative syntax is
 integrated into a javascript framework which ties this method of
