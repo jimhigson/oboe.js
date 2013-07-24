@@ -478,7 +478,8 @@ targeting node and the browser
 
 Node+browser To use Node.js and
 
-Need to build an abstraction layer over xhr/xhr2/node
+Need to build an abstraction layer over xhr/xhr2/node.
+Can only work for packets in-order, for out-of-order packets something else happens.
 
 Use best of the capabilities of each.
 
