@@ -5,16 +5,17 @@
 Application of my dissertation
 ==============================
 
-In the profession of software engineering, Much attention is focused on
-the speed of execution of a program, often neglecting to acknowledge
-that for a system engineered in a SOA style many of the resources a
-program accesses are resident on a remote machine. Because transmission
-over a network can be as much as 10^6^ times slower than local access,
-the interval in which a program waits for io can be much more
-significant to overall performance than execution time on the CPU. As
-such the efficiency of many modern programs is much more dependant on
-sage use of io than it is on other optimisation considerations. For any
-non-trivial message sent as text over a network, the transmission is
+For a system engineered in a SOA style many of the resources a program
+accesses are resident on a remote machine. Although programmers often
+focus attention on the execution time of their algorithms, because
+transmission over a network can be as much as 10^6^ times slower than
+local access, the interval in which a program waits for input usually
+contributes more to the degradation of performance than any local
+concern. As such the the sage use of io should rank above most other
+optimisation considerations when considering the efficiency of many
+modern programs.
+
+For all but single-packet messages, data sent as text over a network is
 readable before it is complete but by ignoring the progressive nature of
 the resource availability I propose that today's common REST client
 libraries are failing to make best use of network bandwidth, this most
@@ -50,8 +51,8 @@ novel style of REST client library which allows use of interesting parts
 of the resource before the entire resource has been downloaded and even
 if the download is never entirely completed.
 
-Advances over prior art
-=======================
+Prior art and new contributions
+===============================
 
 Progressive parsers exist already as a SAX-style but are much less than
 the DOM-style alternative. SAX parsers are little more than tokenizers,
