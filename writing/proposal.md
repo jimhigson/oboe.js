@@ -24,21 +24,21 @@ earlier. In not utilising the progressive nature of resource
 availability I propose that today's common REST client libraries are
 failing to make best use of network bandwidth.
 
-REST today is not solely used for communication between servers, it is
-also widely employed under the AJAX pattern to expose server-side
-resources to clients executing as scripts in web browsers. often sending
-data to mobile devices such as phones and tablets. Once we are operating
-over mobile connections, network bandwidth becomes an even more precious
-resource. However, existing REST clients do not deal well with the
-fallible nature of the mobile internet; if the connection is lost while
-a message is in transit then the potentially valuable data downloaded so
-far is discarded. For many common use cases the incomplete data would be
-complete enough to be useful to the user and by discarding it at a time
-when the network is unreliable we are wasting valuable resources at the
-time when they are most scarce. As a practical example, for a web
-application downloading an email inbox, if the connection is lost during
-transmission the program should be able to display *some* of the emails
-in preference to *none*.
+REST today is not solely the domain of server-to-server communication.
+It is also commonly employed under various AJAX patterns to make
+server-side resources available to client-side software executing
+locally inside a user's web browser. Data transmission often takes place
+over the mobile internet but AJAX clients commonly used in web browsers
+do not deal well with the fallible nature their networks. If a
+connection is lost whilst a message is in transit then the data
+downloaded to that point is discarded. Whilst it would of course be
+preferable to receive the entire resource requested, for many common use
+cases the incomplete data is nonetheless of considerable value. By
+discarding remote data at a time when the network is unreliable we are
+wasting a valuable resource at the time when it is the most scarce. As a
+practical example, for an application downloading an email inbox, if the
+connection is lost during transmission the program should be able to
+display *some* of the emails in preference to *none*.
 
 Prior to the web's AJAX age, browser implementations of progressive html
 rendering allowed server-side generated pages to be viewed in parts as
