@@ -21,8 +21,15 @@ getting the whole message at once is no worse than it is now.
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
 
-breaking out of big/small tradeoff
-----------------------------------
+overall design philosophy and breaking out of big/small tradeoff
+----------------------------------------------------------------
+
+In which a callback call is received not just when the whole resource is
+downloaded but for every interesting part which is seen while the
+transfer is ongoing. The definition of 'interesting' will be generic and
+accommodating enough so as to apply to any data domain and allow any
+granularity of interest, from large object to individual datums. With
+just a few lines of programming
 
 Best of both modes
 
@@ -478,8 +485,8 @@ targeting node and the browser
 
 Node+browser To use Node.js and
 
-Need to build an abstraction layer over xhr/xhr2/node.
-Can only work for packets in-order, for out-of-order packets something else happens.
+Need to build an abstraction layer over xhr/xhr2/node. Can only work for
+packets in-order, for out-of-order packets something else happens.
 
 Use best of the capabilities of each.
 
