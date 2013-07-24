@@ -86,33 +86,34 @@ progressive nature of SAX.
 Delivery methodology
 ====================
 
-My thesis will be developed 'in the open' by committing all code and
-writing to a public Github repository. This should allow members of the
-developer community to contribute comments and suggestions as the work
-progresses. I plan to use Kanban to deliver my dissertation, including
-the written parts. Because Kanban focusses on always having a
-potentially releasable product, it mitigates problems which could
-otherwise lead to non-delivery and allows the direction to be changed as
-necessary. For each unit of work (under Kanban, a card), an entire
-vertical slice of planning, design, implementation and reflection must
-be complete before going onto the next card. Alongside each software
-feature, every written chapter will be expanded and refactored in much
-the same way as the code. Just as for well designed software, the order
-of implementation should not be apparent to a user, my plan is that the
-written work should not feel disjointed for having been written
-non-sequentially. I plan to manage the Kanban process using paper only,
-with cards on a physical board.
+My thesis will be developed 'in the open' by committing all programming
+and analysis to a public Github repository. This will hopefully allow
+members of the developer community to comment on the work and contribute
+suggestions as the work progresses. With the creative process reflecting
+the thing that it creates, I plan to use Kanban to iteratively deliver
+my iterative REST client.
 
-Will code using TDD and design code to be easily testable via TDD. This
-includes stateless and separation of programming into many collaborating
-parts. Constant refactoring, emergent design.
+TDD will be used to gain a reasonable assurance of correctness of the
+software. As well as demonstrating correctness against a set of known
+inputs, TDD will drive many of the design decisions in the programming.
+Designing so as to be easy testable encourages the separation of
+programming into smaller parts which each do one thing, such that each
+text becomes a trivial matter of asserting a single facet. As well as
+decomposition away from monoliths, TDD also encourages traits such as
+statelessness in programming because an assertion of correctness is more
+universally applicable once we can reasonably assume that the behaviour
+under test will not change as some state hidden inside the program
+varies.
+
+The program design will be initially an exercise in creating the easiest
+expression that can possibly work and via constant work towards the
+emergence of elegance.
 
 Timescales
 ==========
 
-I am registered on the Software Engineering Program until December 2013. I
-plan to complete and deliver the dissertation towards the end of Summer
-2013.
+I am registered on the Software Engineering Program until December 2013.
+I plan to complete and deliver the dissertation during Autumn 2013.
 
 Summary of deliverables
 =======================
