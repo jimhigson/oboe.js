@@ -40,22 +40,23 @@ practical example, for an application downloading an email inbox, if the
 connection is lost during transmission the program should be able to
 display *some* of the emails in preference to *none*.
 
-Prior to the web's AJAX age, browser implementations of progressive html
-rendering allowed server-side generated pages to be viewed in parts as
-they arrive over the network. By not allowing the use of a downloaded
-resource before the entire message has been received today's AJAX
-clients have taken a backwards step in terms of the fluid perception of
-performance. I propose that it should be equally possible to program a
-progressive presentation of the data regardless of which side of the
-network the html is generated on.
-
-To improve all of these areas, my thesis is centred on the creation of a
-novel style of REST client library which allows use of interesting parts
-of the resource before the entire resource has been downloaded and even
-if the download is never entirely completed.
+Prior to this AJAX age, progressive html rendering allowed a transmitted
+page to be viewed incrementally as it arrives over the network. By not
+facilitating the use of a REST response before the entire message has
+been received, I observe that today's AJAX clients have taken a
+backwards step in terms of the fluid perception of performance. Given
+that the underlying http transport is the same, I propose that it should
+be equally possible to program a progressive presentation of content
+delivered as data as it is for content delivered as presentational
+markup.
 
 Prior art and new contributions
 ===============================
+
+My thesis is centred on the creation of a novel style of REST client
+library which allows use of interesting parts of the resource before the
+entire resource has been downloaded and even if the download is never
+entirely completed.
 
 Progressive parsers exist already as a SAX-style but are much less than
 the DOM-style alternative. SAX parsers are little more than tokenizers,
