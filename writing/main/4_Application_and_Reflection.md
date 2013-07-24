@@ -1,6 +1,6 @@
 
 
-Applicaiton and Reflection
+Application and Reflection
 ==========================
 
 **40 to 60 pages**
@@ -11,7 +11,7 @@ used to identify the parts of a model which are currently interesting and starte
 declarative ways in which these parts can be obtained.
 
 Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general
-logic of the program, declaritively define
+logic of the program, declaratively define
 the interesting parts and have these parts delivered to the language logic. Once we make the shift to
 thinking in this way, it is no longer necessary to have the whole resource locally before the interesting
 sub-parts are delivered.
@@ -117,7 +117,11 @@ coming as they are for zero bytes.
 different starts, contrast with same as an array](images/placeholder)
      
 * For recognisably with existing code, use lists internally but transform into array on the boundary 
-between Oboe.js and the outside world (at same time, strip off special 'root path' token)  
+between Oboe.js and the outside world (at same time, strip off special 'root path' token)
+
+In parser, can't use 'y' flag to the regualr expression engine which would allow much more elegant matching.
+Only alternative is cumersome: to slice the string and match all tokens with regexes starting with '^' in order
+to track the current location. [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions]  
 
 Incrementally building up the content
 -----
@@ -515,7 +519,13 @@ Conversely, automated testing allows us to write incomprehensible code by making
 it is possible building up layers of complexity one very small part at a time that we couldn't write in a simple
 stage. Clarity > cleverness but cleverness has its place as well (intriducing new concepts)  
 
-Testing via node to give something to test against - slowserver. Proxy.
+Testing via node to give something to test against - slowserver. Proxy. JSTD not up to task.
+Shows how useful node is as a 'network glue'. The same as C was once described as a 'thin glue'
+[http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent proxy is about 20 lines. Transparent enough 
+to fool JSTD into thinking it is connecting directly to its server.
+
+Node comes with very little built in (not even http) but relies on libraries written in the language itself to do 
+everything. Could implement own http on top of sockets if wanted rather than using the provided one.
 
 The test pyramid concept \ref{testingPyramidFig} fits in well with the hiding that is provided. Under the testing pyramid only very high level
 behaviours are tested as ??? tests. While this is a lucky co-incidence, it is also an unavoidable restriction.
