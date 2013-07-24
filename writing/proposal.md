@@ -40,58 +40,48 @@ practical example, for an application downloading an email inbox, if the
 connection is lost during transmission the program should be able to
 display *some* of the emails in preference to *none*.
 
-Prior to this AJAX age, progressive html rendering allowed a transmitted
-page to be viewed incrementally as it arrives over the network. By not
-facilitating the use of a REST response before the entire message has
-been received, I observe that today's AJAX clients have taken a
-backwards step in terms of the fluid perception of performance. Given
-that the underlying http transport is the same, I propose that it should
-be equally possible to program a progressive presentation of content
-delivered as data as it is for content delivered as presentational
-markup.
+Over the last decade or so a significant shift in web application
+architecture has been to push the presentation layer onto the client
+side. Rather than deliver pages to a browser, data is sent instead so
+that it is the responsibility of an application running inside the
+browser to populate the page. Prior to this AJAX age progressive html
+rendering allowed a transmitted page to be viewed incrementally as it
+arrived over the network providing a fluid perception of performance. By
+not facilitating the use of a REST response before the entire message
+has been received, I observe that more recent web architecture has in
+this regard taken a regressive step. Given that the underlying http
+transport is the same, I propose that it should be equally possible to
+progressively consider content delivered as data as it is for content
+delivered as markup.
 
 Prior art and new contributions
 ===============================
 
 My thesis is centred on the creation of a novel style of REST client
-library which allows use of interesting parts of the resource before the
-entire resource has been downloaded and even if the download is never
-entirely completed.
+library which allows programmer specified items of interest from a
+resource to be used while the resource streams in and even if the
+download is only partially successful.
 
-Progressive parsers exist already as a SAX-style but are much less than
-the DOM-style alternative. SAX parsers are little more than tokenizers,
-providing a very low level interface which notifies of tokens as they
-are received. This presents a difficult API, requiring the programmer to
-record state regarding nodes that they have seen and implement their own
-pattern-matching. Whereas for DOM-style parsing there exists a wealth of
-tools to transform structured text into domain model objects based on
-declarative configuration, for SAX-style parsing this is usually done in
-the programming language itself. This logic tends to be difficult to
-read and programmed once per usage rather than assembled from easily
-reusable parts. For this reason, SAX parsing is much less common than
-DOM parding when connecting to REST services. I observe that this trend
-towards DOM style parsing which requires the whole resource to be
-downloaded before inspection can commence hampers the performance of the
-REST paradigm and propose the creation of a third way combining the
-developer ergonomics of DOM with the responsiveness of SAX.
+Sax provides progressive parsing to the XML world. SAX parsers however
+are little more than tokenisers, providing a low level interface which
+notifies the programmer of tokens as they are received. This presents
+poor developer ergonomics, often requiring that the programmer implement
+the recording of state with regard to the nodes that they have seen. For
+DOM-style parsing the programmer rarely directly concerns themselves
+with XML, taking advantage of the wealth of generic tools which automate
+the translation of markup into domain model objects as per a declarative
+configuration. Conversely, for SAX the equivalent logic is usually
+implemented imperatively; it to be difficult to read and programmed once
+per usage rather than programmed as the combination of reusable parts.
+For this reason, SAX is much less common and only generally used for
+fringe cases in which messages are extremely large or memory extremely
+limited.
 
-In which a callback call is received not just when the whole resource is
-downloaded but for every interesting part which is seen while the
-transfer is ongoing. The definition of 'interesting' will be generic and
-accommodating enough so as to apply to any data domain and allow any
-granularity of interest, from large object to individual datums. With
-just a few lines of programming
-
-Http libraries feeding into the parser. In browser, generally single
-callback when whole message received.
-
-Client-side web scripting via Javascript is a field which at inception
-contributed no more than small, frequently gimmicky, dynamic features
-added to otherwise static webpages. Today the scope and power of client
-side scripting has increased to the extent that the entire interface for
-large, complex applications is often programmed in this way. These
-applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software.
+I observe that this popularity of parsing models which require the whole
+message to be downloaded before any inspection can start hampers the
+performance of REST systems and propose the creation of a new, third way
+which combines the pleasant developer ergonomics of DOM with the
+progressive nature of SAX.
 
 Delivery methodology
 ====================
@@ -120,7 +110,7 @@ parts. Constant refactoring, emergent design.
 Timescales
 ==========
 
-I am registered on the Software Engineering Program until December. I
+I am registered on the Software Engineering Program until December 2013. I
 plan to complete and deliver the dissertation towards the end of Summer
 2013.
 
