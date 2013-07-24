@@ -172,6 +172,17 @@ DOM parser can be built on a SAX parser
 State of http as a streaming technology
 ---------------------------------------
 
+Http libraries feeding into the parser. In browser, generally single
+callback when whole message received.
+
+Client-side web scripting via Javascript is a field which at inception
+contributed no more than small, frequently gimmicky, dynamic features
+added to otherwise static webpages. Today the scope and power of client
+side scripting has increased to the extent that the entire interface for
+large, complex applications is often programmed in this way. These
+applications are not limited to running under traditional web browsers
+but also include mobile apps and desktop software.
+
 Dichotamy between streaming and downloading in the browser for
 downloading data. But not for html (progressive rendering) or images
 (progressive PNGs and progressive JPEGs).
