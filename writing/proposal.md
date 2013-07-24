@@ -15,11 +15,14 @@ concern. As such the the sage use of io should rank above most other
 optimisation considerations when considering the efficiency of many
 modern programs.
 
-For all but single-packet messages, data sent as text over a network is
-readable before it is complete but by ignoring the progressive nature of
-the resource availability I propose that today's common REST client
-libraries are failing to make best use of network bandwidth, this most
-precious of resources.
+For all but single-packet messages, data sent over a network is readable
+whilst transmission is still in progress. Hence, it is possible to view
+almost any transmission through the lens of a stream even if the sender
+of the data did not intend for it to be thought of it in this way and by
+doing so it is possible to start using the data from the resource
+earlier. In not utilising the progressive nature of resource
+availability I propose that today's common REST client libraries are
+failing to make best use of network bandwidth.
 
 REST today is not solely used for communication between servers, it is
 also widely employed under the AJAX pattern to expose server-side
