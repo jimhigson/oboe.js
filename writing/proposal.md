@@ -67,8 +67,8 @@ the download is only partially successful.
 Prior art
 =========
 
-SAX provides progressive parsing to the XML world. SAX parsers however
-are little more than tokenisers, providing a low level interface which
+In the XML world progressive parsing is provided by SAX. SAX parsers however
+exist at a level of abstraction only slightly above that of tokenisers, providing a low level interface which
 notifies the programmer of tokens as they are received. This presents
 poor developer ergonomics, often requiring that the programmer implement
 the recording of state with regard to the nodes that they have seen. For
