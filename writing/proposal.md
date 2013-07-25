@@ -32,17 +32,17 @@ REST today is not solely the domain of server-to-server communication.
 It is also commonly employed under various AJAX patterns to make
 server-side resources available to client-side software executing
 locally inside a user's web browser. Data transmission often takes place
-over the mobile internet via AJAX but the AJAX clients which are commonly used in web browsers
-do not deal well with the fallible nature of these networks. If a
-connection is lost whilst a message is in transit then the data
-downloaded to that point is discarded. Whilst of course it would be
-preferable to receive the entire resource, for many common use
-cases the incomplete data is nonetheless of non-zero value. By
-discarding remote data at a time when the network is unreliable we are
-wasting a valuable resource at the time when it is the most scarce. As a
-practical example, for an application downloading an email inbox, if the
-connection is lost during transmission the program should be able to
-display *some* of the emails in preference to *none*.
+over the mobile internet via AJAX but the AJAX clients which are
+commonly used in web browsers do not deal well with the fallible nature
+of these networks. If a connection is lost whilst a message is in
+transit then the data downloaded to that point is discarded. Whilst of
+course it would be preferable to receive the entire resource, for many
+common use cases the incomplete data is nonetheless of non-zero value.
+By discarding remote data at a time when the network is unreliable we
+are wasting a valuable resource at the time when it is the most scarce.
+As a practical example, for an application downloading an email inbox,
+if the connection is lost during transmission the program should be able
+to display *some* of the emails in preference to *none*.
 
 Over the last decade or so a significant shift in web application
 architecture has been to push the presentation layer onto the client
