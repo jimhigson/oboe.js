@@ -893,10 +893,7 @@ if(typeof FastList === 'function') {
 function streamingXhr(method, url, data, progressCallback, doneCallback) {
    
    /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Which is, either a string or
-      null.   
-      
-      TODO: make a streamingXhrTest to validate this works. Can sinon stub XHRs?
+      that is suitable to sending over the wire. Returns either a string, or null.        
     */
    function validatedRequestBody( body ) {
       if( !body )
@@ -918,9 +915,10 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
     */           
    function listenToXhr1(xhr, progressListener, completeListener){
    
-      // unfortunately there is no point polling the responsetext, these bad old browsers rarely make
-      // that possible. Instead, we'll just have to wait for the request to be complete, degrading gracefully
-      // to standard Ajax.      
+      // unfortunately there is no point polling the responsetext, these bad old browsers don't make the partial
+      // text accessible - it is undefined until the request finishes and then it is everything.
+      // Instead, we'll just have to wait for the request to be complete, degrading gracefully
+      // to standard non-streaming Ajax.      
    
       // handle the request being complete: 
       xhr.onreadystatechange = function() {     
@@ -964,15 +962,34 @@ var jsonPathSyntax = (function() {
    //    For all regular expressions:
    //       The first subexpression is the $ (if the token is eligible to capture)
    //       The second subexpression is the name of the expected path node (if the token may have a name)
-   
-   var jsonPathClause = varArgs(function( componentRegexes ) {
-           
-      componentRegexes.unshift(/^/);
-      
-      return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
-   });
 
-   var possiblyCapturing =           /(\$?)/
+
+   /** Allows exporting of a regular expression as a generified function interface by encapsulating just the exec
+    *  function
+    *  
+    *  Could also be expressed as:
+    *    Function.prototype.bind.bind(RegExp.prototype.exec),
+    *    
+    *  But that's far too confusing! (and not even smaller once minified and gzipped)
+    *  
+    *  @type {Function}
+    *  
+    *  @param {RegExp} regex the regular expression to export
+    *  
+    *  @returns a function which is equivalent to calling exec on that regular expression
+    */
+   var regexDescriptor =   function regexDescriptor(regex) {
+                              return regex.exec.bind(regex);
+                           }, 
+  
+       jsonPathClause =    varArgs(function( componentRegexes ) {
+           
+                              componentRegexes.unshift(/^/);
+                           
+                              return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
+                           }),
+
+       possiblyCapturing =           /(\$?)/
    ,   namedNode =                   /(\w+|\*)/
    ,   namePlaceholder =             /()/
    ,   nodeInArrayNotation =         /\["(\w+)"\]/
@@ -1002,30 +1019,22 @@ var jsonPathSyntax = (function() {
    
    ;
    
-   /** allows exporting of a regular expression under a generified function interface
-    * @param regex
-    */
-   function regexDescriptor(regex) {
-      return function(candidate){
-         return regex.exec(candidate);
-      }
-   }
   
    /* we export only a single function. When called, this function injects into a scope the
       descriptor functions from this scope which we want to make available elsewhere. 
     */
    return function (fn){      
       return fn( 
-          lazyUnion(
+         lazyUnion(
             jsonPathNamedNodeInObjectNotation
-          , jsonPathNamedNodeInArrayNotation
-          , jsonPathNumberedNodeInArrayNotation
-          , jsonPathPureDuckTyping 
-          )
-      ,   jsonPathDoubleDot
-      ,   jsonPathDot
-      ,   jsonPathBang
-      ,   emptyString 
+         ,  jsonPathNamedNodeInArrayNotation
+         ,  jsonPathNumberedNodeInArrayNotation
+         ,  jsonPathPureDuckTyping 
+         )
+      ,  jsonPathDoubleDot
+      ,  jsonPathDot
+      ,  jsonPathBang
+      ,  emptyString 
       );
    }; 
 
@@ -1253,14 +1262,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    function pathEqualClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
-      var name = detection[NAME_INDEX],      
-          condition;
-          
-      if( !name || name == '*' ){
-         condition = always;
-      } else {
-         condition = function(ascent){return headKey(ascent) == name}      
-      } 
+      var name = detection[NAME_INDEX],
+            
+          condition = ( !name || name == '*' ) 
+                           ?  always
+                           :  function(ascent){return headKey(ascent) == name};
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found

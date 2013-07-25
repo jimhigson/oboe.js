@@ -28,10 +28,7 @@
 function streamingXhr(method, url, data, progressCallback, doneCallback) {
    
    /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Which is, either a string or
-      null.   
-      
-      TODO: make a streamingXhrTest to validate this works. Can sinon stub XHRs?
+      that is suitable to sending over the wire. Returns either a string, or null.        
     */
    function validatedRequestBody( body ) {
       if( !body )
@@ -53,9 +50,10 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
     */           
    function listenToXhr1(xhr, progressListener, completeListener){
    
-      // unfortunately there is no point polling the responsetext, these bad old browsers rarely make
-      // that possible. Instead, we'll just have to wait for the request to be complete, degrading gracefully
-      // to standard Ajax.      
+      // unfortunately there is no point polling the responsetext, these bad old browsers don't make the partial
+      // text accessible - it is undefined until the request finishes and then it is everything.
+      // Instead, we'll just have to wait for the request to be complete, degrading gracefully
+      // to standard non-streaming Ajax.      
    
       // handle the request being complete: 
       xhr.onreadystatechange = function() {     
