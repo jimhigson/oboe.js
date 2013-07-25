@@ -121,26 +121,29 @@ I plan to complete and deliver the dissertation in late Summer or Autumn
 Summary of deliverables
 =======================
 
-In the interest in quality over bloat, I propose to focus tightly on
-creating a small, high-quality piece of code with a narrow feature set
-but no obvious omissions. Hence, only client, not server, tools already
-exist to send asynchronously. Easier to improve REST with a client than
-a server because async clients still bring benefits with existing
-servers but
+Having observed that it may be possible to improve over the current
+common use of REST, the question I am asking is *"What is the smallest
+possible work which is likely to bring a significant improvement in this
+area?"* I plan to focus on creating as small a library as is possible to
+meet my goals. The feature set will be minimal but contain no obvious
+omissions. To this end I will be focusing on receiving http responses
+rather than sending them. Firstly, asynchronous servers which encourage
+us to view REST through a streaming lens do already have some
+prominence. Secondly, In the creation of a receiver alone, an increased
+performance should be possible even given an entirely synchronous
+sender.
 
-I propose to deliver a progressive rest client as a javascript
-micro-library which runs on either the server or client side and sits on
-top of existing http libraries. My ambitions for wider usage motivate a
-focus programmer ergonomics, packaging so as to allow drop-in
-replacement of today's commonly used tools but also liberal BSD-style
-licencing so as to encourage inclusion in free and non-free software
-projects. Because web programming is size-conscious I will deliver a
-micro library meaning that the size on the wire when sent to a web
-browser will not exceed 5kib.
+I propose to deliver a progressive rest client as a javascript library
+which builds on existing http libraries and may be deployed into either
+a server or a browser context. My ambitions for wider usage motivate a
+focus on programmer ergonomics, example-lead documentation and a
+packaging which allows drop-in replacement of existing tools. Because
+web programming is size-conscious I will deliver a micro-library; the
+size as sent to a web browser will not exceed 5KiB.
 
-Finally, I will evaluate the effectiveness of my solution in terms of
-the compactness of code, ease of programming, fault tolerance and
-performance in comparison with existing tools. Performance will be
-judged both in terms of user perception of speed and in terms of actual
-time required to complete a realistic task such as the aggregation of
-data from several sources.
+Finally, I will evaluate the effectiveness of my solution in comparison
+with existing tools in terms of the compactness of code, ease of
+programming, fault tolerance and speed. Speed will be judged both in
+terms of user perception and in terms of absolute total time required to
+complete realistic tasks such as the aggregation of data from several
+sources.
