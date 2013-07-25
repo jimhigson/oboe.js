@@ -379,3 +379,5 @@ Methodology
 The program design will be initially an exercise in creating the easiest
 expression that can possibly work and via constant work towards the
 emergence of elegance.
+
+Why this method? See W'yg.
