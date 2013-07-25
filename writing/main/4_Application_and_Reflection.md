@@ -560,16 +560,31 @@ Why uglify \* Covers whole language, not just a well-advised subset. \*
 In truth, Closure compiler works over a subset of javascript rather than
 the whole language.
 
-Why not require \* What it is \* Why so popular *\* Why a loader is
-necessary - js doesn't come with an import statement*\* How it can be
-done in the language itself without an import statement \* Meant more
-for AMD than for single-load code *\* Situations AMD is good for - large
-site, most visitors don't need all the code loaded*\* Depends on
-run-time component to be loaded even after code has been optimised \*\*
-Small compatible versions exist that just do loading (almond)\
-\*\* Why ultimately not suitable for a library like this
+Packaging
+---------
 
-Why testing post-concatenation is good idea.
+Why not require. Bits on what rq is can go into B&R section.
+
+Some of this can move into background
+
+-   What it is
+-   Why so popular
+-   Why a loader is necessary - js doesn't come with an import statement
+-   How it can be done in the language itself without an import
+    statement
+-   Meant more for AMD than for single-load code
+-   Situations AMD is good for - large site, most visitors don't need
+    all the code loaded
+-   Depends on run-time component to be loaded even after code has been
+    optimised
+-   Small compatible versions exist that just do loading (almond)\
+-   Why ultimately not suitable for a library like this - would require
+    user to use Require before adopting it.
+
+Testing post-packaging for small set of smoke tests. Can't test
+everything, only through public API.
+
+Uglify. Why not Google Closure Compiler.
 
 polyfilling
 -----------
