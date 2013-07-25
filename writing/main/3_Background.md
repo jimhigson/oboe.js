@@ -372,3 +372,10 @@ call an add listener method means can only have one listener.
 Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
+
+Methodology
+-----------
+
+The program design will be initially an exercise in creating the easiest
+expression that can possibly work and via constant work towards the
+emergence of elegance.
