@@ -45,18 +45,19 @@ if the connection is lost during transmission the program should be able
 to display *some* of the emails in preference to *none*.
 
 Over the last decade or so a significant shift in web application
-architecture has been to push the presentation layer onto the client
-side. Rather than deliver pages to a browser, data is sent instead so
-that it is the responsibility of an application running inside the
-browser to populate the page. Prior to this AJAX age progressive html
+architecture has been to push the presentation layer to the client side.
+Rather than deliver *pages* to a browser, *data* is sent so that an
+application running inside the browser is responsible for using this
+data to populate the page. Prior to this AJAX age, progressive html
 rendering allowed a transmitted page to be viewed incrementally as it
-arrived over the network providing a fluid perception of performance. By
-not facilitating the use of a REST response before the entire message
-has been received, I observe that more recent web architecture has in
-this regard taken a regressive step. Given that the underlying http
-transport is the same, I propose that it should be equally possible to
-progressively consider content delivered as data as it is for content
-delivered as markup.
+arrived over the network, giving a fluid perception of performance. In
+contrast, by not facilitating the use of an AJAX response before the
+entire message has been received, I observe that more recent web
+architecture has in this regard taken a regressive step. Given that the
+underlying http transport is the same, I propose that for content
+delivered as *data* it should be no less possible to employ an
+incremental consideration as were the case for content delivered as
+*markup*.
 
 Prior art and new contributions
 ===============================
