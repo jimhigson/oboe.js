@@ -91,7 +91,9 @@ and analysis to a public Github repository. This will hopefully allow
 members of the developer community to comment on the work and contribute
 suggestions as the work progresses. With the creative process reflecting
 the thing that it creates, I plan to use Kanban to iteratively deliver
-my iterative REST client.
+my iterative REST client. To allow as wide an adoption as possible, it
+will be licenced for uncomplicated inclusion and modification under the
+[2-clause BSD licence](http://opensource.org/licenses/BSD-2-Clause).
 
 TDD will be used to gain a reasonable assurance of correctness of the
 software. As well as demonstrating correctness against a set of known
