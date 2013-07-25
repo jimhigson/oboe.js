@@ -69,24 +69,21 @@ Prior art
 
 In the XML world progressive parsing is provided by SAX. SAX parsers however
 exist at a level of abstraction only slightly above that of tokenisers, providing a low level interface which
-notifies the programmer of tokens as they are received. This presents
-poor developer ergonomics, often requiring that the programmer implement
-the recording of state with regard to the nodes that they have seen. For
-DOM-style parsing the programmer rarely directly concerns themselves
-with XML, taking advantage of the wealth of generic tools which automate
-the translation of markup into domain model objects as per a declarative
-configuration. Conversely, for SAX the equivalent logic is usually
-implemented imperatively; it to be difficult to read and programmed once
-per usage rather than programmed as the combination of reusable parts.
-For this reason, SAX is much less common and only generally used for
+notifies the programmer of basic syntax as it is parsed. This presents
+poor developer ergonomics, requiring that the programmer implement
+the recording of state with regard to the nodes that they have seen. For non-incremental
+DOM-style XML parsers the programmer rarely directly concerns themselves
+with markup features. More likely is that they will take advantage of the wealth of modern, generic tools which automate
+a translation of markup into domain model objects as per a declarative
+configuration. For programmers using SAX a conversion to their domain objects is usually
+implemented imperatively. This programming tends to be difficult to read and programmed once
+per usage rather than assembled as the combination of reusable parts.
+For this reason the use of SAX is usually reserved for
 fringe cases in which messages are extremely large or memory extremely
-limited.
+scarce.
 
-I observe that this popularity of parsing models which require the whole
-message to be downloaded before any inspection can start hampers the
-performance of REST systems and propose the creation of a new, third way
-which combines the pleasant developer ergonomics of DOM with the
-progressive nature of SAX.
+I hope that my REST client library will establish a third way, combining pleasant developer ergonomics of DOM parsing with the
+progressive nature of SAX parsing.
 
 Delivery methodology
 ====================
