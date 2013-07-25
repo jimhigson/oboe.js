@@ -21,6 +21,22 @@ getting the whole message at once is no worse than it is now.
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
 
+delivery methodology
+--------------------
+ Because
+Kanban focusses on always having a potentially releasable product, it
+mitigates problems which could otherwise lead to non-delivery and allows
+the direction to be changed while the project is in progress. For each
+unit of work (under Kanban, a card), an entire vertical slice of
+planning, design, implementation and reflection must be complete before
+going onto the next card. Alongside each software feature, every written
+chapter will be expanded and refactored in much the same way as the
+code. Just as for well designed software, the order of implementation
+should not be apparent to a user, my plan is that the written work
+should not feel disjointed for having been written non-sequentially. I
+plan to manage the Kanban process using paper only, with cards on a
+physical board.
+
 overall design philosophy and breaking out of big/small tradeoff
 ----------------------------------------------------------------
 
@@ -479,6 +495,15 @@ hackers
 JS is much faster with "monomorphic call sites"
 
 However, js execution time is not much of a problem,
+
+functions over constructors
+---------------------------
+
+Functions can be like Factories, gives me the flexability to chagne how something is created but by exposing a constructor
+are stuck with using 'new' to create an instance of exactly one type.
+
+Dart has 'factory' constructors which are called like constructors but act like factory functions:
+(http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html#ch02-constructor-factory) 
 
 targeting node and the browser
 ------------------------------
