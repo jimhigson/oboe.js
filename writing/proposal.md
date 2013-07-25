@@ -59,15 +59,15 @@ delivered as *data* it should be no less possible to employ an
 incremental consideration as were the case for content delivered as
 *markup*.
 
-Prior art and new contributions
-===============================
+My thesis centres on the creation of a novel style of REST client
+library which allows certain programmer-specified items of interest from
+a resource to be used whilst the resource is streaming in and even if
+the download is only partially successful.
 
-My thesis is centred on the creation of a novel style of REST client
-library which allows programmer specified items of interest from a
-resource to be used while the resource streams in and even if the
-download is only partially successful.
+Prior art
+=========
 
-Sax provides progressive parsing to the XML world. SAX parsers however
+SAX provides progressive parsing to the XML world. SAX parsers however
 are little more than tokenisers, providing a low level interface which
 notifies the programmer of tokens as they are received. This presents
 poor developer ergonomics, often requiring that the programmer implement
