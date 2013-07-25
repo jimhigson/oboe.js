@@ -462,7 +462,7 @@ Why this is a problem.
 
 Potential solutions:
 
--   full functional-style imutability. Don't change the objects, just
+-   full functional-style immutability. Don't change the objects, just
     have a function that returns a new one with one extra property.
     Problem - language not optimised for this. A lot of copying. Still
     doesn't stop callback receiver from changing the state of hte object
