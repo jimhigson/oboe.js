@@ -531,11 +531,14 @@ packets in-order, for out-of-order packets something else happens.
 
 Use best of the capabilities of each.
 
-composition of several source files into a distributable binary-like text file
-------------------------------------------------------------------------------
+Packaging the library as a single distributable file
+----------------------------------------------------
+
+Composition of several source files into a distributable binary-like
+text file
 
 Why distributed javascript is more like a binary than a source file.
-Licencing implications?
+Licencing implications? Would be (maybe) under GPL. Not so under BSD.
 
 Inherent hiding by wrapping in a scope.
 
@@ -559,9 +562,6 @@ add to the capabilities but present a nicer interface
 Why uglify \* Covers whole language, not just a well-advised subset. \*
 In truth, Closure compiler works over a subset of javascript rather than
 the whole language.
-
-Packaging
----------
 
 Why not require. Bits on what rq is can go into B&R section.
 
