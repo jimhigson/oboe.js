@@ -8,12 +8,18 @@ var jsonPathSyntax = (function() {
    //       The second subexpression is the name of the expected path node (if the token may have a name)
 
 
-   /** allows exporting of a regular expression as a generified function interface by encapsulating just the exec
+   /** Allows exporting of a regular expression as a generified function interface by encapsulating just the exec
     *  function
+    *  
+    *  Could also be expressed as:
+    *    Function.prototype.bind.bind(RegExp.prototype.exec),
+    *    
+    *  But that's far too confusing! (and not even smaller once minified and gzipped)
     *  
     *  @type {Function}
     *  
     *  @param {RegExp} regex the regular expression to export
+    *  
     *  @returns a function which is equivalent to calling exec on that regular expression
     */
    var regexDescriptor =   function regexDescriptor(regex) {
