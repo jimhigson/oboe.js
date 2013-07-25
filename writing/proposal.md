@@ -92,25 +92,25 @@ Delivery methodology
 ====================
 
 My thesis will be developed 'in the open' by committing all programming
-and analysis to a public Github repository. This will allow
-members of the developer community to contribute with comments and
-suggestions as the project unfolds. With the creative process reflecting
-the thing that it creates, I plan to use Kanban to iteratively deliver
-my iterative REST client. To allow as wide an adoption as possible, it
-will be licenced for uncomplicated inclusion and modification under the
+and analysis to a public Github repository. This will allow members of
+the developer community to contribute with comments and suggestions as
+the project unfolds. With the creative process reflecting the thing that
+it creates, I plan to use Kanban to iteratively deliver my iterative
+REST client. To allow as wide an adoption as possible, it will be
+licenced for uncomplicated inclusion and modification under the
 [2-clause BSD licence](http://opensource.org/licenses/BSD-2-Clause).
 
-Test Driven Development, or *TDD*, will be used to gain a reasonable assurance of the correctness of the
-software. As well as demonstrating correctness against a set of known
-inputs, TDD will drive many of the design decisions in the programming.
-Designing so as to be easy testable encourages the separation of
-programming into smaller parts which each do one thing, such that each
-test becomes a trivial matter of stating the correct behaviour a single facet. As well as
-decomposition away from monoliths, TDD also encourages traits such as
-statelessness in programming: because an assertion of correctness is more
-universally applicable once we can assume that the behaviour
-under test will not vary as some hidden state inside the program
-changes.
+Test Driven Development, or *TDD*, will be used to gain a reasonable
+assurance of the correctness of the software. As well as demonstrating
+correctness against a set of known inputs, TDD will drive many of the
+design decisions in the programming. Designing so as to be easy testable
+encourages the separation of programming into smaller parts which each
+do one thing, such that each test becomes a trivial matter of stating
+the correct behaviour a single facet. As well as decomposition away from
+monoliths, TDD also encourages traits such as statelessness in
+programming: because an assertion of correctness is more universally
+applicable once we can assume that the behaviour under test will not
+vary as some hidden state inside the program changes.
 
 Timescales
 ==========
@@ -125,18 +125,19 @@ Summary of deliverables
 Having observed that it may be possible to improve over the presently
 common use of REST, the question I am asking is *"What is the smallest
 possible work which is likely to bring a significant improvement in this
-area?"*, as such I plan to focus tightly on as small a library as is possible to
-meet my goals. From the initial problem I am zooming in to concentrate on receiving http responses
-whilst de-scoping sending them. Firstly, asynchronous servers which encourage
-us to view the response as a stream do already have some
-prominence. Secondly, In the creation of a receiver alone, because all responses may be considered as streams, an increased
-performance should be possible even given an entirely synchronous
-sender architecture.
+area?"*, as such I plan to focus tightly on as small a library as is
+possible to meet my goals. From the initial problem I am zooming in to
+concentrate on receiving http responses whilst de-scoping sending them.
+Firstly, asynchronous servers which encourage us to view the response as
+a stream do already have some prominence. Secondly, In the creation of a
+receiver alone, because all responses may be considered as streams, an
+increased performance should be possible even given an entirely
+synchronous sender architecture.
 
 I propose to deliver a progressive rest client as a javascript library
 which builds on existing http libraries and may be deployed into either
-a server or a browser context. The feature set will be minimal but contain no obvious
-omissions. My ambitions for wider usage motivate a
+a server or a browser context. The feature set will be minimal but
+contain no obvious omissions. My ambitions for wider usage motivate a
 focus on programmer ergonomics, example-lead documentation and a
 packaging which allows drop-in replacement of existing tools. Because
 web programming is size-conscious I will deliver a micro-library; the
