@@ -5,35 +5,39 @@
 Application of my dissertation
 ==============================
 
-For a system engineered in a SOA style many of the resources a program
-accesses are resident on a remote machine. Although programmers often
-focus attention on the execution time of their algorithms, because
+For a system engineered in a SOA style, many of the resources required
+by a program reside on a remote machine. Although programmers often
+focus their concern on the execution speed of their algorithms, because
 transmission over a network can be as much as 10^6^ times slower than
-local access, the interval in which a program waits for input usually
-contributes more to the degradation of performance than any local
-concern. As such the the sage use of io should rank above most other
-optimisation considerations when considering the efficiency of many
-modern programs.
+local access, the interval in which a program is waiting for input
+usually contributes more to the degradation of performance than any
+local concern. As such the the sage use of io should rank above most
+other optimisation considerations when considering the efficiency of
+many modern programs.
 
 For all but single-packet messages, data sent over a network is readable
 whilst transmission is still in progress. Hence, it is possible to view
 almost any transmission through the lens of a stream even if the sender
-of the data did not intend for it to be thought of it in this way and by
-doing so it is possible to start using the data from the resource
-earlier. In not utilising the progressive nature of resource
-availability I propose that today's common REST client libraries are
-failing to make best use of network bandwidth.
+of the data did not intend for it to be thought of it in this way.
+Although some messages require the whole to be delivered before any part
+of it is useful, this is not the most typical case. So long as a partial
+message may be meaningfully interpreted, we can see that it should be
+possible to start using the resource earlier by examining it while
+transit is ongoing than if we had waited for the complete data. By not
+utilising the incremental, progressive nature of resource availability I
+propose that today's common REST client libraries are not making the
+most efficient use of remote resources.
 
 REST today is not solely the domain of server-to-server communication.
 It is also commonly employed under various AJAX patterns to make
 server-side resources available to client-side software executing
 locally inside a user's web browser. Data transmission often takes place
-over the mobile internet but AJAX clients commonly used in web browsers
-do not deal well with the fallible nature their networks. If a
+over the mobile internet via AJAX but the AJAX clients which are commonly used in web browsers
+do not deal well with the fallible nature of these networks. If a
 connection is lost whilst a message is in transit then the data
-downloaded to that point is discarded. Whilst it would of course be
-preferable to receive the entire resource requested, for many common use
-cases the incomplete data is nonetheless of considerable value. By
+downloaded to that point is discarded. Whilst of course it would be
+preferable to receive the entire resource, for many common use
+cases the incomplete data is nonetheless of non-zero value. By
 discarding remote data at a time when the network is unreliable we are
 wasting a valuable resource at the time when it is the most scarce. As a
 practical example, for an application downloading an email inbox, if the
