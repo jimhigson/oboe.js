@@ -502,6 +502,17 @@ functions over constructors
 What constructors are in js. Any function, but usually an uppercase
 initial char indicates that it is intended to be used as a constructor.
 
+Inheritence is constructed using the language itself. While this is more
+flexible and allows each project to define a bespoke version of
+inherience to suit their particular needs or preferences, it also
+hampers portability more than an 'extends' keyword would.
+
+> So far, the JavaScript community has not agreed on a common
+> inheritance library (which would help tooling and code portability)
+> and it is doubtful that that will ever happen. That means, we’re stuck
+> with constructors under ECMAScript 5.
+> http://www.2ality.com/2013/07/defending-constructors.html
+
 Functions can be like Factories, gives me the flexability to chagne how
 something is created but by exposing a constructor are stuck with using
 'new' to create an instance of exactly one type.
