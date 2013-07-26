@@ -3,15 +3,16 @@ Introduction
 
 **introduction should be 2-5 pages**
 
-Increasing the perception of speed: \* Source that doing things early
-makes page feel faster. \* Also actually faster as well as being
+Increasing the perception of speed: 
+
+- Source that doing things early makes page feel faster. 
+- Also actually faster as well as being
+
 perceived as such since useful things can often be done before whole
 content is loaded.
 
 When connections fail, apps are left with non of the content. Happens a
 lot on mobile networks.
-
-What a Micro-library is
 
 Inefficiencies in performing a fairly simple task
 -------------------------------------------------
@@ -22,7 +23,9 @@ Consider a fairly simple task of retrieving all the images used on a web
 page.
 
 Grab all the images mentioned in a web page Images may be on another
-subdomain \* DNS lookup only after got whole page Dynamically generated
+subdomain 
+
+- DNS lookup only after got whole page Dynamically generated
 pages can often load slowly, even when there is plenty of bandwidth But
 images could load quickly.
 
