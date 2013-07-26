@@ -8,11 +8,11 @@ considered in light of the application of Agile methodologies to SOA,
 providing a framework in which it is acceptable to partially restructure the format in
 which a resource is expressed whilst maintaining compatibility with interoperating systems.
 
-A critique is made of imperative methods under which items of interest
-are programmatically extracted from a resource once retrieved. Following
-from this critique, a declarative alternative is presented under which
-the identification of items of interest is possible prior to a resource
-having been retrieved in its entirety. The declarative syntax is
+A critique is made of current practice, under which resources are entirely retrieved before items of interest
+are extracted programmatically. An alternative is presented allowing
+the specification of items of interest in a declarative syntax, to be returned incrementally while the resource is still streaming.
+
+This declarative syntax is
 integrated into a framework which ties this method of
 identification into a wider scheme of object detection within streaming
 resources.
