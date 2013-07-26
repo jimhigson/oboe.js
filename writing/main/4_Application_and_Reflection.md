@@ -534,6 +534,11 @@ Use best of the capabilities of each.
 Packaging the library as a single distributable file
 ----------------------------------------------------
 
+![packaging of many javascript files into multiple single-file packages.
+The packages are individually targeted at different execution contexts,
+either browsers or node *get from notebook, split sketch diagram in
+half*](images/placeholder.png)
+
 -   One file for browser and node is common.
 -   say how this is done
 -   why not doing this (adds bloat, inhibits µlib)
@@ -573,8 +578,8 @@ Packaging for use in frameworks.
 Why uglify
 
 -   Covers whole language, not just a well-advised subset.
--   Closure compiler works over a subset of javascript rather
-    than the whole language.
+-   Closure compiler works over a subset of javascript rather than the
+    whole language.
 
 Why not require. Bits on what rq is can go into B&R section.
 
