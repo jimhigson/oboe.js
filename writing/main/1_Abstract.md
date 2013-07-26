@@ -1,8 +1,8 @@
 Abstract
 ========
 
-A javascript REST client library targetted at both Node.js and web
-browsers, incorporating http streaming and progressive JSON parsing with
+A javascript REST client library targeting both Node.js and web
+browsers, incorporating http streaming, pattern matching, and progressive JSON parsing with
 the aim of improving performance, fault tolerance, and encouraging a
 greater degree of loose coupling between systems. Loose coupling is
 particularly considered in light of the application of Agile
@@ -13,11 +13,11 @@ whilst maintaining compatibility with dependant systems.
 A critique is made of current practice, under which resources are
 entirely retrieved before items of interest are extracted
 programmatically. An alternative model is presented allowing the
-specification of items of interest to be identified incrementally as the
-resource is still downloading using a declarative syntax similar to
-jsonPath.
+specification of items of interest using a declarative syntax similar to
+jsonPath. The identified items are provided incrementally while the
+resource is still downloading.
 
 In addition to a consideration of performance in absolute terms, the
-revised model is also evaluated in reference to usability with regards
-to differences in perceived performance due to the incremental
-processing of retrieved resources.
+usability implications of incremental
+                          processing of retrieved resources are also evaluated with regards
+to differences in perceived performance.
