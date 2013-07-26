@@ -635,6 +635,9 @@ logic sits on and, by providing abstraction, elucidates the code.
 automated testing
 -----------------
 
+![Relationship between various files and test libraries *other half of
+sketch from notebook*](images/placeholder.png)
+
 How automated testing improves what can be written, not just making what
 is written more reliable.
 
