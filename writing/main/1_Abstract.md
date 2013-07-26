@@ -2,10 +2,10 @@ Abstract
 ========
 
 A Javascript REST client library targeting both Node.js and web
-browsers, incorporating http streaming, pattern matching, and
-progressive JSON parsing with the aim of improving performance, fault
+browsers that incorporates http streaming, pattern matching, and
+progressive JSON parsing, with the aim of improving performance, fault
 tolerance, and encouraging a greater degree of loose coupling between
-systems. Loose coupling is particularly considered in light of the
+programs. Loose coupling is particularly considered in light of the
 application of Agile methodologies to SOA, providing a framework in
 which it is acceptable to partially restructure the JSON format in which
 a resource is expressed whilst maintaining compatibility with dependant
