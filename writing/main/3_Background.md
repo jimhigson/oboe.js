@@ -3,6 +3,8 @@ Background
 
 **background should be 2-10 pages**
 
+The feature set will be minimal but contain no obvious omissions.
+
 Some high-level stuff about webapps and where processing is done
 ----------------------------------------------------------------
 
@@ -373,6 +375,15 @@ Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
 
+Micro-libraries
+---------------
+
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
 Methodology
 -----------
 
@@ -381,3 +392,30 @@ expression that can possibly work and via constant work towards the
 emergence of elegance.
 
 Why this method? See W'yg.
+
+Testing
+-------
+
+![Relationship between the main players in the JS testing landscape.
+JSTD, Karma, Jasmine, NodeUnit, jasmine-node,
+Browsers](images/placeholder.png)
+
+By the commonjs spec, test directory should be called 'test'
+(http://wiki.commonjs.org/wiki/Packages/1.0\#Package\_Directory\_Layout)
+doesn't matter for my project since not using commonjs, but might as
+well stick to the convention.
+
+How TDD helps How can fit into methodology
+
+-   JSTD
+-   NodeUnit
+-   Karma
+-   Jasmine
+
+Initially started with jstestdriver but found it difficult. Karma
+started because engineers working on the Angular project in Google were
+"struggling a lot with jstd": http://www.youtube.com/watch?v=MVw8N3hTfCI
+- jstd is a google project Even Jstd's authors seems to be disowning it
+slightly. Describe what was once its main mode of operation as now being
+for stress testing of jstd itself only. Problems: browsers become
+unresponsive. Generally unreliable, has to be restarted frequently.
