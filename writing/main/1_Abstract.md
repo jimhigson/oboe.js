@@ -1,13 +1,14 @@
 Abstract
 ========
 
-A REST client library incorporating http streaming and progressive parsing 
+A javascript REST client library incorporating http streaming and progressive parsing 
 with the aim of improving performance, fault tolerance, and encouraging a greater
 degree of loose coupling between systems. Loose coupling is particuarly
 considered in light of the application of Agile methodologies to SOA,
 providing a framework in which it is acceptable to partially restructure the format in
-which a resource is expressed whilst maintaining compatibility with interoperating systems. A
-study is made of a real-world situation in which SOA is used extensively
+which a resource is expressed whilst maintaining compatibility with interoperating systems.
+
+A study is made of a real-world situation in which SOA is used extensively
 to create many small systems but problems arise from a tight coupling to
 versions encouraged by the programmer's chosen tool set.
 
