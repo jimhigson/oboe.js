@@ -1,7 +1,7 @@
 Abstract
 ========
 
-A javascript REST client library targeting both Node.js and web
+A Javascript REST client library targeting both Node.js and web
 browsers, incorporating http streaming, pattern matching, and
 progressive JSON parsing with the aim of improving performance, fault
 tolerance, and encouraging a greater degree of loose coupling between
