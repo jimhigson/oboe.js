@@ -4,12 +4,19 @@
 <p>A critique is made of imperative methods under which items of interest are programmatically extracted from a resource once retrieved. Following from this critique, a declarative alternative is presented under which the identification of items of interest is possible prior to a resource having been retrieved in its entirety. The declarative syntax is integrated into a javascript framework which ties this method of identification into a wider scheme of object detection within streaming resources.</p>
 <h1 id="introduction"><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
 <p><strong>introduction should be 2-5 pages</strong></p>
-<p>Increasing the perception of speed: * Source that doing things early makes page feel faster. * Also actually faster as well as being perceived as such since useful things can often be done before whole content is loaded.</p>
+<p>Increasing the perception of speed:</p>
+<ul>
+<li>Source that doing things early makes page feel faster.</li>
+<li>Also actually faster as well as being</li>
+</ul>
+<p>perceived as such since useful things can often be done before whole content is loaded.</p>
 <p>When connections fail, apps are left with non of the content. Happens a lot on mobile networks.</p>
-<p>What a Micro-library is</p>
 <h2 id="inefficiencies-in-performing-a-fairly-simple-task"><a href="#inefficiencies-in-performing-a-fairly-simple-task"><span class="header-section-number">2.1</span> Inefficiencies in performing a fairly simple task</a></h2>
 <p>Despite the enthusiasm for which SOA and REST in particular has been adapted, I believe this model isn't being used to its fullest potential. Consider a fairly simple task of retrieving all the images used on a web page.</p>
-<p>Grab all the images mentioned in a web page Images may be on another subdomain * DNS lookup only after got whole page Dynamically generated pages can often load slowly, even when there is plenty of bandwidth But images could load quickly.</p>
+<p>Grab all the images mentioned in a web page Images may be on another subdomain</p>
+<ul>
+<li>DNS lookup only after got whole page Dynamically generated pages can often load slowly, even when there is plenty of bandwidth But images could load quickly.</li>
+</ul>
 <p>Diagram of timeline to get images from a webpage.</p>
 <p>In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired into the browser engines rather than exposing an API suitable for general use and as such is treated as something of a special case specific to web browsers and has not so far seen a more general application. I wish to argue that a general application of this technique is viable and offers a worthwhile improvement over current common methods.</p>
 <p>The above problem has many analogues and because REST uses standard web semantics applies to much more than just automated web surfing. Indeed, as the machine readability of the data increases, access early can be all the more beneficial since decisions to terminate the connection may be made. Example: academic's list of publications, then downloading all the new ones.</p>
@@ -155,10 +162,15 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>While the request entity body is being transmitted and the upload complete flag is unset, queue a task to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every byte transmitted, whichever is least frequent. <a href="http://www.w3.org/TR/XMLHttpRequest/">w3c, XHR Working Draft</a></p>
 </blockquote>
 <p>Websockets More like node Can connect to any protocol (as always, easier to program if text based but can do binary) Can use to do http but not sufficient advantage over using</p>
-<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.12</span> Methodology</a></h2>
+<h2 id="micro-libraries"><a href="#micro-libraries"><span class="header-section-number">3.12</span> Micro-libraries</a></h2>
+<p>What a Micro-library is. What motivates the trend? This library has a fairly small set of functionality, it isn't a general purpose do-everything library like jQuery so its size will be looked at more critically if it is too large. Micro library is the current gold standard for compactness. Still, have a lot to do in not very much code.</p>
+<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.13</span> Methodology</a></h2>
 <p>The program design will be initially an exercise in creating the easiest expression that can possibly work and via constant work towards the emergence of elegance.</p>
 <p>Why this method? See W'yg.</p>
-<h2 id="testing"><a href="#testing"><span class="header-section-number">3.13</span> Testing</a></h2>
+<h2 id="testing"><a href="#testing"><span class="header-section-number">3.14</span> Testing</a></h2>
+<div class="figure">
+<img src="images/placeholder.png" alt="Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers" /><p class="caption">Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers</p>
+</div>
 <p>By the commonjs spec, test directory should be called 'test' (http://wiki.commonjs.org/wiki/Packages/1.0#Package_Directory_Layout) doesn't matter for my project since not using commonjs, but might as well stick to the convention.</p>
 <p>How TDD helps How can fit into methodology</p>
 <ul>
@@ -375,8 +387,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <li>Covers whole language, not just a well-advised subset.</li>
 <li>Closure compiler works over a subset of javascript rather than the whole language.</li>
 </ul>
-<p>Why not require. Bits on what rq is can go into B&amp;R section.</p>
-<p>Some of this can move into background</p>
+<p>Why not require. Bits on what rq is can go into B&amp;R section. <em>Some of this can move into 3_Background.md</em></p>
 <ul>
 <li>What it is</li>
 <li>Why so popular</li>
@@ -388,6 +399,12 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <li>Small compatible versions exist that just do loading (almond)<br /></li>
 <li>Why ultimately not suitable for a library like this - would require user to use Require before adopting it.</li>
 </ul>
+<p>Browserify is closer.</p>
+<ul>
+<li>Why it is better for some projects</li>
+<li>Very nearly meets my needs</li>
+<li>But http-compatability (https://github.com/substack/http-browserify), while complete enough, isn't compact enough to not push project over micro-library size</li>
+</ul>
 <p>Testing post-packaging for small set of smoke tests. Can't test everything, only through public API.</p>
 <p>Uglify. Why not Google Closure Compiler.</p>
 <h2 id="polyfilling"><a href="#polyfilling"><span class="header-section-number">4.17</span> polyfilling</a></h2>
@@ -396,6 +413,9 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the new methods discussed in the first two parts, the methods here are all reproducible using JavaScript itself. Native implementations are simply faster and more convenient. Having a uniform API for these operations also promotes their usage, making code clearer when shared between developers.</p>
 <p>Even when only used once, preferable to polyfill as a generic solution rather than offer a one-time implementation because it better splits the intention of the logic being presented from the mechanisms that that logic sits on and, by providing abstraction, elucidates the code.</p>
 <h2 id="automated-testing"><a href="#automated-testing"><span class="header-section-number">4.18</span> automated testing</a></h2>
+<div class="figure">
+<img src="images/placeholder.png" alt="Relationship between various files and test libraries other half of sketch from notebook" /><p class="caption">Relationship between various files and test libraries <em>other half of sketch from notebook</em></p>
+</div>
 <p>How automated testing improves what can be written, not just making what is written more reliable.</p>
 <p>TDD drives development by influencing the design - good design is taken as that which is amenable to testing rather than which describes the problem domain accurately or solves a problem with minimum resources. Amenable to testing often means split into many co-operating parts so that each part may be tested via a simple test.</p>
 <p>Bt encourageing splitting into co-operating objects, TDD to a certain degree is anti-encapsulation. The public object that was extracted as a new concern from a larger object now needs public methods whereas before nothing was exposed.</p>
@@ -441,17 +461,27 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Would benefit from a stateless language where everything is stateless at all times to avoid having to program defensively.</p>
 <h1 id="conclusion"><a href="#conclusion"><span class="header-section-number">5</span> Conclusion</a></h1>
 <p><strong>1 to 5 pages</strong></p>
+<h2 id="development-methodology"><a href="#development-methodology"><span class="header-section-number">5.1</span> Development methodology</a></h2>
+<p>Did it help?</p>
+<p>Switched several times. Could have started with winning side? Tension between choosing latest and greatest (promising much) or old established solution alraedy experienced with but with known problems. Judging if problems will become too much of a hinderence and underestimating the flaws. JSTD was yesterday's latest and greatest but Karma genuinely is great. In end, right solution was found despite not being found in most direct way.</p>
+<p>Packaging was a lot of work but has delivered the most concise possible library.</p>
+<h2 id="size"><a href="#size"><span class="header-section-number">5.2</span> Size</a></h2>
+<div class="figure">
+<img src="images/placeholder.png" alt="A pie chart showing the sizes of the various parts of the codebase" /><p class="caption">A pie chart showing the sizes of the various parts of the codebase</p>
+</div>
+<p>Comment on the size of the libraray</p>
+<h2 id="handling-invalid-input"><a href="#handling-invalid-input"><span class="header-section-number">5.3</span> Handling invalid input</a></h2>
 <p>Invalid jsonpaths made from otherwise valid clauses (for example two roots) perhaps could fail early, at compile time. Instead, get a jsonPath that couldn't match anything. Invalid syntax is picked up.</p>
 <p>Same pattern could be extended to XML. Or any tree-based format. Text is easier but no reason why not binary applications.</p>
 <p>Not particularly useful reading from local files.</p>
 <p>Does not save memory over DOM parsing since the same DOM tree is built. May slightly increase memory usage by utilising memory earlier that would otherwise be dept dormant until the whole transmission is received but worst case more often a concern than mean.</p>
 <p>Implementation in a purely functional language with lazy evaluation: could it mean that only the necessary parts are computed? Could I have implemented the same in javascript?</p>
 <p>Would be nice to: * discard patterns that can't match any further parts of the tree * discard branches of the tree that can't match any patterns * just over the parsing of branches of the tree that provably can't match any of the patterns</p>
-<h2 id="comparative-usages"><a href="#comparative-usages"><span class="header-section-number">5.1</span> Comparative usages</a></h2>
+<h2 id="comparative-usages"><a href="#comparative-usages"><span class="header-section-number">5.4</span> Comparative usages</a></h2>
 <p>Interesting article from Clarinet: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</p>
 <p>In terms of syntax: compare to SAX (clarinet) for getting the same job done. Draw examples from github project README. Or from reimplementing Clarinet's examples.</p>
 <p>Consider: * Difficulty to program * Ease of reading the program / clarity of code * Resources consumed * Performance (time) taken -- about the same. Can react equally quickly to io in progress, both largely io bound.</p>
-<h2 id="community-reaction"><a href="#community-reaction"><span class="header-section-number">5.2</span> Community reaction</a></h2>
+<h2 id="community-reaction"><a href="#community-reaction"><span class="header-section-number">5.5</span> Community reaction</a></h2>
 <p>Built into Dojo Followers on Github Being posted in forums (hopefully also listed on blogs) No homepage as of yet other than the Github page</p>
 <h1 id="bibliography"><a href="#bibliography"><span class="header-section-number">6</span> Bibliography</a></h1>
 <h1 id="appendix"><a href="#appendix"><span class="header-section-number">7</span> Appendix</a></h1>
