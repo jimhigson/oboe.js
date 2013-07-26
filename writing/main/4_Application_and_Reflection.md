@@ -534,6 +534,15 @@ Use best of the capabilities of each.
 Packaging the library as a single distributable file
 ----------------------------------------------------
 
+-   One file for browser and node is common.
+-   say how this is done
+-   why not doing this (adds bloat, inhibits µlib)
+-   extra challenges
+-   http adaptor is different
+-   packaging is different
+-   two distributable files, for node minification is not important so
+    don't do to help debugging.
+
 Composition of several source files into a distributable binary-like
 text file
 
@@ -552,16 +561,20 @@ concatenation still done for ease of inclusion in projects
 typical pattern for packaging to work in either a node.js server or a web browser
 ~~~~
 
-Packaging for use in frameworks. \* Many frameworks already come with a
-wrapper arround the browser's inbuilt ajax capabilities \*\* they don't
-add to the capabilities but present a nicer interface
+Packaging for use in frameworks.
+
+-   Many frameworks already come with a wrapper arround the browser's
+    inbuilt ajax capabilities
+-   they don't add to the capabilities but present a nicer interface
 
 -   I'm not doing it but others are \*\* browser-packaged version should
     be use agnostic and therefore amenable to packaging in this way
 
-Why uglify \* Covers whole language, not just a well-advised subset. \*
-In truth, Closure compiler works over a subset of javascript rather than
-the whole language.
+Why uglify
+
+-   Covers whole language, not just a well-advised subset.
+-   Closure compiler works over a subset of javascript rather
+    than the whole language.
 
 Why not require. Bits on what rq is can go into B&R section.
 
