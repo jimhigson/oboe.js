@@ -15,7 +15,7 @@ A critique is made of current practice under which resources are
 entirely retrieved before items of interest are extracted
 programmatically. An alternative model is presented allowing the
 specification of items of interest using a declarative syntax similar to
-jsonPath. The identified items are provided incrementally while the
+JSONPath. The identified items are provided incrementally while the
 resource is still downloading.
 
 In addition to a consideration of performance in absolute terms, the
