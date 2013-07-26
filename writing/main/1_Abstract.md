@@ -19,5 +19,5 @@ jsonPath. The identified items are provided incrementally while the
 resource is still downloading.
 
 In addition to a consideration of performance in absolute terms, the
-usability implications of an incremental model
-are also evaluated with regards to differences in user perception of performance.
+usability implications of an incremental model are also evaluated with
+regards to differences in user perception of performance.
