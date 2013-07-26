@@ -77,7 +77,7 @@ DOM-style XML parsers the programmer rarely directly concerns themselves
 with markup features. More likely is that they will take advantage of
 the wealth of modern, generic tools which automate a translation of
 markup into domain model objects as per a declarative configuration. For
-programmers using SAX a conversion to their domain objects is usually
+programmers using SAX, a conversion to their domain objects is usually
 implemented imperatively. This programming tends to be difficult to read
 and programmed once per usage rather than assembled as the combination
 of reusable parts. For this reason the use of SAX is usually reserved
@@ -103,14 +103,14 @@ licenced for uncomplicated inclusion and modification under the
 Test Driven Development, or *TDD*, will be used to gain a reasonable
 assurance of the correctness of the software. As well as demonstrating
 correctness against a set of known inputs, TDD will drive many of the
-design decisions in the programming. Designing so as to be easy testable
-encourages the separation of programming into smaller parts which each
-do one thing, such that each test becomes a trivial matter of stating
-the correct behaviour a single facet. As well as decomposition away from
-monoliths, TDD also encourages traits such as statelessness in
-programming: because an assertion of correctness is more universally
-applicable once we can assume that the behaviour under test will not
-vary as some hidden state inside the program changes.
+design decisions in the programming. Designing so as to be easily
+testable encourages the separation of programming into smaller parts
+which each do one thing, such that each test becomes a trivial matter of
+specifying the correct behaviour of a single facet. As well as
+decomposition away from monoliths, TDD also encourages traits such as
+statelessness in programming: because an assertion of correctness is
+more universally applicable once we can assume that the behaviour under
+test will not vary as some hidden state inside the program changes.
 
 Timescales
 ==========
@@ -134,7 +134,7 @@ receiver alone, because all responses may be considered as streams, an
 increased performance should be possible even given an entirely
 synchronous sender architecture.
 
-I propose to deliver a progressive rest client as a javascript library
+I propose to deliver a progressive REST client as a javascript library
 which builds on existing http libraries and may be deployed into either
 a server or a browser context. The feature set will be minimal but
 contain no obvious omissions. My ambitions for wider usage motivate a
