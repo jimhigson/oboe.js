@@ -8,15 +8,11 @@ pandoc proposal.md -o proposal.pdf
 
 echo made proposal pdf
 
-ls main/*.md | sort | xargs cat > ../main_concat.md
-
-echo concated main markdown
-
-pandoc main_concat.md --toc --default-image-extension=png --number-sections -o main.html
+./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections -o main.html
 
 echo made main html
 
-pandoc main_concat.md --toc --default-image-extension=png --number-sections --template=mainOboeTemplate -o main.pdf
+./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections --template=mainOboeTemplate -o main.pdf
 
 echo made main pdf
 

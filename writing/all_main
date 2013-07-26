@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Simple shell script. Reads all of the file in the main directory in order, and writes out their contents
+# with two newlines seperating the individual files.
+# With thanks to: http://stackoverflow.com/questions/2576693/linux-merging-multiple-files-each-on-a-new-line 
+
+for f in $(ls main/*.md | sort); do 
+   cat $f
+   echo; echo
+done
