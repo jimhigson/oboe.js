@@ -541,7 +541,7 @@ half*](images/placeholder.png)
 
 -   One file for browser and node is common.
 -   say how this is done
--   why not doing this (adds bloat, inhibits µlib)
+-   why not doing this (adds bloat, inhibits micro-lib)
 -   extra challenges
 -   http adaptor is different
 -   packaging is different
@@ -581,9 +581,8 @@ Why uglify
 -   Closure compiler works over a subset of javascript rather than the
     whole language.
 
-Why not require. Bits on what rq is can go into B&R section.
-
-Some of this can move into background
+Why not require. Bits on what rq is can go into B&R section. *Some of
+this can move into 3\_Background.md*
 
 -   What it is
 -   Why so popular
@@ -598,6 +597,15 @@ Some of this can move into background
 -   Small compatible versions exist that just do loading (almond)\
 -   Why ultimately not suitable for a library like this - would require
     user to use Require before adopting it.
+
+Browserify is closer.
+
+-   Why it is better for some projects
+-   Very nearly meets my needs
+-   But http-compatability
+    (https://github.com/substack/http-browserify), while complete
+    enough, isn't compact enough to not push project over micro-library
+    size
 
 Testing post-packaging for small set of smoke tests. Can't test
 everything, only through public API.
