@@ -3,7 +3,7 @@ Abstract
 
 A javascript REST client library incorporating http streaming and progressive parsing 
 with the aim of improving performance, fault tolerance, and encouraging a greater
-degree of loose coupling between systems. Loose coupling is particuarly
+degree of loose coupling between systems. Loose coupling is particularly
 considered in light of the application of Agile methodologies to SOA,
 providing a framework in which it is acceptable to partially restructure the format in
 which a resource is expressed whilst maintaining compatibility with interoperating systems.
