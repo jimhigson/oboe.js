@@ -3,6 +3,33 @@ Conclusion
 
 **1 to 5 pages**
 
+Development methodology
+-----------------------
+
+Did it help?
+
+Switched several times. Could have started with winning side? Tension
+between choosing latest and greatest (promising much) or old established
+solution alraedy experienced with but with known problems. Judging if
+problems will become too much of a hinderence and underestimating the
+flaws. JSTD was yesterday's latest and greatest but Karma genuinely is
+great. In end, right solution was found despite not being found in most
+direct way.
+
+Packaging was a lot of work but has delivered the most concise possible
+library.
+
+Size
+----
+
+![A pie chart showing the sizes of the various parts of the
+codebase](images/placeholder.png)
+
+Comment on the size of the libraray
+
+Handling invalid input
+----------------------
+
 Invalid jsonpaths made from otherwise valid clauses (for example two
 roots) perhaps could fail early, at compile time. Instead, get a
 jsonPath that couldn't match anything. Invalid syntax is picked up.
