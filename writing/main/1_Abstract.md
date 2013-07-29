@@ -8,7 +8,7 @@ tolerance, and encouraging a greater degree of loose coupling between
 programs. Loose coupling is particularly considered in light of the
 application of Agile methodologies to SOA, providing a framework in
 which it is acceptable to partially restructure the JSON format in which
-a resource is expressed whilst maintaining compatibility with dependant
+a resource is expressed whilst maintaining compatibility with dependent
 systems.
 
 A critique is made of current practice under which resources are
