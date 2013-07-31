@@ -65,10 +65,15 @@ In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
 Clarinet's examples.
 
-Consider: \* Difficulty to program \* Ease of reading the program /
-clarity of code \* Resources consumed \* Performance (time) taken --
-about the same. Can react equally quickly to io in progress, both
-largely io bound.
+Consider:
+
+-   Difficulty to program
+-   Ease of reading the program / clarity of code
+-   Resources consumed
+-   Performance (time) taken
+-   about the same. Can react equally quickly to io in progress, both
+    largely io bound.
+-   Is earlier really faster?
 
 Community reaction
 ------------------
