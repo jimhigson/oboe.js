@@ -117,7 +117,7 @@ function startServer( grunt ) {
 
 
    require('http').createServer().on('request', answerRequest).listen(PORT);
-   grunt.log.writeln('strea,omg server started on port', String(PORT).blue);
+   grunt.log.writeln('streaming server started on port'.green, String(PORT).blue);
 }
 
 module.exports.startServer = startServer;
