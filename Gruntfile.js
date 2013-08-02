@@ -60,7 +60,7 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-contrib-concat');
    grunt.loadNpmTasks('grunt-wrap');
    grunt.loadNpmTasks('grunt-contrib-uglify');   
-   grunt.loadNpmTasks('grunt-jstestdriver');   
+   grunt.loadNpmTasks('grunt-karma');   
 
    grunt.registerTask('devtest', ['jstestdriver']);
    grunt.registerTask('build', ['concat:oboe']);
