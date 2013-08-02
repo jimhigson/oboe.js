@@ -1,26 +1,28 @@
 module.exports = function (grunt) {
 
+   var SOURCE_FILES = [
+      'src/functional.js'                
+   ,  'src/util.js'                    
+   ,  'src/lists.js'                    
+   ,  'src/libs/polyfills.js'
+   ,  'src/libs/clarinet.js'               
+   ,  'src/streamingXhr.js'
+   ,  'src/jsonPathSyntax.js'
+   ,  'src/incrementalContentBuilder.js'            
+   ,  'src/jsonPath.js'
+   ,  'src/pubsub.js'
+   ,  'src/instanceApi.js'
+   ,  'src/controller.js'
+   ,  'src/browser-api.js'
+   ];
+
    grunt.initConfig({
 
       pkg:grunt.file.readJSON("package.json")
       
    ,  concat: {
          oboe:{         
-            src: [
-               'src/functional.js'                
-            ,  'src/util.js'                    
-            ,  'src/lists.js'                    
-            ,  'src/libs/polyfills.js'
-            ,  'src/libs/clarinet.js'               
-            ,  'src/streamingXhr.js'
-            ,  'src/jsonPathSyntax.js'
-            ,  'src/incrementalContentBuilder.js'            
-            ,  'src/jsonPath.js'
-            ,  'src/pubsub.js'
-            ,  'src/instanceApi.js'
-            ,  'src/controller.js'
-            ,  'src/browser-api.js'
-            ],
+            src: SOURCE_FILES,
             dest: 'build/oboe.concat.js'
          }
       }
@@ -64,8 +66,6 @@ module.exports = function (grunt) {
             ]
          }
       }      
-      
-    
       
    });
 
