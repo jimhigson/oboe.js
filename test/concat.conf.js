@@ -18,12 +18,7 @@ files = [
 
 
 // list of files to exclude
-exclude = [
-   // temporarily exclude tests that need to ajax things in:   
-   'test/cases/endToEndIntegrationTest.js'
- 
-];
-
+exclude = [];
 
 // test results reporter to use
 // possible values: 'dots', 'progress', 'junit'
@@ -61,3 +56,9 @@ captureTimeout = 60000;
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
 singleRun = true;
+
+proxies = {
+   '/stream'      : 'http://localhost:4567/stream',
+   '/static/json' : 'http://localhost:4567/static/json'   
+};
+

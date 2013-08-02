@@ -30,13 +30,7 @@ files = [
 
 
 // list of files to exclude
-exclude = [
-   // temporarily exclude tests that need to ajax things in:   
-   'test/cases/endToEndIntegrationTest.js'
-//,  'test/cases/streamingXhrTests.js'
-//,  'test/cases/streamingXhrIntegrationTest.js'
-  
-];
+exclude = [];
 
 
 // test results reporter to use

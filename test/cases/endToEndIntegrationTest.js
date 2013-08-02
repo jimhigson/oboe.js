@@ -23,7 +23,7 @@
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAnOboeInstance('firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks))
+            asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks))
                .andWeAreListeningForNodes('![*]');         
          });
 
@@ -52,7 +52,7 @@
    
          queue.call("request the numbers json", function(jstdCallbacks){
          
-            asserter = givenAnOboeInstanceGetting('firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
+            asserter = givenAnOboeInstanceGetting('/static/json/firstTenNaturalNumbers.json', syncingWith(jstdCallbacks))
                .andWeAreListeningForNodes('![*]');         
          });
 
@@ -79,7 +79,7 @@
                   
             givenAnOboeInstance(
                           
-               'firstTenNaturalNumbers.json',
+               '/static/json/firstTenNaturalNumbers.json',
                syncingWith(jstdCallbacks),
                function ajaxFinished(wholeJsonFromOboe) {
                                     

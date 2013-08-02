@@ -39,7 +39,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
                                           jstdCallbacksListForJsonComplete.add(storeCompleteJson) 
                                        :  storeCompleteJson;
 
-      oboeInstance = oboe.doGet( urlForJsonTestFile(jsonFileName), 
+      oboeInstance = oboe.doGet( jsonFileName, 
                                  requestCompleteCallback
                                );      
       
@@ -172,11 +172,6 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
       }      
    }
    return new Asserter();
-}
-
-/* get the url that jstd will serve a test json file on */
-function urlForJsonTestFile(jsonFilename) {
-   return '/test/test/json/' + jsonFilename;
 }
 
 

@@ -110,8 +110,12 @@ module.exports = function (grunt) {
    
    });
 
-   grunt.registerTask('test',         ['karma:single']);
-   grunt.registerTask('checksize',    ['micro:oboe_min']);
+   //grunt.registerTask('checksize',    ['micro:oboe_min']);
+
+   grunt.registerTask('dev-test',     [
+                                          'start-stream-source',         
+                                          'karma:single-dev'
+                                      ]);
    grunt.registerTask('default',      [   
                                           'start-stream-source',
                                           'karma:single-dev', 
