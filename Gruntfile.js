@@ -21,13 +21,13 @@ module.exports = function (grunt) {
             ,  'src/controller.js'
             ,  'src/browser-api.js'
             ],
-            dest: 'dist/oboe.concat.js'
+            dest: 'build/oboe.concat.js'
          }
       }
       
    ,  wrap: {
          export: {
-            src: 'dist/oboe.concat.js',
+            src: 'build/oboe.concat.js',
             dest: '.',
             wrapper: [
                '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src ' +
@@ -42,7 +42,7 @@ module.exports = function (grunt) {
    ,  uglify: {
          build:{
             files:{
-               'dist/oboe.min.js': 'dist/oboe.concat.js'
+               'build/oboe.min.js': 'build/oboe.concat.js'
             }
          }
       }
@@ -53,16 +53,37 @@ module.exports = function (grunt) {
             singleRun: 'true',
             browsers: ['Chrome', 'Firefox']
          }
+         
+      }
+      
+      ,copy: {
+         dist: {
+            files: [
+               {src: ['build/oboe.min.js'], dest: 'dist/oboe.min.js'}
+            ,  {src: ['build/oboe.concat.js'], dest: 'dist/oboe.js'}
+            ]
+         }
       }      
+      
+    
       
    });
 
    grunt.loadNpmTasks('grunt-contrib-concat');
    grunt.loadNpmTasks('grunt-wrap');
    grunt.loadNpmTasks('grunt-contrib-uglify');   
-   grunt.loadNpmTasks('grunt-karma');   
+   grunt.loadNpmTasks('grunt-karma');
+   grunt.loadNpmTasks('grunt-contrib-copy');      
 
-   grunt.registerTask('test',    ['karma:single']);
-   grunt.registerTask('default', ['karma:single', 'concat:oboe', 'wrap:export', 'uglify']);
+   grunt.registerTask('test',         ['karma:single']);
+   grunt.registerTask('checksize',    ['micro:oboe_min']);
+   grunt.registerTask('default',      [   'karma:single', 
+                                          'concat:oboe', 
+                                          'wrap:export', 
+                                          'uglify',
+                                          'copy:dist'
+                                      //  micro isn't working: 
+                                      //  'micro:oboe_min'
+                                      ]);
 
 };
