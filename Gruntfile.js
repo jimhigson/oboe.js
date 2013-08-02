@@ -73,19 +73,18 @@ module.exports = function (grunt) {
       }
       
    ,  karma: {
-         single: {
+         'single-dev': {
             configFile: 'test/unit.conf.js',
             singleRun: 'true',
             browsers: ['Chrome', 'Firefox']
          }
          
-      ,  concat: {
-            configFile: 'test/unit.conf.js',
+      ,  'single-concat': {
+            configFile: 'test/concat.conf.js',
             singleRun: 'true',
             browsers: ['Chrome', 'Firefox']      
          }         
-         
-         
+
       }
       
    ,  copy: {
@@ -115,11 +114,12 @@ module.exports = function (grunt) {
    grunt.registerTask('checksize',    ['micro:oboe_min']);
    grunt.registerTask('default',      [   
                                           'start-stream-source',
-                                          'karma:single', 
+                                          'karma:single-dev', 
                                           'concat:oboe', 
                                           'wrap:export', 
                                           'uglify',
-                                          'copy:dist'
+                                          'copy:dist',
+                                          'karma:single-concat'                                          
                                       //  micro isn't working: 
                                       //  'micro:oboe_min'
                                       ]);

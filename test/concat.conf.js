@@ -6,26 +6,14 @@ basePath = '..';
 
 // list of files / patterns to load in the browser
 files = [
-   'node_modules/karma-jstd-adapter/jstd-adapter.js'
-  
-,  'src/functional.js'
-,  'src/util.js'
-,  'src/lists.js' 
+   'node_modules/karma-jstd-adapter/jstd-adapter.js'   
 ,  'test/libs/sinon.js'
 ,  'test/libs/sinon-ie.js'
 ,  'test/libs/*.js'
-,  'src/libs/polyfills.js'
-,  'src/libs/clarinet.js'
-,  'src/streamingXhr.js'
-,  'src/jsonPathSyntax.js'
-,  'src/incrementalContentBuilder.js'
-,  'src/jsonPath.js'
-,  'src/pubsub.js' 
-,  'src/instanceApi.js' 
-,  'src/controller.js'
-,  'src/browser-api.js'
-  
-,  'test/cases/*.js'
+,  'dist/oboe.js'
+,  'test/cases/polyfillsTest.js'
+   // NB: this won't be run yet because it is excluded:
+,  'test/cases/endToEndIntegrationTest.js'
 ];
 
 
@@ -33,9 +21,7 @@ files = [
 exclude = [
    // temporarily exclude tests that need to ajax things in:   
    'test/cases/endToEndIntegrationTest.js'
-//,  'test/cases/streamingXhrTests.js'
-//,  'test/cases/streamingXhrIntegrationTest.js'
-  
+ 
 ];
 
 
@@ -75,8 +61,3 @@ captureTimeout = 60000;
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
 singleRun = true;
-
-proxies = {
-   '/stream'      : 'http://localhost:4567/stream',
-   '/static/json' : 'http://localhost:4567/static/json'   
-};
