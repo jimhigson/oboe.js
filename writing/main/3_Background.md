@@ -38,7 +38,10 @@ times.
 
 -   DOM manipulation
 -   rendering
--   most significant: waiting for stuff
+-   most significant: waiting for stuff. Going from js taking 10ms per
+    frame to 1ms per frame will have zero difference because it is
+    already meeting the frame rate. Might help slower devices if
+    performance was marginal before
 
 > The user does something, then the app responds visually with immediacy
 > at 30 frames per second or more, and completes a task in a few hundred
