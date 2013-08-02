@@ -110,7 +110,7 @@
          queue.call("ask the streaming xhr to fetch", function(callbacks){
        
             streamingXhr(
-               'POST', cacheBustUrl('/stream/echoBack.json'),
+               'POST', cacheBustUrl('/stream/echoback.json'),
                JSON.stringify( payload ),               
                 
                function(nextDrip){            

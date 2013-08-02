@@ -28,7 +28,9 @@ function echoBackBody(req, res) {
 }
 
 
-function replyWithTenSlowNumbers(res) {
+function replyWithTenSlowNumbers(_req, res) {
+   sendJsonHeaders(res);
+
    var NUMBER_INTERVAL = 250;
    var MAX_NUMBER = 9;
    
@@ -56,6 +58,24 @@ function replyWithTenSlowNumbers(res) {
    }, NUMBER_INTERVAL);
 }
 
+function replyWithStaticJson(req, res) {
+   sendJsonHeaders(res);
+   
+   var filename = req.url.replace('/static', '..');
+   
+   console.log('will respond with contents of file', filename.blue);
+   
+   require('fs').readFile(filename, 'utf8', function (err,data) {
+      if (err) {
+         console.log('could not read static file'.red, filename.blue);
+         return;
+      }
+      
+      res.end(data);
+      
+      console.log('read file'.green, filename.blue, 'ok'.green);
+   });   
+}
 
 function sendJsonHeaders(res) {
    var JSON_MIME_TYPE = "application/octet-stream";
@@ -64,18 +84,33 @@ function sendJsonHeaders(res) {
 }
 
 function answerRequest(req, res) {
-   console.log('got', req.method.blue, 
-                  'request for url', 'stream/tenSlowNumbers.js'.yellow,
-                  'with body', req.body);   
+   console.log(   '\n----------\ngot',
+                  req.method.blue, 
+                  'request for url', req.url.yellow,
+                   req.body? 'with body' + req.body : '');   
 
-   if (req.method == 'POST') {
-
-      echoBackBody(req, res);
-
-   } else {
-      sendJsonHeaders(res);      
-      replyWithTenSlowNumbers(res);      
+   var urlMappings = {
+      '/stream/echoback': echoBackBody
+   ,  '/static/json': replyWithStaticJson
+   ,  '/stream/tenSlowNumbers': replyWithTenSlowNumbers   
+   };
+   
+   var responder;
+   
+   for( var i in urlMappings ) {
+      if( req.url.indexOf(i) == 0 ) {      
+         responder = urlMappings[i];
+         console.log( 'url starts with '.green, i.blue, 'so will reply using'.green, responder.name.blue);
+         break;
+      }
    }
+   
+   if( !responder ) {
+      console.log("no mapping for".red, req.url.blue);
+      return;
+   }
+    
+   responder(req, res);
 
 }
 
