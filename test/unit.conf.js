@@ -31,7 +31,6 @@ files = [
 
 // list of files to exclude
 exclude = [
-
    // temporarily exclude tests that need to ajax things in:   
    'test/cases/endToEndIntegrationTest.js'
 ,  'test/cases/streamingXhrTests.js'
@@ -83,4 +82,4 @@ captureTimeout = 60000;
 
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
-singleRun = false;
+singleRun = true;
