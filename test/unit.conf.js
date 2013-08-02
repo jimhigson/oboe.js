@@ -6,31 +6,36 @@ basePath = '..';
 
 // list of files / patterns to load in the browser
 files = [
-  'node_modules/karma-jstd-adapter/jstd-adapter.js',
+   'node_modules/karma-jstd-adapter/jstd-adapter.js'
   
-  'src/functional.js',
-  'src/util.js',
-  'src/lists.js', 
-  'test/libs/sinon.js',
-  'test/libs/sinon-ie.js',
-  'test/libs/*.js',
-  'src/libs/polyfills.js',
-  'src/libs/clarinet.js',
-  'src/streamingXhr.js',
-  'src/jsonPathSyntax.js',
-  'src/incrementalContentBuilder.js',
-  'src/jsonPath.js',
-  'src/pubsub.js', 
-  'src/instanceApi.js', 
-  'src/controller.js',
-  'src/browser-api.js',
+,  'src/functional.js'
+,  'src/util.js'
+,  'src/lists.js' 
+,  'test/libs/sinon.js'
+,  'test/libs/sinon-ie.js'
+,  'test/libs/*.js'
+,  'src/libs/polyfills.js'
+,  'src/libs/clarinet.js'
+,  'src/streamingXhr.js'
+,  'src/jsonPathSyntax.js'
+,  'src/incrementalContentBuilder.js'
+,  'src/jsonPath.js'
+,  'src/pubsub.js' 
+,  'src/instanceApi.js' 
+,  'src/controller.js'
+,  'src/browser-api.js'
   
-  'test/cases/*.js'
+,  'test/cases/*.js'
 ];
 
 
 // list of files to exclude
 exclude = [
+
+   // temporarily exclude tests that need to ajax things in:   
+   'test/cases/endToEndIntegrationTest.js'
+,  'test/cases/streamingXhrTests.js'
+,  'test/cases/streamingXhrIntegrationTest.js'
   
 ];
 
@@ -69,7 +74,7 @@ autoWatch = true;
 // - Safari (only Mac)
 // - PhantomJS
 // - IE (only Windows)
-browsers = ['Chrome'];
+browsers = [];
 
 
 // If browser does not capture in given timeout [ms], kill it
