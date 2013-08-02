@@ -3,7 +3,7 @@
 
 (function(){
 
-   AsyncTestCase("testStreamingXhr", {
+   AsyncTestCase("streaming xhr integration", {
 
       // shorten the waiting time before a test fails. Default 30s is too long:
       setUp: function(){
