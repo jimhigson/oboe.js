@@ -57,19 +57,24 @@ function replyWithTenSlowNumbers(res) {
 }
 
 
+function sendJsonHeaders(res) {
+   var JSON_MIME_TYPE = "application/octet-stream";
+   res.setHeader("Content-Type", JSON_MIME_TYPE);
+   res.writeHead(200);
+}
+
 function answerRequest(req, res) {
-   console.log('got', req.method.blue, 'request with body', req.body);
+   console.log('got', req.method.blue, 
+                  'request for url', 'stream/tenSlowNumbers.js'.yellow,
+                  'with body', req.body);   
 
    if (req.method == 'POST') {
 
       echoBackBody(req, res);
 
    } else {
-      var JSON_MIME_TYPE = "application/octet-stream";
-      res.setHeader("Content-Type", JSON_MIME_TYPE);
-      res.writeHead(200);   
-   
-      replyWithTenSlowNumbers(res);
+      sendJsonHeaders(res);      
+      replyWithTenSlowNumbers(res);      
    }
 
 }
