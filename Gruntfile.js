@@ -83,7 +83,13 @@ module.exports = function (grunt) {
             configFile: 'test/concat.conf.js',
             singleRun: 'true',
             browsers: ['Chrome', 'Firefox']      
-         }         
+         }
+         
+      ,  'single-minified': {
+            configFile: 'test/min.conf.js',
+            singleRun: 'true',
+            browsers: ['Chrome', 'Firefox']      
+         }                  
 
       }
       
@@ -123,7 +129,8 @@ module.exports = function (grunt) {
                                           'wrap:export', 
                                           'uglify',
                                           'copy:dist',
-                                          'karma:single-concat'                                          
+                                          'karma:single-concat',                                         
+                                          'karma:single-minified'                                          
                                       //  micro isn't working: 
                                       //  'micro:oboe_min'
                                       ]);
