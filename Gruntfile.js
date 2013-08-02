@@ -107,7 +107,7 @@ module.exports = function (grunt) {
 
    grunt.registerTask('start-stream-source', function () {
    
-      require('./test/streamsource/streamsource.js').startServer(grunt);
+      require('./test/streamsource.js').startServer(grunt);
    
    });
 
