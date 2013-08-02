@@ -47,14 +47,14 @@ module.exports = function (grunt) {
          }
       }
       
-   ,  jstestdriver: {
-
-         options:{
-            verbose:true
+   ,  karma: {
+         single: {
+            configFile: 'test/unit.conf.js',
+            singleRun: 'true',
+            browsers: ['Chrome', 'Firefox']
          }
-      ,  files:{src:['test/jsTestDriver-dev.conf']}  
       }      
-
+      
    });
 
    grunt.loadNpmTasks('grunt-contrib-concat');
@@ -62,9 +62,7 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-contrib-uglify');   
    grunt.loadNpmTasks('grunt-karma');   
 
-   grunt.registerTask('devtest', ['jstestdriver']);
-   grunt.registerTask('build', ['concat:oboe']);
-   grunt.registerTask('minify', ['uglify']);   
-   grunt.registerTask('default', ['concat:oboe', 'wrap:export', 'uglify']);
+   grunt.registerTask('test',    ['karma:single']);
+   grunt.registerTask('default', ['karma:single', 'concat:oboe', 'wrap:export', 'uglify']);
 
 };
