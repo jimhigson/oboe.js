@@ -8,6 +8,7 @@
 
 var PORT = 4567;
 
+require('color');
 
 function startServer( grunt ) {
 
@@ -116,7 +117,7 @@ function startServer( grunt ) {
 
 
    require('http').createServer().on('request', answerRequest).listen(PORT);
-   grunt.log.writeln('slow number server started on port'.green, String(PORT).blue);
+   grunt.log.writeln('strea,omg server started on port', String(PORT).blue);
 }
 
 module.exports.startServer = startServer;
