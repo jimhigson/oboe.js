@@ -19,7 +19,7 @@
             // in practice, since we're running on an internal network and this is a small file,
             // we'll probably only get one callback         
             streamingXhr(
-               'GET', '/test/test/json/smallestPossible.json',
+               'GET', '/static/json/smallestPossible.json',
                null, // this is a get: no data to send               
                 
                callbacks.add(function(nextDrip){
@@ -41,7 +41,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               'GET', '/test/test/json/twentyThousandRecords.json',
+               'GET', '/static/json/twentyThousandRecords.json',
                null, // this is a get: no data to send                
                 
                function(nextDrip){            
@@ -146,7 +146,7 @@
 
             // since this is a large file, even serving locally we're going to get multiple callbacks:       
             streamingXhr(
-               'GET', '/test/test/json/twentyThousandRecords.json',
+               'GET', '/static/json/twentyThousandRecords.json',
                null, // this is a get: no data to send               
                 
                function(nextDrip){            

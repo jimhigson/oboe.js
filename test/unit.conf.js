@@ -34,7 +34,7 @@ exclude = [
    // temporarily exclude tests that need to ajax things in:   
    'test/cases/endToEndIntegrationTest.js'
 ,  'test/cases/streamingXhrTests.js'
-,  'test/cases/streamingXhrIntegrationTest.js'
+//,  'test/cases/streamingXhrIntegrationTest.js'
   
 ];
 
@@ -73,7 +73,7 @@ autoWatch = true;
 // - Safari (only Mac)
 // - PhantomJS
 // - IE (only Windows)
-browsers = [];
+browsers = ['Chrome'];
 
 
 // If browser does not capture in given timeout [ms], kill it
@@ -83,3 +83,8 @@ captureTimeout = 60000;
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
 singleRun = true;
+
+proxies = {
+   '/stream'      : 'http://localhost:4567/stream',
+   '/static/json' : 'http://localhost:4567/static/json'   
+};
