@@ -1,6 +1,16 @@
 module.exports = function (grunt) {
 
-   var SOURCE_FILES = [
+   // TODO: move files list to own file
+
+   var TEST_LIBS = [
+      'node_modules/karma-jstd-adapter/jstd-adapter.js'   
+   ,  'test/libs/sinon.js'
+   ,  'test/libs/sinon-ie.js'
+   ,  'test/libs/*.js'   
+   ];
+
+   // NB: source files are order sensitive
+   var OBOE_SOURCE_FILES = [
       'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
@@ -15,6 +25,19 @@ module.exports = function (grunt) {
    ,  'src/controller.js'
    ,  'src/browser-api.js'
    ];
+   
+   var UNIT_TEST_CASES = [
+      'test/cases/*.js'
+   ];
+   
+  
+   function allOf( /* file lists */ ) {
+      var args = Array.prototype.slice.apply(arguments);
+      
+      return args.reduce(function(soFar, listFromArgments){
+         return soFar.concat(listFromArgments);
+      }, []);
+   }
 
    grunt.initConfig({
 
@@ -22,7 +45,7 @@ module.exports = function (grunt) {
       
    ,  concat: {
          oboe:{         
-            src: SOURCE_FILES,
+            src: OBOE_SOURCE_FILES,
             dest: 'build/oboe.concat.js'
          }
       }
@@ -56,9 +79,16 @@ module.exports = function (grunt) {
             browsers: ['Chrome', 'Firefox']
          }
          
+      ,  concat: {
+            configFile: 'test/unit.conf.js',
+            singleRun: 'true',
+            browsers: ['Chrome', 'Firefox']      
+         }         
+         
+         
       }
       
-      ,copy: {
+   ,  copy: {
          dist: {
             files: [
                {src: ['build/oboe.min.js'], dest: 'dist/oboe.min.js'}
@@ -75,9 +105,17 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-karma');
    grunt.loadNpmTasks('grunt-contrib-copy');      
 
+   grunt.registerTask('start-stream-source', function () {
+   
+      require('./test/streamsource/streamsource.js').startServer(grunt);
+   
+   });
+
    grunt.registerTask('test',         ['karma:single']);
    grunt.registerTask('checksize',    ['micro:oboe_min']);
-   grunt.registerTask('default',      [   'karma:single', 
+   grunt.registerTask('default',      [   
+                                          'start-stream-source',
+                                          'karma:single', 
                                           'concat:oboe', 
                                           'wrap:export', 
                                           'uglify',
