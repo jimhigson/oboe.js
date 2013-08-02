@@ -30,6 +30,24 @@ background.
 However, with Node don't have to reengineer to move from client to
 server.
 
+Where the delays are in a web application
+-----------------------------------------
+
+Even complex apps are not finding a bottleneck in javascript execution
+times.
+
+-   DOM manipulation
+-   rendering
+-   most significant: waiting for stuff
+
+> The user does something, then the app responds visually with immediacy
+> at 30 frames per second or more, and completes a task in a few hundred
+> milliseconds. As long as an app meets this user goal, it doesn’t
+> matter how big an abstraction layer it has to go through to get to
+> silicon.
+
+http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
+
 SOA
 ---
 
@@ -419,3 +437,7 @@ started because engineers working on the Angular project in Google were
 slightly. Describe what was once its main mode of operation as now being
 for stress testing of jstd itself only. Problems: browsers become
 unresponsive. Generally unreliable, has to be restarted frequently.
+
+JSTD, as a Java program, is difficult to start via Grunt. Also an issue
+that Grunt post-dates Karma by enough that JSTD doesn't have the
+attention of the Grunt community.
