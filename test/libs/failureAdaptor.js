@@ -9,13 +9,13 @@
  
    var oldFail = fail;
  
-   fail = function(msg){
+   fail = function(){
    
-      if( msg ) {
-         console.log('FAIL: ' + msg);
+      if( arguments.length ) {
+         console.log.apply(console, arguments);
       }
    
-      oldFail.call(this, msg);
+      oldFail.call(this, arguments);
    };
    
 })();   
