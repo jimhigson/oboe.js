@@ -18,7 +18,7 @@ function startServer( grunt ) {
    
       req.on('readable', function () {
          var reqBody = req.read().toString();
-         grunt.verbose.ok('echoing back' + reqBody.blue);
+         grunt.verbose.ok('echoing back ' + reqBody.blue);
          res.write(reqBody);
       });
    
@@ -35,7 +35,7 @@ function startServer( grunt ) {
       var NUMBER_INTERVAL = 250;
       var MAX_NUMBER = 9;
       
-      grunt.verbose.ok('slow number server: will write numbers 0 ..' + String(MAX_NUMBER) + ' out as a json array at a rate of one per', String(NUMBER_INTERVAL) + 'ms');
+      grunt.verbose.ok('slow number server: will write numbers 0 ..' + String(MAX_NUMBER).blue + ' out as a json array at a rate of one per', String(NUMBER_INTERVAL).blue + 'ms');
    
       res.write('[\n');
    
@@ -64,17 +64,17 @@ function startServer( grunt ) {
       
       var filename = req.url.replace('/static', 'test');
       
-      grunt.verbose.ok('will respond with contents of file ' + filename);
+      grunt.verbose.ok('will respond with contents of file ' + filename.blue);
       
       require('fs').readFile(filename, 'utf8', function (err,data) {
          if (err) {
-            grunt.log.error('could not read static file ' + filename);
+            grunt.log.error('could not read static file ' + filename.red);
             return;
          }
          
          res.end(data);
          
-         grunt.verbose.ok('read file' + filename);
+         grunt.verbose.ok('read file ' + filename.blue);
       });   
    }
    
@@ -86,8 +86,8 @@ function startServer( grunt ) {
    
    function answerRequest(req, res) {
    
-      grunt.verbose.ok('got' + req.method + 'request for url' + req.url + 
-                           (req.body? 'with body' + req.body : '')
+      grunt.verbose.ok('got ' + req.method.blue + ' request for url ' + req.url.blue + 
+                           (req.body? ' with body ' + req.body : '')
       );   
    
       var urlMappings = {
@@ -101,13 +101,13 @@ function startServer( grunt ) {
       for( var i in urlMappings ) {
          if( req.url.indexOf(i) == 0 ) {      
             responder = urlMappings[i];
-            grunt.verbose.ok( 'url starts with ' + i + ' so will reply using ' + responder.name);
+            grunt.verbose.ok( 'url starts with ' + i.blue + ' so will reply using ' + responder.name.blue);
             break;
          }
       }
       
       if( !responder ) {
-         grunt.log.error("no mapping for url " + req.url);
+         grunt.log.error("no mapping for url " + req.url.red);
          return;
       }
        
