@@ -6,6 +6,27 @@
 
 var streamingStub;
 
+function streamingXhrShouldHaveBeenGiven(/* arguments */) {
+
+   var expected = Array.prototype.slice.apply(arguments);
+
+   function alwaysCalledWith( expectedArgs ){
+   
+      return streamingStub.alwaysCalledWithMatch.apply( streamingStub, expectedArgs );    
+   }
+
+
+   if( !alwaysCalledWith(expected) ) {
+   
+      fail( 'arguments given to streamingXhr not as expected. Wanted:',
+            JSON.stringify( expected ),
+            'but have calls:',
+            JSON.stringify(streamingStub.args)
+      );
+   }   
+
+}
+
 TestCase("oboeTestHttp", {
 
    setUp: function() {
@@ -15,20 +36,20 @@ TestCase("oboeTestHttp", {
    tearDown: function() {
       streamingStub.restore();   
    },
-        
+              
    // GET
    testGetViaShortcut:function(){   
       var doneCallback = sinon.stub();
    
       oboe.doGet('http://example.com/oboez', doneCallback);
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven(
          'GET',
          'http://example.com/oboez',
          undefined,
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    },
       
    testGetViaOptionsObject:function(){   
@@ -36,13 +57,13 @@ TestCase("oboeTestHttp", {
    
       oboe.doGet({url: 'http://example.com/oboez', success: doneCallback});
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven(
          'GET',
          'http://example.com/oboez',
          undefined,
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    },   
    
    // DELETE
@@ -50,14 +71,14 @@ TestCase("oboeTestHttp", {
       var doneCallback = sinon.stub();
    
       oboe.doDelete('http://example.com/oboez', doneCallback);
-      
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+    
+      streamingXhrShouldHaveBeenGiven(
          'DELETE',
          'http://example.com/oboez',
          undefined,
          sinon.match.func,
          sinon.match.func
-      ));   
+      );
    },
      
          
@@ -67,13 +88,13 @@ TestCase("oboeTestHttp", {
    
       oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven(
          'POST',
          'http://example.com/oboez',
          'my_data',
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    },
    
    testCanPostAnObject:function(){
@@ -81,13 +102,13 @@ TestCase("oboeTestHttp", {
    
       oboe.doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven( 
          'POST',
          'http://example.com/oboez',
          [1,2,3,4,5],
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    },   
    
    testPostViaOptionsObject:function(){   
@@ -95,13 +116,13 @@ TestCase("oboeTestHttp", {
    
       oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: doneCallback});
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven( 
          'POST',
          'http://example.com/oboez',
          'my_data',
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    },   
    
    // PUT
@@ -111,13 +132,13 @@ TestCase("oboeTestHttp", {
    
       oboe.doPut('http://example.com/oboez', 'my_data', doneCallback);
       
-      assertTrue( streamingStub.alwaysCalledWithMatch(
+      streamingXhrShouldHaveBeenGiven( 
          'PUT',
          'http://example.com/oboez',
          'my_data',
          sinon.match.func,
          sinon.match.func
-      ));   
+      );   
    }
             
       
