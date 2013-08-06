@@ -15,7 +15,6 @@ function streamingXhrShouldHaveBeenGiven(/* arguments */) {
       return streamingStub.alwaysCalledWithMatch.apply( streamingStub, expectedArgs );    
    }
 
-
    if( !alwaysCalledWith(expected) ) {
    
       fail( 'arguments given to streamingXhr not as expected. Wanted:',
@@ -24,7 +23,6 @@ function streamingXhrShouldHaveBeenGiven(/* arguments */) {
             JSON.stringify(streamingStub.args)
       );
    }   
-
 }
 
 TestCase("oboeTestHttp", {
