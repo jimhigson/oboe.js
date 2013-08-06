@@ -75,7 +75,7 @@ TestCase("browserApiTest", {
    },
               
    // GET
-   testGetViaShortcut:function(){   
+   testGet:function(){   
       var doneCallback = sinon.stub();
    
       oboe.doGet('http://example.com/oboez', doneCallback);
