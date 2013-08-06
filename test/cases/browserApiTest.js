@@ -55,10 +55,11 @@ function streamingXhrShouldHaveBeenGiven(/* arguments */) {
 
    if( !alwaysCalledWith(expected) ) {
    
-      fail( 'arguments given to streamingXhr not as expected. Wanted:',
-            anyToString(expected),
-            'but have (first recorded) call:',
-            anyToString(streamingStub.args[0])
+      fail( 
+         'arguments given to streamingXhr not as expected. Wanted:'
+      ,     anyToString(expected)
+      ,  'but have (first recorded) call:'
+      ,     anyToString(streamingStub.args[0])
       );
    }   
 }
