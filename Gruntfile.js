@@ -51,7 +51,7 @@ module.exports = function (grunt) {
       }
       
    ,  wrap: {
-         export: {
+         browserPackage: {
             src: 'build/oboe.concat.js',
             dest: '.',
             wrapper: [
@@ -150,7 +150,7 @@ module.exports = function (grunt) {
                                           'start-stream-source',
                                           'karma:single-dev', 
                                           'concat:oboe', 
-                                          'wrap:export', 
+                                          'wrap:browserPackage', 
                                           'uglify',
                                           'copy:dist',
                                           'karma:single-concat',                                         
