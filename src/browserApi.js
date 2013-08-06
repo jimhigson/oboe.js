@@ -22,11 +22,6 @@
              url, body, doneCallback;
 
          if (isString(firstArg)) {
-            /*console.log( 'apiMethod called', 
-                           anyToString(arguments), 
-                           bodyArgumentIndex, 
-                           arguments[-1] 
-            );*/
          
             // parameters specified as arguments
             //
