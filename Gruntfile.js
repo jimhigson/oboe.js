@@ -101,6 +101,16 @@ module.exports = function (grunt) {
          }
       }      
       
+   ,  exec:{
+         // these might not go too well on Windows :-) - get Cygwin.
+         reportMinifiedSize:{
+            command: "echo Minified size is `wc -c < dist/oboe.min.js` bytes" 
+         },
+         reportMinifiedAndGzippedSize:{
+            command: "echo Size after gzip is `gzip --stdout dist/oboe.min.js | wc -c` bytes"
+         }
+      }     
+      
    });
 
    grunt.loadNpmTasks('grunt-contrib-concat');
@@ -109,6 +119,7 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-karma');
    grunt.loadNpmTasks('grunt-contrib-copy');      
    grunt.loadNpmTasks('grunt-clear');      
+   grunt.loadNpmTasks('grunt-exec');
 
    grunt.registerTask('start-stream-source', function () {
    
@@ -117,6 +128,11 @@ module.exports = function (grunt) {
    });
 
    //grunt.registerTask('checksize',    ['micro:oboe_min']);
+
+   grunt.registerTask('dist-sizes',   [
+                                          'exec:reportMinifiedSize',
+                                          'exec:reportMinifiedAndGzippedSize'
+                                      ]);
 
    grunt.registerTask('dev-test',     [
                                           'clear',
@@ -132,7 +148,8 @@ module.exports = function (grunt) {
                                           'uglify',
                                           'copy:dist',
                                           'karma:single-concat',                                         
-                                          'karma:single-minified'                                          
+                                          'karma:single-minified',
+                                          'dist-sizes'                                          
                                       //  micro isn't working: 
                                       //  'micro:oboe_min'
                                       ]);
