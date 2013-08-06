@@ -78,8 +78,8 @@ module.exports = function (grunt) {
          options:{            
             singleRun: 'true',
             proxies: {
-               '/stream'      : 'http://localhost:4567/stream',
-               '/static/json' : 'http://localhost:4567/static/json'   
+               '/stream'      : 'http://localhost:' + STREAM_SOURCE_PORT + '/stream',
+               '/static/json' : 'http://localhost:' + STREAM_SOURCE_PORT + '/static/json'   
             }         
          }
       ,
