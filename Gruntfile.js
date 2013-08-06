@@ -139,13 +139,10 @@ module.exports = function (grunt) {
    
    });
 
-   //grunt.registerTask('checksize',    ['micro:oboe_min']);
-
    grunt.registerTask('dist-sizes',   [
                                           'exec:reportMinifiedSize',
                                           'exec:reportMinifiedAndGzippedSize'
                                       ]);
-
    grunt.registerTask('dev-test',     [
                                           'clear',
                                           'start-stream-source',         
@@ -162,8 +159,6 @@ module.exports = function (grunt) {
                                           'karma:single-concat',                                         
                                           'karma:single-minified',
                                           'dist-sizes'                                          
-                                      //  micro isn't working: 
-                                      //  'micro:oboe_min'
                                       ]);
 
 };
