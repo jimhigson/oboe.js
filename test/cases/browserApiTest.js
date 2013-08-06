@@ -141,8 +141,7 @@ TestCase("browserApiTest", {
       );   
    },   
    
-   // PUT
-   
+   // PUT   
    testPut:function(){
       var doneCallback = sinon.stub();
    
