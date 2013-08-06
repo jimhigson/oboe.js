@@ -84,8 +84,9 @@ function startServer( grunt, port ) {
    
    function answerRequest(req, res) {
    
-      grunt.verbose.ok('got ' + req.method.blue + ' request for url ' + req.url.blue + 
-                           (req.body? ' with body ' + req.body : '')
+      grunt.verbose.ok(
+         'got ' + req.method.blue + ' request for url ' + req.url.blue + 
+            (req.body? ' with body ' + req.body : '')
       );   
    
       var urlMappings = {
@@ -114,7 +115,10 @@ function startServer( grunt, port ) {
    }
 
 
-   require('http').createServer().on('request', answerRequest).listen(port);
+   require('http')
+      .createServer(answerRequest)
+      .listen(port);
+      
    grunt.log.writeln('streaming server started on port'.green, String(port).blue);
 }
 
