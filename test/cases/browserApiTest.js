@@ -2,6 +2,9 @@
 /*
    Tests that calling .doGet(), .doPost(), .doPut(), .doDelete() pass through to streamingXhr
    correctly. streamingXhr is a stub so no actual calls are made. 
+   
+   Technically this tests some of controller.js as well as browserApi.js but the tests were
+   written before the logic was split into two.
  */
 
 var streamingStub;
