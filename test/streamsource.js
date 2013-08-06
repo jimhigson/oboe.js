@@ -6,11 +6,9 @@
  *    You can start this server up and visit it in a browser to see the numbers stream in.
  */
 
-var PORT = 4567;
-
 require('color');
 
-function startServer( grunt ) {
+function startServer( grunt, port ) {
 
    function echoBackBody(req, res) {
    
@@ -116,8 +114,8 @@ function startServer( grunt ) {
    }
 
 
-   require('http').createServer().on('request', answerRequest).listen(PORT);
-   grunt.log.writeln('streaming server started on port'.green, String(PORT).blue);
+   require('http').createServer().on('request', answerRequest).listen(port);
+   grunt.log.writeln('streaming server started on port'.green, String(port).blue);
 }
 
 module.exports.startServer = startServer;

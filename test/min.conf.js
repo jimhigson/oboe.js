@@ -44,9 +44,3 @@ captureTimeout = 60000;
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
 singleRun = true;
-
-proxies = {
-   '/stream'      : 'http://localhost:4567/stream',
-   '/static/json' : 'http://localhost:4567/static/json'   
-};
-
