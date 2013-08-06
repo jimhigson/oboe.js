@@ -30,6 +30,7 @@
     "karma-jstd-adapter": "0.0.1",
     "grunt-karma": "~0.4.5",
     "grunt-micro": "~0.1.0",
-    "grunt-contrib-copy": "~0.4.1"
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-clear": "~0.2.1"
   }
 }

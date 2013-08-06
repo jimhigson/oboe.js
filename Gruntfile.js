@@ -108,6 +108,7 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-contrib-uglify');   
    grunt.loadNpmTasks('grunt-karma');
    grunt.loadNpmTasks('grunt-contrib-copy');      
+   grunt.loadNpmTasks('grunt-clear');      
 
    grunt.registerTask('start-stream-source', function () {
    
@@ -118,10 +119,12 @@ module.exports = function (grunt) {
    //grunt.registerTask('checksize',    ['micro:oboe_min']);
 
    grunt.registerTask('dev-test',     [
+                                          'clear',
                                           'start-stream-source',         
                                           'karma:single-dev'
                                       ]);
-   grunt.registerTask('default',      [   
+   grunt.registerTask('default',      [
+                                          'clear',   
                                           'start-stream-source',
                                           'karma:single-dev', 
                                           'concat:oboe', 
