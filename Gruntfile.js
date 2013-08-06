@@ -1,5 +1,7 @@
 module.exports = function (grunt) {
 
+   var STREAM_SOURCE_PORT = 4567;
+
    // TODO: move files list to own file
 
    var TEST_LIBS = [
@@ -74,7 +76,11 @@ module.exports = function (grunt) {
       
    ,  karma: {
          options:{            
-            singleRun: 'true'         
+            singleRun: 'true',
+            proxies: {
+               '/stream'      : 'http://localhost:4567/stream',
+               '/static/json' : 'http://localhost:4567/static/json'   
+            }         
          }
       ,
          'precaptured-dev': {                     
@@ -128,8 +134,8 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-exec');
 
    grunt.registerTask('start-stream-source', function () {
-   
-      require('./test/streamsource.js').startServer(grunt);
+
+      require('./test/streamsource.js').startServer(grunt, STREAM_SOURCE_PORT);
    
    });
 
