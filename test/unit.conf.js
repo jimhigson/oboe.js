@@ -7,6 +7,7 @@ basePath = '..';
 // list of files / patterns to load in the browser
 files = [
    'node_modules/karma-jstd-adapter/jstd-adapter.js'
+,  'test/libs/failureAdaptor.js'
   
 ,  'src/functional.js'
 ,  'src/util.js'
