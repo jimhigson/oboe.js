@@ -74,22 +74,20 @@ module.exports = function (grunt) {
       
    ,  karma: {
          options:{
-            browsers: ['Chrome', 'Firefox', 'Safari']         
+            browsers: ['Chrome', 'Firefox', 'Safari'],
+            singleRun: 'true'         
          },
    
          'single-dev': {
-            configFile: 'test/unit.conf.js',
-            singleRun: 'true'
+            configFile: 'test/unit.conf.js'
          }
          
       ,  'single-concat': {
-            configFile: 'test/concat.conf.js',
-            singleRun: 'true'      
+            configFile: 'test/concat.conf.js'      
          }
          
       ,  'single-minified': {
-            configFile: 'test/min.conf.js',
-            singleRun: 'true'      
+            configFile: 'test/min.conf.js'
          }                  
 
       }
