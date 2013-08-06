@@ -140,25 +140,27 @@ module.exports = function (grunt) {
    });
 
    grunt.registerTask('dist-sizes',   [
-                                          'exec:reportMinifiedSize',
-                                          'exec:reportMinifiedAndGzippedSize'
-                                      ]);
+      'exec:reportMinifiedSize',
+      'exec:reportMinifiedAndGzippedSize'
+   ]);
+   
    grunt.registerTask('dev-test',     [
-                                          'clear',
-                                          'start-stream-source',         
-                                          'karma:precaptured-dev'
-                                      ]);
+      'clear',
+      'start-stream-source',         
+      'karma:precaptured-dev'
+   ]);
+   
    grunt.registerTask('default',      [
-                                          'clear',   
-                                          'start-stream-source',
-                                          'karma:single-dev', 
-                                          'concat:oboe', 
-                                          'wrap:browserPackage', 
-                                          'uglify',
-                                          'copy:dist',
-                                          'karma:single-concat',                                         
-                                          'karma:single-minified',
-                                          'dist-sizes'                                          
-                                      ]);
+      'clear',   
+      'start-stream-source',
+      'karma:single-dev', 
+      'concat:oboe', 
+      'wrap:browserPackage', 
+      'uglify',
+      'copy:dist',
+      'karma:single-concat',                                         
+      'karma:single-minified',
+      'dist-sizes'                                          
+   ]);
 
 };
