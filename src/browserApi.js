@@ -15,36 +15,40 @@
          // wire everything up:
          var eventBus = pubSub(),
              clarinetParser = clarinet.parser(),
-             parsedContentSoFar = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-             controller = oboeController( eventBus, clarinetParser, parsedContentSoFar),      
-            
-         //  now work out what the arguments mean:   
-             url, body, doneCallback;
+             contentBuilder = incrementalContentBuilder(clarinetParser, eventBus.notify),             
+             controller = oboeController( eventBus, clarinetParser, contentBuilder),
 
+             /**
+              * create a shortcutted version of controller.start
+              */
+             start = controller.start.bind( controller, httpMethodName );
+             
          if (isString(firstArg)) {
          
             // parameters specified as arguments
             //
-            //  if mayHaveContext, signature is:
+            //  if (mayHaveContext == true) method signature is:
             //     .method( url, content, callback )
+            //
             //  else it is:
             //     .method( url, callback )            
             //                                
-            url = firstArg;
-            body = mayHaveRequestBody? arguments[1] : undefined;
-            doneCallback = arguments[mayHaveRequestBody? 2 : 1]
+            start(   firstArg,                                       // url
+                     mayHaveRequestBody? arguments[1] : undefined,   // body
+                     arguments[mayHaveRequestBody? 2 : 1] );         // callback
          } else {
-            // parameters specified as options object:
-            url = firstArg.url;
-            body = firstArg.body;
-            doneCallback = firstArg.complete;
+         
+            
+            // method signature is:
+            //    .method({url:u, body:b, doneCallback:c})
+            
+            start(   firstArg.url,
+                     firstArg.body,
+                     firstArg.complete );
          }
-
-         // start the request:
-         controller.start(httpMethodName, url, body, doneCallback);         
-                  
+                                           
          // return an api to control this oboe instance                   
-         return instanceApi(controller, eventBus, parsedContentSoFar)           
+         return instanceApi(controller, eventBus, contentBuilder)           
       };
    }   
 
