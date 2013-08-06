@@ -73,30 +73,36 @@ module.exports = function (grunt) {
       }
       
    ,  karma: {
-         options:{
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+         options:{            
             singleRun: 'true'         
-         },
-   
+         }
+      ,
+         'precaptured-dev': {                     
+            configFile: 'test/unit.conf.js',
+            singleRun: 'true'            
+         }
+      ,
          'single-dev': {
+            browsers: ['Chrome', 'Firefox', 'Safari'],
             configFile: 'test/unit.conf.js'
          }
-         
-      ,  'single-concat': {
+      ,
+         'single-concat': {
+            browsers: ['Chrome', 'Firefox', 'Safari'],
             configFile: 'test/concat.conf.js'      
-         }
-         
-      ,  'single-minified': {
+         }  
+      ,  
+         'single-minified': {
+            browsers: ['Chrome', 'Firefox', 'Safari'],
             configFile: 'test/min.conf.js'
-         }                  
-
+         }
       }
       
    ,  copy: {
          dist: {
             files: [
-               {src: ['build/oboe.min.js'], dest: 'dist/oboe.min.js'}
-            ,  {src: ['build/oboe.concat.js'], dest: 'dist/oboe.js'}
+               {src: ['build/oboe.min.js'],    dest: 'dist/oboe.min.js'}
+            ,  {src: ['build/oboe.concat.js'], dest: 'dist/oboe.js'    }
             ]
          }
       }      
@@ -137,7 +143,7 @@ module.exports = function (grunt) {
    grunt.registerTask('dev-test',     [
                                           'clear',
                                           'start-stream-source',         
-                                          'karma:single-dev'
+                                          'karma:precaptured-dev'
                                       ]);
    grunt.registerTask('default',      [
                                           'clear',   
