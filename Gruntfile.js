@@ -23,7 +23,7 @@ module.exports = function (grunt) {
    ,  'src/pubsub.js'
    ,  'src/instanceApi.js'
    ,  'src/controller.js'
-   ,  'src/browser-api.js'
+   ,  'src/browserApi.js'
    ];
    
    var UNIT_TEST_CASES = [

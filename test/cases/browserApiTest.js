@@ -25,7 +25,7 @@ function streamingXhrShouldHaveBeenGiven(/* arguments */) {
    }   
 }
 
-TestCase("oboeTestHttp", {
+TestCase("browserApiTest", {
 
    setUp: function() {
       streamingStub = sinon.stub(window, 'streamingXhr');      

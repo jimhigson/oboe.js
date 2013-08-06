@@ -23,7 +23,7 @@ files = [
 ,  'src/pubsub.js' 
 ,  'src/instanceApi.js' 
 ,  'src/controller.js'
-,  'src/browser-api.js'
+,  'src/browserApi.js'
   
 ,  'test/cases/*.js'
 ];
