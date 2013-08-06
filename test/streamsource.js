@@ -26,7 +26,6 @@ function startServer( grunt, port ) {
       });
    }
    
-   
    function replyWithTenSlowNumbers(_req, res) {
       sendJsonHeaders(res);
    
@@ -116,9 +115,7 @@ function startServer( grunt, port ) {
       }
        
       responder(req, res);
-   
    }
-
 
    require('http')
       .createServer(answerRequest)
