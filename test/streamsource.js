@@ -33,7 +33,12 @@ function startServer( grunt, port ) {
       var NUMBER_INTERVAL = 250;
       var MAX_NUMBER = 9;
       
-      grunt.verbose.ok('slow number server: will write numbers 0 ..' + String(MAX_NUMBER).blue + ' out as a json array at a rate of one per', String(NUMBER_INTERVAL).blue + 'ms');
+      grunt.verbose.ok(
+         'slow number server: will write numbers 0 ..' + 
+         String(MAX_NUMBER).blue + 
+         ' out as a json array at a rate of one per', 
+         String(NUMBER_INTERVAL).blue + 'ms'
+      );
    
       res.write('[\n');
    
