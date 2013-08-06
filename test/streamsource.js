@@ -54,9 +54,8 @@ function startServer( grunt, port ) {
             grunt.verbose.writeln('slow number server: finished writing out');
          } else {
             res.write(',\n');
-         }
-   
-         curNumber++;
+            curNumber++;
+         }  
    
       }, NUMBER_INTERVAL);
    }
