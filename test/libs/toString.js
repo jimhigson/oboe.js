@@ -1,3 +1,6 @@
+/**
+ * Write anything out as a string. For error messages when tests fail. 
+ */
 function anyToString(thing){
    
    if( thing === null ) {
