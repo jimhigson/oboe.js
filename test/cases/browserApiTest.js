@@ -117,6 +117,20 @@ TestCase("browserApiTest", {
          sinon.match.func
       );
    },
+   
+   testDeleteViaOptionsObject:function(){   
+      var doneCallback = sinon.stub();
+   
+      oboe.doDelete({url: 'http://example.com/oboez', success: doneCallback});
+      
+      streamingXhrShouldHaveBeenGiven(
+         'DELETE',
+         'http://example.com/oboez',
+         undefined,
+         sinon.match.func,
+         sinon.match.func
+      );   
+   },   
      
          
    // POST
