@@ -11,7 +11,7 @@ files = [
 ,  'test/libs/sinon-ie.js'
 ,  'test/libs/*.js'
 ,  'dist/oboe.js'
-,  'test/cases/polyfillsTest.js'
+,  'test/cases/polyfillsTest.spec.js'
    // NB: this won't be run yet because it is excluded:
 ,  'test/cases/endToEndIntegrationTest.js'
 ];

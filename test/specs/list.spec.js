@@ -1,18 +1,6 @@
 
 describe("Lists", function(){
-
-   function assertEquals(expected, actual) {
-      expect(actual).toEqual(expected);
-   }
-   
-   function assertTrue(actual) {
-      expect(actual).toBe(true);
-   }
-   
-   function assertFalse(actual) {
-      expect(actual).toBe(false);
-   }   
-
+  
    it("can use cons, head and tail", function() {
       var emptyList = emptyList;
       
