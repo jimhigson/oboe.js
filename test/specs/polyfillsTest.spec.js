@@ -5,72 +5,79 @@
 
 describe("polyfills", function(){
 
-   it("can filter and return a subset", function() {
-      givenTheArray([1,2,3,4,5,6,7,8,9])
-         .whenFilteringBy(odd)
-         .then([1,3,5,7,9])
-   });
+   describe('filter', function(){
    
-   it("can filter and return no items", function() {
-      givenTheArray([1,2,3,4,5,6,7,8,9])
-         .whenFilteringBy(never)
-         .then([])
-   });
-
-   it("can filter and return all items", function() {
-      givenTheArray([1,2,3,4,5,6,7,8,9])
-         .whenFilteringBy(always)
-         .then([1,2,3,4,5,6,7,8,9])
+      it("can return a subset", function() {
+         givenTheArray([1,2,3,4,5,6,7,8,9])
+            .whenFilteringBy(odd)
+            .then([1,3,5,7,9])
+      });
+      
+      it("can return no items", function() {
+         givenTheArray([1,2,3,4,5,6,7,8,9])
+            .whenFilteringBy(never)
+            .then([])
+      });
+   
+      it("can return all items", function() {
+         givenTheArray([1,2,3,4,5,6,7,8,9])
+            .whenFilteringBy(always)
+            .then([1,2,3,4,5,6,7,8,9])
+      });
    });
   
-   it("can bind so that the original function is called", function() {
-      var callCount = 0;
+   describe("bind", function(){
+      it("calls the original function", function() {
+         var callCount = 0;
+         
+         var bound = (function(){ 
+            callCount++; 
+         }).bind({});
+         
+         bound();
+         
+         assertEquals(1, callCount);   
+      });
       
-      var bound = (function(){ 
-         callCount++; 
-      }).bind({});
+      it("uses the given context", function() {
+         var bound = (function(){ 
+            assertEquals('a', this) 
+         }).bind('a');
+         
+         bound();   
+      });
       
-      bound();
-      
-      assertEquals(1, callCount);   
-   });
-   
-   it("can bind so that the given context is used", function() {
-      var bound = (function(){ 
-         assertEquals('a', this) 
-      }).bind('a');
-      
-      bound();   
+      it("propagates call-time arguments", function() {
+         
+         var bound = (function(arg1, arg2){ 
+            assertEquals('b', arg1 ); 
+            assertEquals('c', arg2 ); 
+         }).bind('a');
+         
+         bound('b', 'c'); 
+      });      
    });          
       
-   it("propagates call-time arguments to bound functions", function() {
+   describe("foreach", function(){
+      it("calls the correct number of times", function() {
+         
+         var func = sinon.spy();
+         
+         [1,2,3].forEach(func);
+         
+         assertEquals(3, func.callCount); 
+      });
       
-      var bound = (function(arg1, arg2){ 
-         assertEquals('b', arg1 ); 
-         assertEquals('c', arg2 ); 
-      }).bind('a');
-      
-      bound('b', 'c'); 
-   });
-
-   it("polyfills foreach to call the correct number of times", function() {
-      
-      var func = sinon.spy();
-      
-      [1,2,3].forEach(func);
-      
-      assertEquals(3, func.callCount); 
-   });
-   
-   it("polyfills foreach to call with every item from the array", function() {
-      
-      var func = sinon.spy();
-      
-      [1,2,3].forEach(func);
-      
-      assertTrue(func.calledWith(1)); 
-      assertTrue(func.calledWith(2)); 
-      assertTrue(func.calledWith(3)); 
+      it("calls with every item from the array", function() {
+         
+         var func = sinon.spy();
+         
+         [1,2,3].forEach(func);
+         
+         assertTrue(func.calledWith(1)); 
+         assertTrue(func.calledWith(2)); 
+         assertTrue(func.calledWith(3)); 
+      });
    });
    
    it("polyfills map correctly", function() {
