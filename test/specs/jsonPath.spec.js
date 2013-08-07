@@ -1,11 +1,12 @@
-(function(){
 
-   TestCase("jsonPathTest", {
+describe('jsonPath', function(){
+
+   it("can compile a basic pattern without crashing", function(){
+      givenAPattern('!');
+   });
    
-      testCanCompileBasicPatternWithoutCrashing: function() {
-         givenAPattern('!');
-      }   
-   
+   /*{   
+     
    ,  testMatchesRoot: function() {
          givenAPattern('!')
             .thenShouldMatch(       [])
@@ -355,9 +356,9 @@
                    [         '0'           ], 
                    [rootJson, rootJson[0]  ]);
                    
-      }      
-
-   });
+      }
+   }   
+   */   
    
    function givenAPattern( pattern ) {
    
@@ -452,6 +453,8 @@
       assertEquals(node, nodeOf(this._lastResult));
       
       return this;
-   };      
+   };
+   
+   });   
 
-})();
+
