@@ -97,19 +97,17 @@ describe('jsonPath', function(){
          expect('').toMatchPath( ['a','b']  );
       });      
       
-      
+      it('should match !..* against anything but the root', function() {
+         
+         expect('!..*').not.toMatchPath(  []        );
+         expect('!..*').toMatchPath(      ['a']     );
+         expect('!..*').toMatchPath(      ['a','b'] );      
+      });
    }); 
    
    /*{   
      
-                                  
-   ,  testMatchingForAllDescendantsOfRootMatchAnythingExceptTheRoot: function() {
-         givenAPattern('!..*')
-            .thenShouldNotMatch(    [])
-            .thenShouldMatch(       ['a'])
-            .thenShouldMatch(       ['a','b']);                                  
-      }
-      
+                                        
    ,  testMatchingForAllDescendantsOfAUniversallyMatchedRootMatchAnythingExceptTheRoot: function() {
          givenAPattern('*..*')
             .thenShouldNotMatch(    [])
