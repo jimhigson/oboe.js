@@ -7,15 +7,8 @@ module.exports = function(config) {
       basePath : '..',
       
       // list of files / patterns to load in the browser
-      files : [
-      
-         // jstd-adaptor needs Array.prototype.reduce etc.
-         // we need polyfills:
-      //,  'src/libs/polyfills.js'
-      
-      //,  'node_modules/karma-jstd-adapter/jstd-adapter.js'
-      //,  'test/libs/failureAdaptor.js'
-        
+      files : [           
+         'src/libs/polyfills.js'        
       ,  'src/functional.js'
       ,  'src/util.js'
       ,  'src/lists.js' 
@@ -32,7 +25,6 @@ module.exports = function(config) {
       ,  'src/controller.js'
       ,  'src/browserApi.js'
         
-      //,'test/cases/*.js'
       ,  'test/specs/*.spec.js'
       ],
       
@@ -40,6 +32,7 @@ module.exports = function(config) {
       // list of files to exclude
       exclude : [],
       
+      browsers: [],
       
       // test results reporter to use
       // possible values: 'dots', 'progress', 'junit'
