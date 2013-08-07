@@ -209,43 +209,43 @@ describe('jsonPath', function(){
          expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'bar', 'a'])
          expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])      
       });
-      
-   /*{   
-                  
 
+      describe('patterns specifying numeric path nodes', function() {
+         /*
+         ,  testNumericIndex: function() {
+                expect('!.a.2')
+                   .toMatchPath(       ['a', 2])      
+                   .toMatchPath(       ['a', '2'])      
+                   .not.toMatchPath(    [])            
+                   .not.toMatchPath(    ['a'])
+             }
+                        
+          ,  testNumericExpressedInArrayNotation: function() {
+                expect('!.a[2]')
+                   .toMatchPath(       ['a', 2])      
+                   .toMatchPath(       ['a', '2'])      
+                   .not.toMatchPath(    [])            
+                   .not.toMatchPath(    ['a'])
+             }
+             
+          ,  testArrayNotation: function() {
+                expect('!["a"][2]')
+                   .toMatchPath(       ['a', 2])      
+                   .toMatchPath(       ['a', '2'])      
+                   .not.toMatchPath(    [])            
+                   .not.toMatchPath(    ['a'])
+             }
+             
+          ,  testArrayNotationAtRoot: function() {
+                expect('![2]')
+                   .toMatchPath(       [2])      
+                   .toMatchPath(       ['2'])      
+                   .not.toMatchPath(    [])            
+                   .not.toMatchPath(    ['a'])
+             }*/      
+      });
       
-   ,  testNumericIndex: function() {
-         expect('!.a.2')
-            .toMatchPath(       ['a', 2])      
-            .toMatchPath(       ['a', '2'])      
-            .not.toMatchPath(    [])            
-            .not.toMatchPath(    ['a'])
-      }
-                 
-   ,  testNumericExpressedInArrayNotation: function() {
-         expect('!.a[2]')
-            .toMatchPath(       ['a', 2])      
-            .toMatchPath(       ['a', '2'])      
-            .not.toMatchPath(    [])            
-            .not.toMatchPath(    ['a'])
-      }
-      
-   ,  testArrayNotation: function() {
-         expect('!["a"][2]')
-            .toMatchPath(       ['a', 2])      
-            .toMatchPath(       ['a', '2'])      
-            .not.toMatchPath(    [])            
-            .not.toMatchPath(    ['a'])
-      }
-      
-   ,  testArrayNotationAtRoot: function() {
-         expect('![2]')
-            .toMatchPath(       [2])      
-            .toMatchPath(       ['2'])      
-            .not.toMatchPath(    [])            
-            .not.toMatchPath(    ['a'])
-      }
-      
+   /*{                                 
    ,  testArrayStarNotationAtRoot: function() {
          expect('![*]')
             .toMatchPath(       [2])      
