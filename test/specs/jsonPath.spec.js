@@ -84,25 +84,34 @@ describe('jsonPath', function(){
       });
       
       it('should match * universally', function() {
-         expect('*').toMatchPath( []         );
-         expect('*').toMatchPath( ['a']      );
-         expect('*').toMatchPath( ['a', 2]   );
-         expect('*').toMatchPath( ['a','b']  );
+         expect('*').toMatchPath(            []          );
+         expect('*').toMatchPath(            ['a']       );
+         expect('*').toMatchPath(            ['a', 2]    );
+         expect('*').toMatchPath(            ['a','b']   );
       });
       
       it('should match empty pattern universally', function() {
-         expect('').toMatchPath( []         );
-         expect('').toMatchPath( ['a']      );
-         expect('').toMatchPath( ['a', 2]   );
-         expect('').toMatchPath( ['a','b']  );
+         expect('').toMatchPath(             []          );
+         expect('').toMatchPath(             ['a']       );
+         expect('').toMatchPath(             ['a', 2]    );
+         expect('').toMatchPath(             ['a','b']   );
       });      
       
       it('should match !..* against anything but the root', function() {
          
-         expect('!..*').not.toMatchPath(  []        );
-         expect('!..*').toMatchPath(      ['a']     );
-         expect('!..*').toMatchPath(      ['a','b'] );      
+         expect('!..*').not.toMatchPath(     []          );
+         expect('!..*').toMatchPath(         ['a']       );
+         expect('!..*').toMatchPath(         ['a','b']   );      
       });
+      
+      it('should match *..* against anything except the root since it requires a decendant ' +
+          'which the root will never satisfy because it cannot have an ancestor', function() {
+          
+         expect('*..*').not.toMatchPath(     []          );
+         expect('*..*').toMatchPath(         ['a']       );
+         expect('*..*').toMatchPath(         ['a','b']   );
+
+      }); 
    }); 
    
    /*{   
@@ -110,164 +119,164 @@ describe('jsonPath', function(){
                                         
    ,  testMatchingForAllDescendantsOfAUniversallyMatchedRootMatchAnythingExceptTheRoot: function() {
          givenAPattern('*..*')
-            .thenShouldNotMatch(    [])
-            .thenShouldMatch(       ['a'])
-            .thenShouldMatch(       ['a','b']);                                  
+            .not.toMatchPath(    [])
+            .toMatchPath(       ['a'])
+            .toMatchPath(       ['a','b']);                                  
       }      
             
    ,  testMatchingNamedChildOfRootWorks: function() {
          givenAPattern('!.foo')
-            .thenShouldMatch(       ['foo'])      
-            .thenShouldNotMatch(    [])
-            .thenShouldNotMatch(    ['foo', 'bar'])
-            .thenShouldNotMatch(    ['bar'])
+            .toMatchPath(       ['foo'])      
+            .not.toMatchPath(    [])
+            .not.toMatchPath(    ['foo', 'bar'])
+            .not.toMatchPath(    ['bar'])
       }
       
    ,  testIsNotFooledBySubstringPatterns: function() {
          givenAPattern('!.foo')
-            .thenShouldNotMatch(    ['foot'])      
+            .not.toMatchPath(    ['foot'])      
       }      
       
    ,  testMatchingNamedAncestorOfRootWorks: function() {
          givenAPattern('!..foo')
-            .thenShouldNotMatch(    [])         
-            .thenShouldMatch(       ['foo'])      
-            .thenShouldMatch(       ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'a'])            
-            .thenShouldMatch(       ['a', 'foo', 'foo'])
-            .thenShouldMatch(       ['a', 'a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'foot'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
+            .not.toMatchPath(    [])         
+            .toMatchPath(       ['foo'])      
+            .toMatchPath(       ['a', 'foo'])
+            .not.toMatchPath(    ['a', 'foo', 'a'])            
+            .toMatchPath(       ['a', 'foo', 'foo'])
+            .toMatchPath(       ['a', 'a', 'foo'])
+            .not.toMatchPath(    ['a', 'a', 'foot'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo', 'a'])
       }
       
    ,  testAncestorOfRootRelationshipCanBeImplicit: function() {
          givenAPattern('..foo')
-             .thenShouldNotMatch(   [])         
-            .thenShouldMatch(       ['foo'])      
-            .thenShouldMatch(       ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'a'])            
-            .thenShouldMatch(       ['a', 'foo', 'foo'])
-            .thenShouldMatch(       ['a', 'a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'foot'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
+             .not.toMatchPath(   [])         
+            .toMatchPath(       ['foo'])      
+            .toMatchPath(       ['a', 'foo'])
+            .not.toMatchPath(    ['a', 'foo', 'a'])            
+            .toMatchPath(       ['a', 'foo', 'foo'])
+            .toMatchPath(       ['a', 'a', 'foo'])
+            .not.toMatchPath(    ['a', 'a', 'foot'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo', 'a'])
       }
       
    ,  testAncestorOfRootRelationshipCanBeEvenMoreImplicit: function() {
          givenAPattern('foo')
-             .thenShouldNotMatch(   [])         
-            .thenShouldMatch(       ['foo'])      
-            .thenShouldMatch(       ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'a'])            
-            .thenShouldMatch(       ['a', 'foo', 'foo'])
-            .thenShouldMatch(       ['a', 'a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'foot'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo', 'a'])
+             .not.toMatchPath(   [])         
+            .toMatchPath(       ['foo'])      
+            .toMatchPath(       ['a', 'foo'])
+            .not.toMatchPath(    ['a', 'foo', 'a'])            
+            .toMatchPath(       ['a', 'foo', 'foo'])
+            .toMatchPath(       ['a', 'a', 'foo'])
+            .not.toMatchPath(    ['a', 'a', 'foot'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo', 'a'])
       }            
       
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
          givenAPattern('!..foo.bar')
-             .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldMatch(       ['a', 'foo', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
+             .not.toMatchPath(   [])         
+            .not.toMatchPath(    ['foo'])      
+            .not.toMatchPath(    ['a', 'foo'])
+            .toMatchPath(       ['a', 'foo', 'bar'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo'])
+            .toMatchPath(       ['a', 'a', 'a', 'foo', 'bar'])
+            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
       }
       
    ,  testMatchingTwoNamedAncestorsOfImpliedRootWorks: function() {
          givenAPattern('foo.bar')
-             .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldMatch(       ['a', 'foo', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
+             .not.toMatchPath(   [])         
+            .not.toMatchPath(    ['foo'])      
+            .not.toMatchPath(    ['a', 'foo'])
+            .toMatchPath(       ['a', 'foo', 'bar'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo'])
+            .toMatchPath(       ['a', 'a', 'a', 'foo', 'bar'])
+            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
       }      
       
    ,  testMatchingTwoNamedAncestorsSeperatedByStar: function() {
          givenAPattern('!..foo.*.bar')
-             .thenShouldNotMatch(   [])         
-            .thenShouldNotMatch(    ['foo'])      
-            .thenShouldNotMatch(    ['a', 'foo'])
-            .thenShouldNotMatch(    ['a', 'foo', 'bar'])            
-            .thenShouldMatch(       ['a', 'foo', 'a', 'bar'])            
-            .thenShouldNotMatch(    ['a', 'foo', 'foo'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar'])
-            .thenShouldMatch(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
-            .thenShouldNotMatch(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
+             .not.toMatchPath(   [])         
+            .not.toMatchPath(    ['foo'])      
+            .not.toMatchPath(    ['a', 'foo'])
+            .not.toMatchPath(    ['a', 'foo', 'bar'])            
+            .toMatchPath(       ['a', 'foo', 'a', 'bar'])            
+            .not.toMatchPath(    ['a', 'foo', 'foo'])
+            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar'])
+            .toMatchPath(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
+            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
+            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
       }                  
       
    ,  testMatchingAnyNamedChildOfRootWorks: function() {
          givenAPattern('!.*')
-            .thenShouldMatch(       ['foo'])      
-            .thenShouldMatch(      ['bar'])            
-            .thenShouldNotMatch(    [])
-            .thenShouldNotMatch(    ['foo', 'bar'])
+            .toMatchPath(       ['foo'])      
+            .toMatchPath(      ['bar'])            
+            .not.toMatchPath(    [])
+            .not.toMatchPath(    ['foo', 'bar'])
       }
       
    ,  testMatchingSequenceOfNamesWorks: function() {
          givenAPattern('!.a.b')
-            .thenShouldMatch(       ['a', 'b'])      
-            .thenShouldNotMatch(    [])            
-            .thenShouldNotMatch(    ['a'])
+            .toMatchPath(       ['a', 'b'])      
+            .not.toMatchPath(    [])            
+            .not.toMatchPath(    ['a'])
       }
       
    ,  testNumericIndex: function() {
          givenAPattern('!.a.2')
-            .thenShouldMatch(       ['a', 2])      
-            .thenShouldMatch(       ['a', '2'])      
-            .thenShouldNotMatch(    [])            
-            .thenShouldNotMatch(    ['a'])
+            .toMatchPath(       ['a', 2])      
+            .toMatchPath(       ['a', '2'])      
+            .not.toMatchPath(    [])            
+            .not.toMatchPath(    ['a'])
       }
                  
    ,  testNumericExpressedInArrayNotation: function() {
          givenAPattern('!.a[2]')
-            .thenShouldMatch(       ['a', 2])      
-            .thenShouldMatch(       ['a', '2'])      
-            .thenShouldNotMatch(    [])            
-            .thenShouldNotMatch(    ['a'])
+            .toMatchPath(       ['a', 2])      
+            .toMatchPath(       ['a', '2'])      
+            .not.toMatchPath(    [])            
+            .not.toMatchPath(    ['a'])
       }
       
    ,  testArrayNotation: function() {
          givenAPattern('!["a"][2]')
-            .thenShouldMatch(       ['a', 2])      
-            .thenShouldMatch(       ['a', '2'])      
-            .thenShouldNotMatch(    [])            
-            .thenShouldNotMatch(    ['a'])
+            .toMatchPath(       ['a', 2])      
+            .toMatchPath(       ['a', '2'])      
+            .not.toMatchPath(    [])            
+            .not.toMatchPath(    ['a'])
       }
       
    ,  testArrayNotationAtRoot: function() {
          givenAPattern('![2]')
-            .thenShouldMatch(       [2])      
-            .thenShouldMatch(       ['2'])      
-            .thenShouldNotMatch(    [])            
-            .thenShouldNotMatch(    ['a'])
+            .toMatchPath(       [2])      
+            .toMatchPath(       ['2'])      
+            .not.toMatchPath(    [])            
+            .not.toMatchPath(    ['a'])
       }
       
    ,  testArrayStarNotationAtRoot: function() {
          givenAPattern('![*]')
-            .thenShouldMatch(       [2])      
-            .thenShouldMatch(       ['2'])      
-            .thenShouldMatch(       ['a'])            
-            .thenShouldNotMatch(    [])            
+            .toMatchPath(       [2])      
+            .toMatchPath(       ['2'])      
+            .toMatchPath(       ['a'])            
+            .not.toMatchPath(    [])            
       }            
       
    ,  testTrickyCase: function() {
          givenAPattern('!..foods..fr')
-            .thenShouldMatch(       ['foods', 2, 'name', 'fr']);      
+            .toMatchPath(       ['foods', 2, 'name', 'fr']);      
       }
       
    ,  testDoubleDotFollowedByStar: function() {      
          givenAPattern('!..*.bar')         
-             .thenShouldMatch(['anything', 'bar']);1
+             .toMatchPath(['anything', 'bar']);1
       }
       
    ,  testDoubleDotFollowedByArrayStyleStar: function() {      
          givenAPattern('!..[*].bar')         
-             .thenShouldMatch(['anything', 'bar']);1
+             .toMatchPath(['anything', 'bar']);1
       }                    
 
    // now several tests for css4-style pattern matching
@@ -275,7 +284,7 @@ describe('jsonPath', function(){
    ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
          // let's start with a counter-example without $ syntax   
          givenAPattern('foo.*')                     
-            .thenShouldMatch( 
+            .toMatchPath( 
                   [        'a',       'foo',     'a'], 
                   ['root', 'gparent', 'parent',  'target'])
                      .returning('target');
@@ -283,7 +292,7 @@ describe('jsonPath', function(){
    
    ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
          givenAPattern('$foo.*')                     
-            .thenShouldMatch( 
+            .toMatchPath( 
                   [        'a',      'foo',     'a'], 
                   ['root', 'parent', 'target',  'child'])
                      .returning('target');
@@ -291,7 +300,7 @@ describe('jsonPath', function(){
       
    ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
          givenAPattern('!..$foo..bar')                     
-            .thenShouldMatch( 
+            .toMatchPath( 
                   [        'p',      'foo',    'c',      'bar'], 
                   ['root', 'parent', 'target', 'child',  'gchild'])
                      .returning('target');            
@@ -299,7 +308,7 @@ describe('jsonPath', function(){
       
    ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
          givenAPattern('$!.*')                     
-            .thenShouldMatch( 
+            .toMatchPath( 
                   [        'a'    ], 
                   ['root', 'child'])
                      .returning('root');     
@@ -307,7 +316,7 @@ describe('jsonPath', function(){
       
    ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
          givenAPattern('$["foo"].bar')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [        'foo',    'bar'  ], 
                    ['root', 'target', 'child'])
                       .returning('target');
@@ -315,7 +324,7 @@ describe('jsonPath', function(){
       
    ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
          givenAPattern('$[2].bar')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [        '2',      'bar'  ], 
                    ['root', 'target', 'child'])
                       .returning('target');
@@ -323,7 +332,7 @@ describe('jsonPath', function(){
       
    ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
          givenAPattern('!..$*.bar')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
                       .returning('target');
@@ -331,7 +340,7 @@ describe('jsonPath', function(){
       
    ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
          givenAPattern('!..$[*].bar')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
                       .returning('target');
@@ -351,7 +360,7 @@ describe('jsonPath', function(){
                         };    
          
          givenAPattern('{name email}')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ])
                    
@@ -370,7 +379,7 @@ describe('jsonPath', function(){
                         };    
          
          givenAPattern('{people}.{jack}.{name email}')         
-             .thenShouldMatch( 
+             .toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ])
                    
@@ -389,7 +398,7 @@ describe('jsonPath', function(){
                         };    
          
          givenAPattern('{name email}')         
-             .thenShouldNotMatch( 
+             .not.toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ]);
       }
@@ -409,7 +418,7 @@ describe('jsonPath', function(){
                         };    
          
          givenAPattern('men.{name email}')         
-             .thenShouldNotMatch( 
+             .not.toMatchPath( 
                    [          'women',          'betty'                 ], 
                    [rootJson, rootJson.women,   rootJson.women.betty    ]);
       }
@@ -419,7 +428,7 @@ describe('jsonPath', function(){
          var rootJson = [ 1, 2, 3 ];    
          
          givenAPattern('{spin taste}')         
-             .thenShouldNotMatch( 
+             .not.toMatchPath( 
                    [         '0'           ], 
                    [rootJson, rootJson[0]  ]);
                    
