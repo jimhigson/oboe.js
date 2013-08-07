@@ -111,34 +111,31 @@ describe('jsonPath', function(){
          expect('*..*').toMatchPath(         ['a']       );
          expect('*..*').toMatchPath(         ['a','b']   );
 
+      });
+      
+      it('should match !.foo against foo node at first level only', function(){
+         
+         expect('!.foo').toMatchPath(        ['foo']     );      
+         expect('!.foo').not.toMatchPath(    []          );
+         expect('!.foo').not.toMatchPath(    ['foo', 'bar']);
+         expect('!.foo').not.toMatchPath(    ['bar']     );      
+      });
+      
+      it('is not fooled by substrings in path nodes', function(){
+         expect('!.foo').not.toMatchPath(    ['foot'])
       }); 
    }); 
    
    /*{   
      
-                                        
-   ,  testMatchingForAllDescendantsOfAUniversallyMatchedRootMatchAnythingExceptTheRoot: function() {
-         givenAPattern('*..*')
-            .not.toMatchPath(    [])
-            .toMatchPath(       ['a'])
-            .toMatchPath(       ['a','b']);                                  
-      }      
             
-   ,  testMatchingNamedChildOfRootWorks: function() {
-         givenAPattern('!.foo')
-            .toMatchPath(       ['foo'])      
-            .not.toMatchPath(    [])
-            .not.toMatchPath(    ['foo', 'bar'])
-            .not.toMatchPath(    ['bar'])
-      }
-      
+     
    ,  testIsNotFooledBySubstringPatterns: function() {
-         givenAPattern('!.foo')
-            .not.toMatchPath(    ['foot'])      
+      
       }      
       
    ,  testMatchingNamedAncestorOfRootWorks: function() {
-         givenAPattern('!..foo')
+         expect('!..foo')
             .not.toMatchPath(    [])         
             .toMatchPath(       ['foo'])      
             .toMatchPath(       ['a', 'foo'])
@@ -150,7 +147,7 @@ describe('jsonPath', function(){
       }
       
    ,  testAncestorOfRootRelationshipCanBeImplicit: function() {
-         givenAPattern('..foo')
+         expect('..foo')
              .not.toMatchPath(   [])         
             .toMatchPath(       ['foo'])      
             .toMatchPath(       ['a', 'foo'])
@@ -162,7 +159,7 @@ describe('jsonPath', function(){
       }
       
    ,  testAncestorOfRootRelationshipCanBeEvenMoreImplicit: function() {
-         givenAPattern('foo')
+         expect('foo')
              .not.toMatchPath(   [])         
             .toMatchPath(       ['foo'])      
             .toMatchPath(       ['a', 'foo'])
@@ -174,7 +171,7 @@ describe('jsonPath', function(){
       }            
       
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
-         givenAPattern('!..foo.bar')
+         expect('!..foo.bar')
              .not.toMatchPath(   [])         
             .not.toMatchPath(    ['foo'])      
             .not.toMatchPath(    ['a', 'foo'])
@@ -185,7 +182,7 @@ describe('jsonPath', function(){
       }
       
    ,  testMatchingTwoNamedAncestorsOfImpliedRootWorks: function() {
-         givenAPattern('foo.bar')
+         expect('foo.bar')
              .not.toMatchPath(   [])         
             .not.toMatchPath(    ['foo'])      
             .not.toMatchPath(    ['a', 'foo'])
@@ -196,7 +193,7 @@ describe('jsonPath', function(){
       }      
       
    ,  testMatchingTwoNamedAncestorsSeperatedByStar: function() {
-         givenAPattern('!..foo.*.bar')
+         expect('!..foo.*.bar')
              .not.toMatchPath(   [])         
             .not.toMatchPath(    ['foo'])      
             .not.toMatchPath(    ['a', 'foo'])
@@ -210,7 +207,7 @@ describe('jsonPath', function(){
       }                  
       
    ,  testMatchingAnyNamedChildOfRootWorks: function() {
-         givenAPattern('!.*')
+         expect('!.*')
             .toMatchPath(       ['foo'])      
             .toMatchPath(      ['bar'])            
             .not.toMatchPath(    [])
@@ -218,14 +215,14 @@ describe('jsonPath', function(){
       }
       
    ,  testMatchingSequenceOfNamesWorks: function() {
-         givenAPattern('!.a.b')
+         expect('!.a.b')
             .toMatchPath(       ['a', 'b'])      
             .not.toMatchPath(    [])            
             .not.toMatchPath(    ['a'])
       }
       
    ,  testNumericIndex: function() {
-         givenAPattern('!.a.2')
+         expect('!.a.2')
             .toMatchPath(       ['a', 2])      
             .toMatchPath(       ['a', '2'])      
             .not.toMatchPath(    [])            
@@ -233,7 +230,7 @@ describe('jsonPath', function(){
       }
                  
    ,  testNumericExpressedInArrayNotation: function() {
-         givenAPattern('!.a[2]')
+         expect('!.a[2]')
             .toMatchPath(       ['a', 2])      
             .toMatchPath(       ['a', '2'])      
             .not.toMatchPath(    [])            
@@ -241,7 +238,7 @@ describe('jsonPath', function(){
       }
       
    ,  testArrayNotation: function() {
-         givenAPattern('!["a"][2]')
+         expect('!["a"][2]')
             .toMatchPath(       ['a', 2])      
             .toMatchPath(       ['a', '2'])      
             .not.toMatchPath(    [])            
@@ -249,7 +246,7 @@ describe('jsonPath', function(){
       }
       
    ,  testArrayNotationAtRoot: function() {
-         givenAPattern('![2]')
+         expect('![2]')
             .toMatchPath(       [2])      
             .toMatchPath(       ['2'])      
             .not.toMatchPath(    [])            
@@ -257,7 +254,7 @@ describe('jsonPath', function(){
       }
       
    ,  testArrayStarNotationAtRoot: function() {
-         givenAPattern('![*]')
+         expect('![*]')
             .toMatchPath(       [2])      
             .toMatchPath(       ['2'])      
             .toMatchPath(       ['a'])            
@@ -265,17 +262,17 @@ describe('jsonPath', function(){
       }            
       
    ,  testTrickyCase: function() {
-         givenAPattern('!..foods..fr')
+         expect('!..foods..fr')
             .toMatchPath(       ['foods', 2, 'name', 'fr']);      
       }
       
    ,  testDoubleDotFollowedByStar: function() {      
-         givenAPattern('!..*.bar')         
+         expect('!..*.bar')         
              .toMatchPath(['anything', 'bar']);1
       }
       
    ,  testDoubleDotFollowedByArrayStyleStar: function() {      
-         givenAPattern('!..[*].bar')         
+         expect('!..[*].bar')         
              .toMatchPath(['anything', 'bar']);1
       }                    
 
@@ -283,7 +280,7 @@ describe('jsonPath', function(){
    
    ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
          // let's start with a counter-example without $ syntax   
-         givenAPattern('foo.*')                     
+         expect('foo.*')                     
             .toMatchPath( 
                   [        'a',       'foo',     'a'], 
                   ['root', 'gparent', 'parent',  'target'])
@@ -291,7 +288,7 @@ describe('jsonPath', function(){
       }   
    
    ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
-         givenAPattern('$foo.*')                     
+         expect('$foo.*')                     
             .toMatchPath( 
                   [        'a',      'foo',     'a'], 
                   ['root', 'parent', 'target',  'child'])
@@ -299,7 +296,7 @@ describe('jsonPath', function(){
       }
       
    ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
-         givenAPattern('!..$foo..bar')                     
+         expect('!..$foo..bar')                     
             .toMatchPath( 
                   [        'p',      'foo',    'c',      'bar'], 
                   ['root', 'parent', 'target', 'child',  'gchild'])
@@ -307,7 +304,7 @@ describe('jsonPath', function(){
       }
       
    ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
-         givenAPattern('$!.*')                     
+         expect('$!.*')                     
             .toMatchPath( 
                   [        'a'    ], 
                   ['root', 'child'])
@@ -315,7 +312,7 @@ describe('jsonPath', function(){
       }                  
       
    ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
-         givenAPattern('$["foo"].bar')         
+         expect('$["foo"].bar')         
              .toMatchPath( 
                    [        'foo',    'bar'  ], 
                    ['root', 'target', 'child'])
@@ -323,7 +320,7 @@ describe('jsonPath', function(){
       }
       
    ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
-         givenAPattern('$[2].bar')         
+         expect('$[2].bar')         
              .toMatchPath( 
                    [        '2',      'bar'  ], 
                    ['root', 'target', 'child'])
@@ -331,7 +328,7 @@ describe('jsonPath', function(){
       }      
       
    ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
-         givenAPattern('!..$*.bar')         
+         expect('!..$*.bar')         
              .toMatchPath( 
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
@@ -339,7 +336,7 @@ describe('jsonPath', function(){
       }
       
    ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
-         givenAPattern('!..$[*].bar')         
+         expect('!..$[*].bar')         
              .toMatchPath( 
                    [        'anything', 'bar'  ], 
                    ['root', 'target',   'child'])
@@ -359,7 +356,7 @@ describe('jsonPath', function(){
                            }
                         };    
          
-         givenAPattern('{name email}')         
+         expect('{name email}')         
              .toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ])
@@ -378,7 +375,7 @@ describe('jsonPath', function(){
                            }
                         };    
          
-         givenAPattern('{people}.{jack}.{name email}')         
+         expect('{people}.{jack}.{name email}')         
              .toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ])
@@ -397,7 +394,7 @@ describe('jsonPath', function(){
                            }
                         };    
          
-         givenAPattern('{name email}')         
+         expect('{name email}')         
              .not.toMatchPath( 
                    [          'people',          'jack'                 ], 
                    [rootJson, rootJson.people,   rootJson.people.jack   ]);
@@ -417,7 +414,7 @@ describe('jsonPath', function(){
                            }
                         };    
          
-         givenAPattern('men.{name email}')         
+         expect('men.{name email}')         
              .not.toMatchPath( 
                    [          'women',          'betty'                 ], 
                    [rootJson, rootJson.women,   rootJson.women.betty    ]);
@@ -427,7 +424,7 @@ describe('jsonPath', function(){
    
          var rootJson = [ 1, 2, 3 ];    
          
-         givenAPattern('{spin taste}')         
+         expect('{spin taste}')         
              .not.toMatchPath( 
                    [         '0'           ], 
                    [rootJson, rootJson[0]  ]);
