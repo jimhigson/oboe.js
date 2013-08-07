@@ -133,41 +133,35 @@ describe('jsonPath', function(){
          expect('!..foo').not.toMatchPath(   ['a', 'foo', 'foo', 'a']);      
       });
       
+      it('should match ..foo like !..foo', function() {
+         expect('..foo').not.toMatchPath(   []);         
+         expect('..foo').toMatchPath(       ['foo']);      
+         expect('..foo').toMatchPath(       ['a', 'foo']);
+         expect('..foo').not.toMatchPath(   ['a', 'foo', 'a']);            
+         expect('..foo').toMatchPath(       ['a', 'foo', 'foo']);
+         expect('..foo').toMatchPath(       ['a', 'a', 'foo']);
+         expect('..foo').not.toMatchPath(   ['a', 'a', 'foot']);            
+         expect('..foo').not.toMatchPath(   ['a', 'foo', 'foo', 'a']);      
+      });
+      
+      it('should match foo like !..foo or ..foo', function() {
+         expect('foo').not.toMatchPath(   []);         
+         expect('foo').toMatchPath(       ['foo']);      
+         expect('foo').toMatchPath(       ['a', 'foo']);
+         expect('foo').not.toMatchPath(   ['a', 'foo', 'a']);            
+         expect('foo').toMatchPath(       ['a', 'foo', 'foo']);
+         expect('foo').toMatchPath(       ['a', 'a', 'foo']);
+         expect('foo').not.toMatchPath(   ['a', 'a', 'foot']);            
+         expect('foo').not.toMatchPath(   ['a', 'foo', 'foo', 'a']);      
+      });      
+      
       it('is not fooled by substrings in path nodes', function(){
          expect('!.foo').not.toMatchPath(    ['foot'])
       }); 
    }); 
    
    /*{   
-                       
-   ,  testMatchingNamedAncestorOfRootWorks: function() {
-
-      }
-      
-   ,  testAncestorOfRootRelationshipCanBeImplicit: function() {
-         expect('..foo')
-             .not.toMatchPath(   [])         
-            .toMatchPath(       ['foo'])      
-            .toMatchPath(       ['a', 'foo'])
-            .not.toMatchPath(    ['a', 'foo', 'a'])            
-            .toMatchPath(       ['a', 'foo', 'foo'])
-            .toMatchPath(       ['a', 'a', 'foo'])
-            .not.toMatchPath(    ['a', 'a', 'foot'])            
-            .not.toMatchPath(    ['a', 'foo', 'foo', 'a'])
-      }
-      
-   ,  testAncestorOfRootRelationshipCanBeEvenMoreImplicit: function() {
-         expect('foo')
-             .not.toMatchPath(   [])         
-            .toMatchPath(       ['foo'])      
-            .toMatchPath(       ['a', 'foo'])
-            .not.toMatchPath(    ['a', 'foo', 'a'])            
-            .toMatchPath(       ['a', 'foo', 'foo'])
-            .toMatchPath(       ['a', 'a', 'foo'])
-            .not.toMatchPath(    ['a', 'a', 'foot'])            
-            .not.toMatchPath(    ['a', 'foo', 'foo', 'a'])
-      }            
-      
+                                        
    ,  testMatchingTwoNamedAncestorsOfRootWorks: function() {
          expect('!..foo.bar')
              .not.toMatchPath(   [])         
