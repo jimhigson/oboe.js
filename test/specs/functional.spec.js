@@ -23,7 +23,7 @@ describe("functional", function() {
       });
          
       it("works with no fixed arguments", function() {
-         
+          
          var received1 = 'not yet set';
       
          function f(r1){
