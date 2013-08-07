@@ -97,6 +97,14 @@ describe('jsonPath', function(){
          expect('').toMatchPath(             ['a','b']   );
       });      
       
+      it('should match !.* against any top-level path node', function() {
+         
+         expect('!.*').toMatchPath(          ['foo'])      
+         expect('!.*').toMatchPath(          ['bar'])            
+         expect('!.*').not.toMatchPath(      [])
+         expect('!.*').not.toMatchPath(      ['foo', 'bar'])      
+      }); 
+      
       it('should match !..* against anything but the root', function() {
          
          expect('!..*').not.toMatchPath(     []          );
@@ -180,32 +188,23 @@ describe('jsonPath', function(){
          expect('foo.bar').toMatchPath(       ['a', 'a', 'a', 'foo', 'bar'])
          expect('foo.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'bar', 'a'])      
       });
-   }); 
-   
+      
+      it('matches !..foo.*.bar only if there is an intermediate node between foo and bar', function(){
+         
+         expect('!..foo.*.bar').not.toMatchPath(   [])         
+         expect('!..foo.*.bar').not.toMatchPath(   ['foo'])      
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'foo'])
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'foo', 'bar'])            
+         expect('!..foo.*.bar').toMatchPath(       ['a', 'foo', 'a', 'bar'])            
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'foo', 'foo'])
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'bar'])
+         expect('!..foo.*.bar').toMatchPath(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'bar', 'a'])
+         expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])      
+      });
+      
    /*{   
-      
-   ,  testMatchingTwoNamedAncestorsSeperatedByStar: function() {
-         expect('!..foo.*.bar')
-             .not.toMatchPath(   [])         
-            .not.toMatchPath(    ['foo'])      
-            .not.toMatchPath(    ['a', 'foo'])
-            .not.toMatchPath(    ['a', 'foo', 'bar'])            
-            .toMatchPath(       ['a', 'foo', 'a', 'bar'])            
-            .not.toMatchPath(    ['a', 'foo', 'foo'])
-            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar'])
-            .toMatchPath(       ['a', 'a', 'a', 'foo', 'a', 'bar'])
-            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'bar', 'a'])
-            .not.toMatchPath(    ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])
-      }                  
-      
-   ,  testMatchingAnyNamedChildOfRootWorks: function() {
-         expect('!.*')
-            .toMatchPath(       ['foo'])      
-            .toMatchPath(      ['bar'])            
-            .not.toMatchPath(    [])
-            .not.toMatchPath(    ['foo', 'bar'])
-      }
-      
+                  
    ,  testMatchingSequenceOfNamesWorks: function() {
          expect('!.a.b')
             .toMatchPath(       ['a', 'b'])      
@@ -268,162 +267,168 @@ describe('jsonPath', function(){
              .toMatchPath(['anything', 'bar']);1
       }                    
 
-   // now several tests for css4-style pattern matching
-   
-   ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
-         // let's start with a counter-example without $ syntax   
-         expect('foo.*')                     
-            .toMatchPath( 
-                  [        'a',       'foo',     'a'], 
-                  ['root', 'gparent', 'parent',  'target'])
-                     .returning('target');
-      }   
-   
-   ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
-         expect('$foo.*')                     
-            .toMatchPath( 
-                  [        'a',      'foo',     'a'], 
-                  ['root', 'parent', 'target',  'child'])
-                     .returning('target');
-      }
-      
-   ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
-         expect('!..$foo..bar')                     
-            .toMatchPath( 
-                  [        'p',      'foo',    'c',      'bar'], 
-                  ['root', 'parent', 'target', 'child',  'gchild'])
-                     .returning('target');            
-      }
-      
-   ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
-         expect('$!.*')                     
-            .toMatchPath( 
-                  [        'a'    ], 
-                  ['root', 'child'])
-                     .returning('root');     
-      }                  
-      
-   ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
-         expect('$["foo"].bar')         
-             .toMatchPath( 
-                   [        'foo',    'bar'  ], 
-                   ['root', 'target', 'child'])
-                      .returning('target');
-      }
-      
-   ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
-         expect('$[2].bar')         
-             .toMatchPath( 
-                   [        '2',      'bar'  ], 
-                   ['root', 'target', 'child'])
-                      .returning('target');
-      }      
-      
-   ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
-         expect('!..$*.bar')         
-             .toMatchPath( 
-                   [        'anything', 'bar'  ], 
-                   ['root', 'target',   'child'])
-                      .returning('target');
-      }
-      
-   ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
-         expect('!..$[*].bar')         
-             .toMatchPath( 
-                   [        'anything', 'bar'  ], 
-                   ['root', 'target',   'child'])
-                      .returning('target');
-      }
-      
-      
-      
-   ,  testCanDuckMatchSuccessfully: function() {
-   
-         var rootJson = {  
-                           people:{                           
-                              jack:{                               
-                                 name:  'Jack'
-                              ,  email: 'jack@example.com'
-                              }
-                           }
-                        };    
-         
-         expect('{name email}')         
-             .toMatchPath( 
-                   [          'people',          'jack'                 ], 
-                   [rootJson, rootJson.people,   rootJson.people.jack   ])
-                   
-                      .returning({name:  'Jack',  email: 'jack@example.com'});
-      }
-      
-   ,  testCanDuckMatchSuccessOnSeveralLevelsOfAPath: function() {
-   
-         var rootJson = {  
-                           people:{                           
-                              jack:{                               
-                                 name:  'Jack'
-                              ,  email: 'jack@example.com'
-                              }
-                           }
-                        };    
-         
-         expect('{people}.{jack}.{name email}')         
-             .toMatchPath( 
-                   [          'people',          'jack'                 ], 
-                   [rootJson, rootJson.people,   rootJson.people.jack   ])
-                   
-                      .returning({name:  'Jack',  email: 'jack@example.com'});
-      }      
-      
-   ,  testCanDuckMatchUnsuccessfullyWhenAFieldIsMissing: function() {
-   
-         var rootJson = {  
-                           people:{                           
-                              jack:{
-                                 // no name here!
-                                 email: 'jack@example.com'
-                              }
-                           }
-                        };    
-         
-         expect('{name email}')         
-             .not.toMatchPath( 
-                   [          'people',          'jack'                 ], 
-                   [rootJson, rootJson.people,   rootJson.people.jack   ]);
-      }
-      
-   ,  testCanFailADuckMatchExpressionBecauseUpstreamPathIsWrong: function() {
-   
-         var rootJson = {  
-                           women:{                           
-                              betty:{
-                                 name:'Betty' 
-                              ,  email: 'betty@example.com'
-                              }
-                           },
-                           men:{
-                              // we don't have non here!
-                           }
-                        };    
-         
-         expect('men.{name email}')         
-             .not.toMatchPath( 
-                   [          'women',          'betty'                 ], 
-                   [rootJson, rootJson.women,   rootJson.women.betty    ]);
-      }
-      
-   ,  testDuckMatchFailsWhenAppliedToNonObject: function() {
-   
-         var rootJson = [ 1, 2, 3 ];    
-         
-         expect('{spin taste}')         
-             .not.toMatchPath( 
-                   [         '0'           ], 
-                   [rootJson, rootJson[0]  ]);
-                   
-      }
    }   
-   */   
+   */         
+      
+      describe('using css4-style syntax', function() {
+         /*
+         ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
+               // let's start with a counter-example without $ syntax   
+               expect('foo.*')                     
+                  .toMatchPath( 
+                        [        'a',       'foo',     'a'], 
+                        ['root', 'gparent', 'parent',  'target'])
+                           .returning('target');
+            }   
+         
+         ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
+               expect('$foo.*')                     
+                  .toMatchPath( 
+                        [        'a',      'foo',     'a'], 
+                        ['root', 'parent', 'target',  'child'])
+                           .returning('target');
+            }
+            
+         ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
+               expect('!..$foo..bar')                     
+                  .toMatchPath( 
+                        [        'p',      'foo',    'c',      'bar'], 
+                        ['root', 'parent', 'target', 'child',  'gchild'])
+                           .returning('target');            
+            }
+            
+         ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
+               expect('$!.*')                     
+                  .toMatchPath( 
+                        [        'a'    ], 
+                        ['root', 'child'])
+                           .returning('root');     
+            }                  
+            
+         ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
+               expect('$["foo"].bar')         
+                   .toMatchPath( 
+                         [        'foo',    'bar'  ], 
+                         ['root', 'target', 'child'])
+                            .returning('target');
+            }
+            
+         ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
+               expect('$[2].bar')         
+                   .toMatchPath( 
+                         [        '2',      'bar'  ], 
+                         ['root', 'target', 'child'])
+                            .returning('target');
+            }      
+            
+         ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
+               expect('!..$*.bar')         
+                   .toMatchPath( 
+                         [        'anything', 'bar'  ], 
+                         ['root', 'target',   'child'])
+                            .returning('target');
+            }
+            
+         ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
+               expect('!..$[*].bar')         
+                   .toMatchPath( 
+                         [        'anything', 'bar'  ], 
+                         ['root', 'target',   'child'])
+                            .returning('target');
+            }*/      
+         
+      });
+      
+      describe('with duck matching', function() {
+         /*
+         ,  testCanDuckMatchSuccessfully: function() {
+         
+               var rootJson = {  
+                                 people:{                           
+                                    jack:{                               
+                                       name:  'Jack'
+                                    ,  email: 'jack@example.com'
+                                    }
+                                 }
+                              };    
+               
+               expect('{name email}')         
+                   .toMatchPath( 
+                         [          'people',          'jack'                 ], 
+                         [rootJson, rootJson.people,   rootJson.people.jack   ])
+                         
+                            .returning({name:  'Jack',  email: 'jack@example.com'});
+            }
+            
+         ,  testCanDuckMatchSuccessOnSeveralLevelsOfAPath: function() {
+         
+               var rootJson = {  
+                                 people:{                           
+                                    jack:{                               
+                                       name:  'Jack'
+                                    ,  email: 'jack@example.com'
+                                    }
+                                 }
+                              };    
+               
+               expect('{people}.{jack}.{name email}')         
+                   .toMatchPath( 
+                         [          'people',          'jack'                 ], 
+                         [rootJson, rootJson.people,   rootJson.people.jack   ])
+                         
+                            .returning({name:  'Jack',  email: 'jack@example.com'});
+            }      
+            
+         ,  testCanDuckMatchUnsuccessfullyWhenAFieldIsMissing: function() {
+         
+               var rootJson = {  
+                                 people:{                           
+                                    jack:{
+                                       // no name here!
+                                       email: 'jack@example.com'
+                                    }
+                                 }
+                              };    
+               
+               expect('{name email}')         
+                   .not.toMatchPath( 
+                         [          'people',          'jack'                 ], 
+                         [rootJson, rootJson.people,   rootJson.people.jack   ]);
+            }
+            
+         ,  testCanFailADuckMatchExpressionBecauseUpstreamPathIsWrong: function() {
+         
+               var rootJson = {  
+                                 women:{                           
+                                    betty:{
+                                       name:'Betty' 
+                                    ,  email: 'betty@example.com'
+                                    }
+                                 },
+                                 men:{
+                                    // we don't have non here!
+                                 }
+                              };    
+               
+               expect('men.{name email}')         
+                   .not.toMatchPath( 
+                         [          'women',          'betty'                 ], 
+                         [rootJson, rootJson.women,   rootJson.women.betty    ]);
+            }
+            
+         ,  testDuckMatchFailsWhenAppliedToNonObject: function() {
+         
+               var rootJson = [ 1, 2, 3 ];    
+               
+               expect('{spin taste}')         
+                   .not.toMatchPath( 
+                         [         '0'           ], 
+                         [rootJson, rootJson[0]  ]);
+                         
+            }*/      
+      });
+   }); 
+   
    
    function givenAPattern( pattern ) {
    
