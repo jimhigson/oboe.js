@@ -4,12 +4,12 @@ module.exports = function (grunt) {
 
    // TODO: move files list to own file
 
-   var TEST_LIBS = [
+/*   var TEST_LIBS = [
       'node_modules/karma-jstd-adapter/jstd-adapter.js'   
    ,  'test/libs/sinon.js'
    ,  'test/libs/sinon-ie.js'
    ,  'test/libs/*.js'   
-   ];
+   ]; */
 
    // NB: source files are order sensitive
    var OBOE_SOURCE_FILES = [
@@ -28,9 +28,9 @@ module.exports = function (grunt) {
    ,  'src/browserApi.js'
    ];
    
-   var UNIT_TEST_CASES = [
+/*   var UNIT_TEST_CASES = [
       'test/cases/*.js'
-   ];
+   ];*/
    
   
    function allOf( /* file lists */ ) {
@@ -83,7 +83,8 @@ module.exports = function (grunt) {
             }         
          }
       ,
-         'precaptured-dev': {                     
+         'precaptured-dev': {                
+            browsers: [],     
             configFile: 'test/unit.conf.js',
             singleRun: 'true'            
          }
@@ -144,6 +145,11 @@ module.exports = function (grunt) {
       'exec:reportMinifiedAndGzippedSize'
    ]);
    
+   // dev-test
+   //
+   // For one-off test runs while developing. Capture browsers first. Allows
+   // to capture IE running in VM which would be tricky to set up starting
+   // automatically though Karma   
    grunt.registerTask('dev-test',     [
       'clear',
       'start-stream-source',         
