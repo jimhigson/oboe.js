@@ -1,15 +1,64 @@
 
 describe('jsonPath', function(){
 
-   it("can compile a basic pattern without crashing", function(){
-      givenAPattern('!');
+   describe('compiles valid syntax while rejecting invalid', function() {
+
+      it("compiles a basic pattern without throwing", function(){
+      
+         expect(function(){      
+            jsonPathCompiler('!')         
+         }).not.toThrow();
+       
+      });
+      
+      describe("invalid patterns", function() {
+      
+         it("fails on single invalid token", function(){
+         
+            expect(function(){      
+               jsonPathCompiler('-')         
+            }).toThrow();
+          
+         });
+         
+         it("fails on invalid pattern with some valid tokens", function(){
+         
+            expect(function(){      
+               jsonPathCompiler('$-')         
+            }).toThrow();
+          
+         });
+         
+         it("fails on unclosed duck clause", function(){
+         
+            expect(function(){      
+               jsonPathCompiler('{foo')         
+            }).toThrow();
+          
+         });
+         
+         it("fails on token with capture alone", function(){
+         
+            expect(function(){      
+               jsonPathCompiler('foo$')         
+            }).toThrow();
+          
+         });         
+      });                  
+      
+   });   
+   
+   
+  
+   it("matches root with bang", function(){
+      givenAPattern('!')
+         .thenShouldMatch(       [])   
    });
    
    /*{   
      
    ,  testMatchesRoot: function() {
-         givenAPattern('!')
-            .thenShouldMatch(       [])
+
       }
       
    ,  testDoesntMatchRootAgainstNonRootPaths: function() {
@@ -420,9 +469,9 @@ describe('jsonPath', function(){
          fail( 'Error thrown running pattern "' + this._pattern + 
                   '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
       }
-      
+                  
       assertTrue( 
-         'pattern ' + this._pattern + ' should have matched [' + pathStack.join(',') + ']'
+         'pattern ' + this._pattern + ' should have matched ' + JSON.stringify(pathStack)
       ,   !!this._lastResult 
       );            
       
