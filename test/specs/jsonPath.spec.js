@@ -230,61 +230,58 @@ describe('jsonPath', function(){
       });
       
       describe('with array notation', function() {
-         /*,  testArrayNotation: function() {
-                     expect('!["a"][2]')
-                        .toMatchPath(       ['a', 2])      
-                        .toMatchPath(       ['a', '2'])      
-                        .not.toMatchPath(    [])            
-                        .not.toMatchPath(    ['a'])
-                  }
-                  
-               ,  testArrayNotationAtRoot: function() {
-                     expect('![2]')
-                        .toMatchPath(       [2])      
-                        .toMatchPath(       ['2'])      
-                        .not.toMatchPath(    [])            
-                        .not.toMatchPath(    ['a'])
-                  }      
-        {                                 
-        ,  testArrayStarNotationAtRoot: function() {
-              expect('![*]')
-                 .toMatchPath(       [2])      
-                 .toMatchPath(       ['2'])      
-                 .toMatchPath(       ['a'])            
-                 .not.toMatchPath(    [])            
-           }            
-           
-        ,  testTrickyCase: function() {
-              expect('!..foods..fr')
-                 .toMatchPath(       ['foods', 2, 'name', 'fr']);      
-           }*/      
+      
+         it('should handle adjacent array notations', function(){
+            
+            expect('!["a"][2]').toMatchPath(       ['a', 2])      
+            expect('!["a"][2]').toMatchPath(       ['a', '2'])      
+            expect('!["a"][2]').not.toMatchPath(    [])            
+            expect('!["a"][2]').not.toMatchPath(    ['a'])         
+         });
+         
+         it('should allow to specify child of root', function(){
+            
+            expect('![2]').toMatchPath(       [2])      
+            expect('![2]').toMatchPath(       ['2'])      
+            expect('![2]').not.toMatchPath(    [])            
+            expect('![2]').not.toMatchPath(    ['a'])         
+         }); 
+         
+         it('should be allowed to contain a star', function(){
+            
+            expect('![*]').toMatchPath(       [2])      
+            expect('![*]').toMatchPath(       ['2'])      
+            expect('![*]').toMatchPath(       ['a'])            
+            expect('![*]').not.toMatchPath(    [])         
+         });
+      
       });
-      
-      
-   /*
-            /*
-         ,  testNumericIndex: function() {
-                
-             }
-                        
-          ,  testNumericExpressedInArrayNotation: function() {
-                
-             }
-             
-      
-      
-   ,  testDoubleDotFollowedByStar: function() {      
-         expect('!..*.bar')         
-             .toMatchPath(['anything', 'bar']);1
-      }
-      
-   ,  testDoubleDotFollowedByArrayStyleStar: function() {      
-         expect('!..[*].bar')         
-             .toMatchPath(['anything', 'bar']);1
-      }                    
 
-   }   
-   */         
+      describe('composition of several tokens into complex patterns', function() {
+               /*,                    
+            
+                 
+                 
+              ,  testTrickyCase: function() {
+                    expect('!..foods..fr')
+                       .toMatchPath(       ['foods', 2, 'name', 'fr']);      
+                 }*/      
+                               
+         /*      
+         ,  testDoubleDotFollowedByStar: function() {      
+               expect('!..*.bar')         
+                   .toMatchPath(['anything', 'bar']);1
+            }
+            
+         ,  testDoubleDotFollowedByArrayStyleStar: function() {      
+               expect('!..[*].bar')         
+                   .toMatchPath(['anything', 'bar']);1
+            }                    
+      
+         }   
+         */      
+      });
+         
       
       describe('using css4-style syntax', function() {
          /*
