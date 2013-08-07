@@ -3,11 +3,15 @@ describe('jsonPath', function(){
 
    describe('compiles valid syntax while rejecting invalid', function() {
 
+      function compiling(pattern) {
+         return function(){
+            jsonPathCompiler(pattern);
+         }
+      }
+
       it("compiles a basic pattern without throwing", function(){
       
-         expect(function(){      
-            jsonPathCompiler('!')         
-         }).not.toThrow();
+         expect(compiling('!')).not.toThrow();
        
       });
       
@@ -15,74 +19,90 @@ describe('jsonPath', function(){
       
          it("fails on single invalid token", function(){
          
-            expect(function(){      
-               jsonPathCompiler('-')         
-            }).toThrow();
+            expect(compiling('-')).toThrow();
           
          });
          
          it("fails on invalid pattern with some valid tokens", function(){
          
-            expect(function(){      
-               jsonPathCompiler('$-')         
-            }).toThrow();
+            expect(compiling('$-')).toThrow();
           
          });
          
          it("fails on unclosed duck clause", function(){
          
-            expect(function(){      
-               jsonPathCompiler('{foo')         
-            }).toThrow();
+            expect(compiling('{foo')).toThrow();
           
          });
          
          it("fails on token with capture alone", function(){
          
-            expect(function(){      
-               jsonPathCompiler('foo$')         
-            }).toThrow();
+            expect(compiling('foo$')).toThrow(); 
           
          });         
-      });                  
+      });                   
       
    });   
    
+   describe('patterns match correct paths', function() {
    
-  
-   it("matches root with bang", function(){
-      givenAPattern('!')
-         .thenShouldMatch(       [])   
-   });
+      beforeEach( function(){
+         this.addMatchers({
+            toMatchPath:function( pathStack ) {
+
+               var pattern = this.actual;            
+               var ascent = convertToAscent(pathStack);
+                              
+               var compiledPattern = jsonPathCompiler(pattern);
+               
+               try{                  
+                  return !!compiledPattern(ascent);
+               } catch( e ) {
+                  this.message = function(){
+                     return 'Error thrown running pattern "' + pattern + 
+                            '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) 
+                  };
+                  return false;      
+               } 
+            }            
+         });
+      
+      });
+     
+      describe('when pattern has only bang', function() {
+         it("should match root", function(){
+            
+            expect('!').toMatchPath([]);         
+         });
+         
+         it("should miss non-root", function(){
+            
+            expect('!').not.toMatchPath(['a']);
+            expect('!').not.toMatchPath(['a', 'b']);
+         
+         });
+      });
+      
+      it('should match * universally', function() {
+         expect('*').toMatchPath( []         );
+         expect('*').toMatchPath( ['a']      );
+         expect('*').toMatchPath( ['a', 2]   );
+         expect('*').toMatchPath( ['a','b']  );
+      });
+      
+      it('should match empty pattern universally', function() {
+         expect('').toMatchPath( []         );
+         expect('').toMatchPath( ['a']      );
+         expect('').toMatchPath( ['a', 2]   );
+         expect('').toMatchPath( ['a','b']  );
+      });      
+      
+      
+   }); 
    
    /*{   
      
-   ,  testMatchesRoot: function() {
-
-      }
-      
-   ,  testDoesntMatchRootAgainstNonRootPaths: function() {
-         givenAPattern('!')
-            .thenShouldNotMatch(   ['a'])
-            .thenShouldNotMatch(   ['a','b'])
-      }      
-      
-   ,  testMatchesSingleStarAloneAgainstEveryObject: function() {
-         givenAPattern('*')
-            .thenShouldMatch(       [])
-            .thenShouldMatch(       ['a'])
-            .thenShouldMatch(       ['a', 2])
-            .thenShouldMatch(       ['a','b'])
-      }
-      
-   ,  testEmptyStringIsEquivalentToSingleStar: function() { 
-         givenAPattern('')
-            .thenShouldMatch(       [])
-            .thenShouldMatch(       ['a'])
-            .thenShouldMatch(       ['a', 2])
-            .thenShouldMatch(       ['a','b'])
-      }
-                       
+                                  
    ,  testMatchingForAllDescendantsOfRootMatchAnythingExceptTheRoot: function() {
          givenAPattern('!..*')
             .thenShouldNotMatch(    [])
@@ -435,7 +455,12 @@ describe('jsonPath', function(){
       }          
    }
    
-   function convertParamsToAscent(pathStack, nodeStack){
+   function convertToAscent(pathStack, nodeStack){
+   
+      // first, make a defensive copy of the vars so that we can mutate them at will:
+      pathStack = pathStack && JSON.parse(JSON.stringify(pathStack));
+      nodeStack = nodeStack && JSON.parse(JSON.stringify(nodeStack));      
+   
       // change the two parameters into the test from  arrays (which are easy to write as in-line js) to
       // lists (which is what the code under test needs) 
    
@@ -455,13 +480,12 @@ describe('jsonPath', function(){
          ascent = cons( mapping, ascent );
       }
       
-      return ascent;
-      
+      return ascent;      
    }
    
    Asserter.prototype.thenShouldMatch = function(pathStack, nodeStack) {
 
-      var ascent = convertParamsToAscent(pathStack, nodeStack);
+      var ascent = convertToAscent(pathStack, nodeStack);
       
       try{   
          this._lastResult = this._compiledPattern(ascent);
@@ -480,7 +504,7 @@ describe('jsonPath', function(){
    
    Asserter.prototype.thenShouldNotMatch = function(pathStack, nodeStack) {
 
-      var ascent = convertParamsToAscent(pathStack, nodeStack);
+      var ascent = convertToAscent(pathStack, nodeStack);
 
       try{
          this._lastResult = this._compiledPattern(ascent);
