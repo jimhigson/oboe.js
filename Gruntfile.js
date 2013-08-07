@@ -82,8 +82,12 @@ module.exports = function (grunt) {
                '/static/json' : 'http://localhost:' + STREAM_SOURCE_PORT + '/static/json'   
             }         
          }
-      ,
-         'precaptured-dev': {                
+         
+      ,  
+         'precaptured-dev': {
+            // for doing a single test run with already captured browsers during development.
+            // this is good for running tests in browsers karma can't easily start such as
+            // IE running inside a Windows VM on a unix dev environment                
             browsers: [],     
             configFile: 'test/unit.conf.js',
             singleRun: 'true'            
@@ -103,6 +107,18 @@ module.exports = function (grunt) {
             browsers: ['Chrome', 'Firefox', 'Safari'],
             configFile: 'test/min.conf.js'
          }
+         
+      ,  
+         'persist': {
+            // for setting up a persistent karma server.
+            // To start the server, the task is:
+            //    karma:persist 
+            // To run these, the task is: 
+            //    karma:persist:run
+            configFile: 'test/unit.conf.js',           
+            browsers: [], 
+            singleRun:false
+         }   
       }
       
    ,  copy: {
@@ -122,7 +138,14 @@ module.exports = function (grunt) {
          reportMinifiedAndGzippedSize:{
             command: "echo Size after gzip is `gzip --stdout dist/oboe.min.js | wc -c` bytes"
          }
-      }     
+      }
+      
+   ,  watch:{
+         karma:{
+            files:['src/**.js', 'test/specs/*.spec.js'],
+            tasks:['karma:persist:run']
+         }
+      }           
       
    });
 
@@ -135,10 +158,16 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-exec');
 
    grunt.registerTask('start-stream-source', function () {
-
-      require('./test/streamsource.js').startServer(grunt, STREAM_SOURCE_PORT);
-   
+      require('./test/streamsource.js').startServer(grunt, STREAM_SOURCE_PORT);  
    });
+   
+   grunt.registerTask('test-start-server',   [
+      'karma:persist'
+   ]);
+   
+   grunt.registerTask('test-run',   [
+      'karma:persist:run'
+   ]);   
 
    grunt.registerTask('dist-sizes',   [
       'exec:reportMinifiedSize',
