@@ -270,7 +270,7 @@ describe('jsonPath', function(){
                .toMatchPath(['anything', 'bar']);
                
             expect('!..[*].bar')         
-                .toMatchPath(['anything', 'bar']);1               
+                .toMatchPath(['anything', 'bar']);               
          });
                                      
       });
