@@ -63,6 +63,10 @@ function startServer( grunt, port ) {
    function replyWithStaticJson(req, res) {
       sendJsonHeaders(res);
       
+      if( !req.url ) {
+         throw new Error('no url given');
+      }
+      
       var filename = req.url.replace('/static', 'test');
       
       grunt.verbose.ok('will respond with contents of file ' + filename.blue);
