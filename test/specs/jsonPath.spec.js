@@ -232,7 +232,7 @@ describe('jsonPath', function(){
       describe('with array notation', function() {
       
          it('should handle adjacent array notations', function(){
-            
+             
             expect('!["a"][2]').toMatchPath(       ['a', 2])      
             expect('!["a"][2]').toMatchPath(       ['a', '2'])      
             expect('!["a"][2]').not.toMatchPath(    [])            
@@ -258,28 +258,21 @@ describe('jsonPath', function(){
       });
 
       describe('composition of several tokens into complex patterns', function() {
-               /*,                    
-            
-                 
-                 
-              ,  testTrickyCase: function() {
-                    expect('!..foods..fr')
-                       .toMatchPath(       ['foods', 2, 'name', 'fr']);      
-                 }*/      
-                               
-         /*      
-         ,  testDoubleDotFollowedByStar: function() {      
-               expect('!..*.bar')         
-                   .toMatchPath(['anything', 'bar']);1
-            }
-            
-         ,  testDoubleDotFollowedByArrayStyleStar: function() {      
-               expect('!..[*].bar')         
-                   .toMatchPath(['anything', 'bar']);1
-            }                    
       
-         }   
-         */      
+         it('should be able to handle more than one double dot', function() {
+            expect('!..foods..fr')
+               .toMatchPath( ['foods', 2, 'name', 'fr']);
+         });
+      
+         it('should be able to match ..* or ..[*] as if it were * because .. matches zero nodes', function(){
+         
+            expect('!..*.bar')         
+               .toMatchPath(['anything', 'bar']);
+               
+            expect('!..[*].bar')         
+                .toMatchPath(['anything', 'bar']);1               
+         });
+                                     
       });
          
       
