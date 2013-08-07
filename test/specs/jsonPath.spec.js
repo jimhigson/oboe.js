@@ -1,6 +1,8 @@
 
 describe('jsonPath', function(){
 
+
+
    describe('compiles valid syntax while rejecting invalid', function() {
 
       function compiling(pattern) {
@@ -51,12 +53,9 @@ describe('jsonPath', function(){
             toMatchPath:function( pathStack ) {
 
                var pattern = this.actual;            
-               var ascent = convertToAscent(pathStack);
-                              
-               var compiledPattern = jsonPathCompiler(pattern);
                
                try{                  
-                  return !!compiledPattern(ascent);
+                  return !!matchOf(pattern).against(pathStack);
                } catch( e ) {
                   this.message = function(){
                      return 'Error thrown running pattern "' + pattern + 
@@ -64,7 +63,7 @@ describe('jsonPath', function(){
                   };
                   return false;      
                } 
-            }            
+            }                        
          });
       
       });
@@ -277,14 +276,32 @@ describe('jsonPath', function(){
          
       
       describe('using css4-style syntax', function() {
+      
+         beforeEach(function(){
+            this.addMatchers({
+               toSpecifyNode: function( expectedNode ){
+               
+                  var match = this.actual;
+                  
+                  return expectedNode == match.node;
+               }
+            });
+         });
+            
+         it('returns last node when no css4-style syntax is used', function(){
+                        
+            expect( matchOf( 'foo.*' ).against( 
+            
+                [        'a',       'foo',     'a'], 
+                ['root', 'gparent', 'parent',  'target']
+            
+            )).toSpecifyNode('target');
+            
+         });
          /*
          ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
                // let's start with a counter-example without $ syntax   
-               expect('foo.*')                     
-                  .toMatchPath( 
-                        [        'a',       'foo',     'a'], 
-                        ['root', 'gparent', 'parent',  'target'])
-                           .returning('target');
+
             }   
          
          ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
@@ -435,12 +452,18 @@ describe('jsonPath', function(){
       });
    }); 
    
+   function matchOf(pattern) {
+      var compiledPattern = jsonPathCompiler(pattern);
    
-   function givenAPattern( pattern ) {
-   
-      return new Asserter(pattern);     
+      return {
+         against:function(pathStack, nodeStack) {
+         
+            return compiledPattern(asAscent(pathStack, nodeStack));
+         }
+      };
    }
    
+  
    // for the given pattern, return an array of empty objects of the one greater length to
    // stand in for the nodestack in the cases where we only care about match or not match.
    // one greater because the root node doesnt have a name
@@ -452,17 +475,8 @@ describe('jsonPath', function(){
       return rtn;      
    }
    
-   function Asserter( pattern ){
-      this._pattern = pattern;
-      
-      try {
-         this._compiledPattern = jsonPathCompiler(pattern);
-      } catch( e ) {
-         fail( 'problem parsing:' + pattern + "\n" + (e.stack || e.message) );
-      }          
-   }
    
-   function convertToAscent(pathStack, nodeStack){
+   function asAscent(pathStack, nodeStack){
    
       // first, make a defensive copy of the vars so that we can mutate them at will:
       pathStack = pathStack && JSON.parse(JSON.stringify(pathStack));
@@ -488,53 +502,8 @@ describe('jsonPath', function(){
       }
       
       return ascent;      
-   }
+   }    
    
-   Asserter.prototype.thenShouldMatch = function(pathStack, nodeStack) {
-
-      var ascent = convertToAscent(pathStack, nodeStack);
-      
-      try{   
-         this._lastResult = this._compiledPattern(ascent);
-      } catch( e ) {
-         fail( 'Error thrown running pattern "' + this._pattern + 
-                  '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
-      }
-                  
-      assertTrue( 
-         'pattern ' + this._pattern + ' should have matched ' + JSON.stringify(pathStack)
-      ,   !!this._lastResult 
-      );            
-      
-      return this;
-   };
-   
-   Asserter.prototype.thenShouldNotMatch = function(pathStack, nodeStack) {
-
-      var ascent = convertToAscent(pathStack, nodeStack);
-
-      try{
-         this._lastResult = this._compiledPattern(ascent);
-      } catch( e ) {
-         fail( 'Error thrown running pattern "' + this._pattern + 
-                  '" against path ' + '[' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) );      
-      }
-      
-      assertFalse( 
-         'pattern ' + this._pattern + ' should not have matched [' + pathStack.join(',') + '] but ' +
-             'did, returning ' + JSON.stringify(this._lastResult)
-      ,  !!this._lastResult
-      );          
-        
-      return this;         
-   };
-   
-   Asserter.prototype.returning = function(node) {
-      assertEquals(node, nodeOf(this._lastResult));
-      
-      return this;
-   };
-   
-   });   
+});   
 
 
