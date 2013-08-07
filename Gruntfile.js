@@ -117,7 +117,8 @@ module.exports = function (grunt) {
             //    karma:persist:run
             configFile: 'test/unit.conf.js',           
             browsers: [], 
-            singleRun:false
+            singleRun:false,
+            background:true
          }   
       }
       
@@ -142,7 +143,7 @@ module.exports = function (grunt) {
       
    ,  watch:{
          karma:{
-            files:['src/**.js', 'test/specs/*.spec.js'],
+            files:['src/**/*.js', 'test/specs/*.spec.js'],
             tasks:['karma:persist:run']
          }
       }           
@@ -154,6 +155,7 @@ module.exports = function (grunt) {
    grunt.loadNpmTasks('grunt-contrib-uglify');   
    grunt.loadNpmTasks('grunt-karma');
    grunt.loadNpmTasks('grunt-contrib-copy');      
+   grunt.loadNpmTasks('grunt-contrib-watch');      
    grunt.loadNpmTasks('grunt-clear');      
    grunt.loadNpmTasks('grunt-exec');
 
@@ -167,7 +169,12 @@ module.exports = function (grunt) {
    
    grunt.registerTask('test-run',   [
       'karma:persist:run'
-   ]);   
+   ]);
+   
+   grunt.registerTask('test-auto-run',   [
+      'karma:persist',
+      'watch:karma'
+   ]);      
 
    grunt.registerTask('dist-sizes',   [
       'exec:reportMinifiedSize',
