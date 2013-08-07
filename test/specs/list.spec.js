@@ -1,31 +1,40 @@
 
+describe("Lists", function(){
+
+   function assertEquals(expected, actual) {
+      expect(actual).toEqual(expected);
+   }
+
+
+   it("can use cons, head and tail", function() {
+      var emptyList = emptyList;
+      
+      var listA   = cons('a', emptyList);
+      var listBA  = cons('b', listA);
+      var listCBA = cons('c', listBA);
+      
+      expect(head(listCBA)).toBe('c');
+      expect(head(tail(listCBA))).toBe('b'); 
+      expect(head(tail(tail(listCBA)))).toBe('a');
+   });
+
+
+   it("can convert to an array", function() {
+   
+      var listCBA = cons('c', cons('b', cons('a', emptyList)));
+      
+      assertEquals(['c','b','a'], listAsArray(listCBA));   
+   })
+
+});
+
 (function(){
 
+   function TestCase(name, tests){}
 
    TestCase("listsTest", {
    
-      testConsHeadAndTail: function() {
-      
-         var emptyList = emptyList;
-         
-         var listA   = cons('a', emptyList);
-         var listBA  = cons('b', listA);
-         var listCBA = cons('c', listBA);
-         
-         assertEquals('c', head(listCBA));
-         assertEquals('b', head(tail(listCBA)));
-         assertEquals('a', head(tail(tail(listCBA))));
-      }
-      
-   ,      
-      testListAsArray: function() {
-      
-         var listCBA = cons('c', cons('b', cons('a', emptyList)));
-         
-         assertEquals(['c','b','a'], listAsArray(listCBA));
-      }
-      
-   ,      
+           
       testListAsArrayCanHandleEmptyList: function() {
                
          assertEquals([], listAsArray(emptyList));
