@@ -210,54 +210,68 @@ describe('jsonPath', function(){
          expect('!..foo.*.bar').not.toMatchPath(   ['a', 'a', 'a', 'foo', 'a', 'bar', 'a'])      
       });
 
-      describe('patterns specifying numeric path nodes', function() {
-         /*
+      describe('with numeric path nodes in the pattern', function() {
+      
+         it('should be able to handle numeric nodes in object notation', function(){
+            
+            expect('!.a.2').toMatchPath(       ['a', 2])      
+            expect('!.a.2').toMatchPath(       ['a', '2'])      
+            expect('!.a.2').not.toMatchPath(    [])            
+            expect('!.a.2').not.toMatchPath(    ['a'])         
+         });
+      
+         it('should be able to handle numberic nodes in array notation', function(){
+            
+            expect('!.a[2]').toMatchPath(       ['a', 2])      
+            expect('!.a[2]').toMatchPath(       ['a', '2'])      
+            expect('!.a[2]').not.toMatchPath(    [])            
+            expect('!.a[2]').not.toMatchPath(    ['a'])
+         });                       
+      });
+      
+      describe('with array notation', function() {
+         /*,  testArrayNotation: function() {
+                     expect('!["a"][2]')
+                        .toMatchPath(       ['a', 2])      
+                        .toMatchPath(       ['a', '2'])      
+                        .not.toMatchPath(    [])            
+                        .not.toMatchPath(    ['a'])
+                  }
+                  
+               ,  testArrayNotationAtRoot: function() {
+                     expect('![2]')
+                        .toMatchPath(       [2])      
+                        .toMatchPath(       ['2'])      
+                        .not.toMatchPath(    [])            
+                        .not.toMatchPath(    ['a'])
+                  }      
+        {                                 
+        ,  testArrayStarNotationAtRoot: function() {
+              expect('![*]')
+                 .toMatchPath(       [2])      
+                 .toMatchPath(       ['2'])      
+                 .toMatchPath(       ['a'])            
+                 .not.toMatchPath(    [])            
+           }            
+           
+        ,  testTrickyCase: function() {
+              expect('!..foods..fr')
+                 .toMatchPath(       ['foods', 2, 'name', 'fr']);      
+           }*/      
+      });
+      
+      
+   /*
+            /*
          ,  testNumericIndex: function() {
-                expect('!.a.2')
-                   .toMatchPath(       ['a', 2])      
-                   .toMatchPath(       ['a', '2'])      
-                   .not.toMatchPath(    [])            
-                   .not.toMatchPath(    ['a'])
+                
              }
                         
           ,  testNumericExpressedInArrayNotation: function() {
-                expect('!.a[2]')
-                   .toMatchPath(       ['a', 2])      
-                   .toMatchPath(       ['a', '2'])      
-                   .not.toMatchPath(    [])            
-                   .not.toMatchPath(    ['a'])
+                
              }
              
-          ,  testArrayNotation: function() {
-                expect('!["a"][2]')
-                   .toMatchPath(       ['a', 2])      
-                   .toMatchPath(       ['a', '2'])      
-                   .not.toMatchPath(    [])            
-                   .not.toMatchPath(    ['a'])
-             }
-             
-          ,  testArrayNotationAtRoot: function() {
-                expect('![2]')
-                   .toMatchPath(       [2])      
-                   .toMatchPath(       ['2'])      
-                   .not.toMatchPath(    [])            
-                   .not.toMatchPath(    ['a'])
-             }*/      
-      });
       
-   /*{                                 
-   ,  testArrayStarNotationAtRoot: function() {
-         expect('![*]')
-            .toMatchPath(       [2])      
-            .toMatchPath(       ['2'])      
-            .toMatchPath(       ['a'])            
-            .not.toMatchPath(    [])            
-      }            
-      
-   ,  testTrickyCase: function() {
-         expect('!..foods..fr')
-            .toMatchPath(       ['foods', 2, 'name', 'fr']);      
-      }
       
    ,  testDoubleDotFollowedByStar: function() {      
          expect('!..*.bar')         
