@@ -129,6 +129,13 @@ describe('jsonPath', function(){
          expect('!.foo').not.toMatchPath(    ['bar']     );      
       });
       
+      it('should match !.foo.bar against paths with foo as first node and bar as second', function() {
+                
+         expect('!.a.b').toMatchPath(        ['a', 'b'])      
+         expect('!.a.b').not.toMatchPath(    [])            
+         expect('!.a.b').not.toMatchPath(    ['a'])
+      });
+      
       it('should match !..foo against any path ending in foo', function(){
          
          expect('!..foo').not.toMatchPath(   []);         
@@ -205,12 +212,7 @@ describe('jsonPath', function(){
       
    /*{   
                   
-   ,  testMatchingSequenceOfNamesWorks: function() {
-         expect('!.a.b')
-            .toMatchPath(       ['a', 'b'])      
-            .not.toMatchPath(    [])            
-            .not.toMatchPath(    ['a'])
-      }
+
       
    ,  testNumericIndex: function() {
          expect('!.a.2')
