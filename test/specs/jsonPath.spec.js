@@ -1,6 +1,43 @@
 
 describe('jsonPath', function(){
 
+   beforeEach(function(){
+            
+      this.addMatchers({
+         toSpecifyNode: function( expectedNode ){
+   
+            function jsonSame(a,b) {
+               return JSON.stringify(a) == JSON.stringify(b);
+            }
+         
+            var match = this.actual;
+            
+            var notClause = this.isNot? ' any node except ' : 'node';
+            
+            this.message = function () {
+              return "Expected " + notClause + ' ' + JSON.stringify(expectedNode) + " but got " +
+                        (match.node? JSON.stringify(match.node) : 'no match');
+            }               
+                           
+            return jsonSame( expectedNode, match.node );
+         }
+      
+      ,  toMatchPath:function( pathStack ) {
+
+            var pattern = this.actual;            
+            
+            try{                  
+               return !!matchOf(pattern).against(asAscent(pathStack));
+            } catch( e ) {
+               this.message = function(){
+                  return 'Error thrown running pattern "' + pattern + 
+                         '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) 
+               };
+               return false;      
+            } 
+         }                        
+      });   
+   });   
 
 
    describe('compiles valid syntax while rejecting invalid', function() {
@@ -47,27 +84,7 @@ describe('jsonPath', function(){
    });   
    
    describe('patterns match correct paths', function() {
-   
-      beforeEach( function(){
-         this.addMatchers({
-            toMatchPath:function( pathStack ) {
-
-               var pattern = this.actual;            
-               
-               try{                  
-                  return !!matchOf(pattern).against(asAscent(pathStack));
-               } catch( e ) {
-                  this.message = function(){
-                     return 'Error thrown running pattern "' + pattern + 
-                            '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) 
-                  };
-                  return false;      
-               } 
-            }                        
-         });
-      
-      });
-     
+        
       describe('when pattern has only bang', function() {
          it("should match root", function(){
             
@@ -277,25 +294,6 @@ describe('jsonPath', function(){
       
       describe('using css4-style syntax', function() {
       
-         beforeEach(function(){
-                  
-            this.addMatchers({
-               toSpecifyNode: function( expectedNode ){
-         
-                  function jsonSame(a,b) {
-                     return JSON.stringify(a) == JSON.stringify(b);
-                  }
-               
-                  var match = this.actual;
-                  
-                  this.message = function () {
-                    return "Expected node" + JSON.stringify(expectedNode) + " but got " + JSON.stringify(match.node);
-                  }               
-                                 
-                  return jsonSame( expectedNode, match.node );
-               }
-            });
-         });
             
          it('returns deepest node when no css4-style syntax is used', function(){
                         
@@ -375,56 +373,81 @@ describe('jsonPath', function(){
              
             )).toSpecifyNode({ l3: 'leaf' });
                      
-         }); 
-            /*
-         ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
-               expect('!..$[*].bar')         
-                   .toMatchPath( 
-                         [        'anything', 'bar'  ], 
-                         ['root', 'target',   'child'])
-                            .returning('target');
-            }*/      
-         
+         });              
       });
       
       describe('with duck matching', function() {
-         /*
-         ,  testCanDuckMatchSuccessfully: function() {
+      
+         it('can do basic duck matching', function(){
          
-               var rootJson = {  
-                                 people:{                           
-                                    jack:{                               
-                                       name:  'Jack'
-                                    ,  email: 'jack@example.com'
-                                    }
-                                 }
-                              };    
-               
-               expect('{name email}')         
-                   .toMatchPath( 
-                         [          'people',          'jack'                 ], 
-                         [rootJson, rootJson.people,   rootJson.people.jack   ])
-                         
-                            .returning({name:  'Jack',  email: 'jack@example.com'});
-            }
+            var rootJson = {  
+               people:{                           
+                  jack:{                               
+                     name:  'Jack'
+                  ,  email: 'jack@example.com'
+                  }
+               }
+            };         
+         
+            expect( matchOf( '{name email}' ).against( 
+                                               
+               asAscent(
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]
+               )
+             
+            )).toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});
+         
+         });
+
+         it('can duck match on two levels of a path', function(){
+         
+            var rootJson = {  
+               people:{                           
+                  jack:{                               
+                     name:  'Jack'
+                  ,  email: 'jack@example.com'
+                  }
+               }
+            };    
+            
+            expect( matchOf( '{people}.{jack}.{name email}' ).against( 
+                                               
+               asAscent(
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]
+               )
+             
+            )).toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});                                    
+         });
+         
+         it('fails if one duck is unsatisfied', function(){
+         
+            var rootJson = {  
+               people:{                           
+                  jack:{                               
+                     name:  'Jack'
+                  ,  email: 'jack@example.com'
+                  }
+               }
+            };    
+            
+            expect( matchOf( '{people}.{alberto}.{name email}' ).against( 
+                                               
+               asAscent(
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]
+               )
+             
+            )).not.toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});                                    
+         });         
+      
+/*
+
             
          ,  testCanDuckMatchSuccessOnSeveralLevelsOfAPath: function() {
          
-               var rootJson = {  
-                                 people:{                           
-                                    jack:{                               
-                                       name:  'Jack'
-                                    ,  email: 'jack@example.com'
-                                    }
-                                 }
-                              };    
                
-               expect('{people}.{jack}.{name email}')         
-                   .toMatchPath( 
-                         [          'people',          'jack'                 ], 
-                         [rootJson, rootJson.people,   rootJson.people.jack   ])
-                         
-                            .returning({name:  'Jack',  email: 'jack@example.com'});
             }      
             
          ,  testCanDuckMatchUnsuccessfullyWhenAFieldIsMissing: function() {
