@@ -45,6 +45,8 @@ module.exports = function (grunt) {
 
       pkg:grunt.file.readJSON("package.json")
       
+   ,  clean: ['dist/*.js', 'build/*.js']
+      
    ,  concat: {
          oboe:{         
             src: OBOE_SOURCE_FILES,
