@@ -278,47 +278,55 @@ describe('jsonPath', function(){
       describe('using css4-style syntax', function() {
       
          beforeEach(function(){
+                  
             this.addMatchers({
                toSpecifyNode: function( expectedNode ){
+         
+                  function jsonSame(a,b) {
+                     return JSON.stringify(a) == JSON.stringify(b);
+                  }
                
                   var match = this.actual;
                   
-                  return expectedNode == match.node;
+                  this.message = function () {
+                    return "Expected node" + JSON.stringify(expectedNode) + " but got " + JSON.stringify(match.node);
+                  }               
+                                 
+                  return jsonSame( expectedNode, match.node );
                }
             });
          });
             
          it('returns deepest node when no css4-style syntax is used', function(){
                         
-            expect( matchOf( 'foo.*' ).against( 
+            expect( matchOf( 'l2.*' ).against( 
             
-                ascentFrom({ a:       {foo:      {a:'target'}}})                    
+                ascentFrom({ l1:       {l2:      {l3:'leaf'}}})                    
              
-            )).toSpecifyNode('target');  
+            )).toSpecifyNode('leaf');  
             
          });
-         /*
-         ,  testCanReturnsLastNodeInNonCss4StylePattern: function() {
-               // let's start with a counter-example without $ syntax   
+      
+         it('returns correct named node', function(){
 
-            }   
-         
-         ,  testCanReturnCorrectNamedNodeInSimpleCss4StylePattern: function() {      
-               expect('$foo.*')                     
-                  .toMatchPath( 
-                        [        'a',      'foo',     'a'], 
-                        ['root', 'parent', 'target',  'child'])
-                           .returning('target');
-            }
+            expect( matchOf( '$l2.*' ).against( 
             
-         ,  testCanReturnCorrectNamedNodeInCss4StylePatternWhenFollowedByDoubleDot: function() {      
-               expect('!..$foo..bar')                     
-                  .toMatchPath( 
-                        [        'p',      'foo',    'c',      'bar'], 
-                        ['root', 'parent', 'target', 'child',  'gchild'])
-                           .returning('target');            
-            }
+                ascentFrom({ l1:       {l2:      {l3:'leaf'}}})                    
+             
+            )).toSpecifyNode({l3:'leaf'});
+                  
+         });
+
+         it('returns correct node when css4-style pattern is followed by double dot', function() {
             
+              expect( matchOf( '!..$foo..bar' ).against( 
+              
+                  ascentFrom({ l1:       {foo:      {l3:    {bar:    'leaf'}}}})                    
+               
+              )).toSpecifyNode({l3:    {bar:    'leaf'}});         
+                           
+         });
+            /*
          ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
                expect('$!.*')                     
                   .toMatchPath( 
@@ -519,7 +527,7 @@ describe('jsonPath', function(){
          } 
       }   
       
-      var ascent = emptyList,
+      var ascent = list({key:ROOT_PATH, node:description}),
           curDesc = description;
             
       while( typeof curDesc == 'object' ) {
@@ -531,8 +539,8 @@ describe('jsonPath', function(){
          ascent = cons( mapping, ascent ); 
       }
       
-      console.log('from description', JSON.stringify(description), 'we got ascent',
-         JSON.stringify( listAsArray(ascent)) ); 
+      console.log('from description', description, 'we got ascent',
+         listAsArray(ascent) ); 
       
       return ascent;            
    }       
