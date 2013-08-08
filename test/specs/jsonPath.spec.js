@@ -1,52 +1,7 @@
 
 describe('jsonPath', function(){
-
-   beforeEach(function(){
-            
-      this.addMatchers({
-         toSpecifyNode: function( expectedNode ){
-   
-            function jsonSame(a,b) {
-               return JSON.stringify(a) == JSON.stringify(b);
-            }
-         
-            var match = this.actual;
-            
-            var notClause = this.isNot? ' any node except ' : 'node';
-            
-            this.message = function () {
-              return "Expected " + notClause + ' ' + JSON.stringify(expectedNode) + " but got " +
-                        (match.node? JSON.stringify(match.node) : 'no match');
-            }               
-                           
-            return jsonSame( expectedNode, match.node );
-         }
-      
-      ,  toMatchPath:function( pathStack ) {
-
-            var pattern = this.actual;            
-            
-            try{                  
-               return !!matchOf(pattern).against(asAscent(pathStack));
-            } catch( e ) {
-               this.message = function(){
-                  return 'Error thrown running pattern "' + pattern + 
-                         '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) 
-               };
-               return false;      
-            } 
-         }                        
-      });   
-   });   
-
-
+  
    describe('compiles valid syntax while rejecting invalid', function() {
-
-      function compiling(pattern) {
-         return function(){
-            jsonPathCompiler(pattern);
-         }
-      }
 
       it("compiles a basic pattern without throwing", function(){
       
@@ -522,6 +477,49 @@ describe('jsonPath', function(){
       });
    });
 
+   beforeEach(function(){
+            
+      this.addMatchers({
+         toSpecifyNode: function( expectedNode ){
+   
+            function jsonSame(a,b) {
+               return JSON.stringify(a) == JSON.stringify(b);
+            }
+         
+            var match = this.actual;
+            
+            var notClause = this.isNot? ' any node except ' : 'node';
+            
+            this.message = function () {
+              return "Expected " + notClause + ' ' + JSON.stringify(expectedNode) + " but got " +
+                        (match.node? JSON.stringify(match.node) : 'no match');
+            }               
+                           
+            return jsonSame( expectedNode, match.node );
+         }
+      
+      ,  toMatchPath:function( pathStack ) {
+
+            var pattern = this.actual;            
+            
+            try{                  
+               return !!matchOf(pattern).against(asAscent(pathStack));
+            } catch( e ) {
+               this.message = function(){
+                  return 'Error thrown running pattern "' + pattern + 
+                         '" against path [' + pathStack.join(',') + ']' + "\n" + (e.stack || e.message) 
+               };
+               return false;      
+            } 
+         }                        
+      });   
+   });
+
+   function compiling(pattern) {
+      return function(){
+         jsonPathCompiler(pattern);
+      }
+   }
    
    function matchOf(pattern) {
       var compiledPattern = jsonPathCompiler(pattern);
