@@ -14,17 +14,7 @@ describe("incremental content builder", function(){
             {key:ROOT_PATH, node:{}}
          )
          
-      )
-      
-      
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject')
-            .thenShouldHaveFired(
-                  TYPE_PATH
-               ,  anAscentContaining(  
-                           {key:ROOT_PATH, node:{}}
-                        )
-            );
+      )      
    })
    
    it('fires path found after key is found in root object', function() {
@@ -170,6 +160,7 @@ describe("incremental content builder", function(){
          toHaveFired: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
+            var notifyStub = asserter._notifyStub;
             
             var ascentMatch = sinon.match(function ( foundAscent ) {
                      
@@ -200,11 +191,9 @@ describe("incremental content builder", function(){
                
             }, 'ascent match');
          
-         
-
                     
             this.message = function(){
-               if( !asserter._notifyStub.called ) {
+               if( !notifyStub.called ) {
                   return 'no events have been fired at all';
                }
 
@@ -223,15 +212,16 @@ describe("incremental content builder", function(){
             
                return   'expected a call with : \t' + reportCall(eventName, expectedAscent) +
                         '\n' +  
-                        'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
+                        'latest call had :      \t' + reportArgs(notifyStub.lastCall.args) +
                         '\n' +
                         'all calls were :' +
                         '\n                     \t' +
-                        this._notifyStub.args.map( reportArgs ).join('\n                     \t')
+                        notifyStub.args.map( reportArgs ).join('\n                     \t')
             };
-            
-            
-            return asserter._notifyStub.calledWithMatch( eventName, ascentMatch );
+
+
+
+            return notifyStub.calledWithMatch( eventName, ascentMatch );
          }
                               
       });   
