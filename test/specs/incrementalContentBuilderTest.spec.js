@@ -247,74 +247,7 @@ describe("incremental content builder", function(){
                               
       });   
    });
-   
-   
-   
-   IncrementalContentBuilderAsserter.prototype.toHaveFired = function( eventName, expectedAscent ) {
-   
-      var ascentMatch = sinon.match(function ( foundAscent ) {
-         
-         function matches( expect, found ) {
-            if( !expect && !found ) {
-               return true;
-            }
-            
-            if( !expect || !found ) {
-               // Both not empty, but one is. Inequal length.
-               return false;
-            }
-            
-            if( head(expect).key != head(found).key ) {
-               // keys inequal
-               return false;
-            }
-            
-            if( JSON.stringify( head(expect).node ) != JSON.stringify( head(found).node ) ) {
-               // nodes inequal         
-               return false;
-            }
-            
-            return matches(tail(expect), tail(found));
-         }
-         
-         return matches(expectedAscent, foundAscent);
-         
-      }, 'ascent match');
-   
-   
-      function reportCall(eventName, ascentList) {
       
-         var argArray = listAsArray(ascentList);
-         
-         var toJson = JSON.stringify.bind(JSON);
-         
-         return 'type:' + eventName + ', ascent:[' + argArray.map(toJson).join(',    \t') + ']';
-      }
-      
-      function reportArgs(args){
-         return reportCall(args[0], args[1]);
-      }
-   
-      if( !this._notifyStub.called ) {
-         fail('notify has not been called');
-      }
-   
-      if( !this._notifyStub.calledWithMatch( eventName, ascentMatch ) ) {
-      
-         fail(     
-            '\n' +
-            'expected a call with : \t' + reportCall(eventName, expectedAscent) +
-            '\n' +  
-            'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
-            '\n' +
-            'all calls were :' +
-            '\n                     \t' +
-            this._notifyStub.args.map( reportArgs ).join('\n                     \t')
-         );
-      }
-      return this;   
-   };
-   
    function anAscentContaining ( /* descriptors */ ) {
       
       var ascentArray = Array.prototype.slice.call(arguments),
