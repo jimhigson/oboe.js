@@ -20,9 +20,9 @@ describe("incremental content builder", function(){
    it('fires path found after key is found in root object', function() {
       // above test, plus some extra events from clarinet
    
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject')      
-         .whenClarinetFires('onkey', 'flavour')
+      aContentBuilder()
+         .receivingEvent('onopenobject')      
+         .receivingEvent('onkey', 'flavour')
             .thenShouldHaveFired(
                   TYPE_PATH
                ,  anAscentContaining(  
@@ -35,8 +35,8 @@ describe("incremental content builder", function(){
    it('fires path found if key is found at same time as root object', function() {
       // above test, plus some extra events from clarinet
    
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject', 'flavour')      
+      aContentBuilder()
+         .receivingEvent('onopenobject', 'flavour')      
             .thenShouldHaveFired(
                   TYPE_PATH
                ,  anAscentContaining(  
@@ -48,10 +48,10 @@ describe("incremental content builder", function(){
    
    it('fires node found after value is found for that key', function() {
    
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject')      
-         .whenClarinetFires('onkey'    ,  'flavour')
-         .whenClarinetFires('onvalue'  ,  'strawberry')
+      aContentBuilder()
+         .receivingEvent('onopenobject')      
+         .receivingEvent('onkey'    ,  'flavour')
+         .receivingEvent('onvalue'  ,  'strawberry')
             .thenShouldHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
@@ -64,11 +64,11 @@ describe("incremental content builder", function(){
    
    it('fires node found after root object closes', function() {
    
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject')      
-         .whenClarinetFires('onkey', 'flavour')
-         .whenClarinetFires('onvalue', 'strawberry')
-         .whenClarinetFires('oncloseobject')
+      aContentBuilder()
+         .receivingEvent('onopenobject')      
+         .receivingEvent('onkey', 'flavour')
+         .receivingEvent('onvalue', 'strawberry')
+         .receivingEvent('oncloseobject')
             .thenShouldHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
@@ -80,11 +80,11 @@ describe("incremental content builder", function(){
    
    it('provides numeric paths for first array element', function() {
 
-      givenAnIncrementalContentBuilder()
-          .whenClarinetFires('onopenobject')
-          .whenClarinetFires('onkey', 'alphabet')
-          .whenClarinetFires('onopenarray')
-          .whenClarinetFires('onvalue', 'a')
+      aContentBuilder()
+          .receivingEvent('onopenobject')
+          .receivingEvent('onkey', 'alphabet')
+          .receivingEvent('onopenarray')
+          .receivingEvent('onvalue', 'a')
           .thenShouldHaveFired(
              TYPE_PATH
              , anAscentContaining(
@@ -98,12 +98,12 @@ describe("incremental content builder", function(){
    
    it('provides numeric paths for second array element', function() {
 
-      givenAnIncrementalContentBuilder()
-          .whenClarinetFires('onopenobject')
-          .whenClarinetFires('onkey', 'alphabet')
-          .whenClarinetFires('onopenarray')
-          .whenClarinetFires('onvalue', 'a')
-          .whenClarinetFires('onvalue', 'b')
+      aContentBuilder()
+          .receivingEvent('onopenobject')
+          .receivingEvent('onkey', 'alphabet')
+          .receivingEvent('onopenarray')
+          .receivingEvent('onvalue', 'a')
+          .receivingEvent('onvalue', 'b')
           .thenShouldHaveFired(
              TYPE_PATH
              , anAscentContaining(
@@ -117,11 +117,11 @@ describe("incremental content builder", function(){
    
    it('provides nodes for first array element', function() {
    
-      givenAnIncrementalContentBuilder()
-         .whenClarinetFires('onopenobject')      
-         .whenClarinetFires('onkey'    ,  'alphabet')
-         .whenClarinetFires('onopenarray')
-         .whenClarinetFires('onvalue'    ,  'a')                  
+      aContentBuilder()
+         .receivingEvent('onopenobject')      
+         .receivingEvent('onkey'    ,  'alphabet')
+         .receivingEvent('onopenarray')
+         .receivingEvent('onvalue'    ,  'a')                  
             .thenShouldHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
@@ -133,10 +133,9 @@ describe("incremental content builder", function(){
    
    })        
    
-   function givenAnIncrementalContentBuilder() {
+   function aContentBuilder() {
       return new IncrementalContentBuilderAsserter( {}, sinon.stub() );
    }
-   var aContentBuilder = givenAnIncrementalContentBuilder;
    
    function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
       
@@ -145,8 +144,7 @@ describe("incremental content builder", function(){
       this._subject = incrementalContentBuilder(clarinetStub, notifyStub);
    }
    
-   IncrementalContentBuilderAsserter.prototype.receivingEvent =
-   IncrementalContentBuilderAsserter.prototype.whenClarinetFires = function(fnName /* args */){
+   IncrementalContentBuilderAsserter.prototype.receivingEvent = function(fnName /* args */){
    
       var args = Array.prototype.slice.call(arguments, 1);
    
