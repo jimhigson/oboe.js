@@ -336,32 +336,47 @@ describe('jsonPath', function(){
             )).toSpecifyNode({ l1: 'leaf' });         
                   
          });
+         
+         it('returns captured node with array notation', function() {
+         
+            expect( matchOf( '$["l1"].l2' ).against( 
+                        
+                ascentFrom({ l1: {l2:'leaf'} })                    
+             
+            )).toSpecifyNode({ l2: 'leaf' });
+         
+         });
+         
+         it('returns captured node with array numbered notation', function() {
+         
+            expect( matchOf( '$["2"].l2' ).against( 
+                        
+                ascentFrom({ '2': {l2:'leaf'} })                    
+             
+            )).toSpecifyNode({ l2: 'leaf' });         
+         
+         });
+         
+         it('returns captured node with star notation', function() {
+         
+            expect( matchOf( '!..$*.l3' ).against( 
+                        
+                ascentFrom({ l1: {l2:{l3:'leaf'}} })                    
+             
+            )).toSpecifyNode({ l3: 'leaf' });
+                     
+         });
+         
+         it('returns captured node with array star notation', function(){
+
+            expect( matchOf( '!..$[*].l3' ).against( 
+                        
+                ascentFrom({ l1: {l2:{l3:'leaf'}} })                    
+             
+            )).toSpecifyNode({ l3: 'leaf' });
+                     
+         }); 
             /*
-            
-         ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
-               expect('$["foo"].bar')         
-                   .toMatchPath( 
-                         [        'foo',    'bar'  ], 
-                         ['root', 'target', 'child'])
-                            .returning('target');
-            }
-            
-         ,  testCanReturnCorrectNodeWithArrayNumberedNotationCss4StylePattern: function() {      
-               expect('$[2].bar')         
-                   .toMatchPath( 
-                         [        '2',      'bar'  ], 
-                         ['root', 'target', 'child'])
-                            .returning('target');
-            }      
-            
-         ,  testCanReturnCorrectNodeInInStarCss4StylePattern: function() {      
-               expect('!..$*.bar')         
-                   .toMatchPath( 
-                         [        'anything', 'bar'  ], 
-                         ['root', 'target',   'child'])
-                            .returning('target');
-            }
-            
          ,  testCanReturnCorrectNodeInInArrayStarCss4StylePattern: function() {      
                expect('!..$[*].bar')         
                    .toMatchPath( 
