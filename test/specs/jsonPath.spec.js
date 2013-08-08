@@ -55,7 +55,7 @@ describe('jsonPath', function(){
                var pattern = this.actual;            
                
                try{                  
-                  return !!matchOf(pattern).against(pathStack);
+                  return !!matchOf(pattern).against(asAscent(pathStack));
                } catch( e ) {
                   this.message = function(){
                      return 'Error thrown running pattern "' + pattern + 
@@ -288,14 +288,13 @@ describe('jsonPath', function(){
             });
          });
             
-         it('returns last node when no css4-style syntax is used', function(){
+         it('returns deepest node when no css4-style syntax is used', function(){
                         
             expect( matchOf( 'foo.*' ).against( 
             
-                [        'a',       'foo',     'a'], 
-                ['root', 'gparent', 'parent',  'target']
-            
-            )).toSpecifyNode('target');
+                ascentFrom({ a:       {foo:      {a:'target'}}})                    
+             
+            )).toSpecifyNode('target');  
             
          });
          /*
@@ -450,15 +449,16 @@ describe('jsonPath', function(){
                          
             }*/      
       });
-   }); 
+   });
+
    
    function matchOf(pattern) {
       var compiledPattern = jsonPathCompiler(pattern);
    
       return {
-         against:function(pathStack, nodeStack) {
+         against:function(ascent) {
          
-            return compiledPattern(asAscent(pathStack, nodeStack));
+            return compiledPattern(ascent);
          }
       };
    }
@@ -502,7 +502,40 @@ describe('jsonPath', function(){
       }
       
       return ascent;      
-   }    
+   }
+   
+   /** pass me an object with only one child at each level and will return a nodeStack
+    *  and pathStack which describes the only possibly descent top-to-bottom
+    *  
+    *  @param {Object} description eg { a:       {foo:      {a:'target'}}}
+    */
+   function ascentFrom( description ) {
+   
+      function onlyMapping(obj) {
+         // this for won't loop but it is the most obvious way to extract a 
+         // key/value pair where the key is unknown
+         for( var i in obj ) {
+            return {key:i, node:obj[i]};
+         } 
+      }   
+      
+      var ascent = emptyList,
+          curDesc = description;
+            
+      while( typeof curDesc == 'object' ) {
+      
+         var mapping = onlyMapping(curDesc);
+          
+         curDesc = mapping.node;
+         
+         ascent = cons( mapping, ascent ); 
+      }
+      
+      console.log('from description', JSON.stringify(description), 'we got ascent',
+         JSON.stringify( listAsArray(ascent)) ); 
+      
+      return ascent;            
+   }       
    
 });   
 
