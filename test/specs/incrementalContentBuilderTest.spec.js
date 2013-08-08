@@ -1,9 +1,6 @@
-(function(){
+describe("incremental content builder", function(){
 
-TestCase('incrementalParsedContentTest', {
-
-
-   testFiresPathFoundAfterRootObjectOpens: function() {
+   it('first path found when root object opens', function() {
       
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')
@@ -13,9 +10,9 @@ TestCase('incrementalParsedContentTest', {
                            {key:ROOT_PATH, node:{}}
                         )
             );
-   },
+   });
    
-   testFiresPathFoundAfterKeyIsFoundInRootObject: function() {
+   it('fires path found after key is found in root object', function() {
       // above test, plus some extra events from clarinet
    
       givenAnIncrementalContentBuilder()
@@ -28,9 +25,9 @@ TestCase('incrementalParsedContentTest', {
                         ,  {key:'flavour', node:undefined}
                         )
             );   
-   },
+   })
    
-   testFiresPathFoundIfKeyIsFoundAtSameTimeAsRootObject: function() {
+   it('fires path found if key is found at same time as root object', function() {
       // above test, plus some extra events from clarinet
    
       givenAnIncrementalContentBuilder()
@@ -42,9 +39,9 @@ TestCase('incrementalParsedContentTest', {
                         ,  {key:'flavour', node:undefined}
                         )
             );   
-   },   
+   })   
    
-   testFiresNodeFoundAfterValueIsFoundForThatKey: function() {
+   it('FiresNodeFoundAfterValueIsFoundForThatKey', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
@@ -58,9 +55,9 @@ TestCase('incrementalParsedContentTest', {
                         )
             );   
    
-   },
+   })
    
-   testFiresNodeFoundAfterRootObjectCloses: function() {
+   it('FiresNodeFoundAfterRootObjectCloses', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
@@ -73,10 +70,10 @@ TestCase('incrementalParsedContentTest', {
                           {key:ROOT_PATH, node:{flavour:'strawberry'}}
                         )
             );                  
-   },
+   })
    
    
-   testProvidesNumericPathsForFirstArrayElement: function() {
+   it('ProvidesNumericPathsForFirstArrayElement', function() {
 
       givenAnIncrementalContentBuilder()
           .whenClarinetFires('onopenobject')
@@ -92,9 +89,9 @@ TestCase('incrementalParsedContentTest', {
              )
       );
 
-   },
+   })
    
-   testProvidesNumericPathsForSecondArrayElement: function() {
+   it('ProvidesNumericPathsForSecondArrayElement', function() {
 
       givenAnIncrementalContentBuilder()
           .whenClarinetFires('onopenobject')
@@ -111,9 +108,9 @@ TestCase('incrementalParsedContentTest', {
              )
       );
 
-   },   
+   })   
    
-   testProvidesNodesForFirstArrayElement: function() {
+   it('ProvidesNodesForFirstArrayElement', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
@@ -129,104 +126,102 @@ TestCase('incrementalParsedContentTest', {
                   )
             );   
    
-   }        
+   })        
    
-});
-
-function givenAnIncrementalContentBuilder() {
-   return new IncrementalContentBuilderAsserter( {}, sinon.stub() );
-}
-
-function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
+   function givenAnIncrementalContentBuilder() {
+      return new IncrementalContentBuilderAsserter( {}, sinon.stub() );
+   }
    
-   this._clarinetStub = clarinetStub;
-   this._notifyStub = notifyStub;
-   this._subject = incrementalContentBuilder(clarinetStub, notifyStub);
-}
-
-IncrementalContentBuilderAsserter.prototype.whenClarinetFires = function(fnName /* args */){
-
-   var args = Array.prototype.slice.call(arguments, 1);
-
-   this._clarinetStub[fnName].apply( undefined, args );
-   return this;
-};
-
-IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( eventName, expectedAscent ) {
-
-   var ascentMatch = sinon.match(function ( foundAscent ) {
+   function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
       
-      function matches( expect, found ) {
-         if( !expect && !found ) {
-            return true;
+      this._clarinetStub = clarinetStub;
+      this._notifyStub = notifyStub;
+      this._subject = incrementalContentBuilder(clarinetStub, notifyStub);
+   }
+   
+   IncrementalContentBuilderAsserter.prototype.whenClarinetFires = function(fnName /* args */){
+   
+      var args = Array.prototype.slice.call(arguments, 1);
+   
+      this._clarinetStub[fnName].apply( undefined, args );
+      return this;
+   };
+   
+   IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( eventName, expectedAscent ) {
+   
+      var ascentMatch = sinon.match(function ( foundAscent ) {
+         
+         function matches( expect, found ) {
+            if( !expect && !found ) {
+               return true;
+            }
+            
+            if( !expect || !found ) {
+               // Both not empty, but one is. Inequal length.
+               return false;
+            }
+            
+            if( head(expect).key != head(found).key ) {
+               // keys inequal
+               return false;
+            }
+            
+            if( JSON.stringify( head(expect).node ) != JSON.stringify( head(found).node ) ) {
+               // nodes inequal         
+               return false;
+            }
+            
+            return matches(tail(expect), tail(found));
          }
          
-         if( !expect || !found ) {
-            // Both not empty, but one is. Inequal length.
-            return false;
-         }
+         return matches(expectedAscent, foundAscent);
          
-         if( head(expect).key != head(found).key ) {
-            // keys inequal
-            return false;
-         }
+      }, 'ascent match');
+   
+   
+      function reportCall(eventName, ascentList) {
+      
+         var argArray = listAsArray(ascentList);
          
-         if( JSON.stringify( head(expect).node ) != JSON.stringify( head(found).node ) ) {
-            // nodes inequal         
-            return false;
-         }
+         var toJson = JSON.stringify.bind(JSON);
          
-         return matches(tail(expect), tail(found));
+         return 'type:' + eventName + ', ascent:[' + argArray.map(toJson).join(',    \t') + ']';
       }
       
-      return matches(expectedAscent, foundAscent);
+      function reportArgs(args){
+         return reportCall(args[0], args[1]);
+      }
+   
+      if( !this._notifyStub.called ) {
+         fail('notify has not been called');
+      }
+   
+      if( !this._notifyStub.calledWithMatch( eventName, ascentMatch ) ) {
       
-   }, 'ascent match');
-
-
-   function reportCall(eventName, ascentList) {
+         fail(     
+            '\n' +
+            'expected a call with : \t' + reportCall(eventName, expectedAscent) +
+            '\n' +  
+            'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
+            '\n' +
+            'all calls were :' +
+            '\n                     \t' +
+            this._notifyStub.args.map( reportArgs ).join('\n                     \t')
+         );
+      }
+      return this;   
+   };
    
-      var argArray = listAsArray(ascentList);
+   function anAscentContaining ( /* descriptors */ ) {
       
-      var toJson = JSON.stringify.bind(JSON);
+      var ascentArray = Array.prototype.slice.call(arguments),
+          ascentList = emptyList;
+         
+      ascentArray.forEach( function(ascentNode){
+         ascentList = cons(ascentNode, ascentList);
+      });
       
-      return 'type:' + eventName + ', ascent:[' + argArray.map(toJson).join(',    \t') + ']';
-   }
-   
-   function reportArgs(args){
-      return reportCall(args[0], args[1]);
+      return ascentList;
    }
 
-   if( !this._notifyStub.called ) {
-      fail('notify has not been called');
-   }
-
-   if( !this._notifyStub.calledWithMatch( eventName, ascentMatch ) ) {
-   
-      fail(     
-         '\n' +
-         'expected a call with : \t' + reportCall(eventName, expectedAscent) +
-         '\n' +  
-         'latest call had :      \t' + reportArgs(this._notifyStub.lastCall.args) +
-         '\n' +
-         'all calls were :' +
-         '\n                     \t' +
-         this._notifyStub.args.map( reportArgs ).join('\n                     \t')
-      );
-   }
-   return this;   
-};
-
-function anAscentContaining ( /* descriptors */ ) {
-   
-   var ascentArray = Array.prototype.slice.call(arguments),
-       ascentList = emptyList;
-      
-   ascentArray.forEach( function(ascentNode){
-      ascentList = cons(ascentNode, ascentList);
-   });
-   
-   return ascentList;
-}
-
-})();
+});
