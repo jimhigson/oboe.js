@@ -1,6 +1,6 @@
 describe("incremental content builder", function(){
 
-   it('first path found when root object opens', function() {
+   it('fires path found when root object opens', function() {
       
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')
@@ -10,7 +10,7 @@ describe("incremental content builder", function(){
                            {key:ROOT_PATH, node:{}}
                         )
             );
-   });
+   })
    
    it('fires path found after key is found in root object', function() {
       // above test, plus some extra events from clarinet
@@ -41,7 +41,7 @@ describe("incremental content builder", function(){
             );   
    })   
    
-   it('FiresNodeFoundAfterValueIsFoundForThatKey', function() {
+   it('fires node found after value is found for that key', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
@@ -57,7 +57,7 @@ describe("incremental content builder", function(){
    
    })
    
-   it('FiresNodeFoundAfterRootObjectCloses', function() {
+   it('fires node found after root object closes', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
@@ -73,7 +73,7 @@ describe("incremental content builder", function(){
    })
    
    
-   it('ProvidesNumericPathsForFirstArrayElement', function() {
+   it('provides numeric paths for first array element', function() {
 
       givenAnIncrementalContentBuilder()
           .whenClarinetFires('onopenobject')
@@ -91,7 +91,7 @@ describe("incremental content builder", function(){
 
    })
    
-   it('ProvidesNumericPathsForSecondArrayElement', function() {
+   it('provides numeric paths for second array element', function() {
 
       givenAnIncrementalContentBuilder()
           .whenClarinetFires('onopenobject')
@@ -110,7 +110,7 @@ describe("incremental content builder", function(){
 
    })   
    
-   it('ProvidesNodesForFirstArrayElement', function() {
+   it('provides nodes for first array element', function() {
    
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')      
