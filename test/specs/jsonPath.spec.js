@@ -378,7 +378,7 @@ describe('jsonPath', function(){
       
       describe('with duck matching', function() {
       
-         it('can do basic duck matching', function(){
+         it('can do basic ducking', function(){
          
             var rootJson = {  
                people:{                           
@@ -400,7 +400,7 @@ describe('jsonPath', function(){
          
          });
 
-         it('can duck match on two levels of a path', function(){
+         it('can duck on two levels of a path', function(){
          
             var rootJson = {  
                people:{                           
@@ -442,61 +442,83 @@ describe('jsonPath', function(){
             )).not.toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});                                    
          });         
       
-/*
+         it('fails if not all fields are there', function(){
+         
+            var rootJson = {  
+               people:{                           
+                  jack:{
+                     // no name here!
+                     email: 'jack@example.com'
+                  }
+               }
+            };    
+            
+            expect( matchOf( '{name email}' ).against( 
+                                               
+               asAscent(
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]
+               )
+             
+            )).not.toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});         
+         
+         });
+         
+         it('fails if something upstream fails', function(){
+         
+            var rootJson = {  
+               women:{                           
+                  betty:{
+                     name:'Betty' 
+                  ,  email: 'betty@example.com'
+                  }
+               },
+               men:{
+                  // we don't have no menz!
+               }
+            };    
+            
+            expect( matchOf( 'men.{name email}' ).against( 
+                                               
+               asAscent(
+                  [          'women',          'betty'                 ], 
+                  [rootJson, rootJson.women,   rootJson.women.betty    ]
+               )
+             
+            )).not.toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});         
+         
+         });
+         
+         it('does not crash given ascent starting from non-objects', function(){
+         
+            var rootJson = [ 1, 2, 3 ];    
+                           
+            expect( function(){ matchOf( '{spin taste}' ).against( 
+                                               
+               asAscent(
+                  [         '0'           ], 
+                  [rootJson, rootJson[0]  ]
+               )
+             
+            )}).not.toThrow();
+         
+         });
+         
+         it('does not match when given non-object', function(){
 
-            
-         ,  testCanDuckMatchSuccessOnSeveralLevelsOfAPath: function() {
+            var rootJson = [ 1, 2, 3 ];
          
-               
-            }      
-            
-         ,  testCanDuckMatchUnsuccessfullyWhenAFieldIsMissing: function() {
+            expect( matchOf( '{spin taste}' ).against( 
+                                               
+               asAscent(
+                  [         '0'           ], 
+                  [rootJson, rootJson[0]  ]
+               )
+             
+            )).toBeFalsy();         
          
-               var rootJson = {  
-                                 people:{                           
-                                    jack:{
-                                       // no name here!
-                                       email: 'jack@example.com'
-                                    }
-                                 }
-                              };    
-               
-               expect('{name email}')         
-                   .not.toMatchPath( 
-                         [          'people',          'jack'                 ], 
-                         [rootJson, rootJson.people,   rootJson.people.jack   ]);
-            }
-            
-         ,  testCanFailADuckMatchExpressionBecauseUpstreamPathIsWrong: function() {
-         
-               var rootJson = {  
-                                 women:{                           
-                                    betty:{
-                                       name:'Betty' 
-                                    ,  email: 'betty@example.com'
-                                    }
-                                 },
-                                 men:{
-                                    // we don't have non here!
-                                 }
-                              };    
-               
-               expect('men.{name email}')         
-                   .not.toMatchPath( 
-                         [          'women',          'betty'                 ], 
-                         [rootJson, rootJson.women,   rootJson.women.betty    ]);
-            }
-            
-         ,  testDuckMatchFailsWhenAppliedToNonObject: function() {
-         
-               var rootJson = [ 1, 2, 3 ];    
-               
-               expect('{spin taste}')         
-                   .not.toMatchPath( 
-                         [         '0'           ], 
-                         [rootJson, rootJson[0]  ]);
-                         
-            }*/      
+         });
+                        
       });
    });
 
