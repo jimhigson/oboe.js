@@ -2,6 +2,21 @@ describe("incremental content builder", function(){
 
    it('fires path found when root object opens', function() {
       
+      expect( 
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')
+      
+      ).toHaveFired(
+      
+         TYPE_PATH
+      ,  anAscentContaining(  
+            {key:ROOT_PATH, node:{}}
+         )
+         
+      )
+      
+      
       givenAnIncrementalContentBuilder()
          .whenClarinetFires('onopenobject')
             .thenShouldHaveFired(
@@ -131,6 +146,7 @@ describe("incremental content builder", function(){
    function givenAnIncrementalContentBuilder() {
       return new IncrementalContentBuilderAsserter( {}, sinon.stub() );
    }
+   var aContentBuilder = givenAnIncrementalContentBuilder;
    
    function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
       
@@ -139,6 +155,7 @@ describe("incremental content builder", function(){
       this._subject = incrementalContentBuilder(clarinetStub, notifyStub);
    }
    
+   IncrementalContentBuilderAsserter.prototype.receivingEvent =
    IncrementalContentBuilderAsserter.prototype.whenClarinetFires = function(fnName /* args */){
    
       var args = Array.prototype.slice.call(arguments, 1);
@@ -146,6 +163,17 @@ describe("incremental content builder", function(){
       this._clarinetStub[fnName].apply( undefined, args );
       return this;
    };
+   
+   beforeEach(function(){
+            
+      this.addMatchers({
+         toHaveFired: function( expectedNode ){
+   
+            return true;
+         }
+                              
+      });   
+   });
    
    IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( eventName, expectedAscent ) {
    
