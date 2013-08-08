@@ -23,7 +23,7 @@ describe("incremental content builder", function(){
       aContentBuilder()
          .receivingEvent('onopenobject')      
          .receivingEvent('onkey', 'flavour')
-            .thenShouldHaveFired(
+            .toHaveFired(
                   TYPE_PATH
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:undefined}}
@@ -37,7 +37,7 @@ describe("incremental content builder", function(){
    
       aContentBuilder()
          .receivingEvent('onopenobject', 'flavour')      
-            .thenShouldHaveFired(
+            .toHaveFired(
                   TYPE_PATH
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:undefined}}
@@ -52,7 +52,7 @@ describe("incremental content builder", function(){
          .receivingEvent('onopenobject')      
          .receivingEvent('onkey'    ,  'flavour')
          .receivingEvent('onvalue'  ,  'strawberry')
-            .thenShouldHaveFired(
+            .toHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
                            {key:ROOT_PATH, node:{flavour:'strawberry'}}
@@ -69,7 +69,7 @@ describe("incremental content builder", function(){
          .receivingEvent('onkey', 'flavour')
          .receivingEvent('onvalue', 'strawberry')
          .receivingEvent('oncloseobject')
-            .thenShouldHaveFired(
+            .toHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
                           {key:ROOT_PATH, node:{flavour:'strawberry'}}
@@ -85,7 +85,7 @@ describe("incremental content builder", function(){
           .receivingEvent('onkey', 'alphabet')
           .receivingEvent('onopenarray')
           .receivingEvent('onvalue', 'a')
-          .thenShouldHaveFired(
+          .toHaveFired(
              TYPE_PATH
              , anAscentContaining(
                    {key:ROOT_PATH,  node:{'alphabet':['a']}    }
@@ -104,7 +104,7 @@ describe("incremental content builder", function(){
           .receivingEvent('onopenarray')
           .receivingEvent('onvalue', 'a')
           .receivingEvent('onvalue', 'b')
-          .thenShouldHaveFired(
+          .toHaveFired(
              TYPE_PATH
              , anAscentContaining(
                    {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
@@ -122,7 +122,7 @@ describe("incremental content builder", function(){
          .receivingEvent('onkey'    ,  'alphabet')
          .receivingEvent('onopenarray')
          .receivingEvent('onvalue'    ,  'a')                  
-            .thenShouldHaveFired(
+            .toHaveFired(
                   TYPE_NODE
                ,  anAscentContaining(  
                      {key:ROOT_PATH,      node:{'alphabet':['a']} }
@@ -227,7 +227,7 @@ describe("incremental content builder", function(){
    
    
    
-   IncrementalContentBuilderAsserter.prototype.thenShouldHaveFired = function( eventName, expectedAscent ) {
+   IncrementalContentBuilderAsserter.prototype.toHaveFired = function( eventName, expectedAscent ) {
    
       var ascentMatch = sinon.match(function ( foundAscent ) {
          
