@@ -326,14 +326,17 @@ describe('jsonPath', function(){
               )).toSpecifyNode({l3:    {bar:    'leaf'}});         
                            
          });
+         
+         it('can match children of root while capturing the root', function() {
+         
+            expect( matchOf( '$!.*' ).against( 
+            
+                ascentFrom({ l1: 'leaf' })                    
+             
+            )).toSpecifyNode({ l1: 'leaf' });         
+                  
+         });
             /*
-         ,  testCanMatchChildrenOfRootWileReturningTheRoot: function() {      
-               expect('$!.*')                     
-                  .toMatchPath( 
-                        [        'a'    ], 
-                        ['root', 'child'])
-                           .returning('root');     
-            }                  
             
          ,  testCanReturnCorrectNodeWithArrayStringNotationCss4StylePattern: function() {      
                expect('$["foo"].bar')         
@@ -538,10 +541,7 @@ describe('jsonPath', function(){
          
          ascent = cons( mapping, ascent ); 
       }
-      
-      console.log('from description', description, 'we got ascent',
-         listAsArray(ascent) ); 
-      
+            
       return ascent;            
    }       
    
