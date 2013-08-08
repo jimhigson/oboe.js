@@ -150,14 +150,7 @@ module.exports = function (grunt) {
       
    });
 
-   grunt.loadNpmTasks('grunt-contrib-concat');
-   grunt.loadNpmTasks('grunt-wrap');
-   grunt.loadNpmTasks('grunt-contrib-uglify');   
-   grunt.loadNpmTasks('grunt-karma');
-   grunt.loadNpmTasks('grunt-contrib-copy');      
-   grunt.loadNpmTasks('grunt-contrib-watch');      
-   grunt.loadNpmTasks('grunt-clear');      
-   grunt.loadNpmTasks('grunt-exec');
+   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
    grunt.registerTask('start-stream-source', function () {
       require('./test/streamsource.js').startServer(grunt, STREAM_SOURCE_PORT);  
