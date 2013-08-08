@@ -20,117 +20,140 @@ describe("incremental content builder", function(){
    it('fires path found after key is found in root object', function() {
       // above test, plus some extra events from clarinet
    
-      aContentBuilder()
-         .receivingEvent('onopenobject')      
-         .receivingEvent('onkey', 'flavour')
-            .toHaveFired(
-                  TYPE_PATH
-               ,  anAscentContaining(  
-                           {key:ROOT_PATH, node:{flavour:undefined}}
-                        ,  {key:'flavour', node:undefined}
-                        )
-            );   
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')      
+            .receivingEvent('onkey', 'flavour')      
+      
+      ).toHaveFired(
+          TYPE_PATH
+       ,  anAscentContaining(  
+             {key:ROOT_PATH, node:{flavour:undefined}}
+          ,  {key:'flavour', node:undefined}
+          )      
+      )
+      
    })
    
    it('fires path found if key is found at same time as root object', function() {
       // above test, plus some extra events from clarinet
-   
-      aContentBuilder()
-         .receivingEvent('onopenobject', 'flavour')      
-            .toHaveFired(
-                  TYPE_PATH
-               ,  anAscentContaining(  
-                           {key:ROOT_PATH, node:{flavour:undefined}}
-                        ,  {key:'flavour', node:undefined}
-                        )
-            );   
+
+      expect(
+      
+         aContentBuilder()      
+            .receivingEvent('onopenobject', 'flavour')      
+      ).toHaveFired(
+          TYPE_PATH
+       ,  anAscentContaining(  
+             {key:ROOT_PATH, node:{flavour:undefined}}
+          ,  {key:'flavour', node:undefined}
+          )      
+      )
+      
    })   
    
    it('fires node found after value is found for that key', function() {
    
-      aContentBuilder()
-         .receivingEvent('onopenobject')      
-         .receivingEvent('onkey'    ,  'flavour')
-         .receivingEvent('onvalue'  ,  'strawberry')
-            .toHaveFired(
-                  TYPE_NODE
-               ,  anAscentContaining(  
-                           {key:ROOT_PATH, node:{flavour:'strawberry'}}
-                        ,  {key:'flavour', node:'strawberry'}
-                        )
-            );   
-   
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')      
+            .receivingEvent('onkey'    ,  'flavour')
+            .receivingEvent('onvalue'  ,  'strawberry')               
+      
+      ).toHaveFired(
+         TYPE_NODE
+      ,  anAscentContaining(  
+            {key:ROOT_PATH, node:{flavour:'strawberry'}}
+         ,  {key:'flavour', node:'strawberry'}
+         )      
+      )   
+         
    })
    
    it('fires node found after root object closes', function() {
    
-      aContentBuilder()
-         .receivingEvent('onopenobject')      
-         .receivingEvent('onkey', 'flavour')
-         .receivingEvent('onvalue', 'strawberry')
-         .receivingEvent('oncloseobject')
-            .toHaveFired(
-                  TYPE_NODE
-               ,  anAscentContaining(  
-                          {key:ROOT_PATH, node:{flavour:'strawberry'}}
-                        )
-            );                  
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')      
+            .receivingEvent('onkey', 'flavour')
+            .receivingEvent('onvalue', 'strawberry')
+            .receivingEvent('oncloseobject')               
+      
+      ).toHaveFired(
+         TYPE_NODE
+      ,  anAscentContaining(  
+            {key:ROOT_PATH, node:{flavour:'strawberry'}}
+         )      
+      )   
+                     
    })
    
    
    it('provides numeric paths for first array element', function() {
 
-      aContentBuilder()
-          .receivingEvent('onopenobject')
-          .receivingEvent('onkey', 'alphabet')
-          .receivingEvent('onopenarray')
-          .receivingEvent('onvalue', 'a')
-          .toHaveFired(
-             TYPE_PATH
-             , anAscentContaining(
-                   {key:ROOT_PATH,  node:{'alphabet':['a']}    }
-                 , {key:'alphabet', node:['a']                 }
-                 , {key:0,          node:'a'                   }
-             )
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')
+            .receivingEvent('onkey', 'alphabet')
+            .receivingEvent('onopenarray')
+            .receivingEvent('onvalue', 'a')               
+      
+      ).toHaveFired(
+         TYPE_PATH
+         , anAscentContaining(
+               {key:ROOT_PATH,  node:{'alphabet':['a']}    }
+            ,  {key:'alphabet', node:['a']                 }
+            ,  {key:0,          node:'a'                   }
+         )            
       );
 
    })
    
    it('provides numeric paths for second array element', function() {
 
-      aContentBuilder()
-          .receivingEvent('onopenobject')
-          .receivingEvent('onkey', 'alphabet')
-          .receivingEvent('onopenarray')
-          .receivingEvent('onvalue', 'a')
-          .receivingEvent('onvalue', 'b')
-          .toHaveFired(
-             TYPE_PATH
-             , anAscentContaining(
-                   {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
-                 , {key:'alphabet', node:['a','b']                }
-                 , {key:1,          node:'b'                      }
-             )
-      );
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')
+            .receivingEvent('onkey', 'alphabet')
+            .receivingEvent('onopenarray')
+            .receivingEvent('onvalue', 'a')
+            .receivingEvent('onvalue', 'b')               
+      
+      ).toHaveFired(
+         TYPE_PATH
+         ,  anAscentContaining(
+            {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
+            , {key:'alphabet', node:['a','b']                }
+            , {key:1,          node:'b'                      }
+         )      
+      )
 
    })   
    
    it('provides nodes for first array element', function() {
-   
-      aContentBuilder()
-         .receivingEvent('onopenobject')      
-         .receivingEvent('onkey'    ,  'alphabet')
-         .receivingEvent('onopenarray')
-         .receivingEvent('onvalue'    ,  'a')                  
-            .toHaveFired(
-                  TYPE_NODE
-               ,  anAscentContaining(  
-                     {key:ROOT_PATH,      node:{'alphabet':['a']} }
-                  ,  {key:'alphabet',     node:['a']              }
-                  ,  {key:0,              node:'a'                }
-                  )
-            );   
-   
+
+      expect(
+      
+         aContentBuilder()
+            .receivingEvent('onopenobject')      
+            .receivingEvent('onkey'    ,  'alphabet')
+            .receivingEvent('onopenarray')
+            .receivingEvent('onvalue'    ,  'a')               
+      
+      ).toHaveFired(
+         TYPE_NODE
+      ,  anAscentContaining(  
+            {key:ROOT_PATH,      node:{'alphabet':['a']} }
+         ,  {key:'alphabet',     node:['a']              }
+         ,  {key:0,              node:'a'                }
+         )      
+      )
+      
    })        
    
    function aContentBuilder() {
