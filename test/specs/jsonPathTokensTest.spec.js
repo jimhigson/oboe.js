@@ -13,7 +13,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       return this;
    };
 
-   NodeDescriptionAsserter.prototype.shouldFind = function (expected) {
+   NodeDescriptionAsserter.prototype.toContainMatches = function (expected) {
 
       if (expected && !this._found) {
          if (!expected.capturing && !expected.name && !expected.fieldList) {
@@ -100,6 +100,12 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
                return true;
             }
+         ,  toNotMatch: function(){
+         
+               var foundResults = this.actual;
+               
+               return !foundResults;         
+            }   
          });
       });
 
@@ -134,57 +140,71 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          })
          
          it('needs a closing brace', function () {
-            expect(pathNodeDesc('{a')).toContainMatches({})
+            expect(pathNodeDesc('{a')).toNotMatch()
          })
       })
 
       describe('object notation', function () {
 
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('aaa').shouldFind({name:'aaa'})
-             .whenDescribing('$aaa').shouldFind({name:'aaa', capturing:true})
-             .whenDescribing('aaa{a b c}').shouldFind({name:'aaa', fieldList:'a b c'})
-             .whenDescribing('$aaa{a b c}').shouldFind({name:'aaa', capturing:true, fieldList:'a b c'})
-
-             .whenDescribing('.a').shouldFind({})
-             .whenDescribing('a.b').shouldFind({name:'a'})
-             .whenDescribing('$$a').shouldFind({})
-             .whenDescribing('.a{').shouldFind({})
+         it('parses', function () {
+            expect(pathNodeDesc('aaa')).toContainMatches({name:'aaa'})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('$aaa')).toContainMatches({name:'aaa', capturing:true})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('aaa{a b c}')).toContainMatches({name:'aaa', fieldList:'a b c'})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('$aaa{a b c}')).toContainMatches({name:'aaa', capturing:true, fieldList:'a b c'})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('.a')).toContainMatches({})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('a.b')).toContainMatches({name:'a'})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('$$a')).toContainMatches({})
+         })
+         it('parses', function () {
+            expect(pathNodeDesc('.a{')).toContainMatches({})
+         })
       })
 
       describe('named array notation', function () {
 
          givenDescriptor(pathNodeDesc)
-             .whenDescribing('["foo"]').shouldFind({name:'foo'})
-             .whenDescribing('$["foo"]').shouldFind({name:'foo', capturing:true})
-             .whenDescribing('["foo"]{a b c}').shouldFind({name:'foo', fieldList:'a b c'})
-             .whenDescribing('$["foo"]{a b c}').shouldFind({name:'foo', capturing:true, fieldList:'a b c'})
+             .whenDescribing('["foo"]').toContainMatches({name:'foo'})
+             .whenDescribing('$["foo"]').toContainMatches({name:'foo', capturing:true})
+             .whenDescribing('["foo"]{a b c}').toContainMatches({name:'foo', fieldList:'a b c'})
+             .whenDescribing('$["foo"]{a b c}').toContainMatches({name:'foo', capturing:true, fieldList:'a b c'})
 
-             .whenDescribing('[]').shouldFind({})
-             .whenDescribing('[foo]').shouldFind({})
-             .whenDescribing('[""]').shouldFind({})
-             .whenDescribing('["foo"]["bar"]').shouldFind({name:'foo'})
-             .whenDescribing('[".foo"]').shouldFind({})
+             .whenDescribing('[]').toContainMatches({})
+             .whenDescribing('[foo]').toContainMatches({})
+             .whenDescribing('[""]').toContainMatches({})
+             .whenDescribing('["foo"]["bar"]').toContainMatches({name:'foo'})
+             .whenDescribing('[".foo"]').toContainMatches({})
       })
 
       describe('numbered array notation', function () {
 
          givenDescriptor(pathNodeDesc)
-             .whenDescribing('[2]').shouldFind({name:'2'})
-             .whenDescribing('[123]').shouldFind({name:'123'})
-             .whenDescribing('$[2]').shouldFind({name:'2', capturing:true})
-             .whenDescribing('[2]{a b c}').shouldFind({name:'2', fieldList:'a b c'})
-             .whenDescribing('$[2]{a b c}').shouldFind({name:'2', capturing:true, fieldList:'a b c'})
+             .whenDescribing('[2]').toContainMatches({name:'2'})
+             .whenDescribing('[123]').toContainMatches({name:'123'})
+             .whenDescribing('$[2]').toContainMatches({name:'2', capturing:true})
+             .whenDescribing('[2]{a b c}').toContainMatches({name:'2', fieldList:'a b c'})
+             .whenDescribing('$[2]{a b c}').toContainMatches({name:'2', capturing:true, fieldList:'a b c'})
 
-             .whenDescribing('[]').shouldFind({})
-             .whenDescribing('[""]').shouldFind({})
+             .whenDescribing('[]').toContainMatches({})
+             .whenDescribing('[""]').toContainMatches({})
       })
 
       describe('can parse node description with name and field list', function () {
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('foo{a b}')
-             .shouldFind({  capturing:false,
+             .toContainMatches({  capturing:false,
                 name:'foo',
                 fieldList:'a b'
              });
@@ -195,7 +215,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('foo')
-             .shouldFind({  capturing:false,
+             .toContainMatches({  capturing:false,
                 name:'foo',
                 fieldList:null
              });
@@ -206,7 +226,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('$foo{a b}')
-             .shouldFind({  capturing:true,
+             .toContainMatches({  capturing:true,
                 name:'foo',
                 fieldList:'a b'
              });
@@ -216,7 +236,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       describe('can parse node description with name only in array notation', function () {
          givenDescriptor(pathNodeDesc)
              .whenDescribing('["foo"]')
-             .shouldFind({  capturing:false,
+             .toContainMatches({  capturing:false,
                 name:'foo',
                 fieldList:null
              });
@@ -226,7 +246,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       describe('can parse node description in pure duck type notation', function () {
          givenDescriptor(pathNodeDesc)
              .whenDescribing('{a b c}')
-             .shouldFind({  capturing:false,
+             .toContainMatches({  capturing:false,
                 name:'',
                 fieldList:'a b c'
              });
