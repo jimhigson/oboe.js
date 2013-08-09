@@ -6,12 +6,35 @@
  * and at some point I should convert them over.
  */
 
-function assertEquals(expected, actual) {
-   expect(actual).toEqual(expected);
+
+
+function assertEquals(a,b,c){
+
+   function assertEquals2(expected, actual) {
+      expect(actual).toEqual(expected);
+   }
+   
+   function assertEquals3(msg, expected, actual) {
+      expect(actual).toEqual(expected);
+   }
+
+   if( arguments.length == 2 ) {
+      assertEquals2(a,b);
+   } else if( arguments.length == 3 ) {
+      assertEquals3(a,b,c);
+   }
+
 }
 
-function assertTrue(actual) {
-   expect(actual).toBe(true);
+function assertTrue(a, b) {
+   if( arguments.length == 2 ) {
+   
+      expect(b).toBe(true);
+
+   } else {
+   
+      expect(a).toBe(true); 
+   }
 }
 
 function assertFalse(actual) {
