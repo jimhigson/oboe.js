@@ -146,45 +146,61 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       describe('object notation', function () {
 
-         it('parses', function () {
+         it('parses a name', function () {
             expect(pathNodeDesc('aaa')).toContainMatches({name:'aaa'})
          })
-         it('parses', function () {
+         it('parses a name and recognises the capturing flag', function () {
             expect(pathNodeDesc('$aaa')).toContainMatches({name:'aaa', capturing:true})
          })
-         it('parses', function () {
+         it('parses a name and field list', function () {
             expect(pathNodeDesc('aaa{a b c}')).toContainMatches({name:'aaa', fieldList:'a b c'})
          })
-         it('parses', function () {
+         it('parses a name with field list and capturing flag', function () {
             expect(pathNodeDesc('$aaa{a b c}')).toContainMatches({name:'aaa', capturing:true, fieldList:'a b c'})
          })
-         it('parses', function () {
-            expect(pathNodeDesc('.a')).toContainMatches({})
+         it('wont parse unless the name is at the start', function () {
+            expect(pathNodeDesc('.a')).toNotMatch()
          })
-         it('parses', function () {
+         it('parses only the first name', function () {
             expect(pathNodeDesc('a.b')).toContainMatches({name:'a'})
          })
-         it('parses', function () {
-            expect(pathNodeDesc('$$a')).toContainMatches({})
+         it('ignores invalid', function () {
+            expect(pathNodeDesc('$$a')).toNotMatch()
          })
-         it('parses', function () {
-            expect(pathNodeDesc('.a{')).toContainMatches({})
+         it('needs field list to close', function () {
+            expect(pathNodeDesc('.a{')).toNotMatch()
          })
       })
 
       describe('named array notation', function () {
 
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('["foo"]').toContainMatches({name:'foo'})
-             .whenDescribing('$["foo"]').toContainMatches({name:'foo', capturing:true})
-             .whenDescribing('["foo"]{a b c}').toContainMatches({name:'foo', fieldList:'a b c'})
-             .whenDescribing('$["foo"]{a b c}').toContainMatches({name:'foo', capturing:true, fieldList:'a b c'})
-
-             .whenDescribing('[]').toContainMatches({})
-             .whenDescribing('[foo]').toContainMatches({})
-             .whenDescribing('[""]').toContainMatches({})
-             .whenDescribing('["foo"]["bar"]').toContainMatches({name:'foo'})
-             .whenDescribing('[".foo"]').toContainMatches({})
+         it('parses quoted', function () {
+            expect(pathNodeDesc('["foo"]')).toContainMatches({name:'foo'})
+         })
+         it('parses quoted and capturing', function () {
+            expect(pathNodeDesc('$["foo"]')).toContainMatches({name:'foo', capturing:true})
+         })
+         it('parses quoted with field list', function () {
+            expect(pathNodeDesc('["foo"]{a b c}')).toContainMatches({name:'foo', fieldList:'a b c'})
+         })
+         it('parses quoted with field list and capturing', function () {
+            expect(pathNodeDesc('$["foo"]{a b c}')).toContainMatches({name:'foo', capturing:true, fieldList:'a b c'})
+         })
+         it('ignores without a path name', function () {
+            expect(pathNodeDesc('[]')).toNotMatch()
+         })
+         it('parses unquoted', function () {
+            expect(pathNodeDesc('[foo]')).toNotMatch()
+         })
+         it('ignores unnamed because of an empty string', function () {
+            expect(pathNodeDesc('[""]')).toNotMatch()
+         })
+         it('parses first token only', function () {
+            expect(pathNodeDesc('["foo"]["bar"]')).toContainMatches({name:'foo'})
+         })
+         it('ignores invalid chars in name', function () {
+            expect(pathNodeDesc('[".foo"]')).toNotMatch()
+         })
       })
 
       describe('numbered array notation', function () {
@@ -196,11 +212,11 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
              .whenDescribing('[2]{a b c}').toContainMatches({name:'2', fieldList:'a b c'})
              .whenDescribing('$[2]{a b c}').toContainMatches({name:'2', capturing:true, fieldList:'a b c'})
 
-             .whenDescribing('[]').toContainMatches({})
-             .whenDescribing('[""]').toContainMatches({})
+             .whenDescribing('[]').toNotMatch()
+             .whenDescribing('[""]').toNotMatch()
       })
 
-      describe('can parse node description with name and field list', function () {
+      it('can parse node description with name and field list', function () {
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('foo{a b}')
@@ -211,7 +227,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       })
 
-      describe('can parse node description with name only', function () {
+      it('can parse node description with name only', function () {
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('foo')
@@ -222,7 +238,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       })
 
-      describe('can parse capturing node description with name and field list', function () {
+      it('can parse capturing node description with name and field list', function () {
 
          givenDescriptor(pathNodeDesc)
              .whenDescribing('$foo{a b}')
@@ -233,7 +249,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       })
 
-      describe('can parse node description with name only in array notation', function () {
+      it('can parse node description with name only in array notation', function () {
          givenDescriptor(pathNodeDesc)
              .whenDescribing('["foo"]')
              .toContainMatches({  capturing:false,
@@ -243,7 +259,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       })
 
-      describe('can parse node description in pure duck type notation', function () {
+      it('can parse node description in pure duck type notation', function () {
          givenDescriptor(pathNodeDesc)
              .whenDescribing('{a b c}')
              .toContainMatches({  capturing:false,
