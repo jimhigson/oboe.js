@@ -15,12 +15,15 @@ describe("whole oboe library with only the network stubbed out", function(){
    
    it('MethodsAreChainable',  function() {
       // very basic test that nothing forgot to return 'this':
-      
-      function noop(){}
-      
-      oboe.doGet('http://example.com/oboez')
-         .onPath('*', noop).onNode('*', noop).onError(noop).onPath('*', noop)
-         .onPath({'*':noop}).onNode({'*': noop}).onPath({'*':noop});
+
+      expect(function(){      
+         function noop(){}
+         
+         oboe.doGet('http://example.com/oboez')
+            .onPath('*', noop).onNode('*', noop).onError(noop).onPath('*', noop)
+            .onPath({'*':noop}).onNode({'*': noop}).onPath({'*':noop});
+            
+      }).not.toThrow();
    })
    
    it('HandlesEmptyObjectDetectedWithBang',  function() {
