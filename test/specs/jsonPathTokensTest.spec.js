@@ -1,11 +1,114 @@
 jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc ) {
 
+   function givenDescriptor(descriptor) {
+      return new NodeDescriptionAsserter(descriptor);
+   }
+  
+   function NodeDescriptionAsserter( descriptor ) {
+      this._descriptor = descriptor;         
+   }
+   
+   NodeDescriptionAsserter.prototype.whenDescribing = function( pathFragment ){
+      this._found = this._descriptor(pathFragment);
+      return this;         
+   };
+  
+   NodeDescriptionAsserter.prototype.shouldFind = function( expected ){
+   
+      if( expected && !this._found ) {
+         if( !expected.capturing && !expected.name && !expected.fieldList ) {
+            return this; // wasn't expecting to find anything
+         }
+      
+         throw new Error('wanted to find ' + JSON.stringify(expected) + ' but did not find any matches');
+      }
+      
+      expect(!!this._found[1])      .toBe(!!expected.capturing);
+      expect(this._found[2])        .toBe(expected.name || '');
+      expect(this._found[3] || '')  .toBe(expected.fieldList || '');
+            
+      return this;      
+   };  
+           
+   function RegexMatchAsserter( pattern ){
+      this._regex = pattern;                
+   }
+        
+   RegexMatchAsserter.prototype.shouldNotMatch = function(candidate) {
+
+      this._candidate = candidate;
+
+      assertFalse(
+       
+         'pattern ' + this._regex + ' should not have matched "' + candidate + '" but found' +
+             JSON.stringify( this._regex.exec( candidate ) )         
+      ,   this._matched( candidate ) 
+      );      
+      
+      return this;
+   };
+   
+   RegexMatchAsserter.prototype.finding = function(expected) {
+      
+      var result = this._regex.exec( this._candidate );
+
+      assertEquals( expected,  result[1]);
+      
+      return this;
+   };   
+   
+   RegexMatchAsserter.prototype._matched = function(candidate) {
+      
+      var result = this._regex.exec( candidate );
+      return !!(result && (result[0] === candidate));  
+   };
+   
+   RegexMatchAsserter.prototype.capturing = function(arrayOfExpected) {
+            
+      return this;
+   };      
+   
+   
+
    describe('json path token parser', function() {
    
-      it('field list matches correctly',  function() {
+      beforeEach(function(){
+         this.addMatchers({
+            toContainMatches:function(expectedResults) {
+               
+               var foundResults = this.actual;
+               
+               if( expectedResults && !foundResults ) {
+                  if( !expectedResults.capturing && !expectedResults.name && !expectedResults.fieldList ) {
+                     return true; // wasn't expecting to find anything
+                  }
+               
+                  this.message = function(){ return 'did not find anything' };
+                  return false;
+               }
+               
+               if((!!foundResults[1]    ) !=  (!!expectedResults.capturing))    {
+                  return false
+               }
+               if((foundResults[2]      ) !=  (expectedResults.name || ''))     {
+                  return false
+               }
+               if((foundResults[3] || '') !=  (expectedResults.fieldList || '')){
+                  return false
+               }
+               
+               return true;                
+            }
+         });
+      });
+   
+      describe('field list',  function() {
       
-         givenDescriptor(pathNodeDesc)
-            .whenDescribing(   '{}'        ).shouldFind({fieldList:''       })
+         it('can parse zero-length list', function(){
+            expect( pathNodeDesc('{}') ).toContainMatches({fieldList:''})
+         });
+         
+         givenDescriptor(pathNodeDesc)            
             .whenDescribing(   '{a}'       ).shouldFind({fieldList:'a'      })
             .whenDescribing(   '{r2 d2}'   ).shouldFind({fieldList:'r2 d2'  })
             .whenDescribing(   '{1 2}'     ).shouldFind({fieldList:'1 2'    })
@@ -17,7 +120,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing('{a'           ).shouldFind({})
       })
       
-      it('object notation',  function() {
+      describe('object notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    'aaa'              ).shouldFind({name:'aaa'})
@@ -31,7 +134,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '.a{'            ).shouldFind({})
       })
       
-      it('named array notation',  function() {
+      describe('named array notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    '["foo"]'          ).shouldFind({name: 'foo'})
@@ -46,7 +149,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '[".foo"]'       ).shouldFind({})                        
       })
       
-      it('numbered array notation',  function() {
+      describe('numbered array notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    '[2]'              ).shouldFind({name:'2'})
@@ -59,7 +162,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '[""]' ).shouldFind({})            
       })
       
-     it('can parse node description with name and field list',  function() {
+     describe('can parse node description with name and field list',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('foo{a b}')
@@ -70,7 +173,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-     it('can parse node description with name only',  function() {
+     describe('can parse node description with name only',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('foo')
@@ -81,7 +184,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-     it('can parse capturing node description with name and field list',  function() {
+     describe('can parse capturing node description with name and field list',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('$foo{a b}')
@@ -92,7 +195,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })     
       
-      it('can parse node description with name only in array notation',  function() {      
+      describe('can parse node description with name only in array notation',  function() {      
          givenDescriptor(pathNodeDesc)
             .whenDescribing('["foo"]')
             .shouldFind({  capturing:  false,
@@ -102,7 +205,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-      it('can parse node description in pure duck type notation',  function() {      
+      describe('can parse node description in pure duck type notation',  function() {      
          givenDescriptor(pathNodeDesc)
             .whenDescribing('{a b c}')
             .shouldFind({  capturing:  false,
@@ -114,73 +217,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          
     
      
-      function givenDescriptor(descriptor) {
-         return new NodeDescriptionAsserter(descriptor);
-      }
-     
-      function NodeDescriptionAsserter( descriptor ) {
-         this._descriptor = descriptor;         
-      }
-      
-      NodeDescriptionAsserter.prototype.whenDescribing = function( pathFragment ){
-         this._found = this._descriptor(pathFragment);
-         return this;         
-      };
-     
-      NodeDescriptionAsserter.prototype.shouldFind = function( expected ){
-      
-         if( expected && !this._found ) {
-            if( !expected.capturing && !expected.name && !expected.fieldList ) {
-               return this; // wasn't expecting to find anything
-            }
-         
-            throw new Error('wanted to find ' + JSON.stringify(expected) + ' but did not find any matches');
-         }
-         
-         expect(!!this._found[1])      .toBe(!!expected.capturing);
-         expect(this._found[2])        .toBe(expected.name || '');
-         expect(this._found[3] || '')  .toBe(expected.fieldList || '');
-               
-         return this;      
-      };  
-              
-      function RegexMatchAsserter( pattern ){
-         this._regex = pattern;                
-      }
-           
-      RegexMatchAsserter.prototype.shouldNotMatch = function(candidate) {
-   
-         this._candidate = candidate;
-   
-         assertFalse(
-          
-            'pattern ' + this._regex + ' should not have matched "' + candidate + '" but found' +
-                JSON.stringify( this._regex.exec( candidate ) )         
-         ,   this._matched( candidate ) 
-         );      
-         
-         return this;
-      };
-      
-      RegexMatchAsserter.prototype.finding = function(expected) {
-         
-         var result = this._regex.exec( this._candidate );
-   
-         assertEquals( expected,  result[1]);
-         
-         return this;
-      };   
-      
-      RegexMatchAsserter.prototype._matched = function(candidate) {
-         
-         var result = this._regex.exec( candidate );
-         return !!(result && (result[0] === candidate));  
-      };
-      
-      RegexMatchAsserter.prototype.capturing = function(arrayOfExpected) {
-               
-         return this;
-      };      
+
    
    });
 
