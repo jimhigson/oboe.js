@@ -1,113 +1,7 @@
 jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc) {
 
-   function givenDescriptor(descriptor) {
-      return new NodeDescriptionAsserter(descriptor);
-   }
-
-   function NodeDescriptionAsserter(descriptor) {
-      this._descriptor = descriptor;
-   }
-
-   NodeDescriptionAsserter.prototype.whenDescribing = function (pathFragment) {
-      this._found = this._descriptor(pathFragment);
-      return this;
-   };
-
-   NodeDescriptionAsserter.prototype.toContainMatches = function (expected) {
-
-      if (expected && !this._found) {
-         if (!expected.capturing && !expected.name && !expected.fieldList) {
-            return this; // wasn't expecting to find anything
-         }
-
-         throw new Error('wanted to find ' + JSON.stringify(expected) + ' but did not find any matches');
-      }
-
-      expect(!!this._found[1]).toBe(!!expected.capturing);
-      expect(this._found[2]).toBe(expected.name || '');
-      expect(this._found[3] || '').toBe(expected.fieldList || '');
-
-      return this;
-   };
-
-   function RegexMatchAsserter(pattern) {
-      this._regex = pattern;
-   }
-
-   RegexMatchAsserter.prototype.shouldNotMatch = function (candidate) {
-
-      this._candidate = candidate;
-
-      assertFalse(
-
-          'pattern ' + this._regex + ' should not have matched "' + candidate + '" but found' +
-              JSON.stringify(this._regex.exec(candidate))
-          , this._matched(candidate)
-      );
-
-      return this;
-   };
-
-   RegexMatchAsserter.prototype.finding = function (expected) {
-
-      var result = this._regex.exec(this._candidate);
-
-      assertEquals(expected, result[1]);
-
-      return this;
-   };
-
-   RegexMatchAsserter.prototype._matched = function (candidate) {
-
-      var result = this._regex.exec(candidate);
-      return !!(result && (result[0] === candidate));
-   };
-
-   RegexMatchAsserter.prototype.capturing = function (arrayOfExpected) {
-
-      return this;
-   };
-
-
    describe('json path token parser', function () {
-
-      beforeEach(function () {
-         this.addMatchers({
-            toContainMatches:function (expectedResults) {
-
-               var foundResults = this.actual;
-
-               if (expectedResults && !foundResults) {
-                  if (!expectedResults.capturing && !expectedResults.name && !expectedResults.fieldList) {
-                     return true; // wasn't expecting to find anything
-                  }
-
-                  this.message = function () {
-                     return 'did not find anything'
-                  };
-                  return false;
-               }
-
-               if ((!!foundResults[1]    ) != (!!expectedResults.capturing)) {
-                  return false
-               }
-               if ((foundResults[2]      ) != (expectedResults.name || '')) {
-                  return false
-               }
-               if ((foundResults[3] || '') != (expectedResults.fieldList || '')) {
-                  return false
-               }
-
-               return true;
-            }, toNotMatch:function () {
-
-               var foundResults = this.actual;
-
-               return !foundResults;
-            }
-         });
-      });
-
+      
       describe('field list', function () {
 
          it('parses zero-length list', function () {
@@ -226,61 +120,43 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             expect(pathNodeDesc('[""]')).toNotMatch()
          })
       })
+      
+      beforeEach(function () {
+         this.addMatchers({
+            toContainMatches:function (expectedResults) {
 
-      it('can parse node description with name and field list', function () {
+               var foundResults = this.actual;
 
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('foo{a b}')
-             .toContainMatches({  capturing:false,
-                name:'foo',
-                fieldList:'a b'
-             });
+               if (expectedResults && !foundResults) {
+                  if (!expectedResults.capturing && !expectedResults.name && !expectedResults.fieldList) {
+                     return true; // wasn't expecting to find anything
+                  }
 
-      })
+                  this.message = function () {
+                     return 'did not find anything'
+                  };
+                  return false;
+               }
 
-      it('can parse node description with name only', function () {
+               if ((!!foundResults[1]    ) != (!!expectedResults.capturing)) {
+                  return false
+               }
+               if ((foundResults[2]      ) != (expectedResults.name || '')) {
+                  return false
+               }
+               if ((foundResults[3] || '') != (expectedResults.fieldList || '')) {
+                  return false
+               }
 
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('foo')
-             .toContainMatches({  capturing:false,
-                name:'foo',
-                fieldList:null
-             });
+               return true;
+            }, toNotMatch:function () {
 
-      })
+               var foundResults = this.actual;
 
-      it('can parse capturing node description with name and field list', function () {
-
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('$foo{a b}')
-             .toContainMatches({  capturing:true,
-                name:'foo',
-                fieldList:'a b'
-             });
-
-      })
-
-      it('can parse node description with name only in array notation', function () {
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('["foo"]')
-             .toContainMatches({  capturing:false,
-                name:'foo',
-                fieldList:null
-             });
-
-      })
-
-      it('can parse node description in pure duck type notation', function () {
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('{a b c}')
-             .toContainMatches({  capturing:false,
-                name:'',
-                fieldList:'a b c'
-             });
-
-      })
-
-
+               return !foundResults;
+            }
+         });
+      });      
+ 
    });
-
 });
