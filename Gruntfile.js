@@ -145,7 +145,12 @@ module.exports = function (grunt) {
       
    ,  watch:{
          karma:{
-            files:['src/**/*.js', 'test/specs/*.spec.js', 'test/jstd-jasmine-asserter-bridge.js'],
+            files:[
+               'src/**/*.js', 
+               'test/specs/*.spec.js', 
+               'test/libs/*.js', 
+               'test/jstd-jasmine-asserter-bridge.js'
+            ],
             tasks:['karma:persist:run']
          }
       }           
