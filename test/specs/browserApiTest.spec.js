@@ -1,4 +1,4 @@
-(function(){
+
 /*
    Tests that calling .doGet(), .doPost(), .doPut(), .doDelete() pass through to streamingXhr
    correctly. streamingXhr is a stub so no actual calls are made. 
@@ -29,18 +29,18 @@ function streamingXhrShouldHaveBeenGiven(/* arguments */) {
    }   
 }
 
-TestCase("browserApiTest", {
+describe("calls to browser api propagate to streaming xhr", function(){
 
-   setUp: function() {
+   beforeEach(function() {
       streamingStub = sinon.stub(window, 'streamingXhr');      
-   },
+   });
    
-   tearDown: function() {
+   afterEach( function() {
       streamingStub.restore();   
-   },
+   });
               
    // GET
-   testGet:function(){   
+   it('can make a Get', function(){   
       var doneCallback = sinon.stub();
    
       oboe.doGet('http://example.com/oboez', doneCallback);
@@ -52,9 +52,9 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },
+   })
       
-   testGetViaOptionsObject:function(){   
+   it('can make a GetViaOptionsObject', function(){   
       var doneCallback = sinon.stub();
    
       oboe.doGet({url: 'http://example.com/oboez', success: doneCallback});
@@ -66,10 +66,10 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },   
+   })   
    
    // DELETE
-   testDelete:function(){
+   it('can make a Delete', function(){
       var doneCallback = sinon.stub();
    
       oboe.doDelete('http://example.com/oboez', doneCallback);
@@ -81,9 +81,9 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );
-   },
+   })
    
-   testDeleteViaOptionsObject:function(){   
+   it('can make a DeleteViaOptionsObject', function(){   
       var doneCallback = sinon.stub();
    
       oboe.doDelete({url: 'http://example.com/oboez', success: doneCallback});
@@ -95,11 +95,11 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },   
+   })   
      
          
    // POST
-   testPost:function(){
+   it('can make a Post', function(){
       var doneCallback = sinon.stub();
    
       oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
@@ -111,9 +111,9 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },
+   })
    
-   testCanPostAnObject:function(){
+   it('can make a CanPostAnObject', function(){
       var doneCallback = sinon.stub();
    
       oboe.doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
@@ -125,9 +125,9 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },   
+   })   
    
-   testPostViaOptionsObject:function(){   
+   it('can make a PostViaOptionsObject', function(){   
       var doneCallback = sinon.stub();
    
       oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: doneCallback});
@@ -139,10 +139,10 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   },   
+   })   
    
    // PUT   
-   testPut:function(){
+   it('can make a Put', function(){
       var doneCallback = sinon.stub();
    
       oboe.doPut('http://example.com/oboez', 'my_data', doneCallback);
@@ -154,10 +154,9 @@ TestCase("browserApiTest", {
          sinon.match.func,
          sinon.match.func
       );   
-   }
-            
+   })
       
 });
 
 
-})();
+
