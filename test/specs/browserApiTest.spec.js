@@ -18,7 +18,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
    // GET
    it('can make a get', function(){   
    
-      oboe.doGet('http://example.com/oboez', callbackPlaceholder);
+      oboe.doGet('http://example.com/oboez', callbackPlaceholder)
    
       expect( streamingXhr ).toHaveBeenCalledWith(
           'GET',
@@ -26,13 +26,13 @@ describe("calls to browser api propagate to streaming xhr", function(){
           undefined,
           jasmine.any(Function),
           jasmine.any(Function)
-      );      
+      )      
          
    })
       
    it('can make a GetViaOptionsObject', function(){   
         
-      oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder});
+      oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'GET',
@@ -40,13 +40,13 @@ describe("calls to browser api propagate to streaming xhr", function(){
          undefined,
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })   
    
    // DELETE
    it('can make a Delete', function(){
         
-      oboe.doDelete('http://example.com/oboez', callbackPlaceholder);
+      oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
     
       expect( streamingXhr ).toHaveBeenCalledWith(
          'DELETE',
@@ -54,12 +54,12 @@ describe("calls to browser api propagate to streaming xhr", function(){
          undefined,
          jasmine.any(Function),
          jasmine.any(Function)
-      );
+      )
    })
    
    it('can make a DeleteViaOptionsObject', function(){   
          
-      oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder});
+      oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'DELETE',
@@ -67,14 +67,14 @@ describe("calls to browser api propagate to streaming xhr", function(){
          undefined,
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })   
      
          
    // POST
    it('can make a Post', function(){
          
-      oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder);
+      oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
@@ -82,12 +82,12 @@ describe("calls to browser api propagate to streaming xhr", function(){
          'my_data',
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })
    
    it('can make a CanPostAnObject', function(){
          
-      oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder);
+      oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
@@ -95,12 +95,12 @@ describe("calls to browser api propagate to streaming xhr", function(){
          [1,2,3,4,5],
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })   
    
    it('can make a PostViaOptionsObject', function(){   
          
-      oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder});
+      oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
@@ -108,13 +108,13 @@ describe("calls to browser api propagate to streaming xhr", function(){
          'my_data',
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })   
    
    // PUT   
    it('can make a Put', function(){
          
-      oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder);
+      oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
       
       expect( streamingXhr ).toHaveBeenCalledWith(
          'PUT',
@@ -122,7 +122,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
          'my_data',
          jasmine.any(Function),
          jasmine.any(Function)
-      );   
+      )   
    })
       
 });
