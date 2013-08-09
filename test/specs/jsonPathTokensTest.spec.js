@@ -2,7 +2,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
    describe('json path token parser', function() {
    
-      it('FieldListMatchesCorrectly',  function() {
+      it('field list matches correctly',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(   '{}'        ).shouldFind({fieldList:''       })
@@ -17,7 +17,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing('{a'           ).shouldFind({})
       })
       
-      it('ObjectNotation',  function() {
+      it('object notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    'aaa'              ).shouldFind({name:'aaa'})
@@ -31,7 +31,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '.a{'            ).shouldFind({})
       })
       
-      it('NamedArrayNotation',  function() {
+      it('named array notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    '["foo"]'          ).shouldFind({name: 'foo'})
@@ -46,7 +46,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '[".foo"]'       ).shouldFind({})                        
       })
       
-      it('NumberedArrayNotation',  function() {
+      it('numbered array notation',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing(    '[2]'              ).shouldFind({name:'2'})
@@ -59,7 +59,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
             .whenDescribing( '[""]' ).shouldFind({})            
       })
       
-     it('CanParseNodeDescriptionWithNameAndFieldList',  function() {
+     it('can parse node description with name and field list',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('foo{a b}')
@@ -70,7 +70,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-     it('CanParseNodeDescriptionWithNameOnly',  function() {
+     it('can parse node description with name only',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('foo')
@@ -81,7 +81,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-     it('CanParseCapturingNodeDescriptionWithNameAndFieldList',  function() {
+     it('can parse capturing node description with name and field list',  function() {
       
          givenDescriptor(pathNodeDesc)
             .whenDescribing('$foo{a b}')
@@ -92,7 +92,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })     
       
-      it('CanParseNodeDescriptionWithNameOnlyInArrayNotation',  function() {      
+      it('can parse node description with name only in array notation',  function() {      
          givenDescriptor(pathNodeDesc)
             .whenDescribing('["foo"]')
             .shouldFind({  capturing:  false,
@@ -102,7 +102,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
       
       })
       
-      it('CanParseNodeDescriptionInPureDuckTypeNotation',  function() {      
+      it('can parse node description in pure duck type notation',  function() {      
          givenDescriptor(pathNodeDesc)
             .whenDescribing('{a b c}')
             .shouldFind({  capturing:  false,
