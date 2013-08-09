@@ -7,152 +7,121 @@
    written before the logic was split into two.
  */
 
-var streamingStub;
-
-function streamingXhrShouldHaveBeenGiven(/* arguments */) {
-
-   var expected = Array.prototype.slice.apply(arguments);
-
-   function alwaysCalledWith( expectedArgs ){
-   
-      return streamingStub.alwaysCalledWithMatch.apply( streamingStub, expectedArgs );    
-   }
-   
-   if( !alwaysCalledWith(expected) ) {
-   
-      fail( 
-         'arguments given to streamingXhr not as expected. Wanted:'
-      ,     anyToString(expected)
-      ,  'but have (first recorded) call:'
-      ,     anyToString(streamingStub.args[0])
-      );
-   }   
-}
-
 describe("calls to browser api propagate to streaming xhr", function(){
 
+   var callbackPlaceholder = function(){};
+
    beforeEach(function() {
-      streamingStub = sinon.stub(window, 'streamingXhr');      
+      spyOn(window, 'streamingXhr');      
    });
    
-   afterEach( function() {
-      streamingStub.restore();   
-   });
-              
    // GET
-   it('can make a Get', function(){   
-      var doneCallback = sinon.stub();
+   it('can make a get', function(){   
    
-      oboe.doGet('http://example.com/oboez', doneCallback);
-      
-      streamingXhrShouldHaveBeenGiven(
-         'GET',
-         'http://example.com/oboez',
-         undefined,
-         sinon.match.func,
-         sinon.match.func
-      );   
+      oboe.doGet('http://example.com/oboez', callbackPlaceholder);
+   
+      expect( streamingXhr ).toHaveBeenCalledWith(
+          'GET',
+          'http://example.com/oboez',
+          undefined,
+          jasmine.any(Function),
+          jasmine.any(Function)
+      );      
+         
    })
       
    it('can make a GetViaOptionsObject', function(){   
-      var doneCallback = sinon.stub();
-   
-      oboe.doGet({url: 'http://example.com/oboez', success: doneCallback});
+        
+      oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder});
       
-      streamingXhrShouldHaveBeenGiven(
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'GET',
          'http://example.com/oboez',
          undefined,
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })   
    
    // DELETE
    it('can make a Delete', function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.doDelete('http://example.com/oboez', doneCallback);
+        
+      oboe.doDelete('http://example.com/oboez', callbackPlaceholder);
     
-      streamingXhrShouldHaveBeenGiven(
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'DELETE',
          'http://example.com/oboez',
          undefined,
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );
    })
    
    it('can make a DeleteViaOptionsObject', function(){   
-      var doneCallback = sinon.stub();
-   
-      oboe.doDelete({url: 'http://example.com/oboez', success: doneCallback});
+         
+      oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder});
       
-      streamingXhrShouldHaveBeenGiven(
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'DELETE',
          'http://example.com/oboez',
          undefined,
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })   
      
          
    // POST
    it('can make a Post', function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.doPost('http://example.com/oboez', 'my_data', doneCallback);
+         
+      oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder);
       
-      streamingXhrShouldHaveBeenGiven(
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
          'http://example.com/oboez',
          'my_data',
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })
    
    it('can make a CanPostAnObject', function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.doPost('http://example.com/oboez', [1,2,3,4,5], doneCallback);
+         
+      oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder);
       
-      streamingXhrShouldHaveBeenGiven( 
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
          'http://example.com/oboez',
          [1,2,3,4,5],
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })   
    
    it('can make a PostViaOptionsObject', function(){   
-      var doneCallback = sinon.stub();
-   
-      oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: doneCallback});
+         
+      oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder});
       
-      streamingXhrShouldHaveBeenGiven( 
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'POST',
          'http://example.com/oboez',
          'my_data',
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })   
    
    // PUT   
    it('can make a Put', function(){
-      var doneCallback = sinon.stub();
-   
-      oboe.doPut('http://example.com/oboez', 'my_data', doneCallback);
+         
+      oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder);
       
-      streamingXhrShouldHaveBeenGiven( 
+      expect( streamingXhr ).toHaveBeenCalledWith(
          'PUT',
          'http://example.com/oboez',
          'my_data',
-         sinon.match.func,
-         sinon.match.func
+         jasmine.any(Function),
+         jasmine.any(Function)
       );   
    })
       
