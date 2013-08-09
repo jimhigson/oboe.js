@@ -30,7 +30,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
          
    })
       
-   it('can make a GetViaOptionsObject', function(){   
+   it('can make a get via options object', function(){   
         
       oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
       
@@ -44,7 +44,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
    })   
    
    // DELETE
-   it('can make a Delete', function(){
+   it('can make a delete', function(){
         
       oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
     
@@ -57,7 +57,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
       )
    })
    
-   it('can make a DeleteViaOptionsObject', function(){   
+   it('can make a delete via options object', function(){   
          
       oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
       
@@ -72,7 +72,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
      
          
    // POST
-   it('can make a Post', function(){
+   it('can make a post', function(){
          
       oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
       
@@ -85,7 +85,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
       )   
    })
    
-   it('can make a CanPostAnObject', function(){
+   it('can make a can post an object', function(){
          
       oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
       
@@ -98,7 +98,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
       )   
    })   
    
-   it('can make a PostViaOptionsObject', function(){   
+   it('can make a post via options object', function(){   
          
       oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
       
@@ -112,7 +112,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
    })   
    
    // PUT   
-   it('can make a Put', function(){
+   it('can make a put', function(){
          
       oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
       
