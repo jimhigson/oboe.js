@@ -99,13 +99,12 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
                }
 
                return true;
-            }
-         ,  toNotMatch: function(){
-         
+            }, toNotMatch:function () {
+
                var foundResults = this.actual;
-               
-               return !foundResults;         
-            }   
+
+               return !foundResults;
+            }
          });
       });
 
@@ -118,27 +117,27 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          it('parses single field', function () {
             expect(pathNodeDesc('{a}')).toContainMatches({fieldList:'a'      })
          })
-         
+
          it('parses two fields', function () {
             expect(pathNodeDesc('{r2 d2}')).toContainMatches({fieldList:'r2 d2'  })
          })
-         
+
          it('parses numeric fields', function () {
             expect(pathNodeDesc('{1 2}')).toContainMatches({fieldList:'1 2'    })
          })
-         
+
          it('ignores whitespace', function () {
             expect(pathNodeDesc('{a  b}')).toContainMatches({fieldList:'a  b'   })
          })
-         
+
          it('ignores more whitespace', function () {
             expect(pathNodeDesc('{a   b}')).toContainMatches({fieldList:'a   b'  })
          })
-         
+
          it('parses 3 fields', function () {
             expect(pathNodeDesc('{a  b  c}')).toContainMatches({fieldList:'a  b  c'})
          })
-         
+
          it('needs a closing brace', function () {
             expect(pathNodeDesc('{a')).toNotMatch()
          })
@@ -205,15 +204,27 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
 
       describe('numbered array notation', function () {
 
-         givenDescriptor(pathNodeDesc)
-             .whenDescribing('[2]').toContainMatches({name:'2'})
-             .whenDescribing('[123]').toContainMatches({name:'123'})
-             .whenDescribing('$[2]').toContainMatches({name:'2', capturing:true})
-             .whenDescribing('[2]{a b c}').toContainMatches({name:'2', fieldList:'a b c'})
-             .whenDescribing('$[2]{a b c}').toContainMatches({name:'2', capturing:true, fieldList:'a b c'})
-
-             .whenDescribing('[]').toNotMatch()
-             .whenDescribing('[""]').toNotMatch()
+         it('parses single digit', function () {
+            expect(pathNodeDesc('[2]')).toContainMatches({name:'2'})
+         })
+         it('parses multiple digits', function () {
+            expect(pathNodeDesc('[123]')).toContainMatches({name:'123'})
+         })
+         it('parses with capture flag', function () {
+            expect(pathNodeDesc('$[2]')).toContainMatches({name:'2', capturing:true})
+         })
+         it('parses with field list', function () {
+            expect(pathNodeDesc('[2]{a b c}')).toContainMatches({name:'2', fieldList:'a b c'})
+         })
+         it('parses with field list and capture', function () {
+            expect(pathNodeDesc('$[2]{a b c}')).toContainMatches({name:'2', capturing:true, fieldList:'a b c'})
+         })
+         it('ignores without a name', function () {
+            expect(pathNodeDesc('[]')).toNotMatch()
+         })
+         it('ignores empty string as a name', function () {
+            expect(pathNodeDesc('[""]')).toNotMatch()
+         })
       })
 
       it('can parse node description with name and field list', function () {
