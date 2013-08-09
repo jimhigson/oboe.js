@@ -136,37 +136,18 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          
             throw new Error('wanted to find ' + JSON.stringify(expected) + ' but did not find any matches');
          }
+         
+         expect(!!this._found[1])      .toBe(!!expected.capturing);
+         expect(this._found[2])        .toBe(expected.name || '');
+         expect(this._found[3] || '')  .toBe(expected.fieldList || '');
                
-         assertEquals( 'capturing not found correctly' , !!expected.capturing     , !!this._found[1] );   
-         assertEquals( 'name not found correctly'      , expected.name || ''      , this._found[2]   );
-         assertEquals( 'fieldList not found correctly' , expected.fieldList || '' , this._found[3] || '' );
          return this;      
       };  
-     
-     
-     
-      function givenTheRegex( pattern ) {   
-         return new RegexMatchAsserter(pattern);     
-      }
-         
+              
       function RegexMatchAsserter( pattern ){
          this._regex = pattern;                
       }
-      
-      RegexMatchAsserter.prototype.shouldMatch = function(candidate) {
-          
-         this._candidate = candidate;       
-          
-         assertTrue(
-          
-             'pattern ' + this._regex + ' should have matched all of "' + candidate + '" but found only ' +
-                 JSON.stringify( this._regex.exec( candidate ) )
-         ,   this._matched( candidate )               
-         );      
-         
-         return this;
-      };
-      
+           
       RegexMatchAsserter.prototype.shouldNotMatch = function(candidate) {
    
          this._candidate = candidate;
