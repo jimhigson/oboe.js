@@ -8,7 +8,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
       //jstestdriver.plugins.async.CallbackPool.TIMEOUT = ASYNC_TEST_TIMEOUT;
    })
 
-   it('CanAjaxInASmallKnownFile',  function(queue) {
+   xit('CanAjaxInASmallKnownFile',  function(queue) {
    
       var combinedResult = '';
    
@@ -31,7 +31,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
       });      
    })
               
-   it('CanAjaxInAVeryLargeFileWithoutMissingAny',  function(queue) {
+   xit('CanAjaxInAVeryLargeFileWithoutMissingAny',  function(queue) {
    
       var combinedResult = '';
    
@@ -62,7 +62,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
       });      
    })
    
-   it('CanAjaxInAStreamingFileWithoutMissingAny',  function(queue) {
+   xit('CanAjaxInAStreamingFileWithoutMissingAny',  function(queue) {
    
       var combinedResult = '';
    
@@ -100,7 +100,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
       });      
    })
    
-   it('CanMakeAPostRequest',  function(queue) {
+   xit('CanMakeAPostRequest',  function(queue) {
    
       var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
       var combinedResult = '';
@@ -138,7 +138,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
       });      
    })
    
-   it('DoesntCallbackWithoutNewData',  function(queue) {
+   xit('DoesntCallbackWithoutNewData',  function(queue) {
          
       queue.call("ask the streaming xhr to fetch", function(callbacks){
 
@@ -161,7 +161,7 @@ describe('streaming xhr tested by connecting via real http with nothing stubbed'
    
    })      
    
-   it('AjaxingOverStreamingHttpGivesMultipleCallbacks',  function(queue) {
+   xit('AjaxingOverStreamingHttpGivesMultipleCallbacks',  function(queue) {
          
       var numberOfProgressCallbacks = 0;
    
