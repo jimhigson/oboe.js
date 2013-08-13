@@ -472,32 +472,4 @@ You don't get streaming but it isn't any worse than if you'd have designed your 
 
 ## Running the tests
 
-If you want to do hack on Oboe you can build by just running Grunt but sooner or later you'll have to run the tests.
-
-To build and run the tests you'll need:
-
-* The [JsTestDriver](https://code.google.com/p/js-test-driver/) jar installed somewhere, plus a JVM to run it with 
-* [Grunt](http://gruntjs.com/) installed globally on your system
-* Node
-* Some kind of unix-like environment. On Windows, [cygwin](http://www.cygwin.com/) should do.
-
-An [example streaming http server](test/slowserver/tenSlowNumbers.js) to test against can be found in the [test dir](/test). Unfortunately,
-JSTestDriver's proxying doesn't support streaming HTTP. To get arround this there is 
-[a small proxy](test/slowserver/jstdProxy.js) written in node that sits in front of JSTD.
-
-To start the proxy, streaming server and jstd itself, run:
-
-``` bash
-cd test
-./jstestdriver-serverstart
-
-```
-
-Now, capture some browsers by visiting [http://localhost:2442](port 2442) and kick off the build like this:
-
-``` bash
-cd .. # back to the root dir
-./build
-```
-
-If all goes well you should see output similar to in the [latest buildInfo](dist/buildInfo).
+Use the Grunt. 
