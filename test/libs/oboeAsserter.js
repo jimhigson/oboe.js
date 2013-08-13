@@ -68,6 +68,17 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
          }
       });
 
+      
+      this.listeningForNodesAt = function( pattern, callback ) {
+         
+         var spiedCallback = jasmine.createSpy('whatAmI');
+         
+         oboeInstance.onNode(pattern, spiedCallback);
+      
+         return this;
+      }
+      
+       
       this.andWeAreListeningForNodes = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
@@ -97,7 +108,7 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
          oboeInstance.onError(argumentClone(spiedCallback));
          return this;
       };
-                 
+      
       this.whenGivenInput = function(json) {
          if( typeof json != 'string' ) {
             json = JSON.stringify(json);
@@ -207,8 +218,9 @@ function foundNMatches(n){
 function hasRootJson(expected){
    return {
       testAgainst:
-      function(callback, oboeInstance) { 
-         assertEquals(expected, oboeInstance.root());         
+      function(callback, oboeInstance) {
+      
+         expect(expected).toEqual(oboeInstance.root());
       }
    }
 }
@@ -219,7 +231,7 @@ function gaveFinalCallbackWithRootJson(expected) {
    return {
       testAgainst:
          function(callback, oboeInstance, completeJson) { 
-            assertEquals(expected, completeJson);         
+            expect(expected).toEqual(completeJson);         
          }
    }
 }
@@ -322,13 +334,15 @@ function matched(obj) {
             oldAssertion.apply(this, arguments);
             
             var parentMatcher = sinon.match(function (array) {
-               try{
-                  var foundParent = penultimateOf(array);                    
-                  assertEquals( expectedParent, foundParent );
-               } catch(_e){
-                  return false;
-               }
-               return true;
+
+               var foundParent = penultimateOf(array);
+                  
+               // since this is a matcher, we can't ues expect().toEqual()
+               // because then the test would fail on the first non-match
+               // under jasmine.
+                            
+               return JSON.stringify(foundParent) == JSON.stringify(expectedParent)
+               
             }, "had the right parent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
@@ -349,13 +363,15 @@ function matched(obj) {
             oldAssertion.apply(this, arguments);
             
             var grandparentMatcher = sinon.match(function (array) {
-               try{
-                  var foundGrandparent = prepenultimateOf(array);                
-                  assertEquals( expectedGrandparent, foundGrandparent );
-               } catch(_e){
-                  return false;
-               }
-               return true;
+
+               // since this is a matcher, we can't ues expect().toEqual()
+               // because then the test would fail on the first non-match
+               // under jasmine.
+
+               var foundGrandparent = prepenultimateOf(array);                
+               
+               return JSON.stringify(foundGrandparent) == JSON.stringify(expectedGrandparent);
+               
             }, "had the right grandparent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, grandparentMatcher)) {

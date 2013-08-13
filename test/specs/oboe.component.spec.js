@@ -6,14 +6,14 @@ describe("whole oboe library with only the network stubbed out", function(){
    var streamingStub; 
 
    beforeEach(function() {
-      streamingStub = sinon.stub(window, 'streamingXhr');      
+      streamingStub = sinon.stub(window, 'streamingXhr');
    })
    
    afterEach(function() {
       streamingStub.restore();   
    })
    
-   it('MethodsAreChainable',  function() {
+   it('has chainable methods',  function() {
       // very basic test that nothing forgot to return 'this':
 
       expect(function(){      
@@ -26,6 +26,39 @@ describe("whole oboe library with only the network stubbed out", function(){
       }).not.toThrow();
    })
    
+/*
+   a more jasmine-y version of the next test might look like this:
+    
+   describe('empty object detected with bang',  function() {
+            
+      var callback = jasmine.createSpy('callback');
+      var oboe = anOboe().onNode('!', callback).afterInput('{}')      
+      giveInput(oboe, '{}');
+            
+      it( 'should find the empty object at root', function(){            
+            
+         expect(
+         
+            nodesFoundBy(
+               anOboe().listeningForNodesAt('!').afterInput('{}')
+            )
+               
+         ).toIncludeNode( {}, atRoot )
+      })
+      
+      it( 'should not find anything else', function(){            
+            
+         expect(
+         
+            nodesFoundBy(         
+               anOboe().listeningForNodes('!').afterInput('{}')
+            ).length
+               
+         ).toBe(1)
+      })      
+            
+   })*/
+   
    it('HandlesEmptyObjectDetectedWithBang',  function() {
 
       givenAnOboeInstance()
@@ -35,7 +68,6 @@ describe("whole oboe library with only the network stubbed out", function(){
             matched({}).atRootOfJson(),
             foundOneMatch
          );
-
    })
    
    it('HandlesEmptyObjectDetectedWithBangWhenExplicitlySelected',  function() {
@@ -731,7 +763,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                
          );
    })   
-   it('GivesCorrectParentForSecondObjectInAMixedArray',  function() {
+   it('gives correct parent for second object in a mixed array',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.array.*')
@@ -747,10 +779,8 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
       
-   xit('GivesCorrectParentForEmptyObjectInAMixedArray',  function() {
-   
-      // TODO: reenable
-   
+   it('gives correct parent for empty object in a mixed array',  function() {
+     
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.array.*')
          .whenGivenInput({
@@ -854,9 +884,8 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
 
-   xit('GivesCorrectParentForEmptyObjectInAMixedArrayAtRootOfJson',  function() {
-      //TODO: enable
-   
+   it('gives correct parent for empty object in a mixed array at root of json',  function() {
+      
       // same test as above but without the object wrapper around the array:
     
       givenAnOboeInstance()
@@ -868,7 +897,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                .withParent([{'a':1},'b',{'c':3}, {}])                              
 
          );
-
+ 
    })
 
    it('GivesCorrectParentForSingletonStringArrayInAMixedArrayAtRootOfJson',  function() {
