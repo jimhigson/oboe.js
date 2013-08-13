@@ -13,7 +13,7 @@ files = [
 ,  'dist/oboe.js'
 ,  'test/cases/polyfillsTest.spec.js'
    // NB: this won't be run yet because it is excluded:
-,  'test/cases/endToEndIntegrationTest.js'
+,  'test/cases/endToEnd.integration.spec.js'
 ];
 
 

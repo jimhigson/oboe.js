@@ -1,17 +1,14 @@
 
 describe("end to end integration test of while library", function(){
 
-   xit('GetsJsonPathCallbacksBeforeRequestFinishes',  function( queue ) {
-   
-      var asserter;
-
-      queue.call("request the numbers json", function(jstdCallbacks){
+   it('GetsJsonPathCallbacksBeforeRequestFinishes',  function() {
+       
+      var asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json')
+         .andWeAreListeningForNodes('![*]');         
       
-         asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json',  syncingWith(jstdCallbacks))
-            .andWeAreListeningForNodes('![*]');         
-      });
+      waitsFor( asserter.toComplete(), 'the request to complete', ASYNC_TEST_TIMEOUT);
 
-      queue.call("should have gotten all the numbers", function( _queue ){
+      runs(function(){
                
          asserter.thenTheInstance(
              matched(0).atPath([0])
@@ -24,7 +21,7 @@ describe("end to end integration test of while library", function(){
          ,   matched(7).atPath([7])
          ,   matched(8).atPath([8])
          ,   matched(9).atPath([9])
-         );         
+         );        
       });
    })
    
@@ -75,7 +72,5 @@ describe("end to end integration test of while library", function(){
      
 });  
 
-// identity function to make some tests more readable
-function syncingWith(a){return a}
 
 

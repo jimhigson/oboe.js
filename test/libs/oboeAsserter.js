@@ -6,13 +6,12 @@
 
  */
 
-var givenAnOboeInstanceGetting = givenAnOboeInstance; // givenAParserFetching is a synonym for givenAParser
-
-function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, callbackFromTest) {
+function givenAnOboeInstance(jsonFileName) {
 
    function Asserter() {
 
-      var oboeInstance,
+      var asserter = this,
+          oboeInstance,
 
           expectingErrors = false,
           
@@ -25,40 +24,16 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
           
       jsonFileName = jsonFileName || 'invalid://xhr_should_be_stubbed.org/if/not/thats/bad';
        
-      function storeCompleteJson(completeJsonFromJsonCompleteCall){
+      function requestComplete(completeJsonFromJsonCompleteCall){
          completeJson = completeJsonFromJsonCompleteCall;
-         
-         if( callbackFromTest ) {
-            callbackFromTest.apply(this, arguments);
-         }
+                 
+         asserter.isComplete = true;
       } 
        
-      /* we are testing with real http if a filename was given. Generally this is a bad thing
-      *  but is useful for component tests. Where possible we shouldn't do this.  */
-      var requestCompleteCallback = jstdCallbacksListForJsonComplete? 
-                                          jstdCallbacksListForJsonComplete.add(storeCompleteJson) 
-                                       :  storeCompleteJson;
-
       oboeInstance = oboe.doGet( jsonFileName, 
-                                 requestCompleteCallback
+                                 requestComplete
                                );      
-      
-      /**
-       * Fetch the given test json file.
-       * 
-       * Unless the browser's xhr or streamingXhr has been stubbed, this will make an actual
-       * ajax call. In which case this is for end-to-end testing only.
-       * 
-       * @param {String} jsonFilename
-       * @param {Function} [callbackFromTest] a callback for when all the json has been read
-       */
-      this.makeRequestFor = function(jsonFilename, jstdCallbacksList, callbackFromTest) {
-            
-         oboeInstance.doGet(urlForJsonTestFile(jsonFilename), callback);
-         
-         return this;
-      };                
-          
+                              
       oboeInstance.onError(function(e) {
          // Unless stated, the test isn't expecting errors. Fail the test on error: 
          if(!expectingErrors){ 
@@ -68,17 +43,14 @@ function givenAnOboeInstance(jsonFileName, jstdCallbacksListForJsonComplete, cal
          }
       });
 
-      
-      this.listeningForNodesAt = function( pattern, callback ) {
-         
-         var spiedCallback = jasmine.createSpy('whatAmI');
-         
-         oboeInstance.onNode(pattern, spiedCallback);
-      
-         return this;
+      // designed for use with jasmine's waitsFor, ie:
+      //    waitsFor(asserter.toComplete())
+      this.toComplete = function() {
+         return function() {
+            return this.isComplete;
+         }
       }
-      
-       
+            
       this.andWeAreListeningForNodes = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
       
