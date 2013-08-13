@@ -3,11 +3,6 @@
 
 describe('streaming xhr with via real http', function() {
  
-   // shorten the waiting time before a test fails. Default 30s is too long:
-   beforeEach( function(){
-      //jstestdriver.plugins.async.CallbackPool.TIMEOUT = ;
-   })
-
    it('can ajax in a small known file',  function() {
    
       var combinedResult = '',
@@ -60,7 +55,13 @@ describe('streaming xhr with via real http', function() {
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
 
       runs(function(){
-         var parsedResult = JSON.parse(combinedResult);
+         var parsedResult;
+      
+         expect(function(){
+
+            parsedResult = JSON.parse(combinedResult);
+            
+         }).not.toThrow();
          
          // as per the name, should have 20,000 records in that file:                     
          expect(parsedResult.result.length).toEqual(20000);
@@ -92,14 +93,13 @@ describe('streaming xhr with via real http', function() {
 
       runs(function(){
          // should have given valid json;
-         try{
-            var parsedResult = JSON.parse(combinedResult);
-         } catch(e) {
-            fail('could not parse json "' + combinedResult + '" because ' + e
-                + ' this might happen if the browsers are connecting directly' 
-                + ' to jstd instead of through the proxy'
-                );
-         }
+         var parsedResult;
+         
+         expect(function(){
+
+            parsedResult = JSON.parse(combinedResult);
+            
+         }).not.toThrow();
          
          // as per the name, should have ten numbers in that file:
          expect(parsedResult).toEqual([0,1,2,3,4,5,6,7,8,9]);
@@ -131,15 +131,11 @@ describe('streaming xhr with via real http', function() {
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
 
       runs(function(){
-         // should have given valid json;
-         try{
-            var parsedResult = JSON.parse(combinedResult);
-         } catch(e) {
-            fail('could not parse json "' + combinedResult + '" because ' + e
-                + ' this might happen if the browsers are connecting directly' 
-                + ' to jstd instead of through the proxy'
-                );
-         }
+         expect(function(){
+
+            parsedResult = JSON.parse(combinedResult);
+            
+         }).not.toThrow();
                               
          expect(parsedResult).toEqual(payload);
       });
@@ -171,15 +167,11 @@ describe('streaming xhr with via real http', function() {
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
 
       runs(function(){
-         // should have given valid json;
-         try{
-            var parsedResult = JSON.parse(combinedResult);
-         } catch(e) {
-            fail('could not parse json "' + combinedResult + '" because ' + e
-                + ' this might happen if the browsers are connecting directly' 
-                + ' to jstd instead of through the proxy'
-                );
-         }
+         expect(function(){
+
+            parsedResult = JSON.parse(combinedResult);
+            
+         }).not.toThrow();
                               
          expect(parsedResult).toEqual(payload);
       });
