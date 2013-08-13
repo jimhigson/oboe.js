@@ -178,7 +178,7 @@ module.exports = function (grunt) {
    grunt.registerTask('test-auto-run',   [
       'start-stream-source',
       'karma:persist',
-      'watch:karma'
+      'watch:karma'       
    ]);      
 
    grunt.registerTask('dist-sizes',   [

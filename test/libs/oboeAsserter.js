@@ -47,7 +47,7 @@ function givenAnOboeInstance(jsonFileName) {
       //    waitsFor(asserter.toComplete())
       this.toComplete = function() {
          return function() {
-            return this.isComplete;
+            return asserter.isComplete;
          }
       }
             
