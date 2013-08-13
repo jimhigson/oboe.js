@@ -78,7 +78,7 @@ module.exports = function (grunt) {
       
    ,  karma: {
          options:{            
-            singleRun: 'true',
+            singleRun: true,
             proxies: {
                '/stream'      : 'http://localhost:' + STREAM_SOURCE_PORT + '/stream',
                '/static/json' : 'http://localhost:' + STREAM_SOURCE_PORT + '/static/json'   
@@ -171,7 +171,12 @@ module.exports = function (grunt) {
       'karma:persist:run'
    ]);
    
+   // test-auto-run
+   //
+   // The most useful for developing. Start this task, capture some browsers
+   // then edit the code. Tests will be run as the code is saved.
    grunt.registerTask('test-auto-run',   [
+      'start-stream-source',
       'karma:persist',
       'watch:karma'
    ]);      
