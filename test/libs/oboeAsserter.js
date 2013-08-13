@@ -339,7 +339,9 @@ function matched(obj) {
                   
                // since this is a matcher, we can't ues expect().toEqual()
                // because then the test would fail on the first non-match
-               // under jasmine.
+               // under jasmine. Using stringify is slightly brittle and 
+               // if this breaks we need to work out how to plug into Jasmine's
+               // inner equals(a,b) function
                             
                return JSON.stringify(foundParent) == JSON.stringify(expectedParent)
                
@@ -366,7 +368,9 @@ function matched(obj) {
 
                // since this is a matcher, we can't ues expect().toEqual()
                // because then the test would fail on the first non-match
-               // under jasmine.
+               // under jasmine. Using stringify is slightly brittle and 
+               // if this breaks we need to work out how to plug into Jasmine's
+               // inner equals(a,b) function
 
                var foundGrandparent = prepenultimateOf(array);                
                
