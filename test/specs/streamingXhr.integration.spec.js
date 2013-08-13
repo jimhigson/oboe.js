@@ -1,34 +1,39 @@
 /* Tests the streaming xhr without stubbing anything. Really just a test that 
 *  we've got the interface of the in-browser XHR object pinned down  */
 
-describe('streaming xhr tested by connecting via real http with nothing stubbed', function() {
+describe('streaming xhr with via real http', function() {
  
    // shorten the waiting time before a test fails. Default 30s is too long:
    beforeEach( function(){
-      //jstestdriver.plugins.async.CallbackPool.TIMEOUT = ASYNC_TEST_TIMEOUT;
+      //jstestdriver.plugins.async.CallbackPool.TIMEOUT = ;
    })
 
-   xit('CanAjaxInASmallKnownFile',  function(queue) {
+   it('can ajax in a small known file',  function() {
    
-      var combinedResult = '';
+      var combinedResult = '',
+          requestCompleteStub = sinon.stub();
    
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingXhr(
+         'GET', 
+         '/static/json/smallestPossible.json',
+         null, // this is a GET, no data to send               
+          
+         function(nextDrip){
+            combinedResult += nextDrip;                                                                                     
+         },
+         
+         requestCompleteStub
+      )
+      
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
 
-         // in practice, since we're running on an internal network and this is a small file,
-         // we'll probably only get one callback         
-         streamingXhr(
-            'GET', '/static/json/smallestPossible.json',
-            null, // this is a get: no data to send               
-             
-            callbacks.add(function(nextDrip){
-               combinedResult += nextDrip;                                                                                     
-            })
-         );            
-      });
-
-      queue.call("check we got the json back", function(){
-         assertEquals('{}', combinedResult);
-      });      
+      runs(function(){
+         expect(combinedResult).toEqual('{}');
+      });  
    })
               
    xit('CanAjaxInAVeryLargeFileWithoutMissingAny',  function(queue) {
