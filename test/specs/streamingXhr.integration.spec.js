@@ -63,7 +63,7 @@ describe('streaming xhr with via real http', function() {
          var parsedResult = JSON.parse(combinedResult);
          
          // as per the name, should have 20,000 records in that file:                     
-         assertEquals(20000, parsedResult.result.length);
+         expect(parsedResult.result.length).toEqual(20000);
       });  
    })
    
@@ -186,27 +186,27 @@ describe('streaming xhr with via real http', function() {
      
    })   
    
-   xit('DoesntCallbackWithoutNewData',  function(queue) {
+   it('does not call back with zero-length data',  function(queue) {
          
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
+      var requestCompleteStub = sinon.stub();         
+         
+      // since this is a large file, even serving locally we're going to get multiple callbacks:       
+      streamingXhr(
+         'GET', '/static/json/twentyThousandRecords.json',
+         null, // this is a GET: no data to send               
+          
+         function(nextDrip){            
+            expect(nextDrip.length).not.toEqual(0);                                                                                     
+         },
+         
+         requestCompleteStub
+      )         
 
-         // since this is a large file, even serving locally we're going to get multiple callbacks:       
-         streamingXhr(
-            'GET', '/static/json/twentyThousandRecords.json',
-            null, // this is a get: no data to send               
-             
-            function(nextDrip){            
-               if( nextDrip.length === 0 ) {
-                  fail('zero-length drip received');
-               }                                                                                     
-            },
-            
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // we're done
-            callbacks.noop()
-         )         
-      });
-   
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);
+      
+      runs(function(){})   
    })      
    
    xit('AjaxingOverStreamingHttpGivesMultipleCallbacks',  function(queue) {
