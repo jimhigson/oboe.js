@@ -59,7 +59,7 @@ describe("whole oboe library with only the network stubbed out", function(){
             
    })*/
    
-   it('HandlesEmptyObjectDetectedWithBang',  function() {
+   it('handles empty object detected with bang',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -70,7 +70,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('HandlesEmptyObjectDetectedWithBangWhenExplicitlySelected',  function() {
+   it('handles empty object detected with bang when explicitly selected',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$!')
@@ -82,7 +82,7 @@ describe("whole oboe library with only the network stubbed out", function(){
 
    })   
    
-   it('GivesWindowAsContextWhenNothingGivenExplicitly',  function() {
+   it('gives window as context when nothing given explicitly',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -90,7 +90,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          .thenTheInstance( calledbackWithContext(window) );
    })
    
-   it('CallsOnGivenContext',  function() {
+   it('calls on given context',  function() {
       var myObject = { doSomething: function(){} };
 
       givenAnOboeInstance()
@@ -99,7 +99,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          .thenTheInstance( calledbackWithContext(myObject) );
    })   
 
-   it('FindOnlyFiresWhenHasWholeObject',  function() {
+   it('find only fires when has whole object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -115,7 +115,7 @@ describe("whole oboe library with only the network stubbed out", function(){
 
    })
 
-   it('ListeningForPathFiresWhenRootObjectStarts',  function() {
+   it('fires path to listener when root object starts',  function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -130,7 +130,7 @@ describe("whole oboe library with only the network stubbed out", function(){
           );
    })
    
-   it('ListeningForPathFiresWhenRootArrayStarts',  function() {
+   it('fires path to listener when root array starts',  function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -147,7 +147,7 @@ describe("whole oboe library with only the network stubbed out", function(){
    })
    
      
-   it('HandlesEmptyObjectDetectedWithSingleStar',  function() {
+   it('fires empty object node detected with single star',  function() {
       // *
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
@@ -158,7 +158,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('DoesntDetectSpuriousPathOffEmptyObject',  function() {
+   it('doesnt detect spurious path off empty object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.foo.*')
@@ -168,7 +168,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })   
 
-   it('HandlesEmptyObjectDetectedWithDoubleDot',  function() {
+   it('handles empty object detected with double dot',  function() {
       // *
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
@@ -179,7 +179,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
 
-   it('NotifiesOfStringsWhenListenedTo',  function() {
+   it('notifies of strings when listened to',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.string')
@@ -190,7 +190,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('NotifiesOfPathForOfPropertyNameWithIncompleteJson',  function() {
+   it('notifies of path before given the json value for a property',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.string')
@@ -200,7 +200,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
 
-   it('NotifiesOfSecondPropertyNameWithIncompleteJson',  function() {
+   it('notifies of second property name with incomplete json',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.pencils')
@@ -213,7 +213,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('IsAbleToNotifyOfNull',  function() {
+   it('is able to notify of null',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.pencils')
@@ -226,7 +226,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })   
 
-   it('NotifiesOfMultipleChildrenOfRoot',  function() {
+   it('notifies of multiple children of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.*')
@@ -239,7 +239,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('NotifiesOfMultipleChildrenOfRootWhenSelectingTheRoot',  function() {
+   it('notifies of multiple children of root when selecting the root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$!.*')
@@ -254,7 +254,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })   
    
-   it('DoesNotNotifySpuriouslyOfFoundPath',  function() {
+   it('does not notify spuriously of descendant of roots when key is actually in another object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.a')
@@ -262,7 +262,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          .thenTheInstance(foundNoMatches);
    })
    
-   it('DoesNotNotifySpuriouslyOfFoundObject',  function() {
+   it('does not notify spuriously of found child of root when ndoe is not child of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.a')
@@ -270,7 +270,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          .thenTheInstance(foundNoMatches);
    })      
 
-   it('NotifiesOfMultiplePropertiesOfAnObjectWithoutWaitingForEntireObject',  function() {
+   it('notifies of multiple properties of an object without waiting for entire object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.*')
@@ -290,7 +290,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
    
-   it('CanGetRootJsonAsJsonObjectIsBuiltUp',  function() {
+   it('can get root json as json object is built up',  function() {
 
       givenAnOboeInstance()
          .whenGivenInput('{"a":')
@@ -314,7 +314,8 @@ describe("whole oboe library with only the network stubbed out", function(){
             gaveFinalCallbackWithRootJson({a:'A', b:'B'})
          );
    })   
-   it('CanGetRootJsonAsJsonArrayIsBuiltUp',  function() {
+   
+   it('can notify progressively as root json array is built up',  function() {
 
       // let's feed it the array [11,22] in drips of one or two chars at a time:
 
@@ -349,7 +350,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })      
 
-   it('NotifiesOfNamedChildOfRoot',  function() {
+   it('notifies of named child of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.b')
@@ -359,7 +360,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,   foundOneMatch
          );
    })
-   it('NotifiesOfArrayElements',  function() {
+   it('notifies of array elements',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.testArray.*')
@@ -371,7 +372,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,   foundNMatches(3)
          );
    })
-   it('NotifiesOfPathMatchWhenArrayStarts',  function() {
+   it('notifies of path match when array starts',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.testArray')
@@ -384,7 +385,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                                 // value in json
          );
    })
-   it('NotifiesOfPathMatchWhenSecondArrayStarts',  function() {
+   it('notifies of path match when second array starts',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.array2')
@@ -397,7 +398,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                                // value in json
          );
    })   
-   it('NotifiesOfPathsInsideArrays',  function() {
+   it('notifies of paths inside arrays',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('![*]')
@@ -405,73 +406,74 @@ describe("whole oboe library with only the network stubbed out", function(){
          .thenTheInstance(
             foundNMatches(4)
          );
-   })      
-   it('CorrectlyGivesIndexWhenFindingObjectsInArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2]')
-         .whenGivenInput( [{}, {}, 'this_one'] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
-   })      
-   it('CorrectlyGivesIndexWhenFindingArraysInsideArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2]')
-         .whenGivenInput( [[], [], 'this_one'] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
-   })   
-   it('CorrectlyGivesIndexWhenFindingArraysInsideArraysEtc',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2][2]')
-         .whenGivenInput( [   
-                              [], 
-                              [], 
-                              [  
-                                 [], 
-                                 [], 
-                                 ['this_array']
-                              ]
-                          ] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
    })   
    
-   it('CorrectlyGivesIndexWhenFindingStringsInsideArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2]')
-         .whenGivenInput( ['', '', 'this_one'] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
-   })   
-   it('CorrectlyGivesIndexWhenFindingNumbersInsideArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2]')
-         .whenGivenInput( [1, 1, 'this_one'] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
+   describe('correctly give index inside arrays', function(){   
+      it('when finding objects in array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2]')
+            .whenGivenInput( [{}, {}, 'this_one'] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })      
+      it('when finding arrays inside array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2]')
+            .whenGivenInput( [[], [], 'this_one'] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })   
+      it('when finding arrays inside arrays etc',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2][2]')
+            .whenGivenInput( [   
+                                 [], 
+                                 [], 
+                                 [  
+                                    [], 
+                                    [], 
+                                    ['this_array']
+                                 ]
+                             ] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })   
+      it('when finding strings inside array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2]')
+            .whenGivenInput( ['', '', 'this_one'] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })   
+      it('when finding numbers inside array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2]')
+            .whenGivenInput( [1, 1, 'this_one'] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })         
+      it('when finding nulls inside array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('![2]')
+            .whenGivenInput( [null, null, 'this_one'] )
+            .thenTheInstance(
+               foundNMatches(1)
+            );
+      })      
    })
-      
-   it('CorrectlyGivesIndexWhenFindingNullsInsideArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForPaths('![2]')
-         .whenGivenInput( [null, null, 'this_one'] )
-         .thenTheInstance(
-            foundNMatches(1)
-         );
-   })      
    
-   it('NotifiesOfPathsInsideObjects',  function() {
+   it('notifies of paths inside objects',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('![*]')
@@ -481,114 +483,119 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })      
 
-   it('NotifiesOfArrayElementsSelectedByIndex',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.testArray[2]')
-         .whenGivenInput('{"testArray":["a","b","this_one"]}')
-         .thenTheInstance(
-             matched('this_one').atPath(['testArray',2])
-         ,   foundOneMatch
-         );
-   })
+   describe('selecting by index', function(){
+      it('notifies of array elements',  function() {
    
-   it('NotifiesNestedArrayElementsSelectedByIndex',  function() {
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.testArray[2]')
+            .whenGivenInput('{"testArray":["a","b","this_one"]}')
+            .thenTheInstance(
+                matched('this_one').atPath(['testArray',2])
+            ,   foundOneMatch
+            );
+      })
+      
+      it('notifies nested array elements',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.testArray[2][2]')
+            .whenGivenInput( {"testArray":
+                                 ["a","b",
+                                    ["x","y","this_one"]
+                                 ]
+                             }
+                           )
+            .thenTheInstance(
+                matched('this_one')
+                  .atPath(['testArray',2,2])
+                  .withParent( ["x","y","this_one"] )
+                  .withGrandparent( ["a","b", ["x","y","this_one"]] )
+            ,   foundOneMatch
+            );
+      })   
+      it('can notify nested array elements by passing the root array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.$testArray[2][2]')
+            .whenGivenInput( {"testArray":
+                                 ["a","b",
+                                    ["x","y","this_one"]
+                                 ]
+                             }
+                           )
+            .thenTheInstance(
+                matched(   ["a","b",
+                              ["x","y","this_one"]
+                           ])
+            ,   foundOneMatch
+            );
+      })        
+   });
 
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.testArray[2][2]')
-         .whenGivenInput( {"testArray":
-                              ["a","b",
-                                 ["x","y","this_one"]
-                              ]
-                          }
-                        )
-         .thenTheInstance(
-             matched('this_one')
-               .atPath(['testArray',2,2])
-               .withParent( ["x","y","this_one"] )
-               .withGrandparent( ["a","b", ["x","y","this_one"]] )
-         ,   foundOneMatch
-         );
-   })   
-   it('CanNotifyNestedArrayElementsSelectedByIndexByPassingTheRootArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.$testArray[2][2]')
-         .whenGivenInput( {"testArray":
-                              ["a","b",
-                                 ["x","y","this_one"]
-                              ]
-                          }
-                        )
-         .thenTheInstance(
-             matched(   ["a","b",
-                           ["x","y","this_one"]
-                        ])
-         ,   foundOneMatch
-         );
-   })        
-
-   it('NotifiesOfDeeplyNestedObjectsWithStar',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('*')
-         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
-         .thenTheInstance(
-             matched('e')
-               .atPath(['a', 'b', 'c', 'd'])
-               .withParent({d:'e'})
-         ,   matched({d:"e"})
-               .atPath(['a', 'b', 'c'])
-         ,   matched({c:{d:"e"}})
-               .atPath(['a', 'b'])
-         ,   matched({b:{c:{d:"e"}}})
-               .atPath(['a'])
-         ,   matched({a:{b:{c:{d:"e"}}}})
-               .atRootOfJson()
-         ,   foundNMatches(5)
-         );
-   })   
-   it('NotifiesOfDeeplyNestedObjectsWithDoubleDot',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('..')
-         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
-         .thenTheInstance(
-             matched('e')
-               .atPath(['a', 'b', 'c', 'd'])
-               .withParent({d:'e'})
-         ,   matched({d:"e"})
-               .atPath(['a', 'b', 'c'])
-         ,   matched({c:{d:"e"}})
-               .atPath(['a', 'b'])
-         ,   matched({b:{c:{d:"e"}}})
-               .atPath(['a'])
-         ,   matched({a:{b:{c:{d:"e"}}}})
-               .atRootOfJson()
-         ,   foundNMatches(5)
-         );
-   })   
-   it('NotifiesOfDeeplyNestedObjectsWithDoubleDotStar',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('..*')
-         .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
-         .thenTheInstance(
-             matched('e')
-               .atPath(['a', 'b', 'c', 'd'])
-               .withParent({d:'e'})
-         ,   matched({d:"e"})
-               .atPath(['a', 'b', 'c'])
-         ,   matched({c:{d:"e"}})
-               .atPath(['a', 'b'])
-         ,   matched({b:{c:{d:"e"}}})
-               .atPath(['a'])
-         ,   matched({a:{b:{c:{d:"e"}}}})
-               .atRootOfJson()
-         ,   foundNMatches(5)
-         );
-   })   
-   it('CanDetectAllButRoot',  function() {
+   describe('deeply nested objects', function(){
+      it('notifies with star pattern',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('*')
+            .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+            .thenTheInstance(
+                matched('e')
+                  .atPath(['a', 'b', 'c', 'd'])
+                  .withParent({d:'e'})
+            ,   matched({d:"e"})
+                  .atPath(['a', 'b', 'c'])
+            ,   matched({c:{d:"e"}})
+                  .atPath(['a', 'b'])
+            ,   matched({b:{c:{d:"e"}}})
+                  .atPath(['a'])
+            ,   matched({a:{b:{c:{d:"e"}}}})
+                  .atRootOfJson()
+            ,   foundNMatches(5)
+            );
+      })   
+      it('notifies of with double dot pattern',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('..')
+            .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+            .thenTheInstance(
+                matched('e')
+                  .atPath(['a', 'b', 'c', 'd'])
+                  .withParent({d:'e'})
+            ,   matched({d:"e"})
+                  .atPath(['a', 'b', 'c'])
+            ,   matched({c:{d:"e"}})
+                  .atPath(['a', 'b'])
+            ,   matched({b:{c:{d:"e"}}})
+                  .atPath(['a'])
+            ,   matched({a:{b:{c:{d:"e"}}}})
+                  .atRootOfJson()
+            ,   foundNMatches(5)
+            );
+      })   
+      it('notifies of objects with double dot star pattern',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('..*')
+            .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
+            .thenTheInstance(
+                matched('e')
+                  .atPath(['a', 'b', 'c', 'd'])
+                  .withParent({d:'e'})
+            ,   matched({d:"e"})
+                  .atPath(['a', 'b', 'c'])
+            ,   matched({c:{d:"e"}})
+                  .atPath(['a', 'b'])
+            ,   matched({b:{c:{d:"e"}}})
+                  .atPath(['a'])
+            ,   matched({a:{b:{c:{d:"e"}}}})
+                  .atRootOfJson()
+            ,   foundNMatches(5)
+            );
+      })   
+   });
+   
+   it('can express all but root as a pattern',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*..*')
@@ -607,7 +614,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,   foundNMatches(4)
          );
    })   
-   it('CanDetectSimilarAncestors',  function() {
+   it('can detect similar ancestors',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('foo..foo')
@@ -622,11 +629,11 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })   
 
-   it('CanDetectInsideTheSecondObjectElementOfAnArray',  function() {
+   it('can detect inside the second object element of an array',  function() {
 
-      // this fails if we don't set the curKey to the length of the array
-      // when we detect an object and and the parent of the object that ended
-      // was an array
+      // this fails in incrementalJsonBuilder if we don't set the curKey to the 
+      // length of the array when we detect an object and and the parent of the 
+      // object that ended was an array
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..find')
@@ -643,7 +650,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                .atPath(['array',1,'find'])
          );
    })
-   it('DetectionIgnoresIfOnlyStartOfPatternMatches',  function() {
+   it('ignores keys if only start matches',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..a')
@@ -658,7 +665,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,  foundOneMatch
          );
    })
-   it('DetectionIgnoresIfOnlyEndOfPatternMatches',  function() {
+   it('ignores keys if only end of pattern matches',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..a')
@@ -673,7 +680,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,  foundOneMatch
          );
    })
-   it('DetectionIgnoresPartialPathMatchesInArrayIndices',  function() {
+   it('ignores partial path matches in array indices',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..[1]')
@@ -687,7 +694,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,  foundOneMatch
          );
    })   
-   it('CanGiveAnArrayBackWhenJustPartiallyDone',  function() {
+   it('can give an array back when just partially done',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$![5]')
@@ -697,250 +704,251 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,  foundOneMatch
          );
    })  
+
+   describe('json arrays give correct parent and grandparent', function(){
+      it('gives parent and grandparent for every item of an array',  function() {
    
-   it('GivesCorrectParentAndGrandparentForEveryItemOfAnArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : ['a','b','c']
-            }
-         )
-         .thenTheInstance(
-            matched('a')
-               .withParent(['a'])
-               .withGrandparent({array:['a']})
-         ,  matched('b')
-               .withParent(['a', 'b'])
-               .withGrandparent({array:['a','b']})               
-         ,  matched('c')
-               .withParent(['a', 'b', 'c'])
-               .withGrandparent({array:['a','b','c']})               
-         );
-   })   
-   it('GivesCorrectParentForEveryObjectItemOfAnArrayOfObjects',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},{'b':2},{'c':3}]
-            }
-         )
-         .thenTheInstance(
-            matched({'a':1})
-               .withParent([{'a':1}])
-         ,  matched({'b':2})
-               .withParent([{'a':1},{'b':2}])               
-         ,  matched({'c':3})
-               .withParent([{'a':1},{'b':2},{'c':3}])               
-         );
-   })   
-   it('GivesCorrectParentForObjectInAMixedArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(
-            matched({'a':1})
-               .withParent([{'a':1}])         
-         );
-   })   
-   it('GivesCorrectParentForStringInAMixedArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(
-         
-            matched('b')
-               .withParent([{'a':1},'b'])
-               
-         );
-   })   
-   it('gives correct parent for second object in a mixed array',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(
-               
-            matched({'c':3})
-               .withParent([{'a':1},'b',{'c':3}])
-
-         );
-   })
-      
-   it('gives correct parent for empty object in a mixed array',  function() {
-     
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(
-         
-            matched({})
-               .withParent([{'a':1},'b',{'c':3}, {}])
-                                             
-         );
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : ['a','b','c']
+               }
+            )
+            .thenTheInstance(
+               matched('a')
+                  .withParent(['a'])
+                  .withGrandparent({array:['a']})
+            ,  matched('b')
+                  .withParent(['a', 'b'])
+                  .withGrandparent({array:['a','b']})               
+            ,  matched('c')
+                  .withParent(['a', 'b', 'c'])
+                  .withGrandparent({array:['a','b','c']})               
+            );
+      })   
+      it('is correct for array of objects',  function() {
    
-   })   
-   it('GivesCorrectParentForSingletonStringArrayInAMixedArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(  
-                                     
-            matched(['d'])            
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-               
-         );
-   })   
-   it('GivesCorrectParentForSingletonStringArrayInSingletonArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [['d']]
-            }
-         )
-         .thenTheInstance(  
-                                     
-            matched(['d'])            
-               .withParent([['d']])
-               
-         );
-   })
-
-   it('GivesCorrectParentForLastStringInAMixedArray',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.array.*')
-         .whenGivenInput({
-               array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-            }
-         )
-         .thenTheInstance(
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},{'b':2},{'c':3}]
+               }
+            )
+            .thenTheInstance(
+               matched({'a':1})
+                  .withParent([{'a':1}])
+            ,  matched({'b':2})
+                  .withParent([{'a':1},{'b':2}])               
+            ,  matched({'c':3})
+                  .withParent([{'a':1},{'b':2},{'c':3}])               
+            );
+      })   
+      it('is correct for object in a mixed array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+               matched({'a':1})
+                  .withParent([{'a':1}])         
+            );
+      })   
+      it('has correct parent for string in mixed array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+            
+               matched('b')
+                  .withParent([{'a':1},'b'])
+                  
+            );
+      })   
+      it('has correct parent for second object in mixed array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+                  
+               matched({'c':3})
+                  .withParent([{'a':1},'b',{'c':3}])
+   
+            );
+      })
          
-            matched('e')
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-               
-         );
-   })
-
-   it('GivesCorrectParentForOpeningObjectInAMixedArrayAtRootOfJson',  function() {
-      // same test as above but without the object wrapper around the array:
+      it('has correct parent for empty object in mixed array',  function() {
+        
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+            
+               matched({})
+                  .withParent([{'a':1},'b',{'c':3}, {}])
+                                                
+            );
       
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
+      })   
+      it('has correct parent for singleton string array in mixed array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(  
+                                        
+               matched(['d'])            
+                  .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+                  
+            );
+      })   
+      it('gives correct parent for singleton string array in singleton array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [['d']]
+               }
+            )
+            .thenTheInstance(  
+                                        
+               matched(['d'])            
+                  .withParent([['d']])
+                  
+            );
+      })   
+      it('gives correct parent for last string in a mixed array',  function() {
+   
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+            
+               matched('e')
+                  .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+                  
+            );
+      })
+   
+      it('gives correct parent for opening object in a mixed array at root of json',  function() {
+         // same test as above but without the object wrapper around the array:
          
-            matched({'a':1})
-               .withParent([{'a':1}])
-               
-         );
-   })
-
-   it('GivesCorrectParentForStringInAMixedArrayAtRootOfJson',  function() {
-      // same test as above but without the object wrapper around the array:
-      
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
-
-            matched('b')
-               .withParent([{'a':1},'b'])               
-
-         );
-   })
-
-   it('GivesCorrectParentForSecondObjectInAMixedArrayAtRootOfJson',  function() {
-      // same test as above but without the object wrapper around the array:
-      
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
-               
-            matched({'c':3})
-               .withParent([{'a':1},'b',{'c':3}])
-
-         );
-   })
-
-   it('gives correct parent for empty object in a mixed array at root of json',  function() {
-      
-      // same test as above but without the object wrapper around the array:
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+            
+               matched({'a':1})
+                  .withParent([{'a':1}])
+                  
+            );
+      })
+   
+      it('gives correct parent for string in a mixed array at root of json',  function() {
+         // same test as above but without the object wrapper around the array:
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+   
+               matched('b')
+                  .withParent([{'a':1},'b'])               
+   
+            );
+      })
+   
+      it('gives correct parent for second object in a mixed array at root of json',  function() {
+         // same test as above but without the object wrapper around the array:
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+                  
+               matched({'c':3})
+                  .withParent([{'a':1},'b',{'c':3}])
+   
+            );
+      })
+   
+      it('gives correct parent for empty object in a mixed array at root of json',  function() {
+         
+         // same test as above but without the object wrapper around the array:
+       
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+   
+               matched({})
+                  .withParent([{'a':1},'b',{'c':3}, {}])                              
+   
+            );
     
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
+      })
+   
+      it('gives correct parent for singleton string array in a mixed array at root of json',  function() {
+         // same test as above but without the object wrapper around the array:
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+                                 
+               matched(['d'])
+                  .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+   
+            );
+      })   
+      it('gives correct parent for singleton string array in a singleton array at root of json',  function() {
+         // non-mixed array, easier version:
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([['d']])
+            .thenTheInstance(
+                                 
+               matched(['d'])
+                  .withParent([['d']])
+   
+            );
+      })
+   
+      it('gives correct parent for final string in a mixed array at root of json',  function() {
+         // same test as above but without the object wrapper around the array:
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            .thenTheInstance(
+   
+               matched('e')
+                  .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
+            );
+      })
+   });
 
-            matched({})
-               .withParent([{'a':1},'b',{'c':3}, {}])                              
-
-         );
- 
-   })
-
-   it('GivesCorrectParentForSingletonStringArrayInAMixedArrayAtRootOfJson',  function() {
-      // same test as above but without the object wrapper around the array:
-      
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
-                              
-            matched(['d'])
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-
-         );
-   })   
-   it('GivesCorrectParentForSingletonStringArrayInASingletonArrayAtRootOfJson',  function() {
-      // non-mixed array, easier version:
-      
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([['d']])
-         .thenTheInstance(
-                              
-            matched(['d'])
-               .withParent([['d']])
-
-         );
-   })
-
-   it('GivesCorrectParentForFinalStringInAMixedArrayAtRootOfJson',  function() {
-      // same test as above but without the object wrapper around the array:
-      
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         .thenTheInstance(
-
-            matched('e')
-               .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-         );
-   })
-
-   it('CanDetectAtMultipleDepthsUsingDoubleDot',  function() {
+   it('can detect at multiple depths using double dot',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..find')
@@ -965,7 +973,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          ,   foundNMatches(5)
          );
    })   
-   it('PassesAncestorsOfFoundObjectCorrectly',  function() {
+   it('passes ancestors of found object correctly',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..find')
@@ -998,7 +1006,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
 
-   it('CanDetectAtMultipleDepthsUsingImpliedAncestorOfRootRelationship',  function() {
+   it('can detect at multiple depths using implied ancestor of root relationship',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('find')
@@ -1024,7 +1032,7 @@ describe("whole oboe library with only the network stubbed out", function(){
          );
    })
 
-   it('MatchesNestedAdjacentSelector',  function() {
+   it('matches nested adjacent selector',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..[0].colour')
@@ -1051,7 +1059,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                ,   foundNMatches(2)
                );
    })      
-   it('MatchesNestedSelectorSeparatedByASingleStarSelector',  function() {
+   it('matches nested selector separated by a single star selector',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!..foods.*.name')
@@ -1075,7 +1083,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                ,   foundNMatches(3)
                );
    })   
-   it('GetsAllSimpleObjectsFromAnArray',  function() {
+   it('gets all simple objects from an array',  function() {
 
       // this test is similar to the following one, except it does not use ! in the pattern
       givenAnOboeInstance()
@@ -1095,7 +1103,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                );
    })
 
-   it('GetsSameObjectRepeatedlyUsingCss4Syntax',  function() {
+   it('gets same object repeatedly using css4 syntax',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$foods.*')
@@ -1116,7 +1124,7 @@ describe("whole oboe library with only the network stubbed out", function(){
                );
    })
 
-   it('MatchesNestedSelectorSeparatedByDoubleDot',  function() {
+   it('matches nested selector separated by double dot',  function() {
 
       givenAnOboeInstance()
          // we just want the French names of foods:
@@ -1140,90 +1148,99 @@ describe("whole oboe library with only the network stubbed out", function(){
                ,   matched('noix')
                ,   foundNMatches(3)
                );
-   })   
-   it('CanExtractByDuckTypes',  function() {
-
-      givenAnOboeInstance()
-         // we want the bi-lingual objects
-         .andWeAreListeningForNodes('{en fr}')
-         .whenGivenInput({
-
-            foods: [
-               {name:{en:'aubergine',  fr:'aubergine' }, colour:'purple'},
-               {name:{en:'apple',      fr:'pomme'     }, colour:'red'   },
-               {name:{en:'nuts',       fr:'noix'      }, colour:'brown' }
-            ],
-            non_foods: [
-               {name:{en:'brick'       }, colour:'red'   },
-               {name:{en:'poison'      }, colour:'pink'  },
-               {name:{en:'broken_glass'}, colour:'green' }
-            ]
-         })
-         .thenTheInstance
-               (   matched({en:'aubergine',  fr:'aubergine' })
-               ,   matched({en:'apple',      fr:'pomme'     })
-               ,   matched({en:'nuts',       fr:'noix'      })
-               ,   foundNMatches(3)
-               );
-   })   
-   it('CanExtractByPartialDuckTypes',  function() {
-
-      givenAnOboeInstance()
-         // we want the bi-lingual English and German words, but we still want the ones that have
-         // French as well
-         .andWeAreListeningForNodes('{en de}')
-         .whenGivenInput({
-
-            foods: [
-               {name:{en:'aubergine',  fr:'aubergine',   de: 'aubergine' }, colour:'purple'},
-               {name:{en:'apple',      fr:'pomme',       de: 'apfel'     }, colour:'red'   },
-               {name:{en:'nuts',                         de: 'eier'      }, colour:'brown' }
-            ],
-            non_foods: [
-               {name:{en:'brick'       }, colour:'red'  },
-               {name:{en:'poison'      }, colour:'pink' },
-               {name:{en:'broken_glass'}, colour:'green'}
-            ]
-         })
-         .thenTheInstance
-               (   matched({en:'aubergine',  fr:'aubergine',   de:'aubergine' })
-               ,   matched({en:'apple',      fr:'pomme',       de: 'apfel'    })
-               ,   matched({en:'nuts',                         de: 'eier'     })
-               ,   foundNMatches(3)
-               );
+   })
+   
+   describe('duck types', function(){   
+      // only smoke-testing duck types here, tested thoroughly in jsonpath unit tests
+   
+      it('can detect',  function() {
+   
+         givenAnOboeInstance()
+            // we want the bi-lingual objects
+            .andWeAreListeningForNodes('{en fr}')
+            .whenGivenInput({
+   
+               foods: [
+                  {name:{en:'aubergine',  fr:'aubergine' }, colour:'purple'},
+                  {name:{en:'apple',      fr:'pomme'     }, colour:'red'   },
+                  {name:{en:'nuts',       fr:'noix'      }, colour:'brown' }
+               ],
+               non_foods: [
+                  {name:{en:'brick'       }, colour:'red'   },
+                  {name:{en:'poison'      }, colour:'pink'  },
+                  {name:{en:'broken_glass'}, colour:'green' }
+               ]
+            })
+            .thenTheInstance
+                  (   matched({en:'aubergine',  fr:'aubergine' })
+                  ,   matched({en:'apple',      fr:'pomme'     })
+                  ,   matched({en:'nuts',       fr:'noix'      })
+                  ,   foundNMatches(3)
+                  );
+      })   
+      it('can detect by matches with additional keys',  function() {
+   
+         givenAnOboeInstance()
+            // we want the bi-lingual English and German words, but we still want the ones that have
+            // French as well
+            .andWeAreListeningForNodes('{en de}')
+            .whenGivenInput({
+   
+               foods: [
+                  {name:{en:'aubergine',  fr:'aubergine',   de: 'aubergine' }, colour:'purple'},
+                  {name:{en:'apple',      fr:'pomme',       de: 'apfel'     }, colour:'red'   },
+                  {name:{en:'nuts',                         de: 'eier'      }, colour:'brown' }
+               ],
+               non_foods: [
+                  {name:{en:'brick'       }, colour:'red'  },
+                  {name:{en:'poison'      }, colour:'pink' },
+                  {name:{en:'broken_glass'}, colour:'green'}
+               ]
+            })
+            .thenTheInstance
+                  (   matched({en:'aubergine',  fr:'aubergine',   de:'aubergine' })
+                  ,   matched({en:'apple',      fr:'pomme',       de: 'apfel'    })
+                  ,   matched({en:'nuts',                         de: 'eier'     })
+                  ,   foundNMatches(3)
+                  );
+      })
+      
    })
 
-   it('ErrorsOnJsonWithUnquotedKeys',  function() {
-  
-      givenAnOboeInstance()
-        .andWeAreExpectingSomeErrors()
-        .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
-        .thenTheInstance
-           (   calledCallbackOnce
-           ,   wasPassedAnErrorObject
-           );
-   })   
-   it('ErrorsOnMalformedJson',  function() {
-  
-      givenAnOboeInstance()
-        .andWeAreExpectingSomeErrors()
-        .whenGivenInput('{{') // invalid!
-        .thenTheInstance
-           (   calledCallbackOnce
-           ,   wasPassedAnErrorObject
-           );
-   })   
-   it('CallsErrorListenerIfCallbackErrors',  function() {
-  
-      givenAnOboeInstance()
-        .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
-        .andWeAreExpectingSomeErrors()
-        .whenGivenInput('{}') // valid json, should provide callback
-        .thenTheInstance
-           (   calledCallbackOnce
-           ,   wasPassedAnErrorObject
-           );
-   })
+
+   describe('error cases', function() {
+      it('notifies of error given unquoted string keys',  function() {
+     
+         givenAnOboeInstance()
+           .andWeAreExpectingSomeErrors()
+           .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
+           .thenTheInstance
+              (   calledCallbackOnce
+              ,   wasPassedAnErrorObject
+              );
+      })   
+      it('errors on malformed json',  function() {
+     
+         givenAnOboeInstance()
+           .andWeAreExpectingSomeErrors()
+           .whenGivenInput('{{') // invalid!
+           .thenTheInstance
+              (   calledCallbackOnce
+              ,   wasPassedAnErrorObject
+              );
+      })   
+      it('calls error listener if an error is thrown in the callback',  function() {
+     
+         givenAnOboeInstance()
+           .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
+           .andWeAreExpectingSomeErrors()
+           .whenGivenInput('{}') // valid json, should provide callback
+           .thenTheInstance
+              (   calledCallbackOnce
+              ,   wasPassedAnErrorObject
+              );
+      })
+   });
 
 });
 
