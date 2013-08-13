@@ -36,60 +36,61 @@ describe('streaming xhr with via real http', function() {
       });  
    })
               
-   xit('CanAjaxInAVeryLargeFileWithoutMissingAny',  function(queue) {
+   it('can ajax in a very large file without missing any',  function() {
    
-      var combinedResult = '';
+      var combinedResult = '',
+          requestCompleteStub = sinon.stub();
    
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
-
-         // since this is a large file, even serving locally we're going to get multiple callbacks:       
-         streamingXhr(
-            'GET', '/static/json/twentyThousandRecords.json',
-            null, // this is a get: no data to send                
-             
-            function(nextDrip){            
-               combinedResult += nextDrip;                                                                                     
-            },
-            
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // when to move onto the next queuer            
-            callbacks.noop()
-         )         
-      });
-
-      queue.call("check we got the correct json back", function(){
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingXhr(
+         'GET', 
+         '/static/json/twentyThousandRecords.json',
+         null, // this is a GET, no data to send               
+          
+         function(nextDrip){
+            combinedResult += nextDrip;                                                                                     
+         },
+         
+         requestCompleteStub
+      )
       
-         // should have given valid json;
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+
+      runs(function(){
          var parsedResult = JSON.parse(combinedResult);
          
          // as per the name, should have 20,000 records in that file:                     
          assertEquals(20000, parsedResult.result.length);
-      });      
+      });  
    })
    
-   xit('CanAjaxInAStreamingFileWithoutMissingAny',  function(queue) {
+   it('can ajax in a streaming file without missing any',  function(queue) {
    
-      var combinedResult = '';
+      var combinedResult = '',
+          requestCompleteStub = sinon.stub();
    
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
-
-         // since this is a slowly, asynchronously written resource, we're going to get multiple callbacks:       
-         streamingXhr(
-            'GET', cacheBustUrl('/stream/tenSlowNumbers'),
-             null, // this is a get: no data to send               
-             
-            function(nextDrip){            
-               combinedResult += nextDrip;                                                                                     
-            },
-            
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // when to move onto the next queuer            
-            callbacks.noop()
-         )         
-      });
-
-      queue.call("check we got the correct json back", function(){
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingXhr(
+        'GET', 
+         cacheBustUrl('/stream/tenSlowNumbers'),
+         null, // this is a GET, no data to send               
+          
+         function(nextDrip){
+            combinedResult += nextDrip;                                                                                     
+         },
+         
+         requestCompleteStub
+      )
       
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+
+      runs(function(){
          // should have given valid json;
          try{
             var parsedResult = JSON.parse(combinedResult);
@@ -100,34 +101,36 @@ describe('streaming xhr with via real http', function() {
                 );
          }
          
-         // as per the name, should have 20,000 records in that file:                     
-         assertEquals([0,1,2,3,4,5,6,7,8,9], parsedResult);
-      });      
+         // as per the name, should have ten numbers in that file:
+         expect(parsedResult).toEqual([0,1,2,3,4,5,6,7,8,9]);
+      });              
    })
    
-   xit('CanMakeAPostRequest',  function(queue) {
+   it('can make a post request',  function(queue) {
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
-      var combinedResult = '';
+      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'},
+          combinedResult = '',
+          requestCompleteStub = sinon.stub();
    
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
-    
-         streamingXhr(
-            'POST', cacheBustUrl('/stream/echoback.json'),
-            JSON.stringify( payload ),               
-             
-            function(nextDrip){            
-               combinedResult += nextDrip;                                                                                     
-            },
-            
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // when to move onto the next queuer            
-            callbacks.noop()
-         )         
-      });
-
-      queue.call("check we got the correct json back", function(){
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingXhr(
+        'POST',
+         cacheBustUrl('/stream/echoback.json'),
+         payload, // this is a GET, no data to send               
+          
+         function(nextDrip){
+            combinedResult += nextDrip;                                                                                     
+         },
+         
+         requestCompleteStub
+      )
       
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+
+      runs(function(){
          // should have given valid json;
          try{
             var parsedResult = JSON.parse(combinedResult);
@@ -137,11 +140,51 @@ describe('streaming xhr with via real http', function() {
                 + ' to jstd instead of through the proxy'
                 );
          }
-         
-         // as per the name, should have 20,000 records in that file:                     
-         assertEquals(payload, parsedResult);
-      });      
+                              
+         expect(parsedResult).toEqual(payload);
+      });
+     
    })
+   
+   it('can make a put request',  function(queue) {
+   
+      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'},
+          combinedResult = '',
+          requestCompleteStub = sinon.stub();
+   
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingXhr(
+        'PUT',
+         cacheBustUrl('/stream/echoback.json'),
+         payload, // this is a GET, no data to send               
+          
+         function(nextDrip){
+            combinedResult += nextDrip;                                                                                     
+         },
+         
+         requestCompleteStub
+      )
+      
+      waitsFor(function(){     
+         return requestCompleteStub.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+
+      runs(function(){
+         // should have given valid json;
+         try{
+            var parsedResult = JSON.parse(combinedResult);
+         } catch(e) {
+            fail('could not parse json "' + combinedResult + '" because ' + e
+                + ' this might happen if the browsers are connecting directly' 
+                + ' to jstd instead of through the proxy'
+                );
+         }
+                              
+         expect(parsedResult).toEqual(payload);
+      });
+     
+   })   
    
    xit('DoesntCallbackWithoutNewData',  function(queue) {
          
