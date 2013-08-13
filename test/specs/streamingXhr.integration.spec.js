@@ -185,6 +185,40 @@ describe('streaming xhr with via real http', function() {
       });
      
    })   
+          
+   // this test is only activated for non-IE browsers and IE 10 or newer.
+   // old and rubbish browsers buffer the xhr response meaning that this 
+   // will never pass. But for good browsers it is good to have an integration
+   // test to confirm that we're getting it right.           
+   if( !internetExplorer || internetExplorer >= 10 ) {          
+      it('gives multiple callbacks when loading a streaming resource',  function(queue) {
+            
+         var numberOfProgressCallbacks = 0,
+             requestCompleteStub = sinon.stub();      
+                  
+         streamingXhr(
+            'GET', cacheBustUrl('/stream/tenSlowNumbers'),
+            null, // this is a get: no data to send               
+             
+            function onProgress(){ 
+               numberOfProgressCallbacks++; 
+            },
+                       
+            requestCompleteStub
+         )                     
+         
+         waitsFor(function(){     
+            return requestCompleteStub.called;      
+         }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);      
+   
+         runs(function(){
+                                   
+            // realistically, should have had 10 or 20, but this isn't deterministic so
+            // 3 is enough to indicate the results didn't all arrive in one big blob.
+            expect(numberOfProgressCallbacks).toBeGreaterThan(3);
+         });      
+      })
+   }
    
    it('does not call back with zero-length data',  function(queue) {
          
@@ -207,41 +241,7 @@ describe('streaming xhr with via real http', function() {
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);
       
       runs(function(){})   
-   })      
-   
-   xit('AjaxingOverStreamingHttpGivesMultipleCallbacks',  function(queue) {
-         
-      var numberOfProgressCallbacks = 0;
-   
-      queue.call("ask the streaming xhr to fetch", function(callbacks){
-      
-         // since this is a large file, even serving locally we're going to get multiple callbacks:       
-         streamingXhr(
-            'GET', cacheBustUrl('/stream/tenSlowNumbers'),
-            null, // this is a get: no data to send               
-             
-            function onProgress(){ 
-               numberOfProgressCallbacks++; 
-            },
-            
-            // callback for when the stream is complete. we register this just so that jstd knows
-            // when to move onto the next queuer            
-            callbacks.noop()
-         )                     
-      });
-
-      queue.call("check we got multiple callbacks", function(){
-                                
-         // realistically, should have had 10 or 20, but this isn't deterministic so
-         // 3 is enough to indicate the results didn't all arrive in one big blob.                                               
-         if( numberOfProgressCallbacks < 3)(
-            fail("I had " + numberOfProgressCallbacks + " progress callback(s), should have" +
-                " had at least 3. If this doesn't test the browser's XHR might not support" +
-                " reading partial responses. Unfortunately this is inevitable in IE less than" +
-                " version 10.")                
-         );
-      });      
-   })           
+   })              
       
    function cacheBustUrl(url) {
       var now = Date.now? Date.now() : new Date().valueOf();
