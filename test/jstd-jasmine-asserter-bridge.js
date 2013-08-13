@@ -51,3 +51,4 @@ function fail(message) {
  * @param tests
  */
 function TestCase(name, tests){}
+function AsyncTestCase(name, tests){}
