@@ -1,6 +1,3 @@
-
-
-
 describe("whole oboe library with only the network stubbed out", function(){
 
    var streamingStub; 
