@@ -18,17 +18,17 @@ describe("Lists", function(){
    
       var listCBA = cons('c', cons('b', cons('a', emptyList)));
       
-      assertEquals(['c','b','a'], listAsArray(listCBA));   
+      expect( listAsArray(listCBA) ).toEqual( ['c','b','a'] );   
    });
    
    it("can convert empty list to an array", function(){
-      assertEquals([], listAsArray(emptyList));
+      expect( listAsArray(emptyList) ).toEqual([]);
    });
    
    it("can reverse the order of a list", function() {
       var listCBA = cons('c', cons('b', cons('a', emptyList)));
                
-      assertEquals(['a','b','c'], listAsArray(reverseList(listCBA)));   
+      expect( listAsArray(reverseList(listCBA)) ).toEqual( ['a','b','c'] );   
    });
    
    it("can map over a list", function() {
@@ -37,15 +37,17 @@ describe("Lists", function(){
       
       function doubleIt(n){return n * 2}
       
-      assertEquals(evens, map(doubleIt, naturals));
+      expect( map(doubleIt, naturals) ).toEqual( evens );
    });
    
    it("can convert non empty list to an array", function(){
-      assertEquals(['a','b','c'], listAsArray( asList(['a','b','c']) )  );
+   
+      expect( listAsArray( asList(['a','b','c']) ) ).toEqual( ['a','b','c'] );
    });
    
    it("can convert empty array to list", function() {
-      assertEquals([], listAsArray( asList([]) )  );
+   
+      expect( listAsArray( asList([]) ) ).toEqual( [] );
    });
    
    it("can assert every item in a list holds for a given test", function(){
@@ -67,10 +69,10 @@ describe("Lists", function(){
          return n <= 10;
       }                           
       
-      assertTrue(  listEvery(isANumber,                l ));
-      assertFalse( listEvery(isOdd,                    l ));
-      assertFalse( listEvery(isLessThanTen,            l ));
-      assertTrue(  listEvery(isLessThanOrEqualToTen,   l ));   
+      expect( listEvery(isANumber,                l )).toBe(true);
+      expect( listEvery(isOdd,                    l )).toBe(false);
+      expect( listEvery(isLessThanTen,            l )).toBe(false);
+      expect( listEvery(isLessThanOrEqualToTen,   l )).toBe(true);   
    });
    
    it("can fold list where order doesnt matter", function(){
@@ -78,25 +80,24 @@ describe("Lists", function(){
       
       var sum = foldR(add, 0, list(1,2,3,4));
       
-      assertEquals(10, sum);   
+      expect( sum ).toEqual( 1 + 2 + 3 + 4 );   
    });
    
    it("can fold list where start value matters", function(){
       function divide(n, m){ return n / m }
       
       var result = foldR(divide, 100, list(2, 2));
-      
-      //   (100/2) / 2  = 25       
-      assertEquals(25, result);   
+             
+      expect( result ).toBe( 25 );  //   (100/2) / 2  = 25   
    });
 
    it("can fold list in the correct order", function(){
-      function functionString(stringSoFar, fnName){ return fnName + '(' + stringSoFar + ')' }
+      function functionString(param, fnName){ return fnName + '(' + param + ')' }
       
       var functionStringResult = foldR(functionString, 'x', list('a', 'b', 'c'));
       
       // if order were wrong, might give c(b(a(x)))
                
-      assertEquals('a(b(c(x)))', functionStringResult);   
+      expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
    });
 });
