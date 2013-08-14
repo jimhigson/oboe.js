@@ -36,12 +36,12 @@ describe("polyfills", function(){
          
          bound();
          
-         assertEquals(1, callCount);   
+         expect( callCount ).toBe(1);   
       });
       
       it("uses the given context", function() {
          var bound = (function(){ 
-            assertEquals('a', this) 
+            expect(this).toEqual('a'); 
          }).bind('a');
          
          bound();   
@@ -49,9 +49,11 @@ describe("polyfills", function(){
       
       it("propagates call-time arguments", function() {
          
-         var bound = (function(arg1, arg2){ 
-            assertEquals('b', arg1 ); 
-            assertEquals('c', arg2 ); 
+         var bound = (function(arg1, arg2){
+         
+            expect( arg1 ).toBe('b');
+            expect( arg2 ).toBe('c');
+             
          }).bind('a');
          
          bound('b', 'c'); 
@@ -65,7 +67,7 @@ describe("polyfills", function(){
          
          [1,2,3].forEach(func);
          
-         assertEquals(3, func.callCount); 
+         expect( func.callCount ).toEqual(3); 
       });
       
       it("calls with every item from the array", function() {
@@ -74,15 +76,15 @@ describe("polyfills", function(){
          
          [1,2,3].forEach(func);
          
-         assertTrue(func.calledWith(1)); 
-         assertTrue(func.calledWith(2)); 
-         assertTrue(func.calledWith(3)); 
+         expect(func.calledWith(1)).toBe(true); 
+         expect(func.calledWith(2)).toBe(true); 
+         expect(func.calledWith(3)).toBe(true); 
       });
    });
    
    it("polyfills map correctly", function() {
                
-      assertEquals([2,4,6], [1,2,3].map(doubleUp));          
+      expect( [1,2,3].map(doubleUp) ).toEqual( [2,4,6] );          
    });
 
    function odd(n){ return n % 2 ===1 }
