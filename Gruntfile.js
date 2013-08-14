@@ -82,7 +82,13 @@ module.exports = function (grunt) {
             proxies: {
                '/stream'      : 'http://localhost:' + STREAM_SOURCE_PORT + '/stream',
                '/static/json' : 'http://localhost:' + STREAM_SOURCE_PORT + '/static/json'   
-            }         
+            },         
+            // test results reporter to use
+            // possible values: 'dots', 'progress', 'junit'
+            reporters : ['progress'],
+                        
+            // enable / disable colors in the output (reporters and logs)
+            colors : true            
          }
          
       ,  

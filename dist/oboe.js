@@ -1788,9 +1788,12 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
              controller = oboeController( eventBus, clarinetParser, contentBuilder),
 
              /**
-              * create a shortcutted version of controller.start
+              * create a shortcutted version of controller.start, could also be done with .bind
+              * in supporting browsers
               */
-             start = controller.start.bind( controller, httpMethodName );
+             start = function (url, body, callback){
+                controller.start( httpMethodName, url, body, callback );
+             };
              
          if (isString(firstArg)) {
          
