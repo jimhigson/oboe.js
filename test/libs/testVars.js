@@ -1,1 +1,1 @@
-ASYNC_TEST_TIMEOUT = 10000; // ten seconds
+ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
