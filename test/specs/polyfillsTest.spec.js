@@ -100,7 +100,7 @@ describe("polyfills", function(){
             return {
                then: function( expectedResult ) {
                   
-                  assertEquals( expectedResult, startArray.filter( filterCondition ) );
+                  expect( startArray.filter( filterCondition ) ).toEqual( expectedResult );
                }
             }
          }
