@@ -1,5 +1,5 @@
 
-describe("end to end integration test of while library", function(){
+describe("oboe working end-to-end with real http", function(){
 
    it('gets all expected callbacks by time request finishes',  function() {
        
