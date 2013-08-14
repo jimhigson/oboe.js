@@ -1,4 +1,5 @@
 node_modules
+libpeerconnection.log
 *.idea
 *.iml
 *.tidy
