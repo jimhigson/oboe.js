@@ -20,12 +20,21 @@ For the dissertation I have identified several areas where the typical
 http usage pattern could be improved and wish to offer an alternative
 usage paradigm built on the same technologies. While this solution is
 presented as software, the change is as much a shift in how we think
-about http as it is a change in the underlying technology itself.
+about http as it is a change in the underlying technology itself. The
+problems I wish to address can be split into two broad areas:
+performance in terms of speed (and the perception thereof) and tight
+coupling of semantics between client and server.
 
-The success criteria will be
+Why not writing for the server side? Why just the client?
 
-perceived as such since useful things can often be done before whole
-content is loaded.
+In evaluating this project, we may say it has been a success if
+non-trivial improvements in speed can be made without a corresponding
+increase in the difficulty of programming the client. This improvement
+may be in terms of a measure of the absolute time required to complete a
+representative task or in a user's perception of the speed in completing
+the task. Whilst the difficulty in creating the client resists
+quantification, this will be examined in terms of the length of the
+expression required in programming some common tasks.
 
 Inefficiencies in typical rest usage
 ------------------------------------
