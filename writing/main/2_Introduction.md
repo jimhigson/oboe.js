@@ -19,11 +19,15 @@ Increasing the perception of speed:
 perceived as such since useful things can often be done before whole
 content is loaded.
 
-When connections fail, apps are left with non of the content. Happens a
-lot on mobile networks.
 
-Inefficiencies in performing a fairly simple task
--------------------------------------------------
+Multiple request rest aggregation
+---------------------------------
+
+![Potential differences in overall time taken to download a list of
+publications and then download any ones newer than a certain date.
+Assuming the publications are ordered newest first, the first connection
+may be terminated as soon as an older publication is
+found.](images/rest_timeline.png)
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
@@ -57,14 +61,37 @@ all the more beneficial since decisions to terminate the connection may
 be made. Example: academic's list of publications, then downloading all
 the new ones.
 
-![Potential differences in overall time taken to download a list of
-publications and then download any ones newer than a certain date.
-Assuming the publications are ordered newest first, the first connection
-may be terminated as soon as an older publication is
-found.](images/placeholder)
+Big-small problem
+-----------------
 
-Agile methodologies and future versioning
------------------------------------------
+Or, granularity problem
+
+Eg, infinite scrolling webpages.
+
+Perception of speed
+-------------------
+
+Earlier **is** faster.
+
+Network fallibility
+-------------------
+
+The inefficiencies listed above are present when all network links
+operate perfectly.
+
+When connections fail, apps are left with non of the content. Happens a
+lot on mobile networks.
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to
+
+[!Extra diagram: resume after aborted connection] (images/placeholder)
+
+Agile methodologies, fast deployments and future versioning
+-----------------------------------------------------------
 
 SOA has been adapted widely but versioning remains a common challenge in
 industry.
