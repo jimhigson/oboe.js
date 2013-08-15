@@ -3,7 +3,24 @@ Background
 
 **background should be 2-10 pages**
 
-The feature set will be minimal but contain no obvious omissions.
+
+
+
+In fact, this is exactly how web browsers are implemented. However, this
+progressive use of http is hardwired into the browser engines rather
+than exposing an API suitable for general use and as such is treated as
+something of a special case specific to web browsers and has not so far
+seen a more general application. I wish to argue that a general
+application of this technique is viable and offers a worthwhile
+improvement over current common methods.
+
+The above problem has many analogues and because REST uses standard web
+semantics applies to much more than just automated web surfing. Indeed,
+as the machine readability of the data increases, access early can be
+all the more beneficial since decisions to terminate the connection may
+be made. Example: academic's list of publications, then downloading all
+the new ones.
+
 
 Some high-level stuff about webapps and where processing is done
 ----------------------------------------------------------------

@@ -3,6 +3,8 @@ Application and Reflection
 
 **40 to 60 pages**
 
+A feature set which is minimal but contain no obvious omissions.
+
 Under the heading [Anatomy of a SOA client] I deconstructed the way in
 which programming logic is often used to identify the parts of a model
 which are currently interesting and started to look at some declarative

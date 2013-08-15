@@ -78,27 +78,14 @@ subdomain
 
 Diagram of timeline to get images from a webpage.
 
-In fact, this is exactly how web browsers are implemented. However, this
-progressive use of http is hardwired into the browser engines rather
-than exposing an API suitable for general use and as such is treated as
-something of a special case specific to web browsers and has not so far
-seen a more general application. I wish to argue that a general
-application of this technique is viable and offers a worthwhile
-improvement over current common methods.
-
-The above problem has many analogues and because REST uses standard web
-semantics applies to much more than just automated web surfing. Indeed,
-as the machine readability of the data increases, access early can be
-all the more beneficial since decisions to terminate the connection may
-be made. Example: academic's list of publications, then downloading all
-the new ones.
-
 Big-small problem
 -----------------
 
 Or, granularity problem
 
-Perception. Eg, infinite scrolling webpages.
+Perception. Eg, infinite scrolling webpages. Visualisations.
+
+Two improvements: just hang up; and, start using earlier.
 
 Perception of speed
 -------------------
