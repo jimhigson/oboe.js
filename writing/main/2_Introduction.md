@@ -40,6 +40,9 @@ Figure shows way of thinking about service, not differences in service itself
 As seen the \ref{enhancingrest} example, may be aborted once the data
 needed has been identified.
 
+Right has better pacing of requests with 4 being made at roughly equal intervals
+rather than a single request and then a rapid burst of 3.
+
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
 Consider a fairly simple task of retrieving all the images used on a web
