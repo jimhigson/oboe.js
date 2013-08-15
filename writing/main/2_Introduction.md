@@ -1,12 +1,18 @@
 Introduction
 ============
 
-**introduction should be 2-5 pages**
+**introduction should be 2-5 pages (1,000 to 2,500 wrds)**
 
-Increasing the perception of speed: 
+Intro should:
 
-- Source that doing things early makes page feel faster. 
-- Also actually faster as well as being
+> What is the problem? How do I plan to solve it? What is the success
+> criteria? How will know if been successful? What is the motivation for
+> solving it?
+
+Increasing the perception of speed:
+
+-   Source that doing things early makes page feel faster.
+-   Also actually faster as well as being
 
 perceived as such since useful things can often be done before whole
 content is loaded.
@@ -22,12 +28,15 @@ adapted, I believe this model isn't being used to its fullest potential.
 Consider a fairly simple task of retrieving all the images used on a web
 page.
 
-Grab all the images mentioned in a web page Images may be on another
-subdomain 
+These are not obscure estoteric requirements, rather they prepresent the
+mainstay execution of almost any SOA application.
 
-- DNS lookup only after got whole page Dynamically generated
-pages can often load slowly, even when there is plenty of bandwidth But
-images could load quickly.
+Grab all the images mentioned in a web page Images may be on another
+subdomain
+
+-   DNS lookup only after got whole page Dynamically generated pages can
+    often load slowly, even when there is plenty of bandwidth But images
+    could load quickly.
 
 Diagram of timeline to get images from a webpage.
 
