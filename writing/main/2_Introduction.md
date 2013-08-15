@@ -19,15 +19,26 @@ Increasing the perception of speed:
 perceived as such since useful things can often be done before whole
 content is loaded.
 
-
 Multiple request rest aggregation
 ---------------------------------
 
-![Potential differences in overall time taken to download a list of
-publications and then download any ones newer than a certain date.
-Assuming the publications are ordered newest first, the first connection
-may be terminated as soon as an older publication is
-found.](images/rest_timeline.png)
+![Example use of a REST service; a client learns about an author's
+publications and then retrieves information on the first three. The
+process is much the same regardless of the aims of the client: it could
+be a user interface wanting to display the publications or an aggregator
+wishing to provide a higher-level REST service than the one it
+aggregates. The left sequence represents the most commonly used pattern
+in which the client does no inspection of the response until it is
+complete. The shaded arrows in the right sequence illustrate the concept of
+receiving a response as a sequence of small fragments whereas the darker 
+arrows on the left represent the concept of the response as a one-off
+event 
+\label{enhancingrest}](images/rest_timeline.png)
+
+Figure shows way of thinking about service, not differences in service itself
+
+As seen the \ref{enhancingrest} example, may be aborted once the data
+needed has been identified.
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
@@ -66,7 +77,7 @@ Big-small problem
 
 Or, granularity problem
 
-Eg, infinite scrolling webpages.
+Perception. Eg, infinite scrolling webpages.
 
 Perception of speed
 -------------------
@@ -93,11 +104,11 @@ ability can be used to
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
 
-SOA has been adapted widely but versioning remains a common challenge in
-industry.
+A subtler problem
 
-Anecdote: test environment finds an issue. One system can't be released.
-Contagion.
+SOA has been adapted widely but versioning remains a common challenge in
+industry. Anecdote: test environment finds an issue. One system can't be
+released. Contagion.
 
 How to cope with software that changes every week.
 
