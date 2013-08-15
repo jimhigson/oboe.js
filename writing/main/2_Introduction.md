@@ -18,9 +18,9 @@ Increasing the perception of speed:
 
 For the dissertation I have identified several areas where the typical
 http usage pattern could be improved and wish to offer an alternative
-usage paradigm built on the same technologies. This is as much a shift
-in how we think about http as it is a change in the underlying
-technology itself.
+usage paradigm built on the same technologies. While this solution is
+presented as software, the change is as much a shift in how we think
+about http as it is a change in the underlying technology itself.
 
 The success criteria will be
 
