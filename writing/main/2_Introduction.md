@@ -29,19 +29,20 @@ be a user interface wanting to display the publications or an aggregator
 wishing to provide a higher-level REST service than the one it
 aggregates. The left sequence represents the most commonly used pattern
 in which the client does no inspection of the response until it is
-complete. The shaded arrows in the right sequence illustrate the concept of
-receiving a response as a sequence of small fragments whereas the darker 
-arrows on the left represent the concept of the response as a one-off
-event 
-\label{enhancingrest}](images/rest_timeline.png)
+complete. The shaded arrows in the right sequence illustrate the concept
+of receiving a response as a sequence of small fragments whereas the
+darker arrows on the left represent the concept of the response as a
+one-off event \label{enhancingrest}](images/rest_timeline.png)
 
-Figure shows way of thinking about service, not differences in service itself
+Figure shows way of thinking about service, not differences in service
+itself
 
 As seen the \ref{enhancingrest} example, may be aborted once the data
 needed has been identified.
 
-Right has better pacing of requests with 4 being made at roughly equal intervals
-rather than a single request and then a rapid burst of 3.
+The cadence of the right sequence has better pacing of requests with 4
+being made at roughly equal intervals rather than a single request and
+then a rapid burst of 3.
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
