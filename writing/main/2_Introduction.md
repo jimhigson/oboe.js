@@ -45,7 +45,7 @@ adapted, I believe this model isn't being used to its fullest potential.
 Consider a fairly simple task of retrieving all the images used on a web
 page.
 
-These are not obscure estoteric requirements, rather they prepresent the
+These are not obscure esoteric requirements, rather they represent the
 mainstay execution of almost any SOA application.
 
 Grab all the images mentioned in a web page Images may be on another
