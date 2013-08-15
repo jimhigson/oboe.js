@@ -16,11 +16,19 @@ Increasing the perception of speed:
 -   Source that doing things early makes page feel faster.
 -   Also actually faster as well as being
 
+For the dissertation I have identified several areas where the typical
+http usage pattern could be improved and wish to offer an alternative
+usage paradigm built on the same technologies. This is as much a shift
+in how we think about http as it is a change in the underlying
+technology itself.
+
+The success criteria will be
+
 perceived as such since useful things can often be done before whole
 content is loaded.
 
-Multiple request rest aggregation
----------------------------------
+Inefficiencies in typical rest usage
+------------------------------------
 
 ![Example use of a REST service; a client learns about an author's
 publications and then retrieves information on the first three. The
