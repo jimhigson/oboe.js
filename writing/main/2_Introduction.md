@@ -5,9 +5,11 @@ Introduction
 
 Intro should:
 
-> What is the problem? How do I plan to solve it? What is the success
-> criteria? How will know if been successful? What is the motivation for
-> solving it?
+-   What is the problem?
+-   How do I plan to solve it?
+-   What are the success criteria?
+-   How will know if been successful?
+-   What is the motivation for solving it?
 
 Increasing the perception of speed:
 
