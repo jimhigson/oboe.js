@@ -125,20 +125,26 @@ suspended from a new parent. See \ref{enhancingrest}
 Design of the jsonpath parser
 -----------------------------
 
-Explain why Haskel/lisp style lists are used rather than arrays \* In
-parser clauses, lots of 'do this then go to the next function with the
-rest'. \* Normal arrays extremely inefficient to make a copy with one
-item popped off the start \* Link to FastList on github *\* For sake of
-micro-library, implemented tiny list code with very bare needed*
-Alternative (first impl) was to pass an index around *\* But clause fns
-don't really care about indexes, they care about top of the list.*\*
-Slight advantage to index: allows going past the start for the root path
-(which doesn't have any index) instead, have to use a special value to
-keep node and path list of the same length \*\* Special token for root,
-takes advantage of object identity to make certain that cannot clash
-with something from the json. Better than '**root**' or similar which
-could clash. String in js not considered distinct, any two strings with
-identical character sequences are indistinguishable.
+Explain why Haskel/lisp style lists are used rather than arrays
+
+-   In parser clauses, lots of 'do this then go to the next function
+    with the rest'.
+-   Normal arrays extremely inefficient to make a copy with one item
+    popped off the start
+-   Link to FastList on github
+-   For sake of micro-library, implemented tiny list code with very bare
+    needed
+-   Alternative (first impl) was to pass an index around
+-   But clause fns don't really care about indexes, they care about top
+    of the list.
+-   Slight advantage to index: allows going past the start for the root
+    path (which doesn't have any index) instead, have to use a special
+    value to keep node and path list of the same length
+-   Special token for root, takes advantage of object identity to make
+    certain that cannot clash with something from the json. Better than
+    '**root**' or similar which could clash. String in js not considered
+    distinct, any two strings with identical character sequences are
+    indistinguishable.
 
 Anti-list: nothing is quite so small when making a mircro-library as
 using the types built into the language, coming as they are for zero
