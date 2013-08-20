@@ -39,20 +39,6 @@ this problem should be counted towards the success of the project.
 
 Why not writing for the server side? Why just the client?
 
-In evaluating this project, we may say it has been a success if
-non-trivial improvements in speed can be made without a corresponding
-increase in the difficulty of programming the client. This improvement
-may be in terms of a measure of the absolute time required to complete a
-representative task or in a user's perception of the speed in completing
-the task. Whilst the difficulty in creating the client resists
-quantification, this will be examined in terms of the length of the
-expression required in programming some common tasks.
-
-Because applications in the target domain are much more io-bound than
-CPU-bound, optimisation in terms of the running time of a program on the
-CPU will be de-emphasised in favour of establishing a more optimal use
-of io.
-
 Inefficiencies in typical rest usage
 ------------------------------------
 
@@ -161,3 +147,20 @@ It is often stated that understandability is the number once most
 important concern in a codebase (CITE) - if the code is suitably dynamic
 it is important that changes are axiomic and clarity of the changelog is
 equally important.
+
+Criteria for success
+--------------------
+
+In evaluating this project, we may say it has been a success if
+non-trivial improvements in speed can be made without a corresponding
+increase in the difficulty of programming the client. This improvement
+may be in terms of a measure of the absolute time required to complete a
+representative task or in a user's perception of the speed in completing
+the task. Whilst the difficulty in creating the client resists
+quantification, this will be examined in terms of the length of the
+expression required in programming some common tasks.
+
+Because applications in the target domain are much more io-bound than
+CPU-bound, optimisation in terms of the running time of a program on the
+CPU will be de-emphasised in favour of establishing a more optimal use
+of io.
