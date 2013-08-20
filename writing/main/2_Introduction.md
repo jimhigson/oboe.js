@@ -120,25 +120,36 @@ then a rapid burst of 3.
 Solving the big-small tradeoff
 ------------------------------
 
-With regards to series of data made available via REST, I have often
-seen a trade-off regarding how much data should be requested at once in
-which no choice of a size may be called wholy satisfactory. A good
-example might be the list of tweets on a Twitter page, which is itself
-an instance of a more general pattern known as an "infinitely scrolling"
-webpage. Given the initial finite page of tweets, upon scrolling to the
-bottom of the page the next batch is requested. The new batch is
-delivered in a json format and, once loaded, presented as html and added
-to the bottom of the page, allowing the user to continue scrolling.
+Where the domain model contains a series of data, of which ranges are
+made available via REST, I have often seen a trade-off with regards to
+how much data is requested at once. Deciding this question is usually a
+compromise between competing concerns in which it is not possible to
+find a solution which simultaneously addresses all concerns
+satisfactorily. A good example might be a page on Twitter showing a list
+of tweets. The interface designers here chose to adopt a fairly popular
+pattern, the Infinitely Scrolling Page [CITE]. Starting from an initial
+page showing a finite number of tweets, upon scrolling to the bottom the
+next batch is automatically requested. The new batch is delivered in a
+json format and, once loaded, presented as html and added to the bottom
+of the page, allowing the user to continue scrolling.
 
-Consider the decision of how much data to
+The wait at the bottom of the page while new content is loaded
+introduces a pause in scrolling so, whilst preferable to prior patterns
+incorporating explicit paging, this workflow can feel quite clunky.\
+To frame this problem we might imagine the extreme choices. Firstly,
+requesting only one tweet per http request. Because we are requesting
+the smallest possible content, each request would individually complete
+very quickly and as such the waits would be short. However the page
+would stutter, pausing quickly but frequently. At the opposite extreme,
+we might request some huge number of tweets,\
+taking a long time to load but then scrolling smoothly for a long time.
 
-img tags all added at once.
-
-. One example of this is the "infinitely scrolling" webpage.
+I propose that my thesis may be applied used to break out of this
+compromise and take the best of both approaches, combining the quick
+latency from very small requests with the infrequent pauses of larger
+requests.
 
 Or, granularity problem
-
-Two improvements: just hang up; and, start using earlier.
 
 Network fallibility
 -------------------
