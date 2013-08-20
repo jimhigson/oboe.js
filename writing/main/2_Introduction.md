@@ -3,7 +3,7 @@ Introduction
 
 **introduction should be 2-5 pages (1,000 to 2,500 wrds)**
 
-Intro should:
+Intro should say:
 
 -   What is the problem?
 -   How do I plan to solve it?
@@ -13,10 +13,14 @@ Intro should:
 
 Increasing the perception of speed:
 
--   Source that doing things early makes page feel faster.
--   Also actually faster as well as being
+As a software engineer working on REST systems I have noticed several
+areas where, if http were to be viewed through a new lens, it should be
+possible to evolve the performance of the common paradigms. Because
+incremental changes are easier to action, I have been careful to ensure
+that this perspective may be with only a few carefully chosen changes
+and without any loss of interoperability to existing systems, avoiding
+the temptation of wholesale shift to a new technology stack.
 
-For the dissertation I have identified several areas where the typical
 http usage pattern could be improved and wish to offer an alternative
 usage paradigm built on the same technologies. While this solution is
 presented as software, the change is as much a shift in how we think
@@ -36,23 +40,28 @@ the task. Whilst the difficulty in creating the client resists
 quantification, this will be examined in terms of the length of the
 expression required in programming some common tasks.
 
+Because applications in the target domain are much more io-bound than
+CPU-bound, optimisation in terms of the running time of a program on the
+CPU will be de-emphasised in favour of establishing a more optimal use
+of io.
+
 Inefficiencies in typical rest usage
 ------------------------------------
 
-![Example use of a REST service; a client learns about an author's
-publications and then retrieves information on the first three. The
-process is much the same regardless of the aims of the client: it could
-be a user interface wanting to display the publications or an aggregator
-wishing to provide a higher-level REST service than the one it
-aggregates. The left sequence represents the most commonly used pattern
-in which the client does no inspection of the response until it is
-complete. The shaded arrows in the right sequence illustrate the concept
-of receiving a response as a sequence of small fragments whereas the
-darker arrows on the left represent the concept of the response as a
-one-off event \label{enhancingrest}](images/rest_timeline.png)
+![Use of a REST service. In this example the client fetches a list of an
+author's publications and then retrieves the first three articles. The
+left sequence represents the most commonly used pattern in which the
+client does no inspection of the response until it is complete. The
+shaded arrows in the right sequence illustrate the concept of receiving
+a response as a sequence of small fragments whereas the darker arrows on
+the left represent the concept of the response as a one-off event
+\label{enhancingrest}](images/rest_timeline.png)
 
 Figure shows way of thinking about service, not differences in service
-itself
+itself. The process is much the same regardless of the aims of the
+client: it could be a user interface wanting to display the publications
+or an aggregator wishing to provide a higher-level REST service than the
+one it aggregates.
 
 As seen the \ref{enhancingrest} example, may be aborted once the data
 needed has been identified.
@@ -90,7 +99,10 @@ Two improvements: just hang up; and, start using earlier.
 Perception of speed
 -------------------
 
-Earlier **is** faster.
+Doing something earlier **is** doing it faster.
+
+User perception of speed can be increased by completing a task in small
+parts rather than waiting for a whole to appear fully formed.
 
 Network fallibility
 -------------------
@@ -112,7 +124,7 @@ ability can be used to
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
 
-A subtler problem
+A more subtle problem
 
 SOA has been adapted widely but versioning remains a common challenge in
 industry. Anecdote: test environment finds an issue. One system can't be
