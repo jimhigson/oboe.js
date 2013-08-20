@@ -36,40 +36,45 @@ significant problem area and any benefit my new approach can bring to
 this problem should be counted towards the success of the project.
 
 Inefficiencies in out typical use of http
-------------------------------------
+-----------------------------------------
 
-![Use of a REST service. A client fetches a listing of an
-author's publications and then the first three articles. The
-left sequence represents the most commonly used pattern in which the
-client does not react to the response until it is complete. In the right 
-sequence the client considers the response to return progressively as many small 
-parts. Because UML sequence diagrams do not provide a concept of a returned value other than 
-as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced.
-Each publication is fetched as soon
-as the fragment of response linking to it is available and once the data required
-has been read from the original response it is aborted rather than continuing
-with the download of unnecessary data.
-\label{enhancingrest}](images/rest_timeline.png)
+![Use of a REST service. A client fetches a listing of an author's
+publications and then the first three articles. The left sequence
+represents the most commonly used pattern in which the client does not
+react to the response until it is complete. In the right sequence the
+client considers the response to return progressively as many small
+parts. Because UML sequence diagrams do not provide a concept of a
+returned value other than as a one-off event, the notation of lighter
+arrows illustrating an ongoing response is introduced. Each publication
+is fetched as soon as the fragment of response linking to it is
+available and once the data required has been read from the original
+response it is aborted rather than continuing with the download of
+unnecessary data. \label{enhancingrest}](images/rest_timeline.png)
 
-The figure above \ref{enhancingrest} illustrates how a progressive REST client, without 
-adjustments being required to the server may bring improvements in the  
+The figure above \ref{enhancingrest} illustrates how a progressive REST
+client, without adjustments being required to the server may bring
+improvements in the
 
-
-In the figure above \ref{enhancingrest} shows way of thinking about service, not differences in service
-itself. The process is much the same regardless of the aims of the
-client: it could be a user interface wanting to display the publications
-or an aggregator wishing to provide a higher-level REST service than the
-one it aggregates.
+Although the label "client software" hints at software running directly
+on a user's own device,\
+software in an n-tier architecture can rarely be categorised into client
+and server in a way which is appropriate to all frames of reference.
+Rather, it is common for nodes to be thought of as a client to to the
+layer below and as a server to the layer above. The advantage
+demonstrated holds if the layer labeled "client software" were actually
+an aggregator providing a higher-level service than the one that it
+aggregates. Rather than progressively displaying the publications to the
+user, an aggregator would be able to realise a similar benefit by
+progressively responding to the http request which it received.
 
 As seen the \ref{enhancingrest} example, may be aborted once the data
-needed has been identified.
+needed has been identified. Terminating the message early is though of
+as a useful and routine technique, not simply as a way of dealing with
+error cases.
 
 The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
-
-Terminating the message early is though of as a useful and routine technique, not simply 
-as a way of dealing with error cases.
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
