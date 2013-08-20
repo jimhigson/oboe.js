@@ -70,9 +70,9 @@ client, without adjustments being required to the server may be used to
 display some data requested by a user sooner. While the complete data
 should be available to the user significantly earlier, we see a much
 greater improvement in how early the first piece of data is able to be
-displayed. This is advantageous: firstly, even if the overall timings
-were not improved, progressive display improves the perception of
-performance [CITEME]; secondly, a user wanting to scan from top to
+displayed. This is advantageous: firstly, even if the total time to show
+the data were not improved, progressive display improves the perception
+of performance [CITEME]; secondly, a user wanting to scan from top to
 bottom may start reading the first article while waiting for the later
 ones to arrive. Alternatively, seeing the first article alone may allow
 the user to notice earlier that they have requested the wrong author and
@@ -113,21 +113,30 @@ applies only to a single problem domain, that of displaying web pages.
 The new contribution of this dissertation hinges on providing a generic,
 reusable solution which may be applied to any problem domain.
 
-As seen the \ref{enhancingrest} example, may be aborted once the data
-needed has been identified. Terminating the message early is though of
-as a useful and routine technique, not simply as a way of dealing with
-error cases.
-
 The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
 
-Big-small problem
------------------
+Solving the big-small tradeoff
+------------------------------
+
+With regards to series of data made available via REST, I have often
+seen a trade-off regarding how much data should be requested at once in
+which no choice of a size may be called wholy satisfactory. A good
+example might be the list of tweets on a Twitter page, which is itself
+an instance of a more general pattern known as an "infinitely scrolling"
+webpage. Given the initial finite page of tweets, upon scrolling to the
+bottom of the page the next batch is requested. The new batch is
+delivered in a json format and, once loaded, presented as html and added
+to the bottom of the page, allowing the user to continue scrolling.
+
+Consider the decision of how much data to
+
+img tags all added at once.
+
+. One example of this is the "infinitely scrolling" webpage.
 
 Or, granularity problem
-
-Perception. Eg, infinite scrolling webpages. Visualisations.
 
 Two improvements: just hang up; and, start using earlier.
 
