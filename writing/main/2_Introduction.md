@@ -30,9 +30,12 @@ the throughput and reactivity of systems created using REST, the
 approach chosen may also be considered against a secondary problem often
 experienced in REST systems: that of tight coupling between systems and
 the difficulty this brings in adding new semantics to existing message
-formats.
-
-
+formats. I find that in many cases these problems exist solely as
+inflexible REST client software which is unprepared to accept slight or
+moderate variations on previously agreed formats. Whilst loose coupling
+isn't the primary concern of this dissertation, I have found it to be a
+significant problem area and any benefit my new approach can bring to
+this problem should be counted towards the success of the project.
 
 Why not writing for the server side? Why just the client?
 
