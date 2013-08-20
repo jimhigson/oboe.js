@@ -1,39 +1,62 @@
 <h1 id="abstract"><a href="#abstract"><span class="header-section-number">1</span> Abstract</a></h1>
-<p>A Javascript REST client library targeting both Node.js and web browsers that incorporates http streaming, pattern matching, and progressive JSON parsing, with the aim of improving performance, fault tolerance, and encouraging a greater degree of loose coupling between programs. Loose coupling is particularly considered in light of the application of Agile methodologies to SOA, providing a framework in which it is acceptable to partially restructure the JSON format in which a resource is expressed whilst maintaining compatibility with dependant systems.</p>
+<p>A Javascript REST client library targeting both Node.js and web browsers that incorporates http streaming, pattern matching, and progressive JSON parsing, with the aim of improving performance, fault tolerance, and encouraging a greater degree of loose coupling between programs. Loose coupling is particularly considered in light of the application of Agile methodologies to SOA, providing a framework in which it is acceptable to partially restructure the JSON format in which a resource is expressed whilst maintaining compatibility with dependent systems.</p>
 <p>A critique is made of current practice under which resources are entirely retrieved before items of interest are extracted programmatically. An alternative model is presented allowing the specification of items of interest using a declarative syntax similar to JSONPath. The identified items are then provided incrementally while the resource is still downloading.</p>
 <p>In addition to a consideration of performance in absolute terms, the usability implications of an incremental model are also evaluated with regards to differences in user perception of performance.</p>
 <h1 id="introduction"><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
-<p><strong>introduction should be 2-5 pages</strong></p>
-<p>Increasing the perception of speed:</p>
+<p><strong>introduction should be 2-5 pages (1,000 to 2,500 wrds)</strong></p>
+<p>Intro should say:</p>
 <ul>
-<li>Source that doing things early makes page feel faster.</li>
-<li>Also actually faster as well as being</li>
+<li>What is the problem?</li>
+<li>How do I plan to solve it?</li>
+<li>What are the success criteria?</li>
+<li>How will know if been successful?</li>
+<li>What is the motivation for solving it?</li>
 </ul>
-<p>perceived as such since useful things can often be done before whole content is loaded.</p>
-<p>When connections fail, apps are left with non of the content. Happens a lot on mobile networks.</p>
-<h2 id="inefficiencies-in-performing-a-fairly-simple-task"><a href="#inefficiencies-in-performing-a-fairly-simple-task"><span class="header-section-number">2.1</span> Inefficiencies in performing a fairly simple task</a></h2>
+<p>As a software engineer working on REST systems I have noticed several areas where, if http were to be viewed through a new lens, it should be possible to evolve the performance of the common paradigms. Because incremental changes are easier to action, I have been careful to ensure that this perspective may be with only a few carefully chosen changes and without any loss of interoperability to existing systems, avoiding the temptation of wholesale shift to a new technology stack. Although I will express my dissertation partially through programming, the shift required for this evolutionary change is felt more strongly as a shift in how we <em>think</em> about http than it is a change in the underlying technology itself.</p>
+<p>Whilst the primary area of concern for this dissertation is to improve the throughput and reactivity of systems created using REST, the approach chosen may also be considered against a secondary problem often experienced in REST systems: that of tight coupling between systems and the difficulty this brings in adding new semantics to existing message formats. I find that in many cases these problems exist solely as inflexible REST client software which is unprepared to accept slight or moderate variations on previously agreed formats. Whilst loose coupling isn't the primary concern of this dissertation, I have found it to be a significant problem area and any benefit my new approach can bring to this problem should be counted towards the success of the project.</p>
+<h2 id="inefficiencies-in-out-typical-use-of-http"><a href="#inefficiencies-in-out-typical-use-of-http"><span class="header-section-number">2.1</span> Inefficiencies in out typical use of http</a></h2>
+<div class="figure">
+<img src="images/rest_timeline.png" alt="Use of a REST service. A client fetches a listing of an author&#39;s publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. " /><p class="caption">Use of a REST service. A client fetches a listing of an author's publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. </p>
+</div>
+<p>The figure above  illustrates how a progressive REST client, without adjustments being required to the server may bring improvements in the</p>
+<p>In the figure above  shows way of thinking about service, not differences in service itself. The process is much the same regardless of the aims of the client: it could be a user interface wanting to display the publications or an aggregator wishing to provide a higher-level REST service than the one it aggregates.</p>
+<p>As seen the  example, may be aborted once the data needed has been identified.</p>
+<p>The cadence of the right sequence has better pacing of requests with 4 being made at roughly equal intervals rather than a single request and then a rapid burst of 3.</p>
+<p>Terminating the message early is though of as a useful and routine technique, not simply as a way of dealing with error cases.</p>
 <p>Despite the enthusiasm for which SOA and REST in particular has been adapted, I believe this model isn't being used to its fullest potential. Consider a fairly simple task of retrieving all the images used on a web page.</p>
+<p>These are not obscure esoteric requirements, rather they represent the mainstay execution of almost any SOA application.</p>
 <p>Grab all the images mentioned in a web page Images may be on another subdomain</p>
 <ul>
 <li>DNS lookup only after got whole page Dynamically generated pages can often load slowly, even when there is plenty of bandwidth But images could load quickly.</li>
 </ul>
 <p>Diagram of timeline to get images from a webpage.</p>
-<p>In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired into the browser engines rather than exposing an API suitable for general use and as such is treated as something of a special case specific to web browsers and has not so far seen a more general application. I wish to argue that a general application of this technique is viable and offers a worthwhile improvement over current common methods.</p>
-<p>The above problem has many analogues and because REST uses standard web semantics applies to much more than just automated web surfing. Indeed, as the machine readability of the data increases, access early can be all the more beneficial since decisions to terminate the connection may be made. Example: academic's list of publications, then downloading all the new ones.</p>
-<div class="figure">
-<img src="images/placeholder.png" alt="Potential differences in overall time taken to download a list of publications and then download any ones newer than a certain date. Assuming the publications are ordered newest first, the first connection may be terminated as soon as an older publication is found." /><p class="caption">Potential differences in overall time taken to download a list of publications and then download any ones newer than a certain date. Assuming the publications are ordered newest first, the first connection may be terminated as soon as an older publication is found.</p>
-</div>
-<h2 id="agile-methodologies-and-future-versioning"><a href="#agile-methodologies-and-future-versioning"><span class="header-section-number">2.2</span> Agile methodologies and future versioning</a></h2>
-<p>SOA has been adapted widely but versioning remains a common challenge in industry.</p>
-<p>Anecdote: test environment finds an issue. One system can't be released. Contagion.</p>
+<h2 id="big-small-problem"><a href="#big-small-problem"><span class="header-section-number">2.2</span> Big-small problem</a></h2>
+<p>Or, granularity problem</p>
+<p>Perception. Eg, infinite scrolling webpages. Visualisations.</p>
+<p>Two improvements: just hang up; and, start using earlier.</p>
+<h2 id="perception-of-speed"><a href="#perception-of-speed"><span class="header-section-number">2.3</span> Perception of speed</a></h2>
+<p>Doing something earlier <strong>is</strong> doing it faster.</p>
+<p>User perception of speed can be increased by completing a task in small parts rather than waiting for a whole to appear fully formed.</p>
+<h2 id="network-fallibility"><a href="#network-fallibility"><span class="header-section-number">2.4</span> Network fallibility</a></h2>
+<p>The inefficiencies listed above are present when all network links operate perfectly.</p>
+<p>When connections fail, apps are left with non of the content. Happens a lot on mobile networks.</p>
+<p>Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5] which can be used to request any contiguous part of a response rather than the whole. Common in download managers but not REST clients. This ability can be used to</p>
+<p>[!Extra diagram: resume after aborted connection] (images/placeholder)</p>
+<h2 id="agile-methodologies-fast-deployments-and-future-versioning"><a href="#agile-methodologies-fast-deployments-and-future-versioning"><span class="header-section-number">2.5</span> Agile methodologies, fast deployments and future versioning</a></h2>
+<p>A more subtle problem</p>
+<p>SOA has been adapted widely but versioning remains a common challenge in industry. Anecdote: test environment finds an issue. One system can't be released. Contagion.</p>
 <p>How to cope with software that changes every week.</p>
 <p>Because of the contagion problem, need to be able to create loosely-coupled systems.</p>
 <p>Inside systems also, even with automatic refactoring tools, only automate and therefoer lessen but do not remove the problem that coupling causes changes in one place of a codebase to cause knock-on changes in remote other parts of the code. A method of programming which was truly compatible with extreme programming would involve designing for constant change without disparate parts having to be modified as structural refactoring occurs.</p>
 <p>I propose that in a changing system, readability of code's changelog is as important as readability of the code itself. Extraneous changes dilute the changelog, making it less easily defined by code changes which are intrinsically linked to the actual change in the logic being expressed by the program.</p>
 <p>It is often stated that understandability is the number once most important concern in a codebase (CITE) - if the code is suitably dynamic it is important that changes are axiomic and clarity of the changelog is equally important.</p>
+<h2 id="criteria-for-success"><a href="#criteria-for-success"><span class="header-section-number">2.6</span> Criteria for success</a></h2>
+<p>In evaluating this project, we may say it has been a success if non-trivial improvements in speed can be made without a corresponding increase in the difficulty of programming the client. This improvement may be in terms of a measure of the absolute time required to complete a representative task or in a user's perception of the speed in completing the task. Whilst the difficulty in creating the client resists quantification, this will be examined in terms of the length of the expression required in programming some common tasks.</p>
+<p>Because applications in the target domain are much more io-bound than CPU-bound, optimisation in terms of the running time of a program on the CPU will be de-emphasised in favour of establishing a more optimal use of io.</p>
 <h1 id="background"><a href="#background"><span class="header-section-number">3</span> Background</a></h1>
 <p><strong>background should be 2-10 pages</strong></p>
-<p>The feature set will be minimal but contain no obvious omissions.</p>
+<p>In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired into the browser engines rather than exposing an API suitable for general use and as such is treated as something of a special case specific to web browsers and has not so far seen a more general application. I wish to argue that a general application of this technique is viable and offers a worthwhile improvement over current common methods.</p>
+<p>The above problem has many analogues and because REST uses standard web semantics applies to much more than just automated web surfing. Indeed, as the machine readability of the data increases, access early can be all the more beneficial since decisions to terminate the connection may be made. Example: academic's list of publications, then downloading all the new ones.</p>
 <h2 id="some-high-level-stuff-about-webapps-and-where-processing-is-done"><a href="#some-high-level-stuff-about-webapps-and-where-processing-is-done"><span class="header-section-number">3.1</span> Some high-level stuff about webapps and where processing is done</a></h2>
 <p>Ie, front-end client-side, front-end server-side.</p>
 <p><a href="images/placeholder">!A webapp running with a front end generated partially on server and partially on client side</a></p>
@@ -43,14 +66,25 @@
 <p>Twitter: Moving from client to server for performance. Reduce load times to 1 5th of what they were previously [https://blog.twitter.com/2012/improving-performance-twittercom]</p>
 <p>Give static page (fairly basic but functional), then load js in the background.</p>
 <p>However, with Node don't have to reengineer to move from client to server.</p>
-<h2 id="soa"><a href="#soa"><span class="header-section-number">3.2</span> SOA</a></h2>
+<h2 id="where-the-delays-are-in-a-web-application"><a href="#where-the-delays-are-in-a-web-application"><span class="header-section-number">3.2</span> Where the delays are in a web application</a></h2>
+<p>Even complex apps are not finding a bottleneck in javascript execution times.</p>
+<ul>
+<li>DOM manipulation</li>
+<li>rendering</li>
+<li>most significant: waiting for stuff. Going from js taking 10ms per frame to 1ms per frame will have zero difference because it is already meeting the frame rate. Might help slower devices if performance was marginal before</li>
+</ul>
+<blockquote>
+<p>The user does something, then the app responds visually with immediacy at 30 frames per second or more, and completes a task in a few hundred milliseconds. As long as an app meets this user goal, it doesn’t matter how big an abstraction layer it has to go through to get to silicon.</p>
+</blockquote>
+<p>http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29#date:16:00</p>
+<h2 id="soa"><a href="#soa"><span class="header-section-number">3.3</span> SOA</a></h2>
 <p>REST/WebServices (WSDL etc)</p>
 <p>What is a rest client in this context (a client library)</p>
 <p>Marshalling/ de-marshalling. Benefits and the problems that it causes. Allows one model to be written out to XML or JSON</p>
 <p>Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.</p>
 <p>Javascript as mis-understood language (CITE: Crockford) - list features available.</p>
 <p>(correctly, ECMAScript) Misleadingly named after Java as a marketing ploy when Java was a new technology (CITE) - in true more similar to Scheme or Lisp but with Java or C inspired syntax.</p>
-<h2 id="anatomy-of-a-soa-client"><a href="#anatomy-of-a-soa-client"><span class="header-section-number">3.3</span> Anatomy of a SOA client</a></h2>
+<h2 id="anatomy-of-a-soa-client"><a href="#anatomy-of-a-soa-client"><span class="header-section-number">3.4</span> Anatomy of a SOA client</a></h2>
 <p>First stage after getting a resource is usually to programmatically extract the interesting part from it. This is usually done via calls in the programming language itself, for example by de-marshaling the stream to domain objects and then calling a series of getters to narrow down to the interesting parts.</p>
 <p>This part has become such a natural component of a workflow that it is barely noticed that it is happening. In an OO language, the extraction of small parts of a model which, in the scope of the current concern are of interest is so universal that it could be considered the sole reason that getters exist.</p>
 <p>However subtly incorporated it has become in the thinking of the programmer, we should note that this is a construct and only one possible way of thinking regarding identifying the areas of current interest in a wider model.</p>
@@ -87,10 +121,10 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>CSS. Meant for presentation of HTML, but where HTML markup is semantic it is a selector of the <em>meaning of elements</em> for the sake of applying a meaningful presentation more so than a selector of arbitrary colours and positions on a screen.</p>
 <p>Unlike XML, in the model created by most general programming languages, there is no requirement for the data to be tree shaped. Graph is ok. This make this slighlty harder but nontheless attempts have been made.</p>
 <p>Linq. (CITEME)</p>
-<h2 id="parsing-sax-and-dom"><a href="#parsing-sax-and-dom"><span class="header-section-number">3.4</span> Parsing: SAX and Dom</a></h2>
+<h2 id="parsing-sax-and-dom"><a href="#parsing-sax-and-dom"><span class="header-section-number">3.5</span> Parsing: SAX and Dom</a></h2>
 <p>Why sax is difficult</p>
 <p>DOM parser can be built on a SAX parser</p>
-<h2 id="state-of-http-as-a-streaming-technology"><a href="#state-of-http-as-a-streaming-technology"><span class="header-section-number">3.5</span> State of http as a streaming technology</a></h2>
+<h2 id="state-of-http-as-a-streaming-technology"><a href="#state-of-http-as-a-streaming-technology"><span class="header-section-number">3.6</span> State of http as a streaming technology</a></h2>
 <p>Http libraries feeding into the parser. In browser, generally single callback when whole message received.</p>
 <p>Client-side web scripting via Javascript is a field which at inception contributed no more than small, frequently gimmicky, dynamic features added to otherwise static webpages. Today the scope and power of client side scripting has increased to the extent that the entire interface for large, complex applications is often programmed in this way. These applications are not limited to running under traditional web browsers but also include mobile apps and desktop software.</p>
 <p>Dichotamy between streaming and downloading in the browser for downloading data. But not for html (progressive rendering) or images (progressive PNGs and progressive JPEGs).</p>
@@ -116,14 +150,14 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <span class="co">// the equivalent jsonpath expression is identical:</span>
 <span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
 <p>What 'this' (context) is in javascript. Why not calling it scope.</p>
-<h2 id="the-web-browser-as-rest-client"><a href="#the-web-browser-as-rest-client"><span class="header-section-number">3.6</span> The web browser as REST client</a></h2>
+<h2 id="the-web-browser-as-rest-client"><a href="#the-web-browser-as-rest-client"><span class="header-section-number">3.7</span> The web browser as REST client</a></h2>
 <p>Browser incompatability mostly in presentation layer rather than in scripting languages.</p>
 <p>Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs presented to the scripting language rather than the language itself.</p>
-<h2 id="progressive-ui"><a href="#progressive-ui"><span class="header-section-number">3.7</span> Progressive UI</a></h2>
+<h2 id="progressive-ui"><a href="#progressive-ui"><span class="header-section-number">3.8</span> Progressive UI</a></h2>
 <p>Infinitely scrolling webpages. Need a way to 'pull' information, not just push if reacting to scrolling. Use oboe with websockets? Eg, ebay home page, Facebook. Adv of infinate scroll is page loads quickly and most people won't scroll very far so most of the time have everything needed right away.</p>
-<h2 id="state-of-rest-json-and-xml"><a href="#state-of-rest-json-and-xml"><span class="header-section-number">3.8</span> State of rest: Json and XML</a></h2>
+<h2 id="state-of-rest-json-and-xml"><a href="#state-of-rest-json-and-xml"><span class="header-section-number">3.9</span> State of rest: Json and XML</a></h2>
 <p>Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!</p>
-<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.9</span> Javascript</a></h2>
+<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.10</span> Javascript</a></h2>
 <p>Javascript: not the greatest for 'final' elegant presentation of programming. Does allow 'messy' first drafts which can be refactored into beautiful code. Ie, can write stateful and refactor in small steps towards being stateless. An awareness of beautiful languages lets us know the right direction to go in. An ugly language lets us find something easy to write that works to get us started. Allows a very sketchy program to be written, little more than a programming scratchpad.</p>
 <p>Without strict typing, hard to know if program is correct without running it. In theory (decidability) and in practice (often find errors through running and finding errors thrown). Echo FPR: once compiling, good typing tends to give a reasonable sureness that the code is correct.</p>
 <p>Explain var/function difference, ie construct pluck and explain why var keyOf = partial(pluck) is declared with a var and not a function, why some prefer to do always via . operator can't be made into a function with (.) or similar and so has to be wrapped in a function is a less direct manner. Unfortunately, can make it difficult for a reader to know the types involved. For example, on seeing: <code>var matchesJsonPath = jsonPathCompiler( pattern )</code> there is no way (other than examining the source or doucmentation of the function being called) to know that this is a higher order function and will return another function to be assigned as matchesJsonPath.</p>
@@ -135,7 +169,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
       return cons(fn(head(list)), map(fn,tail(list)));
    }
 }</code></pre>
-<h2 id="node"><a href="#node"><span class="header-section-number">3.10</span> Node</a></h2>
+<h2 id="node"><a href="#node"><span class="header-section-number">3.11</span> Node</a></h2>
 <blockquote>
 <p>Streams in node are one of the rare occasions when doing something the fast way is actually easier. SO USE THEM. not since bash has streaming been introduced into a high level language as nicely as it is in node.&quot; <a href="https://gist.github.com/2401787">high level node style guide</a></p>
 </blockquote>
@@ -154,7 +188,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>How Node is different</p>
 <p>Criticisms of Node. Esp from Erlang etc devs.</p>
 <p>Node's standard stream mechanisms</p>
-<h2 id="browser"><a href="#browser"><span class="header-section-number">3.11</span> Browser</a></h2>
+<h2 id="browser"><a href="#browser"><span class="header-section-number">3.12</span> Browser</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback. polling responseText while in progress * why doesn't work in IE (built on an activeX object that provides buffering)</p>
 <p>Older style of javascript callback. Assign a listener to onprogress, not call an add listener method means can only have one listener.</p>
@@ -162,12 +196,12 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>While the request entity body is being transmitted and the upload complete flag is unset, queue a task to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every byte transmitted, whichever is least frequent. <a href="http://www.w3.org/TR/XMLHttpRequest/">w3c, XHR Working Draft</a></p>
 </blockquote>
 <p>Websockets More like node Can connect to any protocol (as always, easier to program if text based but can do binary) Can use to do http but not sufficient advantage over using</p>
-<h2 id="micro-libraries"><a href="#micro-libraries"><span class="header-section-number">3.12</span> Micro-libraries</a></h2>
+<h2 id="micro-libraries"><a href="#micro-libraries"><span class="header-section-number">3.13</span> Micro-libraries</a></h2>
 <p>What a Micro-library is. What motivates the trend? This library has a fairly small set of functionality, it isn't a general purpose do-everything library like jQuery so its size will be looked at more critically if it is too large. Micro library is the current gold standard for compactness. Still, have a lot to do in not very much code.</p>
-<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.13</span> Methodology</a></h2>
+<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.14</span> Methodology</a></h2>
 <p>The program design will be initially an exercise in creating the easiest expression that can possibly work and via constant work towards the emergence of elegance.</p>
 <p>Why this method? See W'yg.</p>
-<h2 id="testing"><a href="#testing"><span class="header-section-number">3.14</span> Testing</a></h2>
+<h2 id="testing"><a href="#testing"><span class="header-section-number">3.15</span> Testing</a></h2>
 <div class="figure">
 <img src="images/placeholder.png" alt="Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers" /><p class="caption">Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers</p>
 </div>
@@ -183,6 +217,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>JSTD, as a Java program, is difficult to start via Grunt. Also an issue that Grunt post-dates Karma by enough that JSTD doesn't have the attention of the Grunt community.</p>
 <h1 id="application-and-reflection"><a href="#application-and-reflection"><span class="header-section-number">4</span> Application and Reflection</a></h1>
 <p><strong>40 to 60 pages</strong></p>
+<p>A feature set which is minimal but contain no obvious omissions.</p>
 <p>Under the heading <a href="#anatomy-of-a-soa-client">Anatomy of a SOA client</a> I deconstructed the way in which programming logic is often used to identify the parts of a model which are currently interesting and started to look at some declarative ways in which these parts can be obtained.</p>
 <p>Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general logic of the program, declaratively define the interesting parts and have these parts delivered to the language logic. Once we make the shift to thinking in this way, it is no longer necessary to have the whole resource locally before the interesting sub-parts are delivered.</p>
 <p>Focus on replacing ajax, rather than streaming. In older browsers, getting the whole message at once is no worse than it is now.</p>
@@ -219,7 +254,17 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 </div>
 <p>(CITE: re-read citations from SOA)</p>
 <h2 id="design-of-the-jsonpath-parser"><a href="#design-of-the-jsonpath-parser"><span class="header-section-number">4.6</span> Design of the jsonpath parser</a></h2>
-<p>Explain why Haskel/lisp style lists are used rather than arrays * In parser clauses, lots of 'do this then go to the next function with the rest'. * Normal arrays extremely inefficient to make a copy with one item popped off the start * Link to FastList on github <em>* For sake of micro-library, implemented tiny list code with very bare needed</em> Alternative (first impl) was to pass an index around <em>* But clause fns don't really care about indexes, they care about top of the list.</em>* Slight advantage to index: allows going past the start for the root path (which doesn't have any index) instead, have to use a special value to keep node and path list of the same length ** Special token for root, takes advantage of object identity to make certain that cannot clash with something from the json. Better than '<strong>root</strong>' or similar which could clash. String in js not considered distinct, any two strings with identical character sequences are indistinguishable.</p>
+<p>Explain why Haskel/lisp style lists are used rather than arrays</p>
+<ul>
+<li>In parser clauses, lots of 'do this then go to the next function with the rest'.</li>
+<li>Normal arrays extremely inefficient to make a copy with one item popped off the start</li>
+<li>Link to FastList on github</li>
+<li>For sake of micro-library, implemented tiny list code with very bare needed</li>
+<li>Alternative (first impl) was to pass an index around</li>
+<li>But clause fns don't really care about indexes, they care about top of the list.</li>
+<li>Slight advantage to index: allows going past the start for the root path (which doesn't have any index) instead, have to use a special value to keep node and path list of the same length</li>
+<li>Special token for root, takes advantage of object identity to make certain that cannot clash with something from the json. Better than '<strong>root</strong>' or similar which could clash. String in js not considered distinct, any two strings with identical character sequences are indistinguishable.</li>
+</ul>
 <p>Anti-list: nothing is quite so small when making a mircro-library as using the types built into the language, coming as they are for zero bytes.</p>
 <div class="figure">
 <img src="images/placeholder.png" alt="Diagram showing why list is more memory efficient - multiple handles into same structure with different starts, contrast with same as an array" /><p class="caption">Diagram showing why list is more memory efficient - multiple handles into same structure with different starts, contrast with same as an array</p>
@@ -462,6 +507,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Would benefit from a stateless language where everything is stateless at all times to avoid having to program defensively.</p>
 <h1 id="conclusion"><a href="#conclusion"><span class="header-section-number">5</span> Conclusion</a></h1>
 <p><strong>1 to 5 pages</strong></p>
+<p>Doing things faster vs doing things earlier. &quot;Hurry up and wait&quot; approach to optimisation.</p>
 <h2 id="development-methodology"><a href="#development-methodology"><span class="header-section-number">5.1</span> Development methodology</a></h2>
 <p>Did it help?</p>
 <p>Switched several times. Could have started with winning side? Tension between choosing latest and greatest (promising much) or old established solution alraedy experienced with but with known problems. Judging if problems will become too much of a hinderence and underestimating the flaws. JSTD was yesterday's latest and greatest but Karma genuinely is great. In end, right solution was found despite not being found in most direct way.</p>
@@ -481,7 +527,15 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <h2 id="comparative-usages"><a href="#comparative-usages"><span class="header-section-number">5.4</span> Comparative usages</a></h2>
 <p>Interesting article from Clarinet: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</p>
 <p>In terms of syntax: compare to SAX (clarinet) for getting the same job done. Draw examples from github project README. Or from reimplementing Clarinet's examples.</p>
-<p>Consider: * Difficulty to program * Ease of reading the program / clarity of code * Resources consumed * Performance (time) taken -- about the same. Can react equally quickly to io in progress, both largely io bound.</p>
+<p>Consider:</p>
+<ul>
+<li>Difficulty to program</li>
+<li>Ease of reading the program / clarity of code</li>
+<li>Resources consumed</li>
+<li>Performance (time) taken</li>
+<li>about the same. Can react equally quickly to io in progress, both largely io bound.</li>
+<li>Is earlier really faster?</li>
+</ul>
 <h2 id="community-reaction"><a href="#community-reaction"><span class="header-section-number">5.5</span> Community reaction</a></h2>
 <p>Built into Dojo Followers on Github Being posted in forums (hopefully also listed on blogs) No homepage as of yet other than the Github page</p>
 <h1 id="bibliography"><a href="#bibliography"><span class="header-section-number">6</span> Bibliography</a></h1>

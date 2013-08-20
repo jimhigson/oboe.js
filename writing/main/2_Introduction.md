@@ -11,8 +11,6 @@ Intro should say:
 -   How will know if been successful?
 -   What is the motivation for solving it?
 
-Increasing the perception of speed:
-
 As a software engineer working on REST systems I have noticed several
 areas where, if http were to be viewed through a new lens, it should be
 possible to evolve the performance of the common paradigms. Because
@@ -37,21 +35,27 @@ isn't the primary concern of this dissertation, I have found it to be a
 significant problem area and any benefit my new approach can bring to
 this problem should be counted towards the success of the project.
 
-Why not writing for the server side? Why just the client?
-
-Inefficiencies in typical rest usage
+Inefficiencies in out typical use of http
 ------------------------------------
 
-![Use of a REST service. In this example the client fetches a list of an
-author's publications and then retrieves the first three articles. The
+![Use of a REST service. A client fetches a listing of an
+author's publications and then the first three articles. The
 left sequence represents the most commonly used pattern in which the
-client does no inspection of the response until it is complete. The
-shaded arrows in the right sequence illustrate the concept of receiving
-a response as a sequence of small fragments whereas the darker arrows on
-the left represent the concept of the response as a one-off event
+client does not react to the response until it is complete. In the right 
+sequence the client considers the response to return progressively as many small 
+parts. Because UML sequence diagrams do not provide a concept of a returned value other than 
+as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced.
+Each publication is fetched as soon
+as the fragment of response linking to it is available and once the data required
+has been read from the original response it is aborted rather than continuing
+with the download of unnecessary data.
 \label{enhancingrest}](images/rest_timeline.png)
 
-Figure shows way of thinking about service, not differences in service
+The figure above \ref{enhancingrest} illustrates how a progressive REST client, without 
+adjustments being required to the server may bring improvements in the  
+
+
+In the figure above \ref{enhancingrest} shows way of thinking about service, not differences in service
 itself. The process is much the same regardless of the aims of the
 client: it could be a user interface wanting to display the publications
 or an aggregator wishing to provide a higher-level REST service than the
@@ -63,6 +67,9 @@ needed has been identified.
 The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
+
+Terminating the message early is though of as a useful and routine technique, not simply 
+as a way of dealing with error cases.
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, I believe this model isn't being used to its fullest potential.
