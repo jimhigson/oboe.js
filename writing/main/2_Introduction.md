@@ -19,15 +19,20 @@ possible to evolve the performance of the common paradigms. Because
 incremental changes are easier to action, I have been careful to ensure
 that this perspective may be with only a few carefully chosen changes
 and without any loss of interoperability to existing systems, avoiding
-the temptation of wholesale shift to a new technology stack.
+the temptation of wholesale shift to a new technology stack. Although I
+will express my dissertation partially through programming, the shift
+required for this evolutionary change is felt more strongly as a shift
+in how we *think* about http than it is a change in the underlying
+technology itself.
 
-http usage pattern could be improved and wish to offer an alternative
-usage paradigm built on the same technologies. While this solution is
-presented as software, the change is as much a shift in how we think
-about http as it is a change in the underlying technology itself. The
-problems I wish to address can be split into two broad areas:
-performance in terms of speed (and the perception thereof) and tight
-coupling of semantics between client and server.
+Whilst the primary area of concern for this dissertation is to improve
+the throughput and reactivity of systems created using REST, the
+approach chosen may also be considered against a secondary problem often
+experienced in REST systems: that of tight coupling between systems and
+the difficulty this brings in adding new semantics to existing message
+formats.
+
+
 
 Why not writing for the server side? Why just the client?
 
