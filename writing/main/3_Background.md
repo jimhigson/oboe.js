@@ -1,8 +1,9 @@
 Background
 ==========
 
+<!---
 **background should be 2-10 pages**
-
+--->
 
 
 

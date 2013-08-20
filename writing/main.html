@@ -3,46 +3,43 @@
 <p>A critique is made of current practice under which resources are entirely retrieved before items of interest are extracted programmatically. An alternative model is presented allowing the specification of items of interest using a declarative syntax similar to JSONPath. The identified items are then provided incrementally while the resource is still downloading.</p>
 <p>In addition to a consideration of performance in absolute terms, the usability implications of an incremental model are also evaluated with regards to differences in user perception of performance.</p>
 <h1 id="introduction"><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
-<p><strong>introduction should be 2-5 pages (1,000 to 2,500 wrds)</strong></p>
-<p>Intro should say:</p>
-<ul>
-<li>What is the problem?</li>
-<li>How do I plan to solve it?</li>
-<li>What are the success criteria?</li>
-<li>How will know if been successful?</li>
-<li>What is the motivation for solving it?</li>
-</ul>
-<p>As a software engineer working on REST systems I have noticed several areas where, if http were to be viewed through a new lens, it should be possible to evolve the performance of the common paradigms. Because incremental changes are easier to action, I have been careful to ensure that this perspective may be with only a few carefully chosen changes and without any loss of interoperability to existing systems, avoiding the temptation of wholesale shift to a new technology stack. Although I will express my dissertation partially through programming, the shift required for this evolutionary change is felt more strongly as a shift in how we <em>think</em> about http than it is a change in the underlying technology itself.</p>
+<!---
+
+**introduction should be 2-5 pages (1,000 to 2,500 wrds)**
+
+Intro should say:
+
+-   What is the problem?
+-   How do I plan to solve it?
+-   What are the success criteria?
+-   How will know if been successful?
+-   What is the motivation for solving it?
+
+--->
+
+<p>Despite the enthusiasm for which SOA and REST in particular has been adapted, as a software engineer working on REST systems I have noticed a reoccurring trend where, if http were to be viewed through a new lens, by adjusting the REST paradigm to include a more progressive view of the data, it would be possible to avoid many of the common performance pitfalls. With my focus at any particular time being limited to the scope of creating individual services rather than advancing the underlying technology, the glimpses of a more effective way have remained as such for some time. Commercial pressures did not provide the best opportunity to follow up on these ideas. This dissertation is not focused on using REST to provide any particular service. Rather, it aims to apply small incremental changes to the REST paradigm as a whole which should bring tangible benefits to almost any such system.</p>
+<p>I have been careful to focus on as small a set of incremental improvements as is possible to bring the improvements that I would like to see. Incremental changes are easier to action, I have been careful to ensure that this perspective may be with only a few carefully chosen changes and without any loss of interoperability to existing systems, avoiding the temptation of wholesale shift to a new technology stack. Although I will express my dissertation partially through programming, the shift required for this evolutionary change is felt more strongly as a shift in how we <em>think</em> about http than it is a change in the underlying technology itself.</p>
 <p>Whilst the primary area of concern for this dissertation is to improve the throughput and reactivity of systems created using REST, the approach chosen may also be considered against a secondary problem often experienced in REST systems: that of tight coupling between systems and the difficulty this brings in adding new semantics to existing message formats. I find that in many cases these problems exist solely as inflexible REST client software which is unprepared to accept slight or moderate variations on previously agreed formats. Whilst loose coupling isn't the primary concern of this dissertation, I have found it to be a significant problem area and any benefit my new approach can bring to this problem should be counted towards the success of the project.</p>
 <h2 id="inefficiencies-in-out-typical-use-of-http"><a href="#inefficiencies-in-out-typical-use-of-http"><span class="header-section-number">2.1</span> Inefficiencies in out typical use of http</a></h2>
 <div class="figure">
-<img src="images/rest_timeline.png" alt="Use of a REST service. A client fetches a listing of an author&#39;s publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. " /><p class="caption">Use of a REST service. A client fetches a listing of an author's publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. </p>
+<img src="images/rest_timeline.png" alt="A common use of a REST service is the aggregation of data from lower-level services. A client fetches a listing of an author&#39;s publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. " /><p class="caption">A common use of a REST service is the aggregation of data from lower-level services. A client fetches a listing of an author's publications and then the first three articles. The left sequence represents the most commonly used pattern in which the client does not react to the response until it is complete. In the right sequence the client considers the response to return progressively as many small parts. Because UML sequence diagrams do not provide a concept of a returned value other than as a one-off event, the notation of lighter arrows illustrating an ongoing response is introduced. Each publication is fetched as soon as the fragment of response linking to it is available and once the data required has been read from the original response it is aborted rather than continuing with the download of unnecessary data. </p>
 </div>
-<p>The figure above  illustrates how a progressive REST client, without adjustments being required to the server may bring improvements in the</p>
-<p>In the figure above  shows way of thinking about service, not differences in service itself. The process is much the same regardless of the aims of the client: it could be a user interface wanting to display the publications or an aggregator wishing to provide a higher-level REST service than the one it aggregates.</p>
-<p>As seen the  example, may be aborted once the data needed has been identified.</p>
+<p>The figure above  illustrates how a progressive REST client, without adjustments being required to the server may be used to display some data requested by a user sooner. While the complete data should be available to the user significantly earlier, we see a much greater improvement in how early the first piece of data is able to be displayed. This is advantageous: firstly, even if the total time to show the data were not improved, progressive display improves the perception of performance [CITEME]; secondly, a user wanting to scan from top to bottom may start reading the first article while waiting for the later ones to arrive. Alternatively, seeing the first article alone may allow the user to notice earlier that they have requested the wrong author and allow them to backtrack earlier.</p>
+<p>Although the label &quot;client software&quot; hints at software running directly on a user's own device, nodes in an n-tier architecture can rarely be placed into client and server categories in a way which is appropriate from all frames of reference. Rather, it is common for nodes to be thought of as a client from the layer below and as a server from the layer above. The advantage demonstrated holds if the aggregation existing in this layer were actually running on a server to provide a higher-level REST service than the one that it aggregates. An progressive aggregator would perform the same function and see the same benefits but simply be pushed one layer back in the stack. The progressive view of http would allow progressive response to its http request, allowing the data to be viewed similarly progressively.</p>
+<p>The coining of the term REST required no fundamentally new methods, rather it represented a shift in how we think about http away from the transfer of hypertext documents to that of arbitrary data [cite paper]. Likewise, no genuinely new techniques in computer science are required to realise this thesis. As a minimum, the implementation requires an http library which exposes the response whilst it is in progress and a parser which is capable of making sense of a response before it is able to see all of it. In addition to relying on already existing techniques in implementation, I cannot claim my thesis to be an entirely novel concept. Few ideas are genuinely new and it is often useful to mine neighbouring fields for solved problems. To see a specific instance of this concept already widely being used we need only to view a web page containing inline images in any of the standard web browsers; essentially, an aggregation of text and image resources into a single presentation. The html is parsed incrementally as it is downloaded and the images are requested as soon as individual <img> tags are encountered. However, this is achieved by means of a handwritten parser which is specific to a single markup format and an implementation which applies only to a single problem domain, that of displaying web pages. The new contribution of this dissertation hinges on providing a generic, reusable solution which may be applied to any problem domain.</p>
 <p>The cadence of the right sequence has better pacing of requests with 4 being made at roughly equal intervals rather than a single request and then a rapid burst of 3.</p>
-<p>Terminating the message early is though of as a useful and routine technique, not simply as a way of dealing with error cases.</p>
-<p>Despite the enthusiasm for which SOA and REST in particular has been adapted, I believe this model isn't being used to its fullest potential. Consider a fairly simple task of retrieving all the images used on a web page.</p>
-<p>These are not obscure esoteric requirements, rather they represent the mainstay execution of almost any SOA application.</p>
-<p>Grab all the images mentioned in a web page Images may be on another subdomain</p>
-<ul>
-<li>DNS lookup only after got whole page Dynamically generated pages can often load slowly, even when there is plenty of bandwidth But images could load quickly.</li>
-</ul>
-<p>Diagram of timeline to get images from a webpage.</p>
-<h2 id="big-small-problem"><a href="#big-small-problem"><span class="header-section-number">2.2</span> Big-small problem</a></h2>
-<p>Or, granularity problem</p>
-<p>Perception. Eg, infinite scrolling webpages. Visualisations.</p>
-<p>Two improvements: just hang up; and, start using earlier.</p>
-<h2 id="perception-of-speed"><a href="#perception-of-speed"><span class="header-section-number">2.3</span> Perception of speed</a></h2>
-<p>Doing something earlier <strong>is</strong> doing it faster.</p>
-<p>User perception of speed can be increased by completing a task in small parts rather than waiting for a whole to appear fully formed.</p>
-<h2 id="network-fallibility"><a href="#network-fallibility"><span class="header-section-number">2.4</span> Network fallibility</a></h2>
+<h2 id="solving-the-big-small-tradeoff"><a href="#solving-the-big-small-tradeoff"><span class="header-section-number">2.2</span> Solving the big-small tradeoff</a></h2>
+<p>Where the domain model contains a series of data, of which ranges are made available via REST, I have often seen a trade-off with regards to how much data is requested at once. Deciding this question is usually a compromise between competing concerns in which it is not possible to find a solution which simultaneously addresses all concerns satisfactorily. A good example might be a page on Twitter showing a list of tweets. The interface designers here chose to adopt a fairly popular pattern, the Infinitely Scrolling Page [CITE]. Starting from an initial page showing a finite number of tweets, upon scrolling to the bottom the next batch is automatically requested. The new batch is delivered in a json format and, once loaded, presented as html and added to the bottom of the page, allowing the user to continue scrolling.</p>
+<p>The wait at the bottom of the page while new content is loaded introduces a pause in scrolling so, whilst preferable to prior patterns incorporating explicit paging, this workflow can feel quite clunky.<br />To frame this problem we might imagine the extreme choices. Firstly, requesting only one tweet per http request. Because we are requesting the smallest possible content, each request would individually complete very quickly and as such the waits would be short. However the page would stutter, pausing quickly but frequently. At the opposite extreme, we might request some huge number of tweets,<br />taking a long time to load but then scrolling smoothly for a long time.</p>
+<p>I propose that my thesis may be applied used to break out of this compromise and take the best of both approaches, combining quickest possible latency which would only otherwise be achievable via single-tweet requests but also pausing no more frequently than with very large requests. Once we have established a progressive mindset regarding http this may be achieved quite simply by issuing large requests but instead of waiting for the request to complete before rendering, updating the view incrementally as the individual tweets are progressively parsed out of the json response.</p>
+<p>It should be noted that this is a different problem from the granularity problem. Expand.</p>
+<h2 id="network-fallibility"><a href="#network-fallibility"><span class="header-section-number">2.3</span> Network fallibility</a></h2>
 <p>The inefficiencies listed above are present when all network links operate perfectly.</p>
 <p>When connections fail, apps are left with non of the content. Happens a lot on mobile networks.</p>
 <p>Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5] which can be used to request any contiguous part of a response rather than the whole. Common in download managers but not REST clients. This ability can be used to</p>
+<p>Why not this one. Resume on a higher semantic level.</p>
 <p>[!Extra diagram: resume after aborted connection] (images/placeholder)</p>
-<h2 id="agile-methodologies-fast-deployments-and-future-versioning"><a href="#agile-methodologies-fast-deployments-and-future-versioning"><span class="header-section-number">2.5</span> Agile methodologies, fast deployments and future versioning</a></h2>
+<h2 id="agile-methodologies-fast-deployments-and-future-versioning"><a href="#agile-methodologies-fast-deployments-and-future-versioning"><span class="header-section-number">2.4</span> Agile methodologies, fast deployments and future versioning</a></h2>
 <p>A more subtle problem</p>
 <p>SOA has been adapted widely but versioning remains a common challenge in industry. Anecdote: test environment finds an issue. One system can't be released. Contagion.</p>
 <p>How to cope with software that changes every week.</p>
@@ -50,11 +47,17 @@
 <p>Inside systems also, even with automatic refactoring tools, only automate and therefoer lessen but do not remove the problem that coupling causes changes in one place of a codebase to cause knock-on changes in remote other parts of the code. A method of programming which was truly compatible with extreme programming would involve designing for constant change without disparate parts having to be modified as structural refactoring occurs.</p>
 <p>I propose that in a changing system, readability of code's changelog is as important as readability of the code itself. Extraneous changes dilute the changelog, making it less easily defined by code changes which are intrinsically linked to the actual change in the logic being expressed by the program.</p>
 <p>It is often stated that understandability is the number once most important concern in a codebase (CITE) - if the code is suitably dynamic it is important that changes are axiomic and clarity of the changelog is equally important.</p>
-<h2 id="criteria-for-success"><a href="#criteria-for-success"><span class="header-section-number">2.6</span> Criteria for success</a></h2>
+<h2 id="criteria-for-success"><a href="#criteria-for-success"><span class="header-section-number">2.5</span> Criteria for success</a></h2>
+<p>Doing something earlier <strong>is</strong> doing it faster.</p>
 <p>In evaluating this project, we may say it has been a success if non-trivial improvements in speed can be made without a corresponding increase in the difficulty of programming the client. This improvement may be in terms of a measure of the absolute time required to complete a representative task or in a user's perception of the speed in completing the task. Whilst the difficulty in creating the client resists quantification, this will be examined in terms of the length of the expression required in programming some common tasks.</p>
 <p>Because applications in the target domain are much more io-bound than CPU-bound, optimisation in terms of the running time of a program on the CPU will be de-emphasised in favour of establishing a more optimal use of io.</p>
 <h1 id="background"><a href="#background"><span class="header-section-number">3</span> Background</a></h1>
-<p><strong>background should be 2-10 pages</strong></p>
+<!---
+**background should be 2-10 pages**
+--->
+
+
+
 <p>In fact, this is exactly how web browsers are implemented. However, this progressive use of http is hardwired into the browser engines rather than exposing an API suitable for general use and as such is treated as something of a special case specific to web browsers and has not so far seen a more general application. I wish to argue that a general application of this technique is viable and offers a worthwhile improvement over current common methods.</p>
 <p>The above problem has many analogues and because REST uses standard web semantics applies to much more than just automated web surfing. Indeed, as the machine readability of the data increases, access early can be all the more beneficial since decisions to terminate the connection may be made. Example: academic's list of publications, then downloading all the new ones.</p>
 <h2 id="some-high-level-stuff-about-webapps-and-where-processing-is-done"><a href="#some-high-level-stuff-about-webapps-and-where-processing-is-done"><span class="header-section-number">3.1</span> Some high-level stuff about webapps and where processing is done</a></h2>
@@ -216,7 +219,10 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Initially started with jstestdriver but found it difficult. Karma started because engineers working on the Angular project in Google were &quot;struggling a lot with jstd&quot;: http://www.youtube.com/watch?v=MVw8N3hTfCI - jstd is a google project Even Jstd's authors seems to be disowning it slightly. Describe what was once its main mode of operation as now being for stress testing of jstd itself only. Problems: browsers become unresponsive. Generally unreliable, has to be restarted frequently.</p>
 <p>JSTD, as a Java program, is difficult to start via Grunt. Also an issue that Grunt post-dates Karma by enough that JSTD doesn't have the attention of the Grunt community.</p>
 <h1 id="application-and-reflection"><a href="#application-and-reflection"><span class="header-section-number">4</span> Application and Reflection</a></h1>
-<p><strong>40 to 60 pages</strong></p>
+<!---
+**40 to 60 pages**
+--->
+
 <p>A feature set which is minimal but contain no obvious omissions.</p>
 <p>Under the heading <a href="#anatomy-of-a-soa-client">Anatomy of a SOA client</a> I deconstructed the way in which programming logic is often used to identify the parts of a model which are currently interesting and started to look at some declarative ways in which these parts can be obtained.</p>
 <p>Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general logic of the program, declaratively define the interesting parts and have these parts delivered to the language logic. Once we make the shift to thinking in this way, it is no longer necessary to have the whole resource locally before the interesting sub-parts are delivered.</p>
@@ -506,7 +512,10 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>An imutability wrapper might be possible with defineProperty. Can't casually overwrite via assignment but still possible to do defineProperty again.</p>
 <p>Would benefit from a stateless language where everything is stateless at all times to avoid having to program defensively.</p>
 <h1 id="conclusion"><a href="#conclusion"><span class="header-section-number">5</span> Conclusion</a></h1>
-<p><strong>1 to 5 pages</strong></p>
+<!---
+**1 to 5 pages**
+--->
+
 <p>Doing things faster vs doing things earlier. &quot;Hurry up and wait&quot; approach to optimisation.</p>
 <h2 id="development-methodology"><a href="#development-methodology"><span class="header-section-number">5.1</span> Development methodology</a></h2>
 <p>Did it help?</p>

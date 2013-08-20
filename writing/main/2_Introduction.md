@@ -1,6 +1,8 @@
 Introduction
 ============
 
+<!---
+
 **introduction should be 2-5 pages (1,000 to 2,500 wrds)**
 
 Intro should say:
@@ -10,6 +12,8 @@ Intro should say:
 -   What are the success criteria?
 -   How will know if been successful?
 -   What is the motivation for solving it?
+
+--->
 
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, as a software engineer working on REST systems I have noticed a
@@ -145,11 +149,16 @@ we might request some huge number of tweets,\
 taking a long time to load but then scrolling smoothly for a long time.
 
 I propose that my thesis may be applied used to break out of this
-compromise and take the best of both approaches, combining the quick
-latency from very small requests with the infrequent pauses of larger
-requests.
+compromise and take the best of both approaches, combining quickest
+possible latency which would only otherwise be achievable via
+single-tweet requests but also pausing no more frequently than with very
+large requests. Once we have established a progressive mindset regarding
+http this may be achieved quite simply by issuing large requests but
+instead of waiting for the request to complete before rendering,
+updating the view incrementally as the individual tweets are
+progressively parsed out of the json response.
 
-Or, granularity problem
+It should be noted that this is a different problem from the granularity problem. Expand.
 
 Network fallibility
 -------------------
@@ -165,6 +174,8 @@ header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
 which can be used to request any contiguous part of a response rather
 than the whole. Common in download managers but not REST clients. This
 ability can be used to
+
+Why not this one. Resume on a higher semantic level.
 
 [!Extra diagram: resume after aborted connection] (images/placeholder)
 

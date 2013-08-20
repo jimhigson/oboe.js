@@ -1,7 +1,8 @@
 Application and Reflection
 ==========================
-
+<!---
 **40 to 60 pages**
+--->
 
 A feature set which is minimal but contain no obvious omissions.
 

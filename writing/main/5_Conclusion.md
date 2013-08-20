@@ -1,7 +1,9 @@
 Conclusion
 ==========
 
+<!---
 **1 to 5 pages**
+--->
 
 Doing things faster vs doing things earlier. "Hurry up and wait" approach to optimisation.
 
