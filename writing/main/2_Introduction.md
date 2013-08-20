@@ -11,17 +11,30 @@ Intro should say:
 -   How will know if been successful?
 -   What is the motivation for solving it?
 
-As a software engineer working on REST systems I have noticed several
-areas where, if http were to be viewed through a new lens, it should be
-possible to evolve the performance of the common paradigms. Because
-incremental changes are easier to action, I have been careful to ensure
-that this perspective may be with only a few carefully chosen changes
-and without any loss of interoperability to existing systems, avoiding
-the temptation of wholesale shift to a new technology stack. Although I
-will express my dissertation partially through programming, the shift
-required for this evolutionary change is felt more strongly as a shift
-in how we *think* about http than it is a change in the underlying
-technology itself.
+Despite the enthusiasm for which SOA and REST in particular has been
+adapted, as a software engineer working on REST systems I have noticed a
+reoccurring trend where, if http were to be viewed through a new lens,
+by adjusting the REST paradigm to include a more progressive view of the
+data, it would be possible to avoid many of the common performance
+pitfalls. With my focus at any particular time being limited to the
+scope of creating individual services rather than advancing the
+underlying technology, the glimpses of a more effective way have
+remained as such for some time. Commercial pressures did not provide the
+best opportunity to follow up on these ideas. This dissertation is not
+focused on using REST to provide any particular service. Rather, it aims
+to apply small incremental changes to the REST paradigm as a whole which
+should bring tangible benefits to almost any such system.
+
+I have been careful to focus on as small a set of incremental
+improvements as is possible to bring the improvements that I would like
+to see. Incremental changes are easier to action, I have been careful to
+ensure that this perspective may be with only a few carefully chosen
+changes and without any loss of interoperability to existing systems,
+avoiding the temptation of wholesale shift to a new technology stack.
+Although I will express my dissertation partially through programming,
+the shift required for this evolutionary change is felt more strongly as
+a shift in how we *think* about http than it is a change in the
+underlying technology itself.
 
 Whilst the primary area of concern for this dissertation is to improve
 the throughput and reactivity of systems created using REST, the
@@ -38,7 +51,8 @@ this problem should be counted towards the success of the project.
 Inefficiencies in out typical use of http
 -----------------------------------------
 
-![Use of a REST service. A client fetches a listing of an author's
+![A common use of a REST service is the aggregation of data from
+lower-level services. A client fetches a listing of an author's
 publications and then the first three articles. The left sequence
 represents the most commonly used pattern in which the client does not
 react to the response until it is complete. In the right sequence the
@@ -52,20 +66,52 @@ response it is aborted rather than continuing with the download of
 unnecessary data. \label{enhancingrest}](images/rest_timeline.png)
 
 The figure above \ref{enhancingrest} illustrates how a progressive REST
-client, without adjustments being required to the server may bring
-improvements in the
+client, without adjustments being required to the server may be used to
+display some data requested by a user sooner. While the complete data
+should be available to the user significantly earlier, we see a much
+greater improvement in how early the first piece of data is able to be
+displayed. This is advantageous: firstly, even if the overall timings
+were not improved, progressive display improves the perception of
+performance [CITEME]; secondly, a user wanting to scan from top to
+bottom may start reading the first article while waiting for the later
+ones to arrive. Alternatively, seeing the first article alone may allow
+the user to notice earlier that they have requested the wrong author and
+allow them to backtrack earlier.
 
 Although the label "client software" hints at software running directly
-on a user's own device,\
-software in an n-tier architecture can rarely be categorised into client
-and server in a way which is appropriate to all frames of reference.
-Rather, it is common for nodes to be thought of as a client to to the
-layer below and as a server to the layer above. The advantage
-demonstrated holds if the layer labeled "client software" were actually
-an aggregator providing a higher-level service than the one that it
-aggregates. Rather than progressively displaying the publications to the
-user, an aggregator would be able to realise a similar benefit by
-progressively responding to the http request which it received.
+on a user's own device, nodes in an n-tier architecture can rarely be
+placed into client and server categories in a way which is appropriate
+from all frames of reference. Rather, it is common for nodes to be
+thought of as a client from the layer below and as a server from the
+layer above. The advantage demonstrated holds if the aggregation
+existing in this layer were actually running on a server to provide a
+higher-level REST service than the one that it aggregates. An
+progressive aggregator would perform the same function and see the same
+benefits but simply be pushed one layer back in the stack. The
+progressive view of http would allow progressive response to its http
+request, allowing the data to be viewed similarly progressively.
+
+The coining of the term REST required no fundamentally new methods,
+rather it represented a shift in how we think about http away from the
+transfer of hypertext documents to that of arbitrary data [cite paper].
+Likewise, no genuinely new techniques in computer science are required
+to realise this thesis. As a minimum, the implementation requires an
+http library which exposes the response whilst it is in progress and a
+parser which is capable of making sense of a response before it is able
+to see all of it. In addition to relying on already existing techniques
+in implementation, I cannot claim my thesis to be an entirely novel
+concept. Few ideas are genuinely new and it is often useful to mine
+neighbouring fields for solved problems. To see a specific instance of
+this concept already widely being used we need only to view a web page
+containing inline images in any of the standard web browsers;
+essentially, an aggregation of text and image resources into a single
+presentation. The html is parsed incrementally as it is downloaded and
+the images are requested as soon as individual <img> tags are
+encountered. However, this is achieved by means of a handwritten parser
+which is specific to a single markup format and an implementation which
+applies only to a single problem domain, that of displaying web pages.
+The new contribution of this dissertation hinges on providing a generic,
+reusable solution which may be applied to any problem domain.
 
 As seen the \ref{enhancingrest} example, may be aborted once the data
 needed has been identified. Terminating the message early is though of
@@ -76,23 +122,6 @@ The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
 
-Despite the enthusiasm for which SOA and REST in particular has been
-adapted, I believe this model isn't being used to its fullest potential.
-Consider a fairly simple task of retrieving all the images used on a web
-page.
-
-These are not obscure esoteric requirements, rather they represent the
-mainstay execution of almost any SOA application.
-
-Grab all the images mentioned in a web page Images may be on another
-subdomain
-
--   DNS lookup only after got whole page Dynamically generated pages can
-    often load slowly, even when there is plenty of bandwidth But images
-    could load quickly.
-
-Diagram of timeline to get images from a webpage.
-
 Big-small problem
 -----------------
 
@@ -101,14 +130,6 @@ Or, granularity problem
 Perception. Eg, infinite scrolling webpages. Visualisations.
 
 Two improvements: just hang up; and, start using earlier.
-
-Perception of speed
--------------------
-
-Doing something earlier **is** doing it faster.
-
-User perception of speed can be increased by completing a task in small
-parts rather than waiting for a whole to appear fully formed.
 
 Network fallibility
 -------------------
@@ -162,6 +183,8 @@ equally important.
 
 Criteria for success
 --------------------
+
+Doing something earlier **is** doing it faster.
 
 In evaluating this project, we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
