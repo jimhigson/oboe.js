@@ -158,26 +158,52 @@ instead of waiting for the request to complete before rendering,
 updating the view incrementally as the individual tweets are
 progressively parsed out of the json response.
 
-It should be noted that this is a different problem from the granularity problem. Expand.
+It should be noted that this is a different problem from the granularity
+problem. Expand.
 
 Network fallibility
 -------------------
 
-The inefficiencies listed above are present when all network links
-operate perfectly.
+We have been extremely successful in building the TCP abstraction layer
+over many different networks with vastly different purposes, However
+this means that the reliability of networks that a REST client must work
+with varies greatly. At one extreme we have server-room sized networks
+delivering data over a span of few meters with a success rate for any
+particular http request-response that is so high as for failure to be
+negligible. Occupying the opposite extreme we have mobile networks in
+marginal signal where it is common for downloads to be abruptly
+terminated due to loss of connectivity.
 
-When connections fail, apps are left with non of the content. Happens a
-lot on mobile networks.
+Consider an everyday situation where a user is using a phone to check
+their email over a mobile network whilst travelling on a train. The user
+prefers the simplicity of webmail so the communications are sent via
+REST rather than a mail specific protocol such as POP3. In this scenario
+the signal can be expected to be lost and reestablished many times.
+Whilst not strictly forbidding it, none of the web developer's standard
+toolkit of AJAX libraries encourage a use of the partially downloaded
+response if the http request fails. For example, the popular AJAX
+library[CITE], jQuery, very helpfully parses complete JSON or XML
+responses before handing back to the application. But because incomplete
+messages are not valid markup, on connection failure jQuery does not
+attempt to parse the response. Because partial responses are only
+available to the programmer as raw text, to handle them would involve a
+special case and a different methodology. Because of this difficulty I
+can find no example other than such messages being dropped without
+inspection. In practice this means that for the user checking her email,
+even if 90% of her inbox had been downloaded she will be shown nothing.
+When the network is available again the application will have to
+download from scratch, including the 90% which it already fetched. In
+this regard REST falls short of the mail-specific protocols which would
+display messages one at a time as they are fetched. I see much potential
+for improvement here.
 
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to
-
-Why not this one. Resume on a higher semantic level.
-
-[!Extra diagram: resume after aborted connection] (images/placeholder)
+Whilst of course a REST client library cannot understand the semantics
+of specific messages fully enough to decide if a partially downloaded
+message is useful. I propose that the ideal would be to provide
+callbacks in such a way that the calling application may make use of
+partially successful messages with much the same programming than is
+used for complete messages, whilst also having the ability to ignore
+messages whose content is too minimal as to be useful.
 
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
