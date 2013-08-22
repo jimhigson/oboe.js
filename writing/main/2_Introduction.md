@@ -49,46 +49,40 @@ this problem should be counted towards the success of the project.
 Inefficiencies of our typical use of http
 -----------------------------------------
 
-![A common use of a REST service is the aggregation of data from
-lower-level services. A client fetches a listing of an author's
-publications and then the first three articles. The left sequence
-represents the most commonly used pattern in which the client does not
-react to the response until it is complete. In the right sequence the
-client considers the response to return progressively as many small
-parts. Because UML sequence diagrams do not provide a concept of a
-returned value other than as a one-off event, the notation of lighter
-arrows illustrating an ongoing response is introduced. Each publication
-is fetched as soon as the fragment of response linking to it is
-available and once the data required has been read from the original
-response it is aborted rather than continuing with the download of
-unnecessary data. \label{rest_timeline_1}](images/rest_timeline_1.png)
+![**Sequence diagram showing aggregation of lower-level resources exposed
+via REST.** A client fetches a listing of an author's publications and
+then the first three articles. The sequence represents the most
+commonly used technique in which the client does not react to the response
+until it is complete. In this example the second wave of requests cannot
+be made until after the original response is complete, at which time they
+are issued in quick succession. 
+\label{rest_timeline_1}](images/rest_timeline_1.png)
 
-![A common use of a REST service is the aggregation of data from
-lower-level services. A client fetches a listing of an author's
-publications and then the first three articles. The left sequence
-represents the most commonly used pattern in which the client does not
-react to the response until it is complete. In the right sequence the
-client considers the response to return progressively as many small
-parts. Because UML sequence diagrams do not provide a concept of a
-returned value other than as a one-off event, the notation of lighter
-arrows illustrating an ongoing response is introduced. Each publication
-is fetched as soon as the fragment of response linking to it is
-available and once the data required has been read from the original
-response it is aborted rather than continuing with the download of
-unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
+![**Revised sequence of aggregation performed by a client capable of
+progressively interpreting the fetched resource.** The 
+client considers the response to return progressively as
+many small parts. Because UML sequence diagrams do not provide a concept
+of a returned value other than as a one-off event, the notation of
+lighter arrows illustrating fragments an ongoing response is introduced. Each
+request for an individual publication is made at the earliest possible time.
+As soon as the required data has been read from the original
+resource it is aborted rather than continue with the download of
+unnecessary data. This results in a moderate reduction in wait time to see all 3
+articles but a dramatic reduction in waiting before reading the first 
+content \label{rest_timeline_2}](images/rest_timeline_2.png)
 
-The figure above \ref{rest_timeline_1} illustrates how a progressive REST
-client, without adjustments being required to the server may be used to
-display some data requested by a user sooner. While the complete data
-should be available to the user significantly earlier, we see a much
-greater improvement in how early the first piece of data is able to be
-displayed. This is advantageous: firstly, even if the total time to show
-the data were not improved, progressive display improves the perception
-of performance [CITEME]; secondly, a user wanting to scan from top to
-bottom may start reading the first article while waiting for the later
-ones to arrive. Alternatively, seeing the first article alone may allow
-the user to notice earlier that they have requested the wrong author and
-allow them to backtrack earlier.
+The figure above \ref{rest_timeline_1} illustrates how a progressive
+REST client, without adjustments being required to the server may be
+used to display some data requested by a user sooner. While the complete
+data should be available to the user significantly earlier, we see a
+much greater improvement in how early the first piece of data is able to
+be displayed. This is advantageous: firstly, even if the total time to
+show the data were not improved, progressive display improves the
+perception of performance [CITEME]; secondly, a user wanting to scan
+from top to bottom may start reading the first article while waiting for
+the later ones to arrive. Alternatively, seeing the first article alone
+may allow the user to notice earlier that they have requested the wrong
+author and allow them to backtrack earlier.
 
 Although the label "client software" hints at software running directly
 on a user's own device, nodes in an n-tier architecture can rarely be
@@ -130,7 +124,7 @@ being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
 
 Stepping outside the big-small tradeoff
---------------------------------------
+---------------------------------------
 
 Where the domain model contains a series of data, of which ranges are
 made available via REST, I have often seen a trade-off with regards to

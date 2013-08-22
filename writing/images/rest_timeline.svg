@@ -223,9 +223,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="422.56875"
-     inkscape:cy="736.34007"
+     inkscape:zoom="3.959798"
+     inkscape:cx="642.74344"
+     inkscape:cy="802.80424"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -268,105 +268,153 @@
        style="fill:none;stroke:#000000;stroke-width:0.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
        d="m 170,202.36218 134,0"
        id="path3782"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <text
        xml:space="preserve"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="180"
-       y="200.36218"
+       y="327.36218"
        id="text3137"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          sodipodi:role="line"
          id="tspan3139"
          x="180"
-         y="200.36218">GET /pulibcations/author/timbl</tspan></text>
+         y="327.36218">Links to many publications</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
        d="m 170,177.36218 0,250"
        id="path2987"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path9119"
        d="m 310,177.36218 0,250"
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        style="fill:#dfdfdf;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect2993"
        width="10"
        height="130"
        x="305"
-       y="202.36218" />
+       y="202.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path3792"
        d="m 305,332.36218 -134,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="rect3805"
        d="m 305,337.36218 10,0 0,45 -10,0 z"
-       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect3809"
        width="10"
        height="45"
        x="320"
-       y="342.36218" />
+       y="342.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        y="347.36218"
        x="335"
        height="45"
        width="10"
        id="rect3813"
-       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path3817"
        d="m 170,337.36218 134,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:url(#Arrow2Lend)"
        d="m 171,342.36218 148,0"
        id="path3823"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path3829"
        d="m 171,347.36218 163,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-start:none;marker-end:url(#Arrow2Lend)"
        d="m 305,382.36218 -134,0"
        id="path3835"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path3841"
        d="m 320,387.36218 -149,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
        d="m 335,392.36218 -164,0"
        id="path3847"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <text
        sodipodi:linespacing="125%"
        id="text3141"
        y="338.36218"
        x="316"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          y="338.36218"
          x="316"
          id="tspan3143"
@@ -377,7 +425,10 @@
        x="331"
        y="344.36218"
        id="text3145"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          sodipodi:role="line"
          id="tspan3147"
          x="331"
@@ -388,7 +439,10 @@
        y="351.36218"
        x="346"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          y="351.36218"
          x="346"
          id="tspan3151"
@@ -399,12 +453,18 @@
        width="60"
        height="25"
        x="280"
-       y="152.36218" />
+       y="152.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        xml:space="preserve"
        style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        id="flowRoot9129"
-       transform="translate(0,14.044439)"><flowRegion
+       transform="translate(0,14.044439)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9131"><use
            x="0"
            y="0"
@@ -419,12 +479,18 @@
        height="25"
        width="60"
        id="rect9137"
-       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        transform="translate(-140,9.0444393)"
        id="flowRoot9139"
        style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9141"><use
            transform="translate(0,-7.0131893)"
            height="1052.3622"
@@ -438,14 +504,20 @@
        id="path9147"
        d="m 590,202.36218 134,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <text
        sodipodi:linespacing="125%"
        id="text9149"
        y="200.36218"
        x="596"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          y="200.36218"
          x="596"
          id="tspan9151"
@@ -455,46 +527,67 @@
        inkscape:connector-curvature="0"
        id="path9153"
        d="m 590,177.3622 0,249.99999"
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0"
        d="m 730,177.3622 0,249.99999"
        id="path9155"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        y="202.36218"
        x="725"
        height="74"
        width="10"
        id="rect9157"
-       style="fill:#dfdfdf;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:#dfdfdf;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 745,217.36219 10,0 0,50 -10,0 z"
+       d="m 745,217.36219 10,0 0,44.99999 -10,0 z"
        id="path9161"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        y="247.36218"
        x="760"
        height="50"
        width="10"
        id="rect9163"
-       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        style="color:#000000;fill:#dfdfdf;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect9165"
        width="10"
        height="45"
        x="775"
-       y="272.36218" />
+       y="272.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <text
        xml:space="preserve"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="745"
        y="215.36218"
        id="text9179"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          sodipodi:role="line"
          id="tspan9181"
          x="745"
@@ -505,7 +598,10 @@
        y="245.36218"
        x="760"
        style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          y="245.36218"
          x="760"
          id="tspan9185"
@@ -516,7 +612,10 @@
        x="775"
        y="270.36218"
        id="text9187"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
          sodipodi:role="line"
          id="tspan9189"
          x="775"
@@ -527,12 +626,18 @@
        height="25"
        width="60"
        id="rect9191"
-       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        transform="translate(420,14.044438)"
        id="flowRoot9193"
        style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9195"><use
            transform="translate(0,-7.0131893)"
            height="1052.3622"
@@ -547,12 +652,18 @@
        width="60"
        height="25"
        x="560"
-       y="152.36218" />
+       y="152.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        xml:space="preserve"
        style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        id="flowRoot9203"
-       transform="translate(278,9.0444393)"><flowRegion
+       transform="translate(278,9.0444393)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9205"><use
            x="0"
            y="0"
@@ -566,34 +677,52 @@
        id="path9211"
        d="m 730.00001,212.36218 -139,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
        d="m 730.00001,222.36218 -139,0"
        id="path9213"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9215"
        d="m 730.00001,232.36218 -139,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
        d="m 730.00001,242.36218 -139,0"
        id="path9217"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9219"
        d="m 730.00001,252.36218 -139,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <g
        id="g9944"
-       transform="translate(180,-0.99999774)">
+       transform="translate(180,-0.99999774)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062">
       <g
          id="g9940">
         <path
@@ -626,73 +755,91 @@
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
        d="m 590,217.36218 154,0"
        id="path9848"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9850"
        d="m 590,247.36218 169,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
        d="m 590,272.36218 184,0"
        id="path9852"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-start:none;marker-end:url(#Arrow2Lend)"
-       d="m 745,267.36218 -154,0"
+       d="m 745,262.36218 -154,0"
        id="path9934"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9936"
        d="m 760,297.36218 -169,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-start:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker-start:none;marker-end:url(#Arrow2Lend)"
        d="m 775,317.36218 -184,0"
        id="path9938"
-       inkscape:connector-curvature="0" />
-    <path
-       sodipodi:nodetypes="cc"
-       style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       d="m 730.00001,262.36218 -139,0"
-       id="path9951"
-       inkscape:connector-curvature="0" />
-    <path
-       sodipodi:nodetypes="cc"
-       style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999998, 0.49999999;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       d="m 749.99999,237.36218 -158.99999,0"
-       id="path9953"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9955"
        d="m 750,257.36218 -158.99999,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999998, 0.49999999;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9957"
        d="m 749.99999,227.36218 -158.99999,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999998, 0.49999999;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <rect
        style="opacity:1;color:#000000;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect9965"
        width="55"
        height="30"
        x="345"
-       y="217.36218" />
+       y="217.36218"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        xml:space="preserve"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        id="flowRoot9967"
-       transform="translate(125.5,-0.99331235)"><flowRegion
+       transform="translate(125.5,-0.99331235)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9969"><use
            x="0"
            y="0"
@@ -700,35 +847,50 @@
            id="use9971"
            width="744.09448"
            height="1052.3622" /></flowRegion><flowPara
-         id="flowPara9991">First publication is available for user to view  </flowPara></flowRoot>    <path
+         id="flowPara9991">Start of first publication is available for user to view  </flowPara></flowRoot>    <path
        sodipodi:nodetypes="cc"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999996, 0.49999998;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       d="m 764.99998,277.36218 -173.99998,0"
+       d="m 763.99998,282.36218 -173.99998,0"
        id="path9983"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9985"
        d="m 765,287.36218 -173.99998,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999996, 0.49999998;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999996, 0.49999998;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
        d="m 780,302.36218 -188.99998,0"
        id="path9987"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path9989"
        d="m 780,307.36218 -188.99998,0"
        style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999996, 0.49999998;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        transform="translate(125.5,89.006688)"
        id="flowRoot9993"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion9995"><use
            height="1052.3622"
            width="744.09448"
@@ -738,7 +900,10 @@
            x="0" /></flowRegion><flowPara
          id="flowPara10001">All data is available for user to view  </flowPara></flowRoot>    <g
        id="g10042"
-       transform="translate(153,-101)">
+       transform="translate(153,-101)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062">
       <path
          inkscape:connector-curvature="0"
          id="path10031"
@@ -769,7 +934,10 @@
        transform="translate(125.5,-30.993312)"
        id="flowRoot10048"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion10050"><use
            height="1052.3622"
            width="744.09448"
@@ -782,30 +950,45 @@
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
        d="m 528,197.36218 61,0"
        id="path10060"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0"
        d="m 528,177.36218 0,249.99999"
        id="path10062"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path10064"
        d="m 590,227.36218 -61,0"
        style="opacity:0.4;color:#000000;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999998, 0.49999999;stroke-dashoffset:0;marker:none;marker-end:url(#Arrow2Lend);visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="color:#000000;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker:none;marker-end:url(#Arrow2Lend);visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        d="m 590,317.36218 -61,0"
        id="path10104"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <flowRoot
        transform="translate(125.5,41.006688)"
        id="flowRoot10179"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion10181"><use
            height="1052.3622"
            width="744.09448"
@@ -817,7 +1000,10 @@
        transform="translate(-292.5,149.00669)"
        id="flowRoot10187"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><flowRegion
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion10189"><use
            height="1052.3622"
            width="744.09448"
@@ -829,7 +1015,10 @@
        xml:space="preserve"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        id="flowRoot10195"
-       transform="translate(-292.5,175.00669)"><flowRegion
+       transform="translate(-292.5,175.00669)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion10197"><use
            x="0"
            y="0"
@@ -839,7 +1028,10 @@
            height="1052.3622" /></flowRegion><flowPara
          id="flowPara10201">All data is available for user to view  </flowPara></flowRoot>    <g
        transform="translate(-265,-101)"
-       id="g10203">
+       id="g10203"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062">
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 370,277.36218 5,-5 5,5"
@@ -870,7 +1062,10 @@
        xml:space="preserve"
        style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        id="flowRoot10213"
-       transform="translate(-292.5,-30.993312)"><flowRegion
+       transform="translate(-292.5,-30.993312)"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><flowRegion
          id="flowRegion10215"><use
            x="0"
            y="0"
@@ -883,24 +1078,87 @@
        inkscape:connector-curvature="0"
        id="path10221"
        d="m 110,177.36218 0,249.99999"
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.00000011, 3.00000011;stroke-dashoffset:0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path10231"
        d="m 110,197.36218 59,0"
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        sodipodi:nodetypes="cc"
        style="opacity:0.4;color:#000000;fill:none;stroke:#000000;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99999998, 0.49999999;stroke-dashoffset:0;marker:none;marker-end:url(#Arrow2Lend);visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        d="m 170,382.36218 -60,0"
        id="path10235"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
     <path
        inkscape:connector-curvature="0"
        id="path10237"
        d="m 170,392.36218 -59,0"
        style="color:#000000;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2, 0.5;stroke-dashoffset:0;marker:none;marker-end:url(#Arrow2Lend);visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_1.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062" />
+    <text
+       inkscape:export-ydpi="599.89062"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       xml:space="preserve"
+       style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;opacity:0.4"
+       x="596"
+       y="210.36218"
+       id="text10243"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan10245"
+         x="596"
+         y="210.36218">url of article 1</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text10247"
+       y="240.36218"
+       x="597"
+       style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.4;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-ydpi="599.89062"><tspan
+         y="240.36218"
+         x="597"
+         id="tspan10249"
+         sodipodi:role="line">url of article 2</tspan></text>
+    <path
+       inkscape:export-ydpi="599.89062"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       sodipodi:nodetypes="cc"
+       style="opacity:0.4;fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.00000001, 0.50000001;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
+       d="m 730,267.36218 -139,0"
+       id="path10255"
+       inkscape:connector-curvature="0" />
+    <text
+       inkscape:export-ydpi="599.89062"
+       inkscape:export-xdpi="599.89062"
+       inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/rest_timeline_2.png"
+       xml:space="preserve"
+       style="font-size:6px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.4;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="597"
+       y="265.36218"
+       id="text10257"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan10259"
+         x="597"
+         y="265.36218">url of article 3</tspan></text>
   </g>
 </svg>
