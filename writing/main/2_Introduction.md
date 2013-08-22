@@ -61,9 +61,23 @@ arrows illustrating an ongoing response is introduced. Each publication
 is fetched as soon as the fragment of response linking to it is
 available and once the data required has been read from the original
 response it is aborted rather than continuing with the download of
-unnecessary data. \label{enhancingrest}](images/rest_timeline.png)
+unnecessary data. \label{rest_timeline_1}](images/rest_timeline_1.png)
 
-The figure above \ref{enhancingrest} illustrates how a progressive REST
+![A common use of a REST service is the aggregation of data from
+lower-level services. A client fetches a listing of an author's
+publications and then the first three articles. The left sequence
+represents the most commonly used pattern in which the client does not
+react to the response until it is complete. In the right sequence the
+client considers the response to return progressively as many small
+parts. Because UML sequence diagrams do not provide a concept of a
+returned value other than as a one-off event, the notation of lighter
+arrows illustrating an ongoing response is introduced. Each publication
+is fetched as soon as the fragment of response linking to it is
+available and once the data required has been read from the original
+response it is aborted rather than continuing with the download of
+unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
+
+The figure above \ref{rest_timeline_1} illustrates how a progressive REST
 client, without adjustments being required to the server may be used to
 display some data requested by a user sooner. While the complete data
 should be available to the user significantly earlier, we see a much
@@ -115,7 +129,7 @@ The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
 
-Stepping out of the big-small tradeoff
+Stepping outside the big-small tradeoff
 --------------------------------------
 
 Where the domain model contains a series of data, of which ranges are
