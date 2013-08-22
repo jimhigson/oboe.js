@@ -228,7 +228,7 @@ This should be without any additional effort by the programmer as
 compared using message but depending on a rigidly specified overall
 structure. Rather than having this means of interpreting a message as an
 optional extra, because I believe it to be beneficial that all
-messagesare handled this way, it should be the default means of
+messages are handled this way, it should be the default means of
 operation for this library.
 
 Criteria for success
