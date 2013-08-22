@@ -414,6 +414,44 @@ Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
 
+Http resume
+-----------
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to
+
+Why not this one. Resume on a higher semantic level.
+
+Updating versioning
+-------------------
+
+
+
+Because of the contagion problem, need to be able to create
+loosely-coupled systems.
+
+Inside systems also, even with automatic refactoring tools, only
+automate and therefoer lessen but do not remove the problem that
+coupling causes changes in one place of a codebase to cause knock-on
+changes in remote other parts of the code. A method of programming which
+was truly compatible with extreme programming would involve designing
+for constant change without disparate parts having to be modified as
+structural refactoring occurs.
+
+I propose that in a changing system, readability of code's changelog is
+as important as readability of the code itself. Extraneous changes
+dilute the changelog, making it less easily defined by code changes
+which are intrinsically linked to the actual change in the logic being
+expressed by the program.
+
+It is often stated that understandability is the number once most
+important concern in a codebase (CITE) - if the code is suitably dynamic
+it is important that changes are axiomic and clarity of the changelog is
+equally important.
+
 Micro-libraries
 ---------------
 
