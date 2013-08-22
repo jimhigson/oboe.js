@@ -24,7 +24,15 @@ avoiding the temptation of wholesale shift to a new technology stack.
 Although I will express my dissertation partially through programming,
 the shift required for this evolutionary change is felt more strongly as
 a shift in how we *think* about http than it is a change in the
-underlying technology itself.
+underlying technology itself. Once we realise that any multi-packet
+message sent via a network is arrives as a stream so far as some part
+inevitably arrives before another, it follows that a streaming client is
+the minimum set of software needed to realise this vision. A streaming
+client can connect to a non-streaming server but the opposite is not as
+useful. Furthermore, servers which send http messages incrementally,
+while not the most common model, are not rare, whereas clients which
+interpret a message incrementally are limited to very specific use
+cases.
 
 Whilst the primary area of concern for this dissertation is to improve
 the throughput and reactivity of systems created using REST, the
@@ -211,17 +219,19 @@ cycle encouraged by Agile methodologies. Because in SOA we may consider
 that all data is local rather than global and that the components of the
 system are loosely coupled, frequent releases of any particular
 sub-system shouldn't pose a problem to the correct operation of the
-whole. Unfortunately in practice the tools used for REST fail to
-encourage programming in a loosely coupled way. Working in enterprise I
-have often seen the release of dozens of components cancelled because a
-single unit failed to meet acceptance criteria, even where the failing
-unit contained only minor changes. Because of a tight coupling which
-depends on exact versions, a dense dependency graph between
-inter-dependent units creates the perfect environment for contagion to
-occur whereby the impact from a single failing unit spreads until it
-infects all of the system.
+whole. Under truly Agile practice, the formats of resources exposed via
+REST will emerge iteratively, mirroring the iterative design of the
+software which reifies the message.
 
-Emergent design of message shape just as the design of the software transmitting the message is emergent.
+Unfortunately in practice the tools used for REST fail to encourage
+programming in a loosely coupled way. Working in enterprise I have often
+seen the release of dozens of components cancelled because a single unit
+failed to meet acceptance criteria, even where the failing unit
+contained only minor changes. Because of a tight coupling which depends
+on exact versions, a dense dependency graph between inter-dependent
+units creates the perfect environment for contagion to occur whereby the
+impact from a single failing unit spreads until it infects all of the
+system.
 
 As I see it, an effective way to solve this problem would be to
 integrate into a REST client library the ability to use a response
