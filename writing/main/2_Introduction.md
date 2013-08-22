@@ -1,20 +1,6 @@
 Introduction
 ============
 
-<!---
-
-**introduction should be 2-5 pages (1,000 to 2,500 wrds)**
-
-Intro should say:
-
--   What is the problem?
--   How do I plan to solve it?
--   What are the success criteria?
--   How will know if been successful?
--   What is the motivation for solving it?
-
---->
-
 Despite the enthusiasm for which SOA and REST in particular has been
 adapted, as a software engineer working on REST systems I have noticed a
 reoccurring trend where, if http were to be viewed through a new lens,
