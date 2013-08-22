@@ -235,11 +235,15 @@ inter-dependent units creates the perfect environment for contagion to
 occur whereby the impact from a single failing unit spreads until it
 infects all of the system.
 
-As I see it, an effective way to solve this problem would be to provide
-tools which encourage a system in which the shapes of the messages it
-may receive are defined more loosely.
-
-I would like to propose that tools which encourage a
+As I see it, an effective way to solve this problem would be to
+integrate into a REST client library the ability to use a response
+whilst being only loosely coupled to the *shape* of the overall message.
+This should be without any additional effort by the programmer as
+compared using message but depending on a rigidly specified overall
+structure. Rather than having this means of interpreting a message as an
+optional extra, because I believe it to be beneficial that all
+messagesare handled this way, it should be the default means of
+operation for this library.
 
 Criteria for success
 --------------------
