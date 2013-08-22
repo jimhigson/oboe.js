@@ -52,7 +52,7 @@ isn't the primary concern of this dissertation, I have found it to be a
 significant problem area and any benefit my new approach can bring to
 this problem should be counted towards the success of the project.
 
-Inefficiencies in out typical use of http
+Inefficiencies of our typical use of http
 -----------------------------------------
 
 ![A common use of a REST service is the aggregation of data from
@@ -220,35 +220,22 @@ performed.
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
 
-A more subtle problem
+In many respects, a SOA architecture is a good fit for the fast release
+cycle encouraged by Agile methodologies. Because in SOA we may consider
+that all data is local rather than global and that the components of the
+system are loosely coupled, weekly releases of a particular sub-system
+shouldn't pose any problem to the correct operation of the whole.
 
-SOA has been adapted widely but versioning remains a common challenge in
-industry. Anecdote: test environment finds an issue. One system can't be
-released. Contagion.
-
-How to cope with software that changes every week.
-
-Because of the contagion problem, need to be able to create
-loosely-coupled systems.
-
-Inside systems also, even with automatic refactoring tools, only
-automate and therefoer lessen but do not remove the problem that
-coupling causes changes in one place of a codebase to cause knock-on
-changes in remote other parts of the code. A method of programming which
-was truly compatible with extreme programming would involve designing
-for constant change without disparate parts having to be modified as
-structural refactoring occurs.
-
-I propose that in a changing system, readability of code's changelog is
-as important as readability of the code itself. Extraneous changes
-dilute the changelog, making it less easily defined by code changes
-which are intrinsically linked to the actual change in the logic being
-expressed by the program.
-
-It is often stated that understandability is the number once most
-important concern in a codebase (CITE) - if the code is suitably dynamic
-it is important that changes are axiomic and clarity of the changelog is
-equally important.
+However, there is a problem with realising this quality in practice. In
+enterprise I have often personally seen the release of dozens of
+components cancelled because a single unit failed to meet acceptance
+criteria, even where the failing unit contained only minor changes.
+Because of tightly coupling between versions, and a dense dependency
+graph of inter-dependent units, a kind of contagion occurs whereby a
+single failing unit holds back the release of the whole. As I see it, an
+effective way to solve this problem would be to provide tools which
+encouraeg a system in which the shapes of the messages it may receive
+are defined more loosely.
 
 Criteria for success
 --------------------
