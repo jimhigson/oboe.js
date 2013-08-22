@@ -203,8 +203,8 @@ rollback could vary greatly between application domains, in the example
 above of a webmail client it may be that no rollback at all is
 performed.
 
-Agile methodologies, fast deployments and future versioning
------------------------------------------------------------
+Agile methodologies, fast deployments, and compatibility now with future versions
+--------------------------------------------------------------------------------
 
 In many respects, a SOA architecture is a good fit for the fast release
 cycle encouraged by Agile methodologies. Because in SOA we may consider
