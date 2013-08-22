@@ -223,19 +223,23 @@ Agile methodologies, fast deployments and future versioning
 In many respects, a SOA architecture is a good fit for the fast release
 cycle encouraged by Agile methodologies. Because in SOA we may consider
 that all data is local rather than global and that the components of the
-system are loosely coupled, weekly releases of a particular sub-system
-shouldn't pose any problem to the correct operation of the whole.
+system are loosely coupled, frequent releases of any particular
+sub-system shouldn't pose a problem to the correct operation of the
+whole. Unfortunately in practice the tools used for REST fail to
+encourage programming in a loosely coupled way. Working in enterprise I
+have often seen the release of dozens of components cancelled because a
+single unit failed to meet acceptance criteria, even where the failing
+unit contained only minor changes. Because of a tight coupling which
+depends on exact versions, a dense dependency graph between
+inter-dependent units creates the perfect environment for contagion to
+occur whereby the impact from a single failing unit spreads until it
+infects all of the system.
 
-However, there is a problem with realising this quality in practice. In
-enterprise I have often personally seen the release of dozens of
-components cancelled because a single unit failed to meet acceptance
-criteria, even where the failing unit contained only minor changes.
-Because of tightly coupling between versions, and a dense dependency
-graph of inter-dependent units, a kind of contagion occurs whereby a
-single failing unit holds back the release of the whole. As I see it, an
-effective way to solve this problem would be to provide tools which
-encouraeg a system in which the shapes of the messages it may receive
-are defined more loosely.
+As I see it, an effective way to solve this problem would be to provide
+tools which encourage a system in which the shapes of the messages it
+may receive are defined more loosely.
+
+I would like to propose that tools which encourage a
 
 Criteria for success
 --------------------
