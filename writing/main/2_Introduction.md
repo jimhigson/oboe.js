@@ -204,7 +204,7 @@ above of a webmail client it may be that no rollback at all is
 performed.
 
 Agile methodologies, fast deployments, and compatibility now with future versions
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 In many respects, a SOA architecture is a good fit for the fast release
 cycle encouraged by Agile methodologies. Because in SOA we may consider
@@ -221,31 +221,40 @@ inter-dependent units creates the perfect environment for contagion to
 occur whereby the impact from a single failing unit spreads until it
 infects all of the system.
 
+Emergent design of message shape just as the design of the software transmitting the message is emergent.
+
 As I see it, an effective way to solve this problem would be to
 integrate into a REST client library the ability to use a response
 whilst being only loosely coupled to the *shape* of the overall message.
 This should be without any additional effort by the programmer as
 compared using message but depending on a rigidly specified overall
 structure. Rather than having this means of interpreting a message as an
-optional extra, because I believe it to be beneficial that all
-messages are handled this way, it should be the default means of
-operation for this library.
+optional extra, because I believe it to be beneficial that all messages
+are handled this way, it should be the default means of operation for
+this library.
 
 Criteria for success
 --------------------
-
-Doing something earlier **is** doing it faster.
 
 In evaluating this project, we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
 increase in the difficulty of programming the client. This improvement
 may be in terms of a measure of the absolute time required to complete a
 representative task or in a user's perception of the speed in completing
-the task. Whilst the difficulty in creating the client resists
-quantification, this will be examined in terms of the length of the
-expression required in programming some common tasks.
+the task. Because applications in the target domain are much more
+io-bound than CPU-bound, optimisation in terms of the running time of a
+program on the CPU will be de-emphasised unless especially egregious.
+Because the improvements I am seeking are due to a more efficient use of
+io rather than a more optimal algorithmic expression, no distinction is
+made between doing something earlier and doing it faster. Indeed, for
+the sake of this dissertation, earlier *is* faster.
 
-Because applications in the target domain are much more io-bound than
-CPU-bound, optimisation in terms of the running time of a program on the
-CPU will be de-emphasised in favour of establishing a more optimal use
-of io.
+Because REST is often communicated over unreliable connections, my
+client should also allow the use of partially delivered messages without
+requiring programming which treats this as a special case.
+
+Finally, I shall be looking at common ways in which the semantics of a
+message may be added to as a system is developed and examining the
+degree to which it is easier to program in a way which handles these
+unanticipated changes under my client as compared to the current common
+practice.
