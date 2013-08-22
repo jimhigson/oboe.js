@@ -115,8 +115,8 @@ The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
 
-Solving the big-small tradeoff
-------------------------------
+Stepping out of the big-small tradeoff
+--------------------------------------
 
 Where the domain model contains a series of data, of which ranges are
 made available via REST, I have often seen a trade-off with regards to
