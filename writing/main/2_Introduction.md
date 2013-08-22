@@ -207,7 +207,15 @@ response as a progressive stream of many small parts. As each part
 arrives it should be possible to parse and pass onto the application
 without knowing if the whole will be delivered successfully.
 
-Optimistic locking.
+This style of REST client encourages an attitude of optimistic locking
+in the application which uses it. Upon each partial delievery of the
+message there may be made an implicit assumption that the whole message
+will be successful and as such each part can be acted on straight away.
+On discovering a delivery failure the application should be notified in
+case it should wish to rollback some of those actions. The degree of
+rollback could vary greatly between application domains, in the example
+above of a webmail client it may be that no rollback at all is
+performed.
 
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
