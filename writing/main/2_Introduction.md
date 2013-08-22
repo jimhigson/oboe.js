@@ -199,11 +199,14 @@ for improvement here.
 
 Whilst of course a REST client library cannot understand the semantics
 of specific messages fully enough to decide if a partially downloaded
-message is useful. I propose that the ideal would be to provide
+message is useful. I propose that it would be an improvement to provide
 callbacks in such a way that the calling application may make use of
-partially successful messages with much the same programming than is
-used for complete messages, whilst also having the ability to ignore
-messages whose content is too minimal as to be useful.
+partially successful messages via much the same programming as for
+complete messages. This fits in very well with my vision of a http response as a progressive stream of many 
+small parts. As each part arrives it should be possible to parse and pass onto the application without knowing if the
+whole will be delivered successfully.
+
+Optimistic locking.
 
 Agile methodologies, fast deployments and future versioning
 -----------------------------------------------------------
