@@ -184,55 +184,45 @@ application should be notified so that some rollback may be performed.
 Agile methodologies, frequent deployments, and compatibility today with versions tomorrow
 -----------------------------------------------------------------------------------------
 
-In many respects, a SOA architecture is a good fit for the fast release
-cycle encouraged by Agile methodologies. Because in SOA we may consider
-that all data is local rather than global and that the components of the
-system are loosely coupled, frequent releases of any particular
-sub-system shouldn't pose a problem to the correct operation of the
-whole. Under truly Agile practice, the formats of resources exposed via
-REST will emerge iteratively, mirroring the iterative design of the
-software which reifies the message.
+In most respects SOA architecture fits well with the fast release cycle
+that Agile methodologies encourage. Because in SOA we may consider that
+all data is local rather than global and that the components are loosely
+coupled and autonomous, frequent releases of any particular sub-system
+shouldn't pose a problem to the correct operation of the whole.
+Following emergent design it should be possible for the format of
+resources to be realised slowly and iteratively as a greater
+understanding of the problem is achieved. Unfortunately in practice the
+ability to change is hampered by tools which encourage programming
+against rigidly specified formats. Working in enterprise I have often
+seen the release of dozens of components cancelled because of a single
+unit that failed to meet acceptance criteria. By allowing a tight
+coupling that depends on exact versions of formats, the perfect
+environment is created for contagion whereby the updating of any single
+unit may only be done as part of the updating of the whole.
 
-Unfortunately in practice the tools used for REST fail to encourage
-programming in a loosely coupled way. Working in enterprise I have often
-seen the release of dozens of components cancelled because a single unit
-failed to meet acceptance criteria, even where the failing unit
-contained only minor changes. Because of a tight coupling which depends
-on exact versions, a dense dependency graph between inter-dependent
-units creates the perfect environment for contagion to occur whereby the
-impact from a single failing unit spreads until it infects all of the
-system.
-
-As I see it, an effective way to solve this problem would be to
-integrate into a REST client library the ability to use a response
-whilst being only loosely coupled to the *shape* of the overall message.
-This should be without any additional effort by the programmer as
-compared using message but depending on a rigidly specified overall
-structure. Rather than having this means of interpreting a message as an
-optional extra, because I believe it to be beneficial that all messages
-are handled this way, it should be the default means of operation for
-this library.
+An effective response to this problem would be to integrate into a REST
+client library the ability to use a response whilst being only loosely
+coupled to the *shape* of the overall message.
 
 Deliverables
 ------------
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest area which delivers the greatest benefit. Amongst commentators
-on start-up culture this is known as a *zoom-in pivot* [^7] and the work
-it produces should be the *Minimum Viable Product* or MVP[CITE], the
-guiding principle being that it is better to deliver a little well than
+smallest work which can we said to realise my thesis. Amongst commentators
+on start-up companies this is known as a *zoom-in pivot* [^7] and the work
+it produces should be the *Minimum Viable Product* or MVP[^8], the
+guiding principle being that it is preferable to produce a little well than
 more badly. By focusing tightly I cannot not deliver a full stack so I
-am forced to implement only solutions which interoperate in with
-existing stacks. This is advantageous; to somebody looking to improve an
-existing system, evolution is much easier to action than revolution and
-are therefore much more attractive.
+am forced to implement only solutions which interoperate with
+existing deployments. This is advantageous; to somebody looking to improve their
+system small additions are easier to action than wholesale change.
 
-To reify the vision above, a streaming client is the MVP. As we have
-already considered, all network transmissions are viewable though a
-streaming lens so an explicitly streaming server is not required.
-Additionally, whilst http servers capable of streaming are quite common,
-even if they are not typically programmed as such, I have been unable to
-find any example of a streaming-capable rest client.
+To reify the vision above, a streaming client is the MVP. Because all 
+network transmissions may be viewed though a
+streaming lens an explicitly streaming server is not required.
+Additionally, whilst http servers capable of streaming are quite common
+even if they are not always programmed as such, I have been unable to
+find any example of a streaming-capable REST client.
 
 Criteria for success
 --------------------
@@ -284,10 +274,17 @@ practice.
 [^4]: Fielding, R. T.; Taylor, R. N. (2000). Principled design of the
     modern Web architecture. pp. 407–416.
 
-[^5]: http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/
+[^5]: Yogev Ahuvia (2013) DESIGN PATTERNS: Infinite Scrolling: Let’s Get
+    To The Bottom Of This
+    http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/
 
-[^6]: http://www.bbc.co.uk/news/technology-14582499
+[^6]: BBC News (2011) 3G mobile data network crowd-sourcing survey by
+    BBC News http://www.bbc.co.uk/news/technology-14582499
 
 [^7]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use
+    Continuous Innovation to Create Radically Successful Businesses.
+    Crown Business Publishing
+
+[^8]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use
     Continuous Innovation to Create Radically Successful Businesses.
     Crown Business Publishing
