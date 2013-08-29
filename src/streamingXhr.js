@@ -22,7 +22,19 @@
  *                 if method is POST or PUT.
  */
 function streamingXhr(method, url, data, progressCallback, doneCallback) {
+        
+   var 
+      // handleInput doesn't return anything, so handleLoaded equivalent to:
+      //    function(){handleInput(); doneCallback();} 
+      // but a little but shorter to help hold onto the micro-library status.
+      handleLoaded = compose(doneCallback, handleInput),
+
+      xhr = new XMLHttpRequest(),
    
+      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
+       
+      numberOfCharsAlreadyGivenToCallback = 0;
+      
    /** Given a value from the user to send as the request body, return in a form
     *  that is suitable to sending over the wire. Returns either a string, or null.        
     */
@@ -31,7 +43,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
          return null;
    
       return isString(body)? body: JSON.stringify(body);
-   }   
+   }      
    
    /** xhr2 already supports everything that we need so just a bit of abstraction required.
     *  listenToXhr2 is one of two possible values to use as listenToXhr  
@@ -42,10 +54,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
       // not had a progress event..
          
       xhr.onprogress = handleInput;
-      xhr.onload = function() {  
-         handleInput();
-         doneCallback();
-      };
+      xhr.onload = handleLoaded;
    }
    
    /** xhr1 is quite primative so a bit more work is needed to connect to it 
@@ -60,8 +69,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
       // to non-streaming Ajax.      
       xhr.onreadystatechange = function() {     
          if(xhr.readyState == 4 && xhr.status == 200) {
-            handleInput();
-            doneCallback();            
+            handleLoaded();            
          }                            
       };
    }   
@@ -84,14 +92,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
-         
-   var 
-      xhr = new XMLHttpRequest(),
-   
-      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
-       
-      numberOfCharsAlreadyGivenToCallback = 0;
-            
+                     
    listenToXhr( xhr );
    
    xhr.open(method, url, true);
