@@ -19,15 +19,16 @@ applied to the response once it is complete. This tendency to cast REST
 calls using terms from the language feels quite natural; we may call a
 remote service without having to make any adjustment for the fact that
 it is remote. However, we should remember that this construct is not the
-only possible mapping. Importing some moderate Whorfianism [@whorf56] [@sapir58] from
-linguistics, we might venture to say that the programming languages we
-use encourage us to think in the terms that they easily support. For any
-multi-packet message sent via a network some parts will arrive before
-others, at least approximately in-order, but whilst coding a C-inspired
-language whose return statements yield single, discrete values it
-comfortable to conceptualise the REST response as a discrete event.
-Perhaps better suited to representing a progressively returned value
-would have been the relatively unsupported Generator routine [@encycCompSci].
+only possible mapping. Importing some moderate Whorfianism
+[@whorf56][@sapir58] from linguistics, we might venture to say that the
+programming languages we use encourage us to think in the terms that
+they easily support. For any multi-packet message sent via a network
+some parts will arrive before others, at least approximately in-order,
+but whilst coding a C-inspired language whose return statements yield
+single, discrete values it comfortable to conceptualise the REST
+response as a discrete event. Perhaps better suited to representing a
+progressively returned value would have been the relatively unsupported
+Generator routine [@encycCompSci].
 
 In most practical cases where software is being used to perform a task
 there is no reasonable distinction between being earlier and being
@@ -37,22 +38,22 @@ it streams rather than hold unexamined until the message ends.
 
 The coining of the term REST represented a shift in how we think about
 http, away from the transfer of hypertext documents to that of arbitrary
-data [@rest pp. 407–416]. It introduced no fundamentally new methods. Likewise, no
-genuinely new computer science techniques need be invented to realise my
-thesis. As a minimum, the implementation requires an http client which
-exposes the response whilst it is in progress and a parser which can
-start making sense of a response before it sees all of it. I also could
-not claim this thesis to be an entirely novel composition of such parts.
-Few ideas are genuinely new and it is often wiser to mine for solved
-problems then to solve again afresh. The intense competition of Web
-browsers to be as fast as possible has already found this solution. Load
-any graphics rich with images -- essentially an aggregation of hypertext
-and images -- the HTML is parsed incrementally while it is downloading
-and the images are requested as soon as individual \<img\> tags are
-encountered. The browser's implementation involves a highly optimised
-parser created for a single task, that of displaying web pages. The new
-contribution of this dissertation is to provide a generic analog
-applicable to any problem domain.
+data [@rest pp. 407–416]. It introduced no fundamentally new methods.
+Likewise, no genuinely new computer science techniques need be invented
+to realise my thesis. As a minimum, the implementation requires an http
+client which exposes the response whilst it is in progress and a parser
+which can start making sense of a response before it sees all of it. I
+also could not claim this thesis to be an entirely novel composition of
+such parts. Few ideas are genuinely new and it is often wiser to mine
+for solved problems then to solve again afresh. The intense competition
+of Web browsers to be as fast as possible has already found this
+solution. Load any graphics rich with images -- essentially an
+aggregation of hypertext and images -- the HTML is parsed incrementally
+while it is downloading and the images are requested as soon as
+individual \<img\> tags are encountered. The browser's implementation
+involves a highly optimised parser created for a single task, that of
+displaying web pages. The new contribution of this dissertation is to
+provide a generic analog applicable to any problem domain.
 
 REST aggregation could be faster
 --------------------------------
@@ -81,8 +82,8 @@ cadence of the right sequence has better pacing of requests with 4 being
 made at roughly equal intervals rather than a single request and then a
 rapid burst of 3. \label{rest_timeline_2}](images/rest_timeline_2.png)
 
-Figure \ref{rest_timeline_1} and Figure \ref{rest_timeline_2} illustrate
-how a progressive REST client, without adjustments being required to the
+Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} illustrate how a
+progressive REST client, without adjustments being required to the
 server may be used to display some data requested by a user sooner.
 While the complete data should be available to the user significantly
 earlier, we see a much greater improvement in how early the first piece
@@ -116,20 +117,20 @@ much of the series each call should request. Answering this question is
 usually a compromise between competing concerns in which it is not
 simultaneously possible to addresses all concerns satisfactorily. A good
 example might be a Twitter's pages listing a series of tweets where the
-interface designers adopted a currently trending pattern [@infinitescroll], Infinite
-Scrolling. Starting from an initial page showing some finite number of
-tweets, upon scrolling to the bottom the next batch is automatically
-requested. The new batch is fetched in a json format and, once loaded,
-presented as html and added to the bottom of the page. Applied
-repeatedly this allows the user to scroll indefinitely, albeit
-punctuated by slightly jolting pauses while new content is loaded. To
-frame the big-small tradeoff we might consider the extreme choices.
-Firstly, requesting just one tweet per http request. By requesting the
-smallest possible content individual calls would complete very quickly
-and the pauses would be short. Taking the extreme small end the page
-stutters, pausing momentarily but frequently. Taking the opposite
-extreme, by requesting some huge number of tweets we see long periods of
-smooth scrolling partitioned by long waits.
+interface designers adopted a currently trending pattern
+[@infinitescroll], Infinite Scrolling. Starting from an initial page
+showing some finite number of tweets, upon scrolling to the bottom the
+next batch is automatically requested. The new batch is fetched in a
+json format and, once loaded, presented as html and added to the bottom
+of the page. Applied repeatedly this allows the user to scroll
+indefinitely, albeit punctuated by slightly jolting pauses while new
+content is loaded. To frame the big-small tradeoff we might consider the
+extreme choices. Firstly, requesting just one tweet per http request. By
+requesting the smallest possible content individual calls would complete
+very quickly and the pauses would be short. Taking the extreme small end
+the page stutters, pausing momentarily but frequently. Taking the
+opposite extreme, by requesting some huge number of tweets we see long
+periods of smooth scrolling partitioned by long waits.
 
 I propose that my thesis may be applied used to stand down from this
 compromise by delivering pauses which are both infrequent and short. In
@@ -150,8 +151,8 @@ termination poorly. Consider the everyday situation of somebody using a
 smartphone browser to check their email. The use of Webmail necessitates
 that the communication in made via REST rather than a mail specific
 protocol such as IMAP. Mobile data coverage is less than network
-operators claim [@BBC3g] so while travelling the signal can be expected to
-be lost and reestablished many times. Whilst not strictly forbidding
+operators claim [@BBC3g] so while travelling the signal can be expected
+to be lost and reestablished many times. Whilst not strictly forbidding
 their inspection, the web developer's standard AJAX toolkit are
 structured in such a way as to encourage the developer to consider
 partially successful messages as wholly unsuccessful. For example, the
@@ -208,21 +209,22 @@ Deliverables
 ------------
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest work which can we said to realise my thesis. Amongst commentators
-on start-up companies this is known as a *zoom-in pivot* and the work
-it produces should be the *Minimum Viable Product* or MVP [@lean p. ??], the
-guiding principle being that it is preferable to produce a little well than
-more badly. By focusing tightly I cannot not deliver a full stack so I
-am forced to implement only solutions which interoperate with
-existing deployments. This is advantageous; to somebody looking to improve their
-system small additions are easier to action than wholesale change.
+smallest work which can we said to realise my thesis. Amongst
+commentators on start-up companies this is known as a *zoom-in pivot*
+and the work it produces should be the *Minimum Viable Product* or MVP
+[@lean p. ??], the guiding principle being that it is preferable to
+produce a little well than more badly. By focusing tightly I cannot not
+deliver a full stack so I am forced to implement only solutions which
+interoperate with existing deployments. This is advantageous; to
+somebody looking to improve their system small additions are easier to
+action than wholesale change.
 
-To reify the vision above, a streaming client is the MVP. Because all 
-network transmissions may be viewed though a
-streaming lens an explicitly streaming server is not required.
-Additionally, whilst http servers capable of streaming are quite common
-even if they are not always programmed as such, I have been unable to
-find any example of a streaming-capable REST client.
+To reify the vision above, a streaming client is the MVP. Because all
+network transmissions may be viewed though a streaming lens an
+explicitly streaming server is not required. Additionally, whilst http
+servers capable of streaming are quite common even if they are not
+always programmed as such, I have been unable to find any example of a
+streaming-capable REST client.
 
 Criteria for success
 --------------------
@@ -233,13 +235,12 @@ increase in the difficulty of programming the client. This improvement
 may be in terms of the absolute total time required to complete a
 representative task or in a user's perception of the speed in completing
 the task. Because applications in the target domain are much more
-io-bound than CPU-bound, optimisation in terms of the execution time of a
-algorithms will be de-emphasised unless especially egregious. The measuring
-of speed will include a consideration of performance degradation
-due to connections which are terminated early.
+io-bound than CPU-bound, optimisation in terms of the execution time of
+a algorithms will be de-emphasised unless especially egregious. The
+measuring of speed will include a consideration of performance
+degradation due to connections which are terminated early.
 
-Additionally, I shall be looking at common ways in which the semantics of a
-message are expanded as a system's design emerges and commenting on the 
-value of loose coupling in avoiding disruption given unanticipated format changes.  
-
-
+Additionally, I shall be looking at common ways in which the semantics
+of a message are expanded as a system's design emerges and commenting on
+the value of loose coupling in avoiding disruption given unanticipated
+format changes.
