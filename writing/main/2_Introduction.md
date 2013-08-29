@@ -1,170 +1,150 @@
 Introduction
 ============
 
-Despite the enthusiasm for which SOA and REST in particular has been
-adapted, as a software engineer working on REST systems I have noticed a
-reoccurring trend where, if http were to be viewed through a new lens,
-by adjusting the REST paradigm to include a more progressive view of the
-data, it would be possible to avoid many of the common performance
-pitfalls. With my focus at any particular time being limited to the
-scope of creating individual services rather than advancing the
-underlying technology, the glimpses of a more effective way have
-remained as such for some time. Commercial pressures did not provide the
-best opportunity to follow up on these ideas. This dissertation is not
-focused on using REST to provide any particular service. Rather, it aims
-to apply small incremental changes to the REST paradigm as a whole which
-should bring tangible benefits to almost any such system.
+This dissertation does not focus on implementing software for any
+particular problem domain. Rather, its purpose is to encourage the REST
+paradigm to be viewed through a novel lens. In application this may be
+used to deliver tangible benefits to many common REST use cases.
+Although I express my thesis through programming, the contribution I
+hope to deliver is felt more strongly as a shift in how we *think* about
+http than it is a change in the underlying technology.
 
-I have been careful to focus on as small a set of incremental
-improvements as is possible to bring the improvements that I would like
-to see. Incremental changes are easier to action, I have been careful to
-ensure that this perspective may be with only a few carefully chosen
-changes and without any loss of interoperability to existing systems,
-avoiding the temptation of wholesale shift to a new technology stack.
-Although I will express my dissertation partially through programming,
-the shift required for this evolutionary change is felt more strongly as
-a shift in how we *think* about http than it is a change in the
-underlying technology itself. Once we realise that any multi-packet
-message sent via a network is arrives as a stream so far as some part
-inevitably arrives before another, it follows that a streaming client is
-the minimum set of software needed to realise this vision. A streaming
-client can connect to a non-streaming server but the opposite is not as
-useful. Furthermore, servers which send http messages incrementally,
-while not the most common model, are not rare, whereas clients which
-interpret a message incrementally are limited to very specific use
-cases.
+In the interest of developer ergonomics, REST clients have tended to
+style the calling of remote resources similar to the call style of the
+host programming language. Depending on the language, one of two schemas
+are followed: a synchronous style in which the http call is an
+expression which evaluates to the resource that was fetched; or
+asynchronous or monadic in which some logic is specified which may be
+applied to the response once it is complete.
+This tendency to cast REST calls using terms from the language feels
+quite natural; we may call a remote service without having to make any
+adjustment for the fact that it is remote. However, we should remember
+that this construct is not the only possible mapping. Importing some 
+moderate Whorfianism[^whorf][^sapir] from linguistics, we
+might venture to say that the programming languages we use encourage
+us to think in the terms that they easily support. 
+For any multi-packet message sent via a network some parts will arrive before
+others, at least approximately in-order, but whilst coding a
+C-inspired language whose return statements yield single, discrete
+values it comfortable to conceptualise the REST response as a discrete event.
+Perhaps better suited to representing a progressively returned value would have
+been the relatively unsupported Generator routine[^generator]. 
 
-Whilst the primary area of concern for this dissertation is to improve
-the throughput and reactivity of systems created using REST, the
-approach chosen may also be considered against a secondary problem often
-experienced in REST systems: that of tight coupling between systems and
-the difficulty this brings in adding new semantics to existing message
-formats. I find that in many cases these problems exist solely as
-inflexible REST client software which is unprepared to accept slight or
-moderate variations on previously agreed formats. Whilst loose coupling
-isn't the primary concern of this dissertation, I have found it to be a
-significant problem area and any benefit my new approach can bring to
-this problem should be counted towards the success of the project.
+In most practical cases where software is being used to perform a task
+there is no reasonable distinction between being earlier and being
+quicker. Therefore, if our interest is to create fast software we should
+be using data at the first possible opportunity. Examining data
+*while* it streams rather than hold unexamined until the message ends.
 
-Inefficiencies of our typical use of http
------------------------------------------
+The coining of the term REST 
+represented a shift in how we think about http, away from the
+transfer of hypertext documents to that of arbitrary data [^rest]. 
+It introduced no fundamentally new methods.
+Likewise, no genuinely new computer science techniques need be invented
+to realise my thesis. As a minimum, the implementation requires an
+http client which exposes the response whilst it is in progress and a
+parser which can start making sense of a response before it sees all 
+of it. I also could not claim this thesis to be an entirely novel
+composition of such parts. Few ideas are genuinely new and it is often
+wiser to mine for solved problems then to solve again afresh. 
+The intense competition of Web browsers to be as fast as possible has
+already found this solution. Load any graphics rich
+with images -- essentially an aggregation of hypertext and images -- 
+the HTML is parsed incrementally while it is downloading and
+the images are requested as soon as individual \<img\> tags are
+encountered. The browser's implementation involves a highly optimised parser
+created for a single task, that of displaying web pages.
+The new contribution of this dissertation is to provide a generic analog
+applicable to any problem domain.
+   
+REST aggregation could be faster
+--------------------------------
 
-![**Sequence diagram showing aggregation of lower-level resources exposed
-via REST.** A client fetches a listing of an author's publications and
-then the first three articles. The sequence represents the most
-commonly used technique in which the client does not react to the response
-until it is complete. In this example the second wave of requests cannot
-be made until after the original response is complete, at which time they
-are issued in quick succession. 
+![**Sequence diagram showing aggregation of lower-level resources
+exposed via REST.** A client fetches a listing of an author's
+publications and then the first three articles. The sequence represents
+the most commonly used technique in which the client does not react to
+the response until it is complete. In this example the second wave of
+requests cannot be made until after the original response is complete,
+at which time they are issued in quick succession.
 \label{rest_timeline_1}](images/rest_timeline_1.png)
 
 ![**Revised sequence of aggregation performed by a client capable of
-progressively interpreting the fetched resource.** The 
-client considers the response to return progressively as
-many small parts. Because UML sequence diagrams do not provide a concept
-of a returned value other than as a one-off event, the notation of
-lighter arrows illustrating fragments an ongoing response is introduced. Each
-request for an individual publication is made at the earliest possible time.
-As soon as the required data has been read from the original
-resource it is aborted rather than continue with the download of
-unnecessary data. This results in a moderate reduction in wait time to see all 3
-articles but a dramatic reduction in waiting before reading the first 
-content \label{rest_timeline_2}](images/rest_timeline_2.png)
-
-The figure above \ref{rest_timeline_1} illustrates how a progressive
-REST client, without adjustments being required to the server may be
-used to display some data requested by a user sooner. While the complete
-data should be available to the user significantly earlier, we see a
-much greater improvement in how early the first piece of data is able to
-be displayed. This is advantageous: firstly, even if the total time to
-show the data were not improved, progressive display improves the
-perception of performance [CITEME]; secondly, a user wanting to scan
-from top to bottom may start reading the first article while waiting for
-the later ones to arrive. Alternatively, seeing the first article alone
-may allow the user to notice earlier that they have requested the wrong
-author and allow them to backtrack earlier.
-
-Although the label "client software" hints at software running directly
-on a user's own device, nodes in an n-tier architecture can rarely be
-placed into client and server categories in a way which is appropriate
-from all frames of reference. Rather, it is common for nodes to be
-thought of as a client from the layer below and as a server from the
-layer above. The advantage demonstrated holds if the aggregation
-existing in this layer were actually running on a server to provide a
-higher-level REST service than the one that it aggregates. An
-progressive aggregator would perform the same function and see the same
-benefits but simply be pushed one layer back in the stack. The
-progressive view of http would allow progressive response to its http
-request, allowing the data to be viewed similarly progressively.
-
-The coining of the term REST required no fundamentally new methods,
-rather it represented a shift in how we think about http away from the
-transfer of hypertext documents to that of arbitrary data [cite paper].
-Likewise, no genuinely new techniques in computer science are required
-to realise this thesis. As a minimum, the implementation requires an
-http library which exposes the response whilst it is in progress and a
-parser which is capable of making sense of a response before it is able
-to see all of it. In addition to relying on already existing techniques
-in implementation, I cannot claim my thesis to be an entirely novel
-concept. Few ideas are genuinely new and it is often useful to mine
-neighbouring fields for solved problems. To see a specific instance of
-this concept already widely being used we need only to view a web page
-containing inline images in any of the standard web browsers;
-essentially, an aggregation of text and image resources into a single
-presentation. The html is parsed incrementally as it is downloaded and
-the images are requested as soon as individual <img> tags are
-encountered. However, this is achieved by means of a handwritten parser
-which is specific to a single markup format and an implementation which
-applies only to a single problem domain, that of displaying web pages.
-The new contribution of this dissertation hinges on providing a generic,
-reusable solution which may be applied to any problem domain.
-
+progressively interpreting the fetched resource.** The client considers
+the response to return progressively as many small parts. Because UML
+sequence diagrams do not provide a concept of a returned value other
+than as a one-off event, the notation of lighter arrows illustrating
+fragments an ongoing response is introduced. Each request for an
+individual publication is made at the earliest possible time. As soon as
+the required data has been read from the original resource it is aborted
+rather than continue with the download of unnecessary data. This results
+in a moderate reduction in wait time to see all 3 articles but a
+dramatic reduction in waiting before reading the first content.
 The cadence of the right sequence has better pacing of requests with 4
 being made at roughly equal intervals rather than a single request and
 then a rapid burst of 3.
+\label{rest_timeline_2}](images/rest_timeline_2.png)
+
+Figure \ref{rest_timeline_1} and Figure \ref{rest_timeline_2} illustrate
+how a progressive REST client, without adjustments being required to the
+server may be used to display some data requested by a user sooner.
+While the complete data should be available to the user significantly
+earlier, we see a much greater improvement in how early the first piece
+of data is able to be displayed. This is advantageous: firstly, even if
+the total time to show the data were not improved, progressive display
+improves the perception of performance [CITEME]; secondly, a user
+wanting to scan from top to bottom may start reading the first article
+while waiting for the later ones to arrive. Alternatively, seeing the
+first article alone may allow the user to notice earlier that they have
+requested the wrong author and allow them to backtrack earlier.
+
+Although the label "client software" in the figures above hints at
+software running directly on a user's own device, nodes in an n-tier
+architecture can rarely be placed into client and server categories in a
+way which is appropriate from all frames of reference. Rather, it is
+common for nodes to be thought of as a client from the layer below and
+as a server from the layer above. The advantage demonstrated holds if
+the aggregation existing in this layer were actually running on a server
+to provide a higher-level REST service than the one that it aggregates.
+An progressive aggregator would perform the same function and see the
+same benefits but simply be pushed one layer back in the stack. The
+progressive view of http would allow progressive response to its http
+request, allowing the data to be viewed similarly progressively.
+
 
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where the domain model contains a series of data, of which ranges are
+Where a domain model contains a series of data, of which ranges are
 made available via REST, I have often seen a trade-off with regards to
-how much data is requested at once. Deciding this question is usually a
-compromise between competing concerns in which it is not possible to
-find a solution which simultaneously addresses all concerns
-satisfactorily. A good example might be a page on Twitter showing a list
-of tweets. The interface designers here chose to adopt a fairly popular
-pattern, the Infinitely Scrolling Page [CITE]. Starting from an initial
-page showing a finite number of tweets, upon scrolling to the bottom the
-next batch is automatically requested. The new batch is delivered in a
+how much of the series each call should request. Answering this question is usually a
+compromise between competing concerns in which it is not simultaneously possible to
+addresses all concerns satisfactorily.
+A good example might be a Twitter's pages listing a series
+of tweets where the interface designers adopted a currently trending
+pattern[^infiniteScroll], Infinite Scrolling. Starting from an initial
+page showing some finite number of tweets, upon scrolling to the bottom the
+next batch is automatically requested. The new batch is fetched in a
 json format and, once loaded, presented as html and added to the bottom
-of the page, allowing the user to continue scrolling.
+of the page. Applied repeatedly this allows the user to scroll indefinitely,
+albeit punctuated by slightly jolting pauses while new content is loaded. To 
+frame the big-small tradeoff we might consider the extreme choices. Firstly,
+requesting just one tweet per http request. By requesting
+the smallest possible content individual calls would complete
+very quickly and the pauses would be short. Taking the extreme small end the page
+stutters, pausing momentarily but frequently. Taking the opposite extreme,
+by requesting some huge number of tweets we see long periods of smooth scrolling
+partitioned by long waits.
 
-The wait at the bottom of the page while new content is loaded
-introduces a pause in scrolling so, whilst preferable to prior patterns
-incorporating explicit paging, this workflow can feel quite clunky.\
-To frame this problem we might imagine the extreme choices. Firstly,
-requesting only one tweet per http request. Because we are requesting
-the smallest possible content, each request would individually complete
-very quickly and as such the waits would be short. However the page
-would stutter, pausing quickly but frequently. At the opposite extreme,
-we might request some huge number of tweets,\
-taking a long time to load but then scrolling smoothly for a long time.
+I propose that my thesis may be applied used to stand down from this compromise
+by delivering pauses which are both infrequent and short. In the Twitter example, 
+once we have thinking about http progressively this may be achieved quite simply 
+by issuing large requests but instead of deferring all rendering until the request 
+completes, render individual tweets incrementally as they are progressively parsed 
+out of the ongoing response.
 
-I propose that my thesis may be applied used to break out of this
-compromise and take the best of both approaches, combining quickest
-possible latency which would only otherwise be achievable via
-single-tweet requests but also pausing no more frequently than with very
-large requests. Once we have established a progressive mindset regarding
-http this may be achieved quite simply by issuing large requests but
-instead of waiting for the request to complete before rendering,
-updating the view incrementally as the individual tweets are
-progressively parsed out of the json response.
-
-It should be noted that this is a different problem from the granularity
-problem. Expand.
-
-Network fallibility
--------------------
+Staying fast on a fallible network
+----------------------------------
 
 We have been extremely successful in building the TCP abstraction layer
 over many different networks with vastly different purposes, However
@@ -251,8 +231,41 @@ optional extra, because I believe it to be beneficial that all messages
 are handled this way, it should be the default means of operation for
 this library.
 
+Deliverables
+-----
+
+To avoid feature creep I am paring down the software deliverables to
+the smallest area which delivers the greatest benefit. Amongst
+commentators on start-up culture this is known as a *zoom-in pivot*
+[^lean] and the work it produces should be the *Minimum Viable Product*
+or MVP[CITE], the guiding principle being that it is better to deliver a
+little well than more badly. By focusing tightly I cannot not deliver a
+full stack so I am forced to implement only solutions which interoperate
+in with existing stacks. This is advantageous; to somebody looking to
+improve an existing system, evolution is much easier to action than
+revolution and are therefore much more attractive.
+
+To reify the vision above, a streaming client is the MVP. As we have
+already considered, all network transmissions are viewable though a
+streaming lens so an explicitly streaming server is not required. Additionally,
+whilst http servers capable of streaming are quite common, even if they
+are not typically programmed as such, I have been unable 
+to find any example of a streaming-capable rest client.
+
 Criteria for success
 --------------------
+
+Whilst the primary area of concern for this dissertation is to improve
+the throughput and reactivity of systems created using REST, the
+approach chosen may also be considered against a secondary problem often
+experienced in REST systems: that of tight coupling between systems and
+the difficulty this brings in adding new semantics to existing message
+formats. I find that in many cases these problems exist solely as
+inflexible REST client software which is unprepared to accept slight or
+moderate variations on previously agreed formats. Whilst loose coupling
+isn't the primary concern of this dissertation, I have found it to be a
+significant problem area and any benefit my new approach can bring to
+this problem should be counted towards the success of the project.
 
 In evaluating this project, we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
@@ -276,3 +289,19 @@ message may be added to as a system is developed and examining the
 degree to which it is easier to program in a way which handles these
 unanticipated changes under my client as compared to the current common
 practice.
+
+[^sapir]: E. Sapir (1958): Culture, Language and Personality (ed. D. G.
+    Mandelbaum). Berkeley, CA: University of California Press
+
+[^whorf]: B. L. Whorf (1956): Language, Thought and Reality (ed. J. B.
+    Carroll). Cambridge, MA: MIT Press
+
+[^generator]: Anthony Ralston (2000). Encyclopedia of computer science. 
+   Nature Pub. Group. ISBN 978-1-56159-248-7.
+   
+[^lean]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.
+   Crown Business Publishing
+      
+[^rest]: Fielding, R. T.; Taylor, R. N. (2000). Principled design of the modern Web architecture. pp. 407–416.
+
+[^infiniteScroll]: http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/      
