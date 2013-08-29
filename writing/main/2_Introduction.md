@@ -19,7 +19,7 @@ applied to the response once it is complete. This tendency to cast REST
 calls using terms from the language feels quite natural; we may call a
 remote service without having to make any adjustment for the fact that
 it is remote. However, we should remember that this construct is not the
-only possible mapping. Importing some moderate Whorfianism[@whorf56] [@sapir58] from
+only possible mapping. Importing some moderate Whorfianism [@whorf56] [@sapir58] from
 linguistics, we might venture to say that the programming languages we
 use encourage us to think in the terms that they easily support. For any
 multi-packet message sent via a network some parts will arrive before
@@ -27,7 +27,7 @@ others, at least approximately in-order, but whilst coding a C-inspired
 language whose return statements yield single, discrete values it
 comfortable to conceptualise the REST response as a discrete event.
 Perhaps better suited to representing a progressively returned value
-would have been the relatively unsupported Generator routine[@encycCompSci].
+would have been the relatively unsupported Generator routine [@encycCompSci].
 
 In most practical cases where software is being used to perform a task
 there is no reasonable distinction between being earlier and being
@@ -210,7 +210,7 @@ Deliverables
 To avoid feature creep I am paring down the software deliverables to the
 smallest work which can we said to realise my thesis. Amongst commentators
 on start-up companies this is known as a *zoom-in pivot* and the work
-it produces should be the *Minimum Viable Product* or MVP[@lean p. ??], the
+it produces should be the *Minimum Viable Product* or MVP [@lean p. ??], the
 guiding principle being that it is preferable to produce a little well than
 more badly. By focusing tightly I cannot not deliver a full stack so I
 am forced to implement only solutions which interoperate with
