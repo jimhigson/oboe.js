@@ -72,16 +72,38 @@
       "id":"lean",
       "title":"The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.",
       "author": [
-          {
-            "family": "Reis",
-            "given": "Eric"         
-          }
+          { "family": "Reis", "given": "Eric" }
       ],      
       "publisher": "Crown Business Publishing",
       "issued": { "date-parts":[ [2011] ] },
       "type":"book"      
-   }
+   },
    
+   {
+      "id":"perceptionFaxSpeed",   
+      "title":"To influence Time Perception",
+      "author":[
+         { "family":"Geelhoed",     "given":"Erik"       }, 
+         { "family":"Toft",         "given":"Peter"      }, 
+         { "family":"Roberts",      "given":"Suzanne"    }, 
+         { "family":"Hyland",       "given":"Patrick"    } 
+      ],
+      "publisher": "Hewlett Packard Labs",
+      "issued": { "date-parts":[ [1995] ] },      
+      "url":"http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm"
+   },
+   
+   {
+      "id":"perceptionHttpChunkedSpeed",
+      "title":"Progressive rendering via multiple flushes",
+      "author":[         
+         { "family": "Stefanov", "given":"Stoyan"}
+      ],
+      "url":"http://www.phpied.com/progressive-rendering-via-multiple-flushes/",
+      "issued": { "date-parts":[ [2009] ] },
+      "type":"webpage"                  
+   }
+      
 ]
 
 
