@@ -227,40 +227,21 @@ find any example of a streaming-capable REST client.
 Criteria for success
 --------------------
 
-Whilst the primary area of concern for this dissertation is to improve
-the throughput and reactivity of systems created using REST, the
-approach chosen may also be considered against a secondary problem often
-experienced in REST systems: that of tight coupling between systems and
-the difficulty this brings in adding new semantics to existing message
-formats. I find that in many cases these problems exist solely as
-inflexible REST client software which is unprepared to accept slight or
-moderate variations on previously agreed formats. Whilst loose coupling
-isn't the primary concern of this dissertation, I have found it to be a
-significant problem area and any benefit my new approach can bring to
-this problem should be counted towards the success of the project.
-
 In evaluating this project, we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
 increase in the difficulty of programming the client. This improvement
-may be in terms of a measure of the absolute time required to complete a
+may be in terms of the absolute total time required to complete a
 representative task or in a user's perception of the speed in completing
 the task. Because applications in the target domain are much more
-io-bound than CPU-bound, optimisation in terms of the running time of a
-program on the CPU will be de-emphasised unless especially egregious.
-Because the improvements I am seeking are due to a more efficient use of
-io rather than a more optimal algorithmic expression, no distinction is
-made between doing something earlier and doing it faster. Indeed, for
-the sake of this dissertation, earlier *is* faster.
+io-bound than CPU-bound, optimisation in terms of the execution time of a
+algorithms will be de-emphasised unless especially egregious. The measuring
+of speed will include a consideration of performance degradation
+due to connections which are terminated early.
 
-Because REST is often communicated over unreliable connections, my
-client should also allow the use of partially delivered messages without
-requiring programming which treats this as a special case.
+Additionally, I shall be looking at common ways in which the semantics of a
+message are expanded as a system's design emerges and commenting on the 
+value of loose coupling in avoiding disruption given unanticipated format changes.  
 
-Finally, I shall be looking at common ways in which the semantics of a
-message may be added to as a system is developed and examining the
-degree to which it is easier to program in a way which handles these
-unanticipated changes under my client as compared to the current common
-practice.
 
 [^1]: B. L. Whorf (1956): Language, Thought and Reality (ed. J. B.
     Carroll). Cambridge, MA: MIT Press
