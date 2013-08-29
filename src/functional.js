@@ -40,8 +40,18 @@ function varArgs(fn){
    }       
 }
 
-
-var lazyUnionOfFunctionArray = function(fns) {
+/**
+ *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ *  
+ *  So:
+ *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
+ *       
+ *  Is equivalent to: 
+ *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
+ *   
+ *  @returns the first return value that is given that is truthy.
+ */
+var lazyUnion = varArgs(function(fns) {
 
    return varArgs(function(params){
 
@@ -56,20 +66,7 @@ var lazyUnionOfFunctionArray = function(fns) {
          }
       }
    });
-};
-
-/**
- *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
- *  
- *  So:
- *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
- *       
- *  Is equivalent to: 
- *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
- *   
- *  @returns the first return value that is given that is truthy.
- */
-var lazyUnion = varArgs(lazyUnionOfFunctionArray);
+});
 
 /**
  * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
