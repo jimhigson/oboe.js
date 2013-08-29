@@ -15,48 +15,45 @@ host programming language. Depending on the language, one of two schemas
 are followed: a synchronous style in which the http call is an
 expression which evaluates to the resource that was fetched; or
 asynchronous or monadic in which some logic is specified which may be
-applied to the response once it is complete.
-This tendency to cast REST calls using terms from the language feels
-quite natural; we may call a remote service without having to make any
-adjustment for the fact that it is remote. However, we should remember
-that this construct is not the only possible mapping. Importing some 
-moderate Whorfianism[^whorf][^sapir] from linguistics, we
-might venture to say that the programming languages we use encourage
-us to think in the terms that they easily support. 
-For any multi-packet message sent via a network some parts will arrive before
-others, at least approximately in-order, but whilst coding a
-C-inspired language whose return statements yield single, discrete
-values it comfortable to conceptualise the REST response as a discrete event.
-Perhaps better suited to representing a progressively returned value would have
-been the relatively unsupported Generator routine[^generator]. 
+applied to the response once it is complete. This tendency to cast REST
+calls using terms from the language feels quite natural; we may call a
+remote service without having to make any adjustment for the fact that
+it is remote. However, we should remember that this construct is not the
+only possible mapping. Importing some moderate Whorfianism[^1][^2] from
+linguistics, we might venture to say that the programming languages we
+use encourage us to think in the terms that they easily support. For any
+multi-packet message sent via a network some parts will arrive before
+others, at least approximately in-order, but whilst coding a C-inspired
+language whose return statements yield single, discrete values it
+comfortable to conceptualise the REST response as a discrete event.
+Perhaps better suited to representing a progressively returned value
+would have been the relatively unsupported Generator routine[^3].
 
 In most practical cases where software is being used to perform a task
 there is no reasonable distinction between being earlier and being
 quicker. Therefore, if our interest is to create fast software we should
-be using data at the first possible opportunity. Examining data
-*while* it streams rather than hold unexamined until the message ends.
+be using data at the first possible opportunity. Examining data *while*
+it streams rather than hold unexamined until the message ends.
 
-The coining of the term REST 
-represented a shift in how we think about http, away from the
-transfer of hypertext documents to that of arbitrary data [^rest]. 
-It introduced no fundamentally new methods.
-Likewise, no genuinely new computer science techniques need be invented
-to realise my thesis. As a minimum, the implementation requires an
-http client which exposes the response whilst it is in progress and a
-parser which can start making sense of a response before it sees all 
-of it. I also could not claim this thesis to be an entirely novel
-composition of such parts. Few ideas are genuinely new and it is often
-wiser to mine for solved problems then to solve again afresh. 
-The intense competition of Web browsers to be as fast as possible has
-already found this solution. Load any graphics rich
-with images -- essentially an aggregation of hypertext and images -- 
-the HTML is parsed incrementally while it is downloading and
-the images are requested as soon as individual \<img\> tags are
-encountered. The browser's implementation involves a highly optimised parser
-created for a single task, that of displaying web pages.
-The new contribution of this dissertation is to provide a generic analog
+The coining of the term REST represented a shift in how we think about
+http, away from the transfer of hypertext documents to that of arbitrary
+data [^4]. It introduced no fundamentally new methods. Likewise, no
+genuinely new computer science techniques need be invented to realise my
+thesis. As a minimum, the implementation requires an http client which
+exposes the response whilst it is in progress and a parser which can
+start making sense of a response before it sees all of it. I also could
+not claim this thesis to be an entirely novel composition of such parts.
+Few ideas are genuinely new and it is often wiser to mine for solved
+problems then to solve again afresh. The intense competition of Web
+browsers to be as fast as possible has already found this solution. Load
+any graphics rich with images -- essentially an aggregation of hypertext
+and images -- the HTML is parsed incrementally while it is downloading
+and the images are requested as soon as individual \<img\> tags are
+encountered. The browser's implementation involves a highly optimised
+parser created for a single task, that of displaying web pages. The new
+contribution of this dissertation is to provide a generic analog
 applicable to any problem domain.
-   
+
 REST aggregation could be faster
 --------------------------------
 
@@ -79,11 +76,10 @@ individual publication is made at the earliest possible time. As soon as
 the required data has been read from the original resource it is aborted
 rather than continue with the download of unnecessary data. This results
 in a moderate reduction in wait time to see all 3 articles but a
-dramatic reduction in waiting before reading the first content.
-The cadence of the right sequence has better pacing of requests with 4
-being made at roughly equal intervals rather than a single request and
-then a rapid burst of 3.
-\label{rest_timeline_2}](images/rest_timeline_2.png)
+dramatic reduction in waiting before reading the first content. The
+cadence of the right sequence has better pacing of requests with 4 being
+made at roughly equal intervals rather than a single request and then a
+rapid burst of 3. \label{rest_timeline_2}](images/rest_timeline_2.png)
 
 Figure \ref{rest_timeline_1} and Figure \ref{rest_timeline_2} illustrate
 how a progressive REST client, without adjustments being required to the
@@ -111,93 +107,79 @@ same benefits but simply be pushed one layer back in the stack. The
 progressive view of http would allow progressive response to its http
 request, allowing the data to be viewed similarly progressively.
 
-
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where a domain model contains a series of data, of which ranges are
-made available via REST, I have often seen a trade-off with regards to
-how much of the series each call should request. Answering this question is usually a
-compromise between competing concerns in which it is not simultaneously possible to
-addresses all concerns satisfactorily.
-A good example might be a Twitter's pages listing a series
-of tweets where the interface designers adopted a currently trending
-pattern[^infiniteScroll], Infinite Scrolling. Starting from an initial
-page showing some finite number of tweets, upon scrolling to the bottom the
-next batch is automatically requested. The new batch is fetched in a
-json format and, once loaded, presented as html and added to the bottom
-of the page. Applied repeatedly this allows the user to scroll indefinitely,
-albeit punctuated by slightly jolting pauses while new content is loaded. To 
-frame the big-small tradeoff we might consider the extreme choices. Firstly,
-requesting just one tweet per http request. By requesting
-the smallest possible content individual calls would complete
-very quickly and the pauses would be short. Taking the extreme small end the page
-stutters, pausing momentarily but frequently. Taking the opposite extreme,
-by requesting some huge number of tweets we see long periods of smooth scrolling
-partitioned by long waits.
+Where a domain model contains a series of data, of which ranges are made
+available via REST, I have often seen a trade-off with regards to how
+much of the series each call should request. Answering this question is
+usually a compromise between competing concerns in which it is not
+simultaneously possible to addresses all concerns satisfactorily. A good
+example might be a Twitter's pages listing a series of tweets where the
+interface designers adopted a currently trending pattern[^5], Infinite
+Scrolling. Starting from an initial page showing some finite number of
+tweets, upon scrolling to the bottom the next batch is automatically
+requested. The new batch is fetched in a json format and, once loaded,
+presented as html and added to the bottom of the page. Applied
+repeatedly this allows the user to scroll indefinitely, albeit
+punctuated by slightly jolting pauses while new content is loaded. To
+frame the big-small tradeoff we might consider the extreme choices.
+Firstly, requesting just one tweet per http request. By requesting the
+smallest possible content individual calls would complete very quickly
+and the pauses would be short. Taking the extreme small end the page
+stutters, pausing momentarily but frequently. Taking the opposite
+extreme, by requesting some huge number of tweets we see long periods of
+smooth scrolling partitioned by long waits.
 
-I propose that my thesis may be applied used to stand down from this compromise
-by delivering pauses which are both infrequent and short. In the Twitter example, 
-once we have thinking about http progressively this may be achieved quite simply 
-by issuing large requests but instead of deferring all rendering until the request 
-completes, render individual tweets incrementally as they are progressively parsed 
-out of the ongoing response.
+I propose that my thesis may be applied used to stand down from this
+compromise by delivering pauses which are both infrequent and short. In
+the Twitter example, once we have thinking about http progressively this
+may be achieved quite simply by issuing large requests but instead of
+deferring all rendering until the request completes, render individual
+tweets incrementally as they are progressively parsed out of the ongoing
+response.
 
 Staying fast on a fallible network
 ----------------------------------
 
-We have been extremely successful in building the TCP abstraction layer
-over many different networks with vastly different purposes, However
-this means that the reliability of networks that a REST client must work
-with varies greatly. At one extreme we have server-room sized networks
-delivering data over a span of few meters with a success rate for any
-particular http request-response that is so high as for failure to be
-negligible. Occupying the opposite extreme we have mobile networks in
-marginal signal where it is common for downloads to be abruptly
-terminated due to loss of connectivity.
+The reliability of networks that REST operates over varies widely.
+Considering the worst case we see mobile networks in marginal signal
+over which it is common for ongoing downloads to be abruptly
+disconnected. Existing http clients handle this kind of unexpected
+termination poorly. Consider the everyday situation of somebody using a
+smartphone browser to check their email. The use of Webmail necessitates
+that the communication in made via REST rather than a mail specific
+protocol such as IMAP. Mobile data coverage is less than network
+operators claim [^6] so while travelling the signal can be expected to
+be lost and reestablished many times. Whilst not strictly forbidding
+their inspection, the web developer's standard AJAX toolkit are
+structured in such a way as to encourage the developer to consider
+partially successful messages as wholly unsuccessful. For example, the
+popular AJAX library jQuery automatically parses complete JSON or XML
+responses before handing back to the application. But on failure there
+is no attempt to parse or deliver the partial response. To programmers
+who know where to look the partial responses are retrievable as raw text
+but handling them is a special case, bringing-your-own-parser affair.
+Because of this difficulty I can only find examples of partial messages
+being dropped without inspection. In practice this means that for the
+user checking her email, even if 90% of her inbox had been retrieved she
+will be shown nothing. When the network is available again the
+application will have to download from scratch, including the 90% which
+it already fetched. I see much potential for improvement here.
 
-Consider an everyday situation where a user is using a phone to check
-their email over a mobile network whilst travelling on a train. The user
-prefers the simplicity of webmail so the communications are sent via
-REST rather than a mail specific protocol such as POP3. In this scenario
-the signal can be expected to be lost and reestablished many times.
-Whilst not strictly forbidding it, none of the web developer's standard
-toolkit of AJAX libraries encourage a use of the partially downloaded
-response if the http request fails. For example, the popular AJAX
-library[CITE], jQuery, very helpfully parses complete JSON or XML
-responses before handing back to the application. But because incomplete
-messages are not valid markup, on connection failure jQuery does not
-attempt to parse the response. Because partial responses are only
-available to the programmer as raw text, to handle them would involve a
-special case and a different methodology. Because of this difficulty I
-can find no example other than such messages being dropped without
-inspection. In practice this means that for the user checking her email,
-even if 90% of her inbox had been downloaded she will be shown nothing.
-When the network is available again the application will have to
-download from scratch, including the 90% which it already fetched. In
-this regard REST falls short of the mail-specific protocols which would
-display messages one at a time as they are fetched. I see much potential
-for improvement here.
-
-Whilst of course a REST client library cannot understand the semantics
-of specific messages fully enough to decide if a partially downloaded
-message is useful. I propose that it would be an improvement to provide
-callbacks in such a way that the calling application may make use of
-partially successful messages via much the same programming as for
-complete messages. This fits in very well with my vision of a http
-response as a progressive stream of many small parts. As each part
-arrives it should be possible to parse and pass onto the application
-without knowing if the whole will be delivered successfully.
-
-This style of REST client encourages an attitude of optimistic locking
-in the application which uses it. Upon each partial delievery of the
-message there may be made an implicit assumption that the whole message
-will be successful and as such each part can be acted on straight away.
-On discovering a delivery failure the application should be notified in
-case it should wish to rollback some of those actions. The degree of
-rollback could vary greatly between application domains, in the example
-above of a webmail client it may be that no rollback at all is
-performed.
+Not every message, incomplete, is useful. Whilst of course a generic
+REST client cannot understand the semantics of specific messages fully
+enough to decide if a partially downloaded message is useful, I propose
+it would be an improvement if the content from incomplete responses
+could be handled using much the same programming as for complete
+responses. This follows naturally from a conceptualisation of the http
+response as a progressive stream of many small parts; as each part
+arrives it should be possible to use it without knowing if the next will
+be delivered successfully. This style of programming encourages thinking
+in terms of optimistic locking. Upon each partial delivery there is an
+implicit assumption that it may be acted on straight away and the next
+will also be successful. In cases where this assumption fails the
+application should be notified so that some rollback may be performed.
 
 Agile methodologies, fast deployments, and compatibility now with future versions
 ---------------------------------------------------------------------------------
@@ -232,25 +214,25 @@ are handled this way, it should be the default means of operation for
 this library.
 
 Deliverables
------
+------------
 
-To avoid feature creep I am paring down the software deliverables to
-the smallest area which delivers the greatest benefit. Amongst
-commentators on start-up culture this is known as a *zoom-in pivot*
-[^lean] and the work it produces should be the *Minimum Viable Product*
-or MVP[CITE], the guiding principle being that it is better to deliver a
-little well than more badly. By focusing tightly I cannot not deliver a
-full stack so I am forced to implement only solutions which interoperate
-in with existing stacks. This is advantageous; to somebody looking to
-improve an existing system, evolution is much easier to action than
-revolution and are therefore much more attractive.
+To avoid feature creep I am paring down the software deliverables to the
+smallest area which delivers the greatest benefit. Amongst commentators
+on start-up culture this is known as a *zoom-in pivot* [^7] and the work
+it produces should be the *Minimum Viable Product* or MVP[CITE], the
+guiding principle being that it is better to deliver a little well than
+more badly. By focusing tightly I cannot not deliver a full stack so I
+am forced to implement only solutions which interoperate in with
+existing stacks. This is advantageous; to somebody looking to improve an
+existing system, evolution is much easier to action than revolution and
+are therefore much more attractive.
 
 To reify the vision above, a streaming client is the MVP. As we have
 already considered, all network transmissions are viewable though a
-streaming lens so an explicitly streaming server is not required. Additionally,
-whilst http servers capable of streaming are quite common, even if they
-are not typically programmed as such, I have been unable 
-to find any example of a streaming-capable rest client.
+streaming lens so an explicitly streaming server is not required.
+Additionally, whilst http servers capable of streaming are quite common,
+even if they are not typically programmed as such, I have been unable to
+find any example of a streaming-capable rest client.
 
 Criteria for success
 --------------------
@@ -290,18 +272,22 @@ degree to which it is easier to program in a way which handles these
 unanticipated changes under my client as compared to the current common
 practice.
 
-[^sapir]: E. Sapir (1958): Culture, Language and Personality (ed. D. G.
-    Mandelbaum). Berkeley, CA: University of California Press
-
-[^whorf]: B. L. Whorf (1956): Language, Thought and Reality (ed. J. B.
+[^1]: B. L. Whorf (1956): Language, Thought and Reality (ed. J. B.
     Carroll). Cambridge, MA: MIT Press
 
-[^generator]: Anthony Ralston (2000). Encyclopedia of computer science. 
-   Nature Pub. Group. ISBN 978-1-56159-248-7.
-   
-[^lean]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.
-   Crown Business Publishing
-      
-[^rest]: Fielding, R. T.; Taylor, R. N. (2000). Principled design of the modern Web architecture. pp. 407–416.
+[^2]: E. Sapir (1958): Culture, Language and Personality (ed. D. G.
+    Mandelbaum). Berkeley, CA: University of California Press
 
-[^infiniteScroll]: http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/      
+[^3]: Anthony Ralston (2000). Encyclopedia of computer science. Nature
+    Pub. Group. ISBN 978-1-56159-248-7.
+
+[^4]: Fielding, R. T.; Taylor, R. N. (2000). Principled design of the
+    modern Web architecture. pp. 407–416.
+
+[^5]: http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/
+
+[^6]: http://www.bbc.co.uk/news/technology-14582499
+
+[^7]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use
+    Continuous Innovation to Create Radically Successful Businesses.
+    Crown Business Publishing
