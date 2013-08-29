@@ -4,10 +4,6 @@
  * 
  * This probably needs more development and testing more than most other parts 
  * of Oboe.
- *
- * TODO:
- *    error handling
- *    allow setting of request params
  *    
  * Fetch something over ajax, calling back as often as new data is available.
  * 
@@ -27,8 +23,8 @@
  */
 function streamingXhr(method, url, data, progressCallback, doneCallback) {
    
-   /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Returns either a string, or null.        
+   /** Given a value from the user to send as the request body, return in a form
+    *  that is suitable to sending over the wire. Returns either a string, or null.        
     */
    function validatedRequestBody( body ) {
       if( !body )
@@ -37,53 +33,66 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
       return isString(body)? body: JSON.stringify(body);
    }   
    
-   /* xhr2 already supports everything that we need so very little abstraction required.\
-   *  listenToXhr2 is one of two possible values to use as listenToXhr  
-   */
-   function listenToXhr2(xhr, progressListener, completeListener) {      
-      xhr.onprogress = progressListener;
-      xhr.onload = completeListener;
-   }
-
-   /* xhr1 supports little so a bit more work is needed 
-    * listenToXhr1 is one of two possible values to use as listenToXhr  
-    */           
-   function listenToXhr1(xhr, progressListener, completeListener){
-   
-      // unfortunately there is no point polling the responsetext, these bad old browsers don't make the partial
-      // text accessible - it is undefined until the request finishes and then it is everything.
-      // Instead, we'll just have to wait for the request to be complete, degrading gracefully
-      // to standard non-streaming Ajax.      
-   
-      // handle the request being complete: 
-      xhr.onreadystatechange = function() {     
-         if(xhr.readyState == 4 && xhr.status == 200) {
-            progressListener();             
-            completeListener();
-         }                           
+   /** xhr2 already supports everything that we need so just a bit of abstraction required.
+    *  listenToXhr2 is one of two possible values to use as listenToXhr  
+    */
+   function listenToXhr2(xhr) {
+      // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
+      // onload. We need to always do handleInput in case we get the load even but have
+      // not had a progress event..
+         
+      xhr.onprogress = handleInput;
+      xhr.onload = function() {  
+         handleInput();
+         doneCallback();
       };
    }
-         
-   var xhr = new XMLHttpRequest(),
    
-       browserSupportsXhr2 = ('onprogress' in xhr),    
-       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
-       
-       numberOfCharsAlreadyGivenToCallback = 0;
-
-   function handleProgress() {
-      
-      var textSoFar = xhr.responseText;
+   /** xhr1 is quite primative so a bit more work is needed to connect to it 
+    *  listenToXhr1 is one of two possible values to use as listenToXhr  
+    */           
+   function listenToXhr1(xhr){
+   
+      // unfortunately there is no point polling the responsetext, these bad old browsers 
+      // don't make the partial text accessible - it is undefined until the request finishes 
+      // and then it is everything.
+      // Instead, we just have to wait for the request to be complete and degrade gracefully
+      // to non-streaming Ajax.      
+      xhr.onreadystatechange = function() {     
+         if(xhr.readyState == 4 && xhr.status == 200) {
+            handleInput();
+            doneCallback();            
+         }                            
+      };
+   }   
+   
+   /** 
+    * Handle input from the underlying xhr: either a state change,
+    * the progress event or the request being complete.
+    */
+   function handleInput() {
+                        
+      var textSoFar = xhr.responseText,
+          newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
       
       // give the new text to the callback.
       // on older browsers, the new text will alwasys be the whole response. 
-      // On newer/better ones it'll be just the little bit that we got since last time:         
-      progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
+      // On newer/better ones it'll be just the little bit that we got since last time.
+      // On browsers which send progress events for the last bit of the response, if we
+      // are responding to the laod event it is now empty         
+      newText && progressCallback( newText );
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
+         
+   var 
+      xhr = new XMLHttpRequest(),
+   
+      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
+       
+      numberOfCharsAlreadyGivenToCallback = 0;
             
-   listenToXhr( xhr, handleProgress, doneCallback);
+   listenToXhr( xhr );
    
    xhr.open(method, url, true);
    xhr.send(validatedRequestBody(data));   
