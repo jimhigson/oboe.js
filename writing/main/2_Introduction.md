@@ -181,8 +181,8 @@ implicit assumption that it may be acted on straight away and the next
 will also be successful. In cases where this assumption fails the
 application should be notified so that some rollback may be performed.
 
-Agile methodologies, fast deployments, and compatibility now with future versions
----------------------------------------------------------------------------------
+Agile methodologies, frequent deployments, and compatibility today with versions tomorrow
+-----------------------------------------------------------------------------------------
 
 In many respects, a SOA architecture is a good fit for the fast release
 cycle encouraged by Agile methodologies. Because in SOA we may consider
