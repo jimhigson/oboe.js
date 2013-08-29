@@ -25,7 +25,6 @@ module.exports = function(config) {
       ,  'src/controller.js'
       ,  'src/browserApi.js'
         
-      ,  'test/jstd-jasmine-asserter-bridge.js'
       ,  'test/specs/*.spec.js'
       ],
                             

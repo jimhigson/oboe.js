@@ -39,7 +39,7 @@ function givenAnOboeInstance(jsonFileName) {
          if(!expectingErrors){ 
             givenErrors.push(e);
          
-            fail('unexpected error: ' + e);
+            throw new Error('unexpected error: ' + e);
          }
       });
 
@@ -118,7 +118,7 @@ function givenAnOboeInstance(jsonFileName) {
       this.thenTheInstance = function( /* ... functions ... */ ){
       
          if( givenErrors.length > 0 ) {
-            fail('error found during previous stages\n' + givenErrors[0].stack);
+            throw new Error('error found during previous stages\n' + givenErrors[0].stack);
          }      
       
          for (var i = 0; i < arguments.length; i++) {
@@ -162,7 +162,7 @@ var wasPassedAnErrorObject = {
    testAgainst: function failIfNotPassedAnError(callback, oboeInstance) {
    
       if( !callback.args[0][0] instanceof Error ) {
-         fail("Callback should have been given an error but was given" + callback.constructor.name);
+         throw new Error("Callback should have been given an error but was given" + callback.constructor.name);
       }
       
    }
@@ -176,7 +176,7 @@ function foundNMatches(n){
       testAgainst:
       function(callback, oboeInstance) {
          if( n != callback.callCount ) {
-            fail('expected to have been called ' + n + ' times but has been called ' +
+            throw new Error('expected to have been called ' + n + ' times but has been called ' +
                callback.callCount + ' times. \n' +
                    "all calls were with:" +
                    reportArgumentsToCallback(callback.args)
@@ -219,10 +219,10 @@ function calledbackWithContext(callbackScope) {
          if(!callbackStub.calledOn(callbackScope)){
          
             if( !callbackStub.called ) {
-               fail('Expected to be called with context ' + callbackScope + ' but has not been called at all');
+               throw new Error('Expected to be called with context ' + callbackScope + ' but has not been called at all');
             }
          
-            fail('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
+            throw new Error('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
                callbackStub.getCall(0).thisValue);
          }   
       }
@@ -270,7 +270,7 @@ function matched(obj) {
 
             var objectPassedToCall = function(callArgs){return callArgs[0]};
             
-            fail( "was not called with the object " +  JSON.stringify(obj) + "\n" +
+            throw new Error( "was not called with the object " +  JSON.stringify(obj) + "\n" +
                 "objects that I got are:" +
                 JSON.stringify(callbackStub.args.map(objectPassedToCall) ) + "\n" +
                 "all calls were with:" +
@@ -286,7 +286,7 @@ function matched(obj) {
             oldAssertion.apply(this, arguments);
             
             if(!callbackStub.calledWithMatch(sinon.match.any, path)) {
-               fail( "was not called with the path " +  JSON.stringify(path) + "\n" +
+               throw new Error( "was not called with the path " +  JSON.stringify(path) + "\n" +
                    "paths that I have are:\n" +
                    callbackStub.args.map(function(callArgs){
                      return "\t" + JSON.stringify(callArgs[1]) + "\n";
@@ -320,7 +320,7 @@ function matched(obj) {
             }, "had the right parent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, parentMatcher)) {
-               fail( "was not called with the object" + JSON.stringify(obj) + 
+               throw new Error( "was not called with the object" + JSON.stringify(obj) + 
                         " and parent object " +  JSON.stringify(expectedParent) +
                         "all calls were with:" +
                         reportArgumentsToCallback(callbackStub.args));
@@ -351,7 +351,7 @@ function matched(obj) {
             }, "had the right grandparent");
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, grandparentMatcher)) {
-               fail( "was not called with the object" + JSON.stringify(obj) + 
+               throw new Error( "was not called with the object" + JSON.stringify(obj) + 
                         " and garndparent object " +  JSON.stringify(expectedGrandparent) +
                         "all calls were with:" +
                         reportArgumentsToCallback(callbackStub.args));
