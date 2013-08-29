@@ -1,0 +1,89 @@
+[
+   {  "id": "whorf56",
+      "title":"Language, Thought and Reality (ed. J. B. Carroll)",
+      "author": [
+          {
+            "family": "Whorf",
+            "given": "B. L."         
+          }
+      ],
+      "publisher": "Cambridge, MA: MIT Press",
+      "issued": { "date-parts":[ [1956] ] }
+   },
+   
+   {  "id": "sapir58",
+      "title":"Culture, Language and Personality (ed. D. G. Mandelbaum)",
+      "author": [
+          {
+            "family": "Sapir",
+            "given": "E."         
+          }
+      ],
+      "publisher": "Berkeley, CA: University of California Press",
+      "issued": { "date-parts":[ [1958] ] }
+   },
+   
+   {  "id": "encycCompSci",
+      "title":"Encyclopedia of Computer Science",
+      "author": [
+          {
+            "family": "Ralston",
+            "given": "Anthony"         
+          }
+      ],
+      "publisher": "Nature Pub. Group.",
+      "issued": { "date-parts":[ [2000] ] }
+   },
+   
+   {  "id": "rest",
+      "title":"Principled design of the modern Web architecture",
+      "author": [
+          {
+            "family": "Fielding",
+            "given": "R. T."         
+          }
+      ],
+      "issued": { "date-parts":[ [2000] ] }
+   },
+   
+   {
+      "id": "infinitescroll",
+      "title":"Design Patterns: Infinite Scrolling: Let’s Get To The Bottom Of This http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/",
+      "author": [
+          {
+            "family": "Ahuvia",
+            "given": "Yogev"         
+          }
+      ],
+      "publisher": "Smashing Magazine",
+      "issued": { "date-parts":[ [2013] ] },
+      "type":"webpage"
+   },
+   
+   {
+      "id":"BBC3g",
+      "title":"3G mobile data network crowd-sourcing survey",
+      "publisher": "BBC News",
+      "issued": { "date-parts":[ [2011] ] },
+      "type":"webpage"      
+   },
+   
+   {
+      "id":"lean",
+      "title":"The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.",
+      "author": [
+          {
+            "family": "Reis",
+            "given": "Eric"         
+          }
+      ],      
+      "publisher": "Crown Business Publishing",
+      "issued": { "date-parts":[ [2011] ] },
+      "type":"book"      
+   }
+   
+]
+
+
+
+    

@@ -8,11 +8,11 @@ pandoc proposal.md -o proposal.pdf
 
 echo made proposal pdf
 
-./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections -o main.html
+./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections --bibliography=bibliography.json -o main.html
 
 echo made main html
 
-./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections --template=mainOboeTemplate -o main.pdf
+./all_main | pandoc -f markdown --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate -o main.pdf
 
 echo made main pdf
 

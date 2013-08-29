@@ -19,7 +19,7 @@ applied to the response once it is complete. This tendency to cast REST
 calls using terms from the language feels quite natural; we may call a
 remote service without having to make any adjustment for the fact that
 it is remote. However, we should remember that this construct is not the
-only possible mapping. Importing some moderate Whorfianism[^1][^2] from
+only possible mapping. Importing some moderate Whorfianism[@whorf56] [@sapir58] from
 linguistics, we might venture to say that the programming languages we
 use encourage us to think in the terms that they easily support. For any
 multi-packet message sent via a network some parts will arrive before
@@ -27,7 +27,7 @@ others, at least approximately in-order, but whilst coding a C-inspired
 language whose return statements yield single, discrete values it
 comfortable to conceptualise the REST response as a discrete event.
 Perhaps better suited to representing a progressively returned value
-would have been the relatively unsupported Generator routine[^3].
+would have been the relatively unsupported Generator routine[@encycCompSci].
 
 In most practical cases where software is being used to perform a task
 there is no reasonable distinction between being earlier and being
@@ -37,7 +37,7 @@ it streams rather than hold unexamined until the message ends.
 
 The coining of the term REST represented a shift in how we think about
 http, away from the transfer of hypertext documents to that of arbitrary
-data [^4]. It introduced no fundamentally new methods. Likewise, no
+data [@rest pp. 407–416]. It introduced no fundamentally new methods. Likewise, no
 genuinely new computer science techniques need be invented to realise my
 thesis. As a minimum, the implementation requires an http client which
 exposes the response whilst it is in progress and a parser which can
@@ -116,7 +116,7 @@ much of the series each call should request. Answering this question is
 usually a compromise between competing concerns in which it is not
 simultaneously possible to addresses all concerns satisfactorily. A good
 example might be a Twitter's pages listing a series of tweets where the
-interface designers adopted a currently trending pattern[^5], Infinite
+interface designers adopted a currently trending pattern [@infinitescroll], Infinite
 Scrolling. Starting from an initial page showing some finite number of
 tweets, upon scrolling to the bottom the next batch is automatically
 requested. The new batch is fetched in a json format and, once loaded,
@@ -150,7 +150,7 @@ termination poorly. Consider the everyday situation of somebody using a
 smartphone browser to check their email. The use of Webmail necessitates
 that the communication in made via REST rather than a mail specific
 protocol such as IMAP. Mobile data coverage is less than network
-operators claim [^6] so while travelling the signal can be expected to
+operators claim [@BBC3g] so while travelling the signal can be expected to
 be lost and reestablished many times. Whilst not strictly forbidding
 their inspection, the web developer's standard AJAX toolkit are
 structured in such a way as to encourage the developer to consider
@@ -209,8 +209,8 @@ Deliverables
 
 To avoid feature creep I am paring down the software deliverables to the
 smallest work which can we said to realise my thesis. Amongst commentators
-on start-up companies this is known as a *zoom-in pivot* [^7] and the work
-it produces should be the *Minimum Viable Product* or MVP[^8], the
+on start-up companies this is known as a *zoom-in pivot* and the work
+it produces should be the *Minimum Viable Product* or MVP[@lean p. ??], the
 guiding principle being that it is preferable to produce a little well than
 more badly. By focusing tightly I cannot not deliver a full stack so I
 am forced to implement only solutions which interoperate with
@@ -243,29 +243,3 @@ message are expanded as a system's design emerges and commenting on the
 value of loose coupling in avoiding disruption given unanticipated format changes.  
 
 
-[^1]: B. L. Whorf (1956): Language, Thought and Reality (ed. J. B.
-    Carroll). Cambridge, MA: MIT Press
-
-[^2]: E. Sapir (1958): Culture, Language and Personality (ed. D. G.
-    Mandelbaum). Berkeley, CA: University of California Press
-
-[^3]: Anthony Ralston (2000). Encyclopedia of computer science. Nature
-    Pub. Group. ISBN 978-1-56159-248-7.
-
-[^4]: Fielding, R. T.; Taylor, R. N. (2000). Principled design of the
-    modern Web architecture. pp. 407–416.
-
-[^5]: Yogev Ahuvia (2013) DESIGN PATTERNS: Infinite Scrolling: Let’s Get
-    To The Bottom Of This
-    http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/
-
-[^6]: BBC News (2011) 3G mobile data network crowd-sourcing survey by
-    BBC News http://www.bbc.co.uk/news/technology-14582499
-
-[^7]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use
-    Continuous Innovation to Create Radically Successful Businesses.
-    Crown Business Publishing
-
-[^8]: Eric Reis (2011), The Lean Startup: How Today's Entrepreneurs Use
-    Continuous Innovation to Create Radically Successful Businesses.
-    Crown Business Publishing
