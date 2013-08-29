@@ -58,55 +58,59 @@ provide a generic analog applicable to any problem domain.
 REST aggregation could be faster
 --------------------------------
 
-![**Sequence diagram showing aggregation of lower-level resources
-exposed via REST.** A client fetches a listing of an author's
-publications and then the first three articles. The sequence represents
-the most commonly used technique in which the client does not react to
-the response until it is complete. In this example the second wave of
-requests cannot be made until after the original response is complete,
-at which time they are issued in quick succession.
-\label{rest_timeline_1}](images/rest_timeline_1.png)
+![**Aggregation of lower-level resources exposed via REST.** The client
+fetches a listing of an author's publications and then the first three
+articles. The sequence represents the most commonly used technique in
+which the client does not react to the response until it is complete. In
+this example the second wave of requests cannot be made until the
+original response is complete, at which time they are issued in quick
+succession. \label{rest_timeline_1}](images/rest_timeline_1.png)
 
 ![**Revised sequence of aggregation performed by a client capable of
-progressively interpreting the fetched resource.** The client considers
-the response to return progressively as many small parts. Because UML
-sequence diagrams do not provide a concept of a returned value other
-than as a one-off event, the notation of lighter arrows illustrating
-fragments an ongoing response is introduced. Each request for an
-individual publication is made at the earliest possible time. As soon as
+progressively interpreting the fetched resource.** Because UML sequence
+diagrams arrows draw the concept of a returned value as a one-off event
+rather than a continuous process, I have introduced the notation of
+lighter arrows illustrating fragments of an ongoing response. Each
+individual publication request is made at the earliest possible time, as
+soon as the its URL can be extracted from the publications list. Once
 the required data has been read from the original resource it is aborted
-rather than continue with the download of unnecessary data. This results
-in a moderate reduction in wait time to see all 3 articles but a
-dramatic reduction in waiting before reading the first content. The
-cadence of the right sequence has better pacing of requests with 4 being
-made at roughly equal intervals rather than a single request and then a
-rapid burst of 3. \label{rest_timeline_2}](images/rest_timeline_2.png)
+rather than continue to download unnecessary data. This results in a
+moderate reduction in wait time to see all three articles but a dramatic
+reduction in waiting before the first content is presented. Note also
+how the cadence of requests is more even with four connections opened at
+roughly equal intervals rather than a single request followed by a rapid
+burst of three. Clients frequently limit the number of simultaneous
+connections per domain so avoiding bursts of requests is further to our
+advantage. \label{rest_timeline_2}](images/rest_timeline_2.png)
+
+<!--- 
+connections per peer limited:
+http://stackoverflow.com/questions/5751515/official-references-for-default-values-of-concurrent-http-1-1-connections-per-se 
+--->
 
 Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} illustrate how a
-progressive REST client, without adjustments being required to the
-server may be used to display some data requested by a user sooner.
-While the complete data should be available to the user significantly
-earlier, we see a much greater improvement in how early the first piece
-of data is able to be displayed. This is advantageous: firstly, even if
-the total time to show the data were not improved, progressive display
-improves the perception of performance [CITEME]; secondly, a user
-wanting to scan from top to bottom may start reading the first article
-while waiting for the later ones to arrive. Alternatively, seeing the
-first article alone may allow the user to notice earlier that they have
-requested the wrong author and allow them to backtrack earlier.
+progressive REST client may without adjustments to the server be used to
+aggregate REST resources faster. The greatest improvement is in how
+early the first piece of data is able to be used. This is advantageous:
+firstly, progressive display in itself raises the human perception of
+performance [@perceptionFaxSpeed]; secondly, a user wanting to scan from
+top to bottom may start reading the first article while waiting for the
+later ones to arrive; thirdly, on seeing the first content the user may
+notice that they have requested the wrong aggregation, allowing them to
+backtrack earlier.
 
 Although the label "client software" in the figures above hints at
-software running directly on a user's own device, nodes in an n-tier
-architecture can rarely be placed into client and server categories in a
-way which is appropriate from all frames of reference. Rather, it is
-common for nodes to be thought of as a client from the layer below and
-as a server from the layer above. The advantage demonstrated holds if
-the aggregation existing in this layer were actually running on a server
-to provide a higher-level REST service than the one that it aggregates.
-An progressive aggregator would perform the same function and see the
-same benefits but simply be pushed one layer back in the stack. The
-progressive view of http would allow progressive response to its http
-request, allowing the data to be viewed similarly progressively.
+software running directly on a user's own device this is not necessarily
+the case, for example the client may in fact be an server-side
+aggregation layer. Nodes in an n-tier architecture commonly defy
+categorisation as 'client' or 'server' in a way which is appropriate
+from all frames of reference. Rather, nodes may be thought of as a
+client from the layer below and as a server from the layer above. A
+further example would be a server-side webpage generator maintaining a
+perceptual performance improvement by progressively writing out html
+using http chunked encoding. [@perceptionHttpChunkedSpeed]. The
+demonstrated advantages hold regardless of where in the stack the
+'client' is located.
 
 Stepping outside the big-small tradeoff
 ---------------------------------------
