@@ -20,11 +20,11 @@ var ROOT_PATH = {r:1};
  * 
  * Returns a function which gives access to the content built up so far
  * 
- * @param clarinet our source of low-level events
+ * @param clarinetParser our source of low-level events
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinet, notify ) {
+function incrementalContentBuilder( clarinetParser, notify ) {
    
    var            
          // array of nodes from curNode up to the root of the document.
@@ -139,7 +139,7 @@ function incrementalContentBuilder( clarinet, notify ) {
     * Assign listeners to clarinet.
     */     
     
-   clarinet.onopenobject = function (firstKey) {
+   clarinetParser.onopenobject = function (firstKey) {
 
       nodeFound({});
       
@@ -154,14 +154,14 @@ function incrementalContentBuilder( clarinet, notify ) {
       }
    };
    
-   clarinet.onopenarray = function () {
+   clarinetParser.onopenarray = function () {
       nodeFound([]);
    };
 
    // called by Clarinet when keys are found in objects               
-   clarinet.onkey = pathFound;   
+   clarinetParser.onkey = pathFound;   
                
-   clarinet.onvalue = function (value) {
+   clarinetParser.onvalue = function (value) {
    
       // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
       // can't have descendants.
@@ -171,10 +171,10 @@ function incrementalContentBuilder( clarinet, notify ) {
       curNodeFinished();
    };         
    
-   clarinet.oncloseobject =
-   clarinet.onclosearray =       
+   clarinetParser.oncloseobject =
+   clarinetParser.onclosearray =       
       curNodeFinished;      
-      
+            
    /* finally, return a function to get the root of the json (or undefined if not yet found) */      
    return function() {
       return rootNode;
