@@ -53,14 +53,14 @@ function givenAnOboeInstance(jsonFileName) {
       }
             
       this.andWeAreListeningForNodes = function(pattern, callback, scope) {
-         spiedCallback = callback ? sinon.stub() : sinon.spy(callback);
+         spiedCallback = callback ? sinon.spy(callback) : sinon.stub();
       
          oboeInstance.onNode(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForPaths = function(pattern, callback, scope) {
-         spiedCallback = callback ? sinon.stub() : sinon.spy(callback);      
+         spiedCallback = callback ? sinon.spy(callback) : sinon.stub();      
       
          oboeInstance.onPath(pattern, argumentClone(spiedCallback), scope);
          return this;
