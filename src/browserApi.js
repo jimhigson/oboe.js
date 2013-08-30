@@ -57,7 +57,7 @@
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(instController, rootJsonFn)           
+         return instanceApi(instController);           
       };
    }   
 
