@@ -1,9 +1,7 @@
-describe("oboe component (only network stubbed)", function(){
-
-   var streamingStub; 
+describe("oboe component (sXHR stubbed)", function(){
 
    beforeEach(function() {
-      streamingStub = sinon.stub(window, 'streamingXhr')
+      sinon.stub(window, 'streamingXhr')
          .returns({
             req:  sinon.stub(),
             abort:sinon.stub()
@@ -11,7 +9,7 @@ describe("oboe component (only network stubbed)", function(){
    })
    
    afterEach(function() {
-      streamingStub.restore();   
+      window.streamingXhr.restore();   
    })
    
    it('has chainable methods',  function() {
