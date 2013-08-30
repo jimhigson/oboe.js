@@ -27,13 +27,13 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
       }
    );
   
+   // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       notify(ERROR_EVENT, e);
       
-      // the json is invalid, give up and close the parser to prevent getting any more:
-      clarinetParser.close();
+      // note: don't close clarinet here because if it was not expecting
+      // end of the json it will throw an error
    };
-                              
                 
    /**
     *  
