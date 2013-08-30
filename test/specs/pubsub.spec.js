@@ -56,5 +56,17 @@ describe('pub sub', function(){
       expect(listenerB).toHaveBeenCalled();      
    });
    
+   it('should do nothing if asked to notify of event with no listeners', function(){
+   
+      var events = pubSub();
+      
+      expect(function(){
+      
+         events.notify('unknown event');
+      
+      }).not.toThrow();
+   
+   });   
+   
          
 });
