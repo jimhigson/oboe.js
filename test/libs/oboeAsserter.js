@@ -8,7 +8,7 @@
 
 function givenAnOboeInstance(jsonFileName) {
 
-   function Asserter() {
+   function OboeAsserter() {
 
       var asserter = this,
           oboeInstance,
@@ -89,12 +89,12 @@ function givenAnOboeInstance(jsonFileName) {
 
          // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
          // progress callback and give the string to that.
-         var progressCallback = streamingXhr.firstCall.args[3];
+         var eventBusNotify = streamingXhr.firstCall.args[3];
          
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
-         for( var i = 0; i< json.length; i++) { 
-            progressCallback(json.charAt(i));          
+         for( var i = 0; i< json.length; i++) {
+            eventBusNotify(HTTP_PROGRESS_EVENT, json.charAt(i)); 
          }                  
 
          return this;
@@ -104,9 +104,9 @@ function givenAnOboeInstance(jsonFileName) {
 
          // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
          // done callback
-         var doneCallback = streamingXhr.firstCall.args[4];
+         var eventBusNotify = streamingXhr.firstCall.args[3];
          
-         doneCallback();                  
+         eventBusNotify(HTTP_DONE_EVENT);                  
 
          return this;         
       };
@@ -155,7 +155,7 @@ function givenAnOboeInstance(jsonFileName) {
          };
       }      
    }
-   return new Asserter();
+   return new OboeAsserter();
 }
 
 

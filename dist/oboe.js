@@ -41,8 +41,18 @@ function varArgs(fn){
    }       
 }
 
-
-var lazyUnionOfFunctionArray = function(fns) {
+/**
+ *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ *  
+ *  So:
+ *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
+ *       
+ *  Is equivalent to: 
+ *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
+ *   
+ *  @returns the first return value that is given that is truthy.
+ */
+var lazyUnion = varArgs(function(fns) {
 
    return varArgs(function(params){
 
@@ -57,20 +67,7 @@ var lazyUnionOfFunctionArray = function(fns) {
          }
       }
    });
-};
-
-/**
- *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
- *  
- *  So:
- *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
- *       
- *  Is equivalent to: 
- *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
- *   
- *  @returns the first return value that is given that is truthy.
- */
-var lazyUnion = varArgs(lazyUnionOfFunctionArray);
+});
 
 /**
  * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
@@ -869,10 +866,6 @@ if(typeof FastList === 'function') {
  * 
  * This probably needs more development and testing more than most other parts 
  * of Oboe.
- *
- * TODO:
- *    error handling
- *    allow setting of request params
  *    
  * Fetch something over ajax, calling back as often as new data is available.
  * 
@@ -881,74 +874,83 @@ if(typeof FastList === 'function') {
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
  * @param {String|Object|undefined} data
- * @param {Function} progressCallback in form Function(String nextResponseDrip)
- *    A callback to be called repeatedly as the input comes in.
- *    Will be passed the new string since the last call.
- * @param {Function} doneCallback in form Function(String wholeResponse)
- *    A callback to be called when the request is complete.
- *    Will be passed the total response
+ * @param {Function} notify a function to pass events to when something happens
  * @param {String} data some content to be sent with the request. Only valid
  *                 if method is POST or PUT.
  */
-function streamingXhr(method, url, data, progressCallback, doneCallback) {
+function streamingXhr(method, url, data, notify) {
+        
+   var 
+      xhr = new XMLHttpRequest(),
    
-   /* Given a value from the user to send as the request body, return in a form
-      that is suitable to sending over the wire. Returns either a string, or null.        
+      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
+       
+      numberOfCharsAlreadyGivenToCallback = 0;   
+      
+   /** Given a value from the user to send as the request body, return in a form
+    *  that is suitable to sending over the wire. Returns either a string, or null.        
     */
    function validatedRequestBody( body ) {
       if( !body )
          return null;
    
       return isString(body)? body: JSON.stringify(body);
-   }   
+   }      
    
-   /* xhr2 already supports everything that we need so very little abstraction required.\
-   *  listenToXhr2 is one of two possible values to use as listenToXhr  
-   */
-   function listenToXhr2(xhr, progressListener, completeListener) {      
-      xhr.onprogress = progressListener;
-      xhr.onload = completeListener;
+   /** xhr2 already supports everything that we need so just a bit of abstraction required.
+    *  listenToXhr2 is one of two possible values to use as listenToXhr  
+    */
+   function listenToXhr2(xhr) {         
+      xhr.onprogress = handleInput;
+      xhr.onload = handleDone;
    }
-
-   /* xhr1 supports little so a bit more work is needed 
-    * listenToXhr1 is one of two possible values to use as listenToXhr  
+   
+   /** xhr1 is quite primative so a bit more work is needed to connect to it 
+    *  listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(xhr, progressListener, completeListener){
+   function listenToXhr1(xhr){
    
-      // unfortunately there is no point polling the responsetext, these bad old browsers don't make the partial
-      // text accessible - it is undefined until the request finishes and then it is everything.
-      // Instead, we'll just have to wait for the request to be complete, degrading gracefully
-      // to standard non-streaming Ajax.      
-   
-      // handle the request being complete: 
+      // unfortunately there is no point polling the responsetext, these bad old browsers 
+      // don't make the partial text accessible - it is undefined until the request finishes 
+      // and then it is everything.
+      // Instead, we just have to wait for the request to be complete and degrade gracefully
+      // to non-streaming Ajax.      
       xhr.onreadystatechange = function() {     
          if(xhr.readyState == 4 && xhr.status == 200) {
-            progressListener();             
-            completeListener();
-         }                           
+            handleDone();            
+         }                            
       };
-   }
-         
-   var xhr = new XMLHttpRequest(),
+   }   
    
-       browserSupportsXhr2 = ('onprogress' in xhr),    
-       listenToXhr = browserSupportsXhr2? listenToXhr2 : listenToXhr1,
-       
-       numberOfCharsAlreadyGivenToCallback = 0;
-
-   function handleProgress() {
-      
-      var textSoFar = xhr.responseText;
+   /** 
+    * Handle input from the underlying xhr: either a state change,
+    * the progress event or the request being complete.
+    */
+   function handleInput() {
+                        
+      var textSoFar = xhr.responseText,
+          newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
       
       // give the new text to the callback.
       // on older browsers, the new text will alwasys be the whole response. 
-      // On newer/better ones it'll be just the little bit that we got since last time:         
-      progressCallback( textSoFar.substr(numberOfCharsAlreadyGivenToCallback) );
+      // On newer/better ones it'll be just the little bit that we got since last time.
+      // On browsers which send progress events for the last bit of the response, if we
+      // are responding to the laod event it is now empty         
+      newText && notify( HTTP_PROGRESS_EVENT, newText ); 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
-            
-   listenToXhr( xhr, handleProgress, doneCallback);
+   
+   function handleDone() {
+      // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
+      // onload. We need to always do handleInput in case we get the load but have
+      // not had a final progress event..   
+      handleInput();
+      
+      notify( HTTP_DONE_EVENT );
+   }
+                     
+   listenToXhr( xhr );
    
    xhr.open(method, url, true);
    xhr.send(validatedRequestBody(data));   
@@ -1596,25 +1598,30 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
 });
 
-var TYPE_NODE = 'n',
-    TYPE_PATH = 'p',
-    ERROR_EVENT = 'e';
+
 
 function pubSub(){
 
-   var listeners = {n:[], p:[], e:[]};
+   var listeners = {};
                              
    return {
       notify:varArgs(function ( eventId, parameters ) {
                
-         applyAll( listeners[eventId], parameters );
+         listeners[eventId] && applyAll( listeners[eventId] , parameters );
       }),
-      on:function( eventId, fn ) {      
-         listeners[eventId].push(fn);
+      on:function( eventId, fn ) {
+         (listeners[eventId] || (listeners[eventId] = [])).push(fn);
+            
          return this; // chaining                                         
       }            
    };
 }
+var _S = 0,
+    TYPE_NODE = _S++,
+    TYPE_PATH = _S++,
+    ERROR_EVENT = _S++,
+    HTTP_PROGRESS_EVENT = _S++,
+    HTTP_DONE_EVENT = _S++;
 /* 
    The API that is given out when a new Oboe instance is created.
     
@@ -1622,7 +1629,7 @@ function pubSub(){
    and returns the object that exposes a small number of methods.
  */
 
-function instanceApi(controller, eventBus, incrementalParsedContent){
+function instanceApi(instController){
    
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
@@ -1631,7 +1638,7 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    function pushListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         controller.addNewCallback(eventId, pattern, listenerMap[pattern]);
+         instController.addCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -1642,7 +1649,7 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         controller.addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         instController.addCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
@@ -1650,34 +1657,34 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
       return this; // chaining
    }         
 
-   return {      
-      onPath: partialComplete(addNodeOrPathListener, TYPE_PATH),
-      
-      onNode: partialComplete(addNodeOrPathListener, TYPE_NODE),
-      
-      onError: partialComplete(eventBus.on, ERROR_EVENT),
-      
-      root: incrementalParsedContent
-   };   
+   instController.onPath = partialComplete(addNodeOrPathListener, TYPE_PATH); 
+   instController.onNode = partialComplete(addNodeOrPathListener, TYPE_NODE); 
 
+   return instController;   
 }
-
-
-function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
-   
+/**
+ * 
+ * @param eventBus
+ * @param clarinetParser
+ * @param {Function} jsonRoot a function which returns the json root so far
+ */
+function instanceController(eventBus, clarinetParser, jsonRoot) {
+  
+   // eventBus methods are used lots. Shortcut them:
+   var on = eventBus.on,
+       notify = eventBus.notify;   
+  
    clarinetParser.onerror =  
        function(e) {          
-          eventBus.notify(ERROR_EVENT, e);
+          notify(ERROR_EVENT, e);
             
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
        };
                               
-   function start(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
-      streamingXhr(
-         httpMethodName,
-         url, 
-         httpRequestBody,
+   function fetch(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
+         
+      on(HTTP_PROGRESS_EVENT,         
          function (nextDrip) {
             // callback for when a bit more data arrives from the streaming XHR         
              
@@ -1688,33 +1695,44 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
                // to clarinet which will have already been called by the time this 
                // exception is thrown.                
             }
-         },
+         }
+      );
+      
+      on(HTTP_DONE_EVENT,
          function() {
-            // callback for when the response is complete                     
+            // callback for when the response is complete
+                                 
             clarinetParser.close();
             
-            doneCallback && doneCallback(parsedContentSoFar());
-         });
+            doneCallback && doneCallback(jsonRoot());
+         }
+      );
+      
+      streamingXhr(
+         httpMethodName,
+         url, 
+         httpRequestBody,
+         notify);          
    }
                  
    /**
     *  
     */
-   function addNewCallback( eventId, pattern, callback ) {
+   function addPathOrNodeListener( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
    
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function( ascent ){ 
+      on( eventId, function( ascent ){ 
       
          try{
             var maybeMatchingMapping = matchesJsonPath( ascent );
          } catch(e) {
             // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
             // want to catch as early as possible:
-            eventBus.notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
+            notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
          }
         
          // Possible values for foundNode are now:
@@ -1731,14 +1749,13 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //       etc yet so we can't say anything about it. Null isn't used here because
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
-         //                      
          if( maybeMatchingMapping !== false ) {                                 
            
             try{
                notifyCallback(callback, maybeMatchingMapping, ascent);
                
             } catch(e) {
-               eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
+               notify(ERROR_EVENT, e);
             }
          }
       });   
@@ -1761,10 +1778,12 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
    }
    
        
-   /* the controller only needs to expose two methods: */                                          
+   /* the controller exposes two methods: */                                          
    return { 
-      addNewCallback : addNewCallback, 
-      start          : start
+      addCallback : addPathOrNodeListener, 
+      onError     : partialComplete(on, ERROR_EVENT),
+      fetch       : fetch,
+      root        : jsonRoot     
    };                                                         
 }
 (function(){
@@ -1785,14 +1804,14 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          var eventBus = pubSub(),
              clarinetParser = clarinet.parser(),
              contentBuilder = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-             controller = oboeController( eventBus, clarinetParser, contentBuilder),
-
+             instController = instanceController( eventBus, clarinetParser, contentBuilder),
+ 
              /**
               * create a shortcutted version of controller.start, could also be done with .bind
               * in supporting browsers
               */
-             start = function (url, body, callback){
-                controller.start( httpMethodName, url, body, callback );
+             start = function (url, body, callback){ 
+                instController.fetch( httpMethodName, url, body, callback );
              };
              
          if (isString(firstArg)) {
@@ -1820,7 +1839,7 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(controller, eventBus, contentBuilder)           
+         return instanceApi(instController, contentBuilder)           
       };
    }   
 

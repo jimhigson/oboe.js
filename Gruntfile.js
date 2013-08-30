@@ -2,15 +2,6 @@ module.exports = function (grunt) {
 
    var STREAM_SOURCE_PORT = 4567;
 
-   // TODO: move files list to own file
-
-/*   var TEST_LIBS = [
-      'node_modules/karma-jstd-adapter/jstd-adapter.js'   
-   ,  'test/libs/sinon.js'
-   ,  'test/libs/sinon-ie.js'
-   ,  'test/libs/*.js'   
-   ]; */
-
    // NB: source files are order sensitive
    var OBOE_SOURCE_FILES = [
       'src/functional.js'                
@@ -23,16 +14,18 @@ module.exports = function (grunt) {
    ,  'src/incrementalContentBuilder.js'            
    ,  'src/jsonPath.js'
    ,  'src/pubsub.js'
+   ,  'src/events.js'
    ,  'src/instanceApi.js'
    ,  'src/controller.js'
    ,  'src/browserApi.js'
    ];
    
-/*   var UNIT_TEST_CASES = [
-      'test/cases/*.js'
-   ];*/
-   
-  
+   var FILES_TRIGGERING_KARMA = [
+      'src/**/*.js', 
+      'test/specs/*.spec.js', 
+      'test/libs/*.js'
+   ];
+     
    function allOf( /* file lists */ ) {
       var args = Array.prototype.slice.apply(arguments);
       
@@ -151,14 +144,23 @@ module.exports = function (grunt) {
       
    ,  watch:{
          karma:{
-            files:[
-               'src/**/*.js', 
-               'test/specs/*.spec.js', 
-               'test/libs/*.js', 
-               'test/jstd-jasmine-asserter-bridge.js'
-            ],
+            files:FILES_TRIGGERING_KARMA,
             tasks:['karma:persist:run']
-         }
+         },
+         
+         // like above but reports the file size. This is good for 
+         // watching while developing to make sure it doesn't get
+         // too big. Doesn't run tests against minified.
+         karmaAndSize:{
+            files: FILES_TRIGGERING_KARMA,
+            tasks:[
+               'karma:persist:run',
+               'concat:oboe', 
+               'wrap:browserPackage', 
+               'uglify',
+               'copy:dist',               
+               'dist-sizes']
+         }         
       }           
       
    });
@@ -184,7 +186,7 @@ module.exports = function (grunt) {
    grunt.registerTask('test-auto-run',   [
       'start-stream-source',
       'karma:persist',
-      'watch:karma'       
+      'watch:karmaAndSize'       
    ]);      
 
    grunt.registerTask('dist-sizes',   [

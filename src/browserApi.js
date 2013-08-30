@@ -16,14 +16,14 @@
          var eventBus = pubSub(),
              clarinetParser = clarinet.parser(),
              contentBuilder = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-             controller = oboeController( eventBus, clarinetParser, contentBuilder),
-
+             instController = instanceController( eventBus, clarinetParser, contentBuilder),
+ 
              /**
               * create a shortcutted version of controller.start, could also be done with .bind
               * in supporting browsers
               */
-             start = function (url, body, callback){
-                controller.start( httpMethodName, url, body, callback );
+             start = function (url, body, callback){ 
+                instController.fetch( httpMethodName, url, body, callback );
              };
              
          if (isString(firstArg)) {
@@ -51,7 +51,7 @@
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(controller, eventBus, contentBuilder)           
+         return instanceApi(instController, contentBuilder)           
       };
    }   
 

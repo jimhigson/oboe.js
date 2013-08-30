@@ -3,63 +3,46 @@
 
 describe('streaming xhr with via real http', function() {
  
+     
+ 
    it('can ajax in a small known file',  function() {
-   
-      var combinedResult = '',
-          requestCompleteStub = sinon.stub();
-   
+     
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(
          'GET', 
          '/static/json/smallestPossible.json',
-         null, // this is a GET, no data to send               
-          
-         function(nextDrip){
-            combinedResult += nextDrip;                                                                                     
-         },
-         
-         requestCompleteStub
+         null, // this is a GET, no data to send                         
+         eventBus.notify
       )
       
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+      waitForRequestToComplete();            
 
       runs(function(){
-         expect(combinedResult).toEqual('{}');
+         expect(contentReceived).toEqual('{}'); 
       });  
    })
               
    it('can ajax in a very large file without missing any',  function() {
    
-      var combinedResult = '',
-          requestCompleteStub = sinon.stub();
-   
+  
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(
          'GET', 
          '/static/json/twentyThousandRecords.json',
-         null, // this is a GET, no data to send               
-          
-         function(nextDrip){
-            combinedResult += nextDrip;                                                                                     
-         },
-         
-         requestCompleteStub
+         null, // this is a GET, no data to send                         
+         eventBus.notify
       )
       
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+      waitForRequestToComplete();            
 
       runs(function(){
          var parsedResult;
       
          expect(function(){
 
-            parsedResult = JSON.parse(combinedResult);
+            parsedResult = JSON.parse(contentReceived);
             
          }).not.toThrow();
          
@@ -70,8 +53,6 @@ describe('streaming xhr with via real http', function() {
    
    it('can ajax in a streaming file without missing any',  function(queue) {
    
-      var combinedResult = '',
-          requestCompleteStub = sinon.stub();
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
@@ -79,17 +60,10 @@ describe('streaming xhr with via real http', function() {
         'GET', 
          cacheBustUrl('/stream/tenSlowNumbers'),
          null, // this is a GET, no data to send               
-          
-         function(nextDrip){
-            combinedResult += nextDrip;                                                                                     
-         },
-         
-         requestCompleteStub
+         eventBus.notify
       )
       
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+      waitForRequestToComplete();            
 
       runs(function(){
          // should have given valid json;
@@ -97,7 +71,7 @@ describe('streaming xhr with via real http', function() {
          
          expect(function(){
 
-            parsedResult = JSON.parse(combinedResult);
+            parsedResult = JSON.parse(contentReceived);
             
          }).not.toThrow();
          
@@ -108,32 +82,23 @@ describe('streaming xhr with via real http', function() {
    
    it('can make a post request',  function(queue) {
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'},
-          combinedResult = '',
-          requestCompleteStub = sinon.stub();
+      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(
         'POST',
          cacheBustUrl('/stream/echoback.json'),
-         payload, // this is a GET, no data to send               
-          
-         function(nextDrip){
-            combinedResult += nextDrip;                                                                                     
-         },
-         
-         requestCompleteStub
+         payload, // this is a GET, no data to send                         
+         eventBus.notify
       )
       
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+      waitForRequestToComplete();            
 
       runs(function(){
          expect(function(){
 
-            parsedResult = JSON.parse(combinedResult);
+            parsedResult = JSON.parse(contentReceived);
             
          }).not.toThrow();
                               
@@ -144,9 +109,7 @@ describe('streaming xhr with via real http', function() {
    
    it('can make a put request',  function(queue) {
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'},
-          combinedResult = '',
-          requestCompleteStub = sinon.stub();
+      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
@@ -155,21 +118,15 @@ describe('streaming xhr with via real http', function() {
          cacheBustUrl('/stream/echoback.json'),
          payload, // this is a GET, no data to send               
           
-         function(nextDrip){
-            combinedResult += nextDrip;                                                                                     
-         },
-         
-         requestCompleteStub
+         eventBus.notify
       )
       
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);            
+      waitForRequestToComplete();            
 
       runs(function(){
          expect(function(){
 
-            parsedResult = JSON.parse(combinedResult);
+            parsedResult = JSON.parse(contentReceived);
             
          }).not.toThrow();
                               
@@ -184,24 +141,14 @@ describe('streaming xhr with via real http', function() {
    // test to confirm that we're getting it right.           
    if( !internetExplorer || internetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function(queue) {
-            
-         var numberOfProgressCallbacks = 0,
-             requestCompleteStub = sinon.stub();      
-                  
+                              
          streamingXhr(
             'GET', cacheBustUrl('/stream/tenSlowNumbers'),
-            null, // this is a get: no data to send               
-             
-            function onProgress(){ 
-               numberOfProgressCallbacks++; 
-            },
-                       
-            requestCompleteStub
+            null, // this is a get: no data to send                           
+            eventBus.notify
          )                     
          
-         waitsFor(function(){     
-            return requestCompleteStub.called;      
-         }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);      
+         waitForRequestToComplete();      
    
          runs(function(){
                                    
@@ -214,26 +161,49 @@ describe('streaming xhr with via real http', function() {
    
    it('does not call back with zero-length data',  function(queue) {
          
-      var requestCompleteStub = sinon.stub();         
+      eventBus.on(HTTP_PROGRESS_EVENT,
+          function(nextDrip){            
+             expect(nextDrip.length).not.toEqual(0);                                                                                     
+          }
+      );          
          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingXhr(
          'GET', '/static/json/twentyThousandRecords.json',
          null, // this is a GET: no data to send               
-          
-         function(nextDrip){            
-            expect(nextDrip.length).not.toEqual(0);                                                                                     
-         },
-         
-         requestCompleteStub
+         eventBus.notify
       )         
 
-      waitsFor(function(){     
-         return requestCompleteStub.called;      
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);
+      waitForRequestToComplete()
       
       runs(function(){})   
    })              
+
+
+   var requestCompleteListener,
+       contentReceived,
+       numberOfProgressCallbacks,
+       eventBus;
+   
+   function waitForRequestToComplete(){
+      waitsFor(function(){     
+         return requestCompleteListener.called;      
+      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);   
+   }
+   
+   beforeEach(function(){
+      contentReceived = '';      
+      numberOfProgressCallbacks = 0;
+      requestCompleteListener = sinon.stub();
+      eventBus = pubSub();
+      
+      eventBus.on(HTTP_PROGRESS_EVENT, function(nextDrip){
+         numberOfProgressCallbacks ++;
+         contentReceived += nextDrip;                                                                                     
+      });
+      
+      eventBus.on(HTTP_DONE_EVENT, requestCompleteListener);
+   });
       
    function cacheBustUrl(url) {
       var now = Date.now? Date.now() : new Date().valueOf();

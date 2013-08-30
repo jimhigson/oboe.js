@@ -1,20 +1,26 @@
-
-
-function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
-   
+/**
+ * 
+ * @param eventBus
+ * @param clarinetParser
+ * @param {Function} jsonRoot a function which returns the json root so far
+ */
+function instanceController(eventBus, clarinetParser, jsonRoot) {
+  
+   // eventBus methods are used lots. Shortcut them:
+   var on = eventBus.on,
+       notify = eventBus.notify;   
+  
    clarinetParser.onerror =  
        function(e) {          
-          eventBus.notify(ERROR_EVENT, e);
+          notify(ERROR_EVENT, e);
             
           // the json is invalid, give up and close the parser to prevent getting any more:
           clarinetParser.close();
        };
                               
-   function start(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
-      streamingXhr(
-         httpMethodName,
-         url, 
-         httpRequestBody,
+   function fetch(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
+         
+      on(HTTP_PROGRESS_EVENT,         
          function (nextDrip) {
             // callback for when a bit more data arrives from the streaming XHR         
              
@@ -25,33 +31,44 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
                // to clarinet which will have already been called by the time this 
                // exception is thrown.                
             }
-         },
+         }
+      );
+      
+      on(HTTP_DONE_EVENT,
          function() {
-            // callback for when the response is complete                     
+            // callback for when the response is complete
+                                 
             clarinetParser.close();
             
-            doneCallback && doneCallback(parsedContentSoFar());
-         });
+            doneCallback && doneCallback(jsonRoot());
+         }
+      );
+      
+      streamingXhr(
+         httpMethodName,
+         url, 
+         httpRequestBody,
+         notify);          
    }
                  
    /**
     *  
     */
-   function addNewCallback( eventId, pattern, callback ) {
+   function addPathOrNodeListener( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
    
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      eventBus.on( eventId, function( ascent ){ 
+      on( eventId, function( ascent ){ 
       
          try{
             var maybeMatchingMapping = matchesJsonPath( ascent );
          } catch(e) {
             // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
             // want to catch as early as possible:
-            eventBus.notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
+            notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
          }
         
          // Possible values for foundNode are now:
@@ -68,14 +85,13 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
          //       etc yet so we can't say anything about it. Null isn't used here because
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
-         //                      
          if( maybeMatchingMapping !== false ) {                                 
            
             try{
                notifyCallback(callback, maybeMatchingMapping, ascent);
                
             } catch(e) {
-               eventBus.notify(ERROR_EVENT, Error('Error thrown by callback: ' + e.message));
+               notify(ERROR_EVENT, e);
             }
          }
       });   
@@ -98,9 +114,11 @@ function oboeController(eventBus, clarinetParser, parsedContentSoFar) {
    }
    
        
-   /* the controller only needs to expose two methods: */                                          
+   /* the controller exposes two methods: */                                          
    return { 
-      addNewCallback : addNewCallback, 
-      start          : start
+      addCallback : addPathOrNodeListener, 
+      onError     : partialComplete(on, ERROR_EVENT),
+      fetch       : fetch,
+      root        : jsonRoot     
    };                                                         
 }

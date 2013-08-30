@@ -12,28 +12,18 @@
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
  * @param {String|Object|undefined} data
- * @param {Function} progressCallback in form Function(String nextResponseDrip)
- *    A callback to be called repeatedly as the input comes in.
- *    Will be passed the new string since the last call.
- * @param {Function} doneCallback in form Function(String wholeResponse)
- *    A callback to be called when the request is complete.
- *    Will be passed the total response
+ * @param {Function} notify a function to pass events to when something happens
  * @param {String} data some content to be sent with the request. Only valid
  *                 if method is POST or PUT.
  */
-function streamingXhr(method, url, data, progressCallback, doneCallback) {
+function streamingXhr(method, url, data, notify) {
         
    var 
-      // handleInput doesn't return anything, so handleLoaded equivalent to:
-      //    function(){handleInput(); doneCallback();} 
-      // but a little but shorter to help hold onto the micro-library status.
-      handleLoaded = compose(doneCallback, handleInput),
-
       xhr = new XMLHttpRequest(),
    
       listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
        
-      numberOfCharsAlreadyGivenToCallback = 0;
+      numberOfCharsAlreadyGivenToCallback = 0;   
       
    /** Given a value from the user to send as the request body, return in a form
     *  that is suitable to sending over the wire. Returns either a string, or null.        
@@ -48,13 +38,9 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
    /** xhr2 already supports everything that we need so just a bit of abstraction required.
     *  listenToXhr2 is one of two possible values to use as listenToXhr  
     */
-   function listenToXhr2(xhr) {
-      // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
-      // onload. We need to always do handleInput in case we get the load even but have
-      // not had a progress event..
-         
+   function listenToXhr2(xhr) {         
       xhr.onprogress = handleInput;
-      xhr.onload = handleLoaded;
+      xhr.onload = handleDone;
    }
    
    /** xhr1 is quite primative so a bit more work is needed to connect to it 
@@ -69,7 +55,7 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
       // to non-streaming Ajax.      
       xhr.onreadystatechange = function() {     
          if(xhr.readyState == 4 && xhr.status == 200) {
-            handleLoaded();            
+            handleDone();            
          }                            
       };
    }   
@@ -88,9 +74,18 @@ function streamingXhr(method, url, data, progressCallback, doneCallback) {
       // On newer/better ones it'll be just the little bit that we got since last time.
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
-      newText && progressCallback( newText );
+      newText && notify( HTTP_PROGRESS_EVENT, newText ); 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
+   }
+   
+   function handleDone() {
+      // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
+      // onload. We need to always do handleInput in case we get the load but have
+      // not had a final progress event..   
+      handleInput();
+      
+      notify( HTTP_DONE_EVENT );
    }
                      
    listenToXhr( xhr );

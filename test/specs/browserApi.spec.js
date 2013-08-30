@@ -9,7 +9,8 @@
 
 describe("calls to browser api propagate to streaming xhr", function(){
 
-   var callbackPlaceholder = function(){};
+   var callbackPlaceholder = function(){},
+       aNotifyFn = jasmine.any(Function );
 
    beforeEach(function() {
       spyOn(window, 'streamingXhr');      
@@ -25,8 +26,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
              'GET',
              'http://example.com/oboez',
              undefined,
-             jasmine.any(Function),
-             jasmine.any(Function)
+             aNotifyFn
          )      
             
       })
@@ -39,8 +39,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'GET',
             'http://example.com/oboez',
             undefined,
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })
          
@@ -55,8 +54,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'DELETE',
             'http://example.com/oboez',
             undefined,
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )
       })
       
@@ -68,8 +66,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'DELETE',
             'http://example.com/oboez',
             undefined,
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })   
    });
@@ -84,8 +81,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'POST',
             'http://example.com/oboez',
             'my_data',
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })
       
@@ -97,8 +93,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'POST',
             'http://example.com/oboez',
             [1,2,3,4,5],
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })   
       
@@ -110,8 +105,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'POST',
             'http://example.com/oboez',
             'my_data',
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })   
    });
@@ -125,8 +119,7 @@ describe("calls to browser api propagate to streaming xhr", function(){
             'PUT',
             'http://example.com/oboez',
             'my_data',
-            jasmine.any(Function),
-            jasmine.any(Function)
+            aNotifyFn
          )   
       })
    });

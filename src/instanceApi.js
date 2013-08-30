@@ -5,7 +5,7 @@
    and returns the object that exposes a small number of methods.
  */
 
-function instanceApi(controller, eventBus, incrementalParsedContent){
+function instanceApi(instController){
    
    /**
     * implementation behind .onPath() and .onNode(): add several listeners in one call  
@@ -14,7 +14,7 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    function pushListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         controller.addNewCallback(eventId, pattern, listenerMap[pattern]);
+         instController.addCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -25,7 +25,7 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
    function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         controller.addNewCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         instController.addCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
       } else {
          pushListeners(eventId, jsonPathOrListenerMap);
       }
@@ -33,14 +33,8 @@ function instanceApi(controller, eventBus, incrementalParsedContent){
       return this; // chaining
    }         
 
-   return {      
-      onPath: partialComplete(addNodeOrPathListener, TYPE_PATH),
-      
-      onNode: partialComplete(addNodeOrPathListener, TYPE_NODE),
-      
-      onError: partialComplete(eventBus.on, ERROR_EVENT),
-      
-      root: incrementalParsedContent
-   };   
+   instController.onPath = partialComplete(addNodeOrPathListener, TYPE_PATH); 
+   instController.onNode = partialComplete(addNodeOrPathListener, TYPE_NODE); 
 
+   return instController;   
 }
