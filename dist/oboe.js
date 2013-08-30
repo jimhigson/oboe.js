@@ -1686,47 +1686,37 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
    // eventBus methods are used lots. Shortcut them:
    var on = eventBus.on,
        notify = eventBus.notify,
-       sxhr = streamingXhr(notify);  
+       sxhr = streamingXhr(notify); 
+
+   on(HTTP_PROGRESS_EVENT,         
+      function (nextDrip) {
+         // callback for when a bit more data arrives from the streaming XHR         
+          
+         try {
+            clarinetParser.write(nextDrip);
+         } catch(e) {
+            // we don't have to do anything here because we always assign a .onerror
+            // to clarinet which will have already been called by the time this 
+            // exception is thrown.                
+         }
+      }
+   );
+   
+   on(HTTP_DONE_EVENT,
+      function() {
+         // callback for when the response is complete                                 
+         clarinetParser.close();
+      }
+   );
   
-   clarinetParser.onerror =  
-       function(e) {          
-          notify(ERROR_EVENT, e);
-            
-          // the json is invalid, give up and close the parser to prevent getting any more:
-          clarinetParser.close();
-       };
+   clarinetParser.onerror = function(e) {          
+      notify(ERROR_EVENT, e);
+      
+      // the json is invalid, give up and close the parser to prevent getting any more:
+      clarinetParser.close();
+   };
                               
-   function fetch(httpMethodName, url, httpRequestBody, doneCallback) {                                                                                                                                                    
-         
-      on(HTTP_PROGRESS_EVENT,         
-         function (nextDrip) {
-            // callback for when a bit more data arrives from the streaming XHR         
-             
-            try {
-               clarinetParser.write(nextDrip);
-            } catch(e) {
-               // we don't have to do anything here because we always assign a .onerror
-               // to clarinet which will have already been called by the time this 
-               // exception is thrown.                
-            }
-         }
-      );
-      
-      on(HTTP_DONE_EVENT,
-         function() {
-            // callback for when the response is complete
-                                 
-            clarinetParser.close();
-            
-            doneCallback && doneCallback(jsonRoot());
-         }
-      );
-      
-      sxhr.req( httpMethodName,
-                url, 
-                httpRequestBody);
-   }
-                 
+                
    /**
     *  
     */
@@ -1794,7 +1784,7 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
    return { 
       addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
-      fetch       : fetch,
+      fetch       : sxhr.req,
       root        : jsonRoot     
    };                                                         
 }
@@ -1813,18 +1803,23 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
       return function(firstArg){
       
          // wire everything up:
-         var eventBus = pubSub(),
-             clarinetParser = clarinet.parser(),
-             contentBuilder = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-             instController = instanceController( eventBus, clarinetParser, contentBuilder),
+         var 
+            eventBus = pubSub(),
+            clarinetParser = clarinet.parser(),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
+            instController = instanceController( eventBus, clarinetParser, rootJsonFn),
  
-             /**
-              * create a shortcutted version of controller.start, could also be done with .bind
-              * in supporting browsers
-              */
-             start = function (url, body, callback){ 
-                instController.fetch( httpMethodName, url, body, callback );
-             };
+            /**
+             * create a shortcutted version of controller.start for once arguments have been
+             * extracted from their various orders
+             */
+            start = function (url, body, callback){ 
+               if( callback ) {
+                  eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
+               }
+                   
+               instController.fetch( httpMethodName, url, body );
+            };
              
          if (isString(firstArg)) {
          
@@ -1843,7 +1838,7 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
          
             
             // method signature is:
-            //    .method({url:u, body:b, doneCallback:c})
+            //    .method({url:u, body:b, complete:c})
             
             start(   firstArg.url,
                      firstArg.body,
@@ -1851,7 +1846,7 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(instController, contentBuilder)           
+         return instanceApi(instController, rootJsonFn)           
       };
    }   
 

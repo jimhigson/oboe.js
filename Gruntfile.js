@@ -16,7 +16,7 @@ module.exports = function (grunt) {
    ,  'src/pubsub.js'
    ,  'src/events.js'
    ,  'src/instanceApi.js'
-   ,  'src/controller.js'
+   ,  'src/instanceController.js'
    ,  'src/browserApi.js'
    ];
    
@@ -138,7 +138,7 @@ module.exports = function (grunt) {
             command: "echo Minified size is `wc -c < dist/oboe.min.js` bytes" 
          },
          reportMinifiedAndGzippedSize:{
-            command: "echo Size after gzip is `gzip --stdout dist/oboe.min.js | wc -c` bytes"
+            command: "echo Size after gzip is `gzip --best --stdout dist/oboe.min.js | wc -c` bytes"
          }
       }
       

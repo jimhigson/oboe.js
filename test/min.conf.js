@@ -13,8 +13,8 @@ module.exports = function(config) {
       ,  'test/libs/*.js'
       ,  'dist/oboe.min.js'
       
-      ,  'test/specs/polyfillsTest.spec.js'
-      ,  'test/specs/endToEnd.integration.spec.js'
+      ,  'test/specs/polyfills.spec.js'
+      ,  'test/specs/oboe.integration.spec.js'
       ],
       
       // level of logging

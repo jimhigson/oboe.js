@@ -13,18 +13,23 @@
       return function(firstArg){
       
          // wire everything up:
-         var eventBus = pubSub(),
-             clarinetParser = clarinet.parser(),
-             contentBuilder = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-             instController = instanceController( eventBus, clarinetParser, contentBuilder),
+         var 
+            eventBus = pubSub(),
+            clarinetParser = clarinet.parser(),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
+            instController = instanceController( eventBus, clarinetParser, rootJsonFn),
  
-             /**
-              * create a shortcutted version of controller.start, could also be done with .bind
-              * in supporting browsers
-              */
-             start = function (url, body, callback){ 
-                instController.fetch( httpMethodName, url, body, callback );
-             };
+            /**
+             * create a shortcutted version of controller.start for once arguments have been
+             * extracted from their various orders
+             */
+            start = function (url, body, callback){ 
+               if( callback ) {
+                  eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
+               }
+                   
+               instController.fetch( httpMethodName, url, body );
+            };
              
          if (isString(firstArg)) {
          
@@ -43,7 +48,7 @@
          
             
             // method signature is:
-            //    .method({url:u, body:b, doneCallback:c})
+            //    .method({url:u, body:b, complete:c})
             
             start(   firstArg.url,
                      firstArg.body,
@@ -51,7 +56,7 @@
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(instController, contentBuilder)           
+         return instanceApi(instController, rootJsonFn)           
       };
    }   
 

@@ -23,7 +23,7 @@ module.exports = function(config) {
       ,  'src/pubsub.js' 
       ,  'src/events.js' 
       ,  'src/instanceApi.js' 
-      ,  'src/controller.js'
+      ,  'src/instanceController.js'
       ,  'src/browserApi.js'
         
       ,  'test/specs/*.spec.js'

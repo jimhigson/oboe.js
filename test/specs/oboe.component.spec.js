@@ -1,4 +1,4 @@
-describe("whole oboe library with only the network stubbed out", function(){
+describe("oboe component (only network stubbed)", function(){
 
    var streamingStub; 
 

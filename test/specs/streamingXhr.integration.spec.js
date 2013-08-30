@@ -1,9 +1,8 @@
 /* Tests the streaming xhr without stubbing anything. Really just a test that 
 *  we've got the interface of the in-browser XHR object pinned down  */
 
-describe('streaming xhr with via real http', function() {
+describe('streaming xhr integration (real http)', function() {
  
-     
  
    it('can ajax in a small known file',  function() {
      
