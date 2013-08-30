@@ -198,7 +198,7 @@ function hasRootJson(expected){
       testAgainst:
       function(callback, oboeInstance) {
       
-         expect(expected).toEqual(oboeInstance.root());
+         expect(oboeInstance.root()).toEqual(expected);
       }
    }
 }
