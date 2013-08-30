@@ -2,26 +2,24 @@
 describe("streamingXhr", function(){
 
    describe("calls get through to browser xhr correctly", function(){
-                               
-      var notifyStub = jasmine.createSpy('eventBus.notify');                                 
-                               
+                                                                                              
       it('gives xhr null when body is undefined', function(){
       
-         streamingXhr(notifyStub).req('GET', 'http://example.com', undefined);
+         streamingXhr(eventBus.notify, eventBus.on).req('GET', 'http://example.com', undefined);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(null);
       })
       
       it('gives xhr null when body is null', function(){
       
-         streamingXhr(notifyStub).req('GET', 'http://example.com', null);
+         streamingXhr(eventBus.notify, eventBus.on).req('GET', 'http://example.com', null);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(null);
       })      
       
       it('give xhr string request body', function(){
       
-         streamingXhr(notifyStub).req('GET', 'http://example.com', 'my_data');
+         streamingXhr(eventBus.notify, eventBus.on).req('GET', 'http://example.com', 'my_data');
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody('my_data');
       })
@@ -30,25 +28,28 @@ describe("streamingXhr", function(){
    
          var payload = {a:'A', b:'B'};
          
-         streamingXhr(notifyStub).req('GET', 'http://example.com', payload);
+         streamingXhr(eventBus.notify, eventBus.on).req('GET', 'http://example.com', payload);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(JSON.stringify( payload ) );      
       });      
       
       it('should be able to abort an xhr once started', function(){
-         var sXhr = streamingXhr(notifyStub);
+         var sXhr = streamingXhr(eventBus.notify, eventBus.on);
          
          sXhr.req('GET', 'http://example.com', 'my_data');
          
-         sXhr.abort();
+         eventBus.notify(ABORTING);
                   
          expect( lastCreatedXhrInstance.abort.called ).toBe(true);                  
       });
 
 
-      var FakeXhrClass, lastCreatedXhrInstance;      
+      var FakeXhrClass, lastCreatedXhrInstance,
+          eventBus;            
 
       beforeEach( function() {
+      
+         eventBus = pubSub();      
       
          FakeXhrClass = sinon.useFakeXMLHttpRequest();
          

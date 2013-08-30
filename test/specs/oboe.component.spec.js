@@ -2,7 +2,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
   
    it('has chainable methods',  function() {
-      // very basic test that nothing forgot to return 'this':
+      // test that nothing forgot to return 'this':
 
       expect(function(){      
          function noop(){}
@@ -1243,25 +1243,29 @@ describe("oboe component (sXHR stubbed)", function(){
              
          }).not.toThrow();                                  
       });
-   
-      it('aborts the sXHR', function(){
-      
-         givenAnOboeInstance()
-            .andWeAreListeningForPaths('*')
-            .whenGivenInput('[1')
-            .andWeAbortTheRequest();
-             
-         var lastCreatedsXHR = streamingXhr.getCall(0).returnValue;             
-         expect( lastCreatedsXHR.abort.called ).toBe(true);                                  
-      });
+
+      it('can abort once some data has been found in response',  function() {
+          
+         // we should be able to abort even when given all the content at once 
+          
+         var asserter = givenAnOboeInstance();         
+            asserter.andWeAreListeningForNodes('![5]', function(){
+                asserter.andWeAbortTheRequest();
+             })
+            .whenGivenInput([0,1,2,3,4,5,6,7,8,9])
+            .thenTheInstance(
+               // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+               // not the whole ten.
+               hasRootJson([0,1,2,3,4,5])
+            );
+      })      
    });
    
    
    beforeEach(function() {
       sinon.stub(window, 'streamingXhr')
          .returns({
-            req:  sinon.stub(),
-            abort:sinon.stub()
+            req:  sinon.stub()
           });
    })
    

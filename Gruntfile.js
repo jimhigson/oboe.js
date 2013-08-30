@@ -15,7 +15,6 @@ module.exports = function (grunt) {
    ,  'src/jsonPath.js'
    ,  'src/pubsub.js'
    ,  'src/events.js'
-   ,  'src/instanceApi.js'
    ,  'src/instanceController.js'
    ,  'src/browserApi.js'
    ];

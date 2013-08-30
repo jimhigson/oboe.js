@@ -11,15 +11,21 @@
  * 
  * @param {Function} notify a function to pass events to when something happens
  */
-function streamingXhr(notify) {
+function streamingXhr(notify, on) {
         
    var 
       xhr = new XMLHttpRequest(),
-   
+
       listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
-       
-      numberOfCharsAlreadyGivenToCallback = 0;   
-      
+
+      numberOfCharsAlreadyGivenToCallback = 0;
+
+   on( ABORTING, function(){
+      // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
+      // so it doesn't matter if Function.bind is polyfilled, it breaks
+      xhr.abort();
+   });
+
    /** Given a value from the user to send as the request body, return in a form
     *  that is suitable to sending over the wire. Returns either a string, or null.        
     */
@@ -83,8 +89,7 @@ function streamingXhr(notify) {
       notify( HTTP_DONE_EVENT );
    }
                       
-   return {
-   
+   return {         
      /**
       * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
       * @param {String} url
@@ -96,13 +101,6 @@ function streamingXhr(notify) {
          
          xhr.open(method, url, true);
          xhr.send(validatedRequestBody(data));         
-      },
-      
-      abort: function() {
-         // NB: can't do xhr.abort.bind(xhr) becaues IE doesn't allow binding of
-         // XHR methods, even if Function.prototype.bind is polyfilled. I think they
-         // are some kind of weird native non-js function or something.
-         xhr.abort();
-      }
+      } 
    };   
 }

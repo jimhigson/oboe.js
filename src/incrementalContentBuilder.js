@@ -24,7 +24,7 @@ var ROOT_PATH = {r:1};
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinetParser, notify ) {
+function incrementalContentBuilder( clarinetParser, notify, on ) {
    
    var            
          // array of nodes from curNode up to the root of the document.
@@ -173,8 +173,21 @@ function incrementalContentBuilder( clarinetParser, notify ) {
    
    clarinetParser.oncloseobject =
    clarinetParser.onclosearray =       
-      curNodeFinished;      
-            
+      curNodeFinished;
+
+   /**
+    * If we abort this Oboe's request stop listening
+    * to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we 
+    * aborted while reading though a current buffer.
+    */      
+   on( ABORTING, function() {
+      clarinet.EVENTS.forEach(function(event){
+         // maybe not onerror
+         clarinetParser['on'+event] = null;
+      });
+   }); 
+             
    /* finally, return a function to get the root of the json (or undefined if not yet found) */      
    return function() {
       return rootNode;

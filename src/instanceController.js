@@ -1,17 +1,15 @@
 /**
- * 
- * @param eventBus
- * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
+function instanceController(clarinetParser, jsonRoot, notify, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
          try {
-            clarinetParser.write(nextDrip);
+            
+            clarinetParser.write(nextDrip);            
          } catch(e) {
             // we don't have to do anything here because we always assign a .onerror
             // to clarinet which will have already been called by the time this 
@@ -47,18 +45,12 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
       // passes it onto the callback. 
       on( eventId, function( ascent ){ 
       
-         try{
-            var maybeMatchingMapping = matchesJsonPath( ascent );
-         } catch(e) {
-            // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
-            // want to catch as early as possible:
-            notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
-         }
-        
-         // Possible values for foundNode are now:
+         var maybeMatchingMapping = matchesJsonPath( ascent );
+     
+         // Possible values for maybeMatchingMapping are now:
          //
          //    false: 
-         //       we did not match
+         //       we did not match 
          //
          //    an object/array/string/number/null: 
          //       that node is the one that matched. Because json can have nulls, this can 
@@ -70,13 +62,14 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
          if( maybeMatchingMapping !== false ) {                                 
-           
-            try{
+
+            try{              
                notifyCallback(callback, maybeMatchingMapping, ascent);
-               
             } catch(e) {
+               // an error could have happened in the callback. Put it
+               // on the event bus 
                notify(ERROR_EVENT, e);
-            }
+            }               
          }
       });   
    }   
@@ -96,11 +89,35 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
       
       callback( nodeOf(matchingMapping), path, ancestors );  
    }
-                                               
+  
+   function addListenersMap(eventId, listenerMap) {
+   
+      for( var pattern in listenerMap ) {
+         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
+      }
+   }    
+      
+   /**
+    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
+    * depending on the argument types
+    */       
+   function addListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   
+      if( isString(jsonPathOrListenerMap) ) {
+         addPathOrNodeListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+      } else {
+         addListenersMap(eventId, jsonPathOrListenerMap);
+      }
+      
+      return this; // chaining
+   }         
+
    return { 
-      abort       : sXhr.abort,
-      addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
-      root        : jsonRoot     
-   };                                                         
+      onPath      : partialComplete(addListenerApi, TYPE_PATH), 
+      onNode      : partialComplete(addListenerApi, TYPE_NODE),
+      abort       : partialComplete(notify, ABORTING),
+      root        : jsonRoot                 
+   };
+    
 }

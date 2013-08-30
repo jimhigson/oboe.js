@@ -5,7 +5,7 @@ describe("incremental content builder", function(){
       expect( 
       
          aContentBuilder()
-            .receivingEvent('onopenobject')
+            .receivingParserEvent('onopenobject')
       
       ).toHaveFired(
       
@@ -23,8 +23,8 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')      
-            .receivingEvent('onkey', 'flavour')      
+            .receivingParserEvent('onopenobject')      
+            .receivingParserEvent('onkey', 'flavour')      
       
       ).toHaveFired(
           TYPE_PATH
@@ -42,7 +42,7 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()      
-            .receivingEvent('onopenobject', 'flavour')      
+            .receivingParserEvent('onopenobject', 'flavour')      
       ).toHaveFired(
           TYPE_PATH
        ,  anAscentContaining(  
@@ -58,9 +58,9 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')      
-            .receivingEvent('onkey'    ,  'flavour')
-            .receivingEvent('onvalue'  ,  'strawberry')               
+            .receivingParserEvent('onopenobject')      
+            .receivingParserEvent('onkey'    ,  'flavour')
+            .receivingParserEvent('onvalue'  ,  'strawberry')               
       
       ).toHaveFired(
          TYPE_NODE
@@ -77,10 +77,10 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')      
-            .receivingEvent('onkey', 'flavour')
-            .receivingEvent('onvalue', 'strawberry')
-            .receivingEvent('oncloseobject')               
+            .receivingParserEvent('onopenobject')      
+            .receivingParserEvent('onkey', 'flavour')
+            .receivingParserEvent('onvalue', 'strawberry')
+            .receivingParserEvent('oncloseobject')               
       
       ).toHaveFired(
          TYPE_NODE
@@ -91,16 +91,36 @@ describe("incremental content builder", function(){
                      
    })
    
+   it('ignores object closing after Oboe is aborted', function() {
+   
+      expect(
+      
+         aContentBuilder()
+            .receivingParserEvent('onopenobject')      
+            .receivingParserEvent('onkey', 'flavour')
+            .receivingParserEvent('onvalue', 'strawberry')
+            .receiveEventFromBus(ABORTING)
+            .receivingParserEvent('oncloseobject')               
+      
+      ).not.toHaveFired(
+         TYPE_NODE
+      ,  anAscentContaining(  
+            {key:ROOT_PATH, node:{flavour:'strawberry'}}
+         )      
+      )   
+                     
+   })   
+   
    
    it('provides numeric paths for first array element', function() {
 
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')
-            .receivingEvent('onkey', 'alphabet')
-            .receivingEvent('onopenarray')
-            .receivingEvent('onvalue', 'a')               
+            .receivingParserEvent('onopenobject')
+            .receivingParserEvent('onkey', 'alphabet')
+            .receivingParserEvent('onopenarray')
+            .receivingParserEvent('onvalue', 'a')               
       
       ).toHaveFired(
          TYPE_PATH
@@ -118,11 +138,11 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')
-            .receivingEvent('onkey', 'alphabet')
-            .receivingEvent('onopenarray')
-            .receivingEvent('onvalue', 'a')
-            .receivingEvent('onvalue', 'b')               
+            .receivingParserEvent('onopenobject')
+            .receivingParserEvent('onkey', 'alphabet')
+            .receivingParserEvent('onopenarray')
+            .receivingParserEvent('onvalue', 'a')
+            .receivingParserEvent('onvalue', 'b')               
       
       ).toHaveFired(
          TYPE_PATH
@@ -140,10 +160,10 @@ describe("incremental content builder", function(){
       expect(
       
          aContentBuilder()
-            .receivingEvent('onopenobject')      
-            .receivingEvent('onkey'    ,  'alphabet')
-            .receivingEvent('onopenarray')
-            .receivingEvent('onvalue'    ,  'a')               
+            .receivingParserEvent('onopenobject')      
+            .receivingParserEvent('onkey'    ,  'alphabet')
+            .receivingParserEvent('onopenarray')
+            .receivingParserEvent('onvalue'    ,  'a')               
       
       ).toHaveFired(
          TYPE_NODE
@@ -157,23 +177,39 @@ describe("incremental content builder", function(){
    })        
    
    function aContentBuilder() {
-      return new IncrementalContentBuilderAsserter( {}, sinon.stub(), sinon.stub() );
+   
+      return new IncrementalContentBuilderAsserter();      
    }
    
-   function IncrementalContentBuilderAsserter( clarinetStub, notifyStub, onStub ){
+   function IncrementalContentBuilderAsserter(){
+     
+      var eventBus = pubSub();
       
-      this._clarinetStub = clarinetStub;
-      this._notifyStub = notifyStub;
-      this._subject = incrementalContentBuilder(clarinetStub, notifyStub, onStub);
+      sinon.spy(eventBus, 'notify');
+      sinon.spy(eventBus, 'on');
+      
+      this._clarinetStub = {};
+      this._eventBus = eventBus;
+      this._subject = incrementalContentBuilder(this._clarinetStub, eventBus.notify, eventBus.on);
    }
    
-   IncrementalContentBuilderAsserter.prototype.receivingEvent = function(fnName /* args */){
+   IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
    
       var args = Array.prototype.slice.call(arguments, 1);
    
-      this._clarinetStub[fnName].apply( undefined, args );
+      var handlerFn = this._clarinetStub[fnName]; 
+   
+      // to match clarinet behaviour: do nothing if onFoo is falsey
+      handlerFn && handlerFn.apply( undefined, args );
+      
       return this;
    };
+   
+   IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
+     
+      this._eventBus.notify.apply(undefined, arguments);
+      return this;
+   };   
    
    beforeEach(function(){
             
@@ -181,7 +217,7 @@ describe("incremental content builder", function(){
          toHaveFired: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
-            var notifyStub = asserter._notifyStub;
+            var notify = asserter._eventBus.notify;
             
             var ascentMatch = sinon.match(function ( foundAscent ) {
                      
@@ -214,7 +250,7 @@ describe("incremental content builder", function(){
          
                     
             this.message = function(){
-               if( !notifyStub.called ) {
+               if( !notify.called ) {
                   return 'no events have been fired at all';
                }
 
@@ -233,16 +269,16 @@ describe("incremental content builder", function(){
             
                return   'expected a call with : \t' + reportCall(eventName, expectedAscent) +
                         '\n' +  
-                        'latest call had :      \t' + reportArgs(notifyStub.lastCall.args) +
+                        'latest call had :      \t' + reportArgs(notify.lastCall.args) +
                         '\n' +
                         'all calls were :' +
                         '\n                     \t' +
-                        notifyStub.args.map( reportArgs ).join('\n                     \t')
+                        notify.args.map( reportArgs ).join('\n                     \t')
             };
 
 
 
-            return notifyStub.calledWithMatch( eventName, ascentMatch );
+            return notify.calledWithMatch( eventName, ascentMatch );
          }
                               
       });   

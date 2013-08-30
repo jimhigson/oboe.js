@@ -873,15 +873,19 @@ if(typeof FastList === 'function') {
  * 
  * @param {Function} notify a function to pass events to when something happens
  */
-function streamingXhr(notify) {
+function streamingXhr(notify, on) {
         
    var 
       xhr = new XMLHttpRequest(),
-   
+
       listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
-       
-      numberOfCharsAlreadyGivenToCallback = 0;   
-      
+
+      numberOfCharsAlreadyGivenToCallback = 0;
+
+   on( ABORTING, function(){
+      xhr.abort();
+   });
+
    /** Given a value from the user to send as the request body, return in a form
     *  that is suitable to sending over the wire. Returns either a string, or null.        
     */
@@ -945,8 +949,7 @@ function streamingXhr(notify) {
       notify( HTTP_DONE_EVENT );
    }
                       
-   return {
-   
+   return {         
      /**
       * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
       * @param {String} url
@@ -958,14 +961,7 @@ function streamingXhr(notify) {
          
          xhr.open(method, url, true);
          xhr.send(validatedRequestBody(data));         
-      },
-      
-      abort: function() {
-         // NB: can't do xhr.abort.bind(xhr) becaues IE doesn't allow binding of
-         // XHR methods, even if Function.prototype.bind is polyfilled. I think they
-         // are some kind of weird native non-js function or something.
-         xhr.abort();
-      }
+      } 
    };   
 }
 
@@ -1076,11 +1072,11 @@ var ROOT_PATH = {r:1};
  * 
  * Returns a function which gives access to the content built up so far
  * 
- * @param clarinet our source of low-level events
+ * @param clarinetParser our source of low-level events
  * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinet, notify ) {
+function incrementalContentBuilder( clarinetParser, notify, on ) {
    
    var            
          // array of nodes from curNode up to the root of the document.
@@ -1195,7 +1191,7 @@ function incrementalContentBuilder( clarinet, notify ) {
     * Assign listeners to clarinet.
     */     
     
-   clarinet.onopenobject = function (firstKey) {
+   clarinetParser.onopenobject = function (firstKey) {
 
       nodeFound({});
       
@@ -1210,14 +1206,14 @@ function incrementalContentBuilder( clarinet, notify ) {
       }
    };
    
-   clarinet.onopenarray = function () {
+   clarinetParser.onopenarray = function () {
       nodeFound([]);
    };
 
    // called by Clarinet when keys are found in objects               
-   clarinet.onkey = pathFound;   
+   clarinetParser.onkey = pathFound;   
                
-   clarinet.onvalue = function (value) {
+   clarinetParser.onvalue = function (value) {
    
       // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
       // can't have descendants.
@@ -1227,10 +1223,23 @@ function incrementalContentBuilder( clarinet, notify ) {
       curNodeFinished();
    };         
    
-   clarinet.oncloseobject =
-   clarinet.onclosearray =       
-      curNodeFinished;      
-      
+   clarinetParser.oncloseobject =
+   clarinetParser.onclosearray =       
+      curNodeFinished;
+
+   /**
+    * If we abort this Oboe's request stop listening
+    * to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we 
+    * aborted while reading though a current buffer.
+    */      
+   on( ABORTING, function() {
+      clarinet.EVENTS.forEach(function(event){
+         // maybe not onerror
+         clarinetParser['on'+event] = null;
+      });
+   }); 
+             
    /* finally, return a function to get the root of the json (or undefined if not yet found) */      
    return function() {
       return rootNode;
@@ -1634,61 +1643,20 @@ var _S = 0,
     TYPE_PATH = _S++,
     ERROR_EVENT = _S++,
     HTTP_PROGRESS_EVENT = _S++,
-    HTTP_DONE_EVENT = _S++;
-/* 
-   The API that is given out when a new Oboe instance is created.
-    
-   This file handles the peculiarities of being able to add listeners in a couple of different syntaxes
-   and returns the object that exposes a small number of methods.
- */
-
-function instanceApi(instController){
-   
-   /**
-    * implementation behind .onPath() and .onNode(): add several listeners in one call  
-    * @param listenerMap
-    */
-   function pushListeners(eventId, listenerMap) {
-   
-      for( var pattern in listenerMap ) {
-         instController.addCallback(eventId, pattern, listenerMap[pattern]);
-      }
-   }    
-      
-   /**
-    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
-    * depending on the argument types
-    */       
-   function addNodeOrPathListener( eventId, jsonPathOrListenerMap, callback, callbackContext ){
-   
-      if( isString(jsonPathOrListenerMap) ) {
-         instController.addCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
-      } else {
-         pushListeners(eventId, jsonPathOrListenerMap);
-      }
-      
-      return this; // chaining
-   }         
-
-   instController.onPath = partialComplete(addNodeOrPathListener, TYPE_PATH); 
-   instController.onNode = partialComplete(addNodeOrPathListener, TYPE_NODE); 
-
-   return instController;   
-}
+    HTTP_DONE_EVENT = _S++,
+    ABORTING = _S++;
 /**
- * 
- * @param eventBus
- * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
+function instanceController(clarinetParser, jsonRoot, notify, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
          try {
-            clarinetParser.write(nextDrip);
+            
+            clarinetParser.write(nextDrip);            
          } catch(e) {
             // we don't have to do anything here because we always assign a .onerror
             // to clarinet which will have already been called by the time this 
@@ -1724,18 +1692,12 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
       // passes it onto the callback. 
       on( eventId, function( ascent ){ 
       
-         try{
-            var maybeMatchingMapping = matchesJsonPath( ascent );
-         } catch(e) {
-            // I'm hoping evaluating the jsonPath won't throw any Errors but in case it does I
-            // want to catch as early as possible:
-            notify(ERROR_EVENT, Error('Error evaluating pattern ' + pattern + ': ' + e.message));            
-         }
-        
-         // Possible values for foundNode are now:
+         var maybeMatchingMapping = matchesJsonPath( ascent );
+     
+         // Possible values for maybeMatchingMapping are now:
          //
          //    false: 
-         //       we did not match
+         //       we did not match 
          //
          //    an object/array/string/number/null: 
          //       that node is the one that matched. Because json can have nulls, this can 
@@ -1747,13 +1709,14 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
          //       it would be indistinguishable from us finding a node with a value of
          //       null.
          if( maybeMatchingMapping !== false ) {                                 
-           
-            try{
+
+            try{              
                notifyCallback(callback, maybeMatchingMapping, ascent);
-               
             } catch(e) {
+               // an error could have happened in the callback. Put it
+               // on the event bus 
                notify(ERROR_EVENT, e);
-            }
+            }               
          }
       });   
    }   
@@ -1773,13 +1736,37 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
       
       callback( nodeOf(matchingMapping), path, ancestors );  
    }
-                                               
+  
+   function addListenersMap(eventId, listenerMap) {
+   
+      for( var pattern in listenerMap ) {
+         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
+      }
+   }    
+      
+   /**
+    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
+    * depending on the argument types
+    */       
+   function addListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   
+      if( isString(jsonPathOrListenerMap) ) {
+         addPathOrNodeListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+      } else {
+         addListenersMap(eventId, jsonPathOrListenerMap);
+      }
+      
+      return this; // chaining
+   }         
+
    return { 
-      abort       : sXhr.abort,
-      addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
-      root        : jsonRoot     
-   };                                                         
+      onPath      : partialComplete(addListenerApi, TYPE_PATH), 
+      onNode      : partialComplete(addListenerApi, TYPE_NODE),
+      abort       : partialComplete(notify, ABORTING),
+      root        : jsonRoot                 
+   };
+    
 }
 (function(){
 
@@ -1798,10 +1785,12 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
          // wire everything up:
          var 
             eventBus = pubSub(),
-            sXhr = streamingXhr(eventBus.notify),
+            notify = eventBus.notify,
+            on = eventBus.on,            
+            sXhr = streamingXhr(notify, on),
             clarinetParser = clarinet.parser(),
-            rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn, sXhr ),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, notify, on),             
+            instController = instanceController(clarinetParser, rootJsonFn, notify, on),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -1809,7 +1798,7 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
              */
             start = function (url, body, callback){ 
                if( callback ) {
-                  eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
+                  on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
                sXhr.req( httpMethodName, url, body );
@@ -1839,8 +1828,8 @@ function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
                      firstArg.complete );
          }
                                            
-         // return an api to control this oboe instance                   
-         return instanceApi(instController);           
+         // return the controller to ask as the api for this instance                   
+         return instController;           
       };
    }   
 

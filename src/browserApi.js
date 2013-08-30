@@ -15,10 +15,12 @@
          // wire everything up:
          var 
             eventBus = pubSub(),
-            sXhr = streamingXhr(eventBus.notify),
+            notify = eventBus.notify,
+            on = eventBus.on,            
+            sXhr = streamingXhr(notify, on),
             clarinetParser = clarinet.parser(),
-            rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn, sXhr ),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, notify, on),             
+            instController = instanceController(clarinetParser, rootJsonFn, notify, on),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -26,7 +28,7 @@
              */
             start = function (url, body, callback){ 
                if( callback ) {
-                  eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
+                  on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
                sXhr.req( httpMethodName, url, body );
@@ -56,8 +58,8 @@
                      firstArg.complete );
          }
                                            
-         // return an api to control this oboe instance                   
-         return instanceApi(instController);           
+         // return the controller to ask as the api for this instance                   
+         return instController;           
       };
    }   
 

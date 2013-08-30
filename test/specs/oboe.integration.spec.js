@@ -25,11 +25,9 @@ describe("oboe integration (real http)", function(){
       });
    })
    
-   it('can abort once some data has been found',  function() {
+   it('can abort once some data has been found in streamed response',  function() {
        
       var aborted = false; 
-       
-      // debugger; 
        
       var asserter = givenAnOboeInstance('/stream/tenSlowNumbers')
          .andWeAreListeningForNodes('![5]', function(){
@@ -50,7 +48,36 @@ describe("oboe integration (real http)", function(){
             hasRootJson([0,1,2,3,4,5])
          );
       });
-   })   
+   })
+   
+   it('can abort once some data has been found in not very streamed response',  function() {
+       
+      // like above but we're getting a static file not the streamed numbers. This means
+      // we'll almost certainly read in the whole response as one onprogress it is on localhost
+      // and the json is very small 
+
+      var aborted = false; 
+       
+      var asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json')
+         .andWeAreListeningForNodes('![5]', function(){
+             asserter.andWeAbortTheRequest();
+             aborted = true;
+          });         
+      
+      waitsFor( function(){return aborted}, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+      
+      // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
+      // rest of the data now and the test would fail:
+      waitsFor( someSecondsToPass(1), ASYNC_TEST_TIMEOUT);      
+
+      runs( function(){
+         asserter.thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+            hasRootJson([0,1,2,3,4,5])
+         );
+      });
+   })      
    
    it('gives full json to callback when request finishes',  function( queue ) {
             
@@ -73,11 +100,16 @@ describe("oboe integration (real http)", function(){
       
    function someSecondsToPass(waitSecs) {
       
-      var waitStart = Date.now(),
+      function now(){
+         // IE8 doesn't have Date.now() 
+         return new Date().getTime();
+      }
+      
+      var waitStart = now(),
           waitMs = waitSecs * 1000;
       
       return function(){
-         return Date.now() > (waitStart + waitMs); 
+         return now() > (waitStart + waitMs); 
       }
    }
      
