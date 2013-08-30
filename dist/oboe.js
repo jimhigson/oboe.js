@@ -883,6 +883,8 @@ function streamingXhr(notify, on) {
       numberOfCharsAlreadyGivenToCallback = 0;
 
    on( ABORTING, function(){
+      // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
+      // so it doesn't matter if Function.bind is polyfilled, it breaks
       xhr.abort();
    });
 
