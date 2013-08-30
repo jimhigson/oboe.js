@@ -157,14 +157,14 @@ describe("incremental content builder", function(){
    })        
    
    function aContentBuilder() {
-      return new IncrementalContentBuilderAsserter( {}, sinon.stub() );
+      return new IncrementalContentBuilderAsserter( {}, sinon.stub(), sinon.stub() );
    }
    
-   function IncrementalContentBuilderAsserter( clarinetStub, notifyStub ){
+   function IncrementalContentBuilderAsserter( clarinetStub, notifyStub, onStub ){
       
       this._clarinetStub = clarinetStub;
       this._notifyStub = notifyStub;
-      this._subject = incrementalContentBuilder(clarinetStub, notifyStub);
+      this._subject = incrementalContentBuilder(clarinetStub, notifyStub, onStub);
    }
    
    IncrementalContentBuilderAsserter.prototype.receivingEvent = function(fnName /* args */){
