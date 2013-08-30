@@ -15,9 +15,10 @@
          // wire everything up:
          var 
             eventBus = pubSub(),
+            sXhr = streamingXhr(eventBus.notify),
             clarinetParser = clarinet.parser(),
             rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus, clarinetParser, rootJsonFn),
+            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn ),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -28,7 +29,7 @@
                   eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
-               instController.fetch( httpMethodName, url, body );
+               sXhr.req( httpMethodName, url, body );
             };
              
          if (isString(firstArg)) {

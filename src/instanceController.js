@@ -4,13 +4,8 @@
  * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(eventBus, clarinetParser, jsonRoot) {
+function instanceController(on, notify, clarinetParser, jsonRoot) {
   
-   // eventBus methods are used lots. Shortcut them:
-   var on = eventBus.on,
-       notify = eventBus.notify,
-       sxhr = streamingXhr(notify); 
-
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
@@ -107,7 +102,6 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
    return { 
       addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
-      fetch       : sxhr.req,
       root        : jsonRoot     
    };                                                         
 }

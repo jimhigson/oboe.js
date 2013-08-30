@@ -1681,13 +1681,8 @@ function instanceApi(instController){
  * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(eventBus, clarinetParser, jsonRoot) {
+function instanceController(on, notify, clarinetParser, jsonRoot) {
   
-   // eventBus methods are used lots. Shortcut them:
-   var on = eventBus.on,
-       notify = eventBus.notify,
-       sxhr = streamingXhr(notify); 
-
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
@@ -1784,7 +1779,6 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
    return { 
       addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
-      fetch       : sxhr.req,
       root        : jsonRoot     
    };                                                         
 }
@@ -1805,9 +1799,10 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
          // wire everything up:
          var 
             eventBus = pubSub(),
+            sXhr = streamingXhr(eventBus.notify),
             clarinetParser = clarinet.parser(),
             rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus, clarinetParser, rootJsonFn),
+            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn ),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -1818,7 +1813,7 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
                   eventBus.on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
-               instController.fetch( httpMethodName, url, body );
+               sXhr.req( httpMethodName, url, body );
             };
              
          if (isString(firstArg)) {
