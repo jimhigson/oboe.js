@@ -4,7 +4,7 @@
  * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(on, notify, clarinetParser, jsonRoot) {
+function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -96,10 +96,9 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
       
       callback( nodeOf(matchingMapping), path, ancestors );  
    }
-   
-       
-   /* the controller exposes two methods: */                                          
+                                               
    return { 
+      abort       : sXhr.abort,
       addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
       root        : jsonRoot     

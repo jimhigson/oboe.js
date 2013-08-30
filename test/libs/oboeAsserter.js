@@ -82,6 +82,11 @@ function givenAnOboeInstance(jsonFileName) {
          return this;
       };
       
+      this.andWeAbortTheRequest = function() {    
+         oboeInstance.abort();
+         return this;
+      };      
+      
       this.whenGivenInput = function(json) {
          if( typeof json != 'string' ) {
             json = JSON.stringify(json);

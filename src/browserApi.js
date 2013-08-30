@@ -18,7 +18,7 @@
             sXhr = streamingXhr(eventBus.notify),
             clarinetParser = clarinet.parser(),
             rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn ),
+            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn, sXhr ),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been

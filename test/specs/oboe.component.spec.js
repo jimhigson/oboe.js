@@ -1,17 +1,6 @@
 describe("oboe component (sXHR stubbed)", function(){
 
-   beforeEach(function() {
-      sinon.stub(window, 'streamingXhr')
-         .returns({
-            req:  sinon.stub(),
-            abort:sinon.stub()
-          });
-   })
-   
-   afterEach(function() {
-      window.streamingXhr.restore();   
-   })
-   
+  
    it('has chainable methods',  function() {
       // very basic test that nothing forgot to return 'this':
 
@@ -1240,6 +1229,45 @@ describe("oboe component (sXHR stubbed)", function(){
               );
       })
    });
+   
+   describe('aborting a request', function(){
+
+      it('does not throw an error', function(){
+      
+         expect( function(){
+         
+            givenAnOboeInstance()
+               .andWeAreListeningForPaths('*')
+               .whenGivenInput('[1')
+               .andWeAbortTheRequest();
+             
+         }).not.toThrow();                                  
+      });
+   
+      it('aborts the sXHR', function(){
+      
+         givenAnOboeInstance()
+            .andWeAreListeningForPaths('*')
+            .whenGivenInput('[1')
+            .andWeAbortTheRequest();
+             
+         var lastCreatedsXHR = streamingXhr.getCall(0).returnValue;             
+         expect( lastCreatedsXHR.abort.called ).toBe(true);                                  
+      });
+   });
+   
+   
+   beforeEach(function() {
+      sinon.stub(window, 'streamingXhr')
+         .returns({
+            req:  sinon.stub(),
+            abort:sinon.stub()
+          });
+   })
+   
+   afterEach(function() {
+      window.streamingXhr.restore();   
+   })   
 
 });
 

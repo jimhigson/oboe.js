@@ -1681,7 +1681,7 @@ function instanceApi(instController){
  * @param clarinetParser
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(on, notify, clarinetParser, jsonRoot) {
+function instanceController(on, notify, clarinetParser, jsonRoot, sXhr) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -1704,13 +1704,13 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
       }
    );
   
+   // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       notify(ERROR_EVENT, e);
       
-      // the json is invalid, give up and close the parser to prevent getting any more:
-      clarinetParser.close();
+      // note: don't close clarinet here because if it was not expecting
+      // end of the json it will throw an error
    };
-                              
                 
    /**
     *  
@@ -1773,10 +1773,9 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
       
       callback( nodeOf(matchingMapping), path, ancestors );  
    }
-   
-       
-   /* the controller exposes two methods: */                                          
+                                               
    return { 
+      abort       : sXhr.abort,
       addCallback : addPathOrNodeListener, 
       onError     : partialComplete(on, ERROR_EVENT),
       root        : jsonRoot     
@@ -1802,7 +1801,7 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
             sXhr = streamingXhr(eventBus.notify),
             clarinetParser = clarinet.parser(),
             rootJsonFn = incrementalContentBuilder(clarinetParser, eventBus.notify),             
-            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn ),
+            instController = instanceController( eventBus.on, eventBus.notify, clarinetParser, rootJsonFn, sXhr ),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -1841,7 +1840,7 @@ function instanceController(on, notify, clarinetParser, jsonRoot) {
          }
                                            
          // return an api to control this oboe instance                   
-         return instanceApi(instController, rootJsonFn)           
+         return instanceApi(instController);           
       };
    }   
 

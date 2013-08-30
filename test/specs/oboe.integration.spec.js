@@ -3,7 +3,7 @@ describe("oboe integration (real http)", function(){
 
    it('gets all expected callbacks by time request finishes',  function() {
        
-      var asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json')
+      var asserter = givenAnOboeInstance('/stream/tenSlowNumbers')
          .andWeAreListeningForNodes('![*]');         
       
       waitsFor( asserter.toComplete(), 'the request to complete', ASYNC_TEST_TIMEOUT);
@@ -25,6 +25,33 @@ describe("oboe integration (real http)", function(){
       });
    })
    
+   it('can abort once some data has been found',  function() {
+       
+      var aborted = false; 
+       
+      // debugger; 
+       
+      var asserter = givenAnOboeInstance('/stream/tenSlowNumbers')
+         .andWeAreListeningForNodes('![5]', function(){
+             asserter.andWeAbortTheRequest();
+             aborted = true;
+          });         
+      
+      waitsFor( function(){return aborted}, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+      
+      // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
+      // rest of the data now and the test would fail:
+      waitsFor( someSecondsToPass(3), ASYNC_TEST_TIMEOUT);      
+
+      runs( function(){
+         asserter.thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+            hasRootJson([0,1,2,3,4,5])
+         );
+      });
+   })   
+   
    it('gives full json to callback when request finishes',  function( queue ) {
             
       var fullResponse = null;            
@@ -43,6 +70,16 @@ describe("oboe integration (real http)", function(){
          expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9])
       });      
    })
+      
+   function someSecondsToPass(waitSecs) {
+      
+      var waitStart = Date.now(),
+          waitMs = waitSecs * 1000;
+      
+      return function(){
+         return Date.now() > (waitStart + waitMs); 
+      }
+   }
      
 });  
 
