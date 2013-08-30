@@ -871,14 +871,9 @@ if(typeof FastList === 'function') {
  * 
  * None of the parameters are optional.
  * 
- * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
- * @param {String} url
- * @param {String|Object|undefined} data
  * @param {Function} notify a function to pass events to when something happens
- * @param {String} data some content to be sent with the request. Only valid
- *                 if method is POST or PUT.
  */
-function streamingXhr(method, url, data, notify) {
+function streamingXhr(notify) {
         
    var 
       xhr = new XMLHttpRequest(),
@@ -945,15 +940,33 @@ function streamingXhr(method, url, data, notify) {
       // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
       // onload. We need to always do handleInput in case we get the load but have
       // not had a final progress event..   
-      handleInput();
+      handleInput(); 
       
       notify( HTTP_DONE_EVENT );
    }
-                     
-   listenToXhr( xhr );
+                      
+   return {
    
-   xhr.open(method, url, true);
-   xhr.send(validatedRequestBody(data));   
+     /**
+      * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+      * @param {String} url
+      * @param {String} data some content to be sent with the request. Only valid
+      *                 if method is POST or PUT.
+      */                                         
+      req: function(method, url, data){                     
+         listenToXhr( xhr );
+         
+         xhr.open(method, url, true);
+         xhr.send(validatedRequestBody(data));         
+      },
+      
+      abort: function() {
+         // NB: can't do xhr.abort.bind(xhr) becaues IE doesn't allow binding of
+         // XHR methods, even if Function.prototype.bind is polyfilled. I think they
+         // are some kind of weird native non-js function or something.
+         xhr.abort();
+      }
+   };   
 }
 
 var jsonPathSyntax = (function() {
@@ -1672,7 +1685,8 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
   
    // eventBus methods are used lots. Shortcut them:
    var on = eventBus.on,
-       notify = eventBus.notify;   
+       notify = eventBus.notify,
+       sxhr = streamingXhr(notify);  
   
    clarinetParser.onerror =  
        function(e) {          
@@ -1708,11 +1722,9 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
          }
       );
       
-      streamingXhr(
-         httpMethodName,
-         url, 
-         httpRequestBody,
-         notify);          
+      sxhr.req( httpMethodName,
+                url, 
+                httpRequestBody);
    }
                  
    /**

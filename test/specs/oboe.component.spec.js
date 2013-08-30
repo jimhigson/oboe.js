@@ -3,7 +3,11 @@ describe("whole oboe library with only the network stubbed out", function(){
    var streamingStub; 
 
    beforeEach(function() {
-      streamingStub = sinon.stub(window, 'streamingXhr');
+      streamingStub = sinon.stub(window, 'streamingXhr')
+         .returns({
+            req:  sinon.stub(),
+            abort:sinon.stub()
+          });
    })
    
    afterEach(function() {

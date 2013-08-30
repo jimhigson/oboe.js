@@ -1,27 +1,27 @@
 
 describe("streamingXhr", function(){
 
-   var FakeXhrClass, lastCreatedXhrInstance;
-
    describe("requests should get through to browser xhr correctly", function(){
+                               
+      var notifyStub = jasmine.createSpy('eventBus.notify');                                 
                                
       it('gives xhr null when body is undefined', function(){
       
-         streamingXhr('GET', 'http://example.com', undefined, function(){}, function(){});
+         streamingXhr(notifyStub).req('GET', 'http://example.com', undefined);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGiven(null);
       })
       
       it('gives xhr null when body is null', function(){
       
-         streamingXhr('GET', 'http://example.com', null, function(){}, function(){});
+         streamingXhr(notifyStub).req('GET', 'http://example.com', null);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGiven(null);
       })      
       
       it('give xhr string request body', function(){
       
-         streamingXhr('GET', 'http://example.com', 'my_data', function(){}, function(){});
+         streamingXhr(notifyStub).req('GET', 'http://example.com', 'my_data');
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGiven('my_data');
       })
@@ -30,11 +30,13 @@ describe("streamingXhr", function(){
    
          var payload = {a:'A', b:'B'};
          
-         streamingXhr('GET', 'http://example.com', payload, function(){}, function(){});
+         streamingXhr(notifyStub).req('GET', 'http://example.com', payload);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGiven(JSON.stringify( payload ) );      
       });      
-      
+
+
+      var FakeXhrClass, lastCreatedXhrInstance;      
 
       beforeEach( function() {
          FakeXhrClass = sinon.useFakeXMLHttpRequest();

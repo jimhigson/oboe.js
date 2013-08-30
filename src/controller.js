@@ -8,7 +8,8 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
   
    // eventBus methods are used lots. Shortcut them:
    var on = eventBus.on,
-       notify = eventBus.notify;   
+       notify = eventBus.notify,
+       sxhr = streamingXhr(notify);  
   
    clarinetParser.onerror =  
        function(e) {          
@@ -44,11 +45,9 @@ function instanceController(eventBus, clarinetParser, jsonRoot) {
          }
       );
       
-      streamingXhr(
-         httpMethodName,
-         url, 
-         httpRequestBody,
-         notify);          
+      sxhr.req( httpMethodName,
+                url, 
+                httpRequestBody);
    }
                  
    /**
