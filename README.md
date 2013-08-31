@@ -4,8 +4,8 @@ arround https's standard request-response model. It glues a transport that sits
 DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any external dependencies and 
 doesn't care which other libraries you need it to speak to.
 
-Oboe makes it really easy to start using json from a response before the ajax request completes; 
-or even if it never completes.
+Oboe makes it really easy to start using json from a response before the ajax request completes. 
+Or even if it never completes.
 
 # API
 
