@@ -1753,7 +1753,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
    function addListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext));
+         addPathOrNodeListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
@@ -1761,13 +1761,14 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
       return this; // chaining
    }         
 
-   return { 
+   var oboeApi = { 
       onError     : partialComplete(on, ERROR_EVENT),
       onPath      : partialComplete(addListenerApi, TYPE_PATH), 
       onNode      : partialComplete(addListenerApi, TYPE_NODE),
       abort       : partialComplete(notify, ABORTING),
       root        : jsonRoot                 
    };
+   return oboeApi;
     
 }
 (function(){

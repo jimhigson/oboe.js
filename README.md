@@ -30,7 +30,7 @@ instance by calling one of these methods:
 Usually it is better to read the json one bit at a time than waiting for it to completely download so this parameter 
 is optional.
 
-The returned instance exposes four chainable methods:
+The returned instance exposes a few chainable methods:
 
 ```js
    .onNode(String pattern, Function callback(thingFound, String[] path, context))
@@ -56,6 +56,14 @@ Alternatively, several paths may be give at once to either ```onPath``` or ```on
       pattern : callback
    });
 ``` 
+
+```js
+   .abort()
+```
+
+Stop the http call at any time. This is useful if you want to read into a json response only as
+far as is needed. You won't get any further .path() or .node() callbacks, even if the underlying
+xhr already has more content. There's an [example below](#taking-ajax-only-as-far-as-is-needed).
 
 ```js
    .onError(callback(Error e))
@@ -192,6 +200,27 @@ oboe.doGet('/myapp/things.json')
    });
 ```
 
+## Hanging up the AJAX when we have what we want
+
+We can example on the example above. Since we only care about the foods object and 
+not the non-foods we can hang up as soon as we have the foods, reducing our precious 
+download footprint.
+
+``` js
+oboe.doGet('/myapp/things.json')
+   .onNode('foods.*', function( foodObject ){
+
+      var newFoodElement = $('<div>')
+                              .text('it is safe to eat ' + foodObject.name)
+                              .css('color', foodObject.colour)
+                                    
+      $('#foods').append(newFoodElement);
+   })
+   .onNode('foods', function(){
+      this.abort();
+   });
+```
+
 ## Listening for strings
 
 Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
@@ -267,8 +296,10 @@ oboe.doGet('/myapp/things.json')
          // use the items anymore, just hide the spinner:
          MyApp.hideSpinner('#foods');
       }
-   });
+   });   
 ```
+
+
 
 ## The path passback
 

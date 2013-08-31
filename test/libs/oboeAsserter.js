@@ -218,7 +218,7 @@ var foundOneMatch = foundNMatches(1),
     calledCallbackOnce = foundNMatches(1),    
     foundNoMatches = foundNMatches(0);
 
-function calledbackWithContext(callbackScope) {
+function wasCalledbackWithContext(callbackScope) {
    return { 
       testAgainst:
       function(callbackStub, oboeInstance) {
@@ -231,6 +231,15 @@ function calledbackWithContext(callbackScope) {
             throw new Error('was not called in the expected context. Expected ' + callbackScope + ' but got ' + 
                callbackStub.getCall(0).thisValue);
          }   
+      }
+   };
+}
+
+function wasGivenTheOboeAsContext() {
+   return { 
+      testAgainst:
+      function(callbackStub, oboeInstance) {
+         return wasCalledbackWithContext(oboeInstance).testAgainst(callbackStub, oboeInstance);   
       }
    };
 }
