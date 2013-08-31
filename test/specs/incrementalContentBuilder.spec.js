@@ -185,12 +185,12 @@ describe("incremental content builder", function(){
      
       var eventBus = pubSub();
       
-      sinon.spy(eventBus, 'notify');
+      sinon.spy(eventBus, 'fire');
       sinon.spy(eventBus, 'on');
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
-      this._subject = incrementalContentBuilder(this._clarinetStub, eventBus.notify, eventBus.on);
+      this._subject = incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
    }
    
    IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
@@ -207,7 +207,7 @@ describe("incremental content builder", function(){
    
    IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
      
-      this._eventBus.notify.apply(undefined, arguments);
+      this._eventBus.fire.apply(undefined, arguments);
       return this;
    };   
    
@@ -217,7 +217,7 @@ describe("incremental content builder", function(){
          toHaveFired: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
-            var notify = asserter._eventBus.notify;
+            var fire = asserter._eventBus.fire;
             
             var ascentMatch = sinon.match(function ( foundAscent ) {
                      
@@ -250,7 +250,7 @@ describe("incremental content builder", function(){
          
                     
             this.message = function(){
-               if( !notify.called ) {
+               if( !fire.called ) {
                   return 'no events have been fired at all';
                }
 
@@ -269,16 +269,16 @@ describe("incremental content builder", function(){
             
                return   'expected a call with : \t' + reportCall(eventName, expectedAscent) +
                         '\n' +  
-                        'latest call had :      \t' + reportArgs(notify.lastCall.args) +
+                        'latest call had :      \t' + reportArgs(fire.lastCall.args) +
                         '\n' +
                         'all calls were :' +
                         '\n                     \t' +
-                        notify.args.map( reportArgs ).join('\n                     \t')
+                        fire.args.map( reportArgs ).join('\n                     \t')
             };
 
 
 
-            return notify.calledWithMatch( eventName, ascentMatch );
+            return fire.calledWithMatch( eventName, ascentMatch );
          }
                               
       });   

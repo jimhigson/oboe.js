@@ -1264,9 +1264,7 @@ describe("oboe component (sXHR stubbed)", function(){
    
    beforeEach(function() {
       sinon.stub(window, 'streamingXhr')
-         .returns({
-            req:  sinon.stub()
-          });
+         .returns(sinon.stub());
    })
    
    afterEach(function() {

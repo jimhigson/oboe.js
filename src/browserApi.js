@@ -15,12 +15,12 @@
          // wire everything up:
          var 
             eventBus = pubSub(),
-            notify = eventBus.notify,
+            fire = eventBus.fire,
             on = eventBus.on,            
-            sXhr = streamingXhr(notify, on),
+            sXhr = streamingXhr(fire, on),
             clarinetParser = clarinet.parser(),
-            rootJsonFn = incrementalContentBuilder(clarinetParser, notify, on),             
-            instController = instanceController(clarinetParser, rootJsonFn, notify, on),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on),             
+            instController = instanceController(clarinetParser, rootJsonFn, fire, on),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -31,7 +31,7 @@
                   on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
-               sXhr.req( httpMethodName, url, body );
+               sXhr( httpMethodName, url, body );
             };
              
          if (isString(firstArg)) {

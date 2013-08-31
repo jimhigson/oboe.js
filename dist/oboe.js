@@ -871,9 +871,9 @@ if(typeof FastList === 'function') {
  * 
  * None of the parameters are optional.
  * 
- * @param {Function} notify a function to pass events to when something happens
+ * @param {Function} fire a function to pass events to when something happens
  */
-function streamingXhr(notify, on) {
+function streamingXhr(fire, on) {
         
    var 
       xhr = new XMLHttpRequest(),
@@ -937,7 +937,7 @@ function streamingXhr(notify, on) {
       // On newer/better ones it'll be just the little bit that we got since last time.
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
-      newText && notify( HTTP_PROGRESS_EVENT, newText ); 
+      newText && fire( HTTP_PROGRESS_EVENT, newText ); 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
@@ -948,23 +948,21 @@ function streamingXhr(notify, on) {
       // not had a final progress event..   
       handleInput(); 
       
-      notify( HTTP_DONE_EVENT );
+      fire( HTTP_DONE_EVENT );
    }
-                      
-   return {         
-     /**
-      * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
-      * @param {String} url
-      * @param {String} data some content to be sent with the request. Only valid
-      *                 if method is POST or PUT.
-      */                                         
-      req: function(method, url, data){                     
-         listenToXhr( xhr );
-         
-         xhr.open(method, url, true);
-         xhr.send(validatedRequestBody(data));         
-      } 
-   };   
+
+   /**
+    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+    * @param {String} url
+    * @param {String} data some content to be sent with the request. Only valid
+    *                 if method is POST or PUT.
+    */                      
+   return function(method, url, data){                     
+      listenToXhr( xhr );
+      
+      xhr.open(method, url, true);
+      xhr.send(validatedRequestBody(data));         
+   };
 }
 
 var jsonPathSyntax = (function() {
@@ -1075,10 +1073,10 @@ var ROOT_PATH = {r:1};
  * Returns a function which gives access to the content built up so far
  * 
  * @param clarinetParser our source of low-level events
- * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
+ * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinetParser, notify, on ) {
+function incrementalContentBuilder( clarinetParser, fire, on ) {
    
    var            
          // array of nodes from curNode up to the root of the document.
@@ -1173,7 +1171,7 @@ function incrementalContentBuilder( clarinetParser, notify, on ) {
    
       ascent = cons(newLeaf, ascent);
      
-      notify(TYPE_PATH, ascent);
+      fire(TYPE_PATH, ascent);
  
    }
 
@@ -1183,7 +1181,7 @@ function incrementalContentBuilder( clarinetParser, notify, on ) {
     */
    function curNodeFinished( ) {
 
-      notify(TYPE_NODE, ascent);
+      fire(TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the lists:                                    
       ascent = tail(ascent);
@@ -1622,22 +1620,25 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
 
 });
 
-
-
+/**
+ * isn't this the smallest little pub-sub library you've ever seen?
+ */
 function pubSub(){
 
    var listeners = {};
                              
    return {
-      notify:varArgs(function ( eventId, parameters ) {
-               
-         listeners[eventId] && applyAll( listeners[eventId] , parameters );
-      }),
+
       on:function( eventId, fn ) {
          (listeners[eventId] || (listeners[eventId] = [])).push(fn);
-            
+             
          return this; // chaining                                         
-      }            
+      }, 
+   
+      fire:varArgs(function ( eventId, parameters ) {
+               
+         listeners[eventId] && applyAll( listeners[eventId] , parameters );
+      })           
    };
 }
 var _S = 0,
@@ -1650,7 +1651,7 @@ var _S = 0,
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, jsonRoot, notify, on) {
+function instanceController(clarinetParser, jsonRoot, fire, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -1676,7 +1677,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      notify(ERROR_EVENT, e);
+      fire(ERROR_EVENT, e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1717,7 +1718,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
             } catch(e) {
                // an error could have happened in the callback. Put it
                // on the event bus 
-               notify(ERROR_EVENT, e);
+               fire(ERROR_EVENT, e);
             }               
          }
       });   
@@ -1765,7 +1766,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
       onError     : partialComplete(on, ERROR_EVENT),
       onPath      : partialComplete(addListenerApi, TYPE_PATH), 
       onNode      : partialComplete(addListenerApi, TYPE_NODE),
-      abort       : partialComplete(notify, ABORTING),
+      abort       : partialComplete(fire, ABORTING),
       root        : jsonRoot                 
    };
    return oboeApi;
@@ -1788,12 +1789,12 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
          // wire everything up:
          var 
             eventBus = pubSub(),
-            notify = eventBus.notify,
+            fire = eventBus.fire,
             on = eventBus.on,            
-            sXhr = streamingXhr(notify, on),
+            sXhr = streamingXhr(fire, on),
             clarinetParser = clarinet.parser(),
-            rootJsonFn = incrementalContentBuilder(clarinetParser, notify, on),             
-            instController = instanceController(clarinetParser, rootJsonFn, notify, on),
+            rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on),             
+            instController = instanceController(clarinetParser, rootJsonFn, fire, on),
  
             /**
              * create a shortcutted version of controller.start for once arguments have been
@@ -1804,7 +1805,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
                   on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
                }
                    
-               sXhr.req( httpMethodName, url, body );
+               sXhr( httpMethodName, url, body );
             };
              
          if (isString(firstArg)) {

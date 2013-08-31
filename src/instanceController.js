@@ -1,7 +1,7 @@
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, jsonRoot, notify, on) {
+function instanceController(clarinetParser, jsonRoot, fire, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -27,7 +27,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      notify(ERROR_EVENT, e);
+      fire(ERROR_EVENT, e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -68,7 +68,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
             } catch(e) {
                // an error could have happened in the callback. Put it
                // on the event bus 
-               notify(ERROR_EVENT, e);
+               fire(ERROR_EVENT, e);
             }               
          }
       });   
@@ -116,7 +116,7 @@ function instanceController(clarinetParser, jsonRoot, notify, on) {
       onError     : partialComplete(on, ERROR_EVENT),
       onPath      : partialComplete(addListenerApi, TYPE_PATH), 
       onNode      : partialComplete(addListenerApi, TYPE_NODE),
-      abort       : partialComplete(notify, ABORTING),
+      abort       : partialComplete(fire, ABORTING),
       root        : jsonRoot                 
    };
    return oboeApi;

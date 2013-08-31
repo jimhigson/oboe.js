@@ -17,10 +17,7 @@ describe("browser api", function(){
       beforeEach(function() {
          spyOn(window, 'streamingXhr').andCallFake(function(){
 
-            lastCreatedSxhr = {
-               req:  jasmine.createSpy('streamingXhr().req'),            
-               abort:jasmine.createSpy('streamingXhr().abort')
-            };
+            lastCreatedSxhr = jasmine.createSpy('streamingXhr')
              
             return lastCreatedSxhr; 
          });      
@@ -35,7 +32,7 @@ describe("browser api", function(){
          
             oboe.doGet('http://example.com/oboez', callbackPlaceholder)
          
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                 'GET',
                 'http://example.com/oboez',
                 undefined
@@ -47,7 +44,7 @@ describe("browser api", function(){
               
             oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'GET',
                'http://example.com/oboez',
                undefined
@@ -61,7 +58,7 @@ describe("browser api", function(){
               
             oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
           
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'DELETE',
                'http://example.com/oboez',
                undefined
@@ -72,7 +69,7 @@ describe("browser api", function(){
                
             oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'DELETE',
                'http://example.com/oboez',
                undefined
@@ -86,7 +83,7 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
                'my_data'
@@ -97,7 +94,7 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
                [1,2,3,4,5]
@@ -108,7 +105,7 @@ describe("browser api", function(){
                
             oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
                'my_data'
@@ -121,7 +118,7 @@ describe("browser api", function(){
                
             oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(lastCreatedSxhr.req).toHaveBeenCalledWith(
+            expect(lastCreatedSxhr).toHaveBeenCalledWith(
                'PUT',
                'http://example.com/oboez',
                'my_data'

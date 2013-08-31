@@ -9,8 +9,8 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(                         
-         eventBus.notify, eventBus.on
-      ).req(  
+         eventBus.fire, eventBus.on
+      )(  
          'GET', 
          '/static/json/smallestPossible.json',
          null // this is a GET, no data to send);
@@ -29,8 +29,8 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(                         
-         eventBus.notify, eventBus.on
-      ).req(
+         eventBus.fire, eventBus.on
+      )(
          'GET', 
          '/static/json/twentyThousandRecords.json',
          null // this is a GET, no data to send      
@@ -58,8 +58,8 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(                       
-         eventBus.notify, eventBus.on
-      ).req(
+         eventBus.fire, eventBus.on
+      )(
          'GET', 
          cacheBustUrl('/stream/tenSlowNumbers'),
          null // this is a GET, no data to send      
@@ -89,8 +89,8 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(                        
-         eventBus.notify, eventBus.on
-      ).req(
+         eventBus.fire, eventBus.on
+      )(
         'POST',
          cacheBustUrl('/stream/echoback.json'),
          payload       
@@ -117,8 +117,8 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingXhr(
-         eventBus.notify, eventBus.on
-      ).req(
+         eventBus.fire, eventBus.on
+      )(
          'PUT',
          cacheBustUrl('/stream/echoback.json'),
          payload       
@@ -146,8 +146,8 @@ describe('streaming xhr integration (real http)', function() {
       it('gives multiple callbacks when loading a streaming resource',  function(queue) {
                               
          streamingXhr(                           
-            eventBus.notify, eventBus.on
-         ).req(
+            eventBus.fire, eventBus.on
+         )(
             'GET', 
             cacheBustUrl('/stream/tenSlowNumbers'),
             null // this is a get: no data to send         
@@ -174,8 +174,8 @@ describe('streaming xhr integration (real http)', function() {
          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingXhr(              
-         eventBus.notify, eventBus.on
-      ).req(
+         eventBus.fire, eventBus.on
+      )(
          'GET', 
          '/static/json/twentyThousandRecords.json',
          null // this is a GET: no data to send      

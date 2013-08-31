@@ -21,10 +21,10 @@ var ROOT_PATH = {r:1};
  * Returns a function which gives access to the content built up so far
  * 
  * @param clarinetParser our source of low-level events
- * @param {Function} notify a handle on an event bus to fire higher level events on when a new node 
+ * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinetParser, notify, on ) {
+function incrementalContentBuilder( clarinetParser, fire, on ) {
    
    var            
          // array of nodes from curNode up to the root of the document.
@@ -119,7 +119,7 @@ function incrementalContentBuilder( clarinetParser, notify, on ) {
    
       ascent = cons(newLeaf, ascent);
      
-      notify(TYPE_PATH, ascent);
+      fire(TYPE_PATH, ascent);
  
    }
 
@@ -129,7 +129,7 @@ function incrementalContentBuilder( clarinetParser, notify, on ) {
     */
    function curNodeFinished( ) {
 
-      notify(TYPE_NODE, ascent);
+      fire(TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the lists:                                    
       ascent = tail(ascent);

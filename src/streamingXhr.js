@@ -9,9 +9,9 @@
  * 
  * None of the parameters are optional.
  * 
- * @param {Function} notify a function to pass events to when something happens
+ * @param {Function} fire a function to pass events to when something happens
  */
-function streamingXhr(notify, on) {
+function streamingXhr(fire, on) {
         
    var 
       xhr = new XMLHttpRequest(),
@@ -75,7 +75,7 @@ function streamingXhr(notify, on) {
       // On newer/better ones it'll be just the little bit that we got since last time.
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
-      newText && notify( HTTP_PROGRESS_EVENT, newText ); 
+      newText && fire( HTTP_PROGRESS_EVENT, newText ); 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
@@ -86,21 +86,19 @@ function streamingXhr(notify, on) {
       // not had a final progress event..   
       handleInput(); 
       
-      notify( HTTP_DONE_EVENT );
+      fire( HTTP_DONE_EVENT );
    }
-                      
-   return {         
-     /**
-      * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
-      * @param {String} url
-      * @param {String} data some content to be sent with the request. Only valid
-      *                 if method is POST or PUT.
-      */                                         
-      req: function(method, url, data){                     
-         listenToXhr( xhr );
-         
-         xhr.open(method, url, true);
-         xhr.send(validatedRequestBody(data));         
-      } 
-   };   
+
+   /**
+    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+    * @param {String} url
+    * @param {String} data some content to be sent with the request. Only valid
+    *                 if method is POST or PUT.
+    */                      
+   return function(method, url, data){                     
+      listenToXhr( xhr );
+      
+      xhr.open(method, url, true);
+      xhr.send(validatedRequestBody(data));         
+   };
 }
