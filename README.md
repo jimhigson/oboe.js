@@ -23,7 +23,7 @@ instance by calling one of these methods:
       url: String
       body: Object|String
       complete: Function
-   })   
+   })         
 ```   
 
 ```doneCallback``` is passed the entire json when the response is complete.
@@ -189,9 +189,12 @@ we won't wait for them to be loaded:
 ``` js
 oboe.doGet('/myapp/things.json')
    .onNode('foods.*', function( foodObject ){
-      // this callback will be called everytime a new object is found in the 
-      // foods array. We probably should put this in a js model ala MVC but for
-      // simplicity let's just use jQuery to show it in the DOM:
+   
+      // This callback will be called everytime a new object is found in the 
+      // foods array. Oboe won't wait for the download to finish first.
+       
+      // Let's use jQuery to show it in the DOM:
+      
       var newFoodElement = $('<div>')
                               .text('it is safe to eat ' + foodObject.name)
                               .css('color', foodObject.colour)
@@ -208,16 +211,14 @@ download footprint.
 
 ``` js
 oboe.doGet('/myapp/things.json')
-   .onNode('foods.*', function( foodObject ){
-
-      var newFoodElement = $('<div>')
-                              .text('it is safe to eat ' + foodObject.name)
-                              .css('color', foodObject.colour)
-                                    
-      $('#foods').append(newFoodElement);
-   })
-   .onNode('foods', function(){
-      this.abort();
+   .onNode({
+      'foods.*': function( foodObject ){
+   
+         alert('go ahead and eat some ' + foodObject.name);
+      },
+      'foods':, function(){
+         this.abort();
+      }
    });
 ```
 
