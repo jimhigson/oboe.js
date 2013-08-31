@@ -1,7 +1,7 @@
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, jsonRoot, fire, on) {
+function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -24,6 +24,10 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
          clarinetParser.close();
       }
    );
+   
+   if( doneCallback ) {
+      on(HTTP_DONE_EVENT, compose(doneCallback, jsonRoot));
+   }   
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
@@ -32,6 +36,8 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
    };
+  
+   
                 
    /**
     *  

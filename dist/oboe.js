@@ -881,6 +881,9 @@ function streamingXhr(fire, on) {
       listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
 
       numberOfCharsAlreadyGivenToCallback = 0;
+      
+   listenToXhr( xhr );
+         
 
    on( ABORTING, function(){
       // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
@@ -937,7 +940,9 @@ function streamingXhr(fire, on) {
       // On newer/better ones it'll be just the little bit that we got since last time.
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
-      newText && fire( HTTP_PROGRESS_EVENT, newText ); 
+      if( newText ) {
+         fire( HTTP_PROGRESS_EVENT, newText )
+      } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
@@ -952,14 +957,14 @@ function streamingXhr(fire, on) {
    }
 
    /**
+    * Return a function that allows the ajax call to start
+    * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
     * @param {String} data some content to be sent with the request. Only valid
     *                 if method is POST or PUT.
     */                      
-   return function(method, url, data){                     
-      listenToXhr( xhr );
-      
+   return function(method, url, data){                           
       xhr.open(method, url, true);
       xhr.send(validatedRequestBody(data));         
    };
@@ -1651,7 +1656,7 @@ var _S = 0,
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, jsonRoot, fire, on) {
+function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -1674,6 +1679,10 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
          clarinetParser.close();
       }
    );
+   
+   if( doneCallback ) {
+      on(HTTP_DONE_EVENT, compose(doneCallback, jsonRoot));
+   }   
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
@@ -1682,6 +1691,8 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
    };
+  
+   
                 
    /**
     *  
@@ -1785,29 +1796,20 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
    function apiMethod(httpMethodName, mayHaveRequestBody) {
                   
       return function(firstArg){
-      
-         // wire everything up:
-         var 
-            eventBus = pubSub(),
-            fire = eventBus.fire,
-            on = eventBus.on,            
-            sXhr = streamingXhr(fire, on),
-            clarinetParser = clarinet.parser(),
-            rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on),             
-            instController = instanceController(clarinetParser, rootJsonFn, fire, on),
- 
-            /**
-             * create a shortcutted version of controller.start for once arguments have been
-             * extracted from their various orders
-             */
-            start = function (url, body, callback){ 
-               if( callback ) {
-                  on(HTTP_DONE_EVENT, compose(callback, rootJsonFn));
-               }
-                   
-               sXhr( httpMethodName, url, body );
-            };
-             
+       
+         function start (url, body, callback){
+            var 
+               eventBus = pubSub(),
+               fire = eventBus.fire,
+               on = eventBus.on,
+               clarinetParser = clarinet.parser(),
+               rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
+            
+            streamingXhr(fire, on)( httpMethodName, url, body );
+                      
+            return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
+         }
+          
          if (isString(firstArg)) {
          
             // parameters specified as arguments
@@ -1818,7 +1820,8 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
             //  else it is:
             //     .method( url, callback )            
             //                                
-            start(   firstArg,                                       // url
+            return start(   
+                     firstArg,                                       // url
                      mayHaveRequestBody? arguments[1] : undefined,   // body
                      arguments[mayHaveRequestBody? 2 : 1] );         // callback
          } else {
@@ -1827,13 +1830,12 @@ function instanceController(clarinetParser, jsonRoot, fire, on) {
             // method signature is:
             //    .method({url:u, body:b, complete:c})
             
-            start(   firstArg.url,
+            return start(   
+                     firstArg.url,
                      firstArg.body,
                      firstArg.complete );
          }
-                                           
-         // return the controller to ask as the api for this instance                   
-         return instController;           
+                                                      
       };
    }   
 

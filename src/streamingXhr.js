@@ -19,6 +19,9 @@ function streamingXhr(fire, on) {
       listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
 
       numberOfCharsAlreadyGivenToCallback = 0;
+      
+   listenToXhr( xhr );
+         
 
    on( ABORTING, function(){
       // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
@@ -75,7 +78,9 @@ function streamingXhr(fire, on) {
       // On newer/better ones it'll be just the little bit that we got since last time.
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
-      newText && fire( HTTP_PROGRESS_EVENT, newText ); 
+      if( newText ) {
+         fire( HTTP_PROGRESS_EVENT, newText )
+      } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
@@ -90,14 +95,14 @@ function streamingXhr(fire, on) {
    }
 
    /**
+    * Return a function that allows the ajax call to start
+    * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
     * @param {String} data some content to be sent with the request. Only valid
     *                 if method is POST or PUT.
     */                      
-   return function(method, url, data){                     
-      listenToXhr( xhr );
-      
+   return function(method, url, data){                           
       xhr.open(method, url, true);
       xhr.send(validatedRequestBody(data));         
    };
