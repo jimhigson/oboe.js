@@ -7,162 +7,6 @@ doesn't care which other libraries you need it to speak to.
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
 Or even if it never completes.
 
-# API
-
-Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
-instance by calling one of these methods:
-
-```js
-   oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
-   oboe.doPut(    String url, String body, [Function doneCallback(wholeResponse)])
-   oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
-   oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
-   
-// methods also accept an options object:
-   oboe.doPost({
-      url: String
-      body: Object|String
-      complete: Function
-   })         
-```   
-
-```doneCallback``` is passed the entire json when the response is complete.
-Usually it is better to read the json one bit at a time than waiting for it to completely download so this parameter 
-is optional.
-
-The returned instance exposes a few chainable methods:
-
-```js
-   .onNode(String pattern, Function callback(thingFound, String[] path, context))
-```
-
-```.onNode()``` registers our interest in nodes in the JSON which match the given ```pattern```.
-Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
-When the pattern is matched the callback is given the matching node and a path describing where it was found.
-   
-```js
-   .onPath(String pattern, Function callback(thingFound, String[] path, context))
-```
-
-```onPath()``` is the same as ```.onNode()``` except the callback is fired when the *path* matches, not when we have the
-thing. For the same pattern this will always fire before ```.onNode()``` and might be used to get things ready for that call.
-
-Alternatively, several paths may be give at once to either ```onPath``` or ```onNode```:
-
-```js
-   .onNode({
-      pattern : callback,
-      pattern : callback,
-      pattern : callback
-   });
-``` 
-
-```js
-   .abort()
-```
-
-Stop the http call at any time. This is useful if you want to read into a json response only as
-far as is needed. You won't get any further .path() or .node() callbacks, even if the underlying
-xhr already has more content. There's an [example below](#taking-ajax-only-as-far-as-is-needed).
-
-```js
-   .onError(callback(Error e))
-```
-
-Supply a callback for when something goes wrong
-
-```js
-   .root()
-```
-
-At any time, call .root() on the oboe instance to get the json recieved so far. 
-If nothing has been recieved yet this will return undefined, otherwise it will give the root Object.
-Technically, this could also return an Array but it is unusual for a json file to not have an Object at the
-top level.
-
-## Pattern matching
-
-Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these clauses:
-
-`!` root object   
-`.`  path separator   
-`person` an element under the key 'person'  
-`{name email}` an element with attributes name and email  
-`*`  any element at any name  
-`[2]`  the second element (of an array)  
-`['foo']`  equivalent to .foo  
-`[*]`  equivalent to .*  
-`..` any number of intermediate nodes (non-greedy)
-`$` explicitly specify an intermediate clause in the jsonpath spec the callback should be applied to
-
-The pattern engine supports 
-[CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (```$```) symbol.
-
-There are also **[some example patterns](#more-example-patterns)** below. 
-
-# Why I made this
-
-Early in 2013 I was working on complementing some Flash financial charts with a more modern 
-html5/[d3](http://d3js.org) based web application.
-The Flash app started by making http requests for a very large set of initial data. It took
-a long time to load but once it was started the client-side model was so completely primed that it wouldn't need to 
-request again unless the user scrolled **waaaay** into the past.
-
-People hate waiting on the web so *naturally* I want my html5 app to be **light and nimble** and 
-**load in the merest blink of an eye**. 
-Instead of starting with one huge request I set about making lots of smaller ones just-in-time
-as the user moves throughout the data.
-This gave a big improvement in load times but also some new challenges.
- 
-Firstly, with so many small requests there is an increased http overhead. Worse, not having a model full of data 
-early means the user is likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
-*'when you no longer have a good connection'*.
-
-I made Oboe to break out of this big-small compromise. We requested relatively large data but 
-started rendering as soon as the first datum arrived. We have enough for a screenfull when the request is 
-about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
-steams silently in the background.
-
-Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
-but then we'd have to rewrite the server-side and the legacy charts would have no idea how to connect to the new server.
-It is nice to just have one, simple service for everything.
-
-# Status
-
-Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
-Patches and suggestions most welcome.
-
-The project is designed in for easy testability and has [about 200 cases](/test/specs).
-
-BSD licenced.
-    
-# More use cases
-
-Oboe.js isn't specific to my application domain, or even to solving the big-small download compromise. Here are some
-more use cases that I can think of: 
-
-**Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
-inbox when her train goes under a tunnel. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
-she can still read most of her emails. When the connection comes back again later the webapp is smart enough to just 
-re-request the part that failed. 
-
-**Arnold** is using a programmable stock screener.
-The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
-means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. 
-Since Oboe isn't true streaming it plays nice with the browser cache so now he see the same results instantly from cache.
-
-**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, aggregated json 
-for all of her modules.
-Unfortunately, one of the services being aggregated is slower than the others and under traditional
-ajax she is forced to wait for the slowest module to load before she can show any of them. 
-**Oboe.js** is better, the fast modules load quickly and the slow modules load later. 
-Her users are happy because they can navigate page-to-page more fluidly and not all of them cared about the slow module anyway.
-
-**John** is developing internally on a fast network so he doesn't really care about progressive loading. Oboe.js provides 
-a neat way to route different parts of a json response to different parts of his application. One less bit to write.
-
-
 # Examples
 
 ## Using objects from the JSON stream
@@ -453,7 +297,162 @@ oboe.doGet('people.json')
       currentPersonElement.remove();
    })
 ```
+
+# API
+
+Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
+instance by calling one of these methods:
+
+```js
+   oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
+   oboe.doPut(    String url, String body, [Function doneCallback(wholeResponse)])
+   oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
+   oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
+   
+// methods also accept an options object:
+   oboe.doPost({
+      url: String
+      body: Object|String
+      complete: Function
+   })         
+```   
+
+```doneCallback``` is passed the entire json when the response is complete.
+Usually it is better to read the json one bit at a time than waiting for it to completely download so this parameter 
+is optional.
+
+The returned instance exposes a few chainable methods:
+
+```js
+   .onNode(String pattern, Function callback(thingFound, String[] path, context))
+```
+
+```.onNode()``` registers our interest in nodes in the JSON which match the given ```pattern```.
+Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
+When the pattern is matched the callback is given the matching node and a path describing where it was found.
+   
+```js
+   .onPath(String pattern, Function callback(thingFound, String[] path, context))
+```
+
+```onPath()``` is the same as ```.onNode()``` except the callback is fired when the *path* matches, not when we have the
+thing. For the same pattern this will always fire before ```.onNode()``` and might be used to get things ready for that call.
+
+Alternatively, several paths may be give at once to either ```onPath``` or ```onNode```:
+
+```js
+   .onNode({
+      pattern : callback,
+      pattern : callback,
+      pattern : callback
+   });
+``` 
+
+```js
+   .abort()
+```
+
+Stop the http call at any time. This is useful if you want to read into a json response only as
+far as is needed. You won't get any further .path() or .node() callbacks, even if the underlying
+xhr already has more content. There's an [example below](#taking-ajax-only-as-far-as-is-needed).
+
+```js
+   .onError(callback(Error e))
+```
+
+Supply a callback for when something goes wrong
+
+```js
+   .root()
+```
+
+At any time, call .root() on the oboe instance to get the json recieved so far. 
+If nothing has been recieved yet this will return undefined, otherwise it will give the root Object.
+Technically, this could also return an Array but it is unusual for a json file to not have an Object at the
+top level.
+
+## Pattern matching
+
+Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/json-path/). It supports these clauses:
+
+`!` root object   
+`.`  path separator   
+`person` an element under the key 'person'  
+`{name email}` an element with attributes name and email  
+`*`  any element at any name  
+`[2]`  the second element (of an array)  
+`['foo']`  equivalent to .foo  
+`[*]`  equivalent to .*  
+`..` any number of intermediate nodes (non-greedy)
+`$` explicitly specify an intermediate clause in the jsonpath spec the callback should be applied to
+
+The pattern engine supports 
+[CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
+using the dollar (```$```) symbol.
+
+There are also **[some example patterns](#more-example-patterns)** below. 
+
+# Why I made this
+
+Early in 2013 I was working on complementing some Flash financial charts with a more modern 
+html5/[d3](http://d3js.org) based web application.
+The Flash app started by making http requests for a very large set of initial data. It took
+a long time to load but once it was started the client-side model was so completely primed that it wouldn't need to 
+request again unless the user scrolled **waaaay** into the past.
+
+People hate waiting on the web so *naturally* I want my html5 app to be **light and nimble** and 
+**load in the merest blink of an eye**. 
+Instead of starting with one huge request I set about making lots of smaller ones just-in-time
+as the user moves throughout the data.
+This gave a big improvement in load times but also some new challenges.
+ 
+Firstly, with so many small requests there is an increased http overhead. Worse, not having a model full of data 
+early means the user is likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
+*'when you no longer have a good connection'*.
+
+I made Oboe to break out of this big-small compromise. We requested relatively large data but 
+started rendering as soon as the first datum arrived. We have enough for a screenfull when the request is 
+about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
+steams silently in the background.
+
+Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
+but then we'd have to rewrite the server-side and the legacy charts would have no idea how to connect to the new server.
+It is nice to just have one, simple service for everything.
+
+# Status
+
+Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
+Patches and suggestions most welcome.
+
+The project is designed in for easy testability and has [about 200 cases](/test/specs).
+
+BSD licenced.
     
+# More use cases
+
+Oboe.js isn't specific to my application domain, or even to solving the big-small download compromise. Here are some
+more use cases that I can think of: 
+
+**Sarah** is sitting on a train using her mobile phone to check her email. The phone has almost finished downloading her 
+inbox when her train goes under a tunnel. Luckily, her webmail developers used **Oboe.js** so instead of the request failing 
+she can still read most of her emails. When the connection comes back again later the webapp is smart enough to just 
+re-request the part that failed. 
+
+**Arnold** is using a programmable stock screener.
+The query is many-dimensional so screening all possible companies sometimes takes a long time. To speed things up, **Oboe.js**,
+means each result can be streamed and displayed as soon as it is found. Later, he revisits the same query page. 
+Since Oboe isn't true streaming it plays nice with the browser cache so now he see the same results instantly from cache.
+
+**Janet** is working on a single-page modular webapp. When the page changes she wants to ajax in a single, aggregated json 
+for all of her modules.
+Unfortunately, one of the services being aggregated is slower than the others and under traditional
+ajax she is forced to wait for the slowest module to load before she can show any of them. 
+**Oboe.js** is better, the fast modules load quickly and the slow modules load later. 
+Her users are happy because they can navigate page-to-page more fluidly and not all of them cared about the slow module anyway.
+
+**John** is developing internally on a fast network so he doesn't really care about progressive loading. Oboe.js provides 
+a neat way to route different parts of a json response to different parts of his application. One less bit to write.
+   
 ## More example patterns:
   
 `!.foods.colour` the colours of the foods  
