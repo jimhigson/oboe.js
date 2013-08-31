@@ -382,9 +382,9 @@ var things = d3.selectAll('rect.thing');
 // Every time we see a new thing in the data stream, use d3 to add an element to our 
 // visualisation. This basic pattern should work for most visualistions built in d3.
 oboe.doGet('/data/things.json')
-   .onNode('$things.*', function( things ){
+   .onNode('$things.*', function( thingsArray ){
             
-      things.data(things)
+      things.data(thingsArray)
          .enter().append('svg:rect')
             .classed('thing', true)
             .attr(x, function(d){ return d.x })
