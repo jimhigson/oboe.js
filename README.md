@@ -9,7 +9,7 @@ Or even if it never completes.
 
 # API
 
-Oboe exposes only one globally available object, ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
+Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
 instance by calling one of these methods:
 
 ```js
