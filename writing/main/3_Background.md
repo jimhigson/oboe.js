@@ -4,14 +4,15 @@ Background
 <!---
 background should be 2-10 pages
 
-That's 1,000 to 5,000 words.
+That's 1,000 to 5,000 words. (500 per page)
+
+Or, 666 to 3,333 (333 per page)
 
  * introduces the reader to the problem domain or application area
  * ...the context in which the project takes place
  * principles and techniques that will be applied or discussed
     * prior art
     * what out there is being popularly used?
-      
    
 --->
 
@@ -32,7 +33,6 @@ all the more beneficial since decisions to terminate the connection may
 be made. Example: academic's list of publications, then downloading all
 the new ones.
 
-
 Some high-level stuff about webapps and where processing is done
 ----------------------------------------------------------------
 
@@ -44,9 +44,9 @@ partially on client side](images/placeholder)
 Separated from services by http calls regardless.
 
 Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE:
-get from old dis). When timbl appeared at the olympics at a nextcube having
-invented the web, the next os was more of a forerunner for the web than
-just the platform it was implemented on. 
+get from old dis). When timbl appeared at the olympics at a nextcube
+having invented the web, the next os was more of a forerunner for the
+web than just the platform it was implemented on.
 
 Next is closest pre-runner to current web architecture.
 
@@ -215,12 +215,25 @@ This make this slighlty harder but nontheless attempts have been made.
 
 Linq. (CITEME)
 
-Parsing: SAX and Dom
+State of parsing: SAX and Dom
 --------------------
 
-Why sax is difficult
+Why sax is difficult and nobody uses it
 
-DOM parser can be built on a SAX parser. Often are. CITE: Java and XML book.
+DOM parser can be built on a SAX parser. Often are. CITE: Java and XML
+book.
+
+The failure of sax: requires programmer to do a lot of work to identify
+interesting things. Eg, to find tag address inside tag person with a
+given name, have to recognise three things while reieving a callback for
+every single element and attribute in the document. As a principle, the
+programmer should only have to handle the cases which are interesting to
+them, not wade manually through a haystack in search of a needle, which
+means the library should provide an expressive way of associating the
+nodes of interest with their targetted callbacks.
+
+Programmer has to track the descent down to an interesting node in some kind of list
+themselves.
 
 State of http as a streaming technology
 ---------------------------------------
@@ -250,6 +263,19 @@ Must be read Writing script tags
 All require server to have a special mode. Encoding is specific to get
 arround restrictions.
 
+What 'this' (context) is in javascript. Why not calling it scope.
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to
+
+Why not this one. Resume on a higher semantic level.
+
+jsonpath
+--------
+
 JsonPath in general tries to resemble the javascript use of the json
 language nodes it is detecting.
 
@@ -272,8 +298,6 @@ let addresss = person.address[2]
 // the equivalent jsonpath expression is identical:
 let jsonPath = "person.address[2]"
 ~~~~
-
-What 'this' (context) is in javascript. Why not calling it scope.
 
 The web browser as REST client
 ------------------------------
@@ -426,21 +450,8 @@ Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
 
-Http resume
------------
-
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to
-
-Why not this one. Resume on a higher semantic level.
-
 Updating versioning
 -------------------
-
-
 
 Because of the contagion problem, need to be able to create
 loosely-coupled systems.
