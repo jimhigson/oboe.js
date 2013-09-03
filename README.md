@@ -1,11 +1,25 @@
-**Oboe.js** takes a fresh appraoch to AJAX for web applications by wrapping a progressive interface
-around https's standard request-response model. It glues a transport that sits 
-**somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
-DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any external dependencies and 
-doesn't care which other libraries you need it to speak to.
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-Oboe makes it really easy to start using json from a response before the ajax request completes. 
-Or even if it never completes.
+- [Examples](#examples)
+	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
+	- [Hanging up the AJAX when we have what we want](#hanging-up-the-ajax-when-we-have-what-we-want)
+	- [Listening for strings](#listening-for-strings)
+	- [Duck typing](#duck-typing)
+	- [Reacting before we have the whole object](#reacting-before-we-have-the-whole-object)
+	- [Giving some visual feedback as a page is updating](#giving-some-visual-feedback-as-a-page-is-updating)
+	- [The path passback](#the-path-passback)
+	- [Css4 style patterns](#css4-style-patterns)
+	- [Using Oboe with d3.js](#using-oboe-with-d3js)
+	- [Error handling](#error-handling)
+- [API](#api)
+	- [Pattern matching](#pattern-matching)
+- [Why I made this](#why-i-made-this)
+- [Status](#status)
+- [More use cases](#more-use-cases)
+	- [More example patterns](#more-example-patterns)
+	- [Getting the most from oboe](#getting-the-most-from-oboe)
+- [Browser support](#browser-support)
+	- [Running the tests](#running-the-tests)
 
 # Examples
 
@@ -450,7 +464,7 @@ Her users are happy because they can navigate page-to-page more fluidly and not 
 **John** is developing internally on a fast network so he doesn't really care about progressive loading. Oboe.js provides 
 a neat way to route different parts of a json response to different parts of his application. One less bit to write.
    
-## More example patterns:
+## More example patterns
   
 `!.foods.colour` the colours of the foods  
 `person.emails[1]` the first element in the email array for each person
