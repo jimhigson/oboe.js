@@ -2,10 +2,10 @@
 
 - [Examples](#examples)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
-	- [Hanging up the AJAX when we have what we want](#hanging-up-the-ajax-when-we-have-what-we-want)
-	- [Listening for strings](#listening-for-strings)
+	- [Hanging up the AJAX when we get what we need](#hanging-up-the-ajax-when-we-get-what-we-need)
+	- [Detecting strings, numbers](#detecting-strings-numbers)
 	- [Duck typing](#duck-typing)
-	- [Reacting before we have the whole object](#reacting-before-we-have-the-whole-object)
+	- [Reacting before we get the whole object](#reacting-before-we-get-the-whole-object)
 	- [Giving some visual feedback as a page is updating](#giving-some-visual-feedback-as-a-page-is-updating)
 	- [The path passback](#the-path-passback)
 	- [Css4 style patterns](#css4-style-patterns)
@@ -16,8 +16,8 @@
 - [Why I made this](#why-i-made-this)
 - [Status](#status)
 - [More use cases](#more-use-cases)
-	- [More example patterns](#more-example-patterns)
-	- [Getting the most from oboe](#getting-the-most-from-oboe)
+	- [Some example patterns](#some-example-patterns)
+- [Getting the most from oboe](#getting-the-most-from-oboe)
 - [Browser support](#browser-support)
 	- [Running the tests](#running-the-tests)
 
@@ -61,7 +61,7 @@ oboe.doGet('/myapp/things.json')
    });
 ```
 
-## Hanging up the AJAX when we have what we want
+## Hanging up the AJAX when we get what we need
 
 We can example on the example above. Since we only care about the foods object and 
 not the non-foods we can hang up as soon as we have the foods, reducing our precious 
@@ -80,14 +80,19 @@ oboe.doGet('/myapp/things.json')
    });
 ```
 
-## Listening for strings
+## Detecting strings, numbers
 
-Want to detect strings instead of objects? Oboe doesn't care about the types in the json so the syntax is just the same:
+Want to detect strings or numbers instead of objects? Oboe doesn't care about the 
+types in the json so the syntax is the same:
 
 ``` js
-   oboeInstance.onNode('name', function( name ){
-      jQuery('ul#names').append( $('<li>').text(name) );
-   });
+   oboeInstance.onNode({
+      'name': function( name ){
+         jQuery('ul#names').append( $('<li>').text(name) );
+      },
+      'friendCount':function( numberOfFriends ){
+         // etc etc
+      });
 ```
 
 ## Duck typing
@@ -104,7 +109,7 @@ Sometimes it is more useful to say *what you are trying to find* than *where you
 ```   
 
 
-## Reacting before we have the whole object
+## Reacting before we get the whole object
 
 As well as ```.onNode```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
 know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
@@ -464,7 +469,7 @@ Her users are happy because they can navigate page-to-page more fluidly and not 
 **John** is developing internally on a fast network so he doesn't really care about progressive loading. Oboe.js provides 
 a neat way to route different parts of a json response to different parts of his application. One less bit to write.
    
-## More example patterns
+## Some example patterns
   
 `!.foods.colour` the colours of the foods  
 `person.emails[1]` the first element in the email array for each person
@@ -481,7 +486,7 @@ a neat way to route different parts of a json response to different parts of his
 `*` every object, string, number etc found in the json stream  
 `!` the root object (fired when the whole response is available, like JSON.parse())  
 
-## Getting the most from oboe
+# Getting the most from oboe
 
 Asynchronous parsing is better if the data is written out progressively from the server side
 (think [node](http://nodejs.org/) or [Netty](http://netty.io/)) because we're sending
