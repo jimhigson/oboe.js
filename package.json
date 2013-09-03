@@ -36,6 +36,7 @@
     "karma-firefox-launcher": "~0.1.0",
     "grunt-contrib-watch": "~0.5.1",
     "matchdep": "~0.1.2",
-    "grunt-contrib-clean": "~0.5.0"
+    "grunt-contrib-clean": "~0.5.0",
+    "doctoc": "~0.4.3"
   }
 }
