@@ -450,8 +450,8 @@ Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
 
-Updating versioning
--------------------
+Loose coupling and Updating versioning
+--------------------------------------
 
 Because of the contagion problem, need to be able to create
 loosely-coupled systems.
