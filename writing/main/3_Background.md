@@ -16,8 +16,6 @@ Or, 666 to 3,333 (333 per page)
    
 --->
 
-
-
 In fact, this is exactly how web browsers are implemented. However, this
 progressive use of http is hardwired into the browser engines rather
 than exposing an API suitable for general use and as such is treated as
@@ -33,8 +31,10 @@ all the more beneficial since decisions to terminate the connection may
 be made. Example: academic's list of publications, then downloading all
 the new ones.
 
-Some high-level stuff about webapps and where processing is done
-----------------------------------------------------------------
+
+
+State of the web
+----------------
 
 Ie, front-end client-side, front-end server-side.
 
@@ -91,6 +91,44 @@ times.
 
 http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
+State of http as a streaming technology
+---------------------------------------
+
+Http libraries feeding into the parser. In browser, generally single
+callback when whole message received.
+
+Client-side web scripting via Javascript is a field which at inception
+contributed no more than small, frequently gimmicky, dynamic features
+added to otherwise static webpages. Today the scope and power of client
+side scripting has increased to the extent that the entire interface for
+large, complex applications is often programmed in this way. These
+applications are not limited to running under traditional web browsers
+but also include mobile apps and desktop software.
+
+Dichotamy between streaming and downloading in the browser for
+downloading data. But not for html (progressive rendering) or images
+(progressive PNGs and progressive JPEGs).
+
+Also progressive SVGs. IE, load this in a recent version of Google
+Chrome:
+[https://upload.wikimedia.org/wikipedia/commons/0/04/Marriage\_%28Same-Sex\_Couples%29\_Bill%2C\_Second\_Reading.svg]
+
+Lack of support in browser Long poll - for infrequent push messages.
+Must be read Writing script tags
+
+All require server to have a special mode. Encoding is specific to get
+arround restrictions.
+
+What 'this' (context) is in javascript. Why not calling it scope.
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to
+
+Why not this one. Resume on a higher semantic level.
+
 SOA
 ---
 
@@ -101,7 +139,7 @@ What is a rest client in this context (a client library)
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
 Allows one model to be written out to XML or JSON
 
-Anatomy of a SOA client
+Have we marshal/de-marshall our problem domain into REST
 -----------------------
 
 First stage after getting a resource is usually to programmatically
@@ -215,6 +253,31 @@ This make this slighlty harder but nontheless attempts have been made.
 
 Linq. (CITEME)
 
+Loose coupling and Updating versioning
+--------------------------------------
+
+Because of the contagion problem, need to be able to create
+loosely-coupled systems.
+
+Inside systems also, even with automatic refactoring tools, only
+automate and therefoer lessen but do not remove the problem that
+coupling causes changes in one place of a codebase to cause knock-on
+changes in remote other parts of the code. A method of programming which
+was truly compatible with extreme programming would involve designing
+for constant change without disparate parts having to be modified as
+structural refactoring occurs.
+
+I propose that in a changing system, readability of code's changelog is
+as important as readability of the code itself. Extraneous changes
+dilute the changelog, making it less easily defined by code changes
+which are intrinsically linked to the actual change in the logic being
+expressed by the program.
+
+It is often stated that understandability is the number once most
+important concern in a codebase (CITE) - if the code is suitably dynamic
+it is important that changes are axiomic and clarity of the changelog is
+equally important.
+
 State of parsing: SAX and Dom
 --------------------
 
@@ -235,45 +298,13 @@ nodes of interest with their targetted callbacks.
 Programmer has to track the descent down to an interesting node in some kind of list
 themselves.
 
-State of http as a streaming technology
----------------------------------------
+Json and XML
+---------------------------
 
-Http libraries feeding into the parser. In browser, generally single
-callback when whole message received.
+Json is very simple, only a few CFGs required to describe the language
+(json.org) - this project is listed there!
 
-Client-side web scripting via Javascript is a field which at inception
-contributed no more than small, frequently gimmicky, dynamic features
-added to otherwise static webpages. Today the scope and power of client
-side scripting has increased to the extent that the entire interface for
-large, complex applications is often programmed in this way. These
-applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software.
-
-Dichotamy between streaming and downloading in the browser for
-downloading data. But not for html (progressive rendering) or images
-(progressive PNGs and progressive JPEGs).
-
-Also progressive SVGs. IE, load this in a recent version of Google
-Chrome:
-[https://upload.wikimedia.org/wikipedia/commons/0/04/Marriage\_%28Same-Sex\_Couples%29\_Bill%2C\_Second\_Reading.svg]
-
-Lack of support in browser Long poll - for infrequent push messages.
-Must be read Writing script tags
-
-All require server to have a special mode. Encoding is specific to get
-arround restrictions.
-
-What 'this' (context) is in javascript. Why not calling it scope.
-
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to
-
-Why not this one. Resume on a higher semantic level.
-
-jsonpath
+jsonpath and xpath
 --------
 
 JsonPath in general tries to resemble the javascript use of the json
@@ -309,7 +340,7 @@ Language grammars rarely disagree, incompatability due to scripting is
 almost always due to the APIs presented to the scripting language rather
 than the language itself.
 
-Progressive UI
+Progressive UI/ Streaming UI
 --------------
 
 Infinitely scrolling webpages. Need a way to 'pull' information, not
@@ -317,12 +348,6 @@ just push if reacting to scrolling. Use oboe with websockets? Eg, ebay
 home page, Facebook. Adv of infinate scroll is page loads quickly and
 most people won't scroll very far so most of the time have everything
 needed right away.
-
-State of rest: Json and XML
----------------------------
-
-Json is very simple, only a few CFGs required to describe the language
-(json.org) - this project is listed there!
 
 Javascript
 ----------
@@ -365,6 +390,37 @@ misplace a comma or closing bracket.
           return cons(fn(head(list)), map(fn,tail(list)));
        }
     }
+
+Browser
+-------
+
+*XmlHttpRequest* (XHR)
+
+Xhr2 and the .onprogress callback. polling responseText while in
+progress \* why doesn't work in IE (built on an activeX object that
+provides buffering)
+
+Older style of javascript callback. Assign a listener to onprogress, not
+call an add listener method means can only have one listener.
+
+> While the request entity body is being transmitted and the upload
+> complete flag is unset, queue a task to fire a progress event named
+> progress on the XMLHttpRequestUpload object about every 50ms or for
+> every byte transmitted, whichever is least frequent. [w3c, XHR Working
+> Draft](http://www.w3.org/TR/XMLHttpRequest/)
+
+Websockets More like node Can connect to any protocol (as always, easier
+to program if text based but can do binary) Can use to do http but not
+sufficient advantage over using
+
+Micro-libraries
+---------------
+
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
 
 Node
 ----
@@ -428,71 +484,6 @@ Criticisms of Node. Esp from Erlang etc devs.
 
 Node's standard stream mechanisms
 
-Browser
--------
-
-*XmlHttpRequest* (XHR)
-
-Xhr2 and the .onprogress callback. polling responseText while in
-progress \* why doesn't work in IE (built on an activeX object that
-provides buffering)
-
-Older style of javascript callback. Assign a listener to onprogress, not
-call an add listener method means can only have one listener.
-
-> While the request entity body is being transmitted and the upload
-> complete flag is unset, queue a task to fire a progress event named
-> progress on the XMLHttpRequestUpload object about every 50ms or for
-> every byte transmitted, whichever is least frequent. [w3c, XHR Working
-> Draft](http://www.w3.org/TR/XMLHttpRequest/)
-
-Websockets More like node Can connect to any protocol (as always, easier
-to program if text based but can do binary) Can use to do http but not
-sufficient advantage over using
-
-Loose coupling and Updating versioning
---------------------------------------
-
-Because of the contagion problem, need to be able to create
-loosely-coupled systems.
-
-Inside systems also, even with automatic refactoring tools, only
-automate and therefoer lessen but do not remove the problem that
-coupling causes changes in one place of a codebase to cause knock-on
-changes in remote other parts of the code. A method of programming which
-was truly compatible with extreme programming would involve designing
-for constant change without disparate parts having to be modified as
-structural refactoring occurs.
-
-I propose that in a changing system, readability of code's changelog is
-as important as readability of the code itself. Extraneous changes
-dilute the changelog, making it less easily defined by code changes
-which are intrinsically linked to the actual change in the logic being
-expressed by the program.
-
-It is often stated that understandability is the number once most
-important concern in a codebase (CITE) - if the code is suitably dynamic
-it is important that changes are axiomic and clarity of the changelog is
-equally important.
-
-Micro-libraries
----------------
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
-
-Methodology
------------
-
-The program design will be initially an exercise in creating the easiest
-expression that can possibly work and via constant work towards the
-emergence of elegance.
-
-Why this method? See W'yg.
-
 Testing
 -------
 
@@ -523,3 +514,12 @@ unresponsive. Generally unreliable, has to be restarted frequently.
 JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
+
+Methodology
+-----------
+
+The program design will be initially an exercise in creating the easiest
+expression that can possibly work and via constant work towards the
+emergence of elegance.
+
+Why this method? See W'yg.
