@@ -391,6 +391,12 @@ misplace a comma or closing bracket.
        }
     }
 
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
 Browser
 -------
 
@@ -413,14 +419,6 @@ Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
 
-Micro-libraries
----------------
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
 
 Node
 ----
