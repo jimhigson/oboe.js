@@ -2,7 +2,17 @@ Background
 ==========
 
 <!---
-**background should be 2-10 pages**
+background should be 2-10 pages
+
+That's 1,000 to 5,000 words.
+
+ * introduces the reader to the problem domain or application area
+ * ...the context in which the project takes place
+ * principles and techniques that will be applied or discussed
+    * prior art
+    * what out there is being popularly used?
+      
+   
 --->
 
 
@@ -34,7 +44,9 @@ partially on client side](images/placeholder)
 Separated from services by http calls regardless.
 
 Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE:
-get from old dis)
+get from old dis). When timbl appeared at the olympics at a nextcube having
+invented the web, the next os was more of a forerunner for the web than
+just the platform it was implemented on. 
 
 Next is closest pre-runner to current web architecture.
 
@@ -47,6 +59,16 @@ background.
 
 However, with Node don't have to reengineer to move from client to
 server.
+
+Big/small message problem and granularity. With small: http overhead.
+With big: not all may be needed.
+
+Javascript as mis-understood language (CITE: Crockford) - list features
+available.
+
+(correctly, ECMAScript) Misleadingly named after Java as a marketing
+ploy when Java was a new technology (CITE) - in true more similar to
+Scheme or Lisp but with Java or C inspired syntax.
 
 Where the delays are in a web application
 -----------------------------------------
@@ -78,16 +100,6 @@ What is a rest client in this context (a client library)
 
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
 Allows one model to be written out to XML or JSON
-
-Big/small message problem and granularity. With small: http overhead.
-With big: not all may be needed.
-
-Javascript as mis-understood language (CITE: Crockford) - list features
-available.
-
-(correctly, ECMAScript) Misleadingly named after Java as a marketing
-ploy when Java was a new technology (CITE) - in true more similar to
-Scheme or Lisp but with Java or C inspired syntax.
 
 Anatomy of a SOA client
 -----------------------
@@ -172,7 +184,7 @@ is very natural to consider all elements to belong to their ancestors.
 Examples are myriad, for example consider a word count in a book written
 in DOCBook format - it should be calculable without knowing if the book
 is split into chapters or not since this is a concept internal to the
-oranisation of the book itserlf nd not soemthing that a querier is
+organisation of the book itself nd not something that a querier is
 likely to find interesting - if this must be considered the structure
 acts as barrier to information rather than enabling the information's
 delivery. Therefore, in many cases the exact location of a piece of
@@ -208,7 +220,7 @@ Parsing: SAX and Dom
 
 Why sax is difficult
 
-DOM parser can be built on a SAX parser
+DOM parser can be built on a SAX parser. Often are. CITE: Java and XML book.
 
 State of http as a streaming technology
 ---------------------------------------
