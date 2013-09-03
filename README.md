@@ -348,13 +348,10 @@ Alternatively, several paths may be give at once to either ```onPath``` or ```on
    });
 ``` 
 
-```js
-   .abort()
-```
-
-Stop the http call at any time. This is useful if you want to read into a json response only as
-far as is needed. You won't get any further .path() or .node() callbacks, even if the underlying
-xhr already has more content. There's an [example below](#taking-ajax-only-as-far-as-is-needed).
+```abort()``` Stops the http call at any time. This is useful if you want to read a json response only as
+far as is necessary. Everything stops. You are guaranteed not to get any further .path() or .node() 
+callbacks, even if the underlying xhr already has additional content buffered.
+See [example above](#taking-ajax-only-as-far-as-is-needed).
 
 ```js
    .onError(callback(Error e))
