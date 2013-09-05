@@ -91,8 +91,8 @@ times.
 
 http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
-State of http as a streaming technology
----------------------------------------
+Http and streaming
+------------------
 
 Http libraries feeding into the parser. In browser, generally single
 callback when whole message received.
