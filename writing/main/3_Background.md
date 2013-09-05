@@ -119,8 +119,6 @@ Must be read Writing script tags
 All require server to have a special mode. Encoding is specific to get
 arround restrictions.
 
-What 'this' (context) is in javascript. Why not calling it scope.
-
 Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
 which can be used to request any contiguous part of a response rather
@@ -351,6 +349,8 @@ needed right away.
 
 Javascript
 ----------
+
+What 'this' (context) is in javascript. Why not calling it scope.
 
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
