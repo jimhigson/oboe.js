@@ -31,8 +31,6 @@ all the more beneficial since decisions to terminate the connection may
 be made. Example: academic's list of publications, then downloading all
 the new ones.
 
-
-
 State of the web
 ----------------
 
@@ -94,30 +92,83 @@ http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=fee
 Http and streaming
 ------------------
 
-Http libraries feeding into the parser. In browser, generally single
-callback when whole message received.
+Http is essentially a thinly-wrapped text response around some usually text-based (but sometimes
+binary) data. It may give the length of the content as a header, but is not obliged to.
+It supports an explicitly chunked mode, but even the non-chunked mode may be considered as a stream.
+For example, a program generating web pages on the server side might choose to use chunking so that
+the browser is better able to choose when to re-render during the progressive display of a page
+[@perceptionHttpChunkedSpeed] but this is optional and without these hints progressive rendering
+will still take place. 
 
-Client-side web scripting via Javascript is a field which at inception
-contributed no more than small, frequently gimmicky, dynamic features
-added to otherwise static webpages. Today the scope and power of client
-side scripting has increased to the extent that the entire interface for
-large, complex applications is often programmed in this way. These
-applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software.
+The requesting of http from Javascript, commonly termed AJAX, was so significant a technique in 
+establishing the modern web application architecture that it is often taken as being a synonym
+for Javascript-heavy web pages. Although an acronym for Asynchronous Javascript and XML,
+for data services designed with delivery to client-side web applications in mind JSON is 
+almost exclusively preferred to XML and the term is used without regard for the data format of the 
+response (the unpronounceable *AJAJ* never took off).
+During the 'browser war' years adding non-standard features was a common form of
+competition between authors; following this pattern Internet 
+Explorer originally made AJAX possible by exposing Microsoft's Active X *Xml Http Request*, or XHR, 
+object to Javascript programmers. This was widely copied as functional equivalents were added to
+all major browsers and the technique was eventually formalised by the W3C[@xhrWorkingDraft].
+What followed was a period of stagnation for web browsers. HTML4 reached W3C Recommendation status in 
+2001 but having subsequently found several evolutionary dead ends such as XHTML, the developer community
+would see no major updates until HTML5 started to gather pace some ten years later. 
+In this context the web continued to rapidly mature as an application platform and
+AJAX programming inevitably overtook the original XHR specification, browser vendors again adding 
+their own proprietary extensions to compensate.
+
+Given this backdrop of non-standard extensions and lagging standardisation, abstraction layers 
+predictably rose in popularity. These layers competed on developer ergonomics with the popular 
+jQuery and Prototype.js 
+promoting themselves respectively as *"do more, write less"* and *"elegant APIs around the clumsy 
+interfaces of Ajax"*.
+JSON being a subset of Javascript, almost without noticing web developers found themselves in the 
+privileged position whereby the serialised objects 
+in their data format map exactly onto the basic types of their programming
+language. As such there was never any confusion as to which exact object structure to de-serialise to.
+If this seems like a minor advantage, contrast with the plethora of confusing and incompatible representations of 
+JSON output presented by the various Java JSON parsers; JSON's Object better resembles Java's Map than Object and the
+confusing between JSON null, Java null, and Jackson's NullNode ^[http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html]
+is a common cause of errors.
+Given the certainty regarding deserialisation, JSON parsers could be safely integrated 
+directly into AJAX libraries, providing a call style for working with remote resources so 
+streamlined that it hardly requires any additional effort.   
+
+```javascript
+jQuery.ajax('http://example.com/people.json', function( people ) {
+
+   alert('the first person is called ' + people[0].name);
+
+});
+
+```
+ 
+HTML5 is better thought of as an umbrella term for the renewal of the specification of many 
+related technologies rather than referring primarily to the HTML markup format.  
+
+ the HTML5 effort to bring official web standards
+up to date with. Taking the 'tarmaced goat path' approach.  
+XHR2 spec was eventually  
+ 
+Given the emergence of the web as a popular means of application development and given that the
+web has only http available as a transport, a range of techniques have been developed for
+streaming transports to client-side logic by building on top of http. 
+These approaches dichotomously split http usage into downloading and streaming, so that a wholly
+    
+
 
 Dichotamy between streaming and downloading in the browser for
 downloading data. But not for html (progressive rendering) or images
 (progressive PNGs and progressive JPEGs).
 
-Also progressive SVGs. IE, load this in a recent version of Google
-Chrome:
-[https://upload.wikimedia.org/wikipedia/commons/0/04/Marriage\_%28Same-Sex\_Couples%29\_Bill%2C\_Second\_Reading.svg]
+Also progressive SVGs. [^1]
 
 Lack of support in browser Long poll - for infrequent push messages.
 Must be read Writing script tags
 
 All require server to have a special mode. Encoding is specific to get
-arround restrictions.
+around restrictions.
 
 Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
@@ -138,7 +189,7 @@ Marshalling/ de-marshalling. Benefits and the problems that it causes.
 Allows one model to be written out to XML or JSON
 
 Have we marshal/de-marshall our problem domain into REST
------------------------
+--------------------------------------------------------
 
 First stage after getting a resource is usually to programmatically
 extract the interesting part from it. This is usually done via calls in
@@ -277,7 +328,7 @@ it is important that changes are axiomic and clarity of the changelog is
 equally important.
 
 State of parsing: SAX and Dom
---------------------
+-----------------------------
 
 Why sax is difficult and nobody uses it
 
@@ -293,17 +344,17 @@ them, not wade manually through a haystack in search of a needle, which
 means the library should provide an expressive way of associating the
 nodes of interest with their targetted callbacks.
 
-Programmer has to track the descent down to an interesting node in some kind of list
-themselves.
+Programmer has to track the descent down to an interesting node in some
+kind of list themselves.
 
 Json and XML
----------------------------
+------------
 
 Json is very simple, only a few CFGs required to describe the language
 (json.org) - this project is listed there!
 
 jsonpath and xpath
---------
+------------------
 
 JsonPath in general tries to resemble the javascript use of the json
 language nodes it is detecting.
@@ -339,7 +390,7 @@ almost always due to the APIs presented to the scripting language rather
 than the language itself.
 
 Progressive UI/ Streaming UI
---------------
+----------------------------
 
 Infinitely scrolling webpages. Need a way to 'pull' information, not
 just push if reacting to scrolling. Use oboe with websockets? Eg, ebay
@@ -349,6 +400,14 @@ needed right away.
 
 Javascript
 ----------
+
+Client-side web scripting via Javascript is a field which at inception
+contributed no more than small, frequently gimmicky, dynamic features
+added to otherwise static webpages. Today the scope and power of client
+side scripting has increased to the extent that the entire interface for
+large, complex applications is often programmed in this way. These
+applications are not limited to running under traditional web browsers
+but also include mobile apps and desktop software.
 
 What 'this' (context) is in javascript. Why not calling it scope.
 
@@ -418,7 +477,6 @@ call an add listener method means can only have one listener.
 Websockets More like node Can connect to any protocol (as always, easier
 to program if text based but can do binary) Can use to do http but not
 sufficient advantage over using
-
 
 Node
 ----
@@ -521,3 +579,6 @@ expression that can possibly work and via constant work towards the
 emergence of elegance.
 
 Why this method? See W'yg.
+
+[^1]: for quite an obviously visible example of progressive SVG loading, try loading this SVG using a recent version of Google Chrome:
+    <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_%28Same-Sex_Couples%29_Bill%2C_Second_Reading.svg>
