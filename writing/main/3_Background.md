@@ -89,8 +89,8 @@ times.
 
 http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
-Http and streaming
-------------------
+Browsers and REST, Http and streaming
+-------------------------------------
 
 Http is essentially a thinly-wrapped text response around some usually
 text-based (but sometimes binary) data. It may give the length of the
