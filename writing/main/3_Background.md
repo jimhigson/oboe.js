@@ -130,19 +130,18 @@ standardisation, abstraction layers predictably rose in popularity.
 These layers competed on developer ergonomics with the popular jQuery
 and Prototype.js promoting themselves respectively as *"do more, write
 less"* and *"elegant APIs around the clumsy interfaces of Ajax"*. JSON
-being a subset of Javascript, almost without noticing web developers
-found themselves in the privileged position whereby the serialised
-objects in their data format map exactly onto the basic types of their
-programming language. As such there was never any confusion as to which
-exact object structure to de-serialise to. If this seems like a minor
+being a subset of Javascript, web developers barely noticed their privileged 
+position whereby the serialisation of their data format mapped exactly onto 
+the basic types of their programming language. As such there was never any confusion as to which
+exact object structure to de-serialise to. If this seems like a small
 advantage, contrast with the plethora of confusing and incompatible
 representations of JSON output presented by the various Java JSON
 parsers; JSON's Object better resembles Java's Map than Object and the
-confusing between JSON null, Java null, and Jackson's NullNode [^1] is a
-common cause of errors. Given the certainty regarding deserialisation,
-JSON parsers could be safely integrated directly into AJAX libraries,
-providing a call style for working with remote resources so streamlined
-that it hardly requires any additional effort.
+confusion between JSON null, Java null, and Jackson's NullNode[^1] is a
+common cause of errors. Endowed with certainty regarding deserialisation,
+JSON parsers could be safely integrated directly into AJAX libraries. This
+provided a call style while working with remote resources so streamlined
+that it requires hardly any additional effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
