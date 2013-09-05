@@ -89,8 +89,8 @@ times.
 
 http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
-Browsers and REST; http and streaming
--------------------------------------
+Web browsers as REST client hosts
+---------------------------------
 
 Http is essentially a thinly-wrapped text response around some usually
 text-based (but sometimes binary) data. It may give the length of the
@@ -127,45 +127,99 @@ proprietary extensions to compensate.
 
 Given this backdrop of non-standard extensions and lagging
 standardisation, abstraction layers predictably rose in popularity.
-These layers competed on developer ergonomics with the popular jQuery
-and Prototype.js promoting themselves respectively as *"do more, write
-less"* and *"elegant APIs around the clumsy interfaces of Ajax"*. JSON
-being a subset of Javascript, web developers barely noticed their
-privileged position whereby the serialisation of their data format
-mapped exactly onto the basic types of their programming language. As
-such there was never any confusion as to which exact object structure to
-de-serialise to. If this seems like a small advantage, contrast with the
-plethora of confusing and incompatible representations of JSON output
-presented by the various Java JSON parsers; JSON's Object better
-resembles Java's Map than Object and the confusion between JSON null,
-Java null, and Jackson's NullNode[^1] is a common cause of errors.
+Despite a reputation Javascript being poorly standardised, as a language
+it is very consistently implemented. More accurately we should say that
+the libraries provided by the environment lack compatibility. Given an
+abstraction layer to gloss over considerable differences cross-browser
+webapp developers found little difficulty in targeting multiple
+platforms. The various abstraction competed on developer ergonomics with
+the popular jQuery and Prototype.js promoting themselves respectively as
+*"do more, write less"* and *"elegant APIs around the clumsy interfaces
+of Ajax"*. JSON being a subset of Javascript, web developers barely
+noticed their privileged position whereby the serialisation of their
+data format mapped exactly onto the basic types of their programming
+language. As such there was never any confusion as to which exact object
+structure to de-serialise to. If this seems like a small advantage,
+contrast with the plethora of confusing and incompatible representations
+of JSON output presented by the various Java JSON parsers; JSON's Object
+better resembles Java's Map than Object and the confusion between JSON
+null, Java null, and Jackson's NullNode[^1] is a common cause of errors.
 Endowed with certainty regarding deserialisation, JSON parsers could be
 safely integrated directly into AJAX libraries. This provided a call
-style while working with remote resources so streamlined that it
-requires hardly any additional effort.
+style while working with remote resources so streamlined as to require
+hardly any additional effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
 
+   // The parsing of the people json into a javascript object
+   // feels so natural that it is easy to forget while looking 
+   // at the code that it happens at all. 
+   
    alert('the first person is called ' + people[0].name);
-
 });
 ~~~~
 
-HTML5 is better thought of as an umbrella term for the renewal of the
-specification of many related technologies rather than referring
-primarily to the HTML markup format.
+Whilst simple, the above call style is built on the assumption that a
+response is a one-time event and no accommodation is made for a
+continuously delivered response. Meanwhile, the XHR2 standardisation
+process had started and was busy observing and specifying proprietary
+extensions to the original XHR1. Given an interest in streaming, the
+most interesting of these is the progress event:
 
-the HTML5 effort to bring official web standards up to date with. Taking
-the 'tarmaced goat path' approach.\
-XHR2 spec was eventually
+> while the download is progressing, queue a task to fire a progress
+> event named progress about every 50ms or for every byte received,
+> whichever is least frequent. [@xhr2progress]
 
-Given the emergence of the web as a popular means of application
-development and given that the web has only http available as a
-transport, a range of techniques have been developed for streaming
-transports to client-side logic by building on top of http. These
-approaches dichotomously split http usage into downloading and
-streaming, so that a wholly
+Prior to this addition there had been no mechanism, at least so far as
+the published specs to an XHR instance in a streaming fashion. However,
+while all major browsers currently support progress events in their most
+recently versions, the installed userbase of supporting browsers is
+unlikely to grow fast enough that this technique may be relied upon
+without a fallback for several years.
+
+Older streaming frameworks
+--------------------------
+
+To feel truly 'live' many web applications need to be able to update in
+real time by reacting to events pushed from the server side. A host of
+inventive streaming transports have been developed sidestepping the
+browser's apparent limitations. To frame the choices made in this
+project I will briefly examine three techniques.
+
+The earliest and most basic attempt was to poll, with all the associated
+downsides. From here the improved technique of *long polling* was
+invented. A client makes a request to the server side. Once the
+connection is open the server waits, writing nothing until a push is
+required. To push the server writes the message and closes the http
+connection; since the http response is now complete the content is
+available to the client which then immediately makes a new request,
+reiterating the cycle.
+
+*Push tables* observe that, while browsers lack the means of streaming
+ajax, progressive html rendering is available. Streaming data is written
+from the server side into an HTML table, one row per event. On the
+client side this table is hidden in an off-screen frame. Javascript
+listens for changes to table and reacts whenever a new row is found.
+
+While effective, none of these workarounds are using the technology as
+it is intended. *Websockets* is poised to take over, building a
+standardised transport on top of http's chunked mode. The websockets
+framework cannot be built in Javascript and needs to be implemented by
+the browser.
+
+The significant point to take from all 3 approaches is that they
+dichotomously split http usage into downloading and streaming, so that
+downloading and streaming are deliverd through channels which have
+little in common.
+
+All incompatible with REST where the resource is simply sent via
+standard http. Server has to know if client is streaming and jump though
+hoops etc.
+
+If we take streaming as something all downloads should do, not just for
+of forever-ongoing data, none of these approaches are particularly
+satisfactory.
 
 Dichotamy between streaming and downloading in the browser for
 downloading data. But not for html (progressive rendering) or images
@@ -388,16 +442,6 @@ let addresss = person.address[2]
 let jsonPath = "person.address[2]"
 ~~~~
 
-The web browser as REST client
-------------------------------
-
-Browser incompatability mostly in presentation layer rather than in
-scripting languages.
-
-Language grammars rarely disagree, incompatability due to scripting is
-almost always due to the APIs presented to the scripting language rather
-than the language itself.
-
 Progressive UI/ Streaming UI
 ----------------------------
 
@@ -589,8 +633,13 @@ emergence of elegance.
 
 Why this method? See W'yg.
 
-[^1]: http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html
+[^1]: See
+    <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
 
 [^2]: for quite an obviously visible example of progressive SVG loading,
     try loading this SVG using a recent version of Google Chrome:
-    <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_%28Same-Sex_Couples%29_Bill%2C_Second_Reading.svg>
+    <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg>
+    For the perfectionist SVG artist, not just the final image should be
+    considered but also the XML source order, for example in this case
+    it would be helpful if the outline of the UK appeared first and the
+    exploded sections last.
