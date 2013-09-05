@@ -130,18 +130,19 @@ standardisation, abstraction layers predictably rose in popularity.
 These layers competed on developer ergonomics with the popular jQuery
 and Prototype.js promoting themselves respectively as *"do more, write
 less"* and *"elegant APIs around the clumsy interfaces of Ajax"*. JSON
-being a subset of Javascript, web developers barely noticed their privileged 
-position whereby the serialisation of their data format mapped exactly onto 
-the basic types of their programming language. As such there was never any confusion as to which
-exact object structure to de-serialise to. If this seems like a small
-advantage, contrast with the plethora of confusing and incompatible
-representations of JSON output presented by the various Java JSON
-parsers; JSON's Object better resembles Java's Map than Object and the
-confusion between JSON null, Java null, and Jackson's NullNode[^1] is a
-common cause of errors. Endowed with certainty regarding deserialisation,
-JSON parsers could be safely integrated directly into AJAX libraries. This
-provided a call style while working with remote resources so streamlined
-that it requires hardly any additional effort.
+being a subset of Javascript, web developers barely noticed their
+privileged position whereby the serialisation of their data format
+mapped exactly onto the basic types of their programming language. As
+such there was never any confusion as to which exact object structure to
+de-serialise to. If this seems like a small advantage, contrast with the
+plethora of confusing and incompatible representations of JSON output
+presented by the various Java JSON parsers; JSON's Object better
+resembles Java's Map than Object and the confusion between JSON null,
+Java null, and Jackson's NullNode[^1] is a common cause of errors.
+Endowed with certainty regarding deserialisation, JSON parsers could be
+safely integrated directly into AJAX libraries. This provided a call
+style while working with remote resources so streamlined that it
+requires hardly any additional effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
