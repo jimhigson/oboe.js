@@ -8,8 +8,9 @@
           }
       ],
       "publisher": "Cambridge, MA: MIT Press",
-      "issued": { "date-parts":[ [1956] ] }
-   },
+      "issued": { "date-parts":[ [1956] ] },
+      "foundVia":"http://www.aber.ac.uk/media/Documents/short/whorf.html"
+   }, 
    
    {  "id": "sapir58",
       "title":"Culture, Language and Personality (ed. D. G. Mandelbaum)",
@@ -102,6 +103,18 @@
       "url":"http://www.phpied.com/progressive-rendering-via-multiple-flushes/",
       "issued": { "date-parts":[ [2009] ] },
       "type":"webpage"                  
+   },
+     
+   {
+      "id":"xhrWorkingDraft",
+      "title":"The XMLHttpRequest Object",
+      "author":[
+         { "family": "van Kesteren", "given":"Anne"},
+         { "family": "Jackson", "given":"Dean"}
+      ],
+      "url":"http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/",
+      "issued": { "date-parts":[ [2006] ] },      
+      "type":"webpage"
    }
       
 ]
