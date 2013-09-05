@@ -115,7 +115,20 @@
       "url":"http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/",
       "issued": { "date-parts":[ [2006] ] },      
       "type":"webpage"
+   },
+   
+   {
+      "id":"xhr2progress",
+      "title":"XMLHttpRequest Level 2 Working Draft",
+      "author":[         
+         { "family": "van Kesteren", "given":"Anne"}
+      ],
+      "url":"http://www.w3.org/TR/XMLHttpRequest2/#make-progress-notifications",
+      "issued": { "date-parts":[ [2012] ] },
+      "type":"webpage"                  
    }
+   
+
       
 ]
 
