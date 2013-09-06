@@ -13,6 +13,9 @@ Or, 666 to 3,333 (333 per page)
  * principles and techniques that will be applied or discussed
     * prior art
     * what out there is being popularly used?
+    
+ * Don't go into solutions! (that belongs in R&A)   
+ * Can analyse a bit but any new reflections should be put in R&A
    
 --->
 
@@ -89,7 +92,7 @@ times.
 
 http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
-Web browsers as REST client hosts
+Web browsers hosting REST clients
 ---------------------------------
 
 Http is essentially a thinly-wrapped text response around some usually
@@ -178,8 +181,8 @@ recently versions, the installed userbase of supporting browsers is
 unlikely to grow fast enough that this technique may be relied upon
 without a fallback for several years.
 
-Older streaming frameworks
---------------------------
+Browser streaming frameworks
+----------------------------
 
 To feel truly 'live' many web applications need to be able to update in
 real time by reacting to events pushed from the server side. A host of
@@ -208,10 +211,13 @@ standardised transport on top of http's chunked mode. The websockets
 framework cannot be built in Javascript and needs to be implemented by
 the browser.
 
-The significant point to take from all 3 approaches is that they
+The significant point the three approaches outlined above is that they
 dichotomously split http usage into downloading and streaming, so that
-downloading and streaming are deliverd through channels which have
-little in common.
+downloading and streaming are delivered through channels which have
+little in common. While the mechanism of the streaming can be effectively hidden behind
+the API, these kinds of unnatural encodings do not lend themselves to a SOA mindset,
+we can hardly say that the plumbing is on the outside while the messages are rows in an html
+table (why not?) 
 
 All incompatible with REST where the resource is simply sent via
 standard http. Server has to know if client is streaming and jump though
@@ -233,26 +239,67 @@ Must be read Writing script tags
 All require server to have a special mode. Encoding is specific to get
 around restrictions.
 
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to
 
-Why not this one. Resume on a higher semantic level.
 
-SOA
----
 
-REST/WebServices (WSDL etc)
+Parsing: SAX and Dom, Json and XML
+----------------------------------
 
-What is a rest client in this context (a client library)
+Why sax is difficult and nobody uses it
 
-Marshalling/ de-marshalling. Benefits and the problems that it causes.
-Allows one model to be written out to XML or JSON
+DOM parser can be built on a SAX parser. Often are. CITE: Java and XML
+book.
+
+The failure of sax: requires programmer to do a lot of work to identify
+interesting things. Eg, to find tag address inside tag person with a
+given name, have to recognise three things while reieving a callback for
+every single element and attribute in the document. As a principle, the
+programmer should only have to handle the cases which are interesting to
+them, not wade manually through a haystack in search of a needle, which
+means the library should provide an expressive way of associating the
+nodes of interest with their targetted callbacks.
+
+Programmer has to track the descent down to an interesting node in some
+kind of list themselves.
+
+Json and XML
+------------
+
+Json is very simple, only a few CFGs required to describe the language
+(json.org) - this project is listed there!
+
+jsonpath and xpath
+------------------
+
+JsonPath in general tries to resemble the javascript use of the json
+language nodes it is detecting.
+
+~~~~ {.javascript}
+
+// an in-memory person with a multi-line address:
+let person = {
+   name: "...",
+   address: [
+      "line1",
+      "line2",
+      "line3"
+   ]
+};
+
+
+// in javascript we can get line two of the address as such:
+let addresss = person.address[2]
+
+// the equivalent jsonpath expression is identical:
+let jsonPath = "person.address[2]"
+~~~~
+
 
 Have we marshal/de-marshall our problem domain into REST
 --------------------------------------------------------
+
+Marshalling/ de-marshalling. Benefits and the problems that it causes.
+Allows one model to be written out to XML or JSON
 
 First stage after getting a resource is usually to programmatically
 extract the interesting part from it. This is usually done via calls in
@@ -365,6 +412,10 @@ This make this slighlty harder but nontheless attempts have been made.
 
 Linq. (CITEME)
 
+
+
+
+
 Loose coupling and Updating versioning
 --------------------------------------
 
@@ -389,58 +440,6 @@ It is often stated that understandability is the number once most
 important concern in a codebase (CITE) - if the code is suitably dynamic
 it is important that changes are axiomic and clarity of the changelog is
 equally important.
-
-State of parsing: SAX and Dom
------------------------------
-
-Why sax is difficult and nobody uses it
-
-DOM parser can be built on a SAX parser. Often are. CITE: Java and XML
-book.
-
-The failure of sax: requires programmer to do a lot of work to identify
-interesting things. Eg, to find tag address inside tag person with a
-given name, have to recognise three things while reieving a callback for
-every single element and attribute in the document. As a principle, the
-programmer should only have to handle the cases which are interesting to
-them, not wade manually through a haystack in search of a needle, which
-means the library should provide an expressive way of associating the
-nodes of interest with their targetted callbacks.
-
-Programmer has to track the descent down to an interesting node in some
-kind of list themselves.
-
-Json and XML
-------------
-
-Json is very simple, only a few CFGs required to describe the language
-(json.org) - this project is listed there!
-
-jsonpath and xpath
-------------------
-
-JsonPath in general tries to resemble the javascript use of the json
-language nodes it is detecting.
-
-~~~~ {.javascript}
-
-// an in-memory person with a multi-line address:
-let person = {
-   name: "...",
-   address: [
-      "line1",
-      "line2",
-      "line3"
-   ]
-};
-
-
-// in javascript we can get line two of the address as such:
-let addresss = person.address[2]
-
-// the equivalent jsonpath expression is identical:
-let jsonPath = "person.address[2]"
-~~~~
 
 Progressive UI/ Streaming UI
 ----------------------------
