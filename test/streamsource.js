@@ -9,6 +9,8 @@
 require('color');
 
 function startServer( port, grunt ) {
+
+   "use strict";
    
    var verboseLog = grunt? grunt.verbose.ok : console.log,
        errorLog = grunt? grunt.log.error : console.error;
