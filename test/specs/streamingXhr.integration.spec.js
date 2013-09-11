@@ -19,7 +19,7 @@ describe('streaming xhr integration (real http)', function() {
       waitForRequestToComplete();            
 
       runs(function(){
-         expect(contentReceived).toEqual('{}'); 
+         expect(contentReceived).toParseTo({}); 
       });  
    })
               
@@ -46,7 +46,7 @@ describe('streaming xhr integration (real http)', function() {
             parsedResult = JSON.parse(contentReceived);
             
          }).not.toThrow();
-         
+
          // as per the name, should have 20,000 records in that file:                     
          expect(parsedResult.result.length).toEqual(20000);
       });  
@@ -60,25 +60,17 @@ describe('streaming xhr integration (real http)', function() {
       streamingXhr(                       
          eventBus.fire, eventBus.on
       )(
-         'GET', 
-         cacheBustUrl('/stream/tenSlowNumbers'),
-         null // this is a GET, no data to send      
+         'GET',
+ 
+         '/stream/tenSlowNumbers',
+          null // this is a GET, no data to send      
       );
       
       waitForRequestToComplete();            
 
-      runs(function(){
-         // should have given valid json;
-         var parsedResult;
-         
-         expect(function(){
-
-            parsedResult = JSON.parse(contentReceived);
-            
-         }).not.toThrow();
-         
-         // as per the name, should have ten numbers in that file:
-         expect(parsedResult).toEqual([0,1,2,3,4,5,6,7,8,9]);
+      runs(function(){ 
+         // as per the name, should have ten numbers in that file:         
+         expect(contentReceived).toParseTo([0,1,2,3,4,5,6,7,8,9]);
       });              
    })
    
@@ -90,22 +82,16 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingXhr(                        
          eventBus.fire, eventBus.on
-      )(
+      )( 
         'POST',
-         cacheBustUrl('/stream/echoback.json'),
-         payload       
+          '/stream/echoback',
+          payload       
       );
       
       waitForRequestToComplete();            
-
+ 
       runs(function(){
-         expect(function(){
-
-            parsedResult = JSON.parse(contentReceived);
-            
-         }).not.toThrow();
-                              
-         expect(parsedResult).toEqual(payload);
+         expect(contentReceived).toParseTo(payload);
       });
      
    })
@@ -120,20 +106,14 @@ describe('streaming xhr integration (real http)', function() {
          eventBus.fire, eventBus.on
       )(
          'PUT',
-         cacheBustUrl('/stream/echoback.json'),
-         payload       
+          '/stream/echoback',
+          payload       
       );
       
       waitForRequestToComplete();            
 
       runs(function(){
-         expect(function(){
-
-            parsedResult = JSON.parse(contentReceived);
-            
-         }).not.toThrow();
-                              
-         expect(parsedResult).toEqual(payload);
+         expect(contentReceived).toParseTo(payload);
       });
      
    })   
@@ -148,9 +128,10 @@ describe('streaming xhr integration (real http)', function() {
          streamingXhr(                           
             eventBus.fire, eventBus.on
          )(
-            'GET', 
-            cacheBustUrl('/stream/tenSlowNumbers'),
-            null // this is a get: no data to send         
+            'GET',
+
+            '/stream/tenSlowNumbers',
+             null // this is a get: no data to send         
          );                     
          
          waitForRequestToComplete();      
@@ -204,6 +185,31 @@ describe('streaming xhr integration (real http)', function() {
       requestCompleteListener = sinon.stub();
       eventBus = pubSub();
       
+      this.addMatchers({
+         toParseTo:function( expectedObj ){
+            
+            var normalisedActual;
+            
+            try{
+               normalisedActual = JSON.stringify( JSON.parse(this.actual) );
+            }catch(e){
+            
+               this.message = function(){
+                  return "Expected to be able to parse the found content as json " + this.actual;                  
+               }
+               
+               return false;            
+            }   
+            
+            this.message = function(){
+               return "The found json parsed but did not match " + JSON.stringify(expectedObj) + 
+                        " because found " + this.actual; 
+            }
+            
+            return (normalisedActual === JSON.stringify(expectedObj));
+         }
+      });
+      
       eventBus.on(HTTP_PROGRESS_EVENT, function(nextDrip){
          numberOfProgressCallbacks ++;
          contentReceived += nextDrip;                                                                                     
@@ -211,11 +217,5 @@ describe('streaming xhr integration (real http)', function() {
       
       eventBus.on(HTTP_DONE_EVENT, requestCompleteListener);
    });
-      
-   function cacheBustUrl(url) {
-      var now = Date.now? Date.now() : new Date().valueOf();
-   
-      return url + '/cacheBusted/' + now + '.txt';
-   }
 
 });
