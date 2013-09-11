@@ -8,22 +8,17 @@
 
 require('color');
 
-function startServer( grunt, port ) {
+function startServer( port, grunt ) {
+   
+   var verboseLog = grunt? grunt.verbose.ok : console.log,
+       errorLog = grunt? grunt.log.error : console.error;
 
    function echoBackBody(req, res) {
    
-      grunt.verbose.ok('will just echo the same back');
-   
-      req.on('readable', function () {
-         var reqBody = req.read().toString();
-         grunt.verbose.ok('echoing back ' + reqBody.blue);
-         res.write(reqBody);
-      });
-   
-      req.on('end', function () {
-         grunt.verbose.ok('done echoing back');
-         res.end(req.body);
-      });
+      // no need to wait for readable or end events on req because
+      // node-simple-router has already waited in the middleware
+      verboseLog('will just echo the same back\n');   
+      res.end(JSON.stringify(req.body));
    }
    
    function replyWithTenSlowNumbers(_req, res) {
@@ -31,8 +26,8 @@ function startServer( grunt, port ) {
    
       var NUMBER_INTERVAL = 250;
       var MAX_NUMBER = 9;
-      
-      grunt.verbose.ok(
+
+      verboseLog( 
          'slow number server: will write numbers 0 ..' + 
          String(MAX_NUMBER).blue + 
          ' out as a json array at a rate of one per', 
@@ -51,7 +46,7 @@ function startServer( grunt, port ) {
    
             res.end(']');
             clearInterval(inervalId);
-            grunt.verbose.writeln('slow number server: finished writing out');
+            verboseLog('slow number server: finished writing out');
          } else {
             res.write(',\n');
             curNumber++;
@@ -67,19 +62,20 @@ function startServer( grunt, port ) {
          throw new Error('no url given');
       }
       
-      var filename = req.url.replace('/static', 'test');
+      var filename = 'test/json/' + req.params.name + '.json';
       
-      grunt.verbose.ok('will respond with contents of file ' + filename.blue);
+      verboseLog('will respond with contents of file ' + filename);
       
       require('fs').readFile(filename, 'utf8', function (err,data) {
          if (err) {
-            grunt.log.error('could not read static file ' + filename.red);
+            errorLog('could not read static file ' + filename + 
+             ' ' + err);
             return;
          }
          
          res.end(data);
          
-         grunt.verbose.ok('read file ' + filename.blue);
+         verboseLog('read file ' + filename.blue);
       });   
    }
    
@@ -89,43 +85,37 @@ function startServer( grunt, port ) {
       res.writeHead(200);
    }
    
-   function answerRequest(req, res) {
-   
-      grunt.verbose.ok(
-         'got ' + req.method.blue + ' request for url ' + req.url.blue + 
-            (req.body? ' with body ' + req.body : '')
-      );   
-   
-      var urlMappings = {
-         '/stream/echoback': echoBackBody
-      ,  '/static/json': replyWithStaticJson
-      ,  '/stream/tenSlowNumbers': replyWithTenSlowNumbers   
-      };
-      
-      var responder;
-      
-      for( var i in urlMappings ) {
-         if( req.url.indexOf(i) == 0 ) {      
-            responder = urlMappings[i];
-            grunt.verbose.ok( 'url starts with ' + i.blue + ' so will reply using ' + responder.name.blue);
-            break;
-         }
-      }
-      
-      if( !responder ) {
-         grunt.log.error("no mapping for url " + req.url.red);
-         return;
-      }
-       
-      responder(req, res);
-   }
+   function routing() {
+      var Router = require('node-simple-router'),
+          router = Router();
 
-   require('http')
-      .createServer(answerRequest)
-      .listen(port);
+      router.get(    '/stream/echoback',           function(req, res){ res.end("POST here, don't GET")});
+      router.post(   '/stream/echoback',           echoBackBody);
+      router.put(    '/stream/echoback',           echoBackBody);
+      router.get(    '/static/json/:name.json',    replyWithStaticJson);
+      router.get(    '/stream/tenSlowNumbers',     replyWithTenSlowNumbers);
       
-   grunt.log.writeln('streaming server started on port'.green, String(port).blue);
+      return router;
+   }
+         
+   var server = require('http').createServer(routing()).listen(port);
+   
+   verboseLog('streaming source server started on port'.green, String(port).blue);
+
+   return server;        
 }
 
-module.exports.startServer = startServer;
 
+function exportApi(){
+
+   var server;
+
+   module.exports.start = function(port, grunt){
+      server = startServer(port, grunt);          
+   };   
+   module.exports.stop = function(){
+      server.close();
+   };
+}
+
+exportApi();

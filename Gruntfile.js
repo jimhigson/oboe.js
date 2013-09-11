@@ -159,15 +159,44 @@ module.exports = function (grunt) {
                'uglify',
                'copy:dist',               
                'dist-sizes']
+         },
+         
+         restartStreamSourceAndRunTests:{
+            // this fails at the moment because start-stream-source
+            // fails if run more than once - the port is taken.
+            files: ['test/streamsource.js'],
+            tasks: ['start-stream-source', 'karma:persist:run']
          }         
-      }           
+      }
+                 
+   ,  concurrent:{
+         watchDev: {
+            tasks:[ 'watch:karmaAndSize', 'watch:restartStreamSourceAndRunTests' ],
+            options:{
+               logConcurrentOutput: true
+            }
+         }
+      }
       
    });
 
    require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+   var streamSource;
+   
    grunt.registerTask('start-stream-source', function () {
-      require('./test/streamsource.js').startServer(grunt, STREAM_SOURCE_PORT);  
+      grunt.log.ok('do we have a streaming source already?', !!streamSource);
+   
+      // if we previously loaded the streamsource, stop it to let the new one in:
+      if( streamSource ) {
+         grunt.log.ok('there seems to be a streaming server already, let\'s stop it');
+         streamSource.stop();
+      }
+         
+      grunt.log.ok('let\'s get a streaming server started');
+      streamSource = require('./test/streamsource.js');
+      streamSource.start(STREAM_SOURCE_PORT, grunt);
+      grunt.log.ok('we started it, but does it work?', streamSource);  
    });
    
    grunt.registerTask('test-start-server',   [
@@ -185,7 +214,7 @@ module.exports = function (grunt) {
    grunt.registerTask('test-auto-run',   [
       'start-stream-source',
       'karma:persist',
-      'watch:karmaAndSize'       
+      'concurrent:watchDev'       
    ]);      
 
    grunt.registerTask('dist-sizes',   [
