@@ -950,14 +950,16 @@ function streamingXhr(fire, on) {
    function handleDone() {
       // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
       // onload. We need to always do handleInput in case we get the load but have
-      // not had a final progress event..   
+      // not had a final progress event. This may change in future but let's take the safest
+      // approach and assume we might not have received a progress event for every bit of
+      // data before we get the load event.
       handleInput(); 
       
       fire( HTTP_DONE_EVENT );
    }
 
    /**
-    * Return a function that allows the ajax call to start
+    * Return a function that, when called, starts the ajax call
     * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
