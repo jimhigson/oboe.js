@@ -97,7 +97,7 @@ function streamingXhr(fire, on) {
    }
 
    /**
-    * Return a function that allows the ajax call to start
+    * Return a function that, when called, starts the ajax call
     * 
     * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
     * @param {String} url
