@@ -23,6 +23,10 @@ function startServer( port, grunt ) {
       res.end(JSON.stringify(req.body));
    }
    
+   function echoBackHeaders(req, res) {
+      res.end(JSON.stringify(req.headers));
+   }
+   
    function replyWithTenSlowNumbers(_req, res) {
       sendJsonHeaders(res);
    
@@ -94,6 +98,7 @@ function startServer( port, grunt ) {
       router.get(    '/stream/echoback',           function(req, res){ res.end("POST here, don't GET")});
       router.post(   '/stream/echoback',           echoBackBody);
       router.put(    '/stream/echoback',           echoBackBody);
+      router.get(    '/echoBackHeaders',           echoBackHeaders);
       router.get(    '/static/json/:name.json',    replyWithStaticJson);
       router.get(    '/stream/tenSlowNumbers',     replyWithTenSlowNumbers);
       
