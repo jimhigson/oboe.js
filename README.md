@@ -337,17 +337,18 @@ instance by calling one of these methods:
    oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
    oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
    
-// methods also accept an options object:
+// the above methods also accept an options object:
    oboe.doPost({
-      url: String
-      body: Object|String
-      complete: Function
+      url: String,
+      body: Object|String,
+      [complete: Function doneCallback(wholeResponse)],
+      [headers:{ key: value }]
    })         
 ```   
 
 ```doneCallback``` is passed the entire json when the response is complete.
-Usually it is better to read the json one bit at a time than waiting for it to completely download so this parameter 
-is optional.
+Usually it is better to read the json in small parts than waiting for it to completely 
+download but this is there for if you need to know when the request is done.
 
 The returned instance exposes a few chainable methods:
 
