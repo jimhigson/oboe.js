@@ -97,6 +97,24 @@ describe("oboe integration (real http)", function(){
          expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9])
       });      
    })
+   
+   it('gives header to server side',  function( queue ) {
+
+      var done = false;
+
+      oboe.doGet(                      
+         {  url: '/testServer/echoBackHeaders',
+            headers: {'SNARFU':'SNARF'},
+            complete:   function ajaxFinished() {                              
+                           done = true;               
+                        }
+         }
+      ).onNode( 'SNARFU', function( headerValue ){
+         expect( headerValue ).toBe( 'SNARF' )
+      })   
+      
+      waitsFor( function(){ return done }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
+   })
       
    function someSecondsToPass(waitSecs) {
       
