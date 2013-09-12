@@ -95,12 +95,12 @@ function startServer( port, grunt ) {
       var Router = require('node-simple-router'),
           router = Router();
 
-      router.get(    '/stream/echoback',           function(req, res){ res.end("POST here, don't GET")});
-      router.post(   '/stream/echoback',           echoBackBody);
-      router.put(    '/stream/echoback',           echoBackBody);
+      router.get(    '/echoBackBody',              function(req, res){ res.end("POST here, don't GET")});
+      router.post(   '/echoBackBody',              echoBackBody);
+      router.put(    '/echoBackBody',              echoBackBody);
       router.get(    '/echoBackHeaders',           echoBackHeaders);
       router.get(    '/static/json/:name.json',    replyWithStaticJson);
-      router.get(    '/stream/tenSlowNumbers',     replyWithTenSlowNumbers);
+      router.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
       
       return router;
    }

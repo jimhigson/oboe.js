@@ -3,7 +3,7 @@ describe("oboe integration (real http)", function(){
 
    it('gets all expected callbacks by time request finishes',  function() {
        
-      var asserter = givenAnOboeInstance('/stream/tenSlowNumbers')
+      var asserter = givenAnOboeInstance('/testServer/tenSlowNumbers')
          .andWeAreListeningForNodes('![*]');         
       
       waitsFor( asserter.toComplete(), 'the request to complete', ASYNC_TEST_TIMEOUT);
@@ -29,7 +29,7 @@ describe("oboe integration (real http)", function(){
        
       var aborted = false; 
        
-      var asserter = givenAnOboeInstance('/stream/tenSlowNumbers')
+      var asserter = givenAnOboeInstance('/testServer/tenSlowNumbers')
          .andWeAreListeningForNodes('![5]', function(){
              asserter.andWeAbortTheRequest();
              aborted = true;
@@ -58,7 +58,7 @@ describe("oboe integration (real http)", function(){
 
       var aborted = false; 
        
-      var asserter = givenAnOboeInstance('/static/json/firstTenNaturalNumbers.json')
+      var asserter = givenAnOboeInstance('/testServer/static/json/firstTenNaturalNumbers.json')
          .andWeAreListeningForNodes('![5]', function(){
              asserter.andWeAbortTheRequest();
              aborted = true;
@@ -84,7 +84,7 @@ describe("oboe integration (real http)", function(){
       var fullResponse = null;            
                            
       oboe.doGet(                      
-         '/static/json/firstTenNaturalNumbers.json',
+         '/testServer/static/json/firstTenNaturalNumbers.json',
          
          function ajaxFinished(obj) {                              
             fullResponse = obj;               

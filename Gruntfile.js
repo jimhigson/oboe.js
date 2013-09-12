@@ -72,8 +72,7 @@ module.exports = function (grunt) {
          options:{            
             singleRun: true,
             proxies: {
-               '/stream'      : 'http://localhost:' + STREAM_SOURCE_PORT + '/stream',
-               '/static/json' : 'http://localhost:' + STREAM_SOURCE_PORT + '/static/json'   
+               '/testServer'   : 'http://localhost:' + STREAM_SOURCE_PORT   
             },         
             // test results reporter to use
             // possible values: 'dots', 'progress', 'junit'

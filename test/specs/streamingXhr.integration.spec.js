@@ -12,7 +12,7 @@ describe('streaming xhr integration (real http)', function() {
          eventBus.fire, eventBus.on
       )(  
          'GET', 
-         '/static/json/smallestPossible.json',
+         '/testServer/static/json/smallestPossible.json',
          null // this is a GET, no data to send);
       ); 
       
@@ -32,7 +32,7 @@ describe('streaming xhr integration (real http)', function() {
          eventBus.fire, eventBus.on
       )(
          'GET', 
-         '/static/json/twentyThousandRecords.json',
+         '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET, no data to send      
       );
       
@@ -62,7 +62,7 @@ describe('streaming xhr integration (real http)', function() {
       )(
          'GET',
  
-         '/stream/tenSlowNumbers',
+         '/testServer/tenSlowNumbers',
           null // this is a GET, no data to send      
       );
       
@@ -72,7 +72,7 @@ describe('streaming xhr integration (real http)', function() {
          // as per the name, should have ten numbers in that file:         
          expect(contentReceived).toParseTo([0,1,2,3,4,5,6,7,8,9]);
       });              
-   })
+   }) 
    
    it('can make a post request',  function(queue) {
    
@@ -82,10 +82,10 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingXhr(                        
          eventBus.fire, eventBus.on
-      )( 
-        'POST',
-          '/stream/echoback',
-          payload       
+      )(  
+         'POST',
+         '/testServer/echoBackBody',
+         payload       
       );
       
       waitForRequestToComplete();            
@@ -106,7 +106,7 @@ describe('streaming xhr integration (real http)', function() {
          eventBus.fire, eventBus.on
       )(
          'PUT',
-          '/stream/echoback',
+          '/testServer/echoBackBody',
           payload       
       );
       
@@ -130,7 +130,7 @@ describe('streaming xhr integration (real http)', function() {
          )(
             'GET',
 
-            '/stream/tenSlowNumbers',
+            '/testServer/tenSlowNumbers',
              null // this is a get: no data to send         
          );                     
          
@@ -158,7 +158,7 @@ describe('streaming xhr integration (real http)', function() {
          eventBus.fire, eventBus.on
       )(
          'GET', 
-         '/static/json/twentyThousandRecords.json',
+         '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET: no data to send      
       );         
 
