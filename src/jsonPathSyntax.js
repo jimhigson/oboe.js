@@ -34,9 +34,9 @@ var jsonPathSyntax = (function() {
                            }),
 
        possiblyCapturing =           /(\$?)/
-   ,   namedNode =                   /(\w+|\*)/
+   ,   namedNode =                   /([\w-_]+|\*)/
    ,   namePlaceholder =             /()/
-   ,   nodeInArrayNotation =         /\["(\w+)"\]/
+   ,   nodeInArrayNotation =         /\["([^"]+)"\]/
    ,   numberedNodeInArrayNotation = /\[(\d+|\*)\]/
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/

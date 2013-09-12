@@ -42,6 +42,12 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          it('parses a name', function () {
             expect(pathNodeDesc('aaa')).toContainMatches({name:'aaa'})
          })
+         it('parses a name containing a hyphen', function () {
+            expect(pathNodeDesc('x-security-token')).toContainMatches({name:'x-security-token'})
+         })
+         it('parses a name containing an underscore', function () {
+            expect(pathNodeDesc('x_security_token')).toContainMatches({name:'x_security_token'})
+         })                  
          it('parses a name and recognises the capturing flag', function () {
             expect(pathNodeDesc('$aaa')).toContainMatches({name:'aaa', capturing:true})
          })
@@ -82,6 +88,9 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          it('ignores without a path name', function () {
             expect(pathNodeDesc('[]')).toNotMatch()
          })
+         it('fails with too many quotes', function () {
+            expect(pathNodeDesc('["""]')).toNotMatch()
+         })         
          it('parses unquoted', function () {
             expect(pathNodeDesc('[foo]')).toNotMatch()
          })
@@ -91,8 +100,20 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
          it('parses first token only', function () {
             expect(pathNodeDesc('["foo"]["bar"]')).toContainMatches({name:'foo'})
          })
-         it('ignores invalid chars in name', function () {
-            expect(pathNodeDesc('[".foo"]')).toNotMatch()
+         it('allows dot char inside quotes that would otherwise have a special meaning', function () {
+            expect(pathNodeDesc('[".foo"]')).toContainMatches({name:'.foo'})
+         })
+         it('allows star char inside quotes that would otherwise have a special meaning', function () {
+            expect(pathNodeDesc('["*"]')).toContainMatches({name:'*'})
+         })
+         it('allows dollar char inside quotes that would otherwise have a special meaning', function () {
+            expect(pathNodeDesc('["$"]')).toContainMatches({name:'$'})
+         })                  
+         it('allows underscore in quotes', function () {
+            expect(pathNodeDesc('["foo_bar"]')).toContainMatches({name:'foo_bar'})
+         })
+         it('allows non-ASCII chars in quotes', function () {
+            expect(pathNodeDesc('["你好"]')).toContainMatches({name:'你好'})
          })
       })
 

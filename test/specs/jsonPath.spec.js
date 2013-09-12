@@ -13,26 +13,22 @@ describe('jsonPath', function(){
       
          it("fail on single invalid token", function(){
          
-            expect(compiling('-')).toThrow();
-          
+            expect(compiling('/')).toThrow();
          });
          
          it("fail on invalid pattern with some valid tokens", function(){
          
-            expect(compiling('foo-')).toThrow();
-          
+            expect(compiling('foo/')).toThrow();
          });
          
          it("fail on unclosed duck clause", function(){
          
             expect(compiling('{foo')).toThrow();
-          
          });
          
          it("fail on token with capture alone", function(){
          
-            expect(compiling('foo$')).toThrow(); 
-          
+            expect(compiling('foo$')).toThrow();
          });         
       });                   
       

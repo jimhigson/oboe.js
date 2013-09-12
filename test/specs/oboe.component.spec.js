@@ -178,6 +178,61 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
+   it('can detect nodes with hyphen in the name',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!.a-string')
+         .whenGivenInput({"a-string":"s"})
+         .thenTheInstance(
+            matched("s"),
+            foundOneMatch
+         );
+   })
+   
+   it('can detect nodes with underscore in the name',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!.a_string')
+         .whenGivenInput({"a_string":"s"})
+         .thenTheInstance(
+            matched("s"),
+            foundOneMatch
+         );
+   })
+   
+   it('can detect nodes with quoted hyphen in the name',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!["a-string"]')
+         .whenGivenInput({"a-string":"s"})
+         .thenTheInstance(
+            matched("s"),
+            foundOneMatch
+         );
+   })   
+   
+   it('can detect nodes with quoted underscore in the name',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!["a_string"]')
+         .whenGivenInput({"a_string":"s"})
+         .thenTheInstance(
+            matched("s"),
+            foundOneMatch
+         );
+   })
+   
+   it('can detect nodes with quoted unusual chars in the name',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!["£@$%^"]')
+         .whenGivenInput({"£@$%^":"s"}) // ridiculous JSON!
+         .thenTheInstance(
+            matched("s"),
+            foundOneMatch
+         );
+   })            
+   
    it('notifies of path before given the json value for a property',  function() {
 
       givenAnOboeInstance()
