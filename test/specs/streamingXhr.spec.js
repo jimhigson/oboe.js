@@ -2,7 +2,7 @@
 describe("streamingXhr", function(){
    "use strict";
 
-   describe("calls get through to browser xhr correctly", function(){
+   describe("calls through to browser xhr", function(){
                                                                                               
       it('gives xhr null when body is undefined', function(){
       
@@ -32,7 +32,20 @@ describe("streamingXhr", function(){
          streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', payload);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(JSON.stringify( payload ) );      
-      });      
+      });
+      
+      it('gives xhr the request headers', function(){
+           
+         var headers = {
+            'X-FROODINESS':'frood',
+            'X-HOOPINESS':'hoopy'
+         };           
+           
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', undefined, headers);
+         
+         expect( lastCreatedXhrInstance ).toHaveBeenGivenHeader( 'X-FROODINESS', 'frood' );      
+         expect( lastCreatedXhrInstance ).toHaveBeenGivenHeader( 'X-HOOPINESS', 'hoopy' );      
+      });            
       
       it('should be able to abort an xhr once started', function(){
       
@@ -56,6 +69,7 @@ describe("streamingXhr", function(){
          FakeXhrClass.onCreate = function(xhr) {
             lastCreatedXhrInstance = xhr;
             sinon.spy(lastCreatedXhrInstance, 'send');
+            sinon.spy(lastCreatedXhrInstance, 'setRequestHeader');
             sinon.spy(lastCreatedXhrInstance, 'abort');
          };      
          
@@ -65,7 +79,12 @@ describe("streamingXhr", function(){
                var sendMethod = this.actual;
                
                return sendMethod.firstCall.args[0] == expectedBody;               
-            }
+            },
+            
+            toHaveBeenGivenHeader:function( expectedName, expectedValue ) {
+
+               return lastCreatedXhrInstance.setRequestHeader.calledWith(expectedName, expectedValue);
+            }            
          
          });
       });

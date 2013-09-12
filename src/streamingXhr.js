@@ -16,7 +16,7 @@
  * @param {String|Object} data some content to be sent with the request. Only valid
  *                        if method is POST or PUT.
  */
-function streamingXhr(fire, on, method, url, data) {
+function streamingXhr(fire, on, method, url, data, headers) {
         
    var 
       xhr = new XMLHttpRequest(),
@@ -102,6 +102,10 @@ function streamingXhr(fire, on, method, url, data) {
    }
 
    xhr.open(method, url, true);  
+   for( var headerName in headers ){
+      xhr.setRequestHeader(headerName, headers[headerName]);
+   }   
+   
    xhr.send(validatedRequestBody(data));         
 
 }
