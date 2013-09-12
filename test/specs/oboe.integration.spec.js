@@ -104,9 +104,9 @@ describe("oboe integration (real http)", function(){
 
       oboe.doGet(                      
          {  url: '/testServer/echoBackHeaders',
-            headers: {'SNARFU':'SNARF'}
+            headers: {'snarfu':'SNARF'}
          }
-      ).onNode( 'SNARFU', function( headerValue ){
+      ).onNode( 'snarfu', function( headerValue ){
          expect( headerValue ).toBe( 'SNARF' )
          done = true;
       })   
