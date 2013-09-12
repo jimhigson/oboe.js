@@ -23,7 +23,11 @@ function streamingXhr(fire, on, method, url, data, headers) {
 
       numberOfCharsAlreadyGivenToCallback = 0;
       
-   ('onprogress' in xhr? listenToXhr2 : listenToXhr1)( xhr );
+   if('onprogress' in xhr){
+      listenToXhr2();
+   } else {
+      listenToXhr1();
+   }
          
 
    on( ABORTING, function(){
@@ -45,7 +49,7 @@ function streamingXhr(fire, on, method, url, data, headers) {
    /** xhr2 already supports everything that we need so just a bit of abstraction required.
     *  listenToXhr2 is one of two possible values to use as listenToXhr  
     */
-   function listenToXhr2(xhr) {         
+   function listenToXhr2() {         
       xhr.onprogress = handleInput;
       xhr.onload = handleDone;
    }
@@ -53,7 +57,7 @@ function streamingXhr(fire, on, method, url, data, headers) {
    /** xhr1 is quite primative so a bit more work is needed to connect to it 
     *  listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(xhr){
+   function listenToXhr1(){
    
       // unfortunately there is no point polling the responsetext, these bad old browsers 
       // don't make the partial text accessible - it is undefined until the request finishes 
