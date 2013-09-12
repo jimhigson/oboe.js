@@ -104,13 +104,11 @@ describe("oboe integration (real http)", function(){
 
       oboe.doGet(                      
          {  url: '/testServer/echoBackHeaders',
-            headers: {'SNARFU':'SNARF'},
-            complete:   function ajaxFinished() {                              
-                           done = true;               
-                        }
+            headers: {'SNARFU':'SNARF'}
          }
       ).onNode( 'SNARFU', function( headerValue ){
          expect( headerValue ).toBe( 'SNARF' )
+         done = true;
       })   
       
       waitsFor( function(){ return done }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
