@@ -904,25 +904,41 @@ function streamingXhr(fire, on, method, url, data, headers) {
    /** xhr2 already supports everything that we need so just a bit of abstraction required.
     *  listenToXhr2 is one of two possible values to use as listenToXhr  
     */
-   function listenToXhr2() {         
-      xhr.onprogress = handleInput;
-      xhr.onload = handleDone;
+   function listenForProgress() {         
+      xhr.onprogress = handleProgress;      
    }
    
    /** xhr1 is quite primative so a bit more work is needed to connect to it 
     *  listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(){
+   function listenForComplete(){
    
       // unfortunately there is no point polling the responsetext, these bad old browsers 
       // don't make the partial text accessible - it is undefined until the request finishes 
       // and then it is everything.
       // Instead, we just have to wait for the request to be complete and degrade gracefully
       // to non-streaming Ajax.      
-      xhr.onreadystatechange = function() {     
-         if(xhr.readyState == 4 && xhr.status == 200) {
-            handleDone();            
-         }                            
+      xhr.onreadystatechange = function() {
+               
+         if(xhr.readyState == 4 ) {
+
+            // is this a 2xx http code?
+            var sucessful = String(xhr.status)[0] == 2;
+            
+            if( sucessful ) {
+               // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
+               // onload. We need to always do handleInput in case we get the load but have
+               // not had a final progress event. This may change in future but let's take the safest
+               // approach and assume we might not have received a progress event for every bit of
+               // data before we get the load event.
+               handleProgress();
+               
+               fire( HTTP_DONE_EVENT );
+            } else {
+            
+               fire( ERROR_EVENT );
+            }
+         }
       };
    }   
    
@@ -930,7 +946,7 @@ function streamingXhr(fire, on, method, url, data, headers) {
     * Handle input from the underlying xhr: either a state change,
     * the progress event or the request being complete.
     */
-   function handleInput() {
+   function handleProgress() {
                         
       var textSoFar = xhr.responseText,
           newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
@@ -941,35 +957,24 @@ function streamingXhr(fire, on, method, url, data, headers) {
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
       if( newText ) {
-         fire( HTTP_PROGRESS_EVENT, newText )
+         fire( HTTP_PROGRESS_EVENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
    
-   function handleDone() {
-      // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
-      // onload. We need to always do handleInput in case we get the load but have
-      // not had a final progress event. This may change in future but let's take the safest
-      // approach and assume we might not have received a progress event for every bit of
-      // data before we get the load event.
-      handleInput(); 
-      
-      fire( HTTP_DONE_EVENT );
-   }
-
    if('onprogress' in xhr){
-      listenToXhr2();
-   } else {
-      listenToXhr1();
+      listenForProgress();
    }
+   
+   listenForComplete();
 
-   xhr.open(method, url, true);  
+   xhr.open(method, url, true);
    for( var headerName in headers ){
       xhr.setRequestHeader(headerName, headers[headerName]);
-   }   
+   }
    
-   xhr.send(validatedRequestBody(data));         
+   xhr.send(validatedRequestBody(data));
 
 }
 

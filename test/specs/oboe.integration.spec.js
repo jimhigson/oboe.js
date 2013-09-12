@@ -79,7 +79,7 @@ describe("oboe integration (real http)", function(){
       });
    })      
    
-   it('gives full json to callback when request finishes',  function( queue ) {
+   it('gives full json to callback when request finishes',  function() {
             
       var fullResponse = null;            
                            
@@ -98,7 +98,7 @@ describe("oboe integration (real http)", function(){
       });      
    })
    
-   it('gives header to server side',  function( queue ) {
+   it('gives header to server side',  function() {
 
       var countGotBack = 0;
 
@@ -120,6 +120,19 @@ describe("oboe integration (real http)", function(){
       
       waitsFor( function(){ return countGotBack == 2 }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
    })
+   
+   it('fires error on 404',  function() {
+
+      var gotError = false
+
+      oboe.doGet('/testServer/doesNotExist')
+      .onError(function(){
+      
+         gotError = true
+      });
+      
+      waitsFor( function(){ return gotError }, 'the request to fail', ASYNC_TEST_TIMEOUT )            
+   })   
       
    function someSecondsToPass(waitSecs) {
       
