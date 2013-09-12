@@ -100,18 +100,25 @@ describe("oboe integration (real http)", function(){
    
    it('gives header to server side',  function( queue ) {
 
-      var done = false;
+      var countGotBack = 0;
 
       oboe.doGet(                      
          {  url: '/testServer/echoBackHeaders',
-            headers: {'snarfu':'SNARF'}
+            headers: {'x-snarfu':'SNARF', 'x-foo':'BAR'}
          }
-      ).onNode( 'snarfu', function( headerValue ){
+
+      ).onNode( 'x-snarfu', function( headerValue ){
+       
          expect( headerValue ).toBe( 'SNARF' )
-         done = true;
-      })   
+         countGotBack++;
+         
+      }).onNode( 'x-foo', function( headerValue ){
+       
+         expect( headerValue ).toBe( 'BAR' )
+         countGotBack++;
+      })         
       
-      waitsFor( function(){ return done }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
+      waitsFor( function(){ return countGotBack == 2 }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
    })
       
    function someSecondsToPass(waitSecs) {
