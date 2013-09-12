@@ -23,13 +23,6 @@ function streamingXhr(fire, on, method, url, data, headers) {
 
       numberOfCharsAlreadyGivenToCallback = 0;
       
-   if('onprogress' in xhr){
-      listenToXhr2();
-   } else {
-      listenToXhr1();
-   }
-         
-
    on( ABORTING, function(){
       // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
       // so it doesn't matter if Function.bind is polyfilled, it breaks
@@ -101,6 +94,12 @@ function streamingXhr(fire, on, method, url, data, headers) {
       handleInput(); 
       
       fire( HTTP_DONE_EVENT );
+   }
+
+   if('onprogress' in xhr){
+      listenToXhr2();
+   } else {
+      listenToXhr1();
    }
 
    xhr.open(method, url, true);  
