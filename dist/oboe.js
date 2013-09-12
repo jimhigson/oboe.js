@@ -872,8 +872,13 @@ if(typeof FastList === 'function') {
  * None of the parameters are optional.
  * 
  * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} on a function to use to subscribe to events
+ * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+ * @param {String} url
+ * @param {String|Object} data some content to be sent with the request. Only valid
+ *                        if method is POST or PUT.
  */
-function streamingXhr(fire, on) {
+function streamingXhr(fire, on, method, url, data) {
         
    var 
       xhr = new XMLHttpRequest(),
@@ -958,18 +963,9 @@ function streamingXhr(fire, on) {
       fire( HTTP_DONE_EVENT );
    }
 
-   /**
-    * Return a function that, when called, starts the ajax call
-    * 
-    * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
-    * @param {String} url
-    * @param {String} data some content to be sent with the request. Only valid
-    *                 if method is POST or PUT.
-    */                      
-   return function(method, url, data){                           
-      xhr.open(method, url, true);
-      xhr.send(validatedRequestBody(data));         
-   };
+   xhr.open(method, url, true);  
+   xhr.send(validatedRequestBody(data));         
+
 }
 
 var jsonPathSyntax = (function() {
@@ -1807,7 +1803,7 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
                clarinetParser = clarinet.parser(),
                rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
             
-            streamingXhr(fire, on)( httpMethodName, url, body );
+            streamingXhr(fire, on, httpMethodName, url, body );
                       
             return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
          }

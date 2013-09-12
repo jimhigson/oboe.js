@@ -20,7 +20,7 @@
                clarinetParser = clarinet.parser(),
                rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
             
-            streamingXhr(fire, on)( httpMethodName, url, body );
+            streamingXhr(fire, on, httpMethodName, url, body );
                       
             return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
          }

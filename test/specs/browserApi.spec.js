@@ -8,22 +8,14 @@
  */
 
 describe("browser api", function(){
+   "use strict";
 
    describe("propagates through to streaming xhr", function(){
 
-      var callbackPlaceholder = function(){},
-          lastCreatedSxhr;
+      var callbackPlaceholder = function(){};
    
       beforeEach(function() {
-         spyOn(window, 'streamingXhr').andCallFake(function(){
-
-            lastCreatedSxhr = jasmine.createSpy('streamingXhr')
-             
-            return lastCreatedSxhr; 
-         });      
-      });
-      afterEach(function(){
-         lastCreatedSxhr = null;
+         spyOn(window, 'streamingXhr');      
       });
    
       describe('get', function(){
@@ -32,7 +24,9 @@ describe("browser api", function(){
          
             oboe.doGet('http://example.com/oboez', callbackPlaceholder)
          
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+                jasmine.any(Function),
+                jasmine.any(Function),
                 'GET',
                 'http://example.com/oboez',
                 undefined
@@ -44,7 +38,9 @@ describe("browser api", function(){
               
             oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'GET',
                'http://example.com/oboez',
                undefined
@@ -58,7 +54,9 @@ describe("browser api", function(){
               
             oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
           
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'DELETE',
                'http://example.com/oboez',
                undefined
@@ -69,7 +67,9 @@ describe("browser api", function(){
                
             oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'DELETE',
                'http://example.com/oboez',
                undefined
@@ -83,7 +83,9 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
                'my_data'
@@ -94,7 +96,9 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
                [1,2,3,4,5]
@@ -105,7 +109,9 @@ describe("browser api", function(){
                
             oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
                'my_data'
@@ -118,7 +124,9 @@ describe("browser api", function(){
                
             oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(lastCreatedSxhr).toHaveBeenCalledWith(
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
                'PUT',
                'http://example.com/oboez',
                'my_data'

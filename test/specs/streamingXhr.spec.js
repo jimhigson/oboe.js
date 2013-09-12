@@ -1,25 +1,26 @@
 
 describe("streamingXhr", function(){
+   "use strict";
 
    describe("calls get through to browser xhr correctly", function(){
                                                                                               
       it('gives xhr null when body is undefined', function(){
       
-         streamingXhr(eventBus.fire, eventBus.on)('GET', 'http://example.com', undefined);
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', undefined);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(null);
       })
       
       it('gives xhr null when body is null', function(){
       
-         streamingXhr(eventBus.fire, eventBus.on)('GET', 'http://example.com', null);
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', null);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(null);
       })      
       
       it('give xhr string request body', function(){
       
-         streamingXhr(eventBus.fire, eventBus.on)('GET', 'http://example.com', 'my_data');
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', 'my_data');
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody('my_data');
       })
@@ -28,14 +29,14 @@ describe("streamingXhr", function(){
    
          var payload = {a:'A', b:'B'};
          
-         streamingXhr(eventBus.fire, eventBus.on)('GET', 'http://example.com', payload);
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', payload);
          
          expect( lastCreatedXhrInstance.send ).toHaveBeenGivenBody(JSON.stringify( payload ) );      
       });      
       
       it('should be able to abort an xhr once started', function(){
       
-         streamingXhr(eventBus.fire, eventBus.on)('GET', 'http://example.com', 'my_data');
+         streamingXhr(eventBus.fire, eventBus.on, 'GET', 'http://example.com', 'my_data');
          
          eventBus.fire(ABORTING);
                   
