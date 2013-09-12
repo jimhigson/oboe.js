@@ -21,11 +21,9 @@ function streamingXhr(fire, on, method, url, data, headers) {
    var 
       xhr = new XMLHttpRequest(),
 
-      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
-
       numberOfCharsAlreadyGivenToCallback = 0;
       
-   listenToXhr( xhr );
+   ('onprogress' in xhr? listenToXhr2 : listenToXhr1)( xhr );
          
 
    on( ABORTING, function(){
