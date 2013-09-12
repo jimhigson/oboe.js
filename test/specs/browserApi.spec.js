@@ -29,7 +29,8 @@ describe("browser api", function(){
                 jasmine.any(Function),
                 'GET',
                 'http://example.com/oboez',
-                undefined
+                undefined,
+                undefined                
             )      
                
          })
@@ -43,9 +44,28 @@ describe("browser api", function(){
                jasmine.any(Function),
                'GET',
                'http://example.com/oboez',
+               undefined,
                undefined
             )   
          })
+         
+         it('propogates headers', function(){
+
+            var headers = {'X-HEADER-1':'value1', 'X-HEADER-2':'value2'};
+            
+            oboe.doGet({url: 'http://example.com/oboez', 
+                        success: callbackPlaceholder, 
+                        headers:headers})
+            
+            expect(streamingXhr).toHaveBeenCalledWith(
+               jasmine.any(Function), 
+               jasmine.any(Function),
+               'GET',
+               'http://example.com/oboez',
+               undefined,
+               headers
+            )   
+         })         
             
       });
       
@@ -59,7 +79,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'DELETE',
                'http://example.com/oboez',
-               undefined
+               undefined,
+               undefined               
             )
          })
          
@@ -72,7 +93,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'DELETE',
                'http://example.com/oboez',
-               undefined
+               undefined,
+               undefined               
             )   
          })   
       });
@@ -88,7 +110,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
-               'my_data'
+               'my_data',
+               undefined               
             )   
          })
          
@@ -101,7 +124,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
-               [1,2,3,4,5]
+               [1,2,3,4,5],
+               undefined               
             )   
          })   
          
@@ -114,7 +138,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'POST',
                'http://example.com/oboez',
-               'my_data'
+               'my_data',
+               undefined               
             )   
          })   
       });
@@ -129,7 +154,8 @@ describe("browser api", function(){
                jasmine.any(Function),
                'PUT',
                'http://example.com/oboez',
-               'my_data'
+               'my_data',
+               undefined               
             )   
          })
       });

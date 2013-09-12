@@ -878,18 +878,13 @@ if(typeof FastList === 'function') {
  * @param {String|Object} data some content to be sent with the request. Only valid
  *                        if method is POST or PUT.
  */
-function streamingXhr(fire, on, method, url, data) {
+function streamingXhr(fire, on, method, url, data, headers) {
         
    var 
       xhr = new XMLHttpRequest(),
 
-      listenToXhr = 'onprogress' in xhr? listenToXhr2 : listenToXhr1,
-
       numberOfCharsAlreadyGivenToCallback = 0;
       
-   listenToXhr( xhr );
-         
-
    on( ABORTING, function(){
       // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
       // so it doesn't matter if Function.bind is polyfilled, it breaks
@@ -909,7 +904,7 @@ function streamingXhr(fire, on, method, url, data) {
    /** xhr2 already supports everything that we need so just a bit of abstraction required.
     *  listenToXhr2 is one of two possible values to use as listenToXhr  
     */
-   function listenToXhr2(xhr) {         
+   function listenToXhr2() {         
       xhr.onprogress = handleInput;
       xhr.onload = handleDone;
    }
@@ -917,7 +912,7 @@ function streamingXhr(fire, on, method, url, data) {
    /** xhr1 is quite primative so a bit more work is needed to connect to it 
     *  listenToXhr1 is one of two possible values to use as listenToXhr  
     */           
-   function listenToXhr1(xhr){
+   function listenToXhr1(){
    
       // unfortunately there is no point polling the responsetext, these bad old browsers 
       // don't make the partial text accessible - it is undefined until the request finishes 
@@ -963,7 +958,17 @@ function streamingXhr(fire, on, method, url, data) {
       fire( HTTP_DONE_EVENT );
    }
 
+   if('onprogress' in xhr){
+      listenToXhr2();
+   } else {
+      listenToXhr1();
+   }
+
    xhr.open(method, url, true);  
+   for( var headerName in headers ){
+      xhr.setRequestHeader(headerName, headers[headerName]);
+   }   
+   
    xhr.send(validatedRequestBody(data));         
 
 }
@@ -1795,7 +1800,7 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
                   
       return function(firstArg){
        
-         function start (url, body, callback){
+         function start (url, body, callback, headers){
             var 
                eventBus = pubSub(),
                fire = eventBus.fire,
@@ -1803,7 +1808,7 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
                clarinetParser = clarinet.parser(),
                rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
             
-            streamingXhr(fire, on, httpMethodName, url, body );
+            streamingXhr(fire, on, httpMethodName, url, body, headers );
                       
             return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
          }
@@ -1831,7 +1836,8 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
             return start(   
                      firstArg.url,
                      firstArg.body,
-                     firstArg.complete );
+                     firstArg.complete,
+                     firstArg.headers );
          }
                                                       
       };

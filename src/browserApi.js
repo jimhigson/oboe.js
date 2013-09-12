@@ -12,7 +12,7 @@
                   
       return function(firstArg){
        
-         function start (url, body, callback){
+         function start (url, body, callback, headers){
             var 
                eventBus = pubSub(),
                fire = eventBus.fire,
@@ -20,7 +20,7 @@
                clarinetParser = clarinet.parser(),
                rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
             
-            streamingXhr(fire, on, httpMethodName, url, body );
+            streamingXhr(fire, on, httpMethodName, url, body, headers );
                       
             return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
          }
@@ -48,7 +48,8 @@
             return start(   
                      firstArg.url,
                      firstArg.body,
-                     firstArg.complete );
+                     firstArg.complete,
+                     firstArg.headers );
          }
                                                       
       };
