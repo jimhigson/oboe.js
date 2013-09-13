@@ -228,29 +228,30 @@ inside the system is difficult whilst bloated and confusing formats are
 tasked with conveying meaning.
 
 Both long polling and push tables are better throught of as a means to
-circumvent restrictions than indigene technology. A purose-built 
-stack, *Websockets* is poised to take over, building a standardised
-duplex transport and API on top of http's chunked mode. While the newest
+circumvent restrictions than indigene technology. A purose-built stack,
+*Websockets* is poised to take over, building a standardised duplex
+transport and API on top of http's chunked mode. While the newest
 browsers support websockets, most of the wild use base does not. Nor do
 older browsers provide a fine-grained enough interface into http in
-order to allow a Javascript implementation. In practice, real-world streaming libraries such
-as socket.io [CITE] are capable of several streaming techniques and can select the best for
-a given context. To the programmer debugging an application the assortment of transports only
-enhances the black-box mentality with regards to the underlying transports.
+order to allow a Javascript implementation. In practice, real-world
+streaming libraries such as socket.io [CITE] are capable of several
+streaming techniques and can select the best for a given context. To the
+programmer debugging an application the assortment of transports only
+enhances the black-box mentality with regards to the underlying
+transports.
 
 <!---
 *some or all of the below could move to A&R, it is wondering into
 analysis* --->
 
-Whilst there is some overlap, each of the approaches above
-addresses a problem only tangentially related to this project's aims.
-Firstly, requiring a server that can write to an esoteric format feels
-quite anti-REST, especially given that the server is sending in a format
-which requires a specific, known, specialised client rather than a
-generic tool. In REST I have always valued how prominently the plumbing
-of a system is visible, so that to sample a resource all that is
-required is to type a URL and be presented with it in a
-human-comprehensible format.
+Whilst there is some overlap, each of the approaches above addresses a
+problem only tangentially related to this project's aims. Firstly,
+requiring a server that can write to an esoteric format feels quite
+anti-REST, especially given that the server is sending in a format which
+requires a specific, known, specialised client rather than a generic
+tool. In REST I have always valued how prominently the plumbing of a
+system is visible, so that to sample a resource all that is required is
+to type a URL and be presented with it in a human-comprehensible format.
 
 Secondly, as adaptations to the context in which they were created,
 these frameworks realise a view of network usage in which downloading
@@ -281,43 +282,63 @@ not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
 Json and XML (remove this heading later)
-------------
+----------------------------------------
 
-Json is very simple, only a few CFGs required to describe the language
-(json.org) - this project is listed there!
+Although AJAX started as a means to transfer XML, today JSON is the much more popular
+serialisation format. The goals of XML were to simplify SGML to the point that a graduate student would be able to 
+implement a parser in a week [@javaxml p ???]. For JSON a few hours with a parser generator should 
+surfice, being expressable in just 15 CFGs. Indeed, because JSON is a strict subset of Javascript, to the Javascript
+programmer in many cases no parser is required at all. Unimpeeded by SGML's roots as a document format,
+JSON provides a much more direct analogue to the metamodel of a canonical modern programming language. 
+Whilst any model is ultimately expressible in either, by more closely mirroring a programmer's 
+metamodel the translation from domain model objects to serialised objects is simpler and intuative.
+
+This close resemblence to the model of the programming in some cases causes fast-changing formats. 
+
+(MINE SOA assignment). Also the diagram.
 
 Parsing: SAX and Dom
 --------------------
 
-In the XML world two standard parser models exist, SAX and DOM, with DOM far the more popular. 
-DOM performs a parse as a single evaluation, on the request of the programmer, returning an object model
-representing the whole of the document. At this level of abstraction the details of the markup are only distant concern. 
-Conversely, SAX parsers are probably better considered as tokenisers, 
-providing a very low-level event driven interface in line with the Observer pattern to notify the
-programmer of syntax as it is seen. Each element's opening and closing tag is noted 
+In the XML world two standard parser models exist, SAX and DOM, with DOM
+far the more popular. DOM performs a parse as a single evaluation, on
+the request of the programmer, returning an object model representing
+the whole of the document. At this level of abstraction the details of
+the markup are only distant concern. Conversely, SAX parsers are
+probably better considered as tokenisers, providing a very low-level
+event driven interface in line with the Observer pattern to notify the
+programmer of syntax as it is seen. Each element's opening and closing
+tag is noted
 
-This presents poor developer
-ergonomics by requiring that the programmer implement the recording of
-state with regard to the nodes that they have seen. For
-programmers using SAX, a conversion to their domain objects is usually
-implemented imperatively. This programming tends to be difficult to read
-and programmed once per usage rather than assembled as the combination
-of reusable parts. For this reason the use of SAX is usually reserved
-for fringe cases in which messages are extremely large or memory
-extremely scarce.
+This presents poor developer ergonomics by requiring that the programmer
+implement the recording of state with regard to the nodes that they have
+seen. For programmers using SAX, a conversion to their domain objects is
+usually implemented imperatively. This programming tends to be difficult
+to read and programmed once per usage rather than assembled as the
+combination of reusable parts. For this reason the use of SAX is usually
+reserved for fringe cases in which messages are extremely large or
+memory extremely scarce.
 
-Because of the low-level semantics, SAX requires the programmer to write a lot of code and maintain a lot of state
-in order to identify interesting things.
+Because of the low-level semantics, SAX requires the programmer to write
+a lot of code and maintain a lot of state in order to identify
+interesting things.
 
-``` {javascript}
+To illustrate the different in developer ergonomics between the the modes of
+parsing, consider this JSON:
+
+~~~~ {.javascript}
 {
    people: [
       {name: 'John', town:'Oxford'},
       {name: 'Jack', town:'Bristol'}
    ]
 }
-```
-``` {javascript}
+~~~~
+
+Suppose we want to extract the name of the first person. Using DOM
+this is very easy:
+
+~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString ) {
 
    // Extracting an interesting part from JSON-serialised data is
@@ -327,8 +348,12 @@ function nameOfFirstPerson( myJsonString ) {
    var document = JSON.parse( myJsonString );
    return document.people[0].name; // that was easy!
 }
-```
-``` {javascript}
+~~~~
+
+Contrast with the programming below which uses the clarinet JSON 
+SAX parser.
+
+~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
 
    // The equivalent logic, expressed in the most natural way
@@ -380,15 +405,13 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
    
    clarinet.write(myJsonString);   
 }
-
-```
-
+~~~~
 
 Programmer has to track the descent down to an interesting node in some
 kind of list themselves.
 
 JsonPath and XPath
------------------
+------------------
 
 JsonPath in general tries to resemble the javascript use of the json
 language nodes it is detecting.
