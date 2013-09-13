@@ -4,6 +4,14 @@ Application and Reflection
 **40 to 60 pages**
 --->
 
+Relationship between type of a node and its purpose in the document. Purpose is often
+obvious from a combination of URL and type so can disregard the place in the document.
+This structure may be carefully designed but ultimately a looser interpretation of the
+structure can be safer.
+
+
+
+
 A feature set which is minimal but contain no obvious omissions.
 
 Under the heading [Anatomy of a SOA client] I deconstructed the way in
@@ -23,6 +31,17 @@ getting the whole message at once is no worse than it is now.
 
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
+
+
+resume on failure
+-----------------
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to. Why not this one. Resume on a higher semantic 
+level.
 
 delivery methodology
 --------------------
@@ -256,14 +275,7 @@ stack of nodes.
 More important to efficiently detect or efficiently compile the
 patterns?
 
-The failure of sax: requires programmer to do a lot of work to identify
-interesting things. Eg, to find tag address inside tag person with a
-given name, have to recognise three things while reieving a callback for
-every single element and attribute in the document. As a principle, the
-programmer should only have to handle the cases which are interesting to
-them, not wade manually through a haystack in search of a needle, which
-means the library should provide an expressive way of associating the
-nodes of interest with their targetted callbacks.
+As discussed in section ???, Sax is difficult to program and not widely used.
 
 First way to identify an interesting thing is by its location in the
 document. In the absense of node typing beyond the categorisation as
