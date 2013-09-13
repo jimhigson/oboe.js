@@ -181,6 +181,16 @@ recently versions, the installed userbase of supporting browsers is
 unlikely to grow fast enough that this technique may be relied upon
 without a fallback for several years.
 
+While until recently browsers have provided no mechanism to stream into
+AJAX, almost every other instance of downloading has taken advantage of
+streaming and progressive interpretation. This includes image formats,
+as the progressive PNG and JPEG; markup as progressive display of html
+and svg; video; and Javascript itself -- script interpretation starts
+before the script is wholly fetched. Each of these progressive
+considerations is implemented as a specific-purpose mechanism internal
+to the browser which is not exported to Javascript and as such is not
+possible to repurpose.
+
 Browser streaming frameworks
 ----------------------------
 
@@ -219,10 +229,11 @@ While different in detail, all of the three approaches outlined above
 solve a different problem than this project is intended to address.
 Firstly, requiring a server that can write to an esoteric format feels
 quite anti-REST, especially given that the server is sending in a format
-which requires a specific, known, specialised client rather than a generic
-tool. In REST I have always valued how prominently the plumbing of a
-system is visible, so that to sample a resource all that is required is
-to type a URL and be presented with it in a human-comprehensible format.
+which requires a specific, known, specialised client rather than a
+generic tool. In REST I have always valued how prominently the plumbing
+of a system is visible, so that to sample a resource all that is
+required is to type a URL and be presented with it in a
+human-comprehensible format.
 
 Secondly, as adaptations to the context in which they were created,
 these frameworks realise a view of network usage in which downloading
@@ -240,16 +251,16 @@ data in the same format in response to messages from a MOM. By closing
 the dichotomy we would have the advantage that a single implementation
 is able to handle all cases.
 
-It shouldn't be a surprise that a dichotomous implementation of streaming,
-where a streaming transport is used only for live events is incompatible 
-with http caching. If an event is streamed when it is new, but then
-when it is old made available for download, http caching between the
-two requests is impossible. However, where a single mode is used for both
-live and historic events the transport is wholly compatible with http 
-caching.
+It shouldn't be a surprise that a dichotomous implementation of
+streaming, where a streaming transport is used only for live events is
+incompatible with http caching. If an event is streamed when it is new,
+but then when it is old made available for download, http caching
+between the two requests is impossible. However, where a single mode is
+used for both live and historic events the transport is wholly
+compatible with http caching.
 
 If we take streaming as a technique to achieve efficient downloading,
-not only for the transfer of forever-ongoing data, none of these 
+not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
 Dichotomy between streaming and downloading in the browser for
