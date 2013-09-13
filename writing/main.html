@@ -112,14 +112,80 @@ analysis* --->
 <p>Secondly, as adaptations to the context in which they were created, these frameworks realise a view of network usage in which downloading and streaming are dichotomously split, whereas I aim to realise a schema without dichotomy in which <em>streaming is adapted as the most effective means of downloading</em>. In existing common practice a wholly distinct mechanism is provided vs for data which is ongoing vs data which is finite. For example, the display of real-time stock data might start by AJAXing in historical and then separately use a websocket to maintain up-to-the-second updates. This requires the server to support two distinct modes. However, I see no reason why a single transport could not be used for both. Such a server might start answering a request by write historic events from a database, then switch to writing out live data in the same format in response to messages from a MOM. By closing the dichotomy we would have the advantage that a single implementation is able to handle all cases.</p>
 <p>It shouldn't be a surprise that a dichotomous implementation of streaming, where a streaming transport is used only for live events is incompatible with http caching. If an event is streamed when it is new, but then when it is old made available for download, http caching between the two requests is impossible. However, where a single mode is used for both live and historic events the transport is wholly compatible with http caching.</p>
 <p>If we take streaming as a technique to achieve efficient downloading, not only for the transfer of forever-ongoing data, none of these approaches are particularly satisfactory.</p>
-<h2 id="parsing-sax-and-dom-json-and-xml"><a href="#parsing-sax-and-dom-json-and-xml"><span class="header-section-number">3.5</span> Parsing: SAX and Dom, Json and XML</a></h2>
-<p><em>Identify SAX and DOM.</em></p>
-<p>DOM parser can be built on a SAX parser. Often are. CITE: Java and XML book.</p>
-<p>In the XML world progressive parsing is provided by SAX. SAX parsers however exist at a level of abstraction only slightly above that of tokenisers, providing a low level interface which notifies the programmer of basic syntax as it is parsed. This presents poor developer ergonomics, requiring that the programmer implement the recording of state with regard to the nodes that they have seen. For non-incremental DOM-style XML parsers the programmer rarely directly concerns themselves with markup features. More likely is that they will take advantage of the wealth of modern, generic tools which automate a translation of markup into domain model objects as per a declarative configuration. For programmers using SAX, a conversion to their domain objects is usually implemented imperatively. This programming tends to be difficult to read and programmed once per usage rather than assembled as the combination of reusable parts. For this reason the use of SAX is usually reserved for fringe cases in which messages are extremely large or memory extremely scarce.</p>
-<p>The failure of sax: requires programmer to do a lot of work to identify interesting things. Eg, to find tag address inside tag person with a given name, have to recognise three things while reieving at least two callback for every single element and attribute in the document. As a principle, the programmer should only have to handle the cases which are interesting to them, not wade manually through a haystack in search of a needle, which means the library should provide an expressive way of associating the nodes of interest with their targetted callbacks.</p>
-<p>Programmer has to track the descent down to an interesting node in some kind of list themselves.</p>
-<h2 id="json-and-xml-remove-this-heading-later"><a href="#json-and-xml-remove-this-heading-later"><span class="header-section-number">3.6</span> Json and XML (remove this heading later)</a></h2>
+<h2 id="json-and-xml-remove-this-heading-later"><a href="#json-and-xml-remove-this-heading-later"><span class="header-section-number">3.5</span> Json and XML (remove this heading later)</a></h2>
 <p>Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!</p>
+<h2 id="parsing-sax-and-dom"><a href="#parsing-sax-and-dom"><span class="header-section-number">3.6</span> Parsing: SAX and Dom</a></h2>
+<p>In the XML world two standard parser models exist, SAX and DOM, with DOM far the more popular. DOM performs a parse as a single evaluation, on the request of the programmer, returning an object model representing the whole of the document. At this level of abstraction the details of the markup are only distant concern. Conversely, SAX parsers are probably better considered as tokenisers, providing a very low-level event driven interface in line with the Observer pattern to notify the programmer of syntax as it is seen. Each element's opening and closing tag is noted</p>
+<p>This presents poor developer ergonomics by requiring that the programmer implement the recording of state with regard to the nodes that they have seen. For programmers using SAX, a conversion to their domain objects is usually implemented imperatively. This programming tends to be difficult to read and programmed once per usage rather than assembled as the combination of reusable parts. For this reason the use of SAX is usually reserved for fringe cases in which messages are extremely large or memory extremely scarce.</p>
+<p>Because of the low-level semantics, SAX requires the programmer to write a lot of code and maintain a lot of state in order to identify interesting things.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">{
+   <span class="dt">people</span>: [
+      {<span class="dt">name</span>: <span class="st">&#39;John&#39;</span>, <span class="dt">town</span>:<span class="st">&#39;Oxford&#39;</span>},
+      {<span class="dt">name</span>: <span class="st">&#39;Jack&#39;</span>, <span class="dt">town</span>:<span class="st">&#39;Bristol&#39;</span>}
+   ]
+}</code></pre>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">nameOfFirstPerson</span>( myJsonString ) {
+
+   <span class="co">// Extracting an interesting part from JSON-serialised data is</span>
+   <span class="co">// relatively easy given a DOM-style parser. Unfortunately this</span>
+   <span class="co">// forbids any kind of progressive consideration of the data. </span>
+
+   <span class="kw">var</span> document = <span class="ot">JSON</span>.<span class="fu">parse</span>( myJsonString );
+   <span class="kw">return</span> <span class="ot">document</span>.<span class="fu">people</span>[<span class="dv">0</span>].<span class="fu">name</span>; <span class="co">// that was easy!</span>
+}</code></pre>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">nameOfFirstPerson</span>( myJsonString, callbackFunction ){
+
+   <span class="co">// The equivalent logic, expressed in the most natural way</span>
+   <span class="co">// fora s JSON SAX parser is longer and much more </span>
+   <span class="co">// difficult to read. The developer pays a high price for </span>
+   <span class="co">// progressive parsing. </span>
+
+   <span class="kw">var</span> clarinet = <span class="ot">clarinet</span>.<span class="fu">parser</span>(),
+   
+       <span class="co">// with a SAX parser it is the developer&#39;s responsibility </span>
+       <span class="co">// to track where in the document the cursor currently is,</span>
+       <span class="co">// requiring several variables to maintain.        </span>
+       inPeopleArray = <span class="kw">false</span>,   
+       inPersonObject = <span class="kw">false</span>,
+       inNameAttribute = <span class="kw">false</span>,
+       found = <span class="kw">false</span>;
+   
+   <span class="ot">clarinet</span>.<span class="fu">onopenarray</span> = <span class="kw">function</span>(){
+      <span class="co">// for brevity we&#39;ll cheat by assuming there is only one</span>
+      <span class="co">// array in the document. In practice this would be overly</span>
+      <span class="co">// brittle.</span>
+      
+      inPeopleArray = <span class="kw">true</span>; 
+   };
+   
+   <span class="ot">clarinet</span>.<span class="fu">onclosearray</span> = <span class="kw">function</span>(){
+      inPeopleArray = <span class="kw">false</span>;
+   };   
+   
+   <span class="ot">clarinet</span>.<span class="fu">onopenobject</span> = <span class="kw">function</span>(){
+      inPersonObject = inPeopleArray; 
+   };
+   
+   <span class="ot">clarinet</span>.<span class="fu">oncloseobject</span> = <span class="kw">function</span>(){
+      inPersonObject = <span class="kw">false</span>;
+   };   
+      
+   <span class="ot">clarinet</span>.<span class="fu">onkey</span> = <span class="kw">function</span>(key){
+      inNameAttribute = ( inPeopleObject &amp;&amp; key == <span class="st">&#39;name&#39;</span>);
+   };
+
+   <span class="ot">clarinet</span>.<span class="fu">onvalue</span> = <span class="kw">function</span>(value){
+      <span class="kw">if</span>( !found &amp;&amp; inNameAttribute ) {
+         <span class="co">// finally!</span>
+         <span class="fu">callbackFunction</span>( value );
+         found = <span class="kw">true</span>;
+      }
+   };      
+   
+   <span class="ot">clarinet</span>.<span class="fu">write</span>(myJsonString);   
+}</code></pre>
+<p>Programmer has to track the descent down to an interesting node in some kind of list themselves.</p>
+<h2 id="jsonpath-and-xpath"><a href="#jsonpath-and-xpath"><span class="header-section-number">3.7</span> JsonPath and XPath</a></h2>
 <p>JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">
 <span class="co">// an in-memory person with a multi-line address:</span>
@@ -138,7 +204,7 @@ analysis* --->
 
 <span class="co">// the equivalent jsonpath expression is identical:</span>
 <span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
-<h2 id="have-we-marshalde-marshall-our-problem-domain-into-rest"><a href="#have-we-marshalde-marshall-our-problem-domain-into-rest"><span class="header-section-number">3.7</span> Have we marshal/de-marshall our problem domain into REST</a></h2>
+<h2 id="have-we-marshalde-marshall-our-problem-domain-into-rest"><a href="#have-we-marshalde-marshall-our-problem-domain-into-rest"><span class="header-section-number">3.8</span> Have we marshal/de-marshall our problem domain into REST</a></h2>
 <p>Marshalling/ de-marshalling. Benefits and the problems that it causes. Allows one model to be written out to XML or JSON</p>
 <p>First stage after getting a resource is usually to programmatically extract the interesting part from it. This is usually done via calls in the programming language itself, for example by de-marshaling the stream to domain objects and then calling a series of getters to narrow down to the interesting parts.</p>
 <p>This part has become such a natural component of a workflow that it is barely noticed that it is happening. In an OO language, the extraction of small parts of a model which, in the scope of the current concern are of interest is so universal that it could be considered the sole reason that getters exist.</p>
@@ -176,14 +242,14 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>CSS. Meant for presentation of HTML, but where HTML markup is semantic it is a selector of the <em>meaning of elements</em> for the sake of applying a meaningful presentation more so than a selector of arbitrary colours and positions on a screen.</p>
 <p>Unlike XML, in the model created by most general programming languages, there is no requirement for the data to be tree shaped. Graph is ok. This make this slighlty harder but nontheless attempts have been made.</p>
 <p>Linq. (CITEME)</p>
-<h2 id="loose-coupling-and-updating-versioning"><a href="#loose-coupling-and-updating-versioning"><span class="header-section-number">3.8</span> Loose coupling and Updating versioning</a></h2>
+<h2 id="loose-coupling-and-updating-versioning"><a href="#loose-coupling-and-updating-versioning"><span class="header-section-number">3.9</span> Loose coupling and Updating versioning</a></h2>
 <p>Because of the contagion problem, need to be able to create loosely-coupled systems.</p>
 <p>Inside systems also, even with automatic refactoring tools, only automate and therefoer lessen but do not remove the problem that coupling causes changes in one place of a codebase to cause knock-on changes in remote other parts of the code. A method of programming which was truly compatible with extreme programming would involve designing for constant change without disparate parts having to be modified as structural refactoring occurs.</p>
 <p>I propose that in a changing system, readability of code's changelog is as important as readability of the code itself. Extraneous changes dilute the changelog, making it less easily defined by code changes which are intrinsically linked to the actual change in the logic being expressed by the program.</p>
 <p>It is often stated that understandability is the number once most important concern in a codebase (CITE) - if the code is suitably dynamic it is important that changes are axiomic and clarity of the changelog is equally important.</p>
-<h2 id="progressive-ui-streaming-ui"><a href="#progressive-ui-streaming-ui"><span class="header-section-number">3.9</span> Progressive UI/ Streaming UI</a></h2>
+<h2 id="progressive-ui-streaming-ui"><a href="#progressive-ui-streaming-ui"><span class="header-section-number">3.10</span> Progressive UI/ Streaming UI</a></h2>
 <p>Infinitely scrolling webpages. Need a way to 'pull' information, not just push if reacting to scrolling. Use oboe with websockets? Eg, ebay home page, Facebook. Adv of infinate scroll is page loads quickly and most people won't scroll very far so most of the time have everything needed right away.</p>
-<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.10</span> Javascript</a></h2>
+<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.11</span> Javascript</a></h2>
 <p>Client-side web scripting via Javascript is a field which at inception contributed no more than small, frequently gimmicky, dynamic features added to otherwise static webpages. Today the scope and power of client side scripting has increased to the extent that the entire interface for large, complex applications is often programmed in this way. These applications are not limited to running under traditional web browsers but also include mobile apps and desktop software.</p>
 <p>What 'this' (context) is in javascript. Why not calling it scope.</p>
 <p>Javascript: not the greatest for 'final' elegant presentation of programming. Does allow 'messy' first drafts which can be refactored into beautiful code. Ie, can write stateful and refactor in small steps towards being stateless. An awareness of beautiful languages lets us know the right direction to go in. An ugly language lets us find something easy to write that works to get us started. Allows a very sketchy program to be written, little more than a programming scratchpad.</p>
@@ -198,7 +264,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
    }
 }</code></pre>
 <p>What a Micro-library is. What motivates the trend? This library has a fairly small set of functionality, it isn't a general purpose do-everything library like jQuery so its size will be looked at more critically if it is too large. Micro library is the current gold standard for compactness. Still, have a lot to do in not very much code.</p>
-<h2 id="browser"><a href="#browser"><span class="header-section-number">3.11</span> Browser</a></h2>
+<h2 id="browser"><a href="#browser"><span class="header-section-number">3.12</span> Browser</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback. polling responseText while in progress * why doesn't work in IE (built on an activeX object that provides buffering)</p>
 <p>Older style of javascript callback. Assign a listener to onprogress, not call an add listener method means can only have one listener.</p>
@@ -206,7 +272,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>While the request entity body is being transmitted and the upload complete flag is unset, queue a task to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every byte transmitted, whichever is least frequent. <a href="http://www.w3.org/TR/XMLHttpRequest/">w3c, XHR Working Draft</a></p>
 </blockquote>
 <p>Websockets More like node Can connect to any protocol (as always, easier to program if text based but can do binary) Can use to do http but not sufficient advantage over using</p>
-<h2 id="node"><a href="#node"><span class="header-section-number">3.12</span> Node</a></h2>
+<h2 id="node"><a href="#node"><span class="header-section-number">3.13</span> Node</a></h2>
 <blockquote>
 <p>Streams in node are one of the rare occasions when doing something the fast way is actually easier. SO USE THEM. not since bash has streaming been introduced into a high level language as nicely as it is in node.&quot; <a href="https://gist.github.com/2401787">high level node style guide</a></p>
 </blockquote>
@@ -225,7 +291,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>How Node is different</p>
 <p>Criticisms of Node. Esp from Erlang etc devs.</p>
 <p>Node's standard stream mechanisms</p>
-<h2 id="testing"><a href="#testing"><span class="header-section-number">3.13</span> Testing</a></h2>
+<h2 id="testing"><a href="#testing"><span class="header-section-number">3.14</span> Testing</a></h2>
 <div class="figure">
 <img src="images/placeholder.png" alt="Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers" /><p class="caption">Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers</p>
 </div>
@@ -239,7 +305,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 </ul>
 <p>Initially started with jstestdriver but found it difficult. Karma started because engineers working on the Angular project in Google were &quot;struggling a lot with jstd&quot;: <a href="http://www.youtube.com/watch?v=MVw8N3hTfCI">http://www.youtube.com/watch?v=MVw8N3hTfCI</a> - jstd is a google project Even Jstd's authors seems to be disowning it slightly. Describe what was once its main mode of operation as now being for stress testing of jstd itself only. Problems: browsers become unresponsive. Generally unreliable, has to be restarted frequently.</p>
 <p>JSTD, as a Java program, is difficult to start via Grunt. Also an issue that Grunt post-dates Karma by enough that JSTD doesn't have the attention of the Grunt community.</p>
-<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.14</span> Methodology</a></h2>
+<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.15</span> Methodology</a></h2>
 <p>The program design will be initially an exercise in creating the easiest expression that can possibly work and via constant work towards the emergence of elegance.</p>
 <p>Why this method? See W'yg.</p>
 <h1 id="application-and-reflection"><a href="#application-and-reflection"><span class="header-section-number">4</span> Application and Reflection</a></h1>
@@ -248,6 +314,8 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 --->
 
 <p>Relationship between type of a node and its purpose in the document. Purpose is often obvious from a combination of URL and type so can disregard the place in the document. This structure may be carefully designed but ultimately a looser interpretation of the structure can be safer.</p>
+<p>Interestingly, the mixed paradigm design hasn't changed the top-level design very much from how it'd be as a pure OO project (IoC, decorators, event filters, pub/sub etc).</p>
+<p>Why SAX is dumb: As a principle, the programmer should only have to handle the cases which are interesting to them, not wade manually through a haystack in search of a needle, which means the library should provide an expressive way of associating the nodes of interest with their targetted callbacks.</p>
 <p>A feature set which is minimal but contain no obvious omissions.</p>
 <p>Under the heading [Anatomy of a SOA client] I deconstructed the way in which programming logic is often used to identify the parts of a model which are currently interesting and started to look at some declarative ways in which these parts can be obtained.</p>
 <p>Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general logic of the program, declaratively define the interesting parts and have these parts delivered to the language logic. Once we make the shift to thinking in this way, it is no longer necessary to have the whole resource locally before the interesting sub-parts are delivered.</p>
