@@ -7,6 +7,7 @@
 <p>In the interest of developer ergonomics, REST clients have tended to style the calling of remote resources similar to the call style of the host programming language. Depending on the language, one of two schemas are followed: a synchronous style in which the http call is an expression which evaluates to the resource that was fetched; or asynchronous or monadic in which some logic is specified which may be applied to the response once it is complete. This tendency to cast REST calls using terms from the language feels quite natural; we may call a remote service without having to make any adjustment for the fact that it is remote. However, we should remember that this construct is not the only possible mapping. Importing some moderate Whorfianism <span class="citation">(Whorf 1956)</span><span class="citation">(Sapir 1958)</span> from linguistics, we might venture to say that the programming languages we use encourage us to think in the terms that they easily support. Also UML! For any multi-packet message sent via a network some parts will arrive before others, at least approximately in-order, but whilst coding a C-inspired language whose return statements yield single, discrete values it comfortable to conceptualise the REST response as a discrete event. Perhaps better suited to representing a progressively returned value would have been the relatively unsupported Generator routine <span class="citation">(Ralston 2000)</span>.</p>
 <p>In most practical cases where software is being used to perform a task there is no reasonable distinction between being earlier and being quicker. Therefore, if our interest is to create fast software we should be using data at the first possible opportunity. Examining data <em>while</em> it streams rather than hold unexamined until the message ends.</p>
 <p>The coining of the term REST represented a shift in how we think about http, away from the transfer of hypertext documents to that of arbitrary data <span class="citation">(Fielding 2000, 407–416)</span>. It introduced no fundamentally new methods. Likewise, no genuinely new computer science techniques need be invented to realise my thesis. As a minimum, the implementation requires an http client which exposes the response whilst it is in progress and a parser which can start making sense of a response before it sees all of it. I also could not claim this thesis to be an entirely novel composition of such parts. Few ideas are genuinely new and it is often wiser to mine for solved problems then to solve again afresh. The intense competition of Web browsers to be as fast as possible has already found this solution. Load any graphics rich with images -- essentially an aggregation of hypertext and images -- the HTML is parsed incrementally while it is downloading and the images are requested as soon as individual &lt;img&gt; tags are encountered. The browser's implementation involves a highly optimised parser created for a single task, that of displaying web pages. The new contribution of this dissertation is to provide a generic analog applicable to any problem domain.</p>
+<p>Also progressive SVGs.<sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup></p>
 <h2 id="rest-aggregation-could-be-faster"><a href="#rest-aggregation-could-be-faster"><span class="header-section-number">2.1</span> REST aggregation could be faster</a></h2>
 <div class="figure">
 <img src="images/rest_timeline_1.png" alt="Aggregation of lower-level resources exposed via REST. The client fetches a listing of an author&#39;s publications and then the first three articles. The sequence represents the most commonly used technique in which the client does not react to the response until it is complete. In this example the second wave of requests cannot be made until the original response is complete, at which time they are issued in quick succession. " /><p class="caption"><strong>Aggregation of lower-level resources exposed via REST.</strong> The client fetches a listing of an author's publications and then the first three articles. The sequence represents the most commonly used technique in which the client does not react to the response until it is complete. In this example the second wave of requests cannot be made until the original response is complete, at which time they are issued in quick succession. </p>
@@ -49,6 +50,9 @@ Or, 666 to 3,333 (333 per page)
  * principles and techniques that will be applied or discussed
     * prior art
     * what out there is being popularly used?
+    
+ * Don't go into solutions! (that belongs in R&A)   
+ * Can analyse a bit but any new reflections should be put in R&A
    
 --->
 
@@ -60,7 +64,7 @@ Or, 666 to 3,333 (333 per page)
 <p>Separated from services by http calls regardless.</p>
 <p>Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE: get from old dis). When timbl appeared at the olympics at a nextcube having invented the web, the next os was more of a forerunner for the web than just the platform it was implemented on.</p>
 <p>Next is closest pre-runner to current web architecture.</p>
-<p>Twitter: Moving from client to server for performance. Reduce load times to 1 5th of what they were previously [https://blog.twitter.com/2012/improving-performance-twittercom]</p>
+<p>Twitter: Moving from client to server for performance. Reduce load times to 1 5th of what they were previously [<a href="https://blog.twitter.com/2012/improving-performance-twittercom">https://blog.twitter.com/2012/improving-performance-twittercom</a>]</p>
 <p>Give static page (fairly basic but functional), then load js in the background.</p>
 <p>However, with Node don't have to reengineer to move from client to server.</p>
 <p>Big/small message problem and granularity. With small: http overhead. With big: not all may be needed.</p>
@@ -76,22 +80,66 @@ Or, 666 to 3,333 (333 per page)
 <blockquote>
 <p>The user does something, then the app responds visually with immediacy at 30 frames per second or more, and completes a task in a few hundred milliseconds. As long as an app meets this user goal, it doesn’t matter how big an abstraction layer it has to go through to get to silicon.</p>
 </blockquote>
-<p>http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29#date:16:00</p>
-<h2 id="state-of-http-as-a-streaming-technology"><a href="#state-of-http-as-a-streaming-technology"><span class="header-section-number">3.3</span> State of http as a streaming technology</a></h2>
-<p>Http libraries feeding into the parser. In browser, generally single callback when whole message received.</p>
-<p>Client-side web scripting via Javascript is a field which at inception contributed no more than small, frequently gimmicky, dynamic features added to otherwise static webpages. Today the scope and power of client side scripting has increased to the extent that the entire interface for large, complex applications is often programmed in this way. These applications are not limited to running under traditional web browsers but also include mobile apps and desktop software.</p>
-<p>Dichotamy between streaming and downloading in the browser for downloading data. But not for html (progressive rendering) or images (progressive PNGs and progressive JPEGs).</p>
-<p>Also progressive SVGs. IE, load this in a recent version of Google Chrome: [https://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_%28Same-Sex_Couples%29_Bill%2C_Second_Reading.svg]</p>
-<p>Lack of support in browser Long poll - for infrequent push messages. Must be read Writing script tags</p>
-<p>All require server to have a special mode. Encoding is specific to get arround restrictions.</p>
-<p>What 'this' (context) is in javascript. Why not calling it scope.</p>
-<p>Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5] which can be used to request any contiguous part of a response rather than the whole. Common in download managers but not REST clients. This ability can be used to</p>
-<p>Why not this one. Resume on a higher semantic level.</p>
-<h2 id="soa"><a href="#soa"><span class="header-section-number">3.4</span> SOA</a></h2>
-<p>REST/WebServices (WSDL etc)</p>
-<p>What is a rest client in this context (a client library)</p>
+<p><a href="http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&amp;utm\_medium=feed&amp;utm\_campaign=Feed%3A+extblog">http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&amp;utm\_medium=feed&amp;utm\_campaign=Feed%3A+extblog</a>+%28Ext+JS+Blog%29#date:16:00</p>
+<h2 id="web-browsers-hosting-rest-clients"><a href="#web-browsers-hosting-rest-clients"><span class="header-section-number">3.3</span> Web browsers hosting REST clients</a></h2>
+<p>Http is essentially a thinly-wrapped text response around some usually text-based (but sometimes binary) data. It may give the length of the content as a header, but is not obliged to. It supports an explicitly chunked mode, but even the non-chunked mode may be considered as a stream. For example, a program generating web pages on the server side might choose to use chunking so that the browser is better able to choose when to re-render during the progressive display of a page <span class="citation">(Stefanov 2009)</span> but this is optional and without these hints progressive rendering will still take place.</p>
+<p>The requesting of http from Javascript, commonly termed AJAX, was so significant a technique in establishing the modern web application architecture that it is often taken as being a synonym for Javascript-heavy web pages. Although an acronym for Asynchronous Javascript and XML, for data services designed with delivery to client-side web applications in mind JSON is almost exclusively preferred to XML and the term is used without regard for the data format of the response (the unpronounceable <em>AJAJ</em> never took off). During the 'browser war' years adding non-standard features was a common form of competition between authors; following this pattern Internet Explorer originally made AJAX possible by exposing Microsoft's Active X <em>Xml Http Request</em>, or XHR, object to Javascript programmers. This was widely copied as functional equivalents were added to all major browsers and the technique was eventually formalised by the W3C<span class="citation">(van Kesteren and Jackson 2006)</span>. What followed was a period of stagnation for web browsers. HTML4 reached W3C Recommendation status in 2001 but having subsequently found several evolutionary dead ends such as XHTML, the developer community would see no major updates until HTML5 started to gather pace some ten years later. In this context the web continued to rapidly mature as an application platform and AJAX programming inevitably overtook the original XHR specification, browser vendors again adding their own proprietary extensions to compensate.</p>
+<p>Given this backdrop of non-standard extensions and lagging standardisation, abstraction layers predictably rose in popularity. Despite a reputation Javascript being poorly standardised, as a language it is very consistently implemented. More accurately we should say that the libraries provided by the environment lack compatibility. Given an abstraction layer to gloss over considerable differences cross-browser webapp developers found little difficulty in targeting multiple platforms. The various abstraction competed on developer ergonomics with the popular jQuery and Prototype.js promoting themselves respectively as <em>&quot;do more, write less&quot;</em> and <em>&quot;elegant APIs around the clumsy interfaces of Ajax&quot;</em>. JSON being a subset of Javascript, web developers barely noticed their privileged position whereby the serialisation of their data format mapped exactly onto the basic types of their programming language. As such there was never any confusion as to which exact object structure to de-serialise to. If this seems like a small advantage, contrast with the plethora of confusing and incompatible representations of JSON output presented by the various Java JSON parsers; JSON's Object better resembles Java's Map than Object and the confusion between JSON null, Java null, and Jackson's NullNode<sup><a href="#fn2" class="footnoteRef" id="fnref2">2</a></sup> is a common cause of errors. Endowed with certainty regarding deserialisation, JSON parsers could be safely integrated directly into AJAX libraries. This provided a call style while working with remote resources so streamlined as to require hardly any additional effort.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="ot">jQuery</span>.<span class="fu">ajax</span>(<span class="st">&#39;http://example.com/people.json&#39;</span>, <span class="kw">function</span>( people ) {
+
+   <span class="co">// The parsing of the people json into a javascript object</span>
+   <span class="co">// feels so natural that it is easy to forget while looking </span>
+   <span class="co">// at the code that it happens at all. </span>
+   
+   <span class="fu">alert</span>(<span class="st">&#39;the first person is called &#39;</span> + people[<span class="dv">0</span>].<span class="fu">name</span>);
+});</code></pre>
+<p>Whilst simple, the above call style is built on the assumption that a response is a one-time event and no accommodation is made for a continuously delivered response. Meanwhile, the XHR2 standardisation process had started and was busy observing and specifying proprietary extensions to the original XHR1. Given an interest in streaming, the most interesting of these is the progress event:</p>
+<blockquote>
+<p>While the download is progressing, queue a task to fire a progress event named progress about every 50ms or for every byte received, whichever is least frequent. <span class="citation">(van Kesteren 2012)</span></p>
+</blockquote>
+<p>Prior to this addition there had been no mechanism, at least so far as the published specs to an XHR instance in a streaming fashion. However, while all major browsers currently support progress events in their most recently versions, the installed userbase of supporting browsers is unlikely to grow fast enough that this technique may be relied upon without a fallback for several years.</p>
+<p>While until recently browsers have provided no mechanism to stream into AJAX, almost every other instance of downloading has taken advantage of streaming and progressive interpretation. This includes image formats, as the progressive PNG and JPEG; markup as progressive display of html and svg; video; and Javascript itself -- script interpretation starts before the script is wholly fetched. Each of these progressive considerations is implemented as a specific-purpose mechanism internal to the browser which is not exported to Javascript and as such is not possible to repurpose.</p>
+<h2 id="browser-streaming-frameworks"><a href="#browser-streaming-frameworks"><span class="header-section-number">3.4</span> Browser streaming frameworks</a></h2>
+<p>As the web's remit spread to include more applications which would previously have been native apps, to be truly 'live' many applications found the need to be able to receive real-time push events. Dozens of streaming transports have been developed sidestepping the browser's apparent limitations.</p>
+<p>The earliest and most basic attempt was to poll by making many requests, I won't consider this approach other than to say it came with all the usually associated downsides. Despite the inadequacy of this approach, from here the improved technique of <em>long polling</em> was invented. A client makes a request to the server side. Once the connection is open the server waits, writing nothing until a push is required. To push the server writes the message and closes the http connection; since the http response is now complete the content may be handled by the Javascript client which then immediately makes a new request, reiterating the cycle of wait and response. This approach works well where messages are infrequently pushed but where the frequency is high the limitation of one http transmission per connections requires imposes a high overhead.</p>
+<p>Observing that while browsers lack progressive ajax, progressive html rendering is available, <em>push tables</em> achieve progressive data transfer by serialising streaming data to a HTML format. Most commonly messages are written to a table, one row per message. On the client side this table is hidden in an off-screen frame and the Javascript streaming client watches the table and reacts whenever a new row is found. In many ways an improvement over long-polling, this approach nevertheless suffers from an unnatural data format. Whilst html is a textual format so provides a degree of human-readability, html was not designed with the goal of an elegent or compact transfer of asynchronous data. Contrasted with a SOA ideal of <em>'plumbing on the outside'</em>, peeking inside the system is difficult whilst bloated and confusing formats are tasked with conveying meaning.</p>
+<p>Both long polling and push tables are better throught of as a means to circumvent restrictions than indigene technology. A purose-built stack, <em>Websockets</em> is poised to take over, building a standardised duplex transport and API on top of http's chunked mode. While the newest browsers support websockets, most of the wild use base does not. Nor do older browsers provide a fine-grained enough interface into http in order to allow a Javascript implementation. In practice, real-world streaming libraries such as socket.io [CITE] are capable of several streaming techniques and can select the best for a given context. To the programmer debugging an application the assortment of transports only enhances the black-box mentality with regards to the underlying transports.</p>
+<!---
+*some or all of the below could move to A&R, it is wondering into
+analysis* --->
+
+<p>Whilst there is some overlap, each of the approaches above addresses a problem only tangentially related to this project's aims. Firstly, requiring a server that can write to an esoteric format feels quite anti-REST, especially given that the server is sending in a format which requires a specific, known, specialised client rather than a generic tool. In REST I have always valued how prominently the plumbing of a system is visible, so that to sample a resource all that is required is to type a URL and be presented with it in a human-comprehensible format.</p>
+<p>Secondly, as adaptations to the context in which they were created, these frameworks realise a view of network usage in which downloading and streaming are dichotomously split, whereas I aim to realise a schema without dichotomy in which <em>streaming is adapted as the most effective means of downloading</em>. In existing common practice a wholly distinct mechanism is provided vs for data which is ongoing vs data which is finite. For example, the display of real-time stock data might start by AJAXing in historical and then separately use a websocket to maintain up-to-the-second updates. This requires the server to support two distinct modes. However, I see no reason why a single transport could not be used for both. Such a server might start answering a request by write historic events from a database, then switch to writing out live data in the same format in response to messages from a MOM. By closing the dichotomy we would have the advantage that a single implementation is able to handle all cases.</p>
+<p>It shouldn't be a surprise that a dichotomous implementation of streaming, where a streaming transport is used only for live events is incompatible with http caching. If an event is streamed when it is new, but then when it is old made available for download, http caching between the two requests is impossible. However, where a single mode is used for both live and historic events the transport is wholly compatible with http caching.</p>
+<p>If we take streaming as a technique to achieve efficient downloading, not only for the transfer of forever-ongoing data, none of these approaches are particularly satisfactory.</p>
+<h2 id="parsing-sax-and-dom-json-and-xml"><a href="#parsing-sax-and-dom-json-and-xml"><span class="header-section-number">3.5</span> Parsing: SAX and Dom, Json and XML</a></h2>
+<p><em>Identify SAX and DOM.</em></p>
+<p>DOM parser can be built on a SAX parser. Often are. CITE: Java and XML book.</p>
+<p>In the XML world progressive parsing is provided by SAX. SAX parsers however exist at a level of abstraction only slightly above that of tokenisers, providing a low level interface which notifies the programmer of basic syntax as it is parsed. This presents poor developer ergonomics, requiring that the programmer implement the recording of state with regard to the nodes that they have seen. For non-incremental DOM-style XML parsers the programmer rarely directly concerns themselves with markup features. More likely is that they will take advantage of the wealth of modern, generic tools which automate a translation of markup into domain model objects as per a declarative configuration. For programmers using SAX, a conversion to their domain objects is usually implemented imperatively. This programming tends to be difficult to read and programmed once per usage rather than assembled as the combination of reusable parts. For this reason the use of SAX is usually reserved for fringe cases in which messages are extremely large or memory extremely scarce.</p>
+<p>The failure of sax: requires programmer to do a lot of work to identify interesting things. Eg, to find tag address inside tag person with a given name, have to recognise three things while reieving at least two callback for every single element and attribute in the document. As a principle, the programmer should only have to handle the cases which are interesting to them, not wade manually through a haystack in search of a needle, which means the library should provide an expressive way of associating the nodes of interest with their targetted callbacks.</p>
+<p>Programmer has to track the descent down to an interesting node in some kind of list themselves.</p>
+<h2 id="json-and-xml-remove-this-heading-later"><a href="#json-and-xml-remove-this-heading-later"><span class="header-section-number">3.6</span> Json and XML (remove this heading later)</a></h2>
+<p>Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!</p>
+<p>JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">
+<span class="co">// an in-memory person with a multi-line address:</span>
+<span class="kw">let</span> person = {
+   <span class="dt">name</span>: <span class="st">&quot;...&quot;</span>,
+   <span class="dt">address</span>: [
+      <span class="st">&quot;line1&quot;</span>,
+      <span class="st">&quot;line2&quot;</span>,
+      <span class="st">&quot;line3&quot;</span>
+   ]
+};
+
+
+<span class="co">// in javascript we can get line two of the address as such:</span>
+<span class="kw">let</span> addresss = <span class="ot">person</span>.<span class="fu">address</span>[<span class="dv">2</span>]
+
+<span class="co">// the equivalent jsonpath expression is identical:</span>
+<span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
+<h2 id="have-we-marshalde-marshall-our-problem-domain-into-rest"><a href="#have-we-marshalde-marshall-our-problem-domain-into-rest"><span class="header-section-number">3.7</span> Have we marshal/de-marshall our problem domain into REST</a></h2>
 <p>Marshalling/ de-marshalling. Benefits and the problems that it causes. Allows one model to be written out to XML or JSON</p>
-<h2 id="have-we-marshalde-marshall-our-problem-domain-into-rest"><a href="#have-we-marshalde-marshall-our-problem-domain-into-rest"><span class="header-section-number">3.5</span> Have we marshal/de-marshall our problem domain into REST</a></h2>
 <p>First stage after getting a resource is usually to programmatically extract the interesting part from it. This is usually done via calls in the programming language itself, for example by de-marshaling the stream to domain objects and then calling a series of getters to narrow down to the interesting parts.</p>
 <p>This part has become such a natural component of a workflow that it is barely noticed that it is happening. In an OO language, the extraction of small parts of a model which, in the scope of the current concern are of interest is so universal that it could be considered the sole reason that getters exist.</p>
 <p>However subtly incorporated it has become in the thinking of the programmer, we should note that this is a construct and only one possible way of thinking regarding identifying the areas of current interest in a wider model.</p>
@@ -128,43 +176,16 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>CSS. Meant for presentation of HTML, but where HTML markup is semantic it is a selector of the <em>meaning of elements</em> for the sake of applying a meaningful presentation more so than a selector of arbitrary colours and positions on a screen.</p>
 <p>Unlike XML, in the model created by most general programming languages, there is no requirement for the data to be tree shaped. Graph is ok. This make this slighlty harder but nontheless attempts have been made.</p>
 <p>Linq. (CITEME)</p>
-<h2 id="loose-coupling-and-updating-versioning"><a href="#loose-coupling-and-updating-versioning"><span class="header-section-number">3.6</span> Loose coupling and Updating versioning</a></h2>
+<h2 id="loose-coupling-and-updating-versioning"><a href="#loose-coupling-and-updating-versioning"><span class="header-section-number">3.8</span> Loose coupling and Updating versioning</a></h2>
 <p>Because of the contagion problem, need to be able to create loosely-coupled systems.</p>
 <p>Inside systems also, even with automatic refactoring tools, only automate and therefoer lessen but do not remove the problem that coupling causes changes in one place of a codebase to cause knock-on changes in remote other parts of the code. A method of programming which was truly compatible with extreme programming would involve designing for constant change without disparate parts having to be modified as structural refactoring occurs.</p>
 <p>I propose that in a changing system, readability of code's changelog is as important as readability of the code itself. Extraneous changes dilute the changelog, making it less easily defined by code changes which are intrinsically linked to the actual change in the logic being expressed by the program.</p>
 <p>It is often stated that understandability is the number once most important concern in a codebase (CITE) - if the code is suitably dynamic it is important that changes are axiomic and clarity of the changelog is equally important.</p>
-<h2 id="state-of-parsing-sax-and-dom"><a href="#state-of-parsing-sax-and-dom"><span class="header-section-number">3.7</span> State of parsing: SAX and Dom</a></h2>
-<p>Why sax is difficult and nobody uses it</p>
-<p>DOM parser can be built on a SAX parser. Often are. CITE: Java and XML book.</p>
-<p>The failure of sax: requires programmer to do a lot of work to identify interesting things. Eg, to find tag address inside tag person with a given name, have to recognise three things while reieving a callback for every single element and attribute in the document. As a principle, the programmer should only have to handle the cases which are interesting to them, not wade manually through a haystack in search of a needle, which means the library should provide an expressive way of associating the nodes of interest with their targetted callbacks.</p>
-<p>Programmer has to track the descent down to an interesting node in some kind of list themselves.</p>
-<h2 id="json-and-xml"><a href="#json-and-xml"><span class="header-section-number">3.8</span> Json and XML</a></h2>
-<p>Json is very simple, only a few CFGs required to describe the language (json.org) - this project is listed there!</p>
-<h2 id="jsonpath-and-xpath"><a href="#jsonpath-and-xpath"><span class="header-section-number">3.9</span> jsonpath and xpath</a></h2>
-<p>JsonPath in general tries to resemble the javascript use of the json language nodes it is detecting.</p>
-<pre class="sourceCode javascript"><code class="sourceCode javascript">
-<span class="co">// an in-memory person with a multi-line address:</span>
-<span class="kw">let</span> person = {
-   <span class="dt">name</span>: <span class="st">&quot;...&quot;</span>,
-   <span class="dt">address</span>: [
-      <span class="st">&quot;line1&quot;</span>,
-      <span class="st">&quot;line2&quot;</span>,
-      <span class="st">&quot;line3&quot;</span>
-   ]
-};
-
-
-<span class="co">// in javascript we can get line two of the address as such:</span>
-<span class="kw">let</span> addresss = <span class="ot">person</span>.<span class="fu">address</span>[<span class="dv">2</span>]
-
-<span class="co">// the equivalent jsonpath expression is identical:</span>
-<span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span></code></pre>
-<h2 id="the-web-browser-as-rest-client"><a href="#the-web-browser-as-rest-client"><span class="header-section-number">3.10</span> The web browser as REST client</a></h2>
-<p>Browser incompatability mostly in presentation layer rather than in scripting languages.</p>
-<p>Language grammars rarely disagree, incompatability due to scripting is almost always due to the APIs presented to the scripting language rather than the language itself.</p>
-<h2 id="progressive-ui-streaming-ui"><a href="#progressive-ui-streaming-ui"><span class="header-section-number">3.11</span> Progressive UI/ Streaming UI</a></h2>
+<h2 id="progressive-ui-streaming-ui"><a href="#progressive-ui-streaming-ui"><span class="header-section-number">3.9</span> Progressive UI/ Streaming UI</a></h2>
 <p>Infinitely scrolling webpages. Need a way to 'pull' information, not just push if reacting to scrolling. Use oboe with websockets? Eg, ebay home page, Facebook. Adv of infinate scroll is page loads quickly and most people won't scroll very far so most of the time have everything needed right away.</p>
-<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.12</span> Javascript</a></h2>
+<h2 id="javascript"><a href="#javascript"><span class="header-section-number">3.10</span> Javascript</a></h2>
+<p>Client-side web scripting via Javascript is a field which at inception contributed no more than small, frequently gimmicky, dynamic features added to otherwise static webpages. Today the scope and power of client side scripting has increased to the extent that the entire interface for large, complex applications is often programmed in this way. These applications are not limited to running under traditional web browsers but also include mobile apps and desktop software.</p>
+<p>What 'this' (context) is in javascript. Why not calling it scope.</p>
 <p>Javascript: not the greatest for 'final' elegant presentation of programming. Does allow 'messy' first drafts which can be refactored into beautiful code. Ie, can write stateful and refactor in small steps towards being stateless. An awareness of beautiful languages lets us know the right direction to go in. An ugly language lets us find something easy to write that works to get us started. Allows a very sketchy program to be written, little more than a programming scratchpad.</p>
 <p>Without strict typing, hard to know if program is correct without running it. In theory (decidability) and in practice (often find errors through running and finding errors thrown). Echo FPR: once compiling, good typing tends to give a reasonable sureness that the code is correct.</p>
 <p>Explain var/function difference, ie construct pluck and explain why var keyOf = partial(pluck) is declared with a var and not a function, why some prefer to do always via . operator can't be made into a function with (.) or similar and so has to be wrapped in a function is a less direct manner. Unfortunately, can make it difficult for a reader to know the types involved. For example, on seeing: <code>var matchesJsonPath = jsonPathCompiler( pattern )</code> there is no way (other than examining the source or doucmentation of the function being called) to know that this is a higher order function and will return another function to be assigned as matchesJsonPath.</p>
@@ -176,7 +197,8 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
       return cons(fn(head(list)), map(fn,tail(list)));
    }
 }</code></pre>
-<h2 id="browser"><a href="#browser"><span class="header-section-number">3.13</span> Browser</a></h2>
+<p>What a Micro-library is. What motivates the trend? This library has a fairly small set of functionality, it isn't a general purpose do-everything library like jQuery so its size will be looked at more critically if it is too large. Micro library is the current gold standard for compactness. Still, have a lot to do in not very much code.</p>
+<h2 id="browser"><a href="#browser"><span class="header-section-number">3.11</span> Browser</a></h2>
 <p><em>XmlHttpRequest</em> (XHR)</p>
 <p>Xhr2 and the .onprogress callback. polling responseText while in progress * why doesn't work in IE (built on an activeX object that provides buffering)</p>
 <p>Older style of javascript callback. Assign a listener to onprogress, not call an add listener method means can only have one listener.</p>
@@ -184,32 +206,30 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>While the request entity body is being transmitted and the upload complete flag is unset, queue a task to fire a progress event named progress on the XMLHttpRequestUpload object about every 50ms or for every byte transmitted, whichever is least frequent. <a href="http://www.w3.org/TR/XMLHttpRequest/">w3c, XHR Working Draft</a></p>
 </blockquote>
 <p>Websockets More like node Can connect to any protocol (as always, easier to program if text based but can do binary) Can use to do http but not sufficient advantage over using</p>
-<h2 id="micro-libraries"><a href="#micro-libraries"><span class="header-section-number">3.14</span> Micro-libraries</a></h2>
-<p>What a Micro-library is. What motivates the trend? This library has a fairly small set of functionality, it isn't a general purpose do-everything library like jQuery so its size will be looked at more critically if it is too large. Micro library is the current gold standard for compactness. Still, have a lot to do in not very much code.</p>
-<h2 id="node"><a href="#node"><span class="header-section-number">3.15</span> Node</a></h2>
+<h2 id="node"><a href="#node"><span class="header-section-number">3.12</span> Node</a></h2>
 <blockquote>
 <p>Streams in node are one of the rare occasions when doing something the fast way is actually easier. SO USE THEM. not since bash has streaming been introduced into a high level language as nicely as it is in node.&quot; <a href="https://gist.github.com/2401787">high level node style guide</a></p>
 </blockquote>
 <blockquote>
-<p>node Stream API, which is the core I/O abstraction in Node.js (which is a tool for I/O) is essentially an abstract in/out interface that can handle any protocol/stream that also happens to be written in JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]</p>
+<p>node Stream API, which is the core I/O abstraction in Node.js (which is a tool for I/O) is essentially an abstract in/out interface that can handle any protocol/stream that also happens to be written in JavaScript. [<a href="http://maxogden.com/a-proposal-for-streaming-xhr.html">http://maxogden.com/a-proposal-for-streaming-xhr.html</a>]</p>
 </blockquote>
 <p>Bash streams a powerful abstraction easily programmed for linear streaming. Node more powerful, allows a powerful streaming abstraction which is no more complex to program than a javascript webapp front end. Essentially a low-level interface to streaming such as unix sockets or tcp connections.</p>
 <p>Streams in node are the observer pattern. Readable streams emit 'readable' events when they have some data to be read and 'end' events when they are finished. Apart from error handling, so far as reading is concerned, that is the extent of the API.</p>
 <p>Although the streams themselves are stateful, because they are based on callbacks it is entirely possible to use them from a component of a javascript program which is wholly stateless.</p>
 <p>Using Node's http module provides a stream but handles setting headers, putting the method otu etc.</p>
 <p>What Node is V8. Fast. Near-native. JIT.</p>
-<p>V8 is often said to be 'near-native' speed, meaning it runs at close to the speed of a similarly coded C program. However, this relies on the programmer also coding in the style of a C programmer, for example with only mono-morphic callsites and without a functional style. Once either of those programming techniques is taken up performance drops rapidly [http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]. When used in a functional style, not 'near-native' in the sense that not close to the performance gained by compiling a well designed functional language to natively executable code. Depends on style coded in, comparison to native somewhat takes C as the description of the operation of an idealised CPU rather than an abstract machine capable of executing on an actual CPU.</p>
+<p>V8 is often said to be 'near-native' speed, meaning it runs at close to the speed of a similarly coded C program. However, this relies on the programmer also coding in the style of a C programmer, for example with only mono-morphic callsites and without a functional style. Once either of those programming techniques is taken up performance drops rapidly [<a href="http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]. When used in a functional style, not 'near-native' in the sense that not close to the performance gained by compiling a well designed functional language to natively executable code. Depends on style coded in, comparison to native somewhat takes C as the description of the operation of an idealised CPU rather than an abstract machine capable of executing on an actual CPU.</p>
 <p><em>Anecdote: SVG engine: one function for xy vs x and xy. Very large speed increase. Add figures etc.</em></p>
 <p>Why Node perhaps is mis-placed in its current usage as a purely web platform &quot;the aim is absolutely fast io&quot;. This happened because web specialist programmers took it up first</p>
 <p>Why Node is significant * Recognises that most tasks are io-bound rather than CPU bound. Threaded models good for CPU-bound in the main.</p>
 <p>How Node is different</p>
 <p>Criticisms of Node. Esp from Erlang etc devs.</p>
 <p>Node's standard stream mechanisms</p>
-<h2 id="testing"><a href="#testing"><span class="header-section-number">3.16</span> Testing</a></h2>
+<h2 id="testing"><a href="#testing"><span class="header-section-number">3.13</span> Testing</a></h2>
 <div class="figure">
 <img src="images/placeholder.png" alt="Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers" /><p class="caption">Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers</p>
 </div>
-<p>By the commonjs spec, test directory should be called 'test' (http://wiki.commonjs.org/wiki/Packages/1.0#Package_Directory_Layout) doesn't matter for my project since not using commonjs, but might as well stick to the convention.</p>
+<p>By the commonjs spec, test directory should be called 'test' (<a href="http://wiki.commonjs.org/wiki/Packages/1.0">http://wiki.commonjs.org/wiki/Packages/1.0</a>#Package_Directory_Layout) doesn't matter for my project since not using commonjs, but might as well stick to the convention.</p>
 <p>How TDD helps How can fit into methodology</p>
 <ul>
 <li>JSTD</li>
@@ -217,9 +237,9 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <li>Karma</li>
 <li>Jasmine</li>
 </ul>
-<p>Initially started with jstestdriver but found it difficult. Karma started because engineers working on the Angular project in Google were &quot;struggling a lot with jstd&quot;: http://www.youtube.com/watch?v=MVw8N3hTfCI - jstd is a google project Even Jstd's authors seems to be disowning it slightly. Describe what was once its main mode of operation as now being for stress testing of jstd itself only. Problems: browsers become unresponsive. Generally unreliable, has to be restarted frequently.</p>
+<p>Initially started with jstestdriver but found it difficult. Karma started because engineers working on the Angular project in Google were &quot;struggling a lot with jstd&quot;: <a href="http://www.youtube.com/watch?v=MVw8N3hTfCI">http://www.youtube.com/watch?v=MVw8N3hTfCI</a> - jstd is a google project Even Jstd's authors seems to be disowning it slightly. Describe what was once its main mode of operation as now being for stress testing of jstd itself only. Problems: browsers become unresponsive. Generally unreliable, has to be restarted frequently.</p>
 <p>JSTD, as a Java program, is difficult to start via Grunt. Also an issue that Grunt post-dates Karma by enough that JSTD doesn't have the attention of the Grunt community.</p>
-<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.17</span> Methodology</a></h2>
+<h2 id="methodology"><a href="#methodology"><span class="header-section-number">3.14</span> Methodology</a></h2>
 <p>The program design will be initially an exercise in creating the easiest expression that can possibly work and via constant work towards the emergence of elegance.</p>
 <p>Why this method? See W'yg.</p>
 <h1 id="application-and-reflection"><a href="#application-and-reflection"><span class="header-section-number">4</span> Application and Reflection</a></h1>
@@ -227,6 +247,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 **40 to 60 pages**
 --->
 
+<p>Relationship between type of a node and its purpose in the document. Purpose is often obvious from a combination of URL and type so can disregard the place in the document. This structure may be carefully designed but ultimately a looser interpretation of the structure can be safer.</p>
 <p>A feature set which is minimal but contain no obvious omissions.</p>
 <p>Under the heading [Anatomy of a SOA client] I deconstructed the way in which programming logic is often used to identify the parts of a model which are currently interesting and started to look at some declarative ways in which these parts can be obtained.</p>
 <p>Turn this model inside out. Instead of the programmer finding the parts they want as a part of the general logic of the program, declaratively define the interesting parts and have these parts delivered to the language logic. Once we make the shift to thinking in this way, it is no longer necessary to have the whole resource locally before the interesting sub-parts are delivered.</p>
@@ -234,14 +255,16 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <div class="figure">
 <img src="images/timeline.png" alt="Over several hops of aggregation, the benefits of finding the interesting parts early" /><p class="caption">Over several hops of aggregation, the benefits of finding the interesting parts early</p>
 </div>
-<h2 id="delivery-methodology"><a href="#delivery-methodology"><span class="header-section-number">4.1</span> delivery methodology</a></h2>
+<h2 id="resume-on-failure"><a href="#resume-on-failure"><span class="header-section-number">4.1</span> resume on failure</a></h2>
+<p>Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header [<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5] which can be used to request any contiguous part of a response rather than the whole. Common in download managers but not REST clients. This ability can be used to. Why not this one. Resume on a higher semantic level.</p>
+<h2 id="delivery-methodology"><a href="#delivery-methodology"><span class="header-section-number">4.2</span> delivery methodology</a></h2>
 <p>Because Kanban focusses on always having a potentially releasable product, it mitigates problems which could otherwise lead to non-delivery and allows the direction to be changed while the project is in progress. For each unit of work (under Kanban, a card), an entire vertical slice of planning, design, implementation and reflection must be complete before going onto the next card. Alongside each software feature, every written chapter will be expanded and refactored in much the same way as the code. Just as for well designed software, the order of implementation should not be apparent to a user, my plan is that the written work should not feel disjointed for having been written non-sequentially. I plan to manage the Kanban process using paper only, with cards on a physical board.</p>
-<h2 id="overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff"><a href="#overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff"><span class="header-section-number">4.2</span> overall design philosophy and breaking out of big/small tradeoff</a></h2>
+<h2 id="overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff"><a href="#overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff"><span class="header-section-number">4.3</span> overall design philosophy and breaking out of big/small tradeoff</a></h2>
 <p>In which a callback call is received not just when the whole resource is downloaded but for every interesting part which is seen while the transfer is ongoing. The definition of 'interesting' will be generic and accommodating enough so as to apply to any data domain and allow any granularity of interest, from large object to individual datums. With just a few lines of programming</p>
 <p>Best of both modes</p>
 <p>Granularity: only need read as far as necessary. Services could be designed to write the big picture first. Alternatively, where resources link to one another, can stop reading at the link. Eg, looking for a person's publications, start with an index of people but no need to read whole list of people.</p>
 <p>Aborting http request may not stop processing on the server. Why this is perhaps desirable - transactions, leaving resources in a half-complete state.</p>
-<h2 id="choice-of-technologies"><a href="#choice-of-technologies"><span class="header-section-number">4.3</span> choice of technologies</a></h2>
+<h2 id="choice-of-technologies"><a href="#choice-of-technologies"><span class="header-section-number">4.4</span> choice of technologies</a></h2>
 <p>can justify why js as:</p>
 <p>Most widely deployable.</p>
 <p>Node: asynchronous model built into language already, no 'concurrent' library needed. Closures convenient for picking up again where left off.</p>
@@ -251,11 +274,11 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Compare to Erlang. Waiter model. Node resturaunt much more efficient use of expensive resources.</p>
 <p>funcitonal, pure functional possible [FPR] but not as nicely as in a pure functional language, ie function caches although can be implemented, not universal on all functions.</p>
 <p>easy to distribute softare (npm etc)</p>
-<h2 id="summary-of-json"><a href="#summary-of-json"><span class="header-section-number">4.4</span> summary of json</a></h2>
+<h2 id="summary-of-json"><a href="#summary-of-json"><span class="header-section-number">4.5</span> summary of json</a></h2>
 <p>Why json?</p>
 <p>A bridge between languages that isn't too different from the common types in the languages themselves a common bridge between languages</p>
 <p>Also very simple. Easy to parse.</p>
-<h2 id="creating-a-losely-coupled-reader"><a href="#creating-a-losely-coupled-reader"><span class="header-section-number">4.5</span> creating a losely coupled reader</a></h2>
+<h2 id="creating-a-losely-coupled-reader"><a href="#creating-a-losely-coupled-reader"><span class="header-section-number">4.6</span> creating a losely coupled reader</a></h2>
 <p>Programming to identify a certain interesting part of a resource today should with a high probability still work when applied to future releases.</p>
 <p>Requires a small amount of discipline on behalf of the service provider: Upgrade by adding of semantics only most of the time rather than changing existing semantics.</p>
 <p>Adding of semantics should could include adding new fields to objects (which could themselves contain large sub-trees) or a &quot;push-down&quot; refactor in which what was a root node is pushed down a level by being suspended from a new parent. See </p>
@@ -263,7 +286,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <img src="images/placeholder.png" alt="extended json rest service that still works - maybe do a table instead " /><p class="caption">extended json rest service that still works - maybe do a table instead </p>
 </div>
 <p>(CITE: re-read citations from SOA)</p>
-<h2 id="design-of-the-jsonpath-parser"><a href="#design-of-the-jsonpath-parser"><span class="header-section-number">4.6</span> Design of the jsonpath parser</a></h2>
+<h2 id="design-of-the-jsonpath-parser"><a href="#design-of-the-jsonpath-parser"><span class="header-section-number">4.7</span> Design of the jsonpath parser</a></h2>
 <p>Explain why Haskel/lisp style lists are used rather than arrays</p>
 <ul>
 <li>In parser clauses, lots of 'do this then go to the next function with the rest'.</li>
@@ -282,8 +305,8 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <ul>
 <li>For recognisably with existing code, use lists internally but transform into array on the boundary between Oboe.js and the outside world (at same time, strip off special 'root path' token)</li>
 </ul>
-<p>In parser, can't use 'y' flag to the regualr expression engine which would allow much more elegant matching. Only alternative is cumersome: to slice the string and match all tokens with regexes starting with '^' in order to track the current location. [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions]</p>
-<h2 id="incrementally-building-up-the-content"><a href="#incrementally-building-up-the-content"><span class="header-section-number">4.7</span> Incrementally building up the content</a></h2>
+<p>In parser, can't use 'y' flag to the regualr expression engine which would allow much more elegant matching. Only alternative is cumersome: to slice the string and match all tokens with regexes starting with '^' in order to track the current location. [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>]</p>
+<h2 id="incrementally-building-up-the-content"><a href="#incrementally-building-up-the-content"><span class="header-section-number">4.8</span> Incrementally building up the content</a></h2>
 <p>Like SAX, calls from clarinet are entirely 'context free'. Ie, am told that there is a new object but without the preceding calls the root object is indistinguishable from a deeply nested object. Luckily, it should be easy to see that building up this context is a simple matter of maintaining a stack describing the descent from the root node to the current node.</p>
 <p>jsonPath parser gets the output from the incrementalParsedContent, minimally routed there by the controller.</p>
 <div class="figure">
@@ -295,7 +318,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 </div>
 <p>On first attempt at ICB, had two stacks, both arrays, plus reference to current node, current key and root node. After refactorings, just one list was enough. Why single-argument functions are helpful (composition etc)</p>
 <p>Stateless makes using a debugger easier - can look back in stack trace and because of no reassignment, can see the whole, unchanged state of the parent call. What the params are now are what they always have been, no chance of reassignment (some code style guides recommend not to reassign parameters but imperative languages generally do not forbid it) No Side effects: can type expressions into debugger to see evaluation without risk of changing program execution.</p>
-<h2 id="identifying-interesting-objects-in-the-stream"><a href="#identifying-interesting-objects-in-the-stream"><span class="header-section-number">4.8</span> identifying interesting objects in the stream</a></h2>
+<h2 id="identifying-interesting-objects-in-the-stream"><a href="#identifying-interesting-objects-in-the-stream"><span class="header-section-number">4.9</span> identifying interesting objects in the stream</a></h2>
 <p>NB: This consideration of type in json could be in the Background section.</p>
 <p>Xml comes with a strong concept of the <em>type</em> of an element, the tag name is taken as a more immediate fundamental property of the thing than the attributes. For example, in automatic json-Java object demarshallers, the tag name is always mapped to the Java class. In JSON, other than the base types common to most languages (array, object, string etc) there is no further concept of type. If we wish to build a further understanding of the type of the objects then the realtionship with the parent object, expressed by the attribute name, is more likely to indicate the type. A second approach is to use duck typing in which the relationship of the object to its ancestors is not examined but the properties of the object are used instead to communicate an enhanced concept of type. For example, we might say that any object with an isbn and a title is a book.</p>
 <p>Duck typing is of course a much looser concept than an XML document's tag names and collisions are possible where objects co-incidentally share property names. In practice however, I find the looseness a strength more often than a weakness. Under a tag-based marshalling from an OO language, sub-types are assigned a new tag name and as a consumer of the document, the 'isa' relationship between a 'class' tagname and it's 'sub-tabname' may be difficult to track. It is likely that if I'm unaware of this, I'm not interested in the extended capabilities of the subclass and would rather just continue to recieve the base superclass capabilities as before. Under duck typing this is easy - becase the data consumer lists the</p>
@@ -330,11 +353,11 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 
 <span class="fu">jsonPath</span>(matchingObject); <span class="co">// evaluates to true</span></code></pre>
 <p>When we aer searching</p>
-<h2 id="program-design"><a href="#program-design"><span class="header-section-number">4.9</span> program design</a></h2>
+<h2 id="program-design"><a href="#program-design"><span class="header-section-number">4.10</span> program design</a></h2>
 <div class="figure">
 <img src="images/overallDesign.png" alt="Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has been split into different files." /><p class="caption">Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has been split into different files.</p>
 </div>
-<h2 id="incrementally-building-up-a-model"><a href="#incrementally-building-up-a-model"><span class="header-section-number">4.10</span> incrementally building up a model</a></h2>
+<h2 id="incrementally-building-up-a-model"><a href="#incrementally-building-up-a-model"><span class="header-section-number">4.11</span> incrementally building up a model</a></h2>
 <p>A refactoring was used to separate logic and state:</p>
 <ul>
 <li>Take stateful code</li>
@@ -348,7 +371,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>How do notifications fit into this?</p>
 <p>By going to List-style, enforced that functions fail when not able to give an answer. Js default is to return the special 'undefined' value. Why this ensured more robustness but also sometimes took more code to write, ie couldn't just do if( tail(foo)) if foo could be empty but most of the time that would be correct</p>
 <p>Stateful controller very easy to test - only 1 function.</p>
-<h2 id="styles-of-programming"><a href="#styles-of-programming"><span class="header-section-number">4.11</span> styles of programming</a></h2>
+<h2 id="styles-of-programming"><a href="#styles-of-programming"><span class="header-section-number">4.12</span> styles of programming</a></h2>
 <p>The code presented is the result of the development many prior versions, it has never been rewritten in the sense of starting again. Nontheless, every part has been complely renewed several times. I am reviewing only the final version. Git promotes regular commits, there have been more than 500.</p>
 <p>some of it is pure functional (jsonPath, controller) ie, only semantically different from a Haskell programme others, syntactically functional but stateful to fit in with expected APIs etc</p>
 <p>JsonPath implementation allows the compilation of complex expressions into an executable form, but each part implementing the executable form is locally simple. By using recursion, assembling the simple functions into a more function expressing a more complex rule also follows as being locally simple but gaining a usefully sophisticated behaviour through composition of simple parts. Each recursive call of the parser identifies one token for non-empty input and then recursively digests the rest.</p>
@@ -380,7 +403,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Functional programming tends to lend better to minification than OO-style because of untyped record objects (can have any keys).</p>
 <p>Lack of consistency in coding (don't write too much, leave to the conclusion)</p>
 <p>Final consideration of coding: packaging up each unit to export a minimal interface. * Why minimal interfaces are better for minification</p>
-<h2 id="the-mutability-problem"><a href="#the-mutability-problem"><span class="header-section-number">4.12</span> The mutability problem</a></h2>
+<h2 id="the-mutability-problem"><a href="#the-mutability-problem"><span class="header-section-number">4.13</span> The mutability problem</a></h2>
 <p>Javascript provides no way to decalre an object with 'cohorts' who are allowed to change it whereas others cannot - vars may be hidden via use of scope and closures (CITE: crockford) but attributes are either mutable or immutable.</p>
 <p>Why this is a problem.</p>
 <ul>
@@ -393,27 +416,27 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <li>defensive cloning</li>
 <li>defining getter properties</li>
 </ul>
-<h2 id="performance-implications-of-functional-javascript"><a href="#performance-implications-of-functional-javascript"><span class="header-section-number">4.13</span> Performance implications of functional javascript</a></h2>
+<h2 id="performance-implications-of-functional-javascript"><a href="#performance-implications-of-functional-javascript"><span class="header-section-number">4.14</span> Performance implications of functional javascript</a></h2>
 <p>(perhaps move to background, or hint at it, eg &quot;although there are still some performance implications involved in a functional style, javascript may be used in a non-pure functional style&quot;) - with link to here</p>
-<p>http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html 9571 ms vs 504 ms</p>
+<p><a href="http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html 9571 ms vs 504 ms</p>
 <p>The performance degradation, even with a self-hosted forEach, is due to the JIT’s inability to efficiently inline both the closures passed to forEach</p>
-<p>Lambda Lifting, currently not implemented in SpiderMonkey or V8: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346</p>
+<p>Lambda Lifting, currently not implemented in SpiderMonkey or V8: <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346">http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346</a></p>
 <p>The transformations to enable the above criteria are tedious and are surely the purview of the compiler. All that’s needed are brave compiler hackers</p>
 <p>JS is much faster with &quot;monomorphic call sites&quot;</p>
 <p>However, js execution time is not much of a problem,</p>
-<h2 id="functions-over-constructors"><a href="#functions-over-constructors"><span class="header-section-number">4.14</span> functions over constructors</a></h2>
+<h2 id="functions-over-constructors"><a href="#functions-over-constructors"><span class="header-section-number">4.15</span> functions over constructors</a></h2>
 <p>What constructors are in js. Any function, but usually an uppercase initial char indicates that it is intended to be used as a constructor.</p>
 <p>Inheritence is constructed using the language itself. While this is more flexible and allows each project to define a bespoke version of inherience to suit their particular needs or preferences, it also hampers portability more than an 'extends' keyword would.</p>
 <blockquote>
-<p>So far, the JavaScript community has not agreed on a common inheritance library (which would help tooling and code portability) and it is doubtful that that will ever happen. That means, we’re stuck with constructors under ECMAScript 5. http://www.2ality.com/2013/07/defending-constructors.html</p>
+<p>So far, the JavaScript community has not agreed on a common inheritance library (which would help tooling and code portability) and it is doubtful that that will ever happen. That means, we’re stuck with constructors under ECMAScript 5. <a href="http://www.2ality.com/2013/07/defending-constructors.html">http://www.2ality.com/2013/07/defending-constructors.html</a></p>
 </blockquote>
 <p>Functions can be like Factories, gives me the flexability to chagne how something is created but by exposing a constructor are stuck with using 'new' to create an instance of exactly one type.</p>
-<p>Dart has 'factory' constructors which are called like constructors but act like factory functions: (http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html#ch02-constructor-factory)</p>
-<h2 id="targeting-node-and-the-browser"><a href="#targeting-node-and-the-browser"><span class="header-section-number">4.15</span> targeting node and the browser</a></h2>
+<p>Dart has 'factory' constructors which are called like constructors but act like factory functions: (<a href="http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html">http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html</a>#ch02-constructor-factory)</p>
+<h2 id="targeting-node-and-the-browser"><a href="#targeting-node-and-the-browser"><span class="header-section-number">4.16</span> targeting node and the browser</a></h2>
 <p>Node+browser To use Node.js and</p>
 <p>Need to build an abstraction layer over xhr/xhr2/node. Can only work for packets in-order, for out-of-order packets something else happens.</p>
 <p>Use best of the capabilities of each.</p>
-<h2 id="packaging-the-library-as-a-single-distributable-file"><a href="#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">4.16</span> Packaging the library as a single distributable file</a></h2>
+<h2 id="packaging-the-library-as-a-single-distributable-file"><a href="#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">4.17</span> Packaging the library as a single distributable file</a></h2>
 <div class="figure">
 <img src="images/placeholder.png" alt="packaging of many javascript files into multiple single-file packages. The packages are individually targeted at different execution contexts, either browsers or node get from notebook, split sketch diagram in half" /><p class="caption">packaging of many javascript files into multiple single-file packages. The packages are individually targeted at different execution contexts, either browsers or node <em>get from notebook, split sketch diagram in half</em></p>
 </div>
@@ -459,16 +482,16 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <ul>
 <li>Why it is better for some projects</li>
 <li>Very nearly meets my needs</li>
-<li>But http-compatability (https://github.com/substack/http-browserify), while complete enough, isn't compact enough to not push project over micro-library size</li>
+<li>But http-compatability (<a href="https://github.com/substack/http-browserify">https://github.com/substack/http-browserify</a>), while complete enough, isn't compact enough to not push project over micro-library size</li>
 </ul>
 <p>Testing post-packaging for small set of smoke tests. Can't test everything, only through public API.</p>
 <p>Uglify. Why not Google Closure Compiler.</p>
-<h2 id="polyfilling"><a href="#polyfilling"><span class="header-section-number">4.17</span> polyfilling</a></h2>
+<h2 id="polyfilling"><a href="#polyfilling"><span class="header-section-number">4.18</span> polyfilling</a></h2>
 <p>The decline of bad browsers. Incompatability less of a concern than it was.</p>
 <p>Node doesn't require, built on v8.</p>
-<p>http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the new methods discussed in the first two parts, the methods here are all reproducible using JavaScript itself. Native implementations are simply faster and more convenient. Having a uniform API for these operations also promotes their usage, making code clearer when shared between developers.</p>
+<p><a href="http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a> Unlike the new methods discussed in the first two parts, the methods here are all reproducible using JavaScript itself. Native implementations are simply faster and more convenient. Having a uniform API for these operations also promotes their usage, making code clearer when shared between developers.</p>
 <p>Even when only used once, preferable to polyfill as a generic solution rather than offer a one-time implementation because it better splits the intention of the logic being presented from the mechanisms that that logic sits on and, by providing abstraction, elucidates the code.</p>
-<h2 id="automated-testing"><a href="#automated-testing"><span class="header-section-number">4.18</span> automated testing</a></h2>
+<h2 id="automated-testing"><a href="#automated-testing"><span class="header-section-number">4.19</span> automated testing</a></h2>
 <div class="figure">
 <img src="images/placeholder.png" alt="Relationship between various files and test libraries other half of sketch from notebook" /><p class="caption">Relationship between various files and test libraries <em>other half of sketch from notebook</em></p>
 </div>
@@ -483,7 +506,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Why jstd's built in proxy isn't sufficient. An example of a typical Java webserver, features thread-based mutlithreading in which threads wait for a while response to be received.</p>
 <p>Tests deal with the problem of &quot;irreducible complexity&quot; - when a program is made out of parts whose correct behaviour cannot be observed without all of the program. Allows smaller units to be verified before verifying the whole.</p>
 <p>Conversely, automated testing allows us to write incomprehensible code by making us into more powerful programmers, it is possible building up layers of complexity one very small part at a time that we couldn't write in a simple stage. Clarity &gt; cleverness but cleverness has its place as well (intriducing new concepts)</p>
-<p>Testing via node to give something to test against - slowserver. Proxy. JSTD not up to task. Shows how useful node is as a 'network glue'. The same as C was once described as a 'thin glue' [http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent proxy is about 20 lines. Transparent enough to fool JSTD into thinking it is connecting directly to its server.</p>
+<p>Testing via node to give something to test against - slowserver. Proxy. JSTD not up to task. Shows how useful node is as a 'network glue'. The same as C was once described as a 'thin glue' [<a href="http://www.catb.org/esr/writings/taoup/html/ch04s03.html">http://www.catb.org/esr/writings/taoup/html/ch04s03.html</a>]. Transparent proxy is about 20 lines. Transparent enough to fool JSTD into thinking it is connecting directly to its server.</p>
 <p>Node comes with very little built in (not even http) but relies on libraries written in the language itself to do everything. Could implement own http on top of sockets if wanted rather than using the provided one.</p>
 <p>The test pyramid concept  fits in well with the hiding that is provided. Under the testing pyramid only very high level behaviours are tested as ??? tests. While this is a lucky co-incidence, it is also an unavoidable restriction. Once compiled into a single source file, the individual components are hidden, callable only from withing their closure. Hence, it would not be possible to test the composed parts individually post-concatenation into a single javascript file, not even via a workarround for data hiding such as found in Java's reflection. Whereas in Java the protection is a means of protecting otherwise addressable resources, once a function is trapped inside a javascript closure without external exposure it is not just protected but, appearing in no namespaces, inherently unreferenceable.</p>
 <p>TDD fits well into an object pattern because the software is well composed into separate parts. The objects are almost tangible in their distinction as separate encapsulated entities. However, the multi-paradigm style of my implementation draws much fainter borders over the implementation's landscape.</p>
@@ -497,18 +520,18 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <pre class="sourceCode javascript"><code class="sourceCode javascript">   .<span class="fu">onError</span>( error ) {
       <span class="kw">this</span>.<span class="fu">resume</span>();
    }</code></pre>
-<h2 id="inversion-of-control"><a href="#inversion-of-control"><span class="header-section-number">4.19</span> Inversion of Control</a></h2>
+<h2 id="inversion-of-control"><a href="#inversion-of-control"><span class="header-section-number">4.20</span> Inversion of Control</a></h2>
 <p>Aim of creating a micro-library rules out building in a general-purpose IoC library.</p>
 <p>However, can still follow the general principles.</p>
 <p>Why the Observer pattern (cite: des patterns) lends itself well to MVC and inversion of control.</p>
 <p>What the central controller does; acts as a plumber connecting the various parts up. Since oboe is predominantly event/stream based, once wired up little intervention is needed from the controller. Ie, A knows how to listen for ??? events but is unintested who fired them.</p>
-<h2 id="stability-over-upgrades"><a href="#stability-over-upgrades"><span class="header-section-number">4.20</span> stability over upgrades</a></h2>
-<p>why jsonpath-like syntax allows upgrading message semantics without causing problems <a href="#soa">SOA</a> how to guarantee non-breakages? could publish 'supported queries' that are guaranteed to work</p>
-<h2 id="support-for-older-browsers"><a href="#support-for-older-browsers"><span class="header-section-number">4.21</span> support for older browsers</a></h2>
+<h2 id="stability-over-upgrades"><a href="#stability-over-upgrades"><span class="header-section-number">4.21</span> stability over upgrades</a></h2>
+<p>why jsonpath-like syntax allows upgrading message semantics without causing problems [SOA] how to guarantee non-breakages? could publish 'supported queries' that are guaranteed to work</p>
+<h2 id="support-for-older-browsers"><a href="#support-for-older-browsers"><span class="header-section-number">4.22</span> support for older browsers</a></h2>
 <p>Still works as well as non-progressive json Could be used for content that is inherently streaming (wouldn't make sense without streaming)</p>
-<h2 id="suitability-for-databases"><a href="#suitability-for-databases"><span class="header-section-number">4.22</span> suitability for databases</a></h2>
+<h2 id="suitability-for-databases"><a href="#suitability-for-databases"><span class="header-section-number">4.23</span> suitability for databases</a></h2>
 <p>Databases offer data one row at a time, not as a big lump.</p>
-<h2 id="weaknesses"><a href="#weaknesses"><span class="header-section-number">4.23</span> weaknesses</a></h2>
+<h2 id="weaknesses"><a href="#weaknesses"><span class="header-section-number">4.24</span> weaknesses</a></h2>
 <p>implementation keeps 'unreachable' listeners difficult decidability/proof type problem to get completely right but could cover most of the easy cases</p>
 <p>Parse time for large files spread out over a long time. Reaction to parsed content spread out over a long time, for example de-marshalling to domain objects. For UX may be preferable to have many small delays rather than one large one.</p>
 <p>Doesn't support all of jsonpath. Not a strict subset of the language.</p>
@@ -538,7 +561,7 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Implementation in a purely functional language with lazy evaluation: could it mean that only the necessary parts are computed? Could I have implemented the same in javascript?</p>
 <p>Would be nice to: * discard patterns that can't match any further parts of the tree * discard branches of the tree that can't match any patterns * just over the parsing of branches of the tree that provably can't match any of the patterns</p>
 <h2 id="comparative-usages"><a href="#comparative-usages"><span class="header-section-number">5.4</span> Comparative usages</a></h2>
-<p>Interesting article from Clarinet: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</p>
+<p>Interesting article from Clarinet: <a href="http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a></p>
 <p>In terms of syntax: compare to SAX (clarinet) for getting the same job done. Draw examples from github project README. Or from reimplementing Clarinet's examples.</p>
 <p>Consider:</p>
 <ul>
@@ -562,3 +585,12 @@ String firstPersonsSurname = people.<span class="fu">get</span>(<span class="dv"
 <p>Sapir, E. 1958. “Culture, Language and Personality (ed. D. G. Mandelbaum).” Berkeley, CA: University of California Press.</p>
 <p>Stefanov, Stoyan. 2009. “Progressive rendering via multiple flushes.” <a href="http://www.phpied.com/progressive-rendering-via-multiple-flushes/" title="http://www.phpied.com/progressive-rendering-via-multiple-flushes/">http://www.phpied.com/progressive-rendering-via-multiple-flushes/</a>.</p>
 <p>Whorf, B. L. 1956. “Language, Thought and Reality (ed. J. B. Carroll).” Cambridge, MA: MIT Press.</p>
+<p>van Kesteren, Anne. 2012. “XMLHttpRequest Level 2 Working Draft.” <a href="http://www.w3.org/TR/XMLHttpRequest2/#make-progress-notifications" title="http://www.w3.org/TR/XMLHttpRequest2/#make-progress-notifications">http://www.w3.org/TR/XMLHttpRequest2/#make-progress-notifications</a>.</p>
+<p>van Kesteren, Anne, and Dean Jackson. 2006. “The XMLHttpRequest Object.” <a href="http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/" title="http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/">http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/</a>.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>For quite an obviously visible example of progressive SVG loading, try loading this SVG using a recent version of Google Chrome: <a href="http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg">http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg</a> For the perfectionist SVG artist, not just the final image should be considered but also the XML source order, for example in this case it would be helpful if the outline of the UK appeared first and the exploded sections last.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>See <a href="http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html">http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html</a>.<a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
