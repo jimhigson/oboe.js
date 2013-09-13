@@ -284,14 +284,15 @@ approaches are particularly satisfactory.
 Json and XML (remove this heading later)
 ----------------------------------------
 
-Although AJAX started as a means to transfer XML, today JSON is the much more popular
-serialisation format. The goals of XML were to simplify SGML to the point that a graduate student would be able to 
-implement a parser in a week [@javaxml p ???]. For JSON a few hours with a parser generator should 
-surfice, being expressable in just 15 CFGs. Indeed, because JSON is a strict subset of Javascript, to the Javascript
-programmer in many cases no parser is required at all. Unimpeeded by SGML's roots as a document format,
-JSON provides a much more direct analogue to the metamodel of a canonical modern programming language. 
-Whilst any model is ultimately expressible in either, by more closely mirroring a programmer's 
-metamodel the translation from domain model objects to serialised objects is simpler and intuative.
+Although AJAX started as a means to transfer XML, today JSON "The fat-free alternative to XML[@jsonorg]" 
+is the much more popular serialisation format. The goals of XML were to simplify SGML to the point that a 
+graduate student would be able to implement a parser in a week [@javaxml p ???]. For JSON a few hours 
+with a parser generator should surfice, being expressable in just 15 CFGs. Indeed, because JSON is a 
+strict subset of Javascript, to the Javascript programmer in many cases no parser is required at all. 
+Unimpeeded by SGML's roots as a document format, JSON provides a much more direct analogue to the 
+metamodel of a canonical modern programming language. Whilst any model is ultimately expressible in 
+either, by closely mirroring a programmer's metamodel imagining a mapping between a domain model's objects 
+and serialised objects becomes trivial.
 
 This close resemblence to the model of the programming in some cases causes fast-changing formats. 
 
