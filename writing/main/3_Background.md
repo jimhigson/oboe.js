@@ -283,14 +283,31 @@ approaches are particularly satisfactory.
 Parsing: SAX and Dom, Json and XML
 ----------------------------------
 
-Why sax is difficult and nobody uses it
+*Identify SAX and DOM.*
 
 DOM parser can be built on a SAX parser. Often are. CITE: Java and XML
 book.
 
+For non-incremental
+DOM-style XML parsers the programmer rarely directly concerns themselves
+with markup features. More likely is that they will take advantage of
+the wealth of modern, generic tools which automate a translation of
+markup into domain model objects as per a declarative configuration.
+
+SAX parsers are probably better considered as tokenisers plus validation, providing a very low-level interface which notifies the
+programmer of syntax as it is seen. This presents poor developer
+ergonomics by requiring that the programmer implement the recording of
+state with regard to the nodes that they have seen. For
+programmers using SAX, a conversion to their domain objects is usually
+implemented imperatively. This programming tends to be difficult to read
+and programmed once per usage rather than assembled as the combination
+of reusable parts. For this reason the use of SAX is usually reserved
+for fringe cases in which messages are extremely large or memory
+extremely scarce.
+
 The failure of sax: requires programmer to do a lot of work to identify
 interesting things. Eg, to find tag address inside tag person with a
-given name, have to recognise three things while reieving a callback for
+given name, have to recognise three things while reieving at least two callback for
 every single element and attribute in the document. As a principle, the
 programmer should only have to handle the cases which are interesting to
 them, not wade manually through a haystack in search of a needle, which
@@ -299,6 +316,9 @@ nodes of interest with their targetted callbacks.
 
 Programmer has to track the descent down to an interesting node in some
 kind of list themselves.
+
+Json and XML (remove this heading later)
+------------
 
 Json is very simple, only a few CFGs required to describe the language
 (json.org) - this project is listed there!
