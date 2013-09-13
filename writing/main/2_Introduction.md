@@ -22,7 +22,7 @@ it is remote. However, we should remember that this construct is not the
 only possible mapping. Importing some moderate Whorfianism
 [@whorf56][@sapir58] from linguistics, we might venture to say that the
 programming languages we use encourage us to think in the terms that
-they easily support. For any multi-packet message sent via a network
+they easily support. Also UML! For any multi-packet message sent via a network
 some parts will arrive before others, at least approximately in-order,
 but whilst coding a C-inspired language whose return statements yield
 single, discrete values it comfortable to conceptualise the REST
@@ -54,6 +54,8 @@ individual \<img\> tags are encountered. The browser's implementation
 involves a highly optimised parser created for a single task, that of
 displaying web pages. The new contribution of this dissertation is to
 provide a generic analog applicable to any problem domain.
+
+Also progressive SVGs. [^2]
 
 REST aggregation could be faster
 --------------------------------
@@ -248,3 +250,11 @@ Additionally, I shall be looking at common ways in which the semantics
 of a message are expanded as a system's design emerges and commenting on
 the value of loose coupling in avoiding disruption given unanticipated
 format changes.
+
+[^2]: for quite an obviously visible example of progressive SVG loading,
+    try loading this SVG using a recent version of Google Chrome:
+    <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg>
+    For the perfectionist SVG artist, not just the final image should be
+    considered but also the XML source order, for example in this case
+    it would be helpful if the outline of the UK appeared first and the
+    exploded sections last.
