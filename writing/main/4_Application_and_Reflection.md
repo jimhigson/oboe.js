@@ -10,6 +10,11 @@ This structure may be carefully designed but ultimately a looser interpretation 
 structure can be safer.
 
 
+Interestingly, the mixed paradigm design hasn't changed the top-level design 
+very much from how it'd be as a pure OO project (IoC, decorators, event 
+filters, pub/sub etc).
+
+
 
 
 A feature set which is minimal but contain no obvious omissions.
