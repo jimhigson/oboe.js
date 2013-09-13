@@ -284,17 +284,22 @@ approaches are particularly satisfactory.
 Json and XML (remove this heading later)
 ----------------------------------------
 
-Although AJAX started as a means to transfer XML, today JSON "The fat-free alternative to XML[@jsonorg]" 
-is the much more popular serialisation format. The goals of XML were to simplify SGML to the point that a 
-graduate student would be able to implement a parser in a week [@javaxml p ???]. For JSON a few hours 
-with a parser generator should surfice, being expressable in just 15 CFGs. Indeed, because JSON is a 
-strict subset of Javascript, to the Javascript programmer in many cases no parser is required at all. 
-Unimpeeded by SGML's roots as a document format, JSON provides a much more direct analogue to the 
-metamodel of a canonical modern programming language. Whilst any model is ultimately expressible in 
-either, by closely mirroring a programmer's metamodel imagining a mapping between a domain model's objects 
-and serialised objects becomes trivial.
+Although AJAX started as a means to transfer XML, today JSON "The
+fat-free alternative to XML[@jsonorg]" is the much more popular
+serialisation format. The goals of XML were to simplify SGML to the
+point that a graduate student would be able to implement a parser in a
+week [@javaxml p ???]. For JSON a few hours with a parser generator
+should surfice, being expressable in just 15 CFGs. Indeed, because JSON
+is a strict subset of Javascript, to the Javascript programmer in many
+cases no parser is required at all. Unimpeeded by SGML's roots as a
+document format, JSON provides a much more direct analogue to the
+metamodel of a canonical modern programming language. Whilst any model
+is ultimately expressible in either, by closely mirroring a programmer's
+metamodel imagining a mapping between a domain model's objects and
+serialised objects becomes trivial.
 
-This close resemblence to the model of the programming in some cases causes fast-changing formats. 
+This close resemblence to the model of the programming in some cases
+causes fast-changing formats.
 
 (MINE SOA assignment). Also the diagram.
 
@@ -324,8 +329,8 @@ Because of the low-level semantics, SAX requires the programmer to write
 a lot of code and maintain a lot of state in order to identify
 interesting things.
 
-To illustrate the different in developer ergonomics between the the modes of
-parsing, consider this JSON:
+To illustrate the different in developer ergonomics between the the
+modes of parsing, consider this JSON:
 
 ~~~~ {.javascript}
 {
@@ -336,8 +341,8 @@ parsing, consider this JSON:
 }
 ~~~~
 
-Suppose we want to extract the name of the first person. Using DOM
-this is very easy:
+Suppose we want to extract the name of the first person. Using DOM this
+is very easy:
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString ) {
@@ -351,8 +356,8 @@ function nameOfFirstPerson( myJsonString ) {
 }
 ~~~~
 
-Contrast with the programming below which uses the clarinet JSON 
-SAX parser.
+Contrast with the programming below which uses the clarinet JSON SAX
+parser.
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
