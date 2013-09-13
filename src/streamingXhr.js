@@ -39,16 +39,9 @@ function streamingXhr(fire, on, method, url, data, headers) {
       return isString(body)? body: JSON.stringify(body);
    }      
    
-   /** xhr2 already supports everything that we need so just a bit of abstraction required.
-    *  listenToXhr2 is one of two possible values to use as listenToXhr  
-    */
-   function listenForProgress() {         
-      xhr.onprogress = handleProgress;      
-   }
    
-   /** xhr1 is quite primative so a bit more work is needed to connect to it 
-    *  listenToXhr1 is one of two possible values to use as listenToXhr  
-    */           
+   /**
+    */
    function listenForComplete(){
    
       // unfortunately there is no point polling the responsetext, these bad old browsers 
@@ -102,7 +95,7 @@ function streamingXhr(fire, on, method, url, data, headers) {
    }
    
    if('onprogress' in xhr){
-      listenForProgress();
+      xhr.onprogress = handleProgress;
    }
    
    listenForComplete();
