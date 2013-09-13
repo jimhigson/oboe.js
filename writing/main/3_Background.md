@@ -19,13 +19,6 @@ Or, 666 to 3,333 (333 per page)
    
 --->
 
-In fact, this is exactly how web browsers are implemented. However, this
-progressive use of http is hardwired into the browser engines rather
-than exposing an API suitable for general use and as such is treated as
-something of a special case specific to web browsers and has not so far
-seen a more general application. I wish to argue that a general
-application of this technique is viable and offers a worthwhile
-improvement over current common methods.
 
 The above problem has many analogues and because REST uses standard web
 semantics applies to much more than just automated web surfing. Indeed,
@@ -181,6 +174,14 @@ recently versions, the installed userbase of supporting browsers is
 unlikely to grow fast enough that this technique may be relied upon
 without a fallback for several years.
 
+In fact, this is exactly how web browsers are implemented. However, this
+progressive use of http is hardwired into the browser engines rather
+than exposing an API suitable for general use and as such is treated as
+something of a special case specific to web browsers and has not so far
+seen a more general application. I wish to argue that a general
+application of this technique is viable and offers a worthwhile
+improvement over current common methods.
+
 While until recently browsers have provided no mechanism to stream into
 AJAX, almost every other instance of downloading has taken advantage of
 streaming and progressive interpretation. This includes image formats,
@@ -285,18 +286,27 @@ Json and XML (remove this heading later)
 ----------------------------------------
 
 Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the much more popular
+fat-free alternative to XML[@jsonorg]" is the more popular
 serialisation format. The goals of XML were to simplify SGML to the
 point that a graduate student would be able to implement a parser in a
-week [@javaxml p ???]. For JSON a few hours with a parser generator
-should surfice, being expressable in just 15 CFGs. Indeed, because JSON
-is a strict subset of Javascript, to the Javascript programmer in many
-cases no parser is required at all. Unimpeeded by SGML's roots as a
+week [@javaxml p ???]. For the student tackling JSON a few hours with a parser generator
+should surfice, being expressable in 15 CFGs. Indeed, because JSON
+is a strict subset of Javascript, in many cases the Javascript programmer 
+requires no parser at all. Unimpeeded by SGML's roots as a
 document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language. Whilst any model
-is ultimately expressible in either, by closely mirroring a programmer's
-metamodel imagining a mapping between a domain model's objects and
-serialised objects becomes trivial.
+metamodel of a canonical modern programming language with entities 
+such as *string*, *number*, *object* and *array*. By closely mirroring 
+a programmer's metamodel, visualising a mapping between a domain model 
+and it's serialised objects becomes trivial.
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+~~~~
 
 This close resemblence to the model of the programming in some cases
 causes fast-changing formats.
@@ -331,15 +341,6 @@ interesting things.
 
 To illustrate the different in developer ergonomics between the the
 modes of parsing, consider this JSON:
-
-~~~~ {.javascript}
-{
-   people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-   ]
-}
-~~~~
 
 Suppose we want to extract the name of the first person. Using DOM this
 is very easy:
@@ -584,15 +585,6 @@ important concern in a codebase (CITE) - if the code is suitably dynamic
 it is important that changes are axiomic and clarity of the changelog is
 equally important.
 
-Progressive UI/ Streaming UI
-----------------------------
-
-Infinitely scrolling webpages. Need a way to 'pull' information, not
-just push if reacting to scrolling. Use oboe with websockets? Eg, ebay
-home page, Facebook. Adv of infinate scroll is page loads quickly and
-most people won't scroll very far so most of the time have everything
-needed right away.
-
 Javascript
 ----------
 
@@ -650,28 +642,6 @@ fairly small set of functionality, it isn't a general purpose
 do-everything library like jQuery so its size will be looked at more
 critically if it is too large. Micro library is the current gold
 standard for compactness. Still, have a lot to do in not very much code.
-
-Browser
--------
-
-*XmlHttpRequest* (XHR)
-
-Xhr2 and the .onprogress callback. polling responseText while in
-progress \* why doesn't work in IE (built on an activeX object that
-provides buffering)
-
-Older style of javascript callback. Assign a listener to onprogress, not
-call an add listener method means can only have one listener.
-
-> While the request entity body is being transmitted and the upload
-> complete flag is unset, queue a task to fire a progress event named
-> progress on the XMLHttpRequestUpload object about every 50ms or for
-> every byte transmitted, whichever is least frequent. [w3c, XHR Working
-> Draft](http://www.w3.org/TR/XMLHttpRequest/)
-
-Websockets More like node Can connect to any protocol (as always, easier
-to program if text based but can do binary) Can use to do http but not
-sufficient advantage over using
 
 Node
 ----
