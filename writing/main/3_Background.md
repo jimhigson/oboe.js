@@ -170,7 +170,7 @@ process had started and was busy observing and specifying proprietary
 extensions to the original XHR1. Given an interest in streaming, the
 most interesting of these is the progress event:
 
-> while the download is progressing, queue a task to fire a progress
+> While the download is progressing, queue a task to fire a progress
 > event named progress about every 50ms or for every byte received,
 > whichever is least frequent. [@xhr2progress]
 
@@ -185,10 +185,9 @@ Browser streaming frameworks
 ----------------------------
 
 To feel truly 'live' many web applications need to be able to update in
-real time by reacting to events pushed from the server side. A host of
-inventive streaming transports have been developed sidestepping the
-browser's apparent limitations. To frame the choices made in this
-project I will briefly examine three techniques.
+real time by reacting to events pushed from the server side. Dozens of
+streaming transports have been developed sidestepping the browser's
+apparent limitations.
 
 The earliest and most basic attempt was to poll, with all the associated
 downsides. From here the improved technique of *long polling* was
@@ -199,48 +198,69 @@ connection; since the http response is now complete the content is
 available to the client which then immediately makes a new request,
 reiterating the cycle.
 
-*Push tables* observe that, while browsers lack the means of streaming
-ajax, progressive html rendering is available. Streaming data is written
-from the server side into an HTML table, one row per event. On the
-client side this table is hidden in an off-screen frame. Javascript
-listens for changes to table and reacts whenever a new row is found.
+Observing that while browsers lack progressive ajax, progressive html
+rendering is available, *push tables* achieve progressive data transfer
+by serialising streaming data as HTML. This is usually into a table, one
+row per message. On the client side this table is hidden in an
+off-screen frame. Javascript watches the table and reacts whenever a new
+row is found.
 
-While effective, none of these workarounds are using the technology as
-it is intended. *Websockets* is poised to take over, building a
-standardised transport on top of http's chunked mode. The websockets
-framework cannot be built in Javascript and needs to be implemented by
-the browser.
+Whilst useful, neither long polling nor push tables use the technology
+as intended. The latest approach, *Websockets* is poised to take over,
+building a standardised duplex transport and API on top of http's
+chunked mode. While the newest browsers support websockets, most of the
+wild base does not. Nor do older browsers provide a fine-grained enough
+interface into http in order to allow a Javascript implementation.
 
-The significant point the three approaches outlined above is that they
-dichotomously split http usage into downloading and streaming, so that
-downloading and streaming are delivered through channels which have
-little in common. While the mechanism of the streaming can be effectively hidden behind
-the API, these kinds of unnatural encodings do not lend themselves to a SOA mindset,
-we can hardly say that the plumbing is on the outside while the messages are rows in an html
-table (why not?) 
+*some or all of the below could move to A&R, it is wondering into
+analysis*
 
-All incompatible with REST where the resource is simply sent via
-standard http. Server has to know if client is streaming and jump though
-hoops etc.
+While different in detail, all of the three approaches outlined above
+solve a different problem than this project is intended to address.
+Firstly, requiring a server that can write to an esoteric format feels
+quite anti-REST, especially given that the server is sending in a format
+which requires a specific, known, specialised client rather than a generic
+tool. In REST I have always valued how prominently the plumbing of a
+system is visible, so that to sample a resource all that is required is
+to type a URL and be presented with it in a human-comprehensible format.
 
-If we take streaming as something all downloads should do, not just for
-of forever-ongoing data, none of these approaches are particularly
-satisfactory.
+Secondly, as adaptations to the context in which they were created,
+these frameworks realise a view of network usage in which downloading
+and streaming are dichotomously split, whereas I aim to realise a schema
+without dichotomy in which *streaming is adapted as the most effective
+means of downloading*. In existing common practice a wholly distinct
+mechanism is provided vs for data which is ongoing vs data which is
+finite. For example, the display of real-time stock data might start by
+AJAXing in historical and then separately use a websocket to maintain
+up-to-the-second updates. This requires the server to support two
+distinct modes. However, I see no reason why a single transport could
+not be used for both. Such a server might start answering a request by
+write historic events from a database, then switch to writing out live
+data in the same format in response to messages from a MOM. By closing
+the dichotomy we would have the advantage that a single implementation
+is able to handle all cases.
 
-Dichotamy between streaming and downloading in the browser for
+It shouldn't be a surprise that a dichotomous implementation of streaming,
+where a streaming transport is used only for live events is incompatible 
+with http caching. If an event is streamed when it is new, but then
+when it is old made available for download, http caching between the
+two requests is impossible. However, where a single mode is used for both
+live and historic events the transport is wholly compatible with http 
+caching.
+
+If we take streaming as a technique to achieve efficient downloading,
+not only for the transfer of forever-ongoing data, none of these 
+approaches are particularly satisfactory.
+
+Dichotomy between streaming and downloading in the browser for
 downloading data. But not for html (progressive rendering) or images
 (progressive PNGs and progressive JPEGs).
-
-Also progressive SVGs. [^2]
 
 Lack of support in browser Long poll - for infrequent push messages.
 Must be read Writing script tags
 
 All require server to have a special mode. Encoding is specific to get
 around restrictions.
-
-
-
 
 Parsing: SAX and Dom, Json and XML
 ----------------------------------
@@ -262,14 +282,8 @@ nodes of interest with their targetted callbacks.
 Programmer has to track the descent down to an interesting node in some
 kind of list themselves.
 
-Json and XML
-------------
-
 Json is very simple, only a few CFGs required to describe the language
 (json.org) - this project is listed there!
-
-jsonpath and xpath
-------------------
 
 JsonPath in general tries to resemble the javascript use of the json
 language nodes it is detecting.
@@ -293,7 +307,6 @@ let addresss = person.address[2]
 // the equivalent jsonpath expression is identical:
 let jsonPath = "person.address[2]"
 ~~~~
-
 
 Have we marshal/de-marshall our problem domain into REST
 --------------------------------------------------------
@@ -411,10 +424,6 @@ there is no requirement for the data to be tree shaped. Graph is ok.
 This make this slighlty harder but nontheless attempts have been made.
 
 Linq. (CITEME)
-
-
-
-
 
 Loose coupling and Updating versioning
 --------------------------------------
@@ -634,11 +643,3 @@ Why this method? See W'yg.
 
 [^1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
-
-[^2]: for quite an obviously visible example of progressive SVG loading,
-    try loading this SVG using a recent version of Google Chrome:
-    <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg>
-    For the perfectionist SVG artist, not just the final image should be
-    considered but also the XML source order, for example in this case
-    it would be helpful if the outline of the UK appeared first and the
-    exploded sections last.
