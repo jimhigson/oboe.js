@@ -194,39 +194,56 @@ possible to repurpose.
 Browser streaming frameworks
 ----------------------------
 
-To feel truly 'live' many web applications need to be able to update in
-real time by reacting to events pushed from the server side. Dozens of
+As the web's remit spread to include more applications which would
+previously have been native apps, to be truly 'live' many applications
+found the need to be able to receive real-time push events. Dozens of
 streaming transports have been developed sidestepping the browser's
 apparent limitations.
 
-The earliest and most basic attempt was to poll, with all the associated
-downsides. From here the improved technique of *long polling* was
-invented. A client makes a request to the server side. Once the
-connection is open the server waits, writing nothing until a push is
-required. To push the server writes the message and closes the http
-connection; since the http response is now complete the content is
-available to the client which then immediately makes a new request,
-reiterating the cycle.
+The earliest and most basic attempt was to poll by making many requests,
+I won't consider this approach other than to say it came with all the
+usually associated downsides. Despite the inadequacy of this approach,
+from here the improved technique of *long polling* was invented. A
+client makes a request to the server side. Once the connection is open
+the server waits, writing nothing until a push is required. To push the
+server writes the message and closes the http connection; since the http
+response is now complete the content may be handled by the Javascript
+client which then immediately makes a new request, reiterating the cycle
+of wait and response. This approach works well where messages are
+infrequently pushed but where the frequency is high the limitation of
+one http transmission per connections requires imposes a high overhead.
 
 Observing that while browsers lack progressive ajax, progressive html
 rendering is available, *push tables* achieve progressive data transfer
-by serialising streaming data as HTML. This is usually into a table, one
-row per message. On the client side this table is hidden in an
-off-screen frame. Javascript watches the table and reacts whenever a new
-row is found.
+by serialising streaming data to a HTML format. Most commonly messages
+are written to a table, one row per message. On the client side this
+table is hidden in an off-screen frame and the Javascript streaming
+client watches the table and reacts whenever a new row is found. In many
+ways an improvement over long-polling, this approach nevertheless
+suffers from an unnatural data format. Whilst html is a textual format
+so provides a degree of human-readability, html was not designed with
+the goal of an elegent or compact transfer of asynchronous data.
+Contrasted with a SOA ideal of *'plumbing on the outside'*, peeking
+inside the system is difficult whilst bloated and confusing formats are
+tasked with conveying meaning.
 
-Whilst useful, neither long polling nor push tables use the technology
-as intended. The latest approach, *Websockets* is poised to take over,
-building a standardised duplex transport and API on top of http's
-chunked mode. While the newest browsers support websockets, most of the
-wild base does not. Nor do older browsers provide a fine-grained enough
-interface into http in order to allow a Javascript implementation.
+Both long polling and push tables are better throught of as a means to
+circumvent restrictions than indigene technology. A purose-built 
+stack, *Websockets* is poised to take over, building a standardised
+duplex transport and API on top of http's chunked mode. While the newest
+browsers support websockets, most of the wild use base does not. Nor do
+older browsers provide a fine-grained enough interface into http in
+order to allow a Javascript implementation. In practice, real-world streaming libraries such
+as socket.io [CITE] are capable of several streaming techniques and can select the best for
+a given context. To the programmer debugging an application the assortment of transports only
+enhances the black-box mentality with regards to the underlying transports.
 
+<!---
 *some or all of the below could move to A&R, it is wondering into
-analysis*
+analysis* --->
 
-While different in detail, all of the three approaches outlined above
-solve a different problem than this project is intended to address.
+Whilst there is some overlap, each of the approaches above
+addresses a problem only tangentially related to this project's aims.
 Firstly, requiring a server that can write to an esoteric format feels
 quite anti-REST, especially given that the server is sending in a format
 which requires a specific, known, specialised client rather than a
@@ -262,16 +279,6 @@ compatible with http caching.
 If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
-
-Dichotomy between streaming and downloading in the browser for
-downloading data. But not for html (progressive rendering) or images
-(progressive PNGs and progressive JPEGs).
-
-Lack of support in browser Long poll - for infrequent push messages.
-Must be read Writing script tags
-
-All require server to have a special mode. Encoding is specific to get
-around restrictions.
 
 Parsing: SAX and Dom, Json and XML
 ----------------------------------
