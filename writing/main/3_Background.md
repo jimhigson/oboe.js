@@ -280,22 +280,23 @@ If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
-Parsing: SAX and Dom, Json and XML
-----------------------------------
+Json and XML (remove this heading later)
+------------
 
-*Identify SAX and DOM.*
+Json is very simple, only a few CFGs required to describe the language
+(json.org) - this project is listed there!
 
-DOM parser can be built on a SAX parser. Often are. CITE: Java and XML
-book.
+Parsing: SAX and Dom
+--------------------
 
-For non-incremental
-DOM-style XML parsers the programmer rarely directly concerns themselves
-with markup features. More likely is that they will take advantage of
-the wealth of modern, generic tools which automate a translation of
-markup into domain model objects as per a declarative configuration.
+In the XML world two standard parser models exist, SAX and DOM, with DOM far the more popular. 
+DOM performs a parse as a single evaluation, on the request of the programmer, returning an object model
+representing the whole of the document. At this level of abstraction the details of the markup are only distant concern. 
+Conversely, SAX parsers are probably better considered as tokenisers, 
+providing a very low-level event driven interface in line with the Observer pattern to notify the
+programmer of syntax as it is seen. Each element's opening and closing tag is noted 
 
-SAX parsers are probably better considered as tokenisers plus validation, providing a very low-level interface which notifies the
-programmer of syntax as it is seen. This presents poor developer
+This presents poor developer
 ergonomics by requiring that the programmer implement the recording of
 state with regard to the nodes that they have seen. For
 programmers using SAX, a conversion to their domain objects is usually
@@ -305,23 +306,89 @@ of reusable parts. For this reason the use of SAX is usually reserved
 for fringe cases in which messages are extremely large or memory
 extremely scarce.
 
-The failure of sax: requires programmer to do a lot of work to identify
-interesting things. Eg, to find tag address inside tag person with a
-given name, have to recognise three things while reieving at least two callback for
-every single element and attribute in the document. As a principle, the
-programmer should only have to handle the cases which are interesting to
-them, not wade manually through a haystack in search of a needle, which
-means the library should provide an expressive way of associating the
-nodes of interest with their targetted callbacks.
+Because of the low-level semantics, SAX requires the programmer to write a lot of code and maintain a lot of state
+in order to identify interesting things.
+
+``` {javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+```
+``` {javascript}
+function nameOfFirstPerson( myJsonString ) {
+
+   // Extracting an interesting part from JSON-serialised data is
+   // relatively easy given a DOM-style parser. Unfortunately this
+   // forbids any kind of progressive consideration of the data. 
+
+   var document = JSON.parse( myJsonString );
+   return document.people[0].name; // that was easy!
+}
+```
+``` {javascript}
+function nameOfFirstPerson( myJsonString, callbackFunction ){
+
+   // The equivalent logic, expressed in the most natural way
+   // fora s JSON SAX parser is longer and much more 
+   // difficult to read. The developer pays a high price for 
+   // progressive parsing. 
+
+   var clarinet = clarinet.parser(),
+   
+       // with a SAX parser it is the developer's responsibility 
+       // to track where in the document the cursor currently is,
+       // requiring several variables to maintain.        
+       inPeopleArray = false,   
+       inPersonObject = false,
+       inNameAttribute = false,
+       found = false;
+   
+   clarinet.onopenarray = function(){
+      // for brevity we'll cheat by assuming there is only one
+      // array in the document. In practice this would be overly
+      // brittle.
+      
+      inPeopleArray = true; 
+   };
+   
+   clarinet.onclosearray = function(){
+      inPeopleArray = false;
+   };   
+   
+   clarinet.onopenobject = function(){
+      inPersonObject = inPeopleArray; 
+   };
+   
+   clarinet.oncloseobject = function(){
+      inPersonObject = false;
+   };   
+      
+   clarinet.onkey = function(key){
+      inNameAttribute = ( inPeopleObject && key == 'name');
+   };
+
+   clarinet.onvalue = function(value){
+      if( !found && inNameAttribute ) {
+         // finally!
+         callbackFunction( value );
+         found = true;
+      }
+   };      
+   
+   clarinet.write(myJsonString);   
+}
+
+```
+
 
 Programmer has to track the descent down to an interesting node in some
 kind of list themselves.
 
-Json and XML (remove this heading later)
-------------
-
-Json is very simple, only a few CFGs required to describe the language
-(json.org) - this project is listed there!
+JsonPath and XPath
+-----------------
 
 JsonPath in general tries to resemble the javascript use of the json
 language nodes it is detecting.
