@@ -331,26 +331,20 @@ implement the recording of state with regard to the nodes that they have
 seen. For programmers using SAX, a conversion to their domain objects is
 usually implemented imperatively. This programming tends to be difficult
 to read and programmed once per usage rather than assembled as the
-combination of reusable parts. For this reason the use of SAX is usually
-reserved for fringe cases in which messages are extremely large or
-memory extremely scarce.
+combination of reusable parts. For this reason SAX is usually
+reserved for fringe cases where messages are very large or
+memory unusually scarce.
 
-Because of the low-level semantics, SAX requires the programmer to write
-a lot of code and maintain a lot of state in order to identify
-interesting things.
-
-To illustrate the different in developer ergonomics between the the
-modes of parsing, consider this JSON:
-
-Suppose we want to extract the name of the first person. Using DOM this
-is very easy:
+Suppose we want to extract the name of the first person. Given a DOM parser 
+this is very easy:
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString ) {
 
    // Extracting an interesting part from JSON-serialised data is
    // relatively easy given a DOM-style parser. Unfortunately this
-   // forbids any kind of progressive consideration of the data. 
+   // forbids any kind of progressive consideration of the data.
+   // All recent browsers provide a JSON parser as standard. 
 
    var document = JSON.parse( myJsonString );
    return document.people[0].name; // that was easy!
@@ -358,7 +352,8 @@ function nameOfFirstPerson( myJsonString ) {
 ~~~~
 
 Contrast with the programming below which uses the clarinet JSON SAX
-parser.
+parser. To prove that I'm not exaggerating the case, see published
+usages at [Clarinet demos].
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
@@ -414,8 +409,14 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
 }
 ~~~~
 
-Programmer has to track the descent down to an interesting node in some
-kind of list themselves.
+As we can see above, SAX's low-level semantics require a lengthy expression
+and for the programmer to maintain state regarding the position in the document 
+-- usually recording the ancestors seen on the descent from the root to the 
+current node -- in order to identify the interesting parts. This order
+of the code is also quite unintuitive; generally event handlers will cover 
+multiple unrelated concerns and each concern will span multiple event handlers.
+This lends to programming in which separate concerns are not separately
+expressed in the code. 
 
 JsonPath and XPath
 ------------------
