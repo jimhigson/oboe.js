@@ -459,18 +459,20 @@ let jsonPath2 = "person..given"
 ~~~~
 
 The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. To examine
-a whole document for the list of nodes that match a jsonpath expression the
-whole of the tree is required. But to evaluate if a single node matches an
-expression, only the *path of the descent from the root to that node* is required --
-the same state as a programmer usually maintains whilst employing a SAX parser.   
+the whole serialisation has been parsed into a DOM-style model. To
+examine a whole document for the list of nodes that match a jsonpath
+expression the whole of the tree is required. But to evaluate if a
+single node matches an expression, only the *path of the descent from
+the root to that node* is required -- the same state as a programmer
+usually maintains whilst employing a SAX parser.
 
-One limitation of the JSONPath language is that it is not possible to construct an
-'containing' expression. CSS4 allows this in a way that is likely to become familiar
-to web developers over the next five years or so.
+One limitation of the JSONPath language is that it is not possible to
+construct an 'containing' expression. CSS4 allows this in a way that is
+likely to become familiar to web developers over the next five years or
+so.
 
 How domain models are marshal/de-marshalled into REST resources
---------------------------------------------------------
+---------------------------------------------------------------
 
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
 Allows one model to be written out to XML or JSON
