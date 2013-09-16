@@ -335,6 +335,13 @@ combination of reusable parts. For this reason SAX is usually reserved
 for fringe cases where messages are very large or memory unusually
 scarce.
 
+DOM isn't just a parser, it is also a cross-language defined interface
+for manipulating the XML in real time, for example to change the
+contents of a web page in order to provide some interactivity. In JSON
+world, DOM-style parser not refering to the DOM spec, or what browser
+makers would mean. Rather, borrowing from the XML world to mean a parser
+which requires the whole file to be loaded.
+
 Suppose we want to extract the name of the first person. Given a DOM
 parser this is very easy:
 
@@ -421,30 +428,48 @@ which separate concerns are not separately expressed in the code.
 JsonPath and XPath
 ------------------
 
-JsonPath in general tries to resemble the javascript use of the json
-language nodes it is detecting.
+The above difficulty in identifying the interesting parts of a message
+leads me to investigate where this problem has already been solved. For
+XML, the XPath language allows the programmer to declaratively specify
+the nodes that they are interested in. Luckily in JSON there exists
+already an attempt at an equivalent named Jsonpath. JsonPath closely
+resembles the javascript code which would select the same nodes.
 
 ~~~~ {.javascript}
 
 // an in-memory person with a multi-line address:
 let person = {
-   name: "...",
+   name: {givenName:'', familyName:''},
    address: [
       "line1",
       "line2",
       "line3"
    ]
-};
-
+}
 
 // in javascript we can get line two of the address as such:
-let addresss = person.address[2]
+let address = person.address[2]
 
 // the equivalent jsonpath expression is identical:
 let jsonPath = "person.address[2]"
+
+// although jsonpath also allows ancestor relationships which are not
+// expressible quite so neatly as basic Javascript:
+let jsonPath2 = "person..given"
 ~~~~
 
-Have we marshal/de-marshall our problem domain into REST
+The typical use pattern of XPath or JSONPath is to search for nodes once
+the whole serialisation has been parsed into a DOM-style model. To examine
+a whole document for the list of nodes that match a jsonpath expression the
+whole of the tree is required. But to evaluate if a single node matches an
+expression, only the *path of the descent from the root to that node* is required --
+the same state as a programmer usually maintains whilst employing a SAX parser.   
+
+One limitation of the JSONPath language is that it is not possible to construct an
+'containing' expression. CSS4 allows this in a way that is likely to become familiar
+to web developers over the next five years or so.
+
+Have domain models are marshal/de-marshalled into REST resources
 --------------------------------------------------------
 
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
