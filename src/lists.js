@@ -23,15 +23,14 @@ function reverseList(list){
 }
 
 function listAsArray(list){
-   // could be done as a reduce
 
-   if( !list ) {
-      return [];
-   } else {
-      var array = listAsArray(tail(list));
-      array.unshift(head(list)); 
-      return array;
-   }
+   return foldR( function(arraySoFar, listItem){
+      
+      arraySoFar.unshift(listItem);
+      return arraySoFar;
+           
+   }, [], list );
+   
 }
 
 function map(fn, list) {
