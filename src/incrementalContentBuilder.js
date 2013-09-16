@@ -5,12 +5,14 @@ var nodeOf = attr('node');
 /**
  * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
  * have any path). This prevents the need for special-casing detection of the root object and allows it
- * to be treated like any other object.
+ * to be treated like any other object. We might think of this as being similar to the unnamed root
+ * domain: CITE THIS
  * 
  * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
- * distinct, therefore no other object can possibly clash with this one.
+ * distinct, therefore no other object can possibly clash with this one. Strings, numbers etc provide
+ * no such guarantee.
  */
-var ROOT_PATH = {r:1}; 
+var ROOT_PATH = {}; 
 
 
 /**
