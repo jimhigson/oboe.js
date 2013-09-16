@@ -286,18 +286,18 @@ Json and XML (remove this heading later)
 ----------------------------------------
 
 Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the more popular
-serialisation format. The goals of XML were to simplify SGML to the
-point that a graduate student would be able to implement a parser in a
-week [@javaxml p ???]. For the student tackling JSON a few hours with a parser generator
-should surfice, being expressable in 15 CFGs. Indeed, because JSON
-is a strict subset of Javascript, in many cases the Javascript programmer 
-requires no parser at all. Unimpeeded by SGML's roots as a
+fat-free alternative to XML[@jsonorg]" is the more popular serialisation
+format. The goals of XML were to simplify SGML to the point that a
+graduate student would be able to implement a parser in a week [@javaxml
+p ???]. For the student tackling JSON a few hours with a parser
+generator should surfice, being expressable in 15 CFGs. Indeed, because
+JSON is a strict subset of Javascript, in many cases the Javascript
+programmer requires no parser at all. Unimpeeded by SGML's roots as a
 document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language with entities 
-such as *string*, *number*, *object* and *array*. By closely mirroring 
-a programmer's metamodel, visualising a mapping between a domain model 
-and it's serialised objects becomes trivial.
+metamodel of a canonical modern programming language with entities such
+as *string*, *number*, *object* and *array*. By closely mirroring a
+programmer's metamodel, visualising a mapping between a domain model and
+it's serialised objects becomes trivial.
 
 ~~~~ {.javascript}
 {
@@ -331,12 +331,12 @@ implement the recording of state with regard to the nodes that they have
 seen. For programmers using SAX, a conversion to their domain objects is
 usually implemented imperatively. This programming tends to be difficult
 to read and programmed once per usage rather than assembled as the
-combination of reusable parts. For this reason SAX is usually
-reserved for fringe cases where messages are very large or
-memory unusually scarce.
+combination of reusable parts. For this reason SAX is usually reserved
+for fringe cases where messages are very large or memory unusually
+scarce.
 
-Suppose we want to extract the name of the first person. Given a DOM parser 
-this is very easy:
+Suppose we want to extract the name of the first person. Given a DOM
+parser this is very easy:
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString ) {
@@ -409,14 +409,14 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
 }
 ~~~~
 
-As we can see above, SAX's low-level semantics require a lengthy expression
-and for the programmer to maintain state regarding the position in the document 
--- usually recording the ancestors seen on the descent from the root to the 
-current node -- in order to identify the interesting parts. This order
-of the code is also quite unintuitive; generally event handlers will cover 
-multiple unrelated concerns and each concern will span multiple event handlers.
-This lends to programming in which separate concerns are not separately
-expressed in the code. 
+As we can see above, SAX's low-level semantics require a lengthy
+expression and for the programmer to maintain state regarding the
+position in the document -- usually recording the ancestors seen on the
+descent from the root to the current node -- in order to identify the
+interesting parts. This order of the code is also quite unintuitive;
+generally event handlers will cover multiple unrelated concerns and each
+concern will span multiple event handlers. This lends to programming in
+which separate concerns are not separately expressed in the code.
 
 JsonPath and XPath
 ------------------
