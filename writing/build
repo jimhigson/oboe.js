@@ -8,7 +8,7 @@ pandoc proposal.md -o proposal.pdf
 
 echo made proposal pdf
 
-./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json -o main.html
+./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json | tidy -i > main.html
 
 echo made main html
 
