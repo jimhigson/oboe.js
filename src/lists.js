@@ -53,12 +53,16 @@ function foldR(fn, startValue, list) {
             : startValue;
 }
 
+/* return true if the given function holds for every item in 
+ * the list 
+ */
 function listEvery(fn, list) {
    
    return !list || 
           fn(head(list)) && listEvery(fn, tail(list));
 }
 
+/* convert an array to a list */
 function asList(array){
 
    var l = emptyList;
