@@ -66,28 +66,31 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
          pathFound(ROOT_PATH, newLeafNode);
          
          return;            
-      } 
+      }
+
+      // the node is a non-root node
       
       checkForMissedArrayKey(ascent, newLeafNode);
       
-      // the node is a non-root node
-      var branches = tail(ascent),           
-          parentBranch = head(branches),   
+      var ancestorBranches = tail(ascent),
+
           oldLeaf = head(ascent),
           newLeaf = mapping(keyOf(oldLeaf), newLeafNode);      
    
-      appendBuiltContent( parentBranch, newLeaf );
+      appendBuiltContent( ancestorBranches, newLeaf );
                                                                                                          
-      ascent = cons(newLeaf, branches);                                                                          
+      ascent = cons(newLeaf, ancestorBranches);                                                                          
    }
 
 
    /**
     * Add a new value to the top-level object which has been already output   
     */
-   function appendBuiltContent( branch, leaf ){
+   function appendBuiltContent( ancestorBranches, leaf ){
+
+      var parentBranch = head(ancestorBranches);
       
-      nodeOf(branch)[keyOf(leaf)] = nodeOf(leaf);
+      nodeOf(parentBranch)[keyOf(leaf)] = nodeOf(leaf);
    }
 
    /**
@@ -116,7 +119,7 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( head(ascent), newLeaf );
+         appendBuiltContent( ascent, newLeaf );
       }
    
       ascent = cons(newLeaf, ascent);
