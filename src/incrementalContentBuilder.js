@@ -181,10 +181,8 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
       curNodeFinished;
 
    /**
-    * If we abort this Oboe's request stop listening
-    * to the clarinet parser. This prevents more tokens
-    * being found after we abort in the case where we 
-    * aborted while reading though a current buffer.
+    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we aborted while reading though an already filled buffer.
     */      
    on( ABORTING, function() {
       clarinet.EVENTS.forEach(function(event){
