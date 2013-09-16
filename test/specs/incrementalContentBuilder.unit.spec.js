@@ -271,7 +271,7 @@ describe("incremental content builder", function(){
             TYPE_NODE
          ,  anAscentContaining(  
                {key:ROOT_PATH,    node:['a','b']                }
-            ,  {key:1,            node:'b'                     }
+            ,  {key:1,            node:'b'                      }
             )      
          )      
       })      
