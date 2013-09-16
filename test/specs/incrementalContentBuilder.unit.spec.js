@@ -1,93 +1,152 @@
 describe("incremental content builder", function(){
 
-   it('fires path found when root object opens', function() {
+   function IncrementalContentBuilderAsserter(){
+     
+      var eventBus = pubSub();
       
-      expect( 
+      sinon.spy(eventBus, 'fire');
+      sinon.spy(eventBus, 'on');
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')
+      this._clarinetStub = {};
+      this._eventBus = eventBus;
+      this._rootObj = incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
+   }
+   
+   IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
+   
+      var args = Array.prototype.slice.call(arguments, 1);
+   
+      var handlerFn = this._clarinetStub[fnName]; 
+   
+      // to match clarinet behaviour: do nothing if onFoo is falsey
+      handlerFn && handlerFn.apply( undefined, args );
       
-      ).toHaveFired(
+      return this;
+   };
+   
+   IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
+     
+      this._eventBus.fire.apply(undefined, arguments);
+      return this;
+   };
+   
+
+   describe('when root object opens', function() {
       
-         TYPE_PATH
-      ,  anAscentContaining(  
-            {key:ROOT_PATH, node:{}}
-         )
-         
-      )      
+      var builder = aContentBuilder().receivingParserEvent('onopenobject'); 
+      
+      it('fires correct event', function(){
+         expect( builder)
+            .toHaveFired(         
+               TYPE_PATH
+            ,  anAscentContaining(  
+                  {key:ROOT_PATH, node:{}}
+               )
+               
+            )
+      });
+
+      it('reports correct root', function () {
+
+         expect(builder).toReportRoot({})
+
+      });
    })
    
-   it('fires path found after key is found in root object', function() {
+   describe('after key is found in root object', function(){
       // above test, plus some extra events from clarinet
-   
-      expect(
+      var builder = aContentBuilder()
+          .receivingParserEvent('onopenobject')
+          .receivingParserEvent('onkey', 'flavour');
+          
+      it('fires correct event', function(){
+
+         expect( builder )
+            .toHaveFired(
+                TYPE_PATH
+             ,  anAscentContaining(  
+                   {key:ROOT_PATH, node:{flavour:undefined}}
+                ,  {key:'flavour', node:undefined}
+                )      
+            )
+      })
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')      
-            .receivingParserEvent('onkey', 'flavour')      
+      it('reports correct root', function(){
       
-      ).toHaveFired(
-          TYPE_PATH
-       ,  anAscentContaining(  
-             {key:ROOT_PATH, node:{flavour:undefined}}
-          ,  {key:'flavour', node:undefined}
-          )      
-      )
+         expect(builder).toReportRoot({flavour:undefined});
+      });
       
    })
    
-   it('fires path found if key is found at same time as root object', function() {
+   describe('if key is found at same time as root object', function() {
       // above test, plus some extra events from clarinet
 
-      expect(
+      var builder = aContentBuilder()
+          .receivingParserEvent('onopenobject', 'flavour');
+          
+      it('fires correct event', function(){
+          
+         expect(builder).toHaveFired(
+             TYPE_PATH
+          ,  anAscentContaining(  
+                {key:ROOT_PATH, node:{flavour:undefined}}
+             ,  {key:'flavour', node:undefined}
+             )      
+         )
+      });
       
-         aContentBuilder()      
-            .receivingParserEvent('onopenobject', 'flavour')      
-      ).toHaveFired(
-          TYPE_PATH
-       ,  anAscentContaining(  
-             {key:ROOT_PATH, node:{flavour:undefined}}
-          ,  {key:'flavour', node:undefined}
-          )      
-      )
+      it('reports correct root', function(){
+      
+         expect(builder).toReportRoot({flavour:undefined});
+      });      
       
    })   
    
-   it('fires node found after value is found for that key', function() {
-   
-      expect(
+   describe('after value is found for that key', function() {
+
+      var builder = aContentBuilder()
+                 .receivingParserEvent('onopenobject')
+                 .receivingParserEvent('onkey'    ,  'flavour')
+                 .receivingParserEvent('onvalue'  ,  'strawberry');
+                 
+      it('fires correct event', function(){                 
+         expect(builder).toHaveFired(
+            TYPE_NODE
+         ,  anAscentContaining(  
+               {key:ROOT_PATH, node:{flavour:'strawberry'}}
+            ,  {key:'flavour', node:'strawberry'}
+            )      
+         )
+      });
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')      
-            .receivingParserEvent('onkey'    ,  'flavour')
-            .receivingParserEvent('onvalue'  ,  'strawberry')               
-      
-      ).toHaveFired(
-         TYPE_NODE
-      ,  anAscentContaining(  
-            {key:ROOT_PATH, node:{flavour:'strawberry'}}
-         ,  {key:'flavour', node:'strawberry'}
-         )      
-      )   
+      it('reports correct root', function(){
+       
+         expect(builder).toReportRoot({flavour:'strawberry'});
+      });   
          
    })
    
-   it('fires node found after root object closes', function() {
-   
-      expect(
+   describe('fires node found after root object closes', function() {
+
+      var builder = aContentBuilder()
+                 .receivingParserEvent('onopenobject')
+                 .receivingParserEvent('onkey', 'flavour')
+                 .receivingParserEvent('onvalue', 'strawberry')
+                 .receivingParserEvent('oncloseobject');
+                 
+      it('fires correct event', function(){                 
+         expect(builder).toHaveFired(
+            TYPE_NODE
+         ,  anAscentContaining(  
+               {key:ROOT_PATH, node:{flavour:'strawberry'}}
+            )      
+         )
+      })
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')      
-            .receivingParserEvent('onkey', 'flavour')
-            .receivingParserEvent('onvalue', 'strawberry')
-            .receivingParserEvent('oncloseobject')               
+      it('reports correct root', function(){
       
-      ).toHaveFired(
-         TYPE_NODE
-      ,  anAscentContaining(  
-            {key:ROOT_PATH, node:{flavour:'strawberry'}}
-         )      
-      )   
+         expect(builder).toReportRoot({flavour:'strawberry'});      
+      });   
                      
    })
    
@@ -112,108 +171,102 @@ describe("incremental content builder", function(){
    })   
    
    
-   it('provides numeric paths for first array element', function() {
+   describe('first array element', function() {
 
-      expect(
+      var builder = aContentBuilder()
+          .receivingParserEvent('onopenobject')
+          .receivingParserEvent('onkey', 'alphabet')
+          .receivingParserEvent('onopenarray')
+          .receivingParserEvent('onvalue', 'a');
+          
+      it('fires path event with numeric paths', function(){
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')
-            .receivingParserEvent('onkey', 'alphabet')
-            .receivingParserEvent('onopenarray')
-            .receivingParserEvent('onvalue', 'a')               
+         expect(builder).toHaveFired(
+            TYPE_PATH
+            , anAscentContaining(
+                  {key:ROOT_PATH,  node:{'alphabet':['a']}    }
+               ,  {key:'alphabet', node:['a']                 }
+               ,  {key:0,          node:'a'                   }
+            )            
+         );
+      })
       
-      ).toHaveFired(
-         TYPE_PATH
-         , anAscentContaining(
-               {key:ROOT_PATH,  node:{'alphabet':['a']}    }
-            ,  {key:'alphabet', node:['a']                 }
-            ,  {key:0,          node:'a'                   }
-         )            
-      );
+      it('fired node event', function(){
+         expect(builder).toHaveFired(
+            TYPE_NODE
+         ,  anAscentContaining(  
+               {key:ROOT_PATH,      node:{'alphabet':['a']} }
+            ,  {key:'alphabet',     node:['a']              }
+            ,  {key:0,              node:'a'                }
+            )      
+         )      
+      })
+      
+      it('reports correct root', function(){
+      
+         expect(builder).toReportRoot({'alphabet':['a']});
+      });
 
    })
    
-   it('provides numeric paths for second array element', function() {
+   describe('second array element', function() {
 
-      expect(
+      var builder = aContentBuilder()
+          .receivingParserEvent('onopenobject')
+          .receivingParserEvent('onkey', 'alphabet')
+          .receivingParserEvent('onopenarray')
+          .receivingParserEvent('onvalue', 'a')
+          .receivingParserEvent('onvalue', 'b');
+          
+      it('fires events with numeric paths', function(){    
+          
+         expect(builder).toHaveFired(
+            TYPE_PATH
+            ,  anAscentContaining(
+               {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
+               , {key:'alphabet', node:['a','b']                }
+               , {key:1,          node:'b'                      }
+            )      
+         )
+      })
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')
-            .receivingParserEvent('onkey', 'alphabet')
-            .receivingParserEvent('onopenarray')
-            .receivingParserEvent('onvalue', 'a')
-            .receivingParserEvent('onvalue', 'b')               
-      
-      ).toHaveFired(
-         TYPE_PATH
-         ,  anAscentContaining(
-            {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
-            , {key:'alphabet', node:['a','b']                }
-            , {key:1,          node:'b'                      }
+      it('fired node event', function(){
+         expect(builder).toHaveFired(
+            TYPE_NODE
+         ,  anAscentContaining(  
+               {key:ROOT_PATH,      node:{'alphabet':['a', 'b']} }
+            ,  {key:'alphabet',     node:['a','b']               }
+            ,  {key:1,              node:'b'                     }
+            )      
          )      
-      )
+      })      
+      
+      it('reports correct root', function(){
+      
+         expect(builder).toReportRoot({'alphabet':['a','b']});
+      });
 
    })   
-   
-   it('provides nodes for first array element', function() {
-
-      expect(
-      
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')      
-            .receivingParserEvent('onkey'    ,  'alphabet')
-            .receivingParserEvent('onopenarray')
-            .receivingParserEvent('onvalue'    ,  'a')               
-      
-      ).toHaveFired(
-         TYPE_NODE
-      ,  anAscentContaining(  
-            {key:ROOT_PATH,      node:{'alphabet':['a']} }
-         ,  {key:'alphabet',     node:['a']              }
-         ,  {key:0,              node:'a'                }
-         )      
-      )
-      
-   })        
+           
    
    function aContentBuilder() {
    
       return new IncrementalContentBuilderAsserter();      
    }
    
-   function IncrementalContentBuilderAsserter(){
-     
-      var eventBus = pubSub();
       
-      sinon.spy(eventBus, 'fire');
-      sinon.spy(eventBus, 'on');
-      
-      this._clarinetStub = {};
-      this._eventBus = eventBus;
-      this._subject = incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
-   }
-   
-   IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
-   
-      var args = Array.prototype.slice.call(arguments, 1);
-   
-      var handlerFn = this._clarinetStub[fnName]; 
-   
-      // to match clarinet behaviour: do nothing if onFoo is falsey
-      handlerFn && handlerFn.apply( undefined, args );
-      
-      return this;
-   };
-   
-   IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
-     
-      this._eventBus.fire.apply(undefined, arguments);
-      return this;
-   };   
-   
    beforeEach(function(){
             
       this.addMatchers({
+         toReportRoot: function( expectedRootObj ) {
+            var actualRootObj = this.actual._rootObj();
+            
+            expect( actualRootObj ).toEqual( expectedRootObj );
+            
+            return true;
+            //return JSON.stringify( expectedRootObj ) == JSON.stringify( actualRootObj );
+         },
+      
          toHaveFired: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
