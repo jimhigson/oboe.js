@@ -25,7 +25,7 @@ module.exports = function(config) {
       ,  'src/instanceController.js'
       ,  'src/browserApi.js'
         
-      ,  'test/specs/*.spec.js'
+      ,  'test/specs/*unit.spec.js'
       ],
                             
       // level of logging
