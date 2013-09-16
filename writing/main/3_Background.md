@@ -308,7 +308,7 @@ it's serialised objects becomes trivial.
 }
 ~~~~
 
-This close resemblence to the model of the programming in some cases
+This close resemblance to the model of the programming in some cases
 causes fast-changing formats.
 
 Like XML attributes, as a serialised text format, JSON objects have an
