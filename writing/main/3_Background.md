@@ -466,6 +466,9 @@ single node matches an expression, only the *path of the descent from
 the root to that node* is required -- the same state as a programmer
 usually maintains whilst employing a SAX parser.
 
+Investigate: is this true? Does JSONPath have a following/preceding
+grammar? If so, only a subset and rearrange.
+
 One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
@@ -497,8 +500,8 @@ interest in a wider model.
 ~~~~ {.java}
 // an example programmatic approach to a domain model interrogation under Java
 
-List<Person> people = myModel.getPeople();
-String firstPersonsSurname = people.get(0).getSurname();
+List<Person> people = myModel.getPeople()
+String firstPersonsSurname = people.get(0).getSurname()
 ~~~~
 
 One weakness of this imperative, programatic inspection model is that,
