@@ -469,7 +469,7 @@ One limitation of the JSONPath language is that it is not possible to construct 
 'containing' expression. CSS4 allows this in a way that is likely to become familiar
 to web developers over the next five years or so.
 
-Have domain models are marshal/de-marshalled into REST resources
+How domain models are marshal/de-marshalled into REST resources
 --------------------------------------------------------
 
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
