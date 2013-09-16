@@ -246,7 +246,42 @@ describe("incremental content builder", function(){
          expect(builder).toReportRoot({'alphabet':['a','b']});
       });
 
-   })   
+   })
+   
+   describe('array at root', function() {
+
+      var builder = aContentBuilder()
+          .receivingParserEvent('onopenarray')
+          .receivingParserEvent('onvalue', 'a')
+          .receivingParserEvent('onvalue', 'b');
+          
+      it('fires events with numeric paths', function(){    
+          
+         expect(builder).toHaveFired(
+            TYPE_PATH
+            ,  anAscentContaining(
+                 {key:ROOT_PATH,  node:['a','b']                }
+               , {key:1,          node:'b'                      }
+            )      
+         )
+      })
+      
+      it('fired node event', function(){
+         expect(builder).toHaveFired(
+            TYPE_NODE
+         ,  anAscentContaining(  
+               {key:ROOT_PATH,    node:['a','b']                }
+            ,  {key:1,            node:'b'                     }
+            )      
+         )      
+      })      
+      
+      it('reports correct root', function(){
+      
+         expect(builder).toReportRoot(['a','b']);
+      });
+
+   })      
            
    
    function aContentBuilder() {
