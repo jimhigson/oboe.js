@@ -311,6 +311,13 @@ it's serialised objects becomes trivial.
 This close resemblence to the model of the programming in some cases
 causes fast-changing formats.
 
+Like XML attributes, as a serialised text format, JSON objects have an
+order but are almost always parsed to and from orderless maps meaning
+that the order of the keys/value pairings as seen in the stream usually
+follows no defined order. No rule in the format would forbid
+representing of an ordered map in an ordered way but most tools on
+receiving such a message would ignore the ordering.
+
 (MINE SOA assignment). Also the diagram.
 
 Parsing: SAX and Dom
