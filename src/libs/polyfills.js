@@ -3,7 +3,7 @@
    /** If no implementation of a method called (methodName) exists fill it in with the
     *  implementation given as (filler).
     */ 
-   function fillIn(type, methodName, filler) {
+   function polyfill(type, methodName, filler) {
       var proto = type.prototype;
       proto[methodName] = proto[methodName] || filler;
    }
@@ -21,7 +21,7 @@
    // Array.forEach has to be a polyfill, clarinet expects it
    // Ignoring all but function argument since not needed, eg can't take a context
    //       Clarinet needs this          
-   fillIn(Array, 'forEach', function( func ){
+   polyfill(Array, 'forEach', function( func ){
         
       for( var i = 0 ; i < len(this) ; i++ ) {      
          func(this[i]);    
@@ -32,7 +32,7 @@
    // Array.filter has to be a polyfill, clarinet expects it.
    // Ignoring all but function argument since not needed, eg can't take a context
    //       Clarinet needs this
-   fillIn(Array, 'filter', function( filterCondition ){         
+   polyfill(Array, 'filter', function( filterCondition ){         
    
       var passes = [];
    
@@ -48,7 +48,7 @@
    });  
            
    // allow binding. Minimal version which includes binding of context only, not arguments as well
-   fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
+   polyfill(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       var f = this;
    
       return function( /* yet more arguments */ ) {                        
