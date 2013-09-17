@@ -16,6 +16,7 @@ module.exports = function(config) {
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
       ,  'src/libs/clarinet.js'
+      ,  'src/clarinetListenerAdaptor.js'
       ,  'src/streamingXhr.js'
       ,  'src/jsonPathSyntax.js'
       ,  'src/incrementalContentBuilder.js'
@@ -27,6 +28,7 @@ module.exports = function(config) {
         
       ,  'test/specs/*unit.spec.js'
       ,  'test/specs/*component.spec.js'
+//    ,  'test/specs/*integration.spec.js'
       ],
                             
       // level of logging
