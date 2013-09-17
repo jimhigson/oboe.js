@@ -96,15 +96,13 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   var functionList = asList(fns);
-   
    function next(valueSoFar, curFn) {  
       return curFn(valueSoFar);   
    }
    
    return function(startValue){
      
-      return foldR(next, startValue, functionList);
+      return foldR(next, startValue, asList(fns));
    }
 });
 
@@ -228,65 +226,64 @@ function asList(array){
 
 var list = varArgs(asList);
 
-(function(){
 
-   /** If no implementation of a method called (methodName) exists fill it in with the
-    *  implementation given as (filler).
-    */ 
-   function fillIn(type, methodName, filler) {
-      var proto = type.prototype;
-      proto[methodName] = proto[methodName] || filler;
-   }
+/** 
+ * If no implementation of a method called (methodName) exists fill it in with the
+ * implementation given as (filler).
+ */ 
+function polyfill(type, methodName, filler) {
+   var proto = type.prototype;
+   proto[methodName] = proto[methodName] || filler;
+}
 
-   /**
-    * Here we have a minimal set of polyfills needed to let the code run in older browsers such
-    * as IE8.
-    * 
-    * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
-    * to make a custom build without this. However, it is as small as it can be to get the job done.
-    * 
-    */   
+/**
+ * Here we have a minimal set of polyfills needed to let the code run in older browsers such
+ * as IE8.
+ * 
+ * If you already have polyfills in your webapp or you don't need to support bad browsers, feel free 
+ * to make a custom build without this. However, it is as small as it can be to get the job done.
+ * 
+ */   
 
-  
-   // Array.forEach has to be a polyfill, clarinet expects it
-   // Ignoring all but function argument since not needed, eg can't take a context
-   //       Clarinet needs this          
-   fillIn(Array, 'forEach', function( func ){
+
+// Array.forEach has to be a polyfill, clarinet expects it
+// Ignoring all but function argument since not needed, eg can't take a context
+//       Clarinet needs this          
+polyfill(Array, 'forEach', function( func ){
+     
+   for( var i = 0 ; i < len(this) ; i++ ) {      
+      func(this[i]);    
+   }              
+});         
+      
+
+// Array.filter has to be a polyfill, clarinet expects it.
+// Ignoring all but function argument since not needed, eg can't take a context
+//       Clarinet needs this
+polyfill(Array, 'filter', function( filterCondition ){         
+
+   var passes = [];
+
+   // let's use the .forEach we declared above to implement .filter:
+   this.forEach(function(item){      
+      if( filterCondition( item ) ) {
+         passes.push(item);
+      }                  
+   });
+   
+   return passes;
+   
+});  
         
-      for( var i = 0 ; i < len(this) ; i++ ) {      
-         func(this[i]);    
-      }              
-   });         
-         
-  
-   // Array.filter has to be a polyfill, clarinet expects it.
-   // Ignoring all but function argument since not needed, eg can't take a context
-   //       Clarinet needs this
-   fillIn(Array, 'filter', function( filterCondition ){         
-   
-      var passes = [];
-   
-      // let's use the .forEach we declared above to implement .filter:
-      this.forEach(function(item){      
-         if( filterCondition( item ) ) {
-            passes.push(item);
-         }                  
-      });
-      
-      return passes;
-      
-   });  
-           
-   // allow binding. Minimal version which includes binding of context only, not arguments as well
-   fillIn(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
-      var f = this;
-   
-      return function( /* yet more arguments */ ) {                        
-         return f.apply(context, arguments);
-      }
-   });   
+// allow binding. Minimal version which includes binding of context only, not arguments as well
+polyfill(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
+   var f = this;
 
-})();
+   return function( /* yet more arguments */ ) {                        
+      return f.apply(context, arguments);
+   }
+});   
+
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
@@ -1106,13 +1103,12 @@ function incrementalContentBuilder( fire) {
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      if (isOfType( Array, parentNode)) {
-
-         return pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
-      } else {
-         // the ascent I was given isn't inconsistent at all, return as-is
-         return possiblyInconsistentAscent;
-      }
+      return isOfType( Array, parentNode)
+      ?
+         pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode)
+      :  
+         possiblyInconsistentAscent // nothing needed, return unchanged
+      ;
    }
 
    /**
@@ -1203,15 +1199,15 @@ function incrementalContentBuilder( fire) {
          
          // It'd be odd but firstKey could be the empty string like {'':'foo'}. This is valid json even though it 
          // isn't very nice. So can't do !firstKey here, have to compare against undefined
-         if( defined(firstKey) ) {
-          
+         return defined(firstKey)
+         ?          
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
             // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
             // value because we haven't seen that far into the json yet          
-            return pathFound(ascentAfterNodeFound, firstKey);
-         } else {
-            return ascentAfterNodeFound;
-         }
+            pathFound(ascentAfterNodeFound, firstKey)
+         :
+            ascentAfterNodeFound
+         ;
       },
    
       openarray: function (ascent) {
@@ -1223,8 +1219,8 @@ function incrementalContentBuilder( fire) {
       
       value: function (ascent, value) {
    
-         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
-         // can't have descendants.
+         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once 
+         // since they can't have descendants.
                                  
          return curNodeFinished( nodeFound(ascent, value) );
       },
@@ -1817,26 +1813,27 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
             // parameters specified as arguments
             //
             //  if (mayHaveContext == true) method signature is:
-            //     .method( url, content, callback )
+            //     .doMethod( url, content, callback )
             //
             //  else it is:
-            //     .method( url, callback )            
+            //     .doMethod( url, callback )            
             //                                
-            return start(   
-                     firstArg,                                       // url
-                     mayHaveRequestBody? arguments[1] : undefined,   // body
-                     arguments[mayHaveRequestBody? 2 : 1] );         // callback
+            return start(
+                     firstArg,                                  // url
+                     mayHaveRequestBody && arguments[1],        // body
+                     arguments[mayHaveRequestBody? 2 : 1]       // callback
+            );
          } else {
          
-            
             // method signature is:
-            //    .method({url:u, body:b, complete:c})
+            //    .doMethod({url:u, body:b, complete:c, headers:{...}})
             
             return start(   
                      firstArg.url,
                      firstArg.body,
                      firstArg.complete,
-                     firstArg.headers );
+                     firstArg.headers 
+            );
          }
                                                       
       };
