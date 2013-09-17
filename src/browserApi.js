@@ -14,10 +14,10 @@
        
          function start (url, body, callback, headers){
             var 
+               clarinetParser = clarinet.parser(),            
                eventBus = pubSub(),
                fire = eventBus.fire,
-               on = eventBus.on,
-               clarinetParser = clarinet.parser();
+               on = eventBus.on;
 
             // let's kick off ajax and building up the content. 
             // both of these plug into the event bus to receive and send events.
