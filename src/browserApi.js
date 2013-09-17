@@ -31,26 +31,27 @@
             // parameters specified as arguments
             //
             //  if (mayHaveContext == true) method signature is:
-            //     .method( url, content, callback )
+            //     .doMethod( url, content, callback )
             //
             //  else it is:
-            //     .method( url, callback )            
+            //     .doMethod( url, callback )            
             //                                
-            return start(   
-                     firstArg,                                       // url
-                     mayHaveRequestBody? arguments[1] : undefined,   // body
-                     arguments[mayHaveRequestBody? 2 : 1] );         // callback
+            return start(
+                     firstArg,                                  // url
+                     mayHaveRequestBody && arguments[1],        // body
+                     arguments[mayHaveRequestBody? 2 : 1]       // callback
+            );
          } else {
          
-            
             // method signature is:
-            //    .method({url:u, body:b, complete:c})
+            //    .doMethod({url:u, body:b, complete:c, headers:{...}})
             
             return start(   
                      firstArg.url,
                      firstArg.body,
                      firstArg.complete,
-                     firstArg.headers );
+                     firstArg.headers 
+            );
          }
                                                       
       };
