@@ -95,14 +95,12 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   var functionList = asList(fns);
-   
    function next(valueSoFar, curFn) {  
       return curFn(valueSoFar);   
    }
    
    return function(startValue){
      
-      return foldR(next, startValue, functionList);
+      return foldR(next, startValue, asList(fns));
    }
 });
