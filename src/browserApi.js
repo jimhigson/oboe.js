@@ -21,7 +21,7 @@
 
             // let's kick off ajax and building up the content. 
             // both of these plug into the event bus to receive and send events.
-            incrementalContentBuilder(clarinetParser, fire, on);
+            incrementalContentBuilder(fire, on, clarinetParser);
             streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
             return instanceController(clarinetParser, callback, fire, on);

@@ -9,7 +9,7 @@ describe("incremental content builder", function(){
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
-      incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
+      incrementalContentBuilder(eventBus.fire, eventBus.on, this._clarinetStub);
    }
    
    IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){

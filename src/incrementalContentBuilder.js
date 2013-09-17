@@ -27,7 +27,7 @@ var ROOT_PATH = {};
  * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder( clarinetParser, fire, on ) {
+function incrementalContentBuilder(fire, on, clarinetParser) {
 
    // Sole state maintained by this builder.
    // List of nodes from the current node up to the root of the document.
