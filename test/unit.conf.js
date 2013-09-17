@@ -26,6 +26,7 @@ module.exports = function(config) {
       ,  'src/browserApi.js'
         
       ,  'test/specs/*unit.spec.js'
+      ,  'test/specs/*component.spec.js'
       ],
                             
       // level of logging

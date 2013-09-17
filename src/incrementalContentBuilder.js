@@ -29,22 +29,20 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder(fire, on, clarinetParser) {
 
-   // Sole state maintained by this builder.
-   // List of nodes from the current node up to the root of the document.
-   // Root is at the far end of the list. Current node is at the close end (head) of the list. 
-   var ascent;
-
-   function checkForMissedArrayKey(newDeepestNode) {
+   function checkForMissedArrayKey(possiblyInconsistentAscent, newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
       // so we need to notify of the paths when we find the items:
 
-      var parentNode = nodeOf(head(ascent));
+      var parentNode = nodeOf(head(possiblyInconsistentAscent));
       
       if (isOfType(Array, parentNode)) {
 
-         pathFound(len(parentNode), newDeepestNode);
+         return pathFound(possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
+      } else {
+         // the ascent I was given isn't inconsistent at all, return as-is
+         return possiblyInconsistentAscent;
       }
    }
 
@@ -54,30 +52,26 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
     * @param {*} newDeepestNode the thing that has been found in the json
     * @function
     */                 
-   function nodeFound( newDeepestNode ) {
+   function nodeFound( ascent, newDeepestNode ) {
       
       if( !ascent ) {
          // we discovered the root node,
          fire(ROOT_FOUND, newDeepestNode);
                     
-         // it has a special path
-         pathFound(ROOT_PATH, newDeepestNode);
-         
-         return;
+         return pathFound(ascent, ROOT_PATH, newDeepestNode);         
       }
 
-      // the node is a non-root node
+      // we discovered a non-root node
       
-      checkForMissedArrayKey(newDeepestNode);
-      
-      var ancestorBranches = tail(ascent),
-
-          oldDeepestMapping = head(ascent),
-          newDeepestMapping = mapping(keyOf(oldDeepestMapping), newDeepestNode);      
+           
+      var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
+          ancestorBranches       = tail( arrayConsistentAscent),
+          previousDeepestMapping = head( arrayConsistentAscent),          
+          newDeepestMapping      = mapping( keyOf( previousDeepestMapping), newDeepestNode);      
    
       appendBuiltContent( ancestorBranches, newDeepestMapping );
                                                                                                          
-      ascent = cons(newDeepestMapping, ancestorBranches);                                                                          
+      return cons(newDeepestMapping, ancestorBranches);                                                                          
    }
 
 
@@ -109,7 +103,7 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
     * @param {String|Number|Object|Array|Null|undefined} [maybeNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathFound(key, maybeNode) {
+   function pathFound(ascent, key, maybeNode) {
       
       var newDeepestMapping = mapping(key, maybeNode);
       
@@ -120,64 +114,78 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
          appendBuiltContent( ascent, newDeepestMapping );
       }
    
-      ascent = cons(newDeepestMapping, ascent);
+      var ascentWithNewPath = cons(newDeepestMapping, ascent);
      
-      fire(TYPE_PATH, ascent);
+      fire(TYPE_PATH, ascentWithNewPath);
  
+      return ascentWithNewPath;
    }
 
 
    /**
     * manages the state and notifications for when the current node has ended
     */
-   function curNodeFinished( ) {
+   function curNodeFinished( ascent ) {
 
       fire(TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the list:                                    
-      ascent = tail(ascent);
+      return tail(ascent);
    }      
     
    /* 
     * Assign listeners to clarinet.
     */
    function setListeners(handlers){
+
+      // Sole state maintained by this builder.
+      // List of nodes from the current node up to the root of the document.
+      // Root is at the far end of the list. Current node is at the close end (head) of the list.    
+      var ascent = emptyList;
+   
       clarinet.EVENTS.forEach(function(eventName){
-         clarinetParser['on'+eventName] = handlers[eventName];         
+
+         var handlerFunction = handlers[eventName];
+         
+         clarinetParser['on'+eventName] = handlerFunction? 
+            function(p1) {
+               ascent = handlerFunction( ascent, p1 );
+            }
+         :  null;
       });
    }    
          
    setListeners({ 
-      openobject : function (firstKey) {
+      openobject : function (ascent, firstKey) {
 
-         nodeFound({});
+         var ascentAfterNodeFound = nodeFound(ascent, {});         
          
-         // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
-         // so can't do !firstKey here, have to compare against undefined
+         // It'd be odd but firstKey could be the empty string like {'':'foo'}. This is valid json even though it 
+         // isn't very nice. So can't do !firstKey here, have to compare against undefined
          if( defined(firstKey) ) {
-         
+          
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
             // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
             // value because we haven't seen that far into the json yet          
-            pathFound(firstKey);
+            return pathFound(ascentAfterNodeFound, firstKey);
+         } else {
+            return ascentAfterNodeFound;
          }
       },
    
-      openarray: function () {
-         nodeFound([]);
+      openarray: function (ascent) {
+         return nodeFound(ascent, []);
       },
 
       // called by Clarinet when keys are found in objects               
       key: pathFound,
       
-      value: function (value) {
+      value: function (ascent, value) {
    
          // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
          // can't have descendants.
-      
-         nodeFound(value);
-                           
-         curNodeFinished();
+                                 
+         return curNodeFinished( nodeFound(ascent, value) );
       },
       
       closeobject: curNodeFinished,
