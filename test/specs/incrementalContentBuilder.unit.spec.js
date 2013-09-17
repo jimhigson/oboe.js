@@ -9,7 +9,10 @@ describe("incremental content builder", function(){
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
-      incrementalContentBuilder(eventBus.fire, eventBus.on, this._clarinetStub);
+      
+      var builderInstance = incrementalContentBuilder(eventBus.fire, eventBus.on, this._clarinetStub);
+      
+      clarinetListenerAdaptor( this._clarinetStub, builderInstance);
    }
    
    IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
@@ -149,28 +152,7 @@ describe("incremental content builder", function(){
       });   
                      
    })
-   
-   it('ignores object closing after Oboe is aborted', function() {
-   
-      expect(
       
-         aContentBuilder()
-            .receivingParserEvent('onopenobject')      
-            .receivingParserEvent('onkey', 'flavour')
-            .receivingParserEvent('onvalue', 'strawberry')
-            .receiveEventFromBus(ABORTING)
-            .receivingParserEvent('oncloseobject')               
-      
-      ).not.toHaveFired(
-         TYPE_NODE
-      ,  anAscentContaining(  
-            {key:ROOT_PATH, node:{flavour:'strawberry'}}
-         )      
-      )   
-                     
-   })   
-   
-   
    describe('first array element', function() {
 
       var builder = aContentBuilder()

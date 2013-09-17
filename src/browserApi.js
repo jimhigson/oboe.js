@@ -14,17 +14,16 @@
        
          function start (url, body, callback, headers){
             var 
-               clarinetParser = clarinet.parser(),            
                eventBus = pubSub(),
                fire = eventBus.fire,
                on = eventBus.on;
 
             // let's kick off ajax and building up the content. 
             // both of these plug into the event bus to receive and send events.
-            incrementalContentBuilder(fire, on, clarinetParser);
+            
             streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(fire, on, clarinetParser, callback);
+            return instanceController(fire, on, clarinet.parser(), incrementalContentBuilder(fire), callback);
          }
           
          if (isString(firstArg)) {

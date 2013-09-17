@@ -23,23 +23,22 @@ var ROOT_PATH = {};
  * 
  * Returns a function which gives access to the content built up so far
  * 
- * @param clarinetParser our source of low-level events
  * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder(fire, on, clarinetParser) {
+function incrementalContentBuilder( fire) {
 
-   function checkForMissedArrayKey(possiblyInconsistentAscent, newDeepestNode) {
+   function checkForMissedArrayKey( possiblyInconsistentAscent, newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
       // so we need to notify of the paths when we find the items:
 
-      var parentNode = nodeOf(head(possiblyInconsistentAscent));
+      var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      if (isOfType(Array, parentNode)) {
+      if (isOfType( Array, parentNode)) {
 
-         return pathFound(possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
+         return pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
       } else {
          // the ascent I was given isn't inconsistent at all, return as-is
          return possiblyInconsistentAscent;
@@ -56,9 +55,9 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
       
       if( !ascent ) {
          // we discovered the root node,
-         fire(ROOT_FOUND, newDeepestNode);
+         fire( ROOT_FOUND, newDeepestNode);
                     
-         return pathFound(ascent, ROOT_PATH, newDeepestNode);         
+         return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
 
       // we discovered a non-root node
@@ -110,7 +109,7 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
    
       var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
      
-      fire(TYPE_PATH, ascentWithNewPath);
+      fire( TYPE_PATH, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -121,35 +120,13 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
     */
    function curNodeFinished( ascent ) {
 
-      fire(TYPE_NODE, ascent);
+      fire( TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the list:                                    
-      return tail(ascent);
+      return tail( ascent);
    }      
-    
-   /* 
-    * Assign listeners to clarinet.
-    */
-   function setListeners(handlers){
-
-      // Sole state maintained by this builder.
-      // List of nodes from the current node up to the root of the document.
-      // Root is at the far end of the list. Current node is at the close end (head) of the list.    
-      var ascent = emptyList;
-   
-      clarinet.EVENTS.forEach(function(eventName){
-
-         var handlerFunction = handlers[eventName];
-         
-         clarinetParser['on'+eventName] = handlerFunction? 
-            function(p1) {
-               ascent = handlerFunction( ascent, p1 );
-            }
-         :  null;
-      });
-   }    
-         
-   setListeners({ 
+                 
+   return { 
       openobject : function (ascent, firstKey) {
 
          var ascentAfterNodeFound = nodeFound(ascent, {});         
@@ -184,14 +161,5 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
       
       closeobject: curNodeFinished,
       closearray: curNodeFinished       
-   });
-      
-   /**
-    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
-    * being found after we abort in the case where we aborted while reading though an already filled buffer.
-    */
-   on( ABORTING, function() {
-      setListeners({});
-   });
-
+   };
 }

@@ -9,6 +9,7 @@ module.exports = function (grunt) {
    ,  'src/lists.js'                    
    ,  'src/libs/polyfills.js'
    ,  'src/libs/clarinet.js'               
+   ,  'src/clarinetListenerAdaptor.js'
    ,  'src/streamingXhr.js'
    ,  'src/jsonPathSyntax.js'
    ,  'src/incrementalContentBuilder.js'            
@@ -25,14 +26,6 @@ module.exports = function (grunt) {
       'test/libs/*.js'
    ];
      
-   function allOf( /* file lists */ ) {
-      var args = Array.prototype.slice.apply(arguments);
-      
-      return args.reduce(function(soFar, listFromArgments){
-         return soFar.concat(listFromArgments);
-      }, []);
-   }
-
    grunt.initConfig({
 
       pkg:grunt.file.readJSON("package.json")

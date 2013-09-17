@@ -1,7 +1,7 @@
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(fire, on, clarinetParser, doneCallback) {
+function instanceController(fire, on, clarinetParser, contentBuilderHandlers, doneCallback) {
   
    var rootNode,
        oboeApi;
@@ -21,7 +21,7 @@ function instanceController(fire, on, clarinetParser, doneCallback) {
          try {
             
             clarinetParser.write(nextDrip);            
-         } catch(e) {
+         } catch(e) { 
             // we don't have to do anything here because we always assign a .onerror
             // to clarinet which will have already been called by the time this 
             // exception is thrown.                
@@ -35,6 +35,16 @@ function instanceController(fire, on, clarinetParser, doneCallback) {
          clarinetParser.close();
       }
    );
+   
+   /**
+    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we aborted while reading though an already filled buffer.
+    */
+   on( ABORTING, function() {
+      clarinetListenerAdaptor(clarinetParser, {});
+   });   
+
+   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
    
    if( doneCallback ) {
       on(HTTP_DONE_EVENT, compose(doneCallback, rootNodeFunctor));

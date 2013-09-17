@@ -863,6 +863,24 @@ if(typeof FastList === 'function') {
 
 })(typeof exports === "undefined" ? clarinet = {} : exports);
 
+
+/* 
+ * Assign listeners to clarinet.
+ */
+function clarinetListenerAdaptor(clarinetParser, handlers){
+    
+   var state;
+
+   clarinet.EVENTS.forEach(function(eventName){
+ 
+      var handlerFunction = handlers[eventName];
+      
+      clarinetParser['on'+eventName] = handlerFunction && 
+                                       function(param) {
+                                          state = handlerFunction( state, param);
+                                       };
+   });
+}
 /**
  * An xhr wrapper that calls a callback whenever some more of the
  * response is available, without waiting for all of it.
@@ -880,6 +898,7 @@ if(typeof FastList === 'function') {
  * @param {String} url
  * @param {String|Object} data some content to be sent with the request. Only valid
  *                        if method is POST or PUT.
+ * @param {Object} headers the http request headers to send                       
  */
 function streamingXhr(fire, on, method, url, data, headers) {
         
@@ -887,10 +906,13 @@ function streamingXhr(fire, on, method, url, data, headers) {
       xhr = new XMLHttpRequest(),
 
       numberOfCharsAlreadyGivenToCallback = 0;
-      
+         
    on( ABORTING, function(){
-      // NB: don't change to xhr.abort.bind(xhr), in IE abort isn't a proper function
-      // so it doesn't matter if Function.bind is polyfilled, it breaks
+      // when an ABORTING message is put on the event bus abort the ajax request
+   
+      // if we keep the state change listener, aborting gives it a callback the same as
+      // a successful request so null it out.
+      xhr.onreadystatechange = null;
       xhr.abort();
    });
 
@@ -903,41 +925,7 @@ function streamingXhr(fire, on, method, url, data, headers) {
    
       return isString(body)? body: JSON.stringify(body);
    }      
-   
-   
-   /**
-    */
-   function listenForComplete(){
-   
-      // unfortunately there is no point polling the responsetext, these bad old browsers 
-      // don't make the partial text accessible - it is undefined until the request finishes 
-      // and then it is everything.
-      // Instead, we just have to wait for the request to be complete and degrade gracefully
-      // to non-streaming Ajax.      
-      xhr.onreadystatechange = function() {
-               
-         if(xhr.readyState == 4 ) {
 
-            // is this a 2xx http code?
-            var sucessful = String(xhr.status)[0] == 2;
-            
-            if( sucessful ) {
-               // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
-               // onload. We need to always do handleInput in case we get the load but have
-               // not had a final progress event. This may change in future but let's take the safest
-               // approach and assume we might not have received a progress event for every bit of
-               // data before we get the load event.
-               handleProgress();
-               
-               fire( HTTP_DONE_EVENT );
-            } else {
-            
-               fire( ERROR_EVENT );
-            }
-         }
-      };
-   }   
-   
    /** 
     * Handle input from the underlying xhr: either a state change,
     * the progress event or the request being complete.
@@ -963,15 +951,36 @@ function streamingXhr(fire, on, method, url, data, headers) {
       xhr.onprogress = handleProgress;
    }
    
-   listenForComplete();
+   xhr.onreadystatechange = function() {
+            
+      if(xhr.readyState == 4 ) {
+
+         // is this a 2xx http code?
+         var sucessful = String(xhr.status)[0] == 2;
+         
+         if( sucessful ) {
+            // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
+            // onload. We need to always do handleInput in case we get the load but have
+            // not had a final progress event. This may change in future but let's take the safest
+            // approach and assume we might not have received a progress event for every bit of
+            // data before we get the load event.
+            handleProgress();
+            
+            fire( HTTP_DONE_EVENT );
+         } else {
+         
+            fire( ERROR_EVENT );
+         }
+      }
+   };
 
    xhr.open(method, url, true);
+   
    for( var headerName in headers ){
       xhr.setRequestHeader(headerName, headers[headerName]);
    }
    
    xhr.send(validatedRequestBody(data));
-
 }
 
 var jsonPathSyntax = (function() {
@@ -1084,23 +1093,22 @@ var ROOT_PATH = {};
  * 
  * Returns a function which gives access to the content built up so far
  * 
- * @param clarinetParser our source of low-level events
  * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
-function incrementalContentBuilder(fire, on, clarinetParser) {
+function incrementalContentBuilder( fire) {
 
-   function checkForMissedArrayKey(possiblyInconsistentAscent, newDeepestNode) {
+   function checkForMissedArrayKey( possiblyInconsistentAscent, newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
       // so we need to notify of the paths when we find the items:
 
-      var parentNode = nodeOf(head(possiblyInconsistentAscent));
+      var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      if (isOfType(Array, parentNode)) {
+      if (isOfType( Array, parentNode)) {
 
-         return pathFound(possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
+         return pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
       } else {
          // the ascent I was given isn't inconsistent at all, return as-is
          return possiblyInconsistentAscent;
@@ -1117,33 +1125,29 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
       
       if( !ascent ) {
          // we discovered the root node,
-         fire(ROOT_FOUND, newDeepestNode);
+         fire( ROOT_FOUND, newDeepestNode);
                     
-         return pathFound(ascent, ROOT_PATH, newDeepestNode);         
+         return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
 
       // we discovered a non-root node
-      
-           
+                 
       var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
-          previousDeepestMapping = head( arrayConsistentAscent),          
-          newDeepestMapping      = mapping( keyOf( previousDeepestMapping), newDeepestNode);      
-   
-      appendBuiltContent( ancestorBranches, newDeepestMapping );
+          previouslyUnmappedKey  = keyOf( head( arrayConsistentAscent));
+          
+      appendBuiltContent( ancestorBranches, previouslyUnmappedKey, newDeepestNode );
                                                                                                          
-      return cons(newDeepestMapping, ancestorBranches);                                                                          
+      return cons( mapping( previouslyUnmappedKey, newDeepestNode ), ancestorBranches);                                                                          
    }
 
 
    /**
     * Add a new value to the top-level object which has been already output   
     */
-   function appendBuiltContent( ancestorBranches, deepestMapping ){
-
-      var parentBranch = head(ancestorBranches);
-      
-      nodeOf(parentBranch)[keyOf(deepestMapping)] = nodeOf(deepestMapping);
+   function appendBuiltContent( ancestorBranches, key, node ){
+     
+      nodeOf( head( ancestorBranches))[key] = node;
    }
 
    /**
@@ -1159,25 +1163,23 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
+    * @param {String|Number|Object} newDeepestKey the key. If we are in an array will be a number, otherwise a string. May
     *    take the special value ROOT_PATH if the root node has just been found
-    * @param {String|Number|Object|Array|Null|undefined} [maybeNode] usually this won't be known so can be undefined.
+    * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathFound(ascent, key, maybeNode) {
-      
-      var newDeepestMapping = mapping(key, maybeNode);
-      
+   function pathFound(ascent, newDeepestKey, maybeNewDeepestNode) {
+
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( ascent, newDeepestMapping );
+         appendBuiltContent( ascent, newDeepestKey, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons(newDeepestMapping, ascent);
+      var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
      
-      fire(TYPE_PATH, ascentWithNewPath);
+      fire( TYPE_PATH, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -1188,35 +1190,13 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
     */
    function curNodeFinished( ascent ) {
 
-      fire(TYPE_NODE, ascent);
+      fire( TYPE_NODE, ascent);
                           
       // pop the complete node and its path off the list:                                    
-      return tail(ascent);
+      return tail( ascent);
    }      
-    
-   /* 
-    * Assign listeners to clarinet.
-    */
-   function setListeners(handlers){
-
-      // Sole state maintained by this builder.
-      // List of nodes from the current node up to the root of the document.
-      // Root is at the far end of the list. Current node is at the close end (head) of the list.    
-      var ascent = emptyList;
-   
-      clarinet.EVENTS.forEach(function(eventName){
-
-         var handlerFunction = handlers[eventName];
-         
-         clarinetParser['on'+eventName] = handlerFunction? 
-            function(p1) {
-               ascent = handlerFunction( ascent, p1 );
-            }
-         :  null;
-      });
-   }    
-         
-   setListeners({ 
+                 
+   return { 
       openobject : function (ascent, firstKey) {
 
          var ascentAfterNodeFound = nodeFound(ascent, {});         
@@ -1251,16 +1231,7 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
       
       closeobject: curNodeFinished,
       closearray: curNodeFinished       
-   });
-      
-   /**
-    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
-    * being found after we abort in the case where we aborted while reading though an already filled buffer.
-    */
-   on( ABORTING, function() {
-      setListeners({});
-   });
-
+   };
 }
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
@@ -1669,7 +1640,7 @@ var _S = 0,
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(fire, on, clarinetParser, doneCallback) {
+function instanceController(fire, on, clarinetParser, contentBuilderHandlers, doneCallback) {
   
    var rootNode,
        oboeApi;
@@ -1689,7 +1660,7 @@ function instanceController(fire, on, clarinetParser, doneCallback) {
          try {
             
             clarinetParser.write(nextDrip);            
-         } catch(e) {
+         } catch(e) { 
             // we don't have to do anything here because we always assign a .onerror
             // to clarinet which will have already been called by the time this 
             // exception is thrown.                
@@ -1703,6 +1674,16 @@ function instanceController(fire, on, clarinetParser, doneCallback) {
          clarinetParser.close();
       }
    );
+   
+   /**
+    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we aborted while reading though an already filled buffer.
+    */
+   on( ABORTING, function() {
+      clarinetListenerAdaptor(clarinetParser, {});
+   });   
+
+   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
    
    if( doneCallback ) {
       on(HTTP_DONE_EVENT, compose(doneCallback, rootNodeFunctor));
@@ -1819,17 +1800,16 @@ function instanceController(fire, on, clarinetParser, doneCallback) {
        
          function start (url, body, callback, headers){
             var 
-               clarinetParser = clarinet.parser(),            
                eventBus = pubSub(),
                fire = eventBus.fire,
                on = eventBus.on;
 
             // let's kick off ajax and building up the content. 
             // both of these plug into the event bus to receive and send events.
-            incrementalContentBuilder(fire, on, clarinetParser);
+            
             streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(fire, on, clarinetParser, callback);
+            return instanceController(fire, on, clarinet.parser(), incrementalContentBuilder(fire), callback);
          }
           
          if (isString(firstArg)) {
