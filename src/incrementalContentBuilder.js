@@ -34,7 +34,7 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
    // Root is at the far end of the list. Current node is at the close end (head) of the list. 
    var ascent;
 
-   function checkForMissedArrayKey(ascent, newDeepestNode) {
+   function checkForMissedArrayKey(newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
@@ -68,7 +68,7 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
 
       // the node is a non-root node
       
-      checkForMissedArrayKey(ascent, newDeepestNode);
+      checkForMissedArrayKey(newDeepestNode);
       
       var ancestorBranches = tail(ascent),
 
