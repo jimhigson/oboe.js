@@ -1,7 +1,7 @@
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, doneCallback, fire, on) {
+function instanceController(fire, on, clarinetParser, doneCallback) {
   
    var rootNode,
        oboeApi;

@@ -24,7 +24,7 @@
             incrementalContentBuilder(fire, on, clarinetParser);
             streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(clarinetParser, callback, fire, on);
+            return instanceController(fire, on, clarinetParser, callback);
          }
           
          if (isString(firstArg)) {
