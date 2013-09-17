@@ -17,12 +17,14 @@
                eventBus = pubSub(),
                fire = eventBus.fire,
                on = eventBus.on,
-               clarinetParser = clarinet.parser(),
-               rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
-            
-            streamingXhr(fire, on, httpMethodName, url, body, headers );
+               clarinetParser = clarinet.parser();
+
+            // let's kick off ajax and building up the content. 
+            // both of these plug into the event bus to receive and send events.
+            incrementalContentBuilder(clarinetParser, fire, on);
+            streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
+            return instanceController(clarinetParser, callback, fire, on);
          }
           
          if (isString(firstArg)) {

@@ -36,12 +36,8 @@ function givenAnOboeInstance(jsonFileName) {
                               
       oboeInstance.onError(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.
-         // Fail the test on getting an error: 
-         if(!expectingErrors){ 
-            givenErrors.push(e);
-         
-            throw new Error('unexpected error: ' + e);
-         }
+         // Fail the test on getting an error:
+         expect(expectingErrors).toBeTruthy();
       });
 
       // designed for use with jasmine's waitsFor, ie:

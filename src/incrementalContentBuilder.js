@@ -5,8 +5,9 @@ var nodeOf = attr('node');
 /**
  * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
  * have any path). This prevents the need for special-casing detection of the root object and allows it
- * to be treated like any other object. We might think of this as being similar to the unnamed root
- * domain: CITE THIS
+ * to be treated like any other object. We might think of this as being similar to the 'unnamed root'
+ * domain ".", eg if I go to http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates the 
+ * unnamed root of the DNS.
  * 
  * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
  * distinct, therefore no other object can possibly clash with this one. Strings, numbers etc provide
@@ -27,17 +28,13 @@ var ROOT_PATH = {};
  *    or path is found  
  */ 
 function incrementalContentBuilder( clarinetParser, fire, on ) {
-   
-   var            
-         // array of nodes from curNode up to the root of the document.
-         // the root is at the far end of the list, the current node is at the close end (the head) 
-         ascent
-      
-   ,     rootNode;
 
+   // Sole state maintained by this builder.
+   // List of nodes from the current node up to the root of the document.
+   // Root is at the far end of the list. Current node is at the close end (head) of the list. 
+   var ascent;
 
-
-   function checkForMissedArrayKey(ascent, newLeafNode) {
+   function checkForMissedArrayKey(ascent, newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
@@ -47,50 +44,51 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
       
       if (isOfType(Array, parentNode)) {
 
-         pathFound(len(parentNode), newLeafNode);
+         pathFound(len(parentNode), newDeepestNode);
       }
    }
 
    /**
     * Manage the state and notifications for when a new node is found.
     *  
-    * @param {*} newLeafNode the thing that has been found in the json
+    * @param {*} newDeepestNode the thing that has been found in the json
     * @function
     */                 
-   function nodeFound( newLeafNode ) {
+   function nodeFound( newDeepestNode ) {
       
       if( !ascent ) {
-           
-         // we discovered the root node, it has a special path
-         rootNode = newLeafNode;
-         pathFound(ROOT_PATH, newLeafNode);
+         // we discovered the root node,
+         fire(ROOT_FOUND, newDeepestNode);
+                    
+         // it has a special path
+         pathFound(ROOT_PATH, newDeepestNode);
          
-         return;            
+         return;
       }
 
       // the node is a non-root node
       
-      checkForMissedArrayKey(ascent, newLeafNode);
+      checkForMissedArrayKey(ascent, newDeepestNode);
       
       var ancestorBranches = tail(ascent),
 
-          oldLeaf = head(ascent),
-          newLeaf = mapping(keyOf(oldLeaf), newLeafNode);      
+          oldDeepestMapping = head(ascent),
+          newDeepestMapping = mapping(keyOf(oldDeepestMapping), newDeepestNode);      
    
-      appendBuiltContent( ancestorBranches, newLeaf );
+      appendBuiltContent( ancestorBranches, newDeepestMapping );
                                                                                                          
-      ascent = cons(newLeaf, ancestorBranches);                                                                          
+      ascent = cons(newDeepestMapping, ancestorBranches);                                                                          
    }
 
 
    /**
     * Add a new value to the top-level object which has been already output   
     */
-   function appendBuiltContent( ancestorBranches, leaf ){
+   function appendBuiltContent( ancestorBranches, deepestMapping ){
 
       var parentBranch = head(ancestorBranches);
       
-      nodeOf(parentBranch)[keyOf(leaf)] = nodeOf(leaf);
+      nodeOf(parentBranch)[keyOf(deepestMapping)] = nodeOf(deepestMapping);
    }
 
    /**
@@ -113,16 +111,16 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
     **/  
    function pathFound(key, maybeNode) {
       
-      var newLeaf = mapping(key, maybeNode);
+      var newDeepestMapping = mapping(key, maybeNode);
       
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( ascent, newLeaf );
+         appendBuiltContent( ascent, newDeepestMapping );
       }
    
-      ascent = cons(newLeaf, ascent);
+      ascent = cons(newDeepestMapping, ascent);
      
       fire(TYPE_PATH, ascent);
  
@@ -136,7 +134,7 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
 
       fire(TYPE_NODE, ascent);
                           
-      // pop the complete node and its path off the lists:                                    
+      // pop the complete node and its path off the list:                                    
       ascent = tail(ascent);
    }      
     
@@ -186,13 +184,7 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
     */      
    on( ABORTING, function() {
       clarinet.EVENTS.forEach(function(event){
-         // maybe not onerror
          clarinetParser['on'+event] = null;
       });
-   }); 
-             
-   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
-   return function() {
-      return rootNode;
-   }           
+   });                         
 }

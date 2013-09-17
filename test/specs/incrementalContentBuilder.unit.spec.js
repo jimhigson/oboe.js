@@ -9,7 +9,7 @@ describe("incremental content builder", function(){
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
-      this._rootObj = incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
+      incrementalContentBuilder(this._clarinetStub, eventBus.fire, eventBus.on);
    }
    
    IncrementalContentBuilderAsserter.prototype.receivingParserEvent = function(fnName /* args */){
@@ -48,7 +48,7 @@ describe("incremental content builder", function(){
 
       it('reports correct root', function () {
 
-         expect(builder).toReportRoot({})
+         expect(builder).toHaveFiredRootThatIsNow({})
 
       });
    })
@@ -73,7 +73,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot({flavour:undefined});
+         expect(builder).toHaveFiredRootThatIsNow({flavour:undefined});
       });
       
    })
@@ -97,7 +97,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot({flavour:undefined});
+         expect(builder).toHaveFiredRootThatIsNow({flavour:undefined});
       });      
       
    })   
@@ -121,7 +121,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
        
-         expect(builder).toReportRoot({flavour:'strawberry'});
+         expect(builder).toHaveFiredRootThatIsNow({flavour:'strawberry'});
       });   
          
    })
@@ -145,7 +145,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot({flavour:'strawberry'});      
+         expect(builder).toHaveFiredRootThatIsNow({flavour:'strawberry'});      
       });   
                      
    })
@@ -204,7 +204,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot({'alphabet':['a']});
+         expect(builder).toHaveFiredRootThatIsNow({'alphabet':['a']});
       });
 
    })
@@ -243,7 +243,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot({'alphabet':['a','b']});
+         expect(builder).toHaveFiredRootThatIsNow({'alphabet':['a','b']});
       });
 
    })
@@ -278,7 +278,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toReportRoot(['a','b']);
+         expect(builder).toHaveFiredRootThatIsNow(['a','b']);
       });
 
    })      
@@ -293,13 +293,11 @@ describe("incremental content builder", function(){
    beforeEach(function(){
             
       this.addMatchers({
-         toReportRoot: function( expectedRootObj ) {
-            var actualRootObj = this.actual._rootObj();
-            
-            expect( actualRootObj ).toEqual( expectedRootObj );
-            
-            return true;
-            //return JSON.stringify( expectedRootObj ) == JSON.stringify( actualRootObj );
+         toHaveFiredRootThatIsNow: function( expectedRootObj ) {
+            var asserter = this.actual;
+            var fire = asserter._eventBus.fire;
+
+            return fire.calledWith(ROOT_FOUND, expectedRootObj);
          },
       
          toHaveFired: function( eventName, expectedAscent ){
@@ -315,17 +313,17 @@ describe("incremental content builder", function(){
                   }
                   
                   if( !expect || !found ) {
-                     // Both not empty, but one is. Inequal length.
+                     // Both not empty, but one is. Unequal length ascents.
                      return false;
                   }
                   
                   if( head(expect).key != head(found).key ) {
-                     // keys inequal
+                     // keys unequal
                      return false;
                   }
                   
                   if( JSON.stringify( head(expect).node ) != JSON.stringify( head(found).node ) ) {
-                     // nodes inequal         
+                     // nodes unequal         
                      return false;
                   }
                   

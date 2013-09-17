@@ -176,15 +176,14 @@ function reverseList(list){
 }
 
 function listAsArray(list){
-   // could be done as a reduce
 
-   if( !list ) {
-      return [];
-   } else {
-      var array = listAsArray(tail(list));
-      array.unshift(head(list)); 
-      return array;
-   }
+   return foldR( function(arraySoFar, listItem){
+      
+      arraySoFar.unshift(listItem);
+      return arraySoFar;
+           
+   }, [], list );
+   
 }
 
 function map(fn, list) {
@@ -206,12 +205,16 @@ function foldR(fn, startValue, list) {
             : startValue;
 }
 
+/* return true if the given function holds for every item in 
+ * the list 
+ */
 function listEvery(fn, list) {
    
    return !list || 
           fn(head(list)) && listEvery(fn, tail(list));
 }
 
+/* convert an array to a list */
 function asList(array){
 
    var l = emptyList;
@@ -1063,12 +1066,15 @@ var nodeOf = attr('node');
 /**
  * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
  * have any path). This prevents the need for special-casing detection of the root object and allows it
- * to be treated like any other object.
+ * to be treated like any other object. We might think of this as being similar to the 'unnamed root'
+ * domain ".", eg if I go to http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates the 
+ * unnamed root of the DNS.
  * 
  * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
- * distinct, therefore no other object can possibly clash with this one.
+ * distinct, therefore no other object can possibly clash with this one. Strings, numbers etc provide
+ * no such guarantee.
  */
-var ROOT_PATH = {r:1}; 
+var ROOT_PATH = {}; 
 
 
 /**
@@ -1083,17 +1089,13 @@ var ROOT_PATH = {r:1};
  *    or path is found  
  */ 
 function incrementalContentBuilder( clarinetParser, fire, on ) {
-   
-   var            
-         // array of nodes from curNode up to the root of the document.
-         // the root is at the far end of the list, the current node is at the close end (the head) 
-         ascent
-      
-   ,     rootNode;
 
+   // Sole state maintained by this builder.
+   // List of nodes from the current node up to the root of the document.
+   // Root is at the far end of the list. Current node is at the close end (head) of the list. 
+   var ascent;
 
-
-   function checkForMissedArrayKey(ascent, newLeafNode) {
+   function checkForMissedArrayKey(ascent, newDeepestNode) {
    
       // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
       // is for objects)
@@ -1103,47 +1105,51 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
       
       if (isOfType(Array, parentNode)) {
 
-         pathFound(len(parentNode), newLeafNode);
+         pathFound(len(parentNode), newDeepestNode);
       }
    }
 
    /**
     * Manage the state and notifications for when a new node is found.
     *  
-    * @param {*} newLeafNode the thing that has been found in the json
+    * @param {*} newDeepestNode the thing that has been found in the json
     * @function
     */                 
-   function nodeFound( newLeafNode ) {
+   function nodeFound( newDeepestNode ) {
       
       if( !ascent ) {
-           
-         // we discovered the root node, it has a special path
-         rootNode = newLeafNode;
-         pathFound(ROOT_PATH, newLeafNode);
+         // we discovered the root node,
+         fire(ROOT_FOUND, newDeepestNode);
+                    
+         // it has a special path
+         pathFound(ROOT_PATH, newDeepestNode);
          
-         return;            
-      } 
-      
-      checkForMissedArrayKey(ascent, newLeafNode);
-      
+         return;
+      }
+
       // the node is a non-root node
-      var branches = tail(ascent),           
-          parentBranch = head(branches),   
-          oldLeaf = head(ascent),
-          newLeaf = mapping(keyOf(oldLeaf), newLeafNode);      
+      
+      checkForMissedArrayKey(ascent, newDeepestNode);
+      
+      var ancestorBranches = tail(ascent),
+
+          oldDeepestMapping = head(ascent),
+          newDeepestMapping = mapping(keyOf(oldDeepestMapping), newDeepestNode);      
    
-      appendBuiltContent( parentBranch, newLeaf );
+      appendBuiltContent( ancestorBranches, newDeepestMapping );
                                                                                                          
-      ascent = cons(newLeaf, branches);                                                                          
+      ascent = cons(newDeepestMapping, ancestorBranches);                                                                          
    }
 
 
    /**
     * Add a new value to the top-level object which has been already output   
     */
-   function appendBuiltContent( branch, leaf ){
+   function appendBuiltContent( ancestorBranches, deepestMapping ){
+
+      var parentBranch = head(ancestorBranches);
       
-      nodeOf(branch)[keyOf(leaf)] = nodeOf(leaf);
+      nodeOf(parentBranch)[keyOf(deepestMapping)] = nodeOf(deepestMapping);
    }
 
    /**
@@ -1166,16 +1172,16 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
     **/  
    function pathFound(key, maybeNode) {
       
-      var newLeaf = mapping(key, maybeNode);
+      var newDeepestMapping = mapping(key, maybeNode);
       
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( head(ascent), newLeaf );
+         appendBuiltContent( ascent, newDeepestMapping );
       }
    
-      ascent = cons(newLeaf, ascent);
+      ascent = cons(newDeepestMapping, ascent);
      
       fire(TYPE_PATH, ascent);
  
@@ -1189,7 +1195,7 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
 
       fire(TYPE_NODE, ascent);
                           
-      // pop the complete node and its path off the lists:                                    
+      // pop the complete node and its path off the list:                                    
       ascent = tail(ascent);
    }      
     
@@ -1234,22 +1240,14 @@ function incrementalContentBuilder( clarinetParser, fire, on ) {
       curNodeFinished;
 
    /**
-    * If we abort this Oboe's request stop listening
-    * to the clarinet parser. This prevents more tokens
-    * being found after we abort in the case where we 
-    * aborted while reading though a current buffer.
+    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
+    * being found after we abort in the case where we aborted while reading though an already filled buffer.
     */      
    on( ABORTING, function() {
       clarinet.EVENTS.forEach(function(event){
-         // maybe not onerror
          clarinetParser['on'+event] = null;
       });
-   }); 
-             
-   /* finally, return a function to get the root of the json (or undefined if not yet found) */      
-   return function() {
-      return rootNode;
-   }           
+   });                         
 }
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
@@ -1650,6 +1648,7 @@ function pubSub(){
 var _S = 0,
     TYPE_NODE = _S++,
     TYPE_PATH = _S++,
+    ROOT_FOUND = _S++,
     ERROR_EVENT = _S++,
     HTTP_PROGRESS_EVENT = _S++,
     HTTP_DONE_EVENT = _S++,
@@ -1657,7 +1656,18 @@ var _S = 0,
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
+function instanceController(clarinetParser, doneCallback, fire, on) {
+  
+   var rootNode,
+       oboeApi;
+      
+   function rootNodeFunctor() {
+      return rootNode;
+   }
+         
+   on(ROOT_FOUND, function(root) {
+      rootNode = root;   
+   });                         
   
    on(HTTP_PROGRESS_EVENT,         
       function (nextDrip) {
@@ -1682,7 +1692,7 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
    );
    
    if( doneCallback ) {
-      on(HTTP_DONE_EVENT, compose(doneCallback, jsonRoot));
+      on(HTTP_DONE_EVENT, compose(doneCallback, rootNodeFunctor));
    }   
   
    // react to errors by putting them on the event bus
@@ -1692,9 +1702,7 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
    };
-  
-   
-                
+
    /**
     *  
     */
@@ -1774,15 +1782,13 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
       return this; // chaining
    }         
 
-   var oboeApi = { 
+   return oboeApi = { 
       onError     : partialComplete(on, ERROR_EVENT),
       onPath      : partialComplete(addListenerApi, TYPE_PATH), 
       onNode      : partialComplete(addListenerApi, TYPE_NODE),
       abort       : partialComplete(fire, ABORTING),
-      root        : jsonRoot                 
+      root        : rootNodeFunctor
    };
-   return oboeApi;
-    
 }
 (function(){
 
@@ -1803,12 +1809,14 @@ function instanceController(clarinetParser, jsonRoot, doneCallback, fire, on) {
                eventBus = pubSub(),
                fire = eventBus.fire,
                on = eventBus.on,
-               clarinetParser = clarinet.parser(),
-               rootJsonFn = incrementalContentBuilder(clarinetParser, fire, on);            
-            
-            streamingXhr(fire, on, httpMethodName, url, body, headers );
+               clarinetParser = clarinet.parser();
+
+            // let's kick off ajax and building up the content. 
+            // both of these plug into the event bus to receive and send events.
+            incrementalContentBuilder(clarinetParser, fire, on);
+            streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(clarinetParser, rootJsonFn, callback, fire, on);
+            return instanceController(clarinetParser, callback, fire, on);
          }
           
          if (isString(firstArg)) {
