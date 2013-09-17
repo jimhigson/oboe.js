@@ -1201,53 +1201,58 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
     
    /* 
     * Assign listeners to clarinet.
-    */     
-    
-   clarinetParser.onopenobject = function (firstKey) {
+    */
+   function setListeners(handlers){
+      clarinet.EVENTS.forEach(function(eventName){
+         clarinetParser['on'+eventName] = handlers[eventName];         
+      });
+   }    
+         
+   setListeners({ 
+      openobject : function (firstKey) {
 
-      nodeFound({});
+         nodeFound({});
+         
+         // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
+         // so can't do !firstKey here, have to compare against undefined
+         if( defined(firstKey) ) {
+         
+            // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
+            // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
+            // value because we haven't seen that far into the json yet          
+            pathFound(firstKey);
+         }
+      },
+   
+      openarray: function () {
+         nodeFound([]);
+      },
+
+      // called by Clarinet when keys are found in objects               
+      key: pathFound,
       
-      // It'd be odd but firstKey could be the empty string. This is valid json even though it isn't very nice.
-      // so can't do !firstKey here, have to compare against undefined
-      if( defined(firstKey) ) {
+      value: function (value) {
+   
+         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
+         // can't have descendants.
       
-         // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-         // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
-         // value because we haven't seen that far into the json yet          
-         pathFound(firstKey);
-      }
-   };
-   
-   clarinetParser.onopenarray = function () {
-      nodeFound([]);
-   };
-
-   // called by Clarinet when keys are found in objects               
-   clarinetParser.onkey = pathFound;   
-               
-   clarinetParser.onvalue = function (value) {
-   
-      // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
-      // can't have descendants.
-   
-      nodeFound(value);
-                        
-      curNodeFinished();
-   };         
-   
-   clarinetParser.oncloseobject =
-   clarinetParser.onclosearray =       
-      curNodeFinished;
-
+         nodeFound(value);
+                           
+         curNodeFinished();
+      },
+      
+      closeobject: curNodeFinished,
+      closearray: curNodeFinished       
+   });
+      
    /**
     * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
     * being found after we abort in the case where we aborted while reading though an already filled buffer.
-    */      
+    */
    on( ABORTING, function() {
-      clarinet.EVENTS.forEach(function(event){
-         clarinetParser['on'+event] = null;
-      });
-   });                         
+      setListeners({});
+   });
+
 }
 /**
  * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
@@ -1656,7 +1661,7 @@ var _S = 0,
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(clarinetParser, doneCallback, fire, on) {
+function instanceController(fire, on, clarinetParser, doneCallback) {
   
    var rootNode,
        oboeApi;
@@ -1806,17 +1811,17 @@ function instanceController(clarinetParser, doneCallback, fire, on) {
        
          function start (url, body, callback, headers){
             var 
+               clarinetParser = clarinet.parser(),            
                eventBus = pubSub(),
                fire = eventBus.fire,
-               on = eventBus.on,
-               clarinetParser = clarinet.parser();
+               on = eventBus.on;
 
             // let's kick off ajax and building up the content. 
             // both of these plug into the event bus to receive and send events.
             incrementalContentBuilder(fire, on, clarinetParser);
             streamingXhr(fire, on, httpMethodName, url, body, headers );                              
                       
-            return instanceController(clarinetParser, callback, fire, on);
+            return instanceController(fire, on, clarinetParser, callback);
          }
           
          if (isString(firstArg)) {
