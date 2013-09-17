@@ -36,13 +36,12 @@ function incrementalContentBuilder( fire) {
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      if (isOfType( Array, parentNode)) {
-
-         return pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode);         
-      } else {
-         // the ascent I was given isn't inconsistent at all, return as-is
-         return possiblyInconsistentAscent;
-      }
+      return isOfType( Array, parentNode)
+      ?
+         pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode)
+      :  
+         possiblyInconsistentAscent // nothing needed, return unchanged
+      ;
    }
 
    /**
@@ -133,15 +132,15 @@ function incrementalContentBuilder( fire) {
          
          // It'd be odd but firstKey could be the empty string like {'':'foo'}. This is valid json even though it 
          // isn't very nice. So can't do !firstKey here, have to compare against undefined
-         if( defined(firstKey) ) {
-          
+         return defined(firstKey)
+         ?          
             // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
             // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
             // value because we haven't seen that far into the json yet          
-            return pathFound(ascentAfterNodeFound, firstKey);
-         } else {
-            return ascentAfterNodeFound;
-         }
+            pathFound(ascentAfterNodeFound, firstKey)
+         :
+            ascentAfterNodeFound
+         ;
       },
    
       openarray: function (ascent) {
@@ -153,8 +152,8 @@ function incrementalContentBuilder( fire) {
       
       value: function (ascent, value) {
    
-         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once since they 
-         // can't have descendants.
+         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once 
+         // since they can't have descendants.
                                  
          return curNodeFinished( nodeFound(ascent, value) );
       },
