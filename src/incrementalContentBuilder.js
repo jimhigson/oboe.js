@@ -62,27 +62,23 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
       }
 
       // we discovered a non-root node
-      
-           
+                 
       var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
-          previousDeepestMapping = head( arrayConsistentAscent),          
-          newDeepestMapping      = mapping( keyOf( previousDeepestMapping), newDeepestNode);      
-   
-      appendBuiltContent( ancestorBranches, newDeepestMapping );
+          previouslyUnmappedKey  = keyOf( head( arrayConsistentAscent));
+          
+      appendBuiltContent( ancestorBranches, previouslyUnmappedKey, newDeepestNode );
                                                                                                          
-      return cons(newDeepestMapping, ancestorBranches);                                                                          
+      return cons( mapping( previouslyUnmappedKey, newDeepestNode ), ancestorBranches);                                                                          
    }
 
 
    /**
     * Add a new value to the top-level object which has been already output   
     */
-   function appendBuiltContent( ancestorBranches, deepestMapping ){
-
-      var parentBranch = head(ancestorBranches);
-      
-      nodeOf(parentBranch)[keyOf(deepestMapping)] = nodeOf(deepestMapping);
+   function appendBuiltContent( ancestorBranches, key, node ){
+     
+      nodeOf( head( ancestorBranches))[key] = node;
    }
 
    /**
@@ -98,23 +94,21 @@ function incrementalContentBuilder(fire, on, clarinetParser) {
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number|Object} key the key. If we are in an array will be a number, otherwise a string. May
+    * @param {String|Number|Object} newDeepestKey the key. If we are in an array will be a number, otherwise a string. May
     *    take the special value ROOT_PATH if the root node has just been found
-    * @param {String|Number|Object|Array|Null|undefined} [maybeNode] usually this won't be known so can be undefined.
+    * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathFound(ascent, key, maybeNode) {
-      
-      var newDeepestMapping = mapping(key, maybeNode);
-      
+   function pathFound(ascent, newDeepestKey, maybeNewDeepestNode) {
+
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( ascent, newDeepestMapping );
+         appendBuiltContent( ascent, newDeepestKey, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons(newDeepestMapping, ascent);
+      var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
      
       fire(TYPE_PATH, ascentWithNewPath);
  
