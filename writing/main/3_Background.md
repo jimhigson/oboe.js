@@ -51,9 +51,6 @@ to 1 5th of what they were previously
 Give static page (fairly basic but functional), then load js in the
 background.
 
-However, with Node don't have to reengineer to move from client to
-server.
-
 Big/small message problem and granularity. With small: http overhead.
 With big: not all may be needed.
 
@@ -67,15 +64,14 @@ Scheme or Lisp but with Java or C inspired syntax.
 Where the delays are in a web application
 -----------------------------------------
 
-Even complex apps are not finding a bottleneck in javascript execution
-times.
-
--   DOM manipulation
--   rendering
--   most significant: waiting for stuff. Going from js taking 10ms per
-    frame to 1ms per frame will have zero difference because it is
-    already meeting the frame rate. Might help slower devices if
-    performance was marginal before
+Like most application types, web applications usually suffer greater delays
+waiting for io than because javascript execution times present a bottleneck.
+Because Javascript is used for user interfaces, frame-rates are important.
+Single threaded so js holds up rendering. Important to return control to the
+browser quickly. However, once execution of each js frame of execution is no 
+more than the monitor refresh rate, further optimisation brings zero benefit.
+Hence, writing extremely optimised Javascript, especially focusing on micro-optimisations
+that hurt code readability is a bit silly. 
 
 > The user does something, then the app responds visually with immediacy
 > at 30 frames per second or more, and completes a task in a few hundred
@@ -687,8 +683,6 @@ large, complex applications is often programmed in this way. These
 applications are not limited to running under traditional web browsers
 but also include mobile apps and desktop software.
 
-What 'this' (context) is in javascript. Why not calling it scope.
-
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
 into beautiful code. Ie, can write stateful and refactor in small steps
@@ -703,32 +697,6 @@ running it. In theory (decidability) and in practice (often find errors
 through running and finding errors thrown). Echo FPR: once compiling,
 good typing tends to give a reasonable sureness that the code is
 correct.
-
-Explain var/function difference, ie construct pluck and explain why var
-keyOf = partial(pluck) is declared with a var and not a function, why
-some prefer to do always via . operator can't be made into a function
-with (.) or similar and so has to be wrapped in a function is a less
-direct manner. Unfortunately, can make it difficult for a reader to know
-the types involved. For example, on seeing:
-`var matchesJsonPath = jsonPathCompiler( pattern )` there is no way
-(other than examining the source or doucmentation of the function being
-called) to know that this is a higher order function and will return
-another function to be assigned as matchesJsonPath.
-
-C-style brackets around all function arguments hampers a natural
-expression of functional style code. For example, this requires a lot of
-arguments and without checking of function airity, it is easy to
-misplace a comma or closing bracket.
-
-~~~~ {.javascript}
-function map(fn, list){
-   if( !list ) {
-      return emptyList;
-   } else {
-      return cons(fn(head(list)), map(fn,tail(list)));
-   }
-}
-~~~~
 
 What a Micro-library is. What motivates the trend? This library has a
 fairly small set of functionality, it isn't a general purpose
