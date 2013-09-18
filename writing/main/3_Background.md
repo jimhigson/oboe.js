@@ -282,8 +282,8 @@ If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
-Design patterns used when connecting to REST services
------------------------------------------------------
+Common patterns when connecting to REST services
+------------------------------------------------
 
 Marshaling provides two-way mapping between a domain model and a
 serialisation as JSON or XML, either completely automatically or based
