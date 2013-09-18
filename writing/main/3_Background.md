@@ -341,7 +341,7 @@ void handleResponse( RestResponse response ) {
 // remain in the form given by the JSON parser, containing no domain-specific
 // getters, the programming represents a different expression of the same 
 // basic process.
-function handleResponse( RestResponse response ){
+function handleResponse( response ){
 
    response.people.forEach( function( person ){
       addNameToDb( p.givenName, p.surname );
