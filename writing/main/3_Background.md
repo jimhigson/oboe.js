@@ -369,6 +369,8 @@ Contrast with the programming below which uses the clarinet JSON SAX
 parser. To prove that I'm not exaggerating the case, see published
 usages at [Clarinet demos].
 
+\pagebreak
+
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
 
