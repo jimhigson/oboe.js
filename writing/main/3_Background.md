@@ -387,6 +387,9 @@ which are intrinsically linked to the actual change in the logic being
 expressed by the program, and therefore to the thinking behind the change
 and the reason for the change.
 
+JsonPath and XPath 1
+--------------------
+
 In the domain of markup languages there are associated query languages
 such as XPATH whose coupling is loose enough that their
 expressions may continue to function after the exact shape of a message
@@ -600,8 +603,8 @@ generally event handlers will cover multiple unrelated concerns and each
 concern will span multiple event handlers. This lends to programming in
 which separate concerns are not separately expressed in the code.
 
-JsonPath and XPath
-------------------
+JsonPath and XPath 2
+--------------------
 
 The above difficulty in identifying the interesting parts of a message
 leads me to investigate where this problem has already been solved. For
