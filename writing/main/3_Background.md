@@ -648,6 +648,9 @@ construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
 
+Not a real spec. Implementation only allows for search-type usage:
+https://code.google.com/p/jsonpath/
+
 Javascript
 ----------
 
