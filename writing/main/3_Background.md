@@ -328,7 +328,6 @@ concern.
 // is added to a database. The methods used to drill down to the
 // pertinent components of the response are all getters: getPeople, 
 // getGivenName, and getSurname. 
-
 void handleResponse( RestResponse response ) {
 
    for( Person p : response.getPeople() ) {
@@ -342,7 +341,6 @@ void handleResponse( RestResponse response ) {
 // remain in the form given by the JSON parser, containing no domain-specific
 // getters, the programming represents a different expression of the same 
 // basic process.
-
 function handleResponse( RestResponse response ){
 
    response.people.forEach( function( person ){
