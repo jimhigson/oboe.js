@@ -336,6 +336,23 @@ void handleResponse( RestResponse response ) {
    }   
 }
 ~~~~
+~~~~ {.javascript}
+// Although in this Javascript example the objects passed to the handler 
+// remain in the form given by the JSON parser, containing no domain-specific
+// getters, the programming represents a different expression of the same 
+// basic process.
+
+function handleResponse( RestResponse response ){
+
+   response.people.forEach( function( person ){
+      addNameToDb( p.givenName, p.surname );
+   });
+}
+~~~~
+
+
+
+
 
 This part has become such a natural component of a workflow that it is
 barely noticed that it is happening. In an OO language, the extraction
