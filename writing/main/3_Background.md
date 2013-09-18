@@ -483,8 +483,8 @@ construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
 
-How domain models are marshal/de-marshalled into REST resources
----------------------------------------------------------------
+Programming patterns for connecting to REST services
+----------------------------------------------------
 
 Marshalling/ de-marshalling. Benefits and the problems that it causes.
 Allows one model to be written out to XML or JSON
@@ -677,7 +677,7 @@ function map(fn, list){
       return cons(fn(head(list)), map(fn,tail(list)));
    }
 }
-~~~~    
+~~~~
 
 What a Micro-library is. What motivates the trend? This library has a
 fairly small set of functionality, it isn't a general purpose
