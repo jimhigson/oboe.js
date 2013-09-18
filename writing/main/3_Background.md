@@ -64,21 +64,21 @@ Scheme or Lisp but with Java or C inspired syntax.
 Where the delays are in a web application
 -----------------------------------------
 
-Like most application types, web applications usually suffer greater delays
-waiting for io than because javascript execution times present a bottleneck.
-Because Javascript is used for user interfaces, frame-rates are important.
-Single threaded so js holds up rendering. Important to return control to the
-browser quickly. However, once execution of each js frame of execution is no 
-more than the monitor refresh rate, further optimisation brings zero benefit.
-Hence, writing extremely optimised Javascript, especially focusing on micro-optimisations
-that hurt code readability is a bit silly. 
+Like most application types, web applications usually suffer greater
+delays waiting for io than because javascript execution times present a
+bottleneck. Because Javascript is used for user interfaces, frame-rates
+are important. Single threaded so js holds up rendering. Important to
+return control to the browser quickly. However, once execution of each
+js frame of execution is no more than the monitor refresh rate, further
+optimisation brings zero benefit. Hence, writing extremely optimised
+Javascript, especially focusing on micro-optimisations that hurt code
+readability is a bit silly.
 
 > The user does something, then the app responds visually with immediacy
 > at 30 frames per second or more, and completes a task in a few hundred
 > milliseconds. As long as an app meets this user goal, it doesn’t
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
-
 
 Web browsers hosting REST clients
 ---------------------------------
@@ -376,12 +376,13 @@ focused area of the system. The coupling is all the more acute where the
 format of the item being inspected is defined by an independently
 maintained service.
 
-In the domain of markup languages, declarative selector co-languages such as XPATH exist
-whose coupling is loose enough that their expressions may continue to function after
-the exact shape of a message is refactored. While this is nothing more radical than using
-the selection languages as they were intended, their employment is not the
-most natural coming from a programming context in which the application developer's 
-responsibilities usually start where the demarshaler's end.
+In the domain of markup languages, declarative selector co-languages
+such as XPATH exist whose coupling is loose enough that their
+expressions may continue to function after the exact shape of a message
+is refactored. While this is nothing more radical than using the
+selection languages as they were intended, their employment is not the
+most natural coming from a programming context in which the application
+developer's responsibilities usually start where the demarshaler's end.
 Consider the following XML:
 
 ~~~~ {.xml}
