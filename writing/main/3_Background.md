@@ -81,9 +81,8 @@ times.
 > at 30 frames per second or more, and completes a task in a few hundred
 > milliseconds. As long as an app meets this user goal, it doesn’t
 > matter how big an abstraction layer it has to go through to get to
-> silicon.
+> silicon. [@fivemyths]
 
-http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&utm\_medium=feed&utm\_campaign=Feed%3A+extblog+%28Ext+JS+Blog%29\#date:16:00
 
 Web browsers hosting REST clients
 ---------------------------------

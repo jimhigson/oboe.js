@@ -219,6 +219,24 @@
          ]
       },
       "type":"webpage"
+   },
+
+   {
+      "id":"fivemyths",
+      "title":"5 Myths About Mobile Web Performance",
+      "author":[
+         {
+            "family":"Mullany",
+            "given":"Michael"
+         }
+      ],
+      "url":"http://www.sencha.com/blog/5-myths-about-mobile-web-performance",
+      "issued":{
+         "date-parts":[
+            [2013]
+         ]
+      },
+      "type":"webpage"
    }
 
 
