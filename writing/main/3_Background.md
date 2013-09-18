@@ -287,10 +287,10 @@ Common patterns when connecting to REST services
 
 Marshaling provides two-way mapping between a domain model and a
 serialisation as JSON or XML, either completely automatically or based
-on a declarative specification. After parsing a fetched rest response it
-is common to automatically marshall it so that the application may
-interrogate the response from inside its own model, treating it no
-differently than if the objects were assembled in any other way. From
+on a declarative specification. To handle a fetched rest response it
+is common to automatically demarshal it so that the application may
+make use of the response from inside its own model, no
+differently from objects assembled in any other way. From
 the perspective of the programmer it is as if the domain objects
 themselves had been fetched. Another common design pattern, intended to
 give a degree of isolation between concerns, is to demarshal
