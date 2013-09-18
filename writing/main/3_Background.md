@@ -306,15 +306,34 @@ parser's output *is* the DTO and create domain model objects based on
 it, or that no further instantiation is necessary.
 
 [!*Degrees of automatic marshaling*. From marshaling directly to domain
-objects, DTOs, using parser output as a DTO, or using objects
-directly](images/placeholder)
+objects, DTOs, using parser output as a DTO, or using objects directly.
+Distinguish work done by library vs application programmer's
+domain](images/placeholder)
 
-Regardless of the degree of marshaling that is used, the first step
-after receiving the resource is usually to programmatically extract one
-or more interesting parts from it. This is usually done via calls in the
-programming language itself, for example by de-marshaling the stream to
-domain objects and then calling a series of getters to narrow down to
-the interesting parts.
+Ultimately the degree of marshaling that is used changes only the level
+of abstraction of the resource that the REST client library hands over
+to the application developer. Regardless of the exact form of the
+response model, the developer will usually programmatically extract one
+or more parts from it via calls in the programming language itself. For
+example, on receiving a resource de-marshaled to domain objects, a Java
+developer will inspect it by calling a series of getters in order to
+narrow down to the interesting parts. This is not to say that the whole
+of the message might not in some way be interesting, only that by using
+it certain parts will need to be identified as distinct areas of
+concern.
+
+~~~~ {.java}
+// An example programmatic approach to a domain model interrogation 
+// under Java. Upon receiving a list of people, each person's name
+// is added to a database. 
+
+void handleResponse( RestResponse response ) {
+
+   for( Person p : response.getPeople() ) {
+      addNameToDb( p.getGivenName(), p.getSurname() );
+   }   
+}
+~~~~
 
 This part has become such a natural component of a workflow that it is
 barely noticed that it is happening. In an OO language, the extraction
@@ -326,13 +345,6 @@ However subtly incorporated it has become in the thinking of the
 programmer, we should note that this is a construct and only one
 possible way of thinking regarding identifying the areas of current
 interest in a wider model.
-
-~~~~ {.java}
-// an example programmatic approach to a domain model interrogation under Java
-
-List<Person> people = myModel.getPeople()
-String firstPersonsSurname = people.get(0).getSurname()
-~~~~
 
 One weakness of this imperative, programatic inspection model is that,
 once much code is written to interogate models in this way, the
