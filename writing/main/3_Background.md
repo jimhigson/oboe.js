@@ -287,24 +287,23 @@ Common patterns when connecting to REST services
 
 Marshaling provides two-way mapping between a domain model and a
 serialisation as JSON or XML, either completely automatically or based
-on a declarative specification. To handle a fetched rest response it
-is common to automatically demarshal it so that the application may
-make use of the response from inside its own model, no
-differently from objects assembled in any other way. From
-the perspective of the programmer it is as if the domain objects
-themselves had been fetched. Another common design pattern, intended to
-give a degree of isolation between concerns, is to demarshal
-automatically only so far as Data Transfer Objects (DTOs), instances of
-classes which implement no logic other than storage, and from there
-programmatically instantiate the domain model objects. Going one step
-further, for JSON resources sent to loosely-typed languages with a
-native representation of objects as generic key-value pairs such as
-Javascript or Clojure, the marshaling step is often skipped: the output
-from the parser so closely resembles the language's built-in types that
-it is simplest to use it directly. Depending on the programming style
-adopted we might say that the JSON parser's output *is* the DTO and
-create domain model objects based on it, or that no further
-instantiation is necessary.
+on a declarative specification. To handle a fetched rest response it is
+common to automatically demarshal it so that the application may make
+use of the response from inside its own model, no differently from
+objects assembled in any other way. From the perspective of the
+programmer it is as if the domain objects themselves had been fetched.
+Another common design pattern, intended to give a degree of isolation
+between concerns, is to demarshal automatically only so far as Data
+Transfer Objects (DTOs), instances of classes which implement no logic
+other than storage, and from there programmatically instantiate the
+domain model objects. Going one step further, for JSON resources sent to
+loosely-typed languages with a native representation of objects as
+generic key-value pairs such as Javascript or Clojure, the marshaling
+step is often skipped: the output from the parser so closely resembles
+the language's built-in types that it is simplest to use it directly.
+Depending on the programming style adopted we might say that the JSON
+parser's output *is* the DTO and create domain model objects based on
+it, or that no further instantiation is necessary.
 
 [!*Degrees of automatic marshaling*. From marshaling directly to domain
 objects, DTOs, using parser output as a DTO, or using objects
