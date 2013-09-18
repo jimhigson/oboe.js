@@ -669,13 +669,15 @@ expression of functional style code. For example, this requires a lot of
 arguments and without checking of function airity, it is easy to
 misplace a comma or closing bracket.
 
-    function map(fn, list){
-       if( !list ) {
-          return emptyList;
-       } else {
-          return cons(fn(head(list)), map(fn,tail(list)));
-       }
-    }
+~~~~ {.javascript}
+function map(fn, list){
+   if( !list ) {
+      return emptyList;
+   } else {
+      return cons(fn(head(list)), map(fn,tail(list)));
+   }
+}
+~~~~    
 
 What a Micro-library is. What motivates the trend? This library has a
 fairly small set of functionality, it isn't a general purpose
