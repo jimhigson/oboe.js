@@ -379,6 +379,14 @@ refactoring occurs. The coupling is all the more acute where the format
 of the item being inspected is defined by an independently maintained
 service.
 
+*contagion problem*
+
+Extraneous changes
+dilute the changelog, making it less easily defined by code changes
+which are intrinsically linked to the actual change in the logic being
+expressed by the program, and therefore to the thinking behind the change
+and the reason for the change.
+
 In the domain of markup languages, declarative selector co-languages
 such as XPATH exist whose coupling is loose enough that their
 expressions may continue to function after the exact shape of a message
@@ -652,28 +660,6 @@ One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
-
-Loose coupling and Updating versioning
---------------------------------------
-
-Because of the contagion problem, need to be able to create
-loosely-coupled systems.
-
-Inside systems also, even with automatic refactoring tools, only
-automate and therefoer lessen but do not remove the problem that
-coupling causes changes in one place of a codebase to cause knock-on
-changes in remote other parts of the code.
-
-I propose that in a changing system, readability of code's changelog is
-as important as readability of the code itself. Extraneous changes
-dilute the changelog, making it less easily defined by code changes
-which are intrinsically linked to the actual change in the logic being
-expressed by the program.
-
-It is often stated that understandability is the number once most
-important concern in a codebase (CITE) - if the code is suitably dynamic
-it is important that changes are axiomic and clarity of the changelog is
-equally important.
 
 Javascript
 ----------
