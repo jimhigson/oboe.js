@@ -387,11 +387,11 @@ which are intrinsically linked to the actual change in the logic being
 expressed by the program, and therefore to the thinking behind the change
 and the reason for the change.
 
-In the domain of markup languages, declarative selector co-languages
-such as XPATH exist whose coupling is loose enough that their
+In the domain of markup languages there are associated query languages
+such as XPATH whose coupling is loose enough that their
 expressions may continue to function after the exact shape of a message
-is refactored. While this is nothing more radical than using the
-selection languages as they were intended, their employment is not the
+is refactored. While observing this is nothing more radical than using the
+query languages in more-or-less they were intended, their employment is not the
 most natural coming from a programming context in which the application
 developer's responsibilities usually start where the demarshaler's end.
 Consider the following XML:
@@ -399,7 +399,8 @@ Consider the following XML:
 ~~~~ {.xml}
 <people>
    <person>
-      <surname>Bond</surname>
+      <givenName>...</givenName>   
+      <familyName>Bond</familyName>
    </person>
 </people>
 ~~~~
@@ -412,14 +413,12 @@ analogue of the above Java Name refactor:
 <people>
    <person>
       <name>
-         <surname>Bond</surname>
+         <givenName>...</givenName>
+         <familyName>Bond</familyName>
       </name>
    </person>
 </people>
 ~~~~
-
-A few models exist which do not follow this pattern such as XPATH.
-However, these are useful in only a small domain.
 
 Xpath is able to express identifiers which often survive refactoring
 because XML represents a tree, hence we can consider relationships
@@ -448,17 +447,6 @@ were representing a model of partial knowledge:
    </person>
 </people>
 ~~~~
-
-CSS. Meant for presentation of HTML, but where HTML markup is semantic
-it is a selector of the *meaning of elements* for the sake of applying a
-meaningful presentation more so than a selector of arbitrary colours and
-positions on a screen.
-
-Unlike XML, in the model created by most general programming languages,
-there is no requirement for the data to be tree shaped. Graph is ok.
-This make this slighlty harder but nontheless attempts have been made.
-
-Linq. (CITEME)
 
 Json and XML
 ------------
@@ -651,10 +639,9 @@ examine a whole document for the list of nodes that match a jsonpath
 expression the whole of the tree is required. But to evaluate if a
 single node matches an expression, only the *path of the descent from
 the root to that node* is required -- the same state as a programmer
-usually maintains whilst employing a SAX parser.
-
-Investigate: is this true? Does JSONPath have a following/preceding
-grammar? If so, only a subset and rearrange.
+usually maintains whilst employing a SAX parser. This is possible because 
+JSONPath does not have a way to express the relationship with sibling
+nodes, only ancestors and decedents.
 
 One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
