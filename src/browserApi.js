@@ -13,17 +13,13 @@
       return function(firstArg){
        
          function start (url, body, callback, headers){
-            var 
-               eventBus = pubSub(),
-               fire = eventBus.fire,
-               on = eventBus.on;
-
-            // let's kick off ajax and building up the content. 
-            // both of these plug into the event bus to receive and send events.
-            
-            streamingXhr(fire, on, httpMethodName, url, body, headers );                              
+            var eventBus = pubSub();
+                        
+            streamingXhr( eventBus.fire, eventBus.on, 
+                          httpMethodName, url, body, headers );                              
                       
-            return instanceController(fire, on, clarinet.parser(), incrementalContentBuilder(fire), callback);
+            return instanceController( eventBus.fire, eventBus.on, 
+                                       clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
          }
           
          if (isString(firstArg)) {
