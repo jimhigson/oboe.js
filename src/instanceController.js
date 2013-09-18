@@ -3,13 +3,8 @@
  */
 function instanceController(fire, on, clarinetParser, contentBuilderHandlers, doneCallback) {
   
-   var rootNode,
-       oboeApi;
+   var oboeApi, rootNode;
       
-   function rootNodeFunctor() {
-      return rootNode;
-   }
-         
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });                         
@@ -31,8 +26,10 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    
    on(HTTP_DONE_EVENT,
       function() {
-         // callback for when the response is complete                                 
+                                         
          clarinetParser.close();
+         
+         doneCallback && doneCallback(rootNode);         
       }
    );
    
@@ -45,10 +42,6 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    });   
 
    clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
-   
-   if( doneCallback ) {
-      on(HTTP_DONE_EVENT, compose(doneCallback, rootNodeFunctor));
-   }   
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
@@ -138,10 +131,12 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    }         
 
    return oboeApi = { 
-      onError     : partialComplete(on, ERROR_EVENT),
-      onPath      : partialComplete(addListenerApi, TYPE_PATH), 
-      onNode      : partialComplete(addListenerApi, TYPE_NODE),
-      abort       : partialComplete(fire, ABORTING),
-      root        : rootNodeFunctor
+      onError     :  partialComplete(on, ERROR_EVENT),
+      onPath      :  partialComplete(addListenerApi, TYPE_PATH), 
+      onNode      :  partialComplete(addListenerApi, TYPE_NODE),
+      abort       :  partialComplete(fire, ABORTING),
+      root        :  function rootNodeFunctor() {
+                        return rootNode;
+                     }
    };
 }
