@@ -395,7 +395,7 @@ Given the following XML:
 </people>
 ~~~~
 
-The XPath //person[0]//surname//text() (JIM/ME - CHECK THIS!) would
+The XPath //person[0]//surname//text() would
 continue to identify the correct part of the resource without being
 updated after the xml analogue of the above Java Name refactor:
 
@@ -514,7 +514,7 @@ scarce.
 DOM isn't just a parser, it is also a cross-language defined interface
 for manipulating the XML in real time, for example to change the
 contents of a web page in order to provide some interactivity. In JSON
-world, DOM-style parser not refering to the DOM spec, or what browser
+world, DOM-style parser not referring to the DOM spec, or what browser
 makers would mean. Rather, borrowing from the XML world to mean a parser
 which requires the whole file to be loaded.
 
