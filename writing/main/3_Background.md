@@ -372,9 +372,12 @@ regularly, this would be a problem when programming against any kind of
 resource; for example, if change of objects formats propagates knock-on
 changes where ever the object is used it is very difficult to commit
 small diffs to the VCS which make incremental changes to a tightly
-focused area of the system. The coupling is all the more acute where the
-format of the item being inspected is defined by an independently
-maintained service.
+focused area of the system. A method of programming which truly embraced
+extreme programming would allow constant change without disparate,
+barely related parts having to be modified in parallel when structural
+refactoring occurs. The coupling is all the more acute where the format
+of the item being inspected is defined by an independently maintained
+service.
 
 In the domain of markup languages, declarative selector co-languages
 such as XPATH exist whose coupling is loose enough that their
@@ -659,10 +662,7 @@ loosely-coupled systems.
 Inside systems also, even with automatic refactoring tools, only
 automate and therefoer lessen but do not remove the problem that
 coupling causes changes in one place of a codebase to cause knock-on
-changes in remote other parts of the code. A method of programming which
-was truly compatible with extreme programming would involve designing
-for constant change without disparate parts having to be modified as
-structural refactoring occurs.
+changes in remote other parts of the code.
 
 I propose that in a changing system, readability of code's changelog is
 as important as readability of the code itself. Extraneous changes
