@@ -1,146 +1,227 @@
 [
-   {  "id": "whorf56",
-      "title":"Language, Thought and Reality (ed. J. B. Carroll)",
-      "author": [
-          {
-            "family": "Whorf",
-            "given": "B. L."         
-          }
-      ],
-      "publisher": "Cambridge, MA: MIT Press",
-      "issued": { "date-parts":[ [1956] ] },
-      "foundVia":"http://www.aber.ac.uk/media/Documents/short/whorf.html"
-   }, 
-   
-   {  "id": "sapir58",
-      "title":"Culture, Language and Personality (ed. D. G. Mandelbaum)",
-      "author": [
-          {
-            "family": "Sapir",
-            "given": "E."         
-          }
-      ],
-      "publisher": "Berkeley, CA: University of California Press",
-      "issued": { "date-parts":[ [1958] ] }
-   },
-   
-   {  "id": "encycCompSci",
-      "title":"Encyclopedia of Computer Science",
-      "author": [
-          {
-            "family": "Ralston",
-            "given": "Anthony"         
-          }
-      ],
-      "publisher": "Nature Pub. Group.",
-      "issued": { "date-parts":[ [2000] ] }
-   },
-   
-   {  "id": "rest",
-      "title":"Principled design of the modern Web architecture",
-      "author": [
-          {
-            "family": "Fielding",
-            "given": "R. T."         
-          }
-      ],
-      "issued": { "date-parts":[ [2000] ] }
-   },
-   
    {
-      "id": "infinitescroll",
-      "title":"Design Patterns: Infinite Scrolling: Let’s Get To The Bottom Of This http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/",
-      "author": [
-          {
-            "family": "Ahuvia",
-            "given": "Yogev"         
-          }
+      "id":"whorf56",
+      "title":"Language, Thought and Reality (ed. J. B. Carroll)",
+      "author":[
+         {
+            "family":"Whorf",
+            "given":"B. L."
+         }
       ],
-      "publisher": "Smashing Magazine",
-      "issued": { "date-parts":[ [2013] ] },
+      "publisher":"Cambridge, MA: MIT Press",
+      "issued":{
+         "date-parts":[
+            [1956]
+         ]
+      },
+      "foundVia":"http://www.aber.ac.uk/media/Documents/short/whorf.html"
+   },
+
+   {
+      "id":"sapir58",
+      "title":"Culture, Language and Personality (ed. D. G. Mandelbaum)",
+      "author":[
+         {
+            "family":"Sapir",
+            "given":"E."
+         }
+      ],
+      "publisher":"Berkeley, CA: University of California Press",
+      "issued":{
+         "date-parts":[
+            [1958]
+         ]
+      }
+   },
+
+   {
+      "id":"encycCompSci",
+      "title":"Encyclopedia of Computer Science",
+      "author":[
+         {
+            "family":"Ralston",
+            "given":"Anthony"
+         }
+      ],
+      "publisher":"Nature Pub. Group.",
+      "issued":{
+         "date-parts":[
+            [2000]
+         ]
+      }
+   },
+
+   {
+      "id":"rest",
+      "title":"Principled design of the modern Web architecture",
+      "author":[
+         {
+            "family":"Fielding",
+            "given":"R. T."
+         }
+      ],
+      "issued":{
+         "date-parts":[
+            [2000]
+         ]
+      }
+   },
+
+   {
+      "id":"infinitescroll",
+      "title":"Design Patterns: Infinite Scrolling: Let’s Get To The Bottom Of This http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/",
+      "author":[
+         {
+            "family":"Ahuvia",
+            "given":"Yogev"
+         }
+      ],
+      "publisher":"Smashing Magazine",
+      "issued":{
+         "date-parts":[
+            [2013]
+         ]
+      },
       "type":"webpage"
    },
-   
+
    {
       "id":"BBC3g",
       "title":"3G mobile data network crowd-sourcing survey",
-      "publisher": "BBC News",
-      "issued": { "date-parts":[ [2011] ] },
-      "type":"webpage"      
+      "publisher":"BBC News",
+      "issued":{
+         "date-parts":[
+            [2011]
+         ]
+      },
+      "type":"webpage"
    },
-   
+
    {
       "id":"lean",
       "title":"The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.",
-      "author": [
-          { "family": "Reis", "given": "Eric" }
-      ],      
-      "publisher": "Crown Business Publishing",
-      "issued": { "date-parts":[ [2011] ] },
-      "type":"book"      
+      "author":[
+         {
+            "family":"Reis",
+            "given":"Eric"
+         }
+      ],
+      "publisher":"Crown Business Publishing",
+      "issued":{
+         "date-parts":[
+            [2011]
+         ]
+      },
+      "type":"book"
    },
-   
+
    {
-      "id":"perceptionFaxSpeed",   
+      "id":"perceptionFaxSpeed",
       "title":"To influence Time Perception",
       "author":[
-         { "family":"Geelhoed",     "given":"Erik"       }, 
-         { "family":"Toft",         "given":"Peter"      }, 
-         { "family":"Roberts",      "given":"Suzanne"    }, 
-         { "family":"Hyland",       "given":"Patrick"    } 
+         {
+            "family":"Geelhoed",
+            "given":"Erik"
+         },
+         {
+            "family":"Toft",
+            "given":"Peter"
+         },
+         {
+            "family":"Roberts",
+            "given":"Suzanne"
+         },
+         {
+            "family":"Hyland",
+            "given":"Patrick"
+         }
       ],
-      "publisher": "Hewlett Packard Labs",
-      "issued": { "date-parts":[ [1995] ] },      
+      "publisher":"Hewlett Packard Labs",
+      "issued":{
+         "date-parts":[
+            [1995]
+         ]
+      },
       "url":"http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm"
    },
-   
+
    {
       "id":"perceptionHttpChunkedSpeed",
       "title":"Progressive rendering via multiple flushes",
-      "author":[         
-         { "family": "Stefanov", "given":"Stoyan"}
+      "author":[
+         {
+            "family":"Stefanov",
+            "given":"Stoyan"
+         }
       ],
       "url":"http://www.phpied.com/progressive-rendering-via-multiple-flushes/",
-      "issued": { "date-parts":[ [2009] ] },
-      "type":"webpage"                  
+      "issued":{
+         "date-parts":[
+            [2009]
+         ]
+      },
+      "type":"webpage"
    },
-     
+
    {
       "id":"xhrWorkingDraft",
       "title":"The XMLHttpRequest Object",
       "author":[
-         { "family": "van Kesteren", "given":"Anne"},
-         { "family": "Jackson", "given":"Dean"}
+         {
+            "family":"van Kesteren",
+            "given":"Anne"
+         },
+         {
+            "family":"Jackson",
+            "given":"Dean"
+         }
       ],
       "url":"http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/",
-      "issued": { "date-parts":[ [2006] ] },      
+      "issued":{
+         "date-parts":[
+            [2006]
+         ]
+      },
       "type":"webpage"
    },
-   
+
    {
       "id":"xhr2progress",
       "title":"XMLHttpRequest Level 2 Working Draft",
-      "author":[         
-         { "family": "van Kesteren", "given":"Anne"}
+      "author":[
+         {
+            "family":"van Kesteren",
+            "given":"Anne"
+         }
       ],
       "url":"http://www.w3.org/TR/XMLHttpRequest2/#make-progress-notifications",
-      "issued": { "date-parts":[ [2012] ] },
-      "type":"webpage"                  
+      "issued":{
+         "date-parts":[
+            [2012]
+         ]
+      },
+      "type":"webpage"
    },
-   
+
    {
       "id":"jsonorg",
       "title":"JSON: The fat-free alternative to XML",
-      "author":[         
-         { "family": "Douglas", "given":"Crockford"}
+      "author":[
+         {
+            "family":"Douglas",
+            "given":"Crockford"
+         }
       ],
       "url":"http://json.org",
-      "issued": { "date-parts":[ [2009] ] },
-      "type":"webpage"                  
-   }   
-   
+      "issued":{
+         "date-parts":[
+            [2009]
+         ]
+      },
+      "type":"webpage"
+   }
 
-      
+
 ]
 
 
