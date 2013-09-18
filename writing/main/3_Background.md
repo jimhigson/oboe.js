@@ -324,8 +324,10 @@ concern.
 
 ~~~~ {.java}
 // An example programmatic approach to a domain model interrogation 
-// under Java. Upon receiving a list of people, each person's name
-// is added to a database. 
+// under Java; upon receiving a list of people, each person's name
+// is added to a database. The methods used to drill down to the
+// pertinent components of the response are all getters: getPeople, 
+// getGivenName, and getSurname. 
 
 void handleResponse( RestResponse response ) {
 
