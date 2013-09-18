@@ -540,8 +540,13 @@ which are intrinsically linked to the actual change in the logic being
 expressed by the program, and therefore to the thinking behind the change
 and the reason for the change.
 
-JsonPath and XPath 1
---------------------
+JsonPath and XPath
+------------------
+
+Both the above difficulty in identifying the interesting parts of a message
+whilst using a streaming parser and the problem with tight coupling of programmatic
+drilling down to REST formats leads me to search for areas where this problem has 
+already been solved.
 
 In the domain of markup languages there are associated query languages
 such as XPATH whose coupling is loose enough that their
@@ -576,6 +581,35 @@ analogue of the above Java Name refactor:
 </people>
 ~~~~
 
+Luckily in JSON there exists
+already an attempt at an equivalent named Jsonpath. JsonPath closely
+resembles the javascript code which would select the same nodes.
+Not a real spec.
+
+~~~~ {.javascript}
+
+// an in-memory person with a multi-line address:
+let person = {
+   name: {givenName:'', familyName:''},
+   address: [
+      "line1",
+      "line2",
+      "line3"
+   ]
+}
+
+
+// in javascript we can get line two of the address as such:
+let address = person.address[2]
+
+// the equivalent jsonpath expression is identical:
+let jsonPath = "person.address[2]"
+
+// although jsonpath also allows ancestor relationships which are not
+// expressible quite so neatly as basic Javascript:
+let jsonPath2 = "person..given"
+~~~~
+
 Xpath is able to express identifiers which often survive refactoring
 because XML represents a tree, hence we can consider relationships
 between entities to be that of contains/contained in (also siblings?).
@@ -604,41 +638,9 @@ were representing a model of partial knowledge:
 </people>
 ~~~~
 
-JsonPath and XPath 2
---------------------
-
-The above difficulty in identifying the interesting parts of a message
-leads me to investigate where this problem has already been solved. For
-XML, the XPath language allows the programmer to declaratively specify
-the nodes that they are interested in. Luckily in JSON there exists
-already an attempt at an equivalent named Jsonpath. JsonPath closely
-resembles the javascript code which would select the same nodes.
-
-~~~~ {.javascript}
-
-// an in-memory person with a multi-line address:
-let person = {
-   name: {givenName:'', familyName:''},
-   address: [
-      "line1",
-      "line2",
-      "line3"
-   ]
-}
-
-// in javascript we can get line two of the address as such:
-let address = person.address[2]
-
-// the equivalent jsonpath expression is identical:
-let jsonPath = "person.address[2]"
-
-// although jsonpath also allows ancestor relationships which are not
-// expressible quite so neatly as basic Javascript:
-let jsonPath2 = "person..given"
-~~~~
-
 The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. To
+the whole serialisation has been parsed into a DOM-style model. JSONPath 
+implementation only allows for search-type usage: https://code.google.com/p/jsonpath/To
 examine a whole document for the list of nodes that match a jsonpath
 expression the whole of the tree is required. But to evaluate if a
 single node matches an expression, only the *path of the descent from
@@ -651,9 +653,6 @@ One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
-
-Not a real spec. Implementation only allows for search-type usage:
-https://code.google.com/p/jsonpath/
 
 Javascript
 ----------
