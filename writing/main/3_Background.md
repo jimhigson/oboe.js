@@ -336,6 +336,7 @@ void handleResponse( RestResponse response ) {
    }   
 }
 ~~~~
+
 ~~~~ {.javascript}
 // Although in this Javascript example the objects passed to the handler 
 // remain in the form given by the JSON parser, containing no domain-specific
@@ -350,22 +351,18 @@ function handleResponse( RestResponse response ){
 }
 ~~~~
 
+Because it is applied directly to the metamodel of the language[\^ It
+could be argued that getters aren't a part of the metamodel of Java
+itself, but they form such a common pattern that it is a part ], this
+extraction has become such a natural component of a workflow that it
+maye be used while thinking of it as wholly unremarkable. In the
+examples above we are interacting with the model in the way that the
+language makes the most easy to conceptualise. However se should
+consider that, however subtly embedded, the technique is an invented
+construct and only one of the possible formulations which might have
+been drawn.
 
-
-
-
-This part has become such a natural component of a workflow that it is
-barely noticed that it is happening. In an OO language, the extraction
-of small parts of a model which, in the scope of the current concern are
-of interest is so universal that it could be considered the sole reason
-that getters exist.
-
-However subtly incorporated it has become in the thinking of the
-programmer, we should note that this is a construct and only one
-possible way of thinking regarding identifying the areas of current
-interest in a wider model.
-
-One weakness of this imperative, programatic inspection model is that,
+One weakness of this inspection model is that,
 once much code is written to interogate models in this way, the
 interface of the model becomes increasingly expensive to change as the
 code making the inspections becomes more tightly coupled with the thing
@@ -374,13 +371,17 @@ refactored such that the concepts of firstName and surName were pulled
 from the Person class into an extracted Name class, because the
 inspection relies on a sequence of calls made directly into domain
 objects, the code making the query would also have to change.
-
-I believe that this coupling defies Agile methods of programming. Many
-Java IDEs provide tools that would offer to automate the above
-extraction into a Name class, creating the new class and altering the
-existing calls. While reducing the pain, if we accept the concept as I
-stated in the [Introduction] that the code should not be seen as a
-static thing in which understanding is
+Whilst following the object oriented principle of encapsulation of data, such that the caller
+does not have to concern themselves with the data structures hidden
+behind the getter, there is no such abstraction for when the structure
+itself changes. Given an Agile environment where the shape of data is refactored
+regularly, this would be a problem when programming against any
+kind of resource; for example, if change of objects formats propagates 
+knock-on changes where ever the object is used it is very difficult to
+commit small diffs to the VCS which make incremental changes to a tightly
+focused area of the system. The coupling is all the more acute where the 
+format of the item being inspected is defined by an independently maintained 
+service.   
 
 More declarative syntaxes exist which are flexible enough that the
 declarative expressions may still apply as the underlying model is
