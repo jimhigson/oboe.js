@@ -362,26 +362,26 @@ consider that, however subtly embedded, the technique is an invented
 construct and only one of the possible formulations which might have
 been drawn.
 
-One weakness of this inspection model is that,
-once much code is written to interogate models in this way, the
-interface of the model becomes increasingly expensive to change as the
-code making the inspections becomes more tightly coupled with the thing
-that it is inspecting. Taking the above example, if the model were later
-refactored such that the concepts of firstName and surName were pulled
-from the Person class into an extracted Name class, because the
-inspection relies on a sequence of calls made directly into domain
-objects, the code making the query would also have to change.
-Whilst following the object oriented principle of encapsulation of data, such that the caller
-does not have to concern themselves with the data structures hidden
-behind the getter, there is no such abstraction for when the structure
-itself changes. Given an Agile environment where the shape of data is refactored
-regularly, this would be a problem when programming against any
-kind of resource; for example, if change of objects formats propagates 
-knock-on changes where ever the object is used it is very difficult to
-commit small diffs to the VCS which make incremental changes to a tightly
-focused area of the system. The coupling is all the more acute where the 
-format of the item being inspected is defined by an independently maintained 
-service.   
+One weakness of this inspection model is that, once much code is written
+to interogate models in this way, the interface of the model becomes
+increasingly expensive to change as the code making the inspections
+becomes more tightly coupled with the thing that it is inspecting.
+Taking the above example, if the model were later refactored such that
+the concepts of firstName and surName were pulled from the Person class
+into an extracted Name class, because the inspection relies on a
+sequence of calls made directly into domain objects, the code making the
+query would also have to change. Whilst following the object oriented
+principle of encapsulation of data, such that the caller does not have
+to concern themselves with the data structures hidden behind the getter,
+there is no such abstraction for when the structure itself changes.
+Given an Agile environment where the shape of data is refactored
+regularly, this would be a problem when programming against any kind of
+resource; for example, if change of objects formats propagates knock-on
+changes where ever the object is used it is very difficult to commit
+small diffs to the VCS which make incremental changes to a tightly
+focused area of the system. The coupling is all the more acute where the
+format of the item being inspected is defined by an independently
+maintained service.
 
 More declarative syntaxes exist which are flexible enough that the
 declarative expressions may still apply as the underlying model is
