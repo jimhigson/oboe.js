@@ -363,7 +363,7 @@ construct and only one of the possible formulations which might have
 been drawn.
 
 One weakness of this inspection model is that, once much code is written
-to interogate models in this way, the interface of the model becomes
+to interrogate models in this way, the interface of the model becomes
 increasingly expensive to change as the code making the inspections
 becomes more tightly coupled with the thing that it is inspecting.
 Taking the above example, if the model were later refactored such that
@@ -453,8 +453,8 @@ This make this slighlty harder but nontheless attempts have been made.
 
 Linq. (CITEME)
 
-Json and XML (remove this heading later)
-----------------------------------------
+Json and XML
+------------
 
 Although AJAX started as a means to transfer XML, today JSON "The
 fat-free alternative to XML[@jsonorg]" is the more popular serialisation
