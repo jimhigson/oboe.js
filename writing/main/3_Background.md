@@ -32,8 +32,8 @@ State of the web
 
 Ie, front-end client-side, front-end server-side.
 
-[!A webapp running with a front end generated partially on server and
-partially on client side](images/placeholder)
+![A webapp running with a front end generated partially on server and
+partially on client side](images/placeholder.png)
 
 Separated from services by http calls regardless.
 
@@ -305,10 +305,10 @@ Depending on the programming style adopted we might say that the JSON
 parser's output *is* the DTO and create domain model objects based on
 it, or that no further instantiation is necessary.
 
-[!*Degrees of automatic marshaling*. From marshaling directly to domain
+![*Degrees of automatic marshaling*. From marshaling directly to domain
 objects, DTOs, using parser output as a DTO, or using objects directly.
 Distinguish work done by library vs application programmer's
-domain](images/placeholder)
+domain](images/placeholder.png)
 
 Ultimately the degree of marshaling that is used changes only the level
 of abstraction of the resource that the REST client library hands over
