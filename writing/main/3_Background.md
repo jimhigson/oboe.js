@@ -282,14 +282,29 @@ If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
-Programming patterns for connecting to REST services
+Design patterns used when connecting to REST services
 ----------------------------------------------------
 
-Marshalling/ de-marshalling. Benefits and the problems that it causes.
-Allows one model to be written out to XML or JSON
+Marshaling provides two-way mapping between a domain model and a serialisation as JSON or XML, either
+completely automatically or based on a declarative specification.
+After parsing a fetched rest response it is common to automatically marshall it so that
+the application may interrogate the response from inside its own model, treating it no differently
+than if the objects were assembled in any other way. From the perspective of the programmer it is as if the
+domain objects themselves had been fetched. Another common design pattern, intended to give a degree of isolation
+between concerns,
+is to demarshal automatically only so far as Data Transfer Objects (DTOs), instances of classes which implement
+no logic other than storage, and from there programmatically instantiate the domain model objects. Going one step
+further, for JSON resources sent to loosely-typed languages with a native representation of objects as generic 
+key-value pairs such as Javascript or Clojure, the marshaling step is 
+often skipped: the output from the parser so closely resembles the language's built-in types that it is simplest
+to use it directly. Depending on the programming style adopted we might say that the JSON parser's output *is* 
+the DTO and create domain model objects based on it, or that no further instantiation is necessary. 
 
-First stage after getting a resource is usually to programmatically
-extract the interesting part from it. This is usually done via calls in
+[!*Degrees of automatic marshaling*. From marshaling directly to domain objects, DTOs, using parser output
+as a DTO, or using objects directly](images/placeholder)  
+
+Regardless of the degree of marshaling that is used, the first step after receiving the resource is usually to programmatically
+extract one or more interesting parts from it. This is usually done via calls in
 the programming language itself, for example by de-marshaling the stream
 to domain objects and then calling a series of getters to narrow down to
 the interesting parts.
