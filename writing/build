@@ -1,18 +1,18 @@
 #!/bin/sh
 
-pandoc proposal.md -o proposal.html
+pandoc proposal.md -o dist/proposal.html
 
 echo made proposal html
 
-pandoc proposal.md -o proposal.pdf
+pandoc proposal.md -o dist/proposal.pdf
 
 echo made proposal pdf
 
-./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json | tidy -i > main.html
+./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json | tidy -i > dist/main.html
 
 echo made main html
 
-./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate -o main.pdf
+./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate -o dist/main.pdf
 
 echo made main pdf
 
