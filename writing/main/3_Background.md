@@ -800,14 +800,5 @@ JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
 
-Methodology
------------
-
-The program design will be initially an exercise in creating the easiest
-expression that can possibly work and via constant work towards the
-emergence of elegance.
-
-Why this method? See W'yg.
-
 [^1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
