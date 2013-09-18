@@ -277,6 +277,159 @@ If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
 
+
+Json and XML
+------------
+
+Although AJAX started as a means to transfer XML, today JSON "The
+fat-free alternative to XML[@jsonorg]" is the more popular serialisation
+format. The goals of XML were to simplify SGML to the point that a
+graduate student would be able to implement a parser in a week [@javaxml
+p ???]. For the student tackling JSON a few hours with a parser
+generator should surfice, being expressable in 15 CFGs. Indeed, because
+JSON is a strict subset of Javascript, in many cases the Javascript
+programmer requires no parser at all. Unimpeeded by SGML's roots as a
+document format, JSON provides a much more direct analogue to the
+metamodel of a canonical modern programming language with entities such
+as *string*, *number*, *object* and *array*. By closely mirroring a
+programmer's metamodel, visualising a mapping between a domain model and
+it's serialised objects becomes trivial.
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+~~~~
+
+This close resemblance to the model of the programming in some cases
+causes fast-changing formats.
+
+Like XML attributes, as a serialised text format, JSON objects have an
+order but are almost always parsed to and from orderless maps meaning
+that the order of the keys/value pairings as seen in the stream usually
+follows no defined order. No rule in the format would forbid
+representing of an ordered map in an ordered way but most tools on
+receiving such a message would ignore the ordering.
+
+(MINE SOA assignment). Also the diagram.
+
+Parsing: SAX and Dom
+--------------------
+
+In the XML world two standard parser models exist, SAX and DOM, with DOM
+far the more popular. DOM performs a parse as a single evaluation, on
+the request of the programmer, returning an object model representing
+the whole of the document. At this level of abstraction the details of
+the markup are only distant concern. Conversely, SAX parsers are
+probably better considered as tokenisers, providing a very low-level
+event driven interface in line with the Observer pattern to notify the
+programmer of syntax as it is seen. Each element's opening and closing
+tag is noted
+
+This presents poor developer ergonomics by requiring that the programmer
+implement the recording of state with regard to the nodes that they have
+seen. For programmers using SAX, a conversion to their domain objects is
+usually implemented imperatively. This programming tends to be difficult
+to read and programmed once per usage rather than assembled as the
+combination of reusable parts. For this reason SAX is usually reserved
+for fringe cases where messages are very large or memory unusually
+scarce.
+
+DOM isn't just a parser, it is also a cross-language defined interface
+for manipulating the XML in real time, for example to change the
+contents of a web page in order to provide some interactivity. In JSON
+world, DOM-style parser not referring to the DOM spec, or what browser
+makers would mean. Rather, borrowing from the XML world to mean a parser
+which requires the whole file to be loaded.
+
+Suppose we want to extract the name of the first person. Given a DOM
+parser this is very easy:
+
+~~~~ {.javascript}
+function nameOfFirstPerson( myJsonString ) {
+
+   // Extracting an interesting part from JSON-serialised data is
+   // relatively easy given a DOM-style parser. Unfortunately this
+   // forbids any kind of progressive consideration of the data.
+   // All recent browsers provide a JSON parser as standard. 
+
+   var document = JSON.parse( myJsonString );
+   return document.people[0].name; // that was easy!
+}
+~~~~
+
+Contrast with the programming below which uses the clarinet JSON SAX
+parser. To prove that I'm not exaggerating the case, see published
+usages at [Clarinet demos].
+
+\pagebreak
+
+~~~~ {.javascript}
+function nameOfFirstPerson( myJsonString, callbackFunction ){
+
+   // The equivalent logic, expressed in the most natural way
+   // fora s JSON SAX parser is longer and much more 
+   // difficult to read. The developer pays a high price for 
+   // progressive parsing. 
+
+   var clarinet = clarinet.parser(),
+   
+       // with a SAX parser it is the developer's responsibility 
+       // to track where in the document the cursor currently is,
+       // requiring several variables to maintain.        
+       inPeopleArray = false,   
+       inPersonObject = false,
+       inNameAttribute = false,
+       found = false;
+   
+   clarinet.onopenarray = function(){
+      // for brevity we'll cheat by assuming there is only one
+      // array in the document. In practice this would be overly
+      // brittle.
+      
+      inPeopleArray = true; 
+   };
+   
+   clarinet.onclosearray = function(){
+      inPeopleArray = false;
+   };   
+   
+   clarinet.onopenobject = function(){
+      inPersonObject = inPeopleArray; 
+   };
+   
+   clarinet.oncloseobject = function(){
+      inPersonObject = false;
+   };   
+      
+   clarinet.onkey = function(key){
+      inNameAttribute = ( inPeopleObject && key == 'name');
+   };
+
+   clarinet.onvalue = function(value){
+      if( !found && inNameAttribute ) {
+         // finally!
+         callbackFunction( value );
+         found = true;
+      }
+   };      
+   
+   clarinet.write(myJsonString);   
+}
+~~~~
+
+As we can see above, SAX's low-level semantics require a lengthy
+expression and for the programmer to maintain state regarding the
+position in the document -- usually recording the ancestors seen on the
+descent from the root to the current node -- in order to identify the
+interesting parts. This order of the code is also quite unintuitive;
+generally event handlers will cover multiple unrelated concerns and each
+concern will span multiple event handlers. This lends to programming in
+which separate concerns are not separately expressed in the code.
+
 Common patterns when connecting to REST services
 ------------------------------------------------
 
@@ -450,158 +603,6 @@ were representing a model of partial knowledge:
    </person>
 </people>
 ~~~~
-
-Json and XML
-------------
-
-Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the more popular serialisation
-format. The goals of XML were to simplify SGML to the point that a
-graduate student would be able to implement a parser in a week [@javaxml
-p ???]. For the student tackling JSON a few hours with a parser
-generator should surfice, being expressable in 15 CFGs. Indeed, because
-JSON is a strict subset of Javascript, in many cases the Javascript
-programmer requires no parser at all. Unimpeeded by SGML's roots as a
-document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language with entities such
-as *string*, *number*, *object* and *array*. By closely mirroring a
-programmer's metamodel, visualising a mapping between a domain model and
-it's serialised objects becomes trivial.
-
-~~~~ {.javascript}
-{
-   people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-   ]
-}
-~~~~
-
-This close resemblance to the model of the programming in some cases
-causes fast-changing formats.
-
-Like XML attributes, as a serialised text format, JSON objects have an
-order but are almost always parsed to and from orderless maps meaning
-that the order of the keys/value pairings as seen in the stream usually
-follows no defined order. No rule in the format would forbid
-representing of an ordered map in an ordered way but most tools on
-receiving such a message would ignore the ordering.
-
-(MINE SOA assignment). Also the diagram.
-
-Parsing: SAX and Dom
---------------------
-
-In the XML world two standard parser models exist, SAX and DOM, with DOM
-far the more popular. DOM performs a parse as a single evaluation, on
-the request of the programmer, returning an object model representing
-the whole of the document. At this level of abstraction the details of
-the markup are only distant concern. Conversely, SAX parsers are
-probably better considered as tokenisers, providing a very low-level
-event driven interface in line with the Observer pattern to notify the
-programmer of syntax as it is seen. Each element's opening and closing
-tag is noted
-
-This presents poor developer ergonomics by requiring that the programmer
-implement the recording of state with regard to the nodes that they have
-seen. For programmers using SAX, a conversion to their domain objects is
-usually implemented imperatively. This programming tends to be difficult
-to read and programmed once per usage rather than assembled as the
-combination of reusable parts. For this reason SAX is usually reserved
-for fringe cases where messages are very large or memory unusually
-scarce.
-
-DOM isn't just a parser, it is also a cross-language defined interface
-for manipulating the XML in real time, for example to change the
-contents of a web page in order to provide some interactivity. In JSON
-world, DOM-style parser not referring to the DOM spec, or what browser
-makers would mean. Rather, borrowing from the XML world to mean a parser
-which requires the whole file to be loaded.
-
-Suppose we want to extract the name of the first person. Given a DOM
-parser this is very easy:
-
-~~~~ {.javascript}
-function nameOfFirstPerson( myJsonString ) {
-
-   // Extracting an interesting part from JSON-serialised data is
-   // relatively easy given a DOM-style parser. Unfortunately this
-   // forbids any kind of progressive consideration of the data.
-   // All recent browsers provide a JSON parser as standard. 
-
-   var document = JSON.parse( myJsonString );
-   return document.people[0].name; // that was easy!
-}
-~~~~
-
-Contrast with the programming below which uses the clarinet JSON SAX
-parser. To prove that I'm not exaggerating the case, see published
-usages at [Clarinet demos].
-
-\pagebreak
-
-~~~~ {.javascript}
-function nameOfFirstPerson( myJsonString, callbackFunction ){
-
-   // The equivalent logic, expressed in the most natural way
-   // fora s JSON SAX parser is longer and much more 
-   // difficult to read. The developer pays a high price for 
-   // progressive parsing. 
-
-   var clarinet = clarinet.parser(),
-   
-       // with a SAX parser it is the developer's responsibility 
-       // to track where in the document the cursor currently is,
-       // requiring several variables to maintain.        
-       inPeopleArray = false,   
-       inPersonObject = false,
-       inNameAttribute = false,
-       found = false;
-   
-   clarinet.onopenarray = function(){
-      // for brevity we'll cheat by assuming there is only one
-      // array in the document. In practice this would be overly
-      // brittle.
-      
-      inPeopleArray = true; 
-   };
-   
-   clarinet.onclosearray = function(){
-      inPeopleArray = false;
-   };   
-   
-   clarinet.onopenobject = function(){
-      inPersonObject = inPeopleArray; 
-   };
-   
-   clarinet.oncloseobject = function(){
-      inPersonObject = false;
-   };   
-      
-   clarinet.onkey = function(key){
-      inNameAttribute = ( inPeopleObject && key == 'name');
-   };
-
-   clarinet.onvalue = function(value){
-      if( !found && inNameAttribute ) {
-         // finally!
-         callbackFunction( value );
-         found = true;
-      }
-   };      
-   
-   clarinet.write(myJsonString);   
-}
-~~~~
-
-As we can see above, SAX's low-level semantics require a lengthy
-expression and for the programmer to maintain state regarding the
-position in the document -- usually recording the ancestors seen on the
-descent from the root to the current node -- in order to identify the
-interesting parts. This order of the code is also quite unintuitive;
-generally event handlers will cover multiple unrelated concerns and each
-concern will span multiple event handlers. This lends to programming in
-which separate concerns are not separately expressed in the code.
 
 JsonPath and XPath 2
 --------------------
