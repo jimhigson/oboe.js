@@ -376,11 +376,13 @@ focused area of the system. The coupling is all the more acute where the
 format of the item being inspected is defined by an independently
 maintained service.
 
-More declarative syntaxes exist which are flexible enough that the
-declarative expressions may still apply as the underlying model is
-refactored. Whilst not applicable to use in general purpose programming,
-XPATH is an example of this. As an analogue of the Java situation above,
-Given the following XML:
+In the domain of markup languages, declarative selector co-languages such as XPATH exist
+whose coupling is loose enough that their expressions may continue to function after
+the exact shape of a message is refactored. While this is nothing more radical than using
+the selection languages as they were intended, their employment is not the
+most natural coming from a programming context in which the application developer's 
+responsibilities usually start where the demarshaler's end.
+Consider the following XML:
 
 ~~~~ {.xml}
 <people>
@@ -390,9 +392,9 @@ Given the following XML:
 </people>
 ~~~~
 
-The XPath //person[0]//surname//text() would
-continue to identify the correct part of the resource without being
-updated after the xml analogue of the above Java Name refactor:
+The XPath //person[0]//surname//text() would continue to identify the
+correct part of the resource without being updated after the xml
+analogue of the above Java Name refactor:
 
 ~~~~ {.xml}
 <people>
