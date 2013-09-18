@@ -372,9 +372,13 @@ Or, 666 to 3,333 (333 per page)
 
   <p>Ie, front-end client-side, front-end server-side.</p>
 
-  <p><a href="images/placeholder">!A webapp running with a front
-  end generated partially on server and partially on client
-  side</a></p>
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "A webapp running with a front end generated partially on server and partially on client side">
+
+    <p class="caption">A webapp running with a front end generated
+    partially on server and partially on client side</p>
+  </div>
 
   <p>Separated from services by http calls regardless.</p>
 
@@ -393,9 +397,6 @@ Or, 666 to 3,333 (333 per page)
   <p>Give static page (fairly basic but functional), then load js
   in the background.</p>
 
-  <p>However, with Node don't have to reengineer to move from
-  client to server.</p>
-
   <p>Big/small message problem and granularity. With small: http
   overhead. With big: not all may be needed.</p>
 
@@ -412,31 +413,25 @@ Or, 666 to 3,333 (333 per page)
   "header-section-number">3.2</span> Where the delays are in a web
   application</a></h2>
 
-  <p>Even complex apps are not finding a bottleneck in javascript
-  execution times.</p>
-
-  <ul>
-    <li>DOM manipulation</li>
-
-    <li>rendering</li>
-
-    <li>most significant: waiting for stuff. Going from js taking
-    10ms per frame to 1ms per frame will have zero difference
-    because it is already meeting the frame rate. Might help slower
-    devices if performance was marginal before</li>
-  </ul>
+  <p>Like most application types, web applications usually suffer
+  greater delays waiting for io than because javascript execution
+  times present a bottleneck. Because Javascript is used for user
+  interfaces, frame-rates are important. Single threaded so js
+  holds up rendering. Important to return control to the browser
+  quickly. However, once execution of each js frame of execution is
+  no more than the monitor refresh rate, further optimisation
+  brings zero benefit. Hence, writing extremely optimised
+  Javascript, especially focusing on micro-optimisations that hurt
+  code readability is a bit silly.</p>
 
   <blockquote>
     <p>The user does something, then the app responds visually with
     immediacy at 30 frames per second or more, and completes a task
     in a few hundred milliseconds. As long as an app meets this
     user goal, it doesn&acirc;&euro;&trade;t matter how big an
-    abstraction layer it has to go through to get to silicon.</p>
+    abstraction layer it has to go through to get to silicon.
+    <span class="citation">(Mullany 2013)</span></p>
   </blockquote>
-
-  <p><a href=
-  "http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm/_source=feedburner&amp;utm/_medium=feed&amp;utm/_campaign=Feed%3A+extblog">
-  http://www.sencha.com/blog/5-myths-about-mobile-web-performance/?utm\_source=feedburner&amp;utm\_medium=feed&amp;utm\_campaign=Feed%3A+extblog</a>+%28Ext+JS+Blog%29#date:16:00</p>
 
   <h2 id="web-browsers-hosting-rest-clients"><a href=
   "#web-browsers-hosting-rest-clients"><span class=
@@ -667,10 +662,8 @@ analysis* =-->
   downloading, not only for the transfer of forever-ongoing data,
   none of these approaches are particularly satisfactory.</p>
 
-  <h2 id="json-and-xml-remove-this-heading-later"><a href=
-  "#json-and-xml-remove-this-heading-later"><span class=
-  "header-section-number">3.5</span> Json and XML (remove this
-  heading later)</a></h2>
+  <h2 id="json-and-xml"><a href="#json-and-xml"><span class=
+  "header-section-number">3.5</span> Json and XML</a></h2>
 
   <p>Although AJAX started as a means to transfer XML, today JSON
   "The fat-free alternative to XML<span class="citation">(Douglas
@@ -700,8 +693,16 @@ analysis* =-->
 }</code>
 </pre>
 
-  <p>This close resemblence to the model of the programming in some
+  <p>This close resemblance to the model of the programming in some
   cases causes fast-changing formats.</p>
+
+  <p>Like XML attributes, as a serialised text format, JSON objects
+  have an order but are almost always parsed to and from orderless
+  maps meaning that the order of the keys/value pairings as seen in
+  the stream usually follows no defined order. No rule in the
+  format would forbid representing of an ordered map in an ordered
+  way but most tools on receiving such a message would ignore the
+  ordering.</p>
 
   <p>(MINE SOA assignment). Also the diagram.</p>
 
@@ -733,7 +734,7 @@ analysis* =-->
   <p>DOM isn't just a parser, it is also a cross-language defined
   interface for manipulating the XML in real time, for example to
   change the contents of a web page in order to provide some
-  interactivity. In JSON world, DOM-style parser not refering to
+  interactivity. In JSON world, DOM-style parser not referring to
   the DOM spec, or what browser makers would mean. Rather,
   borrowing from the XML world to mean a parser which requires the
   whole file to be loaded.</p>
@@ -849,17 +850,193 @@ analysis* =-->
   multiple event handlers. This lends to programming in which
   separate concerns are not separately expressed in the code.</p>
 
+  <h2 id="common-patterns-when-connecting-to-rest-services">
+  <a href="#common-patterns-when-connecting-to-rest-services"><span class="header-section-number">
+  3.7</span> Common patterns when connecting to REST
+  services</a></h2>
+
+  <p>Marshaling provides two-way mapping between a domain model and
+  a serialisation as JSON or XML, either completely automatically
+  or based on a declarative specification. To handle a fetched rest
+  response it is common to automatically demarshal it so that the
+  application may make use of the response from inside its own
+  model, no differently from objects assembled in any other way.
+  From the perspective of the programmer it is as if the domain
+  objects themselves had been fetched. Another common design
+  pattern, intended to give a degree of isolation between concerns,
+  is to demarshal automatically only so far as Data Transfer
+  Objects (DTOs), instances of classes which implement no logic
+  other than storage, and from there programmatically instantiate
+  the domain model objects. Going one step further, for JSON
+  resources sent to loosely-typed languages with a native
+  representation of objects as generic key-value pairs such as
+  Javascript or Clojure, the marshaling step is often skipped: the
+  output from the parser so closely resembles the language's
+  built-in types that it is simplest to use it directly. Depending
+  on the programming style adopted we might say that the JSON
+  parser's output <em>is</em> the DTO and create domain model
+  objects based on it, or that no further instantiation is
+  necessary.</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "Degrees of automatic marshaling. From marshaling directly to domain objects, DTOs, using parser output as a DTO, or using objects directly. Distinguish work done by library vs application programmer's domain">
+
+    <p class="caption"><em>Degrees of automatic marshaling</em>.
+    From marshaling directly to domain objects, DTOs, using parser
+    output as a DTO, or using objects directly. Distinguish work
+    done by library vs application programmer's domain</p>
+  </div>
+
+  <p>Ultimately the degree of marshaling that is used changes only
+  the level of abstraction of the resource that the REST client
+  library hands over to the application developer. Regardless of
+  the exact form of the response model, the developer will usually
+  programmatically extract one or more parts from it via calls in
+  the programming language itself. For example, on receiving a
+  resource de-marshaled to domain objects, a Java developer will
+  inspect it by calling a series of getters in order to narrow down
+  to the interesting parts. This is not to say that the whole of
+  the message might not in some way be interesting, only that by
+  using it certain parts will need to be identified as distinct
+  areas of concern.</p>
+  <pre class="sourceCode java">
+<code class="sourceCode java"><span class=
+"co">// An example programmatic approach to a domain model interrogation </span>
+<span class=
+"co">// under Java; upon receiving a list of people, each person's name</span>
+<span class=
+"co">// is added to a database. The methods used to drill down to the</span>
+<span class=
+"co">// pertinent components of the response are all getters: getPeople, </span>
+<span class="co">// getGivenName, and getSurname. </span>
+<span class="dt">void</span> <span class=
+"fu">handleResponse</span>( RestResponse response ) {
+
+   <span class="kw">for</span>( Person p : response.<span class=
+"fu">getPeople</span>() ) {
+      <span class="fu">addNameToDb</span>( p.<span class=
+"fu">getGivenName</span>(), p.<span class=
+"fu">getSurname</span>() );
+   }   
+}</code>
+</pre>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"co">// Although in this Javascript example the objects passed to the handler </span>
+<span class=
+"co">// remain in the form given by the JSON parser, containing no domain-specific</span>
+<span class=
+"co">// getters, the programming represents a different expression of the same </span>
+<span class="co">// basic process.</span>
+<span class="kw">function</span> <span class=
+"fu">handleResponse</span>( response ){
+
+   <span class="ot">response</span>.<span class=
+"ot">people</span>.<span class="fu">forEach</span>( <span class=
+"kw">function</span>( person ){
+      <span class="fu">addNameToDb</span>( <span class=
+"ot">p</span>.<span class="fu">givenName</span>, <span class=
+"ot">p</span>.<span class="fu">surname</span> );
+   });
+}</code>
+</pre>
+
+  <p>Because it is applied directly to the metamodel of the
+  language[^ It could be argued that getters aren't a part of the
+  metamodel of Java itself, but they form such a common pattern
+  that it is a part ], this extraction has become such a natural
+  component of a workflow that it maye be used while thinking of it
+  as wholly unremarkable. In the examples above we are interacting
+  with the model in the way that the language makes the most easy
+  to conceptualise. However se should consider that, however subtly
+  embedded, the technique is an invented construct and only one of
+  the possible formulations which might have been drawn.</p>
+
+  <p>One weakness of this inspection model is that, once much code
+  is written to interrogate models in this way, the interface of
+  the model becomes increasingly expensive to change as the code
+  making the inspections becomes more tightly coupled with the
+  thing that it is inspecting. Taking the above example, if the
+  model were later refactored such that the concepts of firstName
+  and surName were pulled from the Person class into an extracted
+  Name class, because the inspection relies on a sequence of calls
+  made directly into domain objects, the code making the query
+  would also have to change. Whilst following the object oriented
+  principle of encapsulation of data, such that the caller does not
+  have to concern themselves with the data structures hidden behind
+  the getter, there is no such abstraction for when the structure
+  itself changes. Given an Agile environment where the shape of
+  data is refactored regularly, this would be a problem when
+  programming against any kind of resource; for example, if change
+  of objects formats propagates knock-on changes where ever the
+  object is used it is very difficult to commit small diffs to the
+  VCS which make incremental changes to a tightly focused area of
+  the system. A method of programming which truly embraced extreme
+  programming would allow constant change without disparate, barely
+  related parts having to be modified in parallel when structural
+  refactoring occurs. The coupling is all the more acute where the
+  format of the item being inspected is defined by an independently
+  maintained service.</p>
+
+  <p><em>contagion problem</em></p>
+
+  <p>Extraneous changes dilute the changelog, making it less easily
+  defined by code changes which are intrinsically linked to the
+  actual change in the logic being expressed by the program, and
+  therefore to the thinking behind the change and the reason for
+  the change.</p>
+
   <h2 id="jsonpath-and-xpath"><a href=
   "#jsonpath-and-xpath"><span class=
-  "header-section-number">3.7</span> JsonPath and XPath</a></h2>
+  "header-section-number">3.8</span> JsonPath and XPath</a></h2>
 
-  <p>The above difficulty in identifying the interesting parts of a
-  message leads me to investigate where this problem has already
-  been solved. For XML, the XPath language allows the programmer to
-  declaratively specify the nodes that they are interested in.
-  Luckily in JSON there exists already an attempt at an equivalent
-  named Jsonpath. JsonPath closely resembles the javascript code
-  which would select the same nodes.</p>
+  <p>Both the above difficulty in identifying the interesting parts
+  of a message whilst using a streaming parser and the problem with
+  tight coupling of programmatic drilling down to REST formats
+  leads me to search for areas where this problem has already been
+  solved.</p>
+
+  <p>In the domain of markup languages there are associated query
+  languages such as XPATH whose coupling is loose enough that their
+  expressions may continue to function after the exact shape of a
+  message is refactored. While observing this is nothing more
+  radical than using the query languages in more-or-less they were
+  intended, their employment is not the most natural coming from a
+  programming context in which the application developer's
+  responsibilities usually start where the demarshaler's end.
+  Consider the following XML:</p>
+  <pre class="sourceCode xml">
+<code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
+   <span class="kw">&lt;person&gt;</span>
+      <span class="kw">&lt;givenName&gt;</span>...<span class=
+"kw">&lt;/givenName&gt;</span>   
+      <span class="kw">&lt;familyName&gt;</span>Bond<span class=
+"kw">&lt;/familyName&gt;</span>
+   <span class="kw">&lt;/person&gt;</span>
+<span class="kw">&lt;/people&gt;</span></code>
+</pre>
+
+  <p>The XPath //person[0]//surname//text() would continue to
+  identify the correct part of the resource without being updated
+  after the xml analogue of the above Java Name refactor:</p>
+  <pre class="sourceCode xml">
+<code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
+   <span class="kw">&lt;person&gt;</span>
+      <span class="kw">&lt;name&gt;</span>
+         <span class="kw">&lt;givenName&gt;</span>...<span class=
+"kw">&lt;/givenName&gt;</span>
+         <span class="kw">&lt;familyName&gt;</span>Bond<span class=
+"kw">&lt;/familyName&gt;</span>
+      <span class="kw">&lt;/name&gt;</span>
+   <span class="kw">&lt;/person&gt;</span>
+<span class="kw">&lt;/people&gt;</span></code>
+</pre>
+
+  <p>Luckily in JSON there exists already an attempt at an
+  equivalent named Jsonpath. JsonPath closely resembles the
+  javascript code which would select the same nodes. Not a real
+  spec.</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
 <span class=
@@ -874,6 +1051,7 @@ analysis* =-->
       <span class="st">"line3"</span>
    ]
 }
+
 
 <span class=
 "co">// in javascript we can get line two of the address as such:</span>
@@ -893,113 +1071,6 @@ analysis* =-->
 <span class="kw">let</span> jsonPath2 = <span class=
 "st">"person..given"</span></code>
 </pre>
-
-  <p>The typical use pattern of XPath or JSONPath is to search for
-  nodes once the whole serialisation has been parsed into a
-  DOM-style model. To examine a whole document for the list of
-  nodes that match a jsonpath expression the whole of the tree is
-  required. But to evaluate if a single node matches an expression,
-  only the <em>path of the descent from the root to that node</em>
-  is required -- the same state as a programmer usually maintains
-  whilst employing a SAX parser.</p>
-
-  <p>Investigate: is this true? Does JSONPath have a
-  following/preceding grammar? If so, only a subset and
-  rearrange.</p>
-
-  <p>One limitation of the JSONPath language is that it is not
-  possible to construct an 'containing' expression. CSS4 allows
-  this in a way that is likely to become familiar to web developers
-  over the next five years or so.</p>
-
-  <h2 id=
-  "how-domain-models-are-marshalde-marshalled-into-rest-resources">
-  <a href=
-  "#how-domain-models-are-marshalde-marshalled-into-rest-resources">
-  <span class="header-section-number">3.8</span> How domain models
-  are marshal/de-marshalled into REST resources</a></h2>
-
-  <p>Marshalling/ de-marshalling. Benefits and the problems that it
-  causes. Allows one model to be written out to XML or JSON</p>
-
-  <p>First stage after getting a resource is usually to
-  programmatically extract the interesting part from it. This is
-  usually done via calls in the programming language itself, for
-  example by de-marshaling the stream to domain objects and then
-  calling a series of getters to narrow down to the interesting
-  parts.</p>
-
-  <p>This part has become such a natural component of a workflow
-  that it is barely noticed that it is happening. In an OO
-  language, the extraction of small parts of a model which, in the
-  scope of the current concern are of interest is so universal that
-  it could be considered the sole reason that getters exist.</p>
-
-  <p>However subtly incorporated it has become in the thinking of
-  the programmer, we should note that this is a construct and only
-  one possible way of thinking regarding identifying the areas of
-  current interest in a wider model.</p>
-  <pre class="sourceCode java">
-<code class="sourceCode java"><span class=
-"co">// an example programmatic approach to a domain model interrogation under Java</span>
-
-List&lt;Person&gt; people = myModel.<span class=
-"fu">getPeople</span>()
-String firstPersonsSurname = people.<span class=
-"fu">get</span>(<span class="dv">0</span>).<span class=
-"fu">getSurname</span>()</code>
-</pre>
-
-  <p>One weakness of this imperative, programatic inspection model
-  is that, once much code is written to interogate models in this
-  way, the interface of the model becomes increasingly expensive to
-  change as the code making the inspections becomes more tightly
-  coupled with the thing that it is inspecting. Taking the above
-  example, if the model were later refactored such that the
-  concepts of firstName and surName were pulled from the Person
-  class into an extracted Name class, because the inspection relies
-  on a sequence of calls made directly into domain objects, the
-  code making the query would also have to change.</p>
-
-  <p>I believe that this coupling defies Agile methods of
-  programming. Many Java IDEs provide tools that would offer to
-  automate the above extraction into a Name class, creating the new
-  class and altering the existing calls. While reducing the pain,
-  if we accept the concept as I stated in the <a href=
-  "#introduction">Introduction</a> that the code should not be seen
-  as a static thing in which understanding is</p>
-
-  <p>More declarative syntaxes exist which are flexible enough that
-  the declarative expressions may still apply as the underlying
-  model is refactored. Whilst not applicable to use in general
-  purpose programming, XPATH is an example of this. As an analogue
-  of the Java situation above, Given the following XML:</p>
-  <pre class="sourceCode xml">
-<code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
-   <span class="kw">&lt;person&gt;</span>
-      <span class="kw">&lt;surname&gt;</span>Bond<span class=
-"kw">&lt;/surname&gt;</span>
-   <span class="kw">&lt;/person&gt;</span>
-<span class="kw">&lt;/people&gt;</span></code>
-</pre>
-
-  <p>The XPath //person[0]//surname//text() (JIM/ME - CHECK THIS!)
-  would continue to identify the correct part of the resource
-  without being updated after the xml analogue of the above Java
-  Name refactor:</p>
-  <pre class="sourceCode xml">
-<code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
-   <span class="kw">&lt;person&gt;</span>
-      <span class="kw">&lt;name&gt;</span>
-         <span class="kw">&lt;surname&gt;</span>Bond<span class=
-"kw">&lt;/surname&gt;</span>
-      <span class="kw">&lt;/name&gt;</span>
-   <span class="kw">&lt;/person&gt;</span>
-<span class="kw">&lt;/people&gt;</span></code>
-</pre>
-
-  <p>A few models exist which do not follow this pattern such as
-  XPATH. However, these are useful in only a small domain.</p>
 
   <p>Xpath is able to express identifiers which often survive
   refactoring because XML represents a tree, hence we can consider
@@ -1031,47 +1102,27 @@ String firstPersonsSurname = people.<span class=
 <span class="kw">&lt;/people&gt;</span></code>
 </pre>
 
-  <p>CSS. Meant for presentation of HTML, but where HTML markup is
-  semantic it is a selector of the <em>meaning of elements</em> for
-  the sake of applying a meaningful presentation more so than a
-  selector of arbitrary colours and positions on a screen.</p>
+  <p>The typical use pattern of XPath or JSONPath is to search for
+  nodes once the whole serialisation has been parsed into a
+  DOM-style model. JSONPath implementation only allows for
+  search-type usage: <a href=
+  "https://code.google.com/p/jsonpath/To">https://code.google.com/p/jsonpath/To</a>
+  examine a whole document for the list of nodes that match a
+  jsonpath expression the whole of the tree is required. But to
+  evaluate if a single node matches an expression, only the
+  <em>path of the descent from the root to that node</em> is
+  required -- the same state as a programmer usually maintains
+  whilst employing a SAX parser. This is possible because JSONPath
+  does not have a way to express the relationship with sibling
+  nodes, only ancestors and decedents.</p>
 
-  <p>Unlike XML, in the model created by most general programming
-  languages, there is no requirement for the data to be tree
-  shaped. Graph is ok. This make this slighlty harder but
-  nontheless attempts have been made.</p>
-
-  <p>Linq. (CITEME)</p>
-
-  <h2 id="loose-coupling-and-updating-versioning"><a href=
-  "#loose-coupling-and-updating-versioning"><span class=
-  "header-section-number">3.9</span> Loose coupling and Updating
-  versioning</a></h2>
-
-  <p>Because of the contagion problem, need to be able to create
-  loosely-coupled systems.</p>
-
-  <p>Inside systems also, even with automatic refactoring tools,
-  only automate and therefoer lessen but do not remove the problem
-  that coupling causes changes in one place of a codebase to cause
-  knock-on changes in remote other parts of the code. A method of
-  programming which was truly compatible with extreme programming
-  would involve designing for constant change without disparate
-  parts having to be modified as structural refactoring occurs.</p>
-
-  <p>I propose that in a changing system, readability of code's
-  changelog is as important as readability of the code itself.
-  Extraneous changes dilute the changelog, making it less easily
-  defined by code changes which are intrinsically linked to the
-  actual change in the logic being expressed by the program.</p>
-
-  <p>It is often stated that understandability is the number once
-  most important concern in a codebase (CITE) - if the code is
-  suitably dynamic it is important that changes are axiomic and
-  clarity of the changelog is equally important.</p>
+  <p>One limitation of the JSONPath language is that it is not
+  possible to construct an 'containing' expression. CSS4 allows
+  this in a way that is likely to become familiar to web developers
+  over the next five years or so.</p>
 
   <h2 id="javascript"><a href="#javascript"><span class=
-  "header-section-number">3.10</span> Javascript</a></h2>
+  "header-section-number">3.9</span> Javascript</a></h2>
 
   <p>Client-side web scripting via Javascript is a field which at
   inception contributed no more than small, frequently gimmicky,
@@ -1081,9 +1132,6 @@ String firstPersonsSurname = people.<span class=
   is often programmed in this way. These applications are not
   limited to running under traditional web browsers but also
   include mobile apps and desktop software.</p>
-
-  <p>What 'this' (context) is in javascript. Why not calling it
-  scope.</p>
 
   <p>Javascript: not the greatest for 'final' elegant presentation
   of programming. Does allow 'messy' first drafts which can be
@@ -1100,32 +1148,6 @@ String firstPersonsSurname = people.<span class=
   Echo FPR: once compiling, good typing tends to give a reasonable
   sureness that the code is correct.</p>
 
-  <p>Explain var/function difference, ie construct pluck and
-  explain why var keyOf = partial(pluck) is declared with a var and
-  not a function, why some prefer to do always via . operator can't
-  be made into a function with (.) or similar and so has to be
-  wrapped in a function is a less direct manner. Unfortunately, can
-  make it difficult for a reader to know the types involved. For
-  example, on seeing: <code>var matchesJsonPath = jsonPathCompiler(
-  pattern )</code> there is no way (other than examining the source
-  or doucmentation of the function being called) to know that this
-  is a higher order function and will return another function to be
-  assigned as matchesJsonPath.</p>
-
-  <p>C-style brackets around all function arguments hampers a
-  natural expression of functional style code. For example, this
-  requires a lot of arguments and without checking of function
-  airity, it is easy to misplace a comma or closing bracket.</p>
-  <pre>
-<code>function map(fn, list){
-   if( !list ) {
-      return emptyList;
-   } else {
-      return cons(fn(head(list)), map(fn,tail(list)));
-   }
-}</code>
-</pre>
-
   <p>What a Micro-library is. What motivates the trend? This
   library has a fairly small set of functionality, it isn't a
   general purpose do-everything library like jQuery so its size
@@ -1134,7 +1156,7 @@ String firstPersonsSurname = people.<span class=
   a lot to do in not very much code.</p>
 
   <h2 id="node"><a href="#node"><span class=
-  "header-section-number">3.11</span> Node</a></h2>
+  "header-section-number">3.10</span> Node</a></h2>
 
   <blockquote>
     <p>Streams in node are one of the rare occasions when doing
@@ -1206,7 +1228,7 @@ String firstPersonsSurname = people.<span class=
   <p>Node's standard stream mechanisms</p>
 
   <h2 id="testing"><a href="#testing"><span class=
-  "header-section-number">3.12</span> Testing</a></h2>
+  "header-section-number">3.11</span> Testing</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -1248,15 +1270,6 @@ String firstPersonsSurname = people.<span class=
   <p>JSTD, as a Java program, is difficult to start via Grunt. Also
   an issue that Grunt post-dates Karma by enough that JSTD doesn't
   have the attention of the Grunt community.</p>
-
-  <h2 id="methodology"><a href="#methodology"><span class=
-  "header-section-number">3.13</span> Methodology</a></h2>
-
-  <p>The program design will be initially an exercise in creating
-  the easiest expression that can possibly work and via constant
-  work towards the emergence of elegance.</p>
-
-  <p>Why this method? See W'yg.</p>
 
   <h1 id="application-and-reflection"><a href=
   "#application-and-reflection"><span class=
@@ -2479,6 +2492,13 @@ String firstPersonsSurname = people.<span class=
   "http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm"
   title=
   "http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm">http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm</a>.</p>
+
+  <p>Mullany, Michael. 2013. &acirc;&euro;&oelig;5 Myths About
+  Mobile Web Performance.&acirc;&euro; <a href=
+  "http://www.sencha.com/blog/5-myths-about-mobile-web-performance"
+  title=
+  "http://www.sencha.com/blog/5-myths-about-mobile-web-performance">
+  http://www.sencha.com/blog/5-myths-about-mobile-web-performance</a>.</p>
 
   <p>Ralston, Anthony. 2000. &acirc;&euro;&oelig;Encyclopedia of
   Computer Science.&acirc;&euro; Nature Pub. Group.</p>
