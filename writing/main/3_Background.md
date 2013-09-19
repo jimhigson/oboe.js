@@ -93,14 +93,25 @@ Difficult to say to what degree Node's use of Javascript is a
 distraction from its design aims and to what degree it defines the
 technology. For the first time it is possible to code a presentation
 logic which is capable of running on either side of the network.
+Javascript has proven itself very effective as the language to meet
+Node's design goals but this suitability is not based on Javascript's
+association with web browsers. Being already familiar with Javascript,
+web programmers were the first to take up Node.js first but the project
+mission statement makes no reference to the web; Node's architecture is
+well suited to any application domain where low-latency responses to i/o
+is more of a concern than heavyweight computation. Web applications fit
+well into this niche but they are far from the only domain that does so.
+
+Most
+
+Why Node is significant. Single-threaded but able to switch contexts
+quickly to achieve a very efficient kind of concurrency. Closures help
+this by removing responsibility to explicitly store the data used by a
+function. Recognises that most tasks are io-bound rather than CPU bound.
+Threaded models good for CPU-bound in the main.
 
 Why Node perhaps is mis-placed in its current usage as a purely web
 platform "the objective is absolutely fast I/O". This happened because,
-being javascript, web specialist programmers took it up first but the
-Node.js mission statement makes no reference to the web.
-
-Why Node is significant. Recognises that most tasks are io-bound rather
-than CPU bound. Threaded models good for CPU-bound in the main.
 
 > Streams in node are one of the rare occasions when doing something the
 > fast way is actually easier. SO USE THEM. not since bash has streaming
@@ -145,7 +156,7 @@ comparison to native somewhat takes C as the description of the
 operation of an idealised CPU rather than an abstract machine capable of
 executing on an actual CPU.
 
-Criticisms of Node. Esp from Erlang etc devs.
+Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
 
 Web browsers hosting REST clients
 ---------------------------------
