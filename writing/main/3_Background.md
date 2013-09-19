@@ -89,29 +89,52 @@ micro-optimisations that hurt code readability is a bit silly.
 Node.js
 -------
 
-Difficult to say to what degree Node's use of Javascript is a
-distraction from its design aims and to what degree it defines the
-technology. For the first time it is possible to code a presentation
-logic which is capable of running on either side of the network.
-Javascript has proven itself very effective as the language to meet
-Node's design goals but this suitability is not based on Javascript's
-association with web browsers. Being already familiar with Javascript,
-web programmers were the first to take up Node.js first but the project
+It is difficult to say to what degree Node's use of Javascript is a
+distraction from the system's principled design aims and to what degree
+it defines the technology. Paradoxically, both may be so. Javascript has
+proven itself very effective as the language to meet Node's design goals
+but this suitability is not based on Javascript's association with web
+browsers, although it is certainly beneficial: for the first time it is
+possible to program presentation logic once which is capable of running
+on either client or server. Being already familiar with Javascript, web
+programmers were the first to take up Node.js first but the project
 mission statement makes no reference to the web; Node's architecture is
 well suited to any application domain where low-latency responses to i/o
 is more of a concern than heavyweight computation. Web applications fit
 well into this niche but they are far from the only domain that does so.
 
-Most attempts at concurrency have focused on threads. Why Node is good.
-Single-threaded but able to switch contexts
-quickly to achieve a very efficient kind of concurrency. Closures help
-this by removing responsibility to explicitly store the data used by a
-function. Many small tasks implemented in Javascript which react to new
-input then quickly exit, possibly queueing up new future tasks. As it happens,
-this is already the means of programming inside of single-threaded web browsers.
-Recognises that most tasks are io-bound rather than CPU bound.
-Threaded models good for CPU-bound by sharing the load of computation
-between threads.
+In most programming languages attempts at concurrency have focused on
+threaded execution, whereas Node is by design single-threaded. Threads
+are an effective means to speed up parallel computation but not well
+suited to concurrently running tasks which are mostly i/o dependent, in
+which each thread remains waiting for long periods, consuming
+considerable resources, punctuated by occasional short bursts of
+processing. Threading in many languages also requires explicity
+syncrhonisation of any memory to be shared between threads and great
+care and experience is required to avoid non-obvious race conditions.
+Consider for example a thread-based http aggregator; the ratio of
+
+waiting to processing per thread is so high that any gains achieved
+through actual concurrent execution is tiny in comparison. Following
+Node's lead, even traditionally thread-based environments such as Java
+are starting to embrace asynchronous single-threaded programming with
+servers such as Netty. Node instead maintains an event loop\
+Unlike Erlang, Node does not swap tasks out, it always waits for them to
+complete, meaning that each task must complete quickly. While this might
+at first seem like an onerous requirement to put on the user, in
+practice the asynchronous nature of the node toolkit makes following
+this requirement more natural than not. This is already the model
+followed inside of web browsers, being single threaded. A programmer
+working with Node's single-thread is able to switch contexts quickly to
+achieve a very efficient kind of concurrency because of Javascript's
+support of closures. Because of Closures, the responsibility to
+explicitly store current data between an asynchronous call and the
+callback-based is removed from the user, in a way that seems so natural
+that looking at a typical node program it is hard to see how there were
+ever any such responsibility.
+
+Serving lots of users means doing simple things many times, it usually
+doesn't mean doing anything more complex than serving a single user.
 
 What Node is V8. Fast. Near-native. JIT.
 
