@@ -19,14 +19,6 @@ Or, 666 to 3,333 (333 per page)
    
 --->
 
-
-The above problem has many analogues and because REST uses standard web
-semantics applies to much more than just automated web surfing. Indeed,
-as the machine readability of the data increases, access early can be
-all the more beneficial since decisions to terminate the connection may
-be made. Example: academic's list of publications, then downloading all
-the new ones.
-
 State of the web
 ----------------
 
