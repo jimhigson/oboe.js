@@ -72,6 +72,100 @@ readability is a bit silly.
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
 
+Javascript
+----------
+
+Client-side web scripting via Javascript is a field which at inception
+contributed no more than small, frequently gimmicky, dynamic features
+added to otherwise static webpages. Today the scope and power of client
+side scripting has increased to the extent that the entire interface for
+large, complex applications is often programmed in this way. These
+applications are not limited to running under traditional web browsers
+but also include mobile apps and desktop software.
+
+Javascript: not the greatest for 'final' elegant presentation of
+programming. Does allow 'messy' first drafts which can be refactored
+into beautiful code. Ie, can write stateful and refactor in small steps
+towards being stateless. An awareness of beautiful languages lets us
+know the right direction to go in. An ugly language lets us find
+something easy to write that works to get us started. Allows a very
+sketchy program to be written, little more than a programming
+scratchpad.
+
+Without strict typing, hard to know if program is correct without
+running it. In theory (decidability) and in practice (often find errors
+through running and finding errors thrown). Echo FPR: once compiling,
+good typing tends to give a reasonable sureness that the code is
+correct.
+
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
+Node
+----
+
+> Streams in node are one of the rare occasions when doing something the
+> fast way is actually easier. SO USE THEM. not since bash has streaming
+> been introduced into a high level language as nicely as it is in
+> node." [high level node style guide](https://gist.github.com/2401787)
+
+> node Stream API, which is the core I/O abstraction in Node.js (which
+> is a tool for I/O) is essentially an abstract in/out interface that
+> can handle any protocol/stream that also happens to be written in
+> JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]
+
+Bash streams a powerful abstraction easily programmed for linear
+streaming. Node more powerful, allows a powerful streaming abstraction
+which is no more complex to program than a javascript webapp front end.
+Essentially a low-level interface to streaming such as unix sockets or
+tcp connections.
+
+Streams in node are the observer pattern. Readable streams emit
+'readable' events when they have some data to be read and 'end' events
+when they are finished. Apart from error handling, so far as reading is
+concerned, that is the extent of the API.
+
+Although the streams themselves are stateful, because they are based on
+callbacks it is entirely possible to use them from a component of a
+javascript program which is wholly stateless.
+
+Using Node's http module provides a stream but handles setting headers,
+putting the method otu etc.
+
+What Node is V8. Fast. Near-native. JIT.
+
+V8 is often said to be 'near-native' speed, meaning it runs at close to
+the speed of a similarly coded C program. However, this relies on the
+programmer also coding in the style of a C programmer, for example with
+only mono-morphic callsites and without a functional style. Once either
+of those programming techniques is taken up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+When used in a functional style, not 'near-native' in the sense that not
+close to the performance gained by compiling a well designed functional
+language to natively executable code. Depends on style coded in,
+comparison to native somewhat takes C as the description of the
+operation of an idealised CPU rather than an abstract machine capable of
+executing on an actual CPU.
+
+*Anecdote: SVG engine: one function for xy vs x and xy. Very large speed
+increase. Add figures etc.*
+
+Why Node perhaps is mis-placed in its current usage as a purely web
+platform "the aim is absolutely fast io". This happened because web
+specialist programmers took it up first
+
+Why Node is significant \* Recognises that most tasks are io-bound
+rather than CPU bound. Threaded models good for CPU-bound in the main.
+
+How Node is different
+
+Criticisms of Node. Esp from Erlang etc devs.
+
+Node's standard stream mechanisms
+
 Web browsers hosting REST clients
 ---------------------------------
 
@@ -645,100 +739,6 @@ One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
-
-Javascript
-----------
-
-Client-side web scripting via Javascript is a field which at inception
-contributed no more than small, frequently gimmicky, dynamic features
-added to otherwise static webpages. Today the scope and power of client
-side scripting has increased to the extent that the entire interface for
-large, complex applications is often programmed in this way. These
-applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software.
-
-Javascript: not the greatest for 'final' elegant presentation of
-programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. Ie, can write stateful and refactor in small steps
-towards being stateless. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
-
-Without strict typing, hard to know if program is correct without
-running it. In theory (decidability) and in practice (often find errors
-through running and finding errors thrown). Echo FPR: once compiling,
-good typing tends to give a reasonable sureness that the code is
-correct.
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
-
-Node
-----
-
-> Streams in node are one of the rare occasions when doing something the
-> fast way is actually easier. SO USE THEM. not since bash has streaming
-> been introduced into a high level language as nicely as it is in
-> node." [high level node style guide](https://gist.github.com/2401787)
-
-> node Stream API, which is the core I/O abstraction in Node.js (which
-> is a tool for I/O) is essentially an abstract in/out interface that
-> can handle any protocol/stream that also happens to be written in
-> JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]
-
-Bash streams a powerful abstraction easily programmed for linear
-streaming. Node more powerful, allows a powerful streaming abstraction
-which is no more complex to program than a javascript webapp front end.
-Essentially a low-level interface to streaming such as unix sockets or
-tcp connections.
-
-Streams in node are the observer pattern. Readable streams emit
-'readable' events when they have some data to be read and 'end' events
-when they are finished. Apart from error handling, so far as reading is
-concerned, that is the extent of the API.
-
-Although the streams themselves are stateful, because they are based on
-callbacks it is entirely possible to use them from a component of a
-javascript program which is wholly stateless.
-
-Using Node's http module provides a stream but handles setting headers,
-putting the method otu etc.
-
-What Node is V8. Fast. Near-native. JIT.
-
-V8 is often said to be 'near-native' speed, meaning it runs at close to
-the speed of a similarly coded C program. However, this relies on the
-programmer also coding in the style of a C programmer, for example with
-only mono-morphic callsites and without a functional style. Once either
-of those programming techniques is taken up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-When used in a functional style, not 'near-native' in the sense that not
-close to the performance gained by compiling a well designed functional
-language to natively executable code. Depends on style coded in,
-comparison to native somewhat takes C as the description of the
-operation of an idealised CPU rather than an abstract machine capable of
-executing on an actual CPU.
-
-*Anecdote: SVG engine: one function for xy vs x and xy. Very large speed
-increase. Add figures etc.*
-
-Why Node perhaps is mis-placed in its current usage as a purely web
-platform "the aim is absolutely fast io". This happened because web
-specialist programmers took it up first
-
-Why Node is significant \* Recognises that most tasks are io-bound
-rather than CPU bound. Threaded models good for CPU-bound in the main.
-
-How Node is different
-
-Criticisms of Node. Esp from Erlang etc devs.
-
-Node's standard stream mechanisms
 
 Testing
 -------
