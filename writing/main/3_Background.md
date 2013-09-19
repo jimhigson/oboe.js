@@ -102,9 +102,8 @@ well suited to any application domain where low-latency responses to i/o
 is more of a concern than heavyweight computation. Web applications fit
 well into this niche but they are far from the only domain that does so.
 
-Most
-
-Why Node is significant. Single-threaded but able to switch contexts
+Most attempts at concurrency have focused on threads. Why Node is good.
+Single-threaded but able to switch contexts
 quickly to achieve a very efficient kind of concurrency. Closures help
 this by removing responsibility to explicitly store the data used by a
 function. Recognises that most tasks are io-bound rather than CPU bound.
