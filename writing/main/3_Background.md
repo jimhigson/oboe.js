@@ -19,8 +19,8 @@ Or, 666 to 3,333 (333 per page)
    
 --->
 
-State of the web
-----------------
+The web as an application platform
+----------------------------------
 
 Ie, front-end client-side, front-end server-side.
 
@@ -52,9 +52,6 @@ available.
 (correctly, ECMAScript) Misleadingly named after Java as a marketing
 ploy when Java was a new technology (CITE) - in true more similar to
 Scheme or Lisp but with Java or C inspired syntax.
-
-Javascript
-----------
 
 Like most application types, web applications usually suffer greater
 delays waiting for io than because javascript execution times present a
