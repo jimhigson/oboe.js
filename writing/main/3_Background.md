@@ -22,36 +22,54 @@ Or, 666 to 3,333 (333 per page)
 The web as an application platform
 ----------------------------------
 
-Ie, front-end client-side, front-end server-side.
+![*A webapp running with a front end generated partially on server and
+partially on client side.* Ie, front-end client-side, front-end
+server-side, presentation layer a more meaningful distinction
+than](images/placeholder.png)
 
-![A webapp running with a front end generated partially on server and
-partially on client side](images/placeholder.png)
+Application design, particularly regarding the presentation layer, has
+charted an undulating path pulled by competing patterns of thick and
+thin clients. Having been taken up as the platform today for all but the
+most specialised applications, the web continues in this fashion by
+resisting easy categorisation as either mode. Although born on the
+network, at inception the web wasn't particularly graphical and didn't
+tread in the steps of networked graphical technologies such as X11 in
+which every presentation decision was made on a remote server [^1] --
+instead of sending fine-grained graphical instructions, a much more
+compact document mark-up format was used. At the same time, the
+markup-format was unlike like Gopher by being not totally semantic
+meaning that presentation layer concerns were kept partially resident on
+the server. At this time, whereas CGI was being used to serve documents
+with changeable content, it was not until 1996 with *ViaWeb* (later to
+become Yahoo Stores) that a user could be given pages comparable in
+function to the GUI interface of a desktop application. [@otherRoad -
+get page number, in old dis]. The interface of these early web
+applications comprised of pages dynamically generated on the server
+side, but handled statically on the client side so far as the browser
+was not able to be scripted to manipulate the page in any way.
 
-Separated from services by http calls regardless.
+The modern, client-scripted web bears a striking resemblance to NeWS.
+Rather than send many individual drawings, the server could send
+parametrised instructions to show the client *how* some item of
+presentation is drawn. Having received the program, the only
+communications required are the parameters. This mixed-model provides no
+lesser degree of server-side control but by using client-side rendering
+a much faster experience was possible than would otherwise be possible
+over low-speed networks [@news].
 
-Contrast: mainframes, thin clients, X11, Wayland, PCs. NextCubes (CITE:
-get from old dis). When timbl appeared at the olympics at a nextcube
-having invented the web, the next os was more of a forerunner for the
-web than just the platform it was implemented on.
-
-Next is closest pre-runner to current web architecture.
-
-Twitter: Moving from client to server for performance. Reduce load times
-to 1 5th of what they were previously
-[https://blog.twitter.com/2012/improving-performance-twittercom]
-
-Give static page (fairly basic but functional), then load js in the
-background.
-
-Big/small message problem and granularity. With small: http overhead.
-With big: not all may be needed.
-
-Javascript as mis-understood language (CITE: Crockford) - list features
-available.
-
-(correctly, ECMAScript) Misleadingly named after Java as a marketing
-ploy when Java was a new technology (CITE) - in true more similar to
-Scheme or Lisp but with Java or C inspired syntax.
+Today it is agreed that program architecture should separate
+presentation from operational logic but there is no firm consensus on
+where each concern should be exercised. While it feels that Javascript
+is becoming requisite to even display a page, there are also actions in
+the opposite direction, for example in 2012 twitter moved much of their
+rendering back to the server-side reducing load times to one fifth of
+their previous design, commenting "The future is coming and it looks
+just like the past"
+[https://blog.twitter.com/2012/improving-performance-twittercom]. This
+model generated server-side short pages that load quick and are ready to
+be displayed but also sent the Javascript which would allow the display
+to be updated without another full server load. One weakness of this
+model is that the same presentational logic requires two expressions.
 
 Like most application types, web applications usually suffer greater
 delays waiting for io than because javascript execution times present a
@@ -69,37 +87,13 @@ readability is a bit silly.
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
 
-Client-side web scripting via Javascript is a field which at inception
-contributed no more than small, frequently gimmicky, dynamic features
-added to otherwise static webpages. Today the scope and power of client
-side scripting has increased to the extent that the entire interface for
-large, complex applications is often programmed in this way. These
-applications are not limited to running under traditional web browsers
-but also include mobile apps and desktop software.
-
-Javascript: not the greatest for 'final' elegant presentation of
-programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. Ie, can write stateful and refactor in small steps
-towards being stateless. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
-
-Without strict typing, hard to know if program is correct without
-running it. In theory (decidability) and in practice (often find errors
-through running and finding errors thrown). Echo FPR: once compiling,
-good typing tends to give a reasonable sureness that the code is
-correct.
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
-
 Node
 ----
+
+Difficult to say to what degree Node's use of Javascript is a
+distraction from its design aims and to what degree it defines the
+technology. For the first time it is possible to code a presentation
+logic which is capable of running on either side of the network.
 
 > Streams in node are one of the rare occasions when doing something the
 > fast way is actually easier. SO USE THEM. not since bash has streaming
@@ -214,7 +208,7 @@ structure to de-serialise to. If this seems like a small advantage,
 contrast with the plethora of confusing and incompatible representations
 of JSON output presented by the various Java JSON parsers; JSON's Object
 better resembles Java's Map than Object and the confusion between JSON
-null, Java null, and Jackson's NullNode[^1] is a common cause of errors.
+null, Java null, and Jackson's NullNode[^2] is a common cause of errors.
 Endowed with certainty regarding deserialisation, JSON parsers could be
 safely integrated directly into AJAX libraries. This provided a call
 style while working with remote resources so streamlined as to require
@@ -356,7 +350,6 @@ compatible with http caching.
 If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
-
 
 Json and XML
 ------------
@@ -614,28 +607,27 @@ service.
 
 *contagion problem*
 
-Extraneous changes
-dilute the changelog, making it less easily defined by code changes
-which are intrinsically linked to the actual change in the logic being
-expressed by the program, and therefore to the thinking behind the change
-and the reason for the change.
+Extraneous changes dilute the changelog, making it less easily defined
+by code changes which are intrinsically linked to the actual change in
+the logic being expressed by the program, and therefore to the thinking
+behind the change and the reason for the change.
 
 JsonPath and XPath
 ------------------
 
-Both the above difficulty in identifying the interesting parts of a message
-whilst using a streaming parser and the problem with tight coupling of programmatic
-drilling down to REST formats leads me to search for areas where this problem has 
-already been solved.
+Both the above difficulty in identifying the interesting parts of a
+message whilst using a streaming parser and the problem with tight
+coupling of programmatic drilling down to REST formats leads me to
+search for areas where this problem has already been solved.
 
 In the domain of markup languages there are associated query languages
-such as XPATH whose coupling is loose enough that their
-expressions may continue to function after the exact shape of a message
-is refactored. While observing this is nothing more radical than using the
-query languages in more-or-less they were intended, their employment is not the
-most natural coming from a programming context in which the application
-developer's responsibilities usually start where the demarshaler's end.
-Consider the following XML:
+such as XPATH whose coupling is loose enough that their expressions may
+continue to function after the exact shape of a message is refactored.
+While observing this is nothing more radical than using the query
+languages in more-or-less they were intended, their employment is not
+the most natural coming from a programming context in which the
+application developer's responsibilities usually start where the
+demarshaler's end. Consider the following XML:
 
 ~~~~ {.xml}
 <people>
@@ -661,10 +653,9 @@ analogue of the above Java Name refactor:
 </people>
 ~~~~
 
-Luckily in JSON there exists
-already an attempt at an equivalent named Jsonpath. JsonPath closely
-resembles the javascript code which would select the same nodes.
-Not a real spec.
+Luckily in JSON there exists already an attempt at an equivalent named
+Jsonpath. JsonPath closely resembles the javascript code which would
+select the same nodes. Not a real spec.
 
 ~~~~ {.javascript}
 
@@ -719,15 +710,15 @@ were representing a model of partial knowledge:
 ~~~~
 
 The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. JSONPath 
-implementation only allows for search-type usage: https://code.google.com/p/jsonpath/To
-examine a whole document for the list of nodes that match a jsonpath
-expression the whole of the tree is required. But to evaluate if a
-single node matches an expression, only the *path of the descent from
-the root to that node* is required -- the same state as a programmer
-usually maintains whilst employing a SAX parser. This is possible because 
-JSONPath does not have a way to express the relationship with sibling
-nodes, only ancestors and decedents.
+the whole serialisation has been parsed into a DOM-style model. JSONPath
+implementation only allows for search-type usage:
+https://code.google.com/p/jsonpath/To examine a whole document for the
+list of nodes that match a jsonpath expression the whole of the tree is
+required. But to evaluate if a single node matches an expression, only
+the *path of the descent from the root to that node* is required -- the
+same state as a programmer usually maintains whilst employing a SAX
+parser. This is possible because JSONPath does not have a way to express
+the relationship with sibling nodes, only ancestors and decedents.
 
 One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
@@ -765,5 +756,9 @@ JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
 
-[^1]: See
+[^1]: rather confusingly, X11 would call the *server* the *client* but I
+    use terms here by their more cannonical meaning such that the client
+    is the machine the user is actually interacting with
+
+[^2]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
