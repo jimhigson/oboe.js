@@ -118,20 +118,27 @@ waiting to processing per thread is so high that any gains achieved
 through actual concurrent execution is tiny in comparison. Following
 Node's lead, even traditionally thread-based environments such as Java
 are starting to embrace asynchronous single-threaded programming with
-servers such as Netty. Node instead maintains an event loop Unlike
-Erlang, Node does not swap tasks out, it always waits for them to
-complete, meaning that each task must complete quickly. While this might
-at first seem like an onerous requirement to put on the user, in
-practice the asynchronous nature of the node toolkit makes following
-this requirement more natural than not. This is already the model
+servers such as Netty. Node instead maintains an event loop and expects
+each task never to wait for io for rather to always make asynchronous
+calls, providing a function to handle the data when available. Unlike
+Erlang, Node does not swap tasks out preemptively, it always waits for
+them to complete, meaning that each task must complete quickly. While
+this might at first seem like an onerous requirement to put on the user.
+In practice the asynchronous nature of the toolkit makes following this
+requirement more natural than not. Indeed, other than accidental
+non-terminating loops or heavy number-crunching, the lack of any
+blocking functions whatsoever makes it rather difficult to write a node
+program whose tasks do not exit quickly.
+
+This is already the model
 followed inside of web browsers, being single threaded. A programmer
 working with Node's single-thread is able to switch contexts quickly to
 achieve a very efficient kind of concurrency because of Javascript's
-support of closures. Because of closures, the responsibility to
+support for closures. Because of closures, the responsibility to
 explicitly store current data between an asynchronous call and the
 callback-based is removed from the user, in a way that seems so natural
-that looking at a typical node program it is hard to see how there were
-ever any such responsibility.
+that looking at a typical node-hosted program it is often not obvious
+that any such responsibility exists.
 
 Serving lots of users means doing simple things many times, it usually
 doesn't mean doing anything more complex than serving a single user.
