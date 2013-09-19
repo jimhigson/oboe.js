@@ -238,7 +238,60 @@
       },
       "type":"webpage"
    }
+   ,
+   {
+      "id":"otherRoad",
+      "title":"The Other Road Ahead",
+      "publisher":"O'Reilly and Associates",
+      "author":[
+         {
+            "family":"Graham",
+            "given":"Paul"
+         }
+      ],
+      "issued":{
+         "date-parts":[
+            [2004]
+         ]
+      },
+      "type":"book"
+   },
 
+   {
+      "id":"news",
+      "title":"The X-Windows Disaster",
+      "publisher":"Hungry Minds",
+      "author":[
+         {
+            "family":"Hopkins",
+            "given":"Don"
+         }
+      ],
+      "issued":{
+         "date-parts":[
+            [1994]
+         ]
+      },
+      "type":"book"
+   }
+   ,
+   {
+      "id":"newTwitter",
+      "title":"Improving performance on twitter.com",
+      "author":[
+         {
+            "family":"Lea",
+            "given":"Tom"
+         }
+      ],
+      "url":"[https://blog.twitter.com/2012/improving-performance-twittercom]",
+      "issued":{
+         "date-parts":[
+            [2012]
+         ]
+      },
+      "type":"webpage"
+   }
 
 ]
 

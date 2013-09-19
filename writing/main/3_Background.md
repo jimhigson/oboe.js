@@ -64,8 +64,7 @@ is becoming requisite to even display a page, there are also actions in
 the opposite direction, for example in 2012 twitter moved much of their
 rendering back to the server-side reducing load times to one fifth of
 their previous design, commenting "The future is coming and it looks
-just like the past"
-[https://blog.twitter.com/2012/improving-performance-twittercom]. This
+just like the past" [@newTwitter]. This
 model generated server-side short pages that load quick and are ready to
 be displayed but also sent the Javascript which would allow the display
 to be updated without another full server load. One weakness of this
