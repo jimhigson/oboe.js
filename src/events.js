@@ -1,6 +1,6 @@
 var _S = 0,
-    TYPE_NODE = _S++,
-    TYPE_PATH = _S++,
+    NODE_FOUND = _S++,
+    PATH_FOUND = _S++,
     ROOT_FOUND = _S++,
     ERROR_EVENT = _S++,
     HTTP_PROGRESS_EVENT = _S++,

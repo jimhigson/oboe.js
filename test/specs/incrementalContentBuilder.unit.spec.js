@@ -41,7 +41,7 @@ describe("incremental content builder", function(){
       it('fires correct event', function(){
          expect( builder)
             .toHaveFired(         
-               TYPE_PATH
+               PATH_FOUND
             ,  anAscentContaining(  
                   {key:ROOT_PATH, node:{}}
                )
@@ -66,7 +66,7 @@ describe("incremental content builder", function(){
 
          expect( builder )
             .toHaveFired(
-                TYPE_PATH
+                PATH_FOUND
              ,  anAscentContaining(  
                    {key:ROOT_PATH, node:{flavour:undefined}}
                 ,  {key:'flavour', node:undefined}
@@ -90,7 +90,7 @@ describe("incremental content builder", function(){
       it('fires correct event', function(){
           
          expect(builder).toHaveFired(
-             TYPE_PATH
+             PATH_FOUND
           ,  anAscentContaining(  
                 {key:ROOT_PATH, node:{flavour:undefined}}
              ,  {key:'flavour', node:undefined}
@@ -114,7 +114,7 @@ describe("incremental content builder", function(){
                  
       it('fires correct event', function(){                 
          expect(builder).toHaveFired(
-            TYPE_NODE
+            NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
             ,  {key:'flavour', node:'strawberry'}
@@ -139,7 +139,7 @@ describe("incremental content builder", function(){
                  
       it('fires correct event', function(){                 
          expect(builder).toHaveFired(
-            TYPE_NODE
+            NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
             )      
@@ -164,7 +164,7 @@ describe("incremental content builder", function(){
       it('fires path event with numeric paths', function(){
       
          expect(builder).toHaveFired(
-            TYPE_PATH
+            PATH_FOUND
             , anAscentContaining(
                   {key:ROOT_PATH,  node:{'alphabet':['a']}    }
                ,  {key:'alphabet', node:['a']                 }
@@ -175,7 +175,7 @@ describe("incremental content builder", function(){
       
       it('fired node event', function(){
          expect(builder).toHaveFired(
-            TYPE_NODE
+            NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a']} }
             ,  {key:'alphabet',     node:['a']              }
@@ -203,7 +203,7 @@ describe("incremental content builder", function(){
       it('fires events with numeric paths', function(){    
           
          expect(builder).toHaveFired(
-            TYPE_PATH
+            PATH_FOUND
             ,  anAscentContaining(
                {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
                , {key:'alphabet', node:['a','b']                }
@@ -214,7 +214,7 @@ describe("incremental content builder", function(){
       
       it('fired node event', function(){
          expect(builder).toHaveFired(
-            TYPE_NODE
+            NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a', 'b']} }
             ,  {key:'alphabet',     node:['a','b']               }
@@ -240,7 +240,7 @@ describe("incremental content builder", function(){
       it('fires events with numeric paths', function(){    
           
          expect(builder).toHaveFired(
-            TYPE_PATH
+            PATH_FOUND
             ,  anAscentContaining(
                  {key:ROOT_PATH,  node:['a','b']                }
                , {key:1,          node:'b'                      }
@@ -250,7 +250,7 @@ describe("incremental content builder", function(){
       
       it('fired node event', function(){
          expect(builder).toHaveFired(
-            TYPE_NODE
+            NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,    node:['a','b']                }
             ,  {key:1,            node:'b'                      }

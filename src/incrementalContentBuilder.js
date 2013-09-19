@@ -108,7 +108,7 @@ function incrementalContentBuilder( fire) {
    
       var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
      
-      fire( TYPE_PATH, ascentWithNewPath);
+      fire( PATH_FOUND, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -119,7 +119,7 @@ function incrementalContentBuilder( fire) {
     */
    function curNodeFinished( ascent ) {
 
-      fire( TYPE_NODE, ascent);
+      fire( NODE_FOUND, ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);

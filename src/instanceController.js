@@ -132,8 +132,8 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
 
    return oboeApi = { 
       onError     :  partialComplete(on, ERROR_EVENT),
-      onPath      :  partialComplete(addListenerApi, TYPE_PATH), 
-      onNode      :  partialComplete(addListenerApi, TYPE_NODE),
+      onPath      :  partialComplete(addListenerApi, PATH_FOUND), 
+      onNode      :  partialComplete(addListenerApi, NODE_FOUND),
       abort       :  partialComplete(fire, ABORTING),
       root        :  function rootNodeFunctor() {
                         return rootNode;

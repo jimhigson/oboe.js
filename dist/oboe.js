@@ -1175,7 +1175,7 @@ function incrementalContentBuilder( fire) {
    
       var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
      
-      fire( TYPE_PATH, ascentWithNewPath);
+      fire( PATH_FOUND, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -1186,7 +1186,7 @@ function incrementalContentBuilder( fire) {
     */
    function curNodeFinished( ascent ) {
 
-      fire( TYPE_NODE, ascent);
+      fire( NODE_FOUND, ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);
@@ -1626,8 +1626,8 @@ function pubSub(){
    };
 }
 var _S = 0,
-    TYPE_NODE = _S++,
-    TYPE_PATH = _S++,
+    NODE_FOUND = _S++,
+    PATH_FOUND = _S++,
     ROOT_FOUND = _S++,
     ERROR_EVENT = _S++,
     HTTP_PROGRESS_EVENT = _S++,
@@ -1638,13 +1638,8 @@ var _S = 0,
  */
 function instanceController(fire, on, clarinetParser, contentBuilderHandlers, doneCallback) {
   
-   var rootNode,
-       oboeApi;
+   var oboeApi, rootNode;
       
-   function rootNodeFunctor() {
-      return rootNode;
-   }
-         
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });                         
@@ -1666,8 +1661,10 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    
    on(HTTP_DONE_EVENT,
       function() {
-         // callback for when the response is complete                                 
+                                         
          clarinetParser.close();
+         
+         doneCallback && doneCallback(rootNode);         
       }
    );
    
@@ -1680,10 +1677,6 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    });   
 
    clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
-   
-   if( doneCallback ) {
-      on(HTTP_DONE_EVENT, compose(doneCallback, rootNodeFunctor));
-   }   
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
@@ -1773,70 +1766,67 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    }         
 
    return oboeApi = { 
-      onError     : partialComplete(on, ERROR_EVENT),
-      onPath      : partialComplete(addListenerApi, TYPE_PATH), 
-      onNode      : partialComplete(addListenerApi, TYPE_NODE),
-      abort       : partialComplete(fire, ABORTING),
-      root        : rootNodeFunctor
+      onError     :  partialComplete(on, ERROR_EVENT),
+      onPath      :  partialComplete(addListenerApi, PATH_FOUND), 
+      onNode      :  partialComplete(addListenerApi, NODE_FOUND),
+      abort       :  partialComplete(fire, ABORTING),
+      root        :  function rootNodeFunctor() {
+                        return rootNode;
+                     }
    };
 }
-(function(){
 
-   /* export public API */
-   window.oboe = {
-      doGet:   apiMethod('GET'),
-      doDelete:apiMethod('DELETE'),
-      doPost:  apiMethod('POST', true),
-      doPut:   apiMethod('PUT', true)
-   };
-   
-   function apiMethod(httpMethodName, mayHaveRequestBody) {
-                  
-      return function(firstArg){
+// export public API
+window.oboe = {
+   doGet:   apiMethod('GET'),
+   doDelete:apiMethod('DELETE'),
+   doPost:  apiMethod('POST', true),
+   doPut:   apiMethod('PUT', true)
+};
+
+function apiMethod(httpMethodName, mayHaveRequestBody) {
+               
+   return function(firstArg){
+    
+      function start (url, body, callback, headers){
+         var eventBus = pubSub();
+                     
+         streamingXhr( eventBus.fire, eventBus.on, 
+                       httpMethodName, url, body, headers );                              
+                   
+         return instanceController( eventBus.fire, eventBus.on, 
+                                    clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
+      }
        
-         function start (url, body, callback, headers){
-            var 
-               eventBus = pubSub(),
-               fire = eventBus.fire,
-               on = eventBus.on;
-
-            // let's kick off ajax and building up the content. 
-            // both of these plug into the event bus to receive and send events.
-            
-            streamingXhr(fire, on, httpMethodName, url, body, headers );                              
-                      
-            return instanceController(fire, on, clarinet.parser(), incrementalContentBuilder(fire), callback);
-         }
-          
-         if (isString(firstArg)) {
+      if (isString(firstArg)) {
+      
+         // parameters specified as arguments
+         //
+         //  if (mayHaveContext == true) method signature is:
+         //     .doMethod( url, content, callback )
+         //
+         //  else it is:
+         //     .doMethod( url, callback )            
+         //                                
+         return start(
+                  firstArg,                                  // url
+                  mayHaveRequestBody && arguments[1],        // body
+                  arguments[mayHaveRequestBody? 2 : 1]       // callback
+         );
+      } else {
+      
+         // method signature is:
+         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
          
-            // parameters specified as arguments
-            //
-            //  if (mayHaveContext == true) method signature is:
-            //     .doMethod( url, content, callback )
-            //
-            //  else it is:
-            //     .doMethod( url, callback )            
-            //                                
-            return start(
-                     firstArg,                                  // url
-                     mayHaveRequestBody && arguments[1],        // body
-                     arguments[mayHaveRequestBody? 2 : 1]       // callback
-            );
-         } else {
-         
-            // method signature is:
-            //    .doMethod({url:u, body:b, complete:c, headers:{...}})
-            
-            return start(   
-                     firstArg.url,
-                     firstArg.body,
-                     firstArg.complete,
-                     firstArg.headers 
-            );
-         }
-                                                      
-      };
-   }   
+         return start(   
+                  firstArg.url,
+                  firstArg.body,
+                  firstArg.complete,
+                  firstArg.headers 
+         );
+      }
+                                                   
+   };
+}   
 
-})();})(window, Object, Array, Error);
+})(window, Object, Array, Error);
