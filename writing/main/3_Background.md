@@ -127,7 +127,7 @@ this requirement more natural than not. This is already the model
 followed inside of web browsers, being single threaded. A programmer
 working with Node's single-thread is able to switch contexts quickly to
 achieve a very efficient kind of concurrency because of Javascript's
-support of closures. Because of Closures, the responsibility to
+support of closures. Because of closures, the responsibility to
 explicitly store current data between an asynchronous call and the
 callback-based is removed from the user, in a way that seems so natural
 that looking at a typical node program it is hard to see how there were
