@@ -118,8 +118,8 @@ waiting to processing per thread is so high that any gains achieved
 through actual concurrent execution is tiny in comparison. Following
 Node's lead, even traditionally thread-based environments such as Java
 are starting to embrace asynchronous single-threaded programming with
-servers such as Netty. Node instead maintains an event loop\
-Unlike Erlang, Node does not swap tasks out, it always waits for them to
+servers such as Netty. Node instead maintains an event loop Unlike
+Erlang, Node does not swap tasks out, it always waits for them to
 complete, meaning that each task must complete quickly. While this might
 at first seem like an onerous requirement to put on the user, in
 practice the asynchronous nature of the node toolkit makes following
