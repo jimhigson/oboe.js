@@ -146,6 +146,9 @@ deferring all rendering until the request completes, render individual
 tweets incrementally as they are progressively parsed out of the ongoing
 response.
 
+Integrate: twitter: page could update at bottom and top with same transport
+perhaps.
+
 Staying fast on a fallible network
 ----------------------------------
 
