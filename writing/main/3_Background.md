@@ -53,8 +53,8 @@ available.
 ploy when Java was a new technology (CITE) - in true more similar to
 Scheme or Lisp but with Java or C inspired syntax.
 
-Where the delays are in a web application
------------------------------------------
+Javascript
+----------
 
 Like most application types, web applications usually suffer greater
 delays waiting for io than because javascript execution times present a
@@ -71,9 +71,6 @@ readability is a bit silly.
 > milliseconds. As long as an app meets this user goal, it doesn’t
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
-
-Javascript
-----------
 
 Client-side web scripting via Javascript is a field which at inception
 contributed no more than small, frequently gimmicky, dynamic features
