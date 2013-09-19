@@ -64,21 +64,21 @@ is becoming requisite to even display a page, there are also actions in
 the opposite direction, for example in 2012 twitter moved much of their
 rendering back to the server-side reducing load times to one fifth of
 their previous design, commenting "The future is coming and it looks
-just like the past" [@newTwitter]. This
-model generated server-side short pages that load quick and are ready to
-be displayed but also sent the Javascript which would allow the display
-to be updated without another full server load. One weakness of this
-model is that the same presentational logic requires two expressions.
+just like the past" [@newTwitter]. This model generated server-side
+short pages that load quick and are ready to be displayed but also sent
+the Javascript which would allow the display to be updated without
+another full server load. One weakness of this model is that the same
+presentational logic requires two expressions.
 
-Like most application types, web applications usually suffer greater
-delays waiting for io than because javascript execution times present a
-bottleneck. Because Javascript is used for user interfaces, frame-rates
-are important. Single threaded so js holds up rendering. Important to
-return control to the browser quickly. However, once execution of each
-js frame of execution is no more than the monitor refresh rate, further
-optimisation brings zero benefit. Hence, writing extremely optimised
-Javascript, especially focusing on micro-optimisations that hurt code
-readability is a bit silly.
+Like most interactive programming, client-side scripts usually suffer
+greater delays waiting for io than because javascript execution times
+present a bottleneck. Because Javascript is used for user interfaces,
+frame-rates are important. Single threaded so js holds up rendering.
+Important to return control to the browser quickly. However, once
+execution of each js frame of execution is no more than the monitor
+refresh rate, further optimisation brings zero benefit. Hence, writing
+extremely optimised Javascript, especially focusing on
+micro-optimisations that hurt code readability is a bit silly.
 
 > The user does something, then the app responds visually with immediacy
 > at 30 frames per second or more, and completes a task in a few hundred
@@ -86,13 +86,21 @@ readability is a bit silly.
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
 
-Node
-----
+Node.js
+-------
 
 Difficult to say to what degree Node's use of Javascript is a
 distraction from its design aims and to what degree it defines the
 technology. For the first time it is possible to code a presentation
 logic which is capable of running on either side of the network.
+
+Why Node perhaps is mis-placed in its current usage as a purely web
+platform "the objective is absolutely fast I/O". This happened because,
+being javascript, web specialist programmers took it up first but the
+Node.js mission statement makes no reference to the web.
+
+Why Node is significant. Recognises that most tasks are io-bound rather
+than CPU bound. Threaded models good for CPU-bound in the main.
 
 > Streams in node are one of the rare occasions when doing something the
 > fast way is actually easier. SO USE THEM. not since bash has streaming
@@ -107,8 +115,8 @@ logic which is capable of running on either side of the network.
 Bash streams a powerful abstraction easily programmed for linear
 streaming. Node more powerful, allows a powerful streaming abstraction
 which is no more complex to program than a javascript webapp front end.
-Essentially a low-level interface to streaming such as unix sockets or
-tcp connections.
+Essentially a lower-level (and therefore more powerful) interface to
+streaming such as unix sockets or tcp connections.
 
 Streams in node are the observer pattern. Readable streams emit
 'readable' events when they have some data to be read and 'end' events
@@ -137,21 +145,7 @@ comparison to native somewhat takes C as the description of the
 operation of an idealised CPU rather than an abstract machine capable of
 executing on an actual CPU.
 
-*Anecdote: SVG engine: one function for xy vs x and xy. Very large speed
-increase. Add figures etc.*
-
-Why Node perhaps is mis-placed in its current usage as a purely web
-platform "the aim is absolutely fast io". This happened because web
-specialist programmers took it up first
-
-Why Node is significant \* Recognises that most tasks are io-bound
-rather than CPU bound. Threaded models good for CPU-bound in the main.
-
-How Node is different
-
 Criticisms of Node. Esp from Erlang etc devs.
-
-Node's standard stream mechanisms
 
 Web browsers hosting REST clients
 ---------------------------------
