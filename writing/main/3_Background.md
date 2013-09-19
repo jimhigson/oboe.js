@@ -106,8 +106,12 @@ Most attempts at concurrency have focused on threads. Why Node is good.
 Single-threaded but able to switch contexts
 quickly to achieve a very efficient kind of concurrency. Closures help
 this by removing responsibility to explicitly store the data used by a
-function. Recognises that most tasks are io-bound rather than CPU bound.
-Threaded models good for CPU-bound in the main.
+function. Many small tasks implemented in Javascript which react to new
+input then quickly exit, possibly queueing up new future tasks. As it happens,
+this is already the means of programming inside of single-threaded web browsers.
+Recognises that most tasks are io-bound rather than CPU bound.
+Threaded models good for CPU-bound by sharing the load of computation
+between threads.
 
 What Node is V8. Fast. Near-native. JIT.
 
