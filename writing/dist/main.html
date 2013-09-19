@@ -213,6 +213,9 @@ http://stackoverflow.com/questions/5751515/official-references-for-default-value
   incrementally as they are progressively parsed out of the ongoing
   response.</p>
 
+  <p>Integrate: twitter: page could update at bottom and top with
+  same transport perhaps.</p>
+
   <h2 id="staying-fast-on-a-fallible-network"><a href=
   "#staying-fast-on-a-fallible-network"><span class=
   "header-section-number">2.3</span> Staying fast on a fallible
@@ -358,71 +361,81 @@ Or, 666 to 3,333 (333 per page)
    
 =-->
 
-  <p>The above problem has many analogues and because REST uses
-  standard web semantics applies to much more than just automated
-  web surfing. Indeed, as the machine readability of the data
-  increases, access early can be all the more beneficial since
-  decisions to terminate the connection may be made. Example:
-  academic's list of publications, then downloading all the new
-  ones.</p>
-
-  <h2 id="state-of-the-web"><a href=
-  "#state-of-the-web"><span class="header-section-number">3.1</span>
-  State of the web</a></h2>
-
-  <p>Ie, front-end client-side, front-end server-side.</p>
+  <h2 id="the-web-as-an-application-platform"><a href=
+  "#the-web-as-an-application-platform"><span class=
+  "header-section-number">3.1</span> The web as an application
+  platform</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
-    "A webapp running with a front end generated partially on server and partially on client side">
+    "A webapp running with a front end generated partially on server and partially on client side. Ie, front-end client-side, front-end server-side, presentation layer a more meaningful distinction than">
 
-    <p class="caption">A webapp running with a front end generated
-    partially on server and partially on client side</p>
+    <p class="caption"><em>A webapp running with a front end
+    generated partially on server and partially on client
+    side.</em> Ie, front-end client-side, front-end server-side,
+    presentation layer a more meaningful distinction than</p>
   </div>
 
-  <p>Separated from services by http calls regardless.</p>
+  <p>Application design, particularly regarding the presentation
+  layer, has charted an undulating path pulled by competing
+  patterns of thick and thin clients. Having been taken up as the
+  platform today for all but the most specialised applications, the
+  web continues in this fashion by resisting easy categorisation as
+  either mode. Although born on the network, at inception the web
+  wasn't particularly graphical and didn't tread in the steps of
+  networked graphical technologies such as X11 in which every
+  presentation decision was made on a remote server<sup><a href=
+  "#fn2" class="footnoteRef" id="fnref2" name="fnref2">2</a></sup>
+  -- instead of sending fine-grained graphical instructions, a much
+  more compact document mark-up format was used. At the same time,
+  the markup-format was unlike like Gopher by being not totally
+  semantic meaning that presentation layer concerns were kept
+  partially resident on the server. At this time, whereas CGI was
+  being used to serve documents with changeable content, it was not
+  until 1996 with <em>ViaWeb</em> (later to become Yahoo Stores)
+  that a user could be given pages comparable in function to the
+  GUI interface of a desktop application. <span class=
+  "citation">(Graham 2004 - get page number, in old dis)</span>.
+  The interface of these early web applications comprised of pages
+  dynamically generated on the server side, but handled statically
+  on the client side so far as the browser was not able to be
+  scripted to manipulate the page in any way.</p>
 
-  <p>Contrast: mainframes, thin clients, X11, Wayland, PCs.
-  NextCubes (CITE: get from old dis). When timbl appeared at the
-  olympics at a nextcube having invented the web, the next os was
-  more of a forerunner for the web than just the platform it was
-  implemented on.</p>
+  <p>The modern, client-scripted web bears a striking resemblance
+  to NeWS. Rather than send many individual drawings, the server
+  could send parametrised instructions to show the client
+  <em>how</em> some item of presentation is drawn. Having received
+  the program, the only communications required are the parameters.
+  This mixed-model provides no lesser degree of server-side control
+  but by using client-side rendering a much faster experience was
+  possible than would otherwise be possible over low-speed networks
+  <span class="citation">(Hopkins 1994)</span>.</p>
 
-  <p>Next is closest pre-runner to current web architecture.</p>
+  <p>Today it is agreed that program architecture should separate
+  presentation from operational logic but there is no firm
+  consensus on where each concern should be exercised. While it
+  feels that Javascript is becoming requisite to even display a
+  page, there are also actions in the opposite direction, for
+  example in 2012 twitter moved much of their rendering back to the
+  server-side reducing load times to one fifth of their previous
+  design, commenting "The future is coming and it looks just like
+  the past" <span class="citation">(Lea 2012)</span>. This model
+  generated server-side short pages that load quick and are ready
+  to be displayed but also sent the Javascript which would allow
+  the display to be updated without another full server load. One
+  weakness of this model is that the same presentational logic
+  requires two expressions.</p>
 
-  <p>Twitter: Moving from client to server for performance. Reduce
-  load times to 1 5th of what they were previously [<a href=
-  "https://blog.twitter.com/2012/improving-performance-twittercom">https://blog.twitter.com/2012/improving-performance-twittercom</a>]</p>
-
-  <p>Give static page (fairly basic but functional), then load js
-  in the background.</p>
-
-  <p>Big/small message problem and granularity. With small: http
-  overhead. With big: not all may be needed.</p>
-
-  <p>Javascript as mis-understood language (CITE: Crockford) - list
-  features available.</p>
-
-  <p>(correctly, ECMAScript) Misleadingly named after Java as a
-  marketing ploy when Java was a new technology (CITE) - in true
-  more similar to Scheme or Lisp but with Java or C inspired
-  syntax.</p>
-
-  <h2 id="where-the-delays-are-in-a-web-application"><a href=
-  "#where-the-delays-are-in-a-web-application"><span class=
-  "header-section-number">3.2</span> Where the delays are in a web
-  application</a></h2>
-
-  <p>Like most application types, web applications usually suffer
-  greater delays waiting for io than because javascript execution
-  times present a bottleneck. Because Javascript is used for user
-  interfaces, frame-rates are important. Single threaded so js
-  holds up rendering. Important to return control to the browser
-  quickly. However, once execution of each js frame of execution is
-  no more than the monitor refresh rate, further optimisation
-  brings zero benefit. Hence, writing extremely optimised
-  Javascript, especially focusing on micro-optimisations that hurt
-  code readability is a bit silly.</p>
+  <p>Like most interactive programming, client-side scripts usually
+  suffer greater delays waiting for io than because javascript
+  execution times present a bottleneck. Because Javascript is used
+  for user interfaces, frame-rates are important. Single threaded
+  so js holds up rendering. Important to return control to the
+  browser quickly. However, once execution of each js frame of
+  execution is no more than the monitor refresh rate, further
+  optimisation brings zero benefit. Hence, writing extremely
+  optimised Javascript, especially focusing on micro-optimisations
+  that hurt code readability is a bit silly.</p>
 
   <blockquote>
     <p>The user does something, then the app responds visually with
@@ -432,6 +445,80 @@ Or, 666 to 3,333 (333 per page)
     abstraction layer it has to go through to get to silicon.
     <span class="citation">(Mullany 2013)</span></p>
   </blockquote>
+
+  <h2 id="node.js"><a href="#node.js"><span class=
+  "header-section-number">3.2</span> Node.js</a></h2>
+
+  <p>Difficult to say to what degree Node's use of Javascript is a
+  distraction from its design aims and to what degree it defines
+  the technology. For the first time it is possible to code a
+  presentation logic which is capable of running on either side of
+  the network.</p>
+
+  <p>Why Node perhaps is mis-placed in its current usage as a
+  purely web platform "the objective is absolutely fast I/O". This
+  happened because, being javascript, web specialist programmers
+  took it up first but the Node.js mission statement makes no
+  reference to the web.</p>
+
+  <p>Why Node is significant. Recognises that most tasks are
+  io-bound rather than CPU bound. Threaded models good for
+  CPU-bound in the main.</p>
+
+  <blockquote>
+    <p>Streams in node are one of the rare occasions when doing
+    something the fast way is actually easier. SO USE THEM. not
+    since bash has streaming been introduced into a high level
+    language as nicely as it is in node." <a href=
+    "https://gist.github.com/2401787">high level node style
+    guide</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p>node Stream API, which is the core I/O abstraction in
+    Node.js (which is a tool for I/O) is essentially an abstract
+    in/out interface that can handle any protocol/stream that also
+    happens to be written in JavaScript. [<a href=
+    "http://maxogden.com/a-proposal-for-streaming-xhr.html">http://maxogden.com/a-proposal-for-streaming-xhr.html</a>]</p>
+  </blockquote>
+
+  <p>Bash streams a powerful abstraction easily programmed for
+  linear streaming. Node more powerful, allows a powerful streaming
+  abstraction which is no more complex to program than a javascript
+  webapp front end. Essentially a lower-level (and therefore more
+  powerful) interface to streaming such as unix sockets or tcp
+  connections.</p>
+
+  <p>Streams in node are the observer pattern. Readable streams
+  emit 'readable' events when they have some data to be read and
+  'end' events when they are finished. Apart from error handling,
+  so far as reading is concerned, that is the extent of the
+  API.</p>
+
+  <p>Although the streams themselves are stateful, because they are
+  based on callbacks it is entirely possible to use them from a
+  component of a javascript program which is wholly stateless.</p>
+
+  <p>Using Node's http module provides a stream but handles setting
+  headers, putting the method otu etc.</p>
+
+  <p>What Node is V8. Fast. Near-native. JIT.</p>
+
+  <p>V8 is often said to be 'near-native' speed, meaning it runs at
+  close to the speed of a similarly coded C program. However, this
+  relies on the programmer also coding in the style of a C
+  programmer, for example with only mono-morphic callsites and
+  without a functional style. Once either of those programming
+  techniques is taken up performance drops rapidly [<a href=
+  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+  When used in a functional style, not 'near-native' in the sense
+  that not close to the performance gained by compiling a well
+  designed functional language to natively executable code. Depends
+  on style coded in, comparison to native somewhat takes C as the
+  description of the operation of an idealised CPU rather than an
+  abstract machine capable of executing on an actual CPU.</p>
+
+  <p>Criticisms of Node. Esp from Erlang etc devs.</p>
 
   <h2 id="web-browsers-hosting-rest-clients"><a href=
   "#web-browsers-hosting-rest-clients"><span class=
@@ -497,8 +584,8 @@ Or, 666 to 3,333 (333 per page)
   incompatible representations of JSON output presented by the
   various Java JSON parsers; JSON's Object better resembles Java's
   Map than Object and the confusion between JSON null, Java null,
-  and Jackson's NullNode<sup><a href="#fn2" class="footnoteRef" id=
-  "fnref2" name="fnref2">2</a></sup> is a common cause of errors.
+  and Jackson's NullNode<sup><a href="#fn3" class="footnoteRef" id=
+  "fnref3" name="fnref3">3</a></sup> is a common cause of errors.
   Endowed with certainty regarding deserialisation, JSON parsers
   could be safely integrated directly into AJAX libraries. This
   provided a call style while working with remote resources so
@@ -1121,114 +1208,8 @@ analysis* =-->
   this in a way that is likely to become familiar to web developers
   over the next five years or so.</p>
 
-  <h2 id="javascript"><a href="#javascript"><span class=
-  "header-section-number">3.9</span> Javascript</a></h2>
-
-  <p>Client-side web scripting via Javascript is a field which at
-  inception contributed no more than small, frequently gimmicky,
-  dynamic features added to otherwise static webpages. Today the
-  scope and power of client side scripting has increased to the
-  extent that the entire interface for large, complex applications
-  is often programmed in this way. These applications are not
-  limited to running under traditional web browsers but also
-  include mobile apps and desktop software.</p>
-
-  <p>Javascript: not the greatest for 'final' elegant presentation
-  of programming. Does allow 'messy' first drafts which can be
-  refactored into beautiful code. Ie, can write stateful and
-  refactor in small steps towards being stateless. An awareness of
-  beautiful languages lets us know the right direction to go in. An
-  ugly language lets us find something easy to write that works to
-  get us started. Allows a very sketchy program to be written,
-  little more than a programming scratchpad.</p>
-
-  <p>Without strict typing, hard to know if program is correct
-  without running it. In theory (decidability) and in practice
-  (often find errors through running and finding errors thrown).
-  Echo FPR: once compiling, good typing tends to give a reasonable
-  sureness that the code is correct.</p>
-
-  <p>What a Micro-library is. What motivates the trend? This
-  library has a fairly small set of functionality, it isn't a
-  general purpose do-everything library like jQuery so its size
-  will be looked at more critically if it is too large. Micro
-  library is the current gold standard for compactness. Still, have
-  a lot to do in not very much code.</p>
-
-  <h2 id="node"><a href="#node"><span class=
-  "header-section-number">3.10</span> Node</a></h2>
-
-  <blockquote>
-    <p>Streams in node are one of the rare occasions when doing
-    something the fast way is actually easier. SO USE THEM. not
-    since bash has streaming been introduced into a high level
-    language as nicely as it is in node." <a href=
-    "https://gist.github.com/2401787">high level node style
-    guide</a></p>
-  </blockquote>
-
-  <blockquote>
-    <p>node Stream API, which is the core I/O abstraction in
-    Node.js (which is a tool for I/O) is essentially an abstract
-    in/out interface that can handle any protocol/stream that also
-    happens to be written in JavaScript. [<a href=
-    "http://maxogden.com/a-proposal-for-streaming-xhr.html">http://maxogden.com/a-proposal-for-streaming-xhr.html</a>]</p>
-  </blockquote>
-
-  <p>Bash streams a powerful abstraction easily programmed for
-  linear streaming. Node more powerful, allows a powerful streaming
-  abstraction which is no more complex to program than a javascript
-  webapp front end. Essentially a low-level interface to streaming
-  such as unix sockets or tcp connections.</p>
-
-  <p>Streams in node are the observer pattern. Readable streams
-  emit 'readable' events when they have some data to be read and
-  'end' events when they are finished. Apart from error handling,
-  so far as reading is concerned, that is the extent of the
-  API.</p>
-
-  <p>Although the streams themselves are stateful, because they are
-  based on callbacks it is entirely possible to use them from a
-  component of a javascript program which is wholly stateless.</p>
-
-  <p>Using Node's http module provides a stream but handles setting
-  headers, putting the method otu etc.</p>
-
-  <p>What Node is V8. Fast. Near-native. JIT.</p>
-
-  <p>V8 is often said to be 'near-native' speed, meaning it runs at
-  close to the speed of a similarly coded C program. However, this
-  relies on the programmer also coding in the style of a C
-  programmer, for example with only mono-morphic callsites and
-  without a functional style. Once either of those programming
-  techniques is taken up performance drops rapidly [<a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-  When used in a functional style, not 'near-native' in the sense
-  that not close to the performance gained by compiling a well
-  designed functional language to natively executable code. Depends
-  on style coded in, comparison to native somewhat takes C as the
-  description of the operation of an idealised CPU rather than an
-  abstract machine capable of executing on an actual CPU.</p>
-
-  <p><em>Anecdote: SVG engine: one function for xy vs x and xy.
-  Very large speed increase. Add figures etc.</em></p>
-
-  <p>Why Node perhaps is mis-placed in its current usage as a
-  purely web platform "the aim is absolutely fast io". This
-  happened because web specialist programmers took it up first</p>
-
-  <p>Why Node is significant * Recognises that most tasks are
-  io-bound rather than CPU bound. Threaded models good for
-  CPU-bound in the main.</p>
-
-  <p>How Node is different</p>
-
-  <p>Criticisms of Node. Esp from Erlang etc devs.</p>
-
-  <p>Node's standard stream mechanisms</p>
-
   <h2 id="testing"><a href="#testing"><span class=
-  "header-section-number">3.11</span> Testing</a></h2>
+  "header-section-number">3.9</span> Testing</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -1278,6 +1259,13 @@ analysis* =-->
 **40 to 60 pages**
 =-->
 
+  <p>What a Micro-library is. What motivates the trend? This
+  library has a fairly small set of functionality, it isn't a
+  general purpose do-everything library like jQuery so its size
+  will be looked at more critically if it is too large. Micro
+  library is the current gold standard for compactness. Still, have
+  a lot to do in not very much code.</p>
+
   <p>Relationship between type of a node and its purpose in the
   document. Purpose is often obvious from a combination of URL and
   type so can disregard the place in the document. This structure
@@ -1293,6 +1281,27 @@ analysis* =-->
   manually through a haystack in search of a needle, which means
   the library should provide an expressive way of associating the
   nodes of interest with their targetted callbacks.</p>
+
+  <h2 id="js-code-style"><a href="#js-code-style"><span class=
+  "header-section-number">4.1</span> JS code style</a></h2>
+
+  <p>Javascript: not the greatest for 'final' elegant presentation
+  of programming. Does allow 'messy' first drafts which can be
+  refactored into beautiful code. Ie, can write stateful and
+  refactor in small steps towards being stateless. An awareness of
+  beautiful languages lets us know the right direction to go in. An
+  ugly language lets us find something easy to write that works to
+  get us started. Allows a very sketchy program to be written,
+  little more than a programming scratchpad.</p>
+
+  <p>Without strict typing, hard to know if program is correct
+  without running it. In theory (decidability) and in practice
+  (often find errors through running and finding errors thrown).
+  Echo FPR: once compiling, good typing tends to give a reasonable
+  sureness that the code is correct.</p>
+
+  <h2 id="something-else"><a href="#something-else"><span class=
+  "header-section-number">4.2</span> something else</a></h2>
 
   <p>A feature set which is minimal but contain no obvious
   omissions.</p>
@@ -1325,7 +1334,7 @@ analysis* =-->
 
   <h2 id="resume-on-failure"><a href=
   "#resume-on-failure"><span class=
-  "header-section-number">4.1</span> resume on failure</a></h2>
+  "header-section-number">4.3</span> resume on failure</a></h2>
 
   <p>Http 1.1 provides a mechanism for Byte Serving via the
   Accepts-Ranges header [<a href=
@@ -1337,7 +1346,7 @@ analysis* =-->
 
   <h2 id="delivery-methodology"><a href=
   "#delivery-methodology"><span class=
-  "header-section-number">4.2</span> delivery methodology</a></h2>
+  "header-section-number">4.4</span> delivery methodology</a></h2>
 
   <p>Because Kanban focusses on always having a potentially
   releasable product, it mitigates problems which could otherwise
@@ -1357,7 +1366,7 @@ analysis* =-->
   "overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
   <a href=
   "#overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
-  <span class="header-section-number">4.3</span> overall design
+  <span class="header-section-number">4.5</span> overall design
   philosophy and breaking out of big/small tradeoff</a></h2>
 
   <p>In which a callback call is received not just when the whole
@@ -1382,7 +1391,7 @@ analysis* =-->
 
   <h2 id="choice-of-technologies"><a href=
   "#choice-of-technologies"><span class=
-  "header-section-number">4.4</span> choice of
+  "header-section-number">4.6</span> choice of
   technologies</a></h2>
 
   <p>can justify why js as:</p>
@@ -1417,7 +1426,7 @@ analysis* =-->
   <p>easy to distribute softare (npm etc)</p>
 
   <h2 id="summary-of-json"><a href="#summary-of-json"><span class=
-  "header-section-number">4.5</span> summary of json</a></h2>
+  "header-section-number">4.7</span> summary of json</a></h2>
 
   <p>Why json?</p>
 
@@ -1429,7 +1438,7 @@ analysis* =-->
 
   <h2 id="creating-a-losely-coupled-reader"><a href=
   "#creating-a-losely-coupled-reader"><span class=
-  "header-section-number">4.6</span> creating a losely coupled
+  "header-section-number">4.8</span> creating a losely coupled
   reader</a></h2>
 
   <p>Programming to identify a certain interesting part of a
@@ -1457,7 +1466,7 @@ analysis* =-->
 
   <h2 id="design-of-the-jsonpath-parser"><a href=
   "#design-of-the-jsonpath-parser"><span class=
-  "header-section-number">4.7</span> Design of the jsonpath
+  "header-section-number">4.9</span> Design of the jsonpath
   parser</a></h2>
 
   <p>Explain why Haskel/lisp style lists are used rather than
@@ -1521,7 +1530,7 @@ analysis* =-->
 
   <h2 id="incrementally-building-up-the-content"><a href=
   "#incrementally-building-up-the-content"><span class=
-  "header-section-number">4.8</span> Incrementally building up the
+  "header-section-number">4.10</span> Incrementally building up the
   content</a></h2>
 
   <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
@@ -1575,7 +1584,7 @@ analysis* =-->
 
   <h2 id="identifying-interesting-objects-in-the-stream"><a href=
   "#identifying-interesting-objects-in-the-stream"><span class=
-  "header-section-number">4.9</span> identifying interesting
+  "header-section-number">4.11</span> identifying interesting
   objects in the stream</a></h2>
 
   <p>NB: This consideration of type in json could be in the
@@ -1707,7 +1716,7 @@ analysis* =-->
   <p>When we aer searching</p>
 
   <h2 id="program-design"><a href="#program-design"><span class=
-  "header-section-number">4.10</span> program design</a></h2>
+  "header-section-number">4.12</span> program design</a></h2>
 
   <div class="figure">
     <img src="images/overallDesign.png" alt=
@@ -1720,7 +1729,7 @@ analysis* =-->
 
   <h2 id="incrementally-building-up-a-model"><a href=
   "#incrementally-building-up-a-model"><span class=
-  "header-section-number">4.11</span> incrementally building up a
+  "header-section-number">4.13</span> incrementally building up a
   model</a></h2>
 
   <p>A refactoring was used to separate logic and state:</p>
@@ -1760,7 +1769,7 @@ analysis* =-->
 
   <h2 id="styles-of-programming"><a href=
   "#styles-of-programming"><span class=
-  "header-section-number">4.12</span> styles of
+  "header-section-number">4.14</span> styles of
   programming</a></h2>
 
   <p>The code presented is the result of the development many prior
@@ -1870,7 +1879,7 @@ analysis* =-->
 
   <h2 id="the-mutability-problem"><a href=
   "#the-mutability-problem"><span class=
-  "header-section-number">4.13</span> The mutability
+  "header-section-number">4.15</span> The mutability
   problem</a></h2>
 
   <p>Javascript provides no way to decalre an object with 'cohorts'
@@ -1905,7 +1914,7 @@ analysis* =-->
   <h2 id="performance-implications-of-functional-javascript">
   <a href=
   "#performance-implications-of-functional-javascript"><span class=
-  "header-section-number">4.14</span> Performance implications of
+  "header-section-number">4.16</span> Performance implications of
   functional javascript</a></h2>
 
   <p>(perhaps move to background, or hint at it, eg "although there
@@ -1936,7 +1945,7 @@ analysis* =-->
 
   <h2 id="functions-over-constructors"><a href=
   "#functions-over-constructors"><span class=
-  "header-section-number">4.15</span> functions over
+  "header-section-number">4.17</span> functions over
   constructors</a></h2>
 
   <p>What constructors are in js. Any function, but usually an
@@ -1969,7 +1978,7 @@ analysis* =-->
 
   <h2 id="targeting-node-and-the-browser"><a href=
   "#targeting-node-and-the-browser"><span class=
-  "header-section-number">4.16</span> targeting node and the
+  "header-section-number">4.18</span> targeting node and the
   browser</a></h2>
 
   <p>Node+browser To use Node.js and</p>
@@ -1983,7 +1992,7 @@ analysis* =-->
   <h2 id="packaging-the-library-as-a-single-distributable-file">
   <a href=
   "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  4.17</span> Packaging the library as a single distributable
+  4.19</span> Packaging the library as a single distributable
   file</a></h2>
 
   <div class="figure">
@@ -2113,7 +2122,7 @@ analysis* =-->
   <p>Uglify. Why not Google Closure Compiler.</p>
 
   <h2 id="polyfilling"><a href="#polyfilling"><span class=
-  "header-section-number">4.18</span> polyfilling</a></h2>
+  "header-section-number">4.20</span> polyfilling</a></h2>
 
   <p>The decline of bad browsers. Incompatability less of a concern
   than it was.</p>
@@ -2136,7 +2145,7 @@ analysis* =-->
 
   <h2 id="automated-testing"><a href=
   "#automated-testing"><span class=
-  "header-section-number">4.19</span> automated testing</a></h2>
+  "header-section-number">4.21</span> automated testing</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -2285,7 +2294,7 @@ analysis* =-->
 
   <h2 id="inversion-of-control"><a href=
   "#inversion-of-control"><span class=
-  "header-section-number">4.20</span> Inversion of Control</a></h2>
+  "header-section-number">4.22</span> Inversion of Control</a></h2>
 
   <p>Aim of creating a micro-library rules out building in a
   general-purpose IoC library.</p>
@@ -2303,7 +2312,7 @@ analysis* =-->
 
   <h2 id="stability-over-upgrades"><a href=
   "#stability-over-upgrades"><span class=
-  "header-section-number">4.21</span> stability over
+  "header-section-number">4.23</span> stability over
   upgrades</a></h2>
 
   <p>why jsonpath-like syntax allows upgrading message semantics
@@ -2312,7 +2321,7 @@ analysis* =-->
 
   <h2 id="support-for-older-browsers"><a href=
   "#support-for-older-browsers"><span class=
-  "header-section-number">4.22</span> support for older
+  "header-section-number">4.24</span> support for older
   browsers</a></h2>
 
   <p>Still works as well as non-progressive json Could be used for
@@ -2321,13 +2330,13 @@ analysis* =-->
 
   <h2 id="suitability-for-databases"><a href=
   "#suitability-for-databases"><span class=
-  "header-section-number">4.23</span> suitability for
+  "header-section-number">4.25</span> suitability for
   databases</a></h2>
 
   <p>Databases offer data one row at a time, not as a big lump.</p>
 
   <h2 id="weaknesses"><a href="#weaknesses"><span class=
-  "header-section-number">4.24</span> weaknesses</a></h2>
+  "header-section-number">4.26</span> weaknesses</a></h2>
 
   <p>implementation keeps 'unreachable' listeners difficult
   decidability/proof type problem to get completely right but could
@@ -2493,6 +2502,19 @@ analysis* =-->
   title=
   "http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm">http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm</a>.</p>
 
+  <p>Graham, Paul. 2004. <em>The Other Road Ahead</em>.
+  O&acirc;&euro;&trade;Reilly and Associates.</p>
+
+  <p>Hopkins, Don. 1994. <em>The X-Windows Disaster</em>. Hungry
+  Minds.</p>
+
+  <p>Lea, Tom. 2012. &acirc;&euro;&oelig;Improving performance on
+  twitter.com.&acirc;&euro; <a href=
+  "[https://blog.twitter.com/2012/improving-performance-twittercom]"
+  title=
+  "[https://blog.twitter.com/2012/improving-performance-twittercom]">
+  [https://blog.twitter.com/2012/improving-performance-twittercom]</a>.</p>
+
   <p>Mullany, Michael. 2013. &acirc;&euro;&oelig;5 Myths About
   Mobile Web Performance.&acirc;&euro; <a href=
   "http://www.sencha.com/blog/5-myths-about-mobile-web-performance"
@@ -2541,22 +2563,23 @@ analysis* =-->
 
     <ol>
       <li id="fn1">
-        <p>For quite an obviously visible example of progressive
-        SVG loading, try loading this SVG using a recent version of
-        Google Chrome: <a href=
-        "http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg">
-        http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg</a>
-        For the perfectionist SVG artist, not just the final image
-        should be considered but also the XML source order, for
-        example in this case it would be helpful if the outline of
-        the UK appeared first and the exploded sections
-        last.<a href="#fnref1">&acirc;&dagger;&copy;</a></p>
+        <p>See <a href=
+        "http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html">
+        http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html</a>.<a href="#fnref1">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn2">
+        <p>Rather confusingly, X11 would call the <em>server</em>
+        the <em>client</em> but I use terms here by their more
+        cannonical meaning such that the client is the machine the
+        user is actually interacting with.<a href=
+        "#fnref2">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn3">
         <p>See <a href=
         "http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html">
-        http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html</a>.<a href="#fnref2">&acirc;&dagger;&copy;</a></p>
+        http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html</a>.<a href="#fnref3">&acirc;&dagger;&copy;</a></p>
       </li>
     </ol>
   </div>
