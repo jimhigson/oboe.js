@@ -109,6 +109,24 @@ this by removing responsibility to explicitly store the data used by a
 function. Recognises that most tasks are io-bound rather than CPU bound.
 Threaded models good for CPU-bound in the main.
 
+What Node is V8. Fast. Near-native. JIT.
+
+V8 is often said to be 'near-native' speed, meaning it runs at close to
+the speed of a similarly coded C program. However, this relies on the
+programmer also coding in the style of a C programmer, for example with
+only mono-morphic callsites and without a functional style. Once either
+of those programming techniques is taken up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+When used in a functional style, not 'near-native' in the sense that not
+close to the performance gained by compiling a well designed functional
+language to natively executable code. Depends on style coded in,
+comparison to native somewhat takes C as the description of the
+operation of an idealised CPU rather than an abstract machine capable of
+executing on an actual CPU.
+
+Streams in Node
+---------------
+
 Why Node perhaps is mis-placed in its current usage as a purely web
 platform "the objective is absolutely fast I/O". This happened because,
 
@@ -136,24 +154,6 @@ concerned, that is the extent of the API.
 Although the streams themselves are stateful, because they are based on
 callbacks it is entirely possible to use them from a component of a
 javascript program which is wholly stateless.
-
-Using Node's http module provides a stream but handles setting headers,
-putting the method otu etc.
-
-What Node is V8. Fast. Near-native. JIT.
-
-V8 is often said to be 'near-native' speed, meaning it runs at close to
-the speed of a similarly coded C program. However, this relies on the
-programmer also coding in the style of a C programmer, for example with
-only mono-morphic callsites and without a functional style. Once either
-of those programming techniques is taken up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-When used in a functional style, not 'near-native' in the sense that not
-close to the performance gained by compiling a well designed functional
-language to natively executable code. Depends on style coded in,
-comparison to native somewhat takes C as the description of the
-operation of an idealised CPU rather than an abstract machine capable of
-executing on an actual CPU.
 
 Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
 
