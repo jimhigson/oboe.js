@@ -449,21 +449,69 @@ Or, 666 to 3,333 (333 per page)
   <h2 id="node.js"><a href="#node.js"><span class=
   "header-section-number">3.2</span> Node.js</a></h2>
 
-  <p>Difficult to say to what degree Node's use of Javascript is a
-  distraction from its design aims and to what degree it defines
-  the technology. For the first time it is possible to code a
-  presentation logic which is capable of running on either side of
-  the network.</p>
+  <p>It is difficult to say to what degree Node's use of Javascript
+  is a distraction from the system's principled design aims and to
+  what degree it defines the technology. Paradoxically, both may be
+  so. Javascript has proven itself very effective as the language
+  to meet Node's design goals but this suitability is not based on
+  Javascript's association with web browsers, although it is
+  certainly beneficial: for the first time it is possible to
+  program presentation logic once which is capable of running on
+  either client or server. Being already familiar with Javascript,
+  web programmers were the first to take up Node.js first but the
+  project mission statement makes no reference to the web; Node's
+  architecture is well suited to any application domain where
+  low-latency responses to i/o is more of a concern than
+  heavyweight computation. Web applications fit well into this
+  niche but they are far from the only domain that does so.</p>
 
-  <p>Why Node perhaps is mis-placed in its current usage as a
-  purely web platform "the objective is absolutely fast I/O". This
-  happened because, being javascript, web specialist programmers
-  took it up first but the Node.js mission statement makes no
-  reference to the web.</p>
+  <p>In most imperative languages attempts at concurrency have
+  focused on threaded execution, whereas Node is by design
+  single-threaded. Threads are an effective means to speed up
+  parallel computation but not well suited to concurrently running
+  tasks which are mostly i/o dependent. Used for io, threads
+  consume considerable resources while spending most of their lives
+  waiting, occasionally punctuated with short bursts of activity.
+  Programming Java safely with threads which share access to
+  mutable objects requires great care and experience, otherwise the
+  programmer is liable to create race conditions. If we consider
+  for example a Java thread-based http aggregator; each 'requester'
+  thread waits for seconds and then processes for milliseconds. The
+  ratio of waiting to processing is so high that any gains achieved
+  through actual concurrent execution of the active phase is
+  pyrrhic. Following Node's lead, even traditionally thread-based
+  environments such as Java are starting to embrace asynchronous,
+  single-threaded servers with projects such as Netty.</p>
 
-  <p>Why Node is significant. Recognises that most tasks are
-  io-bound rather than CPU bound. Threaded models good for
-  CPU-bound in the main.</p>
+  <p>Node manages concurrency by managing an event loop of queued
+  tasks and expects each task never to block. Non-blocking calls
+  are used for all io and are callback based. Unlike Erlang, Node
+  does not swap tasks out preemptively, it always waits for tasks
+  to complete. This means that each task must complete quickly;
+  while this might at first seem like an onerous requirement to put
+  on the programmer, in practice the asynchronous nature of the
+  toolkit makes following this requirement more natural than not.
+  Indeed, other than accidental non-terminating loops or heavy
+  number-crunching, the lack of any blocking io whatsoever makes it
+  rather difficult to write a node program whose tasks do not exit
+  quickly. This programming model of callback-based, asynchronous,
+  non-blocking io with an event loop is already the model followed
+  inside web browsers, which although multi-threaded in some
+  regards, present a single-threaded virtual machine in terms of
+  Javascript execution.</p>
+
+  <p>A programmer working with Node's single-thread is able to
+  switch contexts quickly to achieve a very efficient kind of
+  concurrency because of Javascript's support for closures. Because
+  of closures, under Node the responsibility to explicitly store
+  state between making an asynchronous call and receiving the
+  callback is removed from the programmer. Closures require no new
+  syntax, the implicit storage of this data feels so natural and
+  inevitable that looking at the typical program it is often not
+  obvious that the responsibility exists at all.</p>
+
+  <h2 id="streams-in-node"><a href="#streams-in-node"><span class=
+  "header-section-number">3.3</span> Streams in Node</a></h2>
 
   <blockquote>
     <p>Streams in node are one of the rare occasions when doing
@@ -474,14 +522,6 @@ Or, 666 to 3,333 (333 per page)
     guide</a></p>
   </blockquote>
 
-  <blockquote>
-    <p>node Stream API, which is the core I/O abstraction in
-    Node.js (which is a tool for I/O) is essentially an abstract
-    in/out interface that can handle any protocol/stream that also
-    happens to be written in JavaScript. [<a href=
-    "http://maxogden.com/a-proposal-for-streaming-xhr.html">http://maxogden.com/a-proposal-for-streaming-xhr.html</a>]</p>
-  </blockquote>
-
   <p>Bash streams a powerful abstraction easily programmed for
   linear streaming. Node more powerful, allows a powerful streaming
   abstraction which is no more complex to program than a javascript
@@ -489,40 +529,23 @@ Or, 666 to 3,333 (333 per page)
   powerful) interface to streaming such as unix sockets or tcp
   connections.</p>
 
-  <p>Streams in node are the observer pattern. Readable streams
-  emit 'readable' events when they have some data to be read and
-  'end' events when they are finished. Apart from error handling,
-  so far as reading is concerned, that is the extent of the
-  API.</p>
+  <blockquote>
+    <p>Node Stream API, which is the core I/O abstraction in
+    Node.js (which is a tool for I/O) is essentially an abstract
+    in/out interface that can handle any protocol/stream that also
+    happens to be written in JavaScript. [<a href=
+    "http://maxogden.com/a-proposal-for-streaming-xhr.html">http://maxogden.com/a-proposal-for-streaming-xhr.html</a>]</p>
+  </blockquote>
 
-  <p>Although the streams themselves are stateful, because they are
-  based on callbacks it is entirely possible to use them from a
-  component of a javascript program which is wholly stateless.</p>
-
-  <p>Using Node's http module provides a stream but handles setting
-  headers, putting the method otu etc.</p>
-
-  <p>What Node is V8. Fast. Near-native. JIT.</p>
-
-  <p>V8 is often said to be 'near-native' speed, meaning it runs at
-  close to the speed of a similarly coded C program. However, this
-  relies on the programmer also coding in the style of a C
-  programmer, for example with only mono-morphic callsites and
-  without a functional style. Once either of those programming
-  techniques is taken up performance drops rapidly [<a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-  When used in a functional style, not 'near-native' in the sense
-  that not close to the performance gained by compiling a well
-  designed functional language to natively executable code. Depends
-  on style coded in, comparison to native somewhat takes C as the
-  description of the operation of an idealised CPU rather than an
-  abstract machine capable of executing on an actual CPU.</p>
-
-  <p>Criticisms of Node. Esp from Erlang etc devs.</p>
+  <p>Streams in node are a variant of the observer pattern and fit
+  into a wider Node event model. Streams emit 'readable' events
+  when they have some data to be read and 'end' events when they
+  are finished. Apart from error handling, so far as reading is
+  concerned, that is the extent of the API.</p>
 
   <h2 id="web-browsers-hosting-rest-clients"><a href=
   "#web-browsers-hosting-rest-clients"><span class=
-  "header-section-number">3.3</span> Web browsers hosting REST
+  "header-section-number">3.4</span> Web browsers hosting REST
   clients</a></h2>
 
   <p>Http is essentially a thinly-wrapped text response around some
@@ -653,7 +676,7 @@ Or, 666 to 3,333 (333 per page)
 
   <h2 id="browser-streaming-frameworks"><a href=
   "#browser-streaming-frameworks"><span class=
-  "header-section-number">3.4</span> Browser streaming
+  "header-section-number">3.5</span> Browser streaming
   frameworks</a></h2>
 
   <p>As the web's remit spread to include more applications which
@@ -750,7 +773,7 @@ analysis* =-->
   none of these approaches are particularly satisfactory.</p>
 
   <h2 id="json-and-xml"><a href="#json-and-xml"><span class=
-  "header-section-number">3.5</span> Json and XML</a></h2>
+  "header-section-number">3.6</span> Json and XML</a></h2>
 
   <p>Although AJAX started as a means to transfer XML, today JSON
   "The fat-free alternative to XML<span class="citation">(Douglas
@@ -795,7 +818,7 @@ analysis* =-->
 
   <h2 id="parsing-sax-and-dom"><a href=
   "#parsing-sax-and-dom"><span class=
-  "header-section-number">3.6</span> Parsing: SAX and Dom</a></h2>
+  "header-section-number">3.7</span> Parsing: SAX and Dom</a></h2>
 
   <p>In the XML world two standard parser models exist, SAX and
   DOM, with DOM far the more popular. DOM performs a parse as a
@@ -939,7 +962,7 @@ analysis* =-->
 
   <h2 id="common-patterns-when-connecting-to-rest-services">
   <a href="#common-patterns-when-connecting-to-rest-services"><span class="header-section-number">
-  3.7</span> Common patterns when connecting to REST
+  3.8</span> Common patterns when connecting to REST
   services</a></h2>
 
   <p>Marshaling provides two-way mapping between a domain model and
@@ -1076,7 +1099,7 @@ analysis* =-->
 
   <h2 id="jsonpath-and-xpath"><a href=
   "#jsonpath-and-xpath"><span class=
-  "header-section-number">3.8</span> JsonPath and XPath</a></h2>
+  "header-section-number">3.9</span> JsonPath and XPath</a></h2>
 
   <p>Both the above difficulty in identifying the interesting parts
   of a message whilst using a streaming parser and the problem with
@@ -1209,7 +1232,7 @@ analysis* =-->
   over the next five years or so.</p>
 
   <h2 id="testing"><a href="#testing"><span class=
-  "header-section-number">3.9</span> Testing</a></h2>
+  "header-section-number">3.10</span> Testing</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -1299,6 +1322,13 @@ analysis* =-->
   (often find errors through running and finding errors thrown).
   Echo FPR: once compiling, good typing tends to give a reasonable
   sureness that the code is correct.</p>
+
+  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
+  promises.</p>
+
+  <p>Although the streams themselves are stateful, because they are
+  based on callbacks it is entirely possible to use them from a
+  component of a javascript program which is wholly stateless.</p>
 
   <h2 id="something-else"><a href="#something-else"><span class=
   "header-section-number">4.2</span> something else</a></h2>
@@ -1917,14 +1947,26 @@ analysis* =-->
   "header-section-number">4.16</span> Performance implications of
   functional javascript</a></h2>
 
+  <p>V8 and other modern JS engines are often said to be
+  'near-native' speed, meaning it runs at close to the speed of a
+  similarly coded C program. However, this relies on the programmer
+  also coding in the style of a C programmer, for example with only
+  mono-morphic callsites and without a functional style. Once
+  either of those programming techniques is taken up performance
+  drops rapidly [<a href=
+  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
+  9571 ms vs 504 ms. When used in a functional style, not
+  'near-native' in the sense that not close to the performance
+  gained by compiling a well designed functional language to
+  natively executable code. Depends on style coded in, comparison
+  to native somewhat takes C as the description of the operation of
+  an idealised CPU rather than an abstract machine capable of
+  executing on an actual CPU.</p>
+
   <p>(perhaps move to background, or hint at it, eg "although there
   are still some performance implications involved in a functional
   style, javascript may be used in a non-pure functional style") -
   with link to here</p>
-
-  <p><a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html
-  9571 ms vs 504 ms</p>
 
   <p>The performance degradation, even with a self-hosted forEach,
   is due to the JIT&acirc;&euro;&trade;s inability to efficiently
