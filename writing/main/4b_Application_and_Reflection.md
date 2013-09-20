@@ -656,7 +656,7 @@ everything, only through public API.
 
 Uglify. Why not Google Closure Compiler.
 
-(not) Resume
+Resume (not) 
 ------------
 
 Could implement a resume function for if transmission stops halfway
