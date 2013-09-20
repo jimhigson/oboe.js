@@ -32,6 +32,10 @@ defineProperty again.
 Would benefit from a stateless language where everything is stateless at
 all times to avoid having to program defensively.
 
+Aborting http request may not stop processing on the server. Why this is
+perhaps desirable - transactions, leaving resources in a half-complete
+state.
+
 Development methodology
 -----------------------
 
