@@ -158,15 +158,6 @@ implemented, not universal on all functions.
 
 easy to distribute softare (npm etc)
 
-summary of json
----------------
-
-Why json?
-
-A bridge between languages that isn't too different from the common
-types in the languages themselves a common bridge between languages
-
-Also very simple. Easy to parse.
 
 creating a losely coupled reader
 --------------------------------
