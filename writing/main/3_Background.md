@@ -111,27 +111,30 @@ which each thread spends most of its life waiting, consuming
 considerable resources, occasionally punctuated with short bursts of
 activity. Programming Java safely with threads which share access to
 mutable objects requires great care and experience, otherwise the
-programmer is liable to create race conditions.
-
-Consider the example a Java thread-based http aggregator; each
+programmer is liable to create race conditions. If we consider for example a Java thread-based http aggregator; each
 'requester' thread waits for seconds and then processes for
 milliseconds. The ratio of waiting to processing is so high that any
 gains achieved through actual concurrent execution of the active phase
 is pyrrhic. Following Node's lead, even traditionally thread-based
 environments such as Java are starting to embrace asynchronous,
-single-threaded servers with projects such as Netty. Node manages
-concurrency by maintaining an event loop and expects each task never to
-block. Non-blocking io is used for everything and is callback based.
+single-threaded servers with projects such as Netty. 
+
+Node manages
+concurrency by managing an event loop of queued tasks and expects each task never to
+block. Non-blocking calls are used for all io and are callback based.
 Unlike Erlang, Node does not swap tasks out preemptively, it always
-waits for tasks to complete which means that each task must complete
-quickly. While this might at first seem like an onerous requirement to
+waits for tasks to complete. This means that each task must complete
+quickly; while this might at first seem like an onerous requirement to
 put on the programmer, in practice the asynchronous nature of the
 toolkit makes following this requirement more natural than not. Indeed,
 other than accidental non-terminating loops or heavy number-crunching,
 the lack of any blocking io whatsoever makes it rather difficult to
-write a node program whose tasks do not exit quickly.
+write a node program whose tasks do not exit quickly. This programming model of callback-based, asynchronous, non-blocking io
+with an event loop is already the model followed inside web browsers, which
+although multi-threaded in some regards, present a single-threaded virtual
+machine in terms of Javascript execution.
 
-This is already the model followed inside of web browsers, being single
+, being single
 threaded. A programmer working with Node's single-thread is able to
 switch contexts quickly to achieve a very efficient kind of concurrency
 because of Javascript's support for closures. Because of closures, the
