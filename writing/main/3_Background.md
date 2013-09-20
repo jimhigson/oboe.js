@@ -106,37 +106,38 @@ well into this niche but they are far from the only domain that does so.
 In most imperative languages attempts at concurrency have focused on
 threaded execution, whereas Node is by design single-threaded. Threads
 are an effective means to speed up parallel computation but not well
-suited to concurrently running tasks which are mostly i/o dependent. Used for io,
-threads consume
-considerable resources while spending most of their lives waiting, occasionally punctuated with short bursts of
+suited to concurrently running tasks which are mostly i/o dependent.
+Used for io, threads consume considerable resources while spending most
+of their lives waiting, occasionally punctuated with short bursts of
 activity. Programming Java safely with threads which share access to
 mutable objects requires great care and experience, otherwise the
-programmer is liable to create race conditions. If we consider for example a Java thread-based http aggregator; each
-'requester' thread waits for seconds and then processes for
-milliseconds. The ratio of waiting to processing is so high that any
-gains achieved through actual concurrent execution of the active phase
-is pyrrhic. Following Node's lead, even traditionally thread-based
-environments such as Java are starting to embrace asynchronous,
-single-threaded servers with projects such as Netty. 
+programmer is liable to create race conditions. If we consider for
+example a Java thread-based http aggregator; each 'requester' thread
+waits for seconds and then processes for milliseconds. The ratio of
+waiting to processing is so high that any gains achieved through actual
+concurrent execution of the active phase is pyrrhic. Following Node's
+lead, even traditionally thread-based environments such as Java are
+starting to embrace asynchronous, single-threaded servers with projects
+such as Netty.
 
-Node manages
-concurrency by managing an event loop of queued tasks and expects each task never to
-block. Non-blocking calls are used for all io and are callback based.
-Unlike Erlang, Node does not swap tasks out preemptively, it always
-waits for tasks to complete. This means that each task must complete
-quickly; while this might at first seem like an onerous requirement to
-put on the programmer, in practice the asynchronous nature of the
-toolkit makes following this requirement more natural than not. Indeed,
-other than accidental non-terminating loops or heavy number-crunching,
-the lack of any blocking io whatsoever makes it rather difficult to
-write a node program whose tasks do not exit quickly. This programming model of callback-based, asynchronous, non-blocking io
-with an event loop is already the model followed inside web browsers, which
-although multi-threaded in some regards, present a single-threaded virtual
-machine in terms of Javascript execution.
+Node manages concurrency by managing an event loop of queued tasks and
+expects each task never to block. Non-blocking calls are used for all io
+and are callback based. Unlike Erlang, Node does not swap tasks out
+preemptively, it always waits for tasks to complete. This means that
+each task must complete quickly; while this might at first seem like an
+onerous requirement to put on the programmer, in practice the
+asynchronous nature of the toolkit makes following this requirement more
+natural than not. Indeed, other than accidental non-terminating loops or
+heavy number-crunching, the lack of any blocking io whatsoever makes it
+rather difficult to write a node program whose tasks do not exit
+quickly. This programming model of callback-based, asynchronous,
+non-blocking io with an event loop is already the model followed inside
+web browsers, which although multi-threaded in some regards, present a
+single-threaded virtual machine in terms of Javascript execution.
 
-A programmer working with Node's single-thread is able to
-switch contexts quickly to achieve a very efficient kind of concurrency
-because of Javascript's support for closures. Because of closures, the
+A programmer working with Node's single-thread is able to switch
+contexts quickly to achieve a very efficient kind of concurrency because
+of Javascript's support for closures. Because of closures, the
 responsibility to explicitly store current data between an asynchronous
 call and the callback-based is removed from the user, in a way that
 seems so natural that looking at a typical node-hosted program it is
