@@ -126,6 +126,45 @@ programmer. Closures require no new syntax, the implicit storage of this
 data feels so natural and inevitable that looking at the typical program
 it is often not obvious that the responsibility exists at all.
 
+~~~~ {.javascript}
+
+// Rather than blocking, this function relies on non-blocking io and
+// schedules three tasks, each of which exit quickly, allowing this
+// node instance to continue with other tasks in between. 
+// However sophisticated and performant this style of programming, 
+// to the developer it is barely more difficult than if a blocking io
+// model were followed. 
+
+function makeRequest( host, path ) {
+
+   var options = { host: host, path: path };
+   
+   http.get(options, function(response){
+      
+      // This function will be called when the response starts. The callback
+      // having started listening to the response object will quickly exit
+      // as Node tasks are want to do. Because of closures we are able to
+      // access the path variable declared in a containing scope, even after
+      // the containing scope has exited.      
+      console.log("The response has started for " + path);
+   
+      response.on('data', function(chunk) {
+      
+         // This function is called each time some data is received from the 
+         // http request
+         
+         console.log('Got some response ' + chunk);
+       
+      });
+   }).on("error", function(e){
+   
+      console.log("Got error: " + e.message);
+   });
+   
+   console.log("Request has been made");
+}
+~~~~
+
 Streams in Node
 ---------------
 
