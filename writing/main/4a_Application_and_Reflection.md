@@ -114,11 +114,6 @@ packets in-order, for out-of-order packets something else happens.
 
 Use best of the capabilities of each.
 
-Suitability for databases (really just an inline asside)
---------------------------------------------------------
-
-Databases offer data one row at a time, not as a big lump.
-
 Incorporating existing libraries
 --------------------------------
 

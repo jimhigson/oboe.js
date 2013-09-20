@@ -36,6 +36,11 @@ Aborting http request may not stop processing on the server. Why this is
 perhaps desirable - transactions, leaving resources in a half-complete
 state.
 
+Suitability for databases (really just an inline asside)
+--------------------------------------------------------
+
+Databases offer data one row at a time, not as a big lump.
+
 Development methodology
 -----------------------
 
