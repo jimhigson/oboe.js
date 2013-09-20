@@ -1257,43 +1257,23 @@ analysis* =-->
 
   <p>JSTD, as a Java program, is difficult to start via Grunt. Also
   an issue that Grunt post-dates Karma by enough that JSTD doesn't
-  have the attention of the Grunt community.</p>
-
-  <h1 id="application-and-reflection"><a href=
-  "#application-and-reflection"><span class=
-  "header-section-number">4</span> Application and
-  Reflection</a></h1><!---
+  have the attention of the Grunt community.</p><!---
 **40 to 60 pages**
 
-@500w, 13,000 to 19,000
+@333w, 13,000 to 19,000
 =-->
 
-  <p>What a Micro-library is. What motivates the trend? This
-  library has a fairly small set of functionality, it isn't a
-  general purpose do-everything library like jQuery so its size
-  will be looked at more critically if it is too large. Micro
-  library is the current gold standard for compactness. Still, have
-  a lot to do in not very much code.</p>
+  <h1 id="application-and-reflection-1-what-is-it"><a href=
+  "#application-and-reflection-1-what-is-it"><span class=
+  "header-section-number">4</span> Application and Reflection 1:
+  what is it?</a></h1>
 
-  <p>Relationship between type of a node and its purpose in the
-  document. Purpose is often obvious from a combination of URL and
-  type so can disregard the place in the document. This structure
-  may be carefully designed but ultimately a looser interpretation
-  of the structure can be safer.</p>
+  <h2 id="high-level-solution"><a href=
+  "#high-level-solution"><span class=
+  "header-section-number">4.1</span> High-level solution</a></h2>
 
-  <p>Interestingly, the mixed paradigm design hasn't changed the
-  top-level design very much from how it'd be as a pure OO project
-  (IoC, decorators, event filters, pub/sub etc).</p>
-
-  <p>Why SAX is dumb: As a principle, the programmer should only
-  have to handle the cases which are interesting to them, not wade
-  manually through a haystack in search of a needle, which means
-  the library should provide an expressive way of associating the
-  nodes of interest with their targetted callbacks.</p>
-
-  <h2 id="high-level-design"><a href=
-  "#high-level-design"><span class=
-  "header-section-number">4.1</span> High-level design</a></h2>
+  <p>Doing things faster vs doing things earlier. "Hurry up and
+  wait" approach to optimisation.</p>
 
   <p>A feature set which is minimal but contain no obvious
   omissions.</p>
@@ -1312,52 +1292,11 @@ analysis* =-->
   the whole resource locally before the interesting sub-parts are
   delivered.</p>
 
-  <p>Focus on replacing ajax, rather than streaming. In older
-  browsers, getting the whole message at once is no worse than it
-  is now.</p>
-
-  <div class="figure">
-    <img src="images/timeline.png" alt=
-    "Over several hops of aggregation, the benefits of finding the interesting parts early">
-
-    <p class="caption">Over several hops of aggregation, the
-    benefits of finding the interesting parts early</p>
-  </div>
-
-  <h3 id="stability-over-upgrades"><a href=
-  "#stability-over-upgrades"><span class=
-  "header-section-number">4.1.1</span> stability over
-  upgrades</a></h3>
-
-  <p>why jsonpath-like syntax allows upgrading message semantics
-  without causing problems [SOA] how to guarantee non-breakages?
-  could publish 'supported queries' that are guaranteed to work</p>
-
-  <h3 id="suitability-for-databases"><a href=
-  "#suitability-for-databases"><span class=
-  "header-section-number">4.1.2</span> suitability for
-  databases</a></h3>
-
-  <p>Databases offer data one row at a time, not as a big lump.</p>
-
-  <h2 id="resume-on-failure"><a href=
-  "#resume-on-failure"><span class=
-  "header-section-number">4.2</span> resume on failure</a></h2>
-
-  <p>Http 1.1 provides a mechanism for Byte Serving via the
-  Accepts-Ranges header [<a href=
-  "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5]
-  which can be used to request any contiguous part of a response
-  rather than the whole. Common in download managers but not REST
-  clients. This ability can be used to. Why not this one. Resume on
-  a higher semantic level.</p>
-
-  <h2 id=
-  "overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
-  <a href=
-  "#overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
-  <span class="header-section-number">4.3</span> overall design
-  philosophy and breaking out of big/small tradeoff</a></h2>
+  <p>Why not SAX: As a principle, the programmer should only have
+  to handle the cases which are interesting to them, not wade
+  manually through a haystack in search of a needle, which means
+  the library should provide an expressive way of associating the
+  nodes of interest with their targeted callbacks.</p>
 
   <p>In which a callback call is received not just when the whole
   resource is downloaded but for every interesting part which is
@@ -1367,22 +1306,86 @@ analysis* =-->
   from large object to individual datums. With just a few lines of
   programming</p>
 
-  <p>Best of both modes</p>
+  <p>Older browsers: getting the whole message at once is no worse
+  than it is now.</p>
 
-  <p>Granularity: only need read as far as necessary. Services
-  could be designed to write the big picture first. Alternatively,
-  where resources link to one another, can stop reading at the
-  link. Eg, looking for a person's publications, start with an
-  index of people but no need to read whole list of people.</p>
+  <div class="figure">
+    <img src="images/timeline.png" alt=
+    "Over several hops of aggregation, the benefits of finding the interesting parts early">
 
-  <p>Aborting http request may not stop processing on the server.
-  Why this is perhaps desirable - transactions, leaving resources
-  in a half-complete state.</p>
+    <p class="caption">Over several hops of aggregation, the
+    benefits of finding the interesting parts early</p>
+  </div>
 
-  <h2 id="high-level-choice-of-technologies"><a href=
-  "#high-level-choice-of-technologies"><span class=
-  "header-section-number">4.4</span> high-level choice of
-  technologies</a></h2>
+  <p>Interestingly, the mixed paradigm design hasn't changed the
+  top-level design very much from how it'd be as a pure OO project
+  (IoC, decorators, event filters, pub/sub etc).</p>
+
+  <p>Programming to identify a certain interesting part of a
+  resource today should with a high probability still work when
+  applied to future releases.</p>
+
+  <p>Requires a small amount of discipline on behalf of the service
+  provider: Upgrade by adding of semantics only most of the time
+  rather than changing existing semantics.</p>
+
+  <p>Adding of semantics should could include adding new fields to
+  objects (which could themselves contain large sub-trees) or a
+  "push-down" refactor in which what was a root node is pushed down
+  a level by being suspended from a new parent. See</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "extended json rest service that still works - maybe do a table instead ">
+
+    <p class="caption">extended json rest service that still works
+    - maybe do a table instead</p>
+  </div>
+
+  <h2 id="micro-lib"><a href="#micro-lib"><span class=
+  "header-section-number">4.2</span> Micro-lib</a></h2>
+
+  <p>What a Micro-library is. What motivates the trend? This
+  library has a fairly small set of functionality, it isn't a
+  general purpose do-everything library like jQuery so its size
+  will be looked at more critically if it is too large. Micro
+  library is the current gold standard for compactness. Still, have
+  a lot to do in not very much code.</p>
+
+  <h2 id="where-to-target"><a href="#where-to-target"><span class=
+  "header-section-number">4.3</span> Where to target</a></h2>
+
+  <p>targeting node and the browser</p>
+
+  <p>Node+browser To use Node.js and</p>
+
+  <p>Need to build an abstraction layer over xhr/xhr2/node. Can
+  only work for packets in-order, for out-of-order packets
+  something else happens.</p>
+
+  <p>Use best of the capabilities of each.</p>
+
+  <h2 id="stability-over-upgrades"><a href=
+  "#stability-over-upgrades"><span class=
+  "header-section-number">4.4</span> stability over
+  upgrades</a></h2>
+
+  <p>why jsonpath-like syntax allows upgrading message semantics
+  without causing problems [SOA] how to guarantee non-breakages?
+  could publish 'supported queries' that are guaranteed to work</p>
+
+  <h2 id="suitability-for-databases-really-just-an-inline-asside">
+  <a href=
+  "#suitability-for-databases-really-just-an-inline-asside"><span class="header-section-number">
+  4.5</span> suitability for databases (really just an inline
+  asside)</a></h2>
+
+  <p>Databases offer data one row at a time, not as a big lump.</p>
+
+  <h2 id="incorporating-existing-libraries"><a href=
+  "#incorporating-existing-libraries"><span class=
+  "header-section-number">4.6</span> Incorporating existing
+  libraries</a></h2>
 
   <p>can justify why js as:</p>
 
@@ -1415,37 +1418,414 @@ analysis* =-->
 
   <p>easy to distribute softare (npm etc)</p>
 
-  <h2 id="principles-of-a-loosely-coupled-reader"><a href=
-  "#principles-of-a-loosely-coupled-reader"><span class=
-  "header-section-number">4.5</span> principles of a loosely
-  coupled reader</a></h2>
+  <h2 id="handling-failures"><a href=
+  "#handling-failures"><span class=
+  "header-section-number">4.7</span> Handling failures</a></h2>
 
-  <p>Programming to identify a certain interesting part of a
-  resource today should with a high probability still work when
-  applied to future releases.</p>
+  <p>(not) Resume on failure</p>
 
-  <p>Requires a small amount of discipline on behalf of the service
-  provider: Upgrade by adding of semantics only most of the time
-  rather than changing existing semantics.</p>
+  <p>Http 1.1 provides a mechanism for Byte Serving via the
+  Accepts-Ranges header [<a href=
+  "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5]
+  which can be used to request any contiguous part of a response
+  rather than the whole. Common in download managers but not REST
+  clients. This ability can be used to. Why not this one. Resume on
+  a higher semantic level.</p>
 
-  <p>Adding of semantics should could include adding new fields to
-  objects (which could themselves contain large sub-trees) or a
-  "push-down" refactor in which what was a root node is pushed down
-  a level by being suspended from a new parent. See</p>
+  <h1 id="application-and-reflection-2-makin-it"><a href=
+  "#application-and-reflection-2-makin-it"><span class=
+  "header-section-number">5</span> Application and Reflection 2:
+  makin' it</a></h1>
+
+  <h2 id="decomposition-into-components"><a href=
+  "#decomposition-into-components"><span class=
+  "header-section-number">5.1</span> Decomposition into
+  components</a></h2>
+
+  <p>Split up concerns etc</p>
+
+  <p>Local event bus</p>
+
+  <p>Controller</p>
+
+  <p>The problem decomposes nicely into loosely-coupled components,
+  each quite detailed but unconcerned with the others. Once these
+  parts are made, bringing them together under a simple controller
+  is just a matter of joining the dots.</p>
+
+  <p>Code is good when each line feels like a statement of fact
+  rather than a way of going about making an intention true.</p>
+
+  <p>Content builder: like a decorator/wrapper but event based, not
+  based on object wrapping.</p>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
-    "extended json rest service that still works - maybe do a table instead ">
+    "components of the design">
 
-    <p class="caption">extended json rest service that still works
-    - maybe do a table instead</p>
+    <p class="caption">components of the design</p>
   </div>
 
-  <p>(CITE: re-read citations from SOA)</p>
+  <h2 id="inversion-of-control"><a href=
+  "#inversion-of-control"><span class=
+  "header-section-number">5.2</span> Inversion of Control</a></h2>
 
-  <h2 id="design-of-the-jsonpath-parser"><a href=
-  "#design-of-the-jsonpath-parser"><span class=
-  "header-section-number">4.6</span> Design of the jsonpath
+  <p>Aim of creating a micro-library rules out building in a
+  general-purpose IoC library.</p>
+
+  <p>However, can still follow the general principles.</p>
+
+  <p>Why the Observer pattern (cite: des patterns) lends itself
+  well to MVC and inversion of control.</p>
+
+  <p>What the central controller does; acts as a plumber connecting
+  the various parts up. Since oboe is predominantly event/stream
+  based, once wired up little intervention is needed from the
+  controller. Ie, A knows how to listen for ??? events but is
+  unintested who fired them.</p>
+
+  <h2 id="automated-testing"><a href=
+  "#automated-testing"><span class=
+  "header-section-number">5.3</span> Automated testing</a></h2>
+
+  <p>Do it on every save!</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "Relationship between various files and test libraries other half of sketch from notebook">
+
+    <p class="caption">Relationship between various files and test
+    libraries <em>other half of sketch from notebook</em></p>
+  </div>
+
+  <p>How automated testing improves what can be written, not just
+  making what is written more reliable.</p>
+
+  <p>TDD drives development by influencing the design - good design
+  is taken as that which is amenable to testing rather than which
+  describes the problem domain accurately or solves a problem with
+  minimum resources. Amenable to testing often means split into
+  many co-operating parts so that each part may be tested via a
+  simple test.</p>
+
+  <p>Bt encourageing splitting into co-operating objects, TDD to a
+  certain degree is anti-encapsulation. The public object that was
+  extracted as a new concern from a larger object now needs public
+  methods whereas before nothing was exposed.</p>
+
+  <div class="figure">
+    <img src="images/pyramid.png" alt=
+    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. ">
+
+    <p class="caption">The testing pyramid is a common concept,
+    relying on the assumption that verification of small parts
+    provides a solid base from which to compose system-level
+    behaviours. A Lot of testing is done on the low-level
+    components of the system, whereas for the high-level tests only
+    smoke tests are provided.</p>
+  </div>
+
+  <p>Jstd can serve example files but need to write out slowly
+  which it has no concept of. Customistation is via configuration
+  rather than by plug-in, but even if it were, the threading model
+  is not suitable to create this kind of timed output.</p>
+
+  <p>Tests include an extremely large file twentyThousandRecords.js
+  to test under stress</p>
+
+  <p>Why jstd's built in proxy isn't sufficient. An example of a
+  typical Java webserver, features thread-based mutlithreading in
+  which threads wait for a while response to be received.</p>
+
+  <p>Tests deal with the problem of "irreducible complexity" - when
+  a program is made out of parts whose correct behaviour cannot be
+  observed without all of the program. Allows smaller units to be
+  verified before verifying the whole.</p>
+
+  <p>Conversely, automated testing allows us to write
+  incomprehensible code by making us into more powerful
+  programmers, it is possible building up layers of complexity one
+  very small part at a time that we couldn't write in a simple
+  stage. Clarity &gt; cleverness but cleverness has its place as
+  well (intriducing new concepts)</p>
+
+  <p>Testing via node to give something to test against -
+  slowserver. Proxy. JSTD not up to task. Shows how useful node is
+  as a 'network glue'. The same as C was once described as a 'thin
+  glue' [<a href=
+  "http://www.catb.org/esr/writings/taoup/html/ch04s03.html">http://www.catb.org/esr/writings/taoup/html/ch04s03.html</a>].
+  Transparent proxy is about 20 lines. Transparent enough to fool
+  JSTD into thinking it is connecting directly to its server.</p>
+
+  <p>Node comes with very little built in (not even http) but
+  relies on libraries written in the language itself to do
+  everything. Could implement own http on top of sockets if wanted
+  rather than using the provided one.</p>
+
+  <p>The test pyramid concept fits in well with the hiding that is
+  provided. Under the testing pyramid only very high level
+  behaviours are tested as ??? tests. While this is a lucky
+  co-incidence, it is also an unavoidable restriction. Once
+  compiled into a single source file, the individual components are
+  hidden, callable only from withing their closure. Hence, it would
+  not be possible to test the composed parts individually
+  post-concatenation into a single javascript file, not even via a
+  workarround for data hiding such as found in Java's reflection.
+  Whereas in Java the protection is a means of protecting otherwise
+  addressable resources, once a function is trapped inside a
+  javascript closure without external exposure it is not just
+  protected but, appearing in no namespaces, inherently
+  unreferenceable.</p>
+
+  <p>TDD fits well into an object pattern because the software is
+  well composed into separate parts. The objects are almost
+  tangible in their distinction as separate encapsulated entities.
+  However, the multi-paradigm style of my implementation draws much
+  fainter borders over the implementation's landscape.</p>
+
+  <p>Approach has been to the test the intricate code, then for
+  wiring don't have tests to check that things are plumbed together
+  correctly, rather rely on this being obvious enough to be
+  detected via a smoke test.</p>
+
+  <p>A good test should be able to go unchanged as the source under
+  test is refactored. Indeed, the test will be how we know that the
+  code under test still works as intended. Experince tells me that
+  testing that A listens to B (ie that the controller wires the
+  jsonbuilder up to clarinet) produces the kind of test that
+  'follows the code arround' meaning that because it is testing
+  implementation details rather than behaviours, whenever the
+  implementation is updated the tests have to be updated too.</p>
+
+  <p>By testing individual tokens are correct and the use of those
+  tokens as a wider expression, am testing the same thing twice.
+  Arguably, redundant effort. But may simply be easier to write in
+  that way - software is written by a human in a certain order and
+  if we take a bottom-up approach to some of that design, each
+  layer is easier to create if we first know the layers that it
+  sits on are sound. Writing complex regular expressions is still
+  programming and it is more difficult to test them completely when
+  wrapped in rather a lot more logic than directly. For example, a
+  regex which matches "{a,b}" or "{a}" but not "{a,}" is not
+  trivial.</p>
+
+  <p>Can test less exhaustively on higher levels if lower ones are
+  well tested, testing where it is easier to do whilst giving good
+  guarantees.</p>
+
+  <p>Genuine data hiding gets in the way sometimes. Eg, token
+  regexes are built from the combination of smaller regualar
+  expressions for clarity (long regular expressions are concise but
+  hard to read), and then wrapped in functions (why? - explain to
+  generify interface) before being exposed. Because the components
+  are hidden in a scope, they are not addressable by the tests and
+  therefore cannot be directly tested. Reluctantly</p>
+
+  <p>One dilemma in implementing the testing is how far to test the
+  more generic sections of the codebase as generic components. A
+  purist approach to TDD would say</p>
+
+  <h2 id="styles-of-programming"><a href=
+  "#styles-of-programming"><span class=
+  "header-section-number">5.4</span> Styles of Programming</a></h2>
+
+  <p>"Mixed paradigm" design.</p>
+
+  <p>The code presented is the result of the development many prior
+  versions, it has never been rewritten in the sense of starting
+  again. Nontheless, every part has been complely renewed several
+  times. I am reviewing only the final version. Git promotes
+  regular commits, there have been more than 500.</p>
+
+  <p>some of it is pure functional (jsonPath, controller) ie, only
+  semantically different from a Haskell programme others,
+  syntactically functional but stateful to fit in with expected
+  APIs etc</p>
+
+  <p>JsonPath implementation allows the compilation of complex
+  expressions into an executable form, but each part implementing
+  the executable form is locally simple. By using recursion,
+  assembling the simple functions into a more function expressing a
+  more complex rule also follows as being locally simple but
+  gaining a usefully sophisticated behaviour through composition of
+  simple parts. Each recursive call of the parser identifies one
+  token for non-empty input and then recursively digests the
+  rest.</p>
+
+  <p>The style of implementation of the generator of functions
+  corresponding to json path expressions is reminiscent of a
+  traditional parser generator, although rather than generating
+  source, functions are dynamically composed. Reflecting on this,
+  parser gens only went to source to break out of the ability to
+  compose the expressive power of the language itself from inside
+  the language itself. With a functional approach, assembly from
+  very small pieces gives a similar level of expressivity as
+  writing the logic out as source code.</p>
+
+  <p>Why could implement Function#partial via prototype. Why not
+  going to. Is a shame. However, are using prototype for minimal
+  set of polyfills. Not general purpose.</p>
+
+  <p>Different ways to do currying below:</p>
+
+  <p>Partial completion is implemented using the language itself,
+  not provided by the language.</p>
+
+  <p>Why would we choose 1 over the other? First simpler from
+  caller side, second more flexible. Intuitive to call as a single
+  call and can call self more easily.</p>
+
+  <p>In same cases, first form makes it easier to communicate that
+  the completion comes in two parts, for example:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"> <span class=
+"fu">namedNodeExpr</span>(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )</code>
+</pre>
+
+  <p>There is a construction part (first 3 args) and a usage part
+  (last three). Comsume many can only be constructed to ues consume
+  1 in second style because may refer to its own paritally
+  completed version.</p>
+
+  <p>In first case, can avoid this: <code>consume1(
+  partialComplete(consumeMany, previousExpr, undefined, undefined),
+  undefined, undefined, pathStack, nodeStack, stackIndex);</code>
+  because function factory can have optional arguments so don't
+  have to give all of them</p>
+
+  <p>Function factory easier to debug. 'Step in' works. With
+  partialCompletion have an awkward proxy function that breaks the
+  programmer's train of thought as stepping through the code.</p>
+
+  <p>Why it is important to consider the frame of mind of the coder
+  (CITEME: Hackers and Painters) and not just the elegance of the
+  possible language expressions.</p>
+
+  <p>If implementing own functional caching, functional cache
+  allows two levels of caching. Problematic though, for example no
+  way to clear out the cache if memory becomes scarce.</p>
+
+  <p>Functional programming tends to lend better to minification
+  than OO-style because of untyped record objects (can have any
+  keys).</p>
+
+  <p>Lack of consistency in coding (don't write too much, leave to
+  the conclusion)</p>
+
+  <p>Final consideration of coding: packaging up each unit to
+  export a minimal interface. * Why minimal interfaces are better
+  for minification</p>
+
+  <h2 id="js-code-style"><a href="#js-code-style"><span class=
+  "header-section-number">5.5</span> JS code style</a></h2>
+
+  <p>Javascript: not the greatest for 'final' elegant presentation
+  of programming. Does allow 'messy' first drafts which can be
+  refactored into beautiful code. Ie, can write stateful and
+  refactor in small steps towards being stateless. An awareness of
+  beautiful languages lets us know the right direction to go in. An
+  ugly language lets us find something easy to write that works to
+  get us started. Allows a very sketchy program to be written,
+  little more than a programming scratchpad.</p>
+
+  <p>Without strict typing, hard to know if program is correct
+  without running it. In theory (decidability) and in practice
+  (often find errors through running and finding errors thrown).
+  Echo FPR: once compiling, good typing tends to give a reasonable
+  sureness that the code is correct.</p>
+
+  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
+  promises.</p>
+
+  <p>Although the streams themselves are stateful, because they are
+  based on callbacks it is entirely possible to use them from a
+  component of a javascript program which is wholly stateless.</p>
+
+  <h2 id=
+  "performance-implications-of-functional-javascript-subsume-into-above">
+  <a href=
+  "#performance-implications-of-functional-javascript-subsume-into-above">
+  <span class="header-section-number">5.6</span> Performance
+  implications of functional javascript (subsume into
+  above?)</a></h2>
+
+  <p>V8 and other modern JS engines are often said to be
+  'near-native' speed, meaning it runs at close to the speed of a
+  similarly coded C program. However, this relies on the programmer
+  also coding in the style of a C programmer, for example with only
+  mono-morphic callsites and without a functional style. Once
+  either of those programming techniques is taken up performance
+  drops rapidly [<a href=
+  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
+  9571 ms vs 504 ms. When used in a functional style, not
+  'near-native' in the sense that not close to the performance
+  gained by compiling a well designed functional language to
+  natively executable code. Depends on style coded in, comparison
+  to native somewhat takes C as the description of the operation of
+  an idealised CPU rather than an abstract machine capable of
+  executing on an actual CPU.</p>
+
+  <p>(perhaps move to background, or hint at it, eg "although there
+  are still some performance implications involved in a functional
+  style, javascript may be used in a non-pure functional style") -
+  with link to here</p>
+
+  <p>The performance degradation, even with a self-hosted forEach,
+  is due to the JIT&acirc;&euro;&trade;s inability to efficiently
+  inline both the closures passed to forEach</p>
+
+  <p>Lambda Lifting, currently not implemented in SpiderMonkey or
+  V8: <a href=
+  "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346">
+  http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346</a></p>
+
+  <p>The transformations to enable the above criteria are tedious
+  and are surely the purview of the compiler. All
+  that&acirc;&euro;&trade;s needed are brave compiler hackers</p>
+
+  <p>JS is much faster with "monomorphic call sites"</p>
+
+  <p>However, js execution time is not much of a problem,</p>
+
+  <h2 id=
+  "preferring-functions-over-constructors-subsume-into-above-section">
+  <a href=
+  "#preferring-functions-over-constructors-subsume-into-above-section">
+  <span class="header-section-number">5.7</span> Preferring
+  functions over constructors (subsume into above
+  section?)</a></h2>
+
+  <p>What constructors are in js. Any function, but usually an
+  uppercase initial char indicates that it is intended to be used
+  as a constructor.</p>
+
+  <p>Inheritence is constructed using the language itself. While
+  this is more flexible and allows each project to define a bespoke
+  version of inherience to suit their particular needs or
+  preferences, it also hampers portability more than an 'extends'
+  keyword would.</p>
+
+  <blockquote>
+    <p>So far, the JavaScript community has not agreed on a common
+    inheritance library (which would help tooling and code
+    portability) and it is doubtful that that will ever happen.
+    That means, we&acirc;&euro;&trade;re stuck with constructors
+    under ECMAScript 5. <a href=
+    "http://www.2ality.com/2013/07/defending-constructors.html">http://www.2ality.com/2013/07/defending-constructors.html</a></p>
+  </blockquote>
+
+  <p>Functions can be like Factories, gives me the flexability to
+  chagne how something is created but by exposing a constructor are
+  stuck with using 'new' to create an instance of exactly one
+  type.</p>
+
+  <p>Dart has 'factory' constructors which are called like
+  constructors but act like factory functions: (<a href=
+  "http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html">http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html</a>#ch02-constructor-factory)</p>
+
+  <h2 id="design-and-implementation-of-the-jsonpath-parser">
+  <a href="#design-and-implementation-of-the-jsonpath-parser"><span class="header-section-number">
+  5.8</span> Design and implementation of the jsonpath
   parser</a></h2>
 
   <p>NB: This consideration of type in json could be in the
@@ -1478,6 +1858,12 @@ analysis* =-->
   and would rather just continue to recieve the base superclass
   capabilities as before. Under duck typing this is easy - becase
   the data consumer lists the</p>
+
+  <p>Relationship between type of a node and its purpose in the
+  document. Purpose is often obvious from a combination of URL and
+  type so can disregard the place in the document. This structure
+  may be carefully designed but ultimately a looser interpretation
+  of the structure can be safer.</p>
 
   <p>A third injection of type into json comes in the form of
   taking the first property of an object as being the tagname.
@@ -1635,7 +2021,7 @@ analysis* =-->
 
   <h2 id="incrementally-building-up-the-content"><a href=
   "#incrementally-building-up-the-content"><span class=
-  "header-section-number">4.7</span> Incrementally building up the
+  "header-section-number">5.9</span> Incrementally building up the
   content</a></h2>
 
   <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
@@ -1729,9 +2115,10 @@ analysis* =-->
   tail(foo)) if foo could be empty but most of the time that would
   be correct</p>
 
-  <h3 id="mutability-problem"><a href=
-  "#mutability-problem"><span class=
-  "header-section-number">4.7.1</span> mutability problem</a></h3>
+  <h2 id="callback-and-mutability-problem"><a href=
+  "#callback-and-mutability-problem"><span class=
+  "header-section-number">5.10</span> Callback and mutability
+  Problem</a></h2>
 
   <p>Stateful controller very easy to test - only 1 function.</p>
 
@@ -1764,214 +2151,10 @@ analysis* =-->
     <li>defining getter properties</li>
   </ul>
 
-  <h2 id="styles-of-programming"><a href=
-  "#styles-of-programming"><span class=
-  "header-section-number">4.8</span> styles of programming</a></h2>
-
-  <p>The code presented is the result of the development many prior
-  versions, it has never been rewritten in the sense of starting
-  again. Nontheless, every part has been complely renewed several
-  times. I am reviewing only the final version. Git promotes
-  regular commits, there have been more than 500.</p>
-
-  <p>some of it is pure functional (jsonPath, controller) ie, only
-  semantically different from a Haskell programme others,
-  syntactically functional but stateful to fit in with expected
-  APIs etc</p>
-
-  <p>JsonPath implementation allows the compilation of complex
-  expressions into an executable form, but each part implementing
-  the executable form is locally simple. By using recursion,
-  assembling the simple functions into a more function expressing a
-  more complex rule also follows as being locally simple but
-  gaining a usefully sophisticated behaviour through composition of
-  simple parts. Each recursive call of the parser identifies one
-  token for non-empty input and then recursively digests the
-  rest.</p>
-
-  <p>The style of implementation of the generator of functions
-  corresponding to json path expressions is reminiscent of a
-  traditional parser generator, although rather than generating
-  source, functions are dynamically composed. Reflecting on this,
-  parser gens only went to source to break out of the ability to
-  compose the expressive power of the language itself from inside
-  the language itself. With a functional approach, assembly from
-  very small pieces gives a similar level of expressivity as
-  writing the logic out as source code.</p>
-
-  <p>Why could implement Function#partial via prototype. Why not
-  going to. Is a shame. However, are using prototype for minimal
-  set of polyfills. Not general purpose.</p>
-
-  <p>Different ways to do currying below:</p>
-
-  <p>Partial completion is implemented using the language itself,
-  not provided by the language.</p>
-
-  <p>Why would we choose 1 over the other? First simpler from
-  caller side, second more flexible. Intuitive to call as a single
-  call and can call self more easily.</p>
-
-  <p>In same cases, first form makes it easier to communicate that
-  the completion comes in two parts, for example:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript"> <span class=
-"fu">namedNodeExpr</span>(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )</code>
-</pre>
-
-  <p>There is a construction part (first 3 args) and a usage part
-  (last three). Comsume many can only be constructed to ues consume
-  1 in second style because may refer to its own paritally
-  completed version.</p>
-
-  <p>In first case, can avoid this: <code>consume1(
-  partialComplete(consumeMany, previousExpr, undefined, undefined),
-  undefined, undefined, pathStack, nodeStack, stackIndex);</code>
-  because function factory can have optional arguments so don't
-  have to give all of them</p>
-
-  <p>Function factory easier to debug. 'Step in' works. With
-  partialCompletion have an awkward proxy function that breaks the
-  programmer's train of thought as stepping through the code.</p>
-
-  <p>Why it is important to consider the frame of mind of the coder
-  (CITEME: Hackers and Painters) and not just the elegance of the
-  possible language expressions.</p>
-
-  <p>If implementing own functional caching, functional cache
-  allows two levels of caching. Problematic though, for example no
-  way to clear out the cache if memory becomes scarce.</p>
-
-  <p>Functional programming tends to lend better to minification
-  than OO-style because of untyped record objects (can have any
-  keys).</p>
-
-  <p>Lack of consistency in coding (don't write too much, leave to
-  the conclusion)</p>
-
-  <p>Final consideration of coding: packaging up each unit to
-  export a minimal interface. * Why minimal interfaces are better
-  for minification</p>
-
-  <h3 id="performance-implications-of-functional-javascript">
-  <a href=
-  "#performance-implications-of-functional-javascript"><span class=
-  "header-section-number">4.8.1</span> Performance implications of
-  functional javascript</a></h3>
-
-  <p>V8 and other modern JS engines are often said to be
-  'near-native' speed, meaning it runs at close to the speed of a
-  similarly coded C program. However, this relies on the programmer
-  also coding in the style of a C programmer, for example with only
-  mono-morphic callsites and without a functional style. Once
-  either of those programming techniques is taken up performance
-  drops rapidly [<a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-  9571 ms vs 504 ms. When used in a functional style, not
-  'near-native' in the sense that not close to the performance
-  gained by compiling a well designed functional language to
-  natively executable code. Depends on style coded in, comparison
-  to native somewhat takes C as the description of the operation of
-  an idealised CPU rather than an abstract machine capable of
-  executing on an actual CPU.</p>
-
-  <p>(perhaps move to background, or hint at it, eg "although there
-  are still some performance implications involved in a functional
-  style, javascript may be used in a non-pure functional style") -
-  with link to here</p>
-
-  <p>The performance degradation, even with a self-hosted forEach,
-  is due to the JIT&acirc;&euro;&trade;s inability to efficiently
-  inline both the closures passed to forEach</p>
-
-  <p>Lambda Lifting, currently not implemented in SpiderMonkey or
-  V8: <a href=
-  "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346">
-  http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346</a></p>
-
-  <p>The transformations to enable the above criteria are tedious
-  and are surely the purview of the compiler. All
-  that&acirc;&euro;&trade;s needed are brave compiler hackers</p>
-
-  <p>JS is much faster with "monomorphic call sites"</p>
-
-  <p>However, js execution time is not much of a problem,</p>
-
-  <h2 id="js-code-style"><a href="#js-code-style"><span class=
-  "header-section-number">4.9</span> JS code style</a></h2>
-
-  <p>Javascript: not the greatest for 'final' elegant presentation
-  of programming. Does allow 'messy' first drafts which can be
-  refactored into beautiful code. Ie, can write stateful and
-  refactor in small steps towards being stateless. An awareness of
-  beautiful languages lets us know the right direction to go in. An
-  ugly language lets us find something easy to write that works to
-  get us started. Allows a very sketchy program to be written,
-  little more than a programming scratchpad.</p>
-
-  <p>Without strict typing, hard to know if program is correct
-  without running it. In theory (decidability) and in practice
-  (often find errors through running and finding errors thrown).
-  Echo FPR: once compiling, good typing tends to give a reasonable
-  sureness that the code is correct.</p>
-
-  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
-  promises.</p>
-
-  <p>Although the streams themselves are stateful, because they are
-  based on callbacks it is entirely possible to use them from a
-  component of a javascript program which is wholly stateless.</p>
-
-  <h3 id="functions-over-constructors"><a href=
-  "#functions-over-constructors"><span class=
-  "header-section-number">4.9.1</span> functions over
-  constructors</a></h3>
-
-  <p>What constructors are in js. Any function, but usually an
-  uppercase initial char indicates that it is intended to be used
-  as a constructor.</p>
-
-  <p>Inheritence is constructed using the language itself. While
-  this is more flexible and allows each project to define a bespoke
-  version of inherience to suit their particular needs or
-  preferences, it also hampers portability more than an 'extends'
-  keyword would.</p>
-
-  <blockquote>
-    <p>So far, the JavaScript community has not agreed on a common
-    inheritance library (which would help tooling and code
-    portability) and it is doubtful that that will ever happen.
-    That means, we&acirc;&euro;&trade;re stuck with constructors
-    under ECMAScript 5. <a href=
-    "http://www.2ality.com/2013/07/defending-constructors.html">http://www.2ality.com/2013/07/defending-constructors.html</a></p>
-  </blockquote>
-
-  <p>Functions can be like Factories, gives me the flexability to
-  chagne how something is created but by exposing a constructor are
-  stuck with using 'new' to create an instance of exactly one
-  type.</p>
-
-  <p>Dart has 'factory' constructors which are called like
-  constructors but act like factory functions: (<a href=
-  "http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html">http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html</a>#ch02-constructor-factory)</p>
-
-  <h2 id="targeting-node-and-the-browser"><a href=
-  "#targeting-node-and-the-browser"><span class=
-  "header-section-number">4.10</span> targeting node and the
-  browser</a></h2>
-
-  <p>Node+browser To use Node.js and</p>
-
-  <p>Need to build an abstraction layer over xhr/xhr2/node. Can
-  only work for packets in-order, for out-of-order packets
-  something else happens.</p>
-
-  <p>Use best of the capabilities of each.</p>
-
   <h2 id="packaging-the-library-as-a-single-distributable-file">
   <a href=
   "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  4.11</span> Packaging the library as a single distributable
+  5.11</span> Packaging the library as a single distributable
   file</a></h2>
 
   <div class="figure">
@@ -2100,144 +2283,8 @@ analysis* =-->
 
   <p>Uglify. Why not Google Closure Compiler.</p>
 
-  <h2 id="automated-testing"><a href=
-  "#automated-testing"><span class=
-  "header-section-number">4.12</span> automated testing</a></h2>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "Relationship between various files and test libraries other half of sketch from notebook">
-
-    <p class="caption">Relationship between various files and test
-    libraries <em>other half of sketch from notebook</em></p>
-  </div>
-
-  <p>How automated testing improves what can be written, not just
-  making what is written more reliable.</p>
-
-  <p>TDD drives development by influencing the design - good design
-  is taken as that which is amenable to testing rather than which
-  describes the problem domain accurately or solves a problem with
-  minimum resources. Amenable to testing often means split into
-  many co-operating parts so that each part may be tested via a
-  simple test.</p>
-
-  <p>Bt encourageing splitting into co-operating objects, TDD to a
-  certain degree is anti-encapsulation. The public object that was
-  extracted as a new concern from a larger object now needs public
-  methods whereas before nothing was exposed.</p>
-
-  <div class="figure">
-    <img src="images/pyramid.png" alt=
-    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. ">
-
-    <p class="caption">The testing pyramid is a common concept,
-    relying on the assumption that verification of small parts
-    provides a solid base from which to compose system-level
-    behaviours. A Lot of testing is done on the low-level
-    components of the system, whereas for the high-level tests only
-    smoke tests are provided.</p>
-  </div>
-
-  <p>Jstd can serve example files but need to write out slowly
-  which it has no concept of. Customistation is via configuration
-  rather than by plug-in, but even if it were, the threading model
-  is not suitable to create this kind of timed output.</p>
-
-  <p>Tests include an extremely large file twentyThousandRecords.js
-  to test under stress</p>
-
-  <p>Why jstd's built in proxy isn't sufficient. An example of a
-  typical Java webserver, features thread-based mutlithreading in
-  which threads wait for a while response to be received.</p>
-
-  <p>Tests deal with the problem of "irreducible complexity" - when
-  a program is made out of parts whose correct behaviour cannot be
-  observed without all of the program. Allows smaller units to be
-  verified before verifying the whole.</p>
-
-  <p>Conversely, automated testing allows us to write
-  incomprehensible code by making us into more powerful
-  programmers, it is possible building up layers of complexity one
-  very small part at a time that we couldn't write in a simple
-  stage. Clarity &gt; cleverness but cleverness has its place as
-  well (intriducing new concepts)</p>
-
-  <p>Testing via node to give something to test against -
-  slowserver. Proxy. JSTD not up to task. Shows how useful node is
-  as a 'network glue'. The same as C was once described as a 'thin
-  glue' [<a href=
-  "http://www.catb.org/esr/writings/taoup/html/ch04s03.html">http://www.catb.org/esr/writings/taoup/html/ch04s03.html</a>].
-  Transparent proxy is about 20 lines. Transparent enough to fool
-  JSTD into thinking it is connecting directly to its server.</p>
-
-  <p>Node comes with very little built in (not even http) but
-  relies on libraries written in the language itself to do
-  everything. Could implement own http on top of sockets if wanted
-  rather than using the provided one.</p>
-
-  <p>The test pyramid concept fits in well with the hiding that is
-  provided. Under the testing pyramid only very high level
-  behaviours are tested as ??? tests. While this is a lucky
-  co-incidence, it is also an unavoidable restriction. Once
-  compiled into a single source file, the individual components are
-  hidden, callable only from withing their closure. Hence, it would
-  not be possible to test the composed parts individually
-  post-concatenation into a single javascript file, not even via a
-  workarround for data hiding such as found in Java's reflection.
-  Whereas in Java the protection is a means of protecting otherwise
-  addressable resources, once a function is trapped inside a
-  javascript closure without external exposure it is not just
-  protected but, appearing in no namespaces, inherently
-  unreferenceable.</p>
-
-  <p>TDD fits well into an object pattern because the software is
-  well composed into separate parts. The objects are almost
-  tangible in their distinction as separate encapsulated entities.
-  However, the multi-paradigm style of my implementation draws much
-  fainter borders over the implementation's landscape.</p>
-
-  <p>Approach has been to the test the intricate code, then for
-  wiring don't have tests to check that things are plumbed together
-  correctly, rather rely on this being obvious enough to be
-  detected via a smoke test.</p>
-
-  <p>A good test should be able to go unchanged as the source under
-  test is refactored. Indeed, the test will be how we know that the
-  code under test still works as intended. Experince tells me that
-  testing that A listens to B (ie that the controller wires the
-  jsonbuilder up to clarinet) produces the kind of test that
-  'follows the code arround' meaning that because it is testing
-  implementation details rather than behaviours, whenever the
-  implementation is updated the tests have to be updated too.</p>
-
-  <p>By testing individual tokens are correct and the use of those
-  tokens as a wider expression, am testing the same thing twice.
-  Arguably, redundant effort. But may simply be easier to write in
-  that way - software is written by a human in a certain order and
-  if we take a bottom-up approach to some of that design, each
-  layer is easier to create if we first know the layers that it
-  sits on are sound. Writing complex regular expressions is still
-  programming and it is more difficult to test them completely when
-  wrapped in rather a lot more logic than directly. For example, a
-  regex which matches "{a,b}" or "{a}" but not "{a,}" is not
-  trivial.</p>
-
-  <p>Can test less exhaustively on higher levels if lower ones are
-  well tested, testing where it is easier to do whilst giving good
-  guarantees.</p>
-
-  <p>Genuine data hiding gets in the way sometimes. Eg, token
-  regexes are built from the combination of smaller regualar
-  expressions for clarity (long regular expressions are concise but
-  hard to read), and then wrapped in functions (why? - explain to
-  generify interface) before being exposed. Because the components
-  are hidden in a scope, they are not addressable by the tests and
-  therefore cannot be directly tested. Reluctantly</p>
-
-  <p>One dilemma in implementing the testing is how far to test the
-  more generic sections of the codebase as generic components. A
-  purist approach to TDD would say</p>
+  <h2 id="not-resume"><a href="#not-resume"><span class=
+  "header-section-number">5.12</span> (not) Resume</a></h2>
 
   <p>Could implement a resume function for if transmission stops
   halfway</p>
@@ -2249,40 +2296,17 @@ analysis* =-->
    }</code>
 </pre>
 
-  <h2 id="inversion-of-control"><a href=
-  "#inversion-of-control"><span class=
-  "header-section-number">4.13</span> Inversion of Control</a></h2>
-
-  <p>Aim of creating a micro-library rules out building in a
-  general-purpose IoC library.</p>
-
-  <p>However, can still follow the general principles.</p>
-
-  <p>Why the Observer pattern (cite: des patterns) lends itself
-  well to MVC and inversion of control.</p>
-
-  <p>What the central controller does; acts as a plumber connecting
-  the various parts up. Since oboe is predominantly event/stream
-  based, once wired up little intervention is needed from the
-  controller. Ie, A knows how to listen for ??? events but is
-  unintested who fired them.</p>
-
   <h2 id="support-for-older-browsers"><a href=
   "#support-for-older-browsers"><span class=
-  "header-section-number">4.14</span> support for older
+  "header-section-number">5.13</span> support for older
   browsers</a></h2>
 
   <p>Still works as well as non-progressive json Could be used for
   content that is inherently streaming (wouldn't make sense without
   streaming)</p>
 
-  <h3 id="polyfilling"><a href="#polyfilling"><span class=
-  "header-section-number">4.14.1</span> polyfilling</a></h3>
-
   <p>The decline of bad browsers. Incompatibility less of a concern
   than it was.</p>
-
-  <p>Node doesn't require, built on v8.</p>
 
   <p><a href=
   "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
@@ -2298,8 +2322,16 @@ analysis* =-->
   mechanisms that that logic sits on and, by providing abstraction,
   elucidates the code.</p>
 
+  <h1 id="conclusion"><a href="#conclusion"><span class=
+  "header-section-number">6</span> Conclusion</a></h1><!---
+**1 to 5 pages**
+=-->
+
+  <p>Doing things faster vs doing things earlier. "Hurry up and
+  wait" approach to optimisation.</p>
+
   <h2 id="weaknesses"><a href="#weaknesses"><span class=
-  "header-section-number">4.15</span> weaknesses</a></h2>
+  "header-section-number">6.1</span> weaknesses</a></h2>
 
   <p>implementation keeps 'unreachable' listeners difficult
   decidability/proof type problem to get completely right but could
@@ -2327,17 +2359,13 @@ analysis* =-->
   stateless at all times to avoid having to program
   defensively.</p>
 
-  <h1 id="conclusion"><a href="#conclusion"><span class=
-  "header-section-number">5</span> Conclusion</a></h1><!---
-**1 to 5 pages**
-=-->
-
-  <p>Doing things faster vs doing things earlier. "Hurry up and
-  wait" approach to optimisation.</p>
+  <p>Aborting http request may not stop processing on the server.
+  Why this is perhaps desirable - transactions, leaving resources
+  in a half-complete state.</p>
 
   <h2 id="development-methodology"><a href=
   "#development-methodology"><span class=
-  "header-section-number">5.1</span> Development
+  "header-section-number">6.2</span> Development
   methodology</a></h2>
 
   <p>Did it help?</p>
@@ -2355,7 +2383,7 @@ analysis* =-->
   possible library.</p>
 
   <h2 id="size"><a href="#size"><span class=
-  "header-section-number">5.2</span> Size</a></h2>
+  "header-section-number">6.3</span> Size</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -2369,7 +2397,7 @@ analysis* =-->
 
   <h2 id="handling-invalid-input"><a href=
   "#handling-invalid-input"><span class=
-  "header-section-number">5.3</span> Handling invalid
+  "header-section-number">6.4</span> Handling invalid
   input</a></h2>
 
   <p>Invalid jsonpaths made from otherwise valid clauses (for
@@ -2400,7 +2428,7 @@ analysis* =-->
 
   <h2 id="comparative-usages"><a href=
   "#comparative-usages"><span class=
-  "header-section-number">5.4</span> Comparative usages</a></h2>
+  "header-section-number">6.5</span> Comparative usages</a></h2>
 
   <p>Interesting article from Clarinet: <a href=
   "http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">
@@ -2429,17 +2457,17 @@ analysis* =-->
 
   <h2 id="community-reaction"><a href=
   "#community-reaction"><span class=
-  "header-section-number">5.5</span> Community reaction</a></h2>
+  "header-section-number">6.6</span> Community reaction</a></h2>
 
   <p>Built into Dojo Followers on Github Being posted in forums
   (hopefully also listed on blogs) No homepage as of yet other than
   the Github page</p>
 
   <h1 id="appendix"><a href="#appendix"><span class=
-  "header-section-number">6</span> Appendix</a></h1>
+  "header-section-number">7</span> Appendix</a></h1>
 
   <h1 id="bibliography"><a href="#bibliography"><span class=
-  "header-section-number">7</span> Bibliography</a></h1>
+  "header-section-number">8</span> Bibliography</a></h1>
 
   <p>Ahuvia, Yogev. 2013. &acirc;&euro;&oelig;Design Patterns:
   Infinite Scrolling: Let&acirc;&euro;&trade;s Get To The Bottom Of
