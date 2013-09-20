@@ -60,8 +60,19 @@ suspended from a new parent. See \ref{enhancingrest}
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
+Micro-lib
+---------
+
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
+Where to target
+---------------
+
 targeting node and the browser
-------------------------------
 
 Node+browser To use Node.js and
 
@@ -82,26 +93,7 @@ suitability for databases (really just an inline asside)
 
 Databases offer data one row at a time, not as a big lump.
 
-Micro-lib
----------
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
-
-resume on failure
------------------
-
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to. Why not this one. Resume on a higher semantic
-level.
-
-incorporating existing libraries
+Incorporating existing libraries
 --------------------------------
 
 can justify why js as:
@@ -132,3 +124,15 @@ pure functional language, ie function caches although can be
 implemented, not universal on all functions.
 
 easy to distribute softare (npm etc)
+
+Handling failures
+-----------------
+
+(not) Resume on failure
+
+Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
+header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
+which can be used to request any contiguous part of a response rather
+than the whole. Common in download managers but not REST clients. This
+ability can be used to. Why not this one. Resume on a higher semantic
+level.
