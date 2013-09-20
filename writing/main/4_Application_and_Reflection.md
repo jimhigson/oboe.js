@@ -37,6 +37,8 @@ operation of an idealised CPU rather than an abstract machine capable of
 executing on an actual CPU.
 
 
+
+
 Why SAX is dumb:
 As a principle, the
 programmer should only have to handle the cases which are interesting to
@@ -62,9 +64,14 @@ through running and finding errors thrown). Echo FPR: once compiling,
 good typing tends to give a reasonable sureness that the code is
 correct.
 
+Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
+
+Although the streams themselves are stateful, because they are based on
+callbacks it is entirely possible to use them from a component of a
+javascript program which is wholly stateless.
+
 something else
 --------------
-
 
 A feature set which is minimal but contain no obvious omissions.
 

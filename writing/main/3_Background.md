@@ -147,18 +147,10 @@ it is often not obvious that the responsibility exists at all.
 Streams in Node
 ---------------
 
-Why Node perhaps is mis-placed in its current usage as a purely web
-platform "the objective is absolutely fast I/O". This happened because,
-
 > Streams in node are one of the rare occasions when doing something the
 > fast way is actually easier. SO USE THEM. not since bash has streaming
 > been introduced into a high level language as nicely as it is in
 > node." [high level node style guide](https://gist.github.com/2401787)
-
-> node Stream API, which is the core I/O abstraction in Node.js (which
-> is a tool for I/O) is essentially an abstract in/out interface that
-> can handle any protocol/stream that also happens to be written in
-> JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]
 
 Bash streams a powerful abstraction easily programmed for linear
 streaming. Node more powerful, allows a powerful streaming abstraction
@@ -166,16 +158,16 @@ which is no more complex to program than a javascript webapp front end.
 Essentially a lower-level (and therefore more powerful) interface to
 streaming such as unix sockets or tcp connections.
 
-Streams in node are the observer pattern. Readable streams emit
-'readable' events when they have some data to be read and 'end' events
-when they are finished. Apart from error handling, so far as reading is
-concerned, that is the extent of the API.
+> Node Stream API, which is the core I/O abstraction in Node.js (which
+> is a tool for I/O) is essentially an abstract in/out interface that
+> can handle any protocol/stream that also happens to be written in
+> JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]
 
-Although the streams themselves are stateful, because they are based on
-callbacks it is entirely possible to use them from a component of a
-javascript program which is wholly stateless.
-
-Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
+Streams in node are a variant of the observer pattern and fit into a
+wider Node event model. Streams emit 'readable' events when they have
+some data to be read and 'end' events when they are finished. Apart from
+error handling, so far as reading is concerned, that is the extent of
+the API.
 
 Web browsers hosting REST clients
 ---------------------------------
