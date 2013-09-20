@@ -1,24 +1,6 @@
 Background
 ==========
 
-<!---
-background should be 2-10 pages
-
-That's 1,000 to 5,000 words. (500 per page)
-
-Or, 666 to 3,333 (333 per page)
-
- * introduces the reader to the problem domain or application area
- * ...the context in which the project takes place
- * principles and techniques that will be applied or discussed
-    * prior art
-    * what out there is being popularly used?
-    
- * Don't go into solutions! (that belongs in R&A)   
- * Can analyse a bit but any new reflections should be put in R&A
-   
---->
-
 The web as an application platform
 ----------------------------------
 
