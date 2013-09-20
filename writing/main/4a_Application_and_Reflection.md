@@ -1,10 +1,11 @@
-Application and Reflection 1
-============================
+Application and Reflection 1: what is it?
+=========================================
 
-High-level design
+High-level solution
 -----------------
 
-Doing things faster vs doing things earlier. "Hurry up and wait" approach to optimisation.
+Doing things faster vs doing things earlier. "Hurry up and wait"
+approach to optimisation.
 
 A feature set which is minimal but contain no obvious omissions.
 
@@ -20,11 +21,11 @@ language logic. Once we make the shift to thinking in this way, it is no
 longer necessary to have the whole resource locally before the
 interesting sub-parts are delivered.
 
-Why not SAX: As a principle, the programmer should only have to
-handle the cases which are interesting to them, not wade manually
-through a haystack in search of a needle, which means the library should
-provide an expressive way of associating the nodes of interest with
-their targeted callbacks.
+Why not SAX: As a principle, the programmer should only have to handle
+the cases which are interesting to them, not wade manually through a
+haystack in search of a needle, which means the library should provide
+an expressive way of associating the nodes of interest with their
+targeted callbacks.
 
 In which a callback call is received not just when the whole resource is
 downloaded but for every interesting part which is seen while the
@@ -33,7 +34,8 @@ accommodating enough so as to apply to any data domain and allow any
 granularity of interest, from large object to individual datums. With
 just a few lines of programming
 
-Older browsers: getting the whole message at once is no worse than it is now.
+Older browsers: getting the whole message at once is no worse than it is
+now.
 
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
@@ -58,11 +60,6 @@ suspended from a new parent. See \ref{enhancingrest}
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
-coding strategy
----------
-
-"Mixed paradigm" design.
-
 targeting node and the browser
 ------------------------------
 
@@ -81,7 +78,7 @@ causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
 suitability for databases (really just an inline asside)
--------------------
+--------------------------------------------------------
 
 Databases offer data one row at a time, not as a big lump.
 
