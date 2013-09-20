@@ -137,29 +137,12 @@ single-threaded virtual machine in terms of Javascript execution.
 
 A programmer working with Node's single-thread is able to switch
 contexts quickly to achieve a very efficient kind of concurrency because
-of Javascript's support for closures. Because of closures, the
-responsibility to explicitly store current data between an asynchronous
-call and the callback-based is removed from the user, in a way that
-seems so natural that looking at a typical node-hosted program it is
-often not obvious that any such responsibility exists.
-
-Serving lots of users means doing simple things many times, it usually
-doesn't mean doing anything more complex than serving a single user.
-
-What Node is V8. Fast. Near-native. JIT.
-
-V8 is often said to be 'near-native' speed, meaning it runs at close to
-the speed of a similarly coded C program. However, this relies on the
-programmer also coding in the style of a C programmer, for example with
-only mono-morphic callsites and without a functional style. Once either
-of those programming techniques is taken up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-When used in a functional style, not 'near-native' in the sense that not
-close to the performance gained by compiling a well designed functional
-language to natively executable code. Depends on style coded in,
-comparison to native somewhat takes C as the description of the
-operation of an idealised CPU rather than an abstract machine capable of
-executing on an actual CPU.
+of Javascript's support for closures. Because of closures, under Node
+the responsibility to explicitly store state between making an
+asynchronous call and receiving the callback is removed from the
+programmer. Closures require no new syntax, the implicit storage of this
+data feels so natural and inevitable that looking at the typical program
+it is often not obvious that the responsibility exists at all.
 
 Streams in Node
 ---------------

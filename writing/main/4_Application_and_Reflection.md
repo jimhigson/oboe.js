@@ -4,6 +4,12 @@ Application and Reflection
 **40 to 60 pages**
 --->
 
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
 Relationship between type of a node and its purpose in the document. Purpose is often
 obvious from a combination of URL and type so can disregard the place in the document.
 This structure may be carefully designed but ultimately a looser interpretation of the
@@ -14,7 +20,50 @@ Interestingly, the mixed paradigm design hasn't changed the top-level design
 very much from how it'd be as a pure OO project (IoC, decorators, event 
 filters, pub/sub etc).
 
+When looking at functional style include this:
+---------------------------------------------
 
+V8 and other modern JS engines are often said to be 'near-native' speed, meaning it runs at close to
+the speed of a similarly coded C program. However, this relies on the
+programmer also coding in the style of a C programmer, for example with
+only mono-morphic callsites and without a functional style. Once either
+of those programming techniques is taken up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
+When used in a functional style, not 'near-native' in the sense that not
+close to the performance gained by compiling a well designed functional
+language to natively executable code. Depends on style coded in,
+comparison to native somewhat takes C as the description of the
+operation of an idealised CPU rather than an abstract machine capable of
+executing on an actual CPU.
+
+
+Why SAX is dumb:
+As a principle, the
+programmer should only have to handle the cases which are interesting to
+them, not wade manually through a haystack in search of a needle, which
+means the library should provide an expressive way of associating the
+nodes of interest with their targetted callbacks.
+
+JS code style
+-------------
+
+Javascript: not the greatest for 'final' elegant presentation of
+programming. Does allow 'messy' first drafts which can be refactored
+into beautiful code. Ie, can write stateful and refactor in small steps
+towards being stateless. An awareness of beautiful languages lets us
+know the right direction to go in. An ugly language lets us find
+something easy to write that works to get us started. Allows a very
+sketchy program to be written, little more than a programming
+scratchpad.
+
+Without strict typing, hard to know if program is correct without
+running it. In theory (decidability) and in practice (often find errors
+through running and finding errors thrown). Echo FPR: once compiling,
+good typing tends to give a reasonable sureness that the code is
+correct.
+
+something else
+--------------
 
 
 A feature set which is minimal but contain no obvious omissions.
