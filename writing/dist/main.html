@@ -1278,19 +1278,20 @@ analysis* =-->
   <p>A feature set which is minimal but contain no obvious
   omissions.</p>
 
+  <p>Like other ajax libs still callback-based but turn model for
+  drilling down inside out. Instead of the programmer finding the
+  parts they want as a part of the general logic of the program,
+  declaratively define the interesting parts and have these parts
+  delivered to the language logic. Once we make the shift to
+  thinking in this way, it is no longer necessary to have the whole
+  resource locally before the interesting sub-parts are
+  delivered.</p>
+
   <p>Under the heading [Anatomy of a SOA client] I deconstructed
   the way in which programming logic is often used to identify the
   parts of a model which are currently interesting and started to
   look at some declarative ways in which these parts can be
   obtained.</p>
-
-  <p>Turn this model inside out. Instead of the programmer finding
-  the parts they want as a part of the general logic of the
-  program, declaratively define the interesting parts and have
-  these parts delivered to the language logic. Once we make the
-  shift to thinking in this way, it is no longer necessary to have
-  the whole resource locally before the interesting sub-parts are
-  delivered.</p>
 
   <p>Why not SAX: As a principle, the programmer should only have
   to handle the cases which are interesting to them, not wade
@@ -1342,8 +1343,43 @@ analysis* =-->
     - maybe do a table instead</p>
   </div>
 
+  <h2 id="jsonpath-variation"><a href=
+  "#jsonpath-variation"><span class=
+  "header-section-number">4.2</span> JsonPATH variation</a></h2>
+
+  <p>Duck typing is of course a much looser concept than an XML
+  document's tag names and collisions are possible where objects
+  co-incidentally share property names. In practice however, I find
+  the looseness a strength more often than a weakness. Under a
+  tag-based marshalling from an OO language, sub-types are assigned
+  a new tag name and as a consumer of the document, the 'isa'
+  relationship between a 'class' tagname and it's 'sub-tabname' may
+  be difficult to track. It is likely that if I'm unaware of this,
+  I'm not interested in the extended capabilities of the subclass
+  and would rather just continue to recieve the base superclass
+  capabilities as before. Under duck typing this is easy - becase
+  the data consumer lists the</p>
+
+  <p>Relationship between type of a node and its purpose in the
+  document. Purpose is often obvious from a combination of URL and
+  type so can disregard the place in the document. This structure
+  may be carefully designed but ultimately a looser interpretation
+  of the structure can be safer.</p>
+
+  <h2 id="stability-over-upgrades"><a href=
+  "#stability-over-upgrades"><span class=
+  "header-section-number">4.3</span> Stability over
+  upgrades</a></h2>
+
+  <p>why jsonpath-like syntax allows upgrading message semantics
+  without causing problems [SOA] how to guarantee non-breakages?
+  could publish 'supported queries' that are guaranteed to work</p>
+
+  <h2 id="api-design"><a href="#api-design"><span class=
+  "header-section-number">4.4</span> API design</a></h2>
+
   <h2 id="micro-lib"><a href="#micro-lib"><span class=
-  "header-section-number">4.2</span> Micro-lib</a></h2>
+  "header-section-number">4.5</span> Micro-lib</a></h2>
 
   <p>What a Micro-library is. What motivates the trend? This
   library has a fairly small set of functionality, it isn't a
@@ -1353,7 +1389,7 @@ analysis* =-->
   a lot to do in not very much code.</p>
 
   <h2 id="where-to-target"><a href="#where-to-target"><span class=
-  "header-section-number">4.3</span> Where to target</a></h2>
+  "header-section-number">4.6</span> Where to target</a></h2>
 
   <p>targeting node and the browser</p>
 
@@ -1365,26 +1401,17 @@ analysis* =-->
 
   <p>Use best of the capabilities of each.</p>
 
-  <h2 id="stability-over-upgrades"><a href=
-  "#stability-over-upgrades"><span class=
-  "header-section-number">4.4</span> stability over
-  upgrades</a></h2>
-
-  <p>why jsonpath-like syntax allows upgrading message semantics
-  without causing problems [SOA] how to guarantee non-breakages?
-  could publish 'supported queries' that are guaranteed to work</p>
-
   <h2 id="suitability-for-databases-really-just-an-inline-asside">
   <a href=
   "#suitability-for-databases-really-just-an-inline-asside"><span class="header-section-number">
-  4.5</span> suitability for databases (really just an inline
+  4.7</span> Suitability for databases (really just an inline
   asside)</a></h2>
 
   <p>Databases offer data one row at a time, not as a big lump.</p>
 
   <h2 id="incorporating-existing-libraries"><a href=
   "#incorporating-existing-libraries"><span class=
-  "header-section-number">4.6</span> Incorporating existing
+  "header-section-number">4.8</span> Incorporating existing
   libraries</a></h2>
 
   <p>can justify why js as:</p>
@@ -1420,7 +1447,7 @@ analysis* =-->
 
   <h2 id="handling-failures"><a href=
   "#handling-failures"><span class=
-  "header-section-number">4.7</span> Handling failures</a></h2>
+  "header-section-number">4.9</span> Handling failures</a></h2>
 
   <p>(not) Resume on failure</p>
 
@@ -1431,6 +1458,35 @@ analysis* =-->
   rather than the whole. Common in download managers but not REST
   clients. This ability can be used to. Why not this one. Resume on
   a higher semantic level.</p>
+
+  <h2 id="required-support-for-older-browsers"><a href=
+  "#required-support-for-older-browsers"><span class=
+  "header-section-number">4.10</span> Required support for older
+  browsers</a></h2>
+
+  <p>Aims not possible to realise but don't want to make devs using
+  lib have to special-case.</p>
+
+  <p>Still works as well as non-progressive json Could be used for
+  content that is inherently streaming (wouldn't make sense without
+  streaming)</p>
+
+  <p>The decline of bad browsers. Incompatibility less of a concern
+  than it was.</p>
+
+  <p><a href=
+  "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
+  Unlike the new methods discussed in the first two parts, the
+  methods here are all reproducible using JavaScript itself. Native
+  implementations are simply faster and more convenient. Having a
+  uniform API for these operations also promotes their usage,
+  making code clearer when shared between developers.</p>
+
+  <p>Even when only used once, preferable to polyfill as a generic
+  solution rather than offer a one-time implementation because it
+  better splits the intention of the logic being presented from the
+  mechanisms that that logic sits on and, by providing abstraction,
+  elucidates the code.</p>
 
   <h1 id="application-and-reflection-2-makin-it"><a href=
   "#application-and-reflection-2-makin-it"><span class=
@@ -1484,9 +1540,12 @@ analysis* =-->
   controller. Ie, A knows how to listen for ??? events but is
   unintested who fired them.</p>
 
+  <h2 id="grunt"><a href="#grunt"><span class=
+  "header-section-number">5.3</span> Grunt</a></h2>
+
   <h2 id="automated-testing"><a href=
   "#automated-testing"><span class=
-  "header-section-number">5.3</span> Automated testing</a></h2>
+  "header-section-number">5.4</span> Automated testing</a></h2>
 
   <p>Do it on every save!</p>
 
@@ -1627,13 +1686,14 @@ analysis* =-->
 
   <h2 id="styles-of-programming"><a href=
   "#styles-of-programming"><span class=
-  "header-section-number">5.4</span> Styles of Programming</a></h2>
+  "header-section-number">5.5</span> Styles of Programming</a></h2>
 
-  <p>"Mixed paradigm" design.</p>
+  <p>"Mixed paradigm" design. But not classical: don't need
+  inheritance.</p>
 
   <p>The code presented is the result of the development many prior
   versions, it has never been rewritten in the sense of starting
-  again. Nontheless, every part has been complely renewed several
+  again. Nonetheless, every part has been complely renewed several
   times. I am reviewing only the final version. Git promotes
   regular commits, there have been more than 500.</p>
 
@@ -1717,7 +1777,7 @@ analysis* =-->
   for minification</p>
 
   <h2 id="js-code-style"><a href="#js-code-style"><span class=
-  "header-section-number">5.5</span> JS code style</a></h2>
+  "header-section-number">5.6</span> JS code style</a></h2>
 
   <p>Javascript: not the greatest for 'final' elegant presentation
   of programming. Does allow 'messy' first drafts which can be
@@ -1745,7 +1805,7 @@ analysis* =-->
   "performance-implications-of-functional-javascript-subsume-into-above">
   <a href=
   "#performance-implications-of-functional-javascript-subsume-into-above">
-  <span class="header-section-number">5.6</span> Performance
+  <span class="header-section-number">5.7</span> Performance
   implications of functional javascript (subsume into
   above?)</a></h2>
 
@@ -1791,7 +1851,7 @@ analysis* =-->
   "preferring-functions-over-constructors-subsume-into-above-section">
   <a href=
   "#preferring-functions-over-constructors-subsume-into-above-section">
-  <span class="header-section-number">5.7</span> Preferring
+  <span class="header-section-number">5.8</span> Preferring
   functions over constructors (subsume into above
   section?)</a></h2>
 
@@ -1825,8 +1885,10 @@ analysis* =-->
 
   <h2 id="design-and-implementation-of-the-jsonpath-parser">
   <a href="#design-and-implementation-of-the-jsonpath-parser"><span class="header-section-number">
-  5.8</span> Design and implementation of the jsonpath
+  5.9</span> Design and implementation of the jsonpath
   parser</a></h2>
+
+  <p>Show evolution of it</p>
 
   <p>NB: This consideration of type in json could be in the
   Background section.</p>
@@ -1845,25 +1907,6 @@ analysis* =-->
   is not examined but the properties of the object are used instead
   to communicate an enhanced concept of type. For example, we might
   say that any object with an isbn and a title is a book.</p>
-
-  <p>Duck typing is of course a much looser concept than an XML
-  document's tag names and collisions are possible where objects
-  co-incidentally share property names. In practice however, I find
-  the looseness a strength more often than a weakness. Under a
-  tag-based marshalling from an OO language, sub-types are assigned
-  a new tag name and as a consumer of the document, the 'isa'
-  relationship between a 'class' tagname and it's 'sub-tabname' may
-  be difficult to track. It is likely that if I'm unaware of this,
-  I'm not interested in the extended capabilities of the subclass
-  and would rather just continue to recieve the base superclass
-  capabilities as before. Under duck typing this is easy - becase
-  the data consumer lists the</p>
-
-  <p>Relationship between type of a node and its purpose in the
-  document. Purpose is often obvious from a combination of URL and
-  type so can disregard the place in the document. This structure
-  may be carefully designed but ultimately a looser interpretation
-  of the structure can be safer.</p>
 
   <p>A third injection of type into json comes in the form of
   taking the first property of an object as being the tagname.
@@ -2021,7 +2064,7 @@ analysis* =-->
 
   <h2 id="incrementally-building-up-the-content"><a href=
   "#incrementally-building-up-the-content"><span class=
-  "header-section-number">5.9</span> Incrementally building up the
+  "header-section-number">5.10</span> Incrementally building up the
   content</a></h2>
 
   <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
@@ -2117,7 +2160,7 @@ analysis* =-->
 
   <h2 id="callback-and-mutability-problem"><a href=
   "#callback-and-mutability-problem"><span class=
-  "header-section-number">5.10</span> Callback and mutability
+  "header-section-number">5.11</span> Callback and mutability
   Problem</a></h2>
 
   <p>Stateful controller very easy to test - only 1 function.</p>
@@ -2154,7 +2197,7 @@ analysis* =-->
   <h2 id="packaging-the-library-as-a-single-distributable-file">
   <a href=
   "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  5.11</span> Packaging the library as a single distributable
+  5.12</span> Packaging the library as a single distributable
   file</a></h2>
 
   <div class="figure">
@@ -2283,8 +2326,8 @@ analysis* =-->
 
   <p>Uglify. Why not Google Closure Compiler.</p>
 
-  <h2 id="not-resume"><a href="#not-resume"><span class=
-  "header-section-number">5.12</span> (not) Resume</a></h2>
+  <h2 id="resume-not"><a href="#resume-not"><span class=
+  "header-section-number">5.13</span> Resume (not)</a></h2>
 
   <p>Could implement a resume function for if transmission stops
   halfway</p>
@@ -2295,32 +2338,6 @@ analysis* =-->
 "fu">resume</span>();
    }</code>
 </pre>
-
-  <h2 id="support-for-older-browsers"><a href=
-  "#support-for-older-browsers"><span class=
-  "header-section-number">5.13</span> support for older
-  browsers</a></h2>
-
-  <p>Still works as well as non-progressive json Could be used for
-  content that is inherently streaming (wouldn't make sense without
-  streaming)</p>
-
-  <p>The decline of bad browsers. Incompatibility less of a concern
-  than it was.</p>
-
-  <p><a href=
-  "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
-  Unlike the new methods discussed in the first two parts, the
-  methods here are all reproducible using JavaScript itself. Native
-  implementations are simply faster and more convenient. Having a
-  uniform API for these operations also promotes their usage,
-  making code clearer when shared between developers.</p>
-
-  <p>Even when only used once, preferable to polyfill as a generic
-  solution rather than offer a one-time implementation because it
-  better splits the intention of the logic being presented from the
-  mechanisms that that logic sits on and, by providing abstraction,
-  elucidates the code.</p>
 
   <h1 id="conclusion"><a href="#conclusion"><span class=
   "header-section-number">6</span> Conclusion</a></h1><!---

@@ -10,12 +10,13 @@ Local event bus
 
 Controller
 
-The problem decomposes nicely into loosely-coupled components, each quite
-detailed but unconcerned with the others. Once these parts are made, bringing
-them together under a simple controller is just a matter of joining the dots.
+The problem decomposes nicely into loosely-coupled components, each
+quite detailed but unconcerned with the others. Once these parts are
+made, bringing them together under a simple controller is just a matter
+of joining the dots.
 
-Code is good when each line feels like a statement of fact rather than a way
-of going about making an intention true.
+Code is good when each line feels like a statement of fact rather than a
+way of going about making an intention true.
 
 Content builder: like a decorator/wrapper but event based, not based on
 object wrapping.
@@ -37,6 +38,9 @@ What the central controller does; acts as a plumber connecting the
 various parts up. Since oboe is predominantly event/stream based, once
 wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
+
+Grunt
+-----
 
 Automated testing
 -----------------
@@ -163,10 +167,10 @@ approach to TDD would say
 Styles of Programming
 ---------------------
 
-"Mixed paradigm" design.
+"Mixed paradigm" design. But not classical: don't need inheritance.
 
 The code presented is the result of the development many prior versions,
-it has never been rewritten in the sense of starting again. Nontheless,
+it has never been rewritten in the sense of starting again. Nonetheless,
 every part has been complely renewed several times. I am reviewing only
 the final version. Git promotes regular commits, there have been more
 than 500.
@@ -331,6 +335,8 @@ act like factory functions:
 Design and implementation of the jsonpath parser
 ------------------------------------------------
 
+Show evolution of it
+
 NB: This consideration of type in json could be in the Background
 section.
 
@@ -347,24 +353,6 @@ the relationship of the object to its ancestors is not examined but the
 properties of the object are used instead to communicate an enhanced
 concept of type. For example, we might say that any object with an isbn
 and a title is a book.
-
-Duck typing is of course a much looser concept than an XML document's
-tag names and collisions are possible where objects co-incidentally
-share property names. In practice however, I find the looseness a
-strength more often than a weakness. Under a tag-based marshalling from
-an OO language, sub-types are assigned a new tag name and as a consumer
-of the document, the 'isa' relationship between a 'class' tagname and
-it's 'sub-tabname' may be difficult to track. It is likely that if I'm
-unaware of this, I'm not interested in the extended capabilities of the
-subclass and would rather just continue to recieve the base superclass
-capabilities as before. Under duck typing this is easy - becase the data
-consumer lists the
-
-Relationship between type of a node and its purpose in the document.
-Purpose is often obvious from a combination of URL and type so can
-disregard the place in the document. This structure may be carefully
-designed but ultimately a looser interpretation of the structure can be
-safer.
 
 A third injection of type into json comes in the form of taking the
 first property of an object as being the tagname. Unsatisfactory,
@@ -656,7 +644,7 @@ everything, only through public API.
 
 Uglify. Why not Google Closure Compiler.
 
-Resume (not) 
+Resume (not)
 ------------
 
 Could implement a resume function for if transmission stops halfway
@@ -666,24 +654,3 @@ Could implement a resume function for if transmission stops halfway
       this.resume();
    }
 ~~~~
-
-support for older browsers
---------------------------
-
-Still works as well as non-progressive json Could be used for content
-that is inherently streaming (wouldn't make sense without streaming)
-
-The decline of bad browsers. Incompatibility less of a concern than it
-was.
-
-http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the
-new methods discussed in the first two parts, the methods here are all
-reproducible using JavaScript itself. Native implementations are simply
-faster and more convenient. Having a uniform API for these operations
-also promotes their usage, making code clearer when shared between
-developers.
-
-Even when only used once, preferable to polyfill as a generic solution
-rather than offer a one-time implementation because it better splits the
-intention of the logic being presented from the mechanisms that that
-logic sits on and, by providing abstraction, elucidates the code.
