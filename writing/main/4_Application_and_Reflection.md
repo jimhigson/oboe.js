@@ -29,32 +29,11 @@ through a haystack in search of a needle, which means the library should
 provide an expressive way of associating the nodes of interest with
 their targetted callbacks.
 
-JS code style
--------------
-
-Javascript: not the greatest for 'final' elegant presentation of
-programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. Ie, can write stateful and refactor in small steps
-towards being stateless. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
-
-Without strict typing, hard to know if program is correct without
-running it. In theory (decidability) and in practice (often find errors
-through running and finding errors thrown). Echo FPR: once compiling,
-good typing tends to give a reasonable sureness that the code is
-correct.
-
-Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
-
-Although the streams themselves are stateful, because they are based on
-callbacks it is entirely possible to use them from a component of a
-javascript program which is wholly stateless.
 
 High-level design
 -----------------
+
+Doing things faster vs doing things earlier. "Hurry up and wait" approach to optimisation.
 
 A feature set which is minimal but contain no obvious omissions.
 
@@ -75,6 +54,16 @@ getting the whole message at once is no worse than it is now.
 
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
+
+### stability over upgrades
+
+why jsonpath-like syntax allows upgrading message semantics without
+causing problems [SOA] how to guarantee non-breakages? could publish
+'supported queries' that are guaranteed to work
+
+### suitability for databases
+
+Databases offer data one row at a time, not as a big lump.
 
 resume on failure
 -----------------
@@ -108,8 +97,8 @@ Aborting http request may not stop processing on the server. Why this is
 perhaps desirable - transactions, leaving resources in a half-complete
 state.
 
-choice of technologies
-----------------------
+high-level choice of technologies
+---------------------------------
 
 can justify why js as:
 
@@ -131,17 +120,17 @@ powerful for genuine parallel computation but Wasteful of resources
 where the tasks are more io-bound than cpu-bound. Resources consumed by
 threads while doing nothing but waiting.
 
-Compare to Erlang. Waiter model. Node resturaunt much more efficient use
+Compare to Erlang. Waiter model. Node restaurant much more efficient use
 of expensive resources.
 
-funcitonal, pure functional possible [FPR] but not as nicely as in a
+functional, pure functional possible [FPR] but not as nicely as in a
 pure functional language, ie function caches although can be
 implemented, not universal on all functions.
 
 easy to distribute softare (npm etc)
 
-creating a losely coupled reader
---------------------------------
+principles of a loosely coupled reader
+--------------------------------------
 
 Programming to identify a certain interesting part of a resource today
 should with a high probability still work when applied to future
@@ -163,86 +152,6 @@ suspended from a new parent. See \ref{enhancingrest}
 
 Design of the jsonpath parser
 -----------------------------
-
-Explain why Haskel/lisp style lists are used rather than arrays
-
--   In parser clauses, lots of 'do this then go to the next function
-    with the rest'.
--   Normal arrays extremely inefficient to make a copy with one item
-    popped off the start
--   Link to FastList on github
--   For sake of micro-library, implemented tiny list code with very bare
-    needed
--   Alternative (first impl) was to pass an index around
--   But clause fns don't really care about indexes, they care about top
-    of the list.
--   Slight advantage to index: allows going past the start for the root
-    path (which doesn't have any index) instead, have to use a special
-    value to keep node and path list of the same length
--   Special token for root, takes advantage of object identity to make
-    certain that cannot clash with something from the json. Better than
-    '**root**' or similar which could clash. String in js not considered
-    distinct, any two strings with identical character sequences are
-    indistinguishable.
-
-Anti-list: nothing is quite so small when making a mircro-library as
-using the types built into the language, coming as they are for zero
-bytes.
-
-![Diagram showing why list is more memory efficient - multiple handles
-into same structure with different starts, contrast with same as an
-array](images/placeholder)
-
--   For recognisably with existing code, use lists internally but
-    transform into array on the boundary between Oboe.js and the outside
-    world (at same time, strip off special 'root path' token)
-
-In parser, can't use 'y' flag to the regualr expression engine which
-would allow much more elegant matching. Only alternative is cumersome:
-to slice the string and match all tokens with regexes starting with '\^'
-in order to track the current location.
-[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
-
-Incrementally building up the content
--------------------------------------
-
-Like SAX, calls from clarinet are entirely 'context free'. Ie, am told
-that there is a new object but without the preceding calls the root
-object is indistinguishable from a deeply nested object. Luckily, it
-should be easy to see that building up this context is a simple matter
-of maintaining a stack describing the descent from the root node to the
-current node.
-
-jsonPath parser gets the output from the incrementalParsedContent,
-minimally routed there by the controller.
-
-![Show a call into a compiled jsonPath to explain coming from
-incrementalParsedContent with two lists, ie the paths and the objects
-and how they relate to each other. Can use links to show that object
-list contains objects that contain others on the list. Aubergine etc
-example might be a good one](images/placeholder)
-
-Explain match starting from end of candidate path
-
-![Some kind of diagram showing jsonPath expressions and functions
-partially completed to link back to the previous function. Include the
-statementExpr pointing to the last clause](images/placeholder)
-
-On first attempt at ICB, had two stacks, both arrays, plus reference to
-current node, current key and root node. After refactorings, just one
-list was enough. Why single-argument functions are helpful (composition
-etc)
-
-Stateless makes using a debugger easier - can look back in stack trace
-and because of no reassignment, can see the whole, unchanged state of
-the parent call. What the params are now are what they always have been,
-no chance of reassignment (some code style guides recommend not to
-reassign parameters but imperative languages generally do not forbid it)
-No Side effects: can type expressions into debugger to see evaluation
-without risk of changing program execution.
-
-identifying interesting objects in the stream
----------------------------------------------
 
 NB: This consideration of type in json could be in the Background
 section.
@@ -351,17 +260,86 @@ let matchingObject = {
 jsonPath(matchingObject); // evaluates to true
 ~~~~
 
-When we aer searching
+Explain why Haskel/lisp style lists are used rather than arrays
 
-program design
---------------
+-   In parser clauses, lots of 'do this then go to the next function
+    with the rest'.
+-   Normal arrays extremely inefficient to make a copy with one item
+    popped off the start
+-   Link to FastList on github
+-   For sake of micro-library, implemented tiny list code with very bare
+    needed
+-   Alternative (first impl) was to pass an index around
+-   But clause fns don't really care about indexes, they care about top
+    of the list.
+-   Slight advantage to index: allows going past the start for the root
+    path (which doesn't have any index) instead, have to use a special
+    value to keep node and path list of the same length
+-   Special token for root, takes advantage of object identity to make
+    certain that cannot clash with something from the json. Better than
+    '**root**' or similar which could clash. String in js not considered
+    distinct, any two strings with identical character sequences are
+    indistinguishable.
+
+Anti-list: nothing is quite so small when making a mircro-library as
+using the types built into the language, coming as they are for zero
+bytes.
+
+![Diagram showing why list is more memory efficient - multiple handles
+into same structure with different starts, contrast with same as an
+array](images/placeholder)
+
+-   For recognisably with existing code, use lists internally but
+    transform into array on the boundary between Oboe.js and the outside
+    world (at same time, strip off special 'root path' token)
+
+In parser, can't use 'y' flag to the regualr expression engine which
+would allow much more elegant matching. Only alternative is cumersome:
+to slice the string and match all tokens with regexes starting with '\^'
+in order to track the current location.
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
+
+Incrementally building up the content
+-------------------------------------
+
+Like SAX, calls from clarinet are entirely 'context free'. Ie, am told
+that there is a new object but without the preceding calls the root
+object is indistinguishable from a deeply nested object. Luckily, it
+should be easy to see that building up this context is a simple matter
+of maintaining a stack describing the descent from the root node to the
+current node.
+
+jsonPath parser gets the output from the incrementalParsedContent,
+minimally routed there by the controller.
+
+![Show a call into a compiled jsonPath to explain coming from
+incrementalParsedContent with two lists, ie the paths and the objects
+and how they relate to each other. Can use links to show that object
+list contains objects that contain others on the list. Aubergine etc
+example might be a good one](images/placeholder)
+
+Explain match starting from end of candidate path
+
+![Some kind of diagram showing jsonPath expressions and functions
+partially completed to link back to the previous function. Include the
+statementExpr pointing to the last clause](images/placeholder)
+
+On first attempt at ICB, had two stacks, both arrays, plus reference to
+current node, current key and root node. After refactorings, just one
+list was enough. Why single-argument functions are helpful (composition
+etc)
+
+Stateless makes using a debugger easier - can look back in stack trace
+and because of no reassignment, can see the whole, unchanged state of
+the parent call. What the params are now are what they always have been,
+no chance of reassignment (some code style guides recommend not to
+reassign parameters but imperative languages generally do not forbid it)
+No Side effects: can type expressions into debugger to see evaluation
+without risk of changing program execution.
 
 ![Overall design of Oboe.js. Nodes in the diagram represent division of
 control so far that it has been split into different
 files.](images/overallDesign)
-
-incrementally building up a model
----------------------------------
 
 A refactoring was used to separate logic and state:
 
@@ -387,7 +365,30 @@ Why this ensured more robustness but also sometimes took more code to
 write, ie couldn't just do if( tail(foo)) if foo could be empty but most
 of the time that would be correct
 
+### mutability problem
+
 Stateful controller very easy to test - only 1 function.
+
+Javascript provides no way to decalre an object with 'cohorts' who are
+allowed to change it whereas others cannot - vars may be hidden via use
+of scope and closures (CITE: crockford) but attributes are either
+mutable or immutable.
+
+Why this is a problem.
+
+-   bugs likely to be attributied to oboe because they'll be in a future
+    *frame of execution*. But user error.
+
+Potential solutions:
+
+-   full functional-style immutability. Don't change the objects, just
+    have a function that returns a new one with one extra property.
+    Problem - language not optimised for this. A lot of copying. Still
+    doesn't stop callback receiver from changing the state of hte object
+    given. (CITE: optimisations other languages use)
+-   immutable wrappers.
+-   defensive cloning
+-   defining getter properties
 
 styles of programming
 ---------------------
@@ -425,22 +426,6 @@ Is a shame. However, are using prototype for minimal set of polyfills.
 Not general purpose.
 
 Different ways to do currying below:
-
-~~~~ {.javascript}
-
-// function factory pattern (CITEME)
-function foo(a,b,c) {
-   return function partiallyCompleted(d,e,f) {
-   
-      // may refer to partiallyCompleted in here
-   }
-}
-
-function fooBar(a,b,c,d,e,f) {
-}
-
-partial(fooBar, a,b);
-~~~~
 
 Partial completion is implemented using the language itself, not
 provided by the language.
@@ -486,32 +471,7 @@ conclusion)
 Final consideration of coding: packaging up each unit to export a
 minimal interface. \* Why minimal interfaces are better for minification
 
-The mutability problem
-----------------------
-
-Javascript provides no way to decalre an object with 'cohorts' who are
-allowed to change it whereas others cannot - vars may be hidden via use
-of scope and closures (CITE: crockford) but attributes are either
-mutable or immutable.
-
-Why this is a problem.
-
--   bugs likely to be attributied to oboe because they'll be in a future
-    *frame of execution*. But user error.
-
-Potential solutions:
-
--   full functional-style immutability. Don't change the objects, just
-    have a function that returns a new one with one extra property.
-    Problem - language not optimised for this. A lot of copying. Still
-    doesn't stop callback receiver from changing the state of hte object
-    given. (CITE: optimisations other languages use)
--   immutable wrappers.
--   defensive cloning
--   defining getter properties
-
-Performance implications of functional javascript
--------------------------------------------------
+### Performance implications of functional javascript
 
 V8 and other modern JS engines are often said to be 'near-native' speed,
 meaning it runs at close to the speed of a similarly coded C program.
@@ -546,8 +506,31 @@ JS is much faster with "monomorphic call sites"
 
 However, js execution time is not much of a problem,
 
-functions over constructors
----------------------------
+JS code style
+-------------
+
+Javascript: not the greatest for 'final' elegant presentation of
+programming. Does allow 'messy' first drafts which can be refactored
+into beautiful code. Ie, can write stateful and refactor in small steps
+towards being stateless. An awareness of beautiful languages lets us
+know the right direction to go in. An ugly language lets us find
+something easy to write that works to get us started. Allows a very
+sketchy program to be written, little more than a programming
+scratchpad.
+
+Without strict typing, hard to know if program is correct without
+running it. In theory (decidability) and in practice (often find errors
+through running and finding errors thrown). Echo FPR: once compiling,
+good typing tends to give a reasonable sureness that the code is
+correct.
+
+Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
+
+Although the streams themselves are stateful, because they are based on
+callbacks it is entirely possible to use them from a component of a
+javascript program which is wholly stateless.
+
+### functions over constructors
 
 What constructors are in js. Any function, but usually an uppercase
 initial char indicates that it is intended to be used as a constructor.
@@ -806,12 +789,6 @@ various parts up. Since oboe is predominantly event/stream based, once
 wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
 
-stability over upgrades
------------------------
-
-why jsonpath-like syntax allows upgrading message semantics without
-causing problems [SOA] how to guarantee non-breakages? could publish
-'supported queries' that are guaranteed to work
 
 support for older browsers
 --------------------------
@@ -838,32 +815,4 @@ rather than offer a one-time implementation because it better splits the
 intention of the logic being presented from the mechanisms that that
 logic sits on and, by providing abstraction, elucidates the code.
 
-suitability for databases
--------------------------
 
-Databases offer data one row at a time, not as a big lump.
-
-weaknesses
-----------
-
-implementation keeps 'unreachable' listeners difficult
-decidability/proof type problem to get completely right but could cover
-most of the easy cases
-
-Parse time for large files spread out over a long time. Reaction to
-parsed content spread out over a long time, for example de-marshalling
-to domain objects. For UX may be preferable to have many small delays
-rather than one large one.
-
-Doesn't support all of jsonpath. Not a strict subset of the language.
-
-Rest client as a library is passing mutable objects to the caller. too
-inefficient to re-create a new map/array every time an item is not as
-efficient in immutability as list head-tail type storage
-
-An imutability wrapper might be possible with defineProperty. Can't
-casually overwrite via assignment but still possible to do
-defineProperty again.
-
-Would benefit from a stateless language where everything is stateless at
-all times to avoid having to program defensively.

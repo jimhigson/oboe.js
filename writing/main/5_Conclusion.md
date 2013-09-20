@@ -7,6 +7,31 @@ Conclusion
 
 Doing things faster vs doing things earlier. "Hurry up and wait" approach to optimisation.
 
+weaknesses
+----------
+
+implementation keeps 'unreachable' listeners difficult
+decidability/proof type problem to get completely right but could cover
+most of the easy cases
+
+Parse time for large files spread out over a long time. Reaction to
+parsed content spread out over a long time, for example de-marshalling
+to domain objects. For UX may be preferable to have many small delays
+rather than one large one.
+
+Doesn't support all of jsonpath. Not a strict subset of the language.
+
+Rest client as a library is passing mutable objects to the caller. too
+inefficient to re-create a new map/array every time an item is not as
+efficient in immutability as list head-tail type storage
+
+An imutability wrapper might be possible with defineProperty. Can't
+casually overwrite via assignment but still possible to do
+defineProperty again.
+
+Would benefit from a stateless language where everything is stateless at
+all times to avoid having to program defensively.
+
 Development methodology
 -----------------------
 

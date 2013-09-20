@@ -343,23 +343,7 @@ http://stackoverflow.com/questions/5751515/official-references-for-default-value
   disruption given unanticipated format changes.</p>
 
   <h1 id="background"><a href="#background"><span class=
-  "header-section-number">3</span> Background</a></h1><!---
-background should be 2-10 pages
-
-That's 1,000 to 5,000 words. (500 per page)
-
-Or, 666 to 3,333 (333 per page)
-
- * introduces the reader to the problem domain or application area
- * ...the context in which the project takes place
- * principles and techniques that will be applied or discussed
-    * prior art
-    * what out there is being popularly used?
-    
- * Don't go into solutions! (that belongs in R&A)   
- * Can analyse a bit but any new reflections should be put in R&A
-   
-=-->
+  "header-section-number">3</span> Background</a></h1>
 
   <h2 id="the-web-as-an-application-platform"><a href=
   "#the-web-as-an-application-platform"><span class=
@@ -1280,6 +1264,8 @@ analysis* =-->
   "header-section-number">4</span> Application and
   Reflection</a></h1><!---
 **40 to 60 pages**
+
+@500w, 13,000 to 19,000
 =-->
 
   <p>What a Micro-library is. What motivates the trend? This
@@ -1305,33 +1291,9 @@ analysis* =-->
   the library should provide an expressive way of associating the
   nodes of interest with their targetted callbacks.</p>
 
-  <h2 id="js-code-style"><a href="#js-code-style"><span class=
-  "header-section-number">4.1</span> JS code style</a></h2>
-
-  <p>Javascript: not the greatest for 'final' elegant presentation
-  of programming. Does allow 'messy' first drafts which can be
-  refactored into beautiful code. Ie, can write stateful and
-  refactor in small steps towards being stateless. An awareness of
-  beautiful languages lets us know the right direction to go in. An
-  ugly language lets us find something easy to write that works to
-  get us started. Allows a very sketchy program to be written,
-  little more than a programming scratchpad.</p>
-
-  <p>Without strict typing, hard to know if program is correct
-  without running it. In theory (decidability) and in practice
-  (often find errors through running and finding errors thrown).
-  Echo FPR: once compiling, good typing tends to give a reasonable
-  sureness that the code is correct.</p>
-
-  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
-  promises.</p>
-
-  <p>Although the streams themselves are stateful, because they are
-  based on callbacks it is entirely possible to use them from a
-  component of a javascript program which is wholly stateless.</p>
-
-  <h2 id="something-else"><a href="#something-else"><span class=
-  "header-section-number">4.2</span> something else</a></h2>
+  <h2 id="high-level-design"><a href=
+  "#high-level-design"><span class=
+  "header-section-number">4.1</span> High-level design</a></h2>
 
   <p>A feature set which is minimal but contain no obvious
   omissions.</p>
@@ -1362,9 +1324,25 @@ analysis* =-->
     benefits of finding the interesting parts early</p>
   </div>
 
+  <h3 id="stability-over-upgrades"><a href=
+  "#stability-over-upgrades"><span class=
+  "header-section-number">4.1.1</span> stability over
+  upgrades</a></h3>
+
+  <p>why jsonpath-like syntax allows upgrading message semantics
+  without causing problems [SOA] how to guarantee non-breakages?
+  could publish 'supported queries' that are guaranteed to work</p>
+
+  <h3 id="suitability-for-databases"><a href=
+  "#suitability-for-databases"><span class=
+  "header-section-number">4.1.2</span> suitability for
+  databases</a></h3>
+
+  <p>Databases offer data one row at a time, not as a big lump.</p>
+
   <h2 id="resume-on-failure"><a href=
   "#resume-on-failure"><span class=
-  "header-section-number">4.3</span> resume on failure</a></h2>
+  "header-section-number">4.2</span> resume on failure</a></h2>
 
   <p>Http 1.1 provides a mechanism for Byte Serving via the
   Accepts-Ranges header [<a href=
@@ -1374,29 +1352,11 @@ analysis* =-->
   clients. This ability can be used to. Why not this one. Resume on
   a higher semantic level.</p>
 
-  <h2 id="delivery-methodology"><a href=
-  "#delivery-methodology"><span class=
-  "header-section-number">4.4</span> delivery methodology</a></h2>
-
-  <p>Because Kanban focusses on always having a potentially
-  releasable product, it mitigates problems which could otherwise
-  lead to non-delivery and allows the direction to be changed while
-  the project is in progress. For each unit of work (under Kanban,
-  a card), an entire vertical slice of planning, design,
-  implementation and reflection must be complete before going onto
-  the next card. Alongside each software feature, every written
-  chapter will be expanded and refactored in much the same way as
-  the code. Just as for well designed software, the order of
-  implementation should not be apparent to a user, my plan is that
-  the written work should not feel disjointed for having been
-  written non-sequentially. I plan to manage the Kanban process
-  using paper only, with cards on a physical board.</p>
-
   <h2 id=
   "overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
   <a href=
   "#overall-design-philosophy-and-breaking-out-of-bigsmall-tradeoff">
-  <span class="header-section-number">4.5</span> overall design
+  <span class="header-section-number">4.3</span> overall design
   philosophy and breaking out of big/small tradeoff</a></h2>
 
   <p>In which a callback call is received not just when the whole
@@ -1419,9 +1379,9 @@ analysis* =-->
   Why this is perhaps desirable - transactions, leaving resources
   in a half-complete state.</p>
 
-  <h2 id="choice-of-technologies"><a href=
-  "#choice-of-technologies"><span class=
-  "header-section-number">4.6</span> choice of
+  <h2 id="high-level-choice-of-technologies"><a href=
+  "#high-level-choice-of-technologies"><span class=
+  "header-section-number">4.4</span> high-level choice of
   technologies</a></h2>
 
   <p>can justify why js as:</p>
@@ -1446,30 +1406,19 @@ analysis* =-->
   cpu-bound. Resources consumed by threads while doing nothing but
   waiting.</p>
 
-  <p>Compare to Erlang. Waiter model. Node resturaunt much more
+  <p>Compare to Erlang. Waiter model. Node restaurant much more
   efficient use of expensive resources.</p>
 
-  <p>funcitonal, pure functional possible [FPR] but not as nicely
+  <p>functional, pure functional possible [FPR] but not as nicely
   as in a pure functional language, ie function caches although can
   be implemented, not universal on all functions.</p>
 
   <p>easy to distribute softare (npm etc)</p>
 
-  <h2 id="summary-of-json"><a href="#summary-of-json"><span class=
-  "header-section-number">4.7</span> summary of json</a></h2>
-
-  <p>Why json?</p>
-
-  <p>A bridge between languages that isn't too different from the
-  common types in the languages themselves a common bridge between
-  languages</p>
-
-  <p>Also very simple. Easy to parse.</p>
-
-  <h2 id="creating-a-losely-coupled-reader"><a href=
-  "#creating-a-losely-coupled-reader"><span class=
-  "header-section-number">4.8</span> creating a losely coupled
-  reader</a></h2>
+  <h2 id="principles-of-a-loosely-coupled-reader"><a href=
+  "#principles-of-a-loosely-coupled-reader"><span class=
+  "header-section-number">4.5</span> principles of a loosely
+  coupled reader</a></h2>
 
   <p>Programming to identify a certain interesting part of a
   resource today should with a high probability still work when
@@ -1496,126 +1445,8 @@ analysis* =-->
 
   <h2 id="design-of-the-jsonpath-parser"><a href=
   "#design-of-the-jsonpath-parser"><span class=
-  "header-section-number">4.9</span> Design of the jsonpath
+  "header-section-number">4.6</span> Design of the jsonpath
   parser</a></h2>
-
-  <p>Explain why Haskel/lisp style lists are used rather than
-  arrays</p>
-
-  <ul>
-    <li>In parser clauses, lots of 'do this then go to the next
-    function with the rest'.</li>
-
-    <li>Normal arrays extremely inefficient to make a copy with one
-    item popped off the start</li>
-
-    <li>Link to FastList on github</li>
-
-    <li>For sake of micro-library, implemented tiny list code with
-    very bare needed</li>
-
-    <li>Alternative (first impl) was to pass an index around</li>
-
-    <li>But clause fns don't really care about indexes, they care
-    about top of the list.</li>
-
-    <li>Slight advantage to index: allows going past the start for
-    the root path (which doesn't have any index) instead, have to
-    use a special value to keep node and path list of the same
-    length</li>
-
-    <li>Special token for root, takes advantage of object identity
-    to make certain that cannot clash with something from the json.
-    Better than '<strong>root</strong>' or similar which could
-    clash. String in js not considered distinct, any two strings
-    with identical character sequences are indistinguishable.</li>
-  </ul>
-
-  <p>Anti-list: nothing is quite so small when making a
-  mircro-library as using the types built into the language, coming
-  as they are for zero bytes.</p>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "Diagram showing why list is more memory efficient - multiple handles into same structure with different starts, contrast with same as an array">
-
-    <p class="caption">Diagram showing why list is more memory
-    efficient - multiple handles into same structure with different
-    starts, contrast with same as an array</p>
-  </div>
-
-  <ul>
-    <li>For recognisably with existing code, use lists internally
-    but transform into array on the boundary between Oboe.js and
-    the outside world (at same time, strip off special 'root path'
-    token)</li>
-  </ul>
-
-  <p>In parser, can't use 'y' flag to the regualr expression engine
-  which would allow much more elegant matching. Only alternative is
-  cumersome: to slice the string and match all tokens with regexes
-  starting with '^' in order to track the current location.
-  [<a href=
-  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>]</p>
-
-  <h2 id="incrementally-building-up-the-content"><a href=
-  "#incrementally-building-up-the-content"><span class=
-  "header-section-number">4.10</span> Incrementally building up the
-  content</a></h2>
-
-  <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
-  am told that there is a new object but without the preceding
-  calls the root object is indistinguishable from a deeply nested
-  object. Luckily, it should be easy to see that building up this
-  context is a simple matter of maintaining a stack describing the
-  descent from the root node to the current node.</p>
-
-  <p>jsonPath parser gets the output from the
-  incrementalParsedContent, minimally routed there by the
-  controller.</p>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "Show a call into a compiled jsonPath to explain coming from incrementalParsedContent with two lists, ie the paths and the objects and how they relate to each other. Can use links to show that object list contains objects that contain others on the list. Aubergine etc example might be a good one">
-
-    <p class="caption">Show a call into a compiled jsonPath to
-    explain coming from incrementalParsedContent with two lists, ie
-    the paths and the objects and how they relate to each other.
-    Can use links to show that object list contains objects that
-    contain others on the list. Aubergine etc example might be a
-    good one</p>
-  </div>
-
-  <p>Explain match starting from end of candidate path</p>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "Some kind of diagram showing jsonPath expressions and functions partially completed to link back to the previous function. Include the statementExpr pointing to the last clause">
-
-    <p class="caption">Some kind of diagram showing jsonPath
-    expressions and functions partially completed to link back to
-    the previous function. Include the statementExpr pointing to
-    the last clause</p>
-  </div>
-
-  <p>On first attempt at ICB, had two stacks, both arrays, plus
-  reference to current node, current key and root node. After
-  refactorings, just one list was enough. Why single-argument
-  functions are helpful (composition etc)</p>
-
-  <p>Stateless makes using a debugger easier - can look back in
-  stack trace and because of no reassignment, can see the whole,
-  unchanged state of the parent call. What the params are now are
-  what they always have been, no chance of reassignment (some code
-  style guides recommend not to reassign parameters but imperative
-  languages generally do not forbid it) No Side effects: can type
-  expressions into debugger to see evaluation without risk of
-  changing program execution.</p>
-
-  <h2 id="identifying-interesting-objects-in-the-stream"><a href=
-  "#identifying-interesting-objects-in-the-stream"><span class=
-  "header-section-number">4.11</span> identifying interesting
-  objects in the stream</a></h2>
 
   <p>NB: This consideration of type in json could be in the
   Background section.</p>
@@ -1743,10 +1574,118 @@ analysis* =-->
 "co">// evaluates to true</span></code>
 </pre>
 
-  <p>When we aer searching</p>
+  <p>Explain why Haskel/lisp style lists are used rather than
+  arrays</p>
 
-  <h2 id="program-design"><a href="#program-design"><span class=
-  "header-section-number">4.12</span> program design</a></h2>
+  <ul>
+    <li>In parser clauses, lots of 'do this then go to the next
+    function with the rest'.</li>
+
+    <li>Normal arrays extremely inefficient to make a copy with one
+    item popped off the start</li>
+
+    <li>Link to FastList on github</li>
+
+    <li>For sake of micro-library, implemented tiny list code with
+    very bare needed</li>
+
+    <li>Alternative (first impl) was to pass an index around</li>
+
+    <li>But clause fns don't really care about indexes, they care
+    about top of the list.</li>
+
+    <li>Slight advantage to index: allows going past the start for
+    the root path (which doesn't have any index) instead, have to
+    use a special value to keep node and path list of the same
+    length</li>
+
+    <li>Special token for root, takes advantage of object identity
+    to make certain that cannot clash with something from the json.
+    Better than '<strong>root</strong>' or similar which could
+    clash. String in js not considered distinct, any two strings
+    with identical character sequences are indistinguishable.</li>
+  </ul>
+
+  <p>Anti-list: nothing is quite so small when making a
+  mircro-library as using the types built into the language, coming
+  as they are for zero bytes.</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "Diagram showing why list is more memory efficient - multiple handles into same structure with different starts, contrast with same as an array">
+
+    <p class="caption">Diagram showing why list is more memory
+    efficient - multiple handles into same structure with different
+    starts, contrast with same as an array</p>
+  </div>
+
+  <ul>
+    <li>For recognisably with existing code, use lists internally
+    but transform into array on the boundary between Oboe.js and
+    the outside world (at same time, strip off special 'root path'
+    token)</li>
+  </ul>
+
+  <p>In parser, can't use 'y' flag to the regualr expression engine
+  which would allow much more elegant matching. Only alternative is
+  cumersome: to slice the string and match all tokens with regexes
+  starting with '^' in order to track the current location.
+  [<a href=
+  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>]</p>
+
+  <h2 id="incrementally-building-up-the-content"><a href=
+  "#incrementally-building-up-the-content"><span class=
+  "header-section-number">4.7</span> Incrementally building up the
+  content</a></h2>
+
+  <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
+  am told that there is a new object but without the preceding
+  calls the root object is indistinguishable from a deeply nested
+  object. Luckily, it should be easy to see that building up this
+  context is a simple matter of maintaining a stack describing the
+  descent from the root node to the current node.</p>
+
+  <p>jsonPath parser gets the output from the
+  incrementalParsedContent, minimally routed there by the
+  controller.</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "Show a call into a compiled jsonPath to explain coming from incrementalParsedContent with two lists, ie the paths and the objects and how they relate to each other. Can use links to show that object list contains objects that contain others on the list. Aubergine etc example might be a good one">
+
+    <p class="caption">Show a call into a compiled jsonPath to
+    explain coming from incrementalParsedContent with two lists, ie
+    the paths and the objects and how they relate to each other.
+    Can use links to show that object list contains objects that
+    contain others on the list. Aubergine etc example might be a
+    good one</p>
+  </div>
+
+  <p>Explain match starting from end of candidate path</p>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "Some kind of diagram showing jsonPath expressions and functions partially completed to link back to the previous function. Include the statementExpr pointing to the last clause">
+
+    <p class="caption">Some kind of diagram showing jsonPath
+    expressions and functions partially completed to link back to
+    the previous function. Include the statementExpr pointing to
+    the last clause</p>
+  </div>
+
+  <p>On first attempt at ICB, had two stacks, both arrays, plus
+  reference to current node, current key and root node. After
+  refactorings, just one list was enough. Why single-argument
+  functions are helpful (composition etc)</p>
+
+  <p>Stateless makes using a debugger easier - can look back in
+  stack trace and because of no reassignment, can see the whole,
+  unchanged state of the parent call. What the params are now are
+  what they always have been, no chance of reassignment (some code
+  style guides recommend not to reassign parameters but imperative
+  languages generally do not forbid it) No Side effects: can type
+  expressions into debugger to see evaluation without risk of
+  changing program execution.</p>
 
   <div class="figure">
     <img src="images/overallDesign.png" alt=
@@ -1756,11 +1695,6 @@ analysis* =-->
     diagram represent division of control so far that it has been
     split into different files.</p>
   </div>
-
-  <h2 id="incrementally-building-up-a-model"><a href=
-  "#incrementally-building-up-a-model"><span class=
-  "header-section-number">4.13</span> incrementally building up a
-  model</a></h2>
 
   <p>A refactoring was used to separate logic and state:</p>
 
@@ -1795,12 +1729,44 @@ analysis* =-->
   tail(foo)) if foo could be empty but most of the time that would
   be correct</p>
 
+  <h3 id="mutability-problem"><a href=
+  "#mutability-problem"><span class=
+  "header-section-number">4.7.1</span> mutability problem</a></h3>
+
   <p>Stateful controller very easy to test - only 1 function.</p>
+
+  <p>Javascript provides no way to decalre an object with 'cohorts'
+  who are allowed to change it whereas others cannot - vars may be
+  hidden via use of scope and closures (CITE: crockford) but
+  attributes are either mutable or immutable.</p>
+
+  <p>Why this is a problem.</p>
+
+  <ul>
+    <li>bugs likely to be attributied to oboe because they'll be in
+    a future <em>frame of execution</em>. But user error.</li>
+  </ul>
+
+  <p>Potential solutions:</p>
+
+  <ul>
+    <li>full functional-style immutability. Don't change the
+    objects, just have a function that returns a new one with one
+    extra property. Problem - language not optimised for this. A
+    lot of copying. Still doesn't stop callback receiver from
+    changing the state of hte object given. (CITE: optimisations
+    other languages use)</li>
+
+    <li>immutable wrappers.</li>
+
+    <li>defensive cloning</li>
+
+    <li>defining getter properties</li>
+  </ul>
 
   <h2 id="styles-of-programming"><a href=
   "#styles-of-programming"><span class=
-  "header-section-number">4.14</span> styles of
-  programming</a></h2>
+  "header-section-number">4.8</span> styles of programming</a></h2>
 
   <p>The code presented is the result of the development many prior
   versions, it has never been rewritten in the sense of starting
@@ -1838,26 +1804,6 @@ analysis* =-->
   set of polyfills. Not general purpose.</p>
 
   <p>Different ways to do currying below:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
-<span class="co">// function factory pattern (CITEME)</span>
-<span class="kw">function</span> <span class=
-"fu">foo</span>(a,b,c) {
-   <span class="kw">return</span> <span class=
-"kw">function</span> <span class=
-"fu">partiallyCompleted</span>(d,e,f) {
-   
-      <span class=
-"co">// may refer to partiallyCompleted in here</span>
-   }
-}
-
-<span class="kw">function</span> <span class=
-"fu">fooBar</span>(a,b,c,d,e,f) {
-}
-
-<span class="fu">partial</span>(fooBar, a,b);</code>
-</pre>
 
   <p>Partial completion is implemented using the language itself,
   not provided by the language.</p>
@@ -1907,45 +1853,11 @@ analysis* =-->
   export a minimal interface. * Why minimal interfaces are better
   for minification</p>
 
-  <h2 id="the-mutability-problem"><a href=
-  "#the-mutability-problem"><span class=
-  "header-section-number">4.15</span> The mutability
-  problem</a></h2>
-
-  <p>Javascript provides no way to decalre an object with 'cohorts'
-  who are allowed to change it whereas others cannot - vars may be
-  hidden via use of scope and closures (CITE: crockford) but
-  attributes are either mutable or immutable.</p>
-
-  <p>Why this is a problem.</p>
-
-  <ul>
-    <li>bugs likely to be attributied to oboe because they'll be in
-    a future <em>frame of execution</em>. But user error.</li>
-  </ul>
-
-  <p>Potential solutions:</p>
-
-  <ul>
-    <li>full functional-style immutability. Don't change the
-    objects, just have a function that returns a new one with one
-    extra property. Problem - language not optimised for this. A
-    lot of copying. Still doesn't stop callback receiver from
-    changing the state of hte object given. (CITE: optimisations
-    other languages use)</li>
-
-    <li>immutable wrappers.</li>
-
-    <li>defensive cloning</li>
-
-    <li>defining getter properties</li>
-  </ul>
-
-  <h2 id="performance-implications-of-functional-javascript">
+  <h3 id="performance-implications-of-functional-javascript">
   <a href=
   "#performance-implications-of-functional-javascript"><span class=
-  "header-section-number">4.16</span> Performance implications of
-  functional javascript</a></h2>
+  "header-section-number">4.8.1</span> Performance implications of
+  functional javascript</a></h3>
 
   <p>V8 and other modern JS engines are often said to be
   'near-native' speed, meaning it runs at close to the speed of a
@@ -1985,10 +1897,35 @@ analysis* =-->
 
   <p>However, js execution time is not much of a problem,</p>
 
-  <h2 id="functions-over-constructors"><a href=
+  <h2 id="js-code-style"><a href="#js-code-style"><span class=
+  "header-section-number">4.9</span> JS code style</a></h2>
+
+  <p>Javascript: not the greatest for 'final' elegant presentation
+  of programming. Does allow 'messy' first drafts which can be
+  refactored into beautiful code. Ie, can write stateful and
+  refactor in small steps towards being stateless. An awareness of
+  beautiful languages lets us know the right direction to go in. An
+  ugly language lets us find something easy to write that works to
+  get us started. Allows a very sketchy program to be written,
+  little more than a programming scratchpad.</p>
+
+  <p>Without strict typing, hard to know if program is correct
+  without running it. In theory (decidability) and in practice
+  (often find errors through running and finding errors thrown).
+  Echo FPR: once compiling, good typing tends to give a reasonable
+  sureness that the code is correct.</p>
+
+  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
+  promises.</p>
+
+  <p>Although the streams themselves are stateful, because they are
+  based on callbacks it is entirely possible to use them from a
+  component of a javascript program which is wholly stateless.</p>
+
+  <h3 id="functions-over-constructors"><a href=
   "#functions-over-constructors"><span class=
-  "header-section-number">4.17</span> functions over
-  constructors</a></h2>
+  "header-section-number">4.9.1</span> functions over
+  constructors</a></h3>
 
   <p>What constructors are in js. Any function, but usually an
   uppercase initial char indicates that it is intended to be used
@@ -2020,7 +1957,7 @@ analysis* =-->
 
   <h2 id="targeting-node-and-the-browser"><a href=
   "#targeting-node-and-the-browser"><span class=
-  "header-section-number">4.18</span> targeting node and the
+  "header-section-number">4.10</span> targeting node and the
   browser</a></h2>
 
   <p>Node+browser To use Node.js and</p>
@@ -2034,7 +1971,7 @@ analysis* =-->
   <h2 id="packaging-the-library-as-a-single-distributable-file">
   <a href=
   "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  4.19</span> Packaging the library as a single distributable
+  4.11</span> Packaging the library as a single distributable
   file</a></h2>
 
   <div class="figure">
@@ -2163,31 +2100,9 @@ analysis* =-->
 
   <p>Uglify. Why not Google Closure Compiler.</p>
 
-  <h2 id="polyfilling"><a href="#polyfilling"><span class=
-  "header-section-number">4.20</span> polyfilling</a></h2>
-
-  <p>The decline of bad browsers. Incompatability less of a concern
-  than it was.</p>
-
-  <p>Node doesn't require, built on v8.</p>
-
-  <p><a href=
-  "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
-  Unlike the new methods discussed in the first two parts, the
-  methods here are all reproducible using JavaScript itself. Native
-  implementations are simply faster and more convenient. Having a
-  uniform API for these operations also promotes their usage,
-  making code clearer when shared between developers.</p>
-
-  <p>Even when only used once, preferable to polyfill as a generic
-  solution rather than offer a one-time implementation because it
-  better splits the intention of the logic being presented from the
-  mechanisms that that logic sits on and, by providing abstraction,
-  elucidates the code.</p>
-
   <h2 id="automated-testing"><a href=
   "#automated-testing"><span class=
-  "header-section-number">4.21</span> automated testing</a></h2>
+  "header-section-number">4.12</span> automated testing</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -2336,7 +2251,7 @@ analysis* =-->
 
   <h2 id="inversion-of-control"><a href=
   "#inversion-of-control"><span class=
-  "header-section-number">4.22</span> Inversion of Control</a></h2>
+  "header-section-number">4.13</span> Inversion of Control</a></h2>
 
   <p>Aim of creating a micro-library rules out building in a
   general-purpose IoC library.</p>
@@ -2352,33 +2267,39 @@ analysis* =-->
   controller. Ie, A knows how to listen for ??? events but is
   unintested who fired them.</p>
 
-  <h2 id="stability-over-upgrades"><a href=
-  "#stability-over-upgrades"><span class=
-  "header-section-number">4.23</span> stability over
-  upgrades</a></h2>
-
-  <p>why jsonpath-like syntax allows upgrading message semantics
-  without causing problems [SOA] how to guarantee non-breakages?
-  could publish 'supported queries' that are guaranteed to work</p>
-
   <h2 id="support-for-older-browsers"><a href=
   "#support-for-older-browsers"><span class=
-  "header-section-number">4.24</span> support for older
+  "header-section-number">4.14</span> support for older
   browsers</a></h2>
 
   <p>Still works as well as non-progressive json Could be used for
   content that is inherently streaming (wouldn't make sense without
   streaming)</p>
 
-  <h2 id="suitability-for-databases"><a href=
-  "#suitability-for-databases"><span class=
-  "header-section-number">4.25</span> suitability for
-  databases</a></h2>
+  <h3 id="polyfilling"><a href="#polyfilling"><span class=
+  "header-section-number">4.14.1</span> polyfilling</a></h3>
 
-  <p>Databases offer data one row at a time, not as a big lump.</p>
+  <p>The decline of bad browsers. Incompatibility less of a concern
+  than it was.</p>
+
+  <p>Node doesn't require, built on v8.</p>
+
+  <p><a href=
+  "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
+  Unlike the new methods discussed in the first two parts, the
+  methods here are all reproducible using JavaScript itself. Native
+  implementations are simply faster and more convenient. Having a
+  uniform API for these operations also promotes their usage,
+  making code clearer when shared between developers.</p>
+
+  <p>Even when only used once, preferable to polyfill as a generic
+  solution rather than offer a one-time implementation because it
+  better splits the intention of the logic being presented from the
+  mechanisms that that logic sits on and, by providing abstraction,
+  elucidates the code.</p>
 
   <h2 id="weaknesses"><a href="#weaknesses"><span class=
-  "header-section-number">4.26</span> weaknesses</a></h2>
+  "header-section-number">4.15</span> weaknesses</a></h2>
 
   <p>implementation keeps 'unreachable' listeners difficult
   decidability/proof type problem to get completely right but could
