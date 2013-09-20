@@ -3,6 +3,8 @@ Application and Reflection
 
 <!---
 **40 to 60 pages**
+
+@500w, 13,000 to 19,000
 --->
 
 What a Micro-library is. What motivates the trend? This library has a
@@ -51,8 +53,8 @@ Although the streams themselves are stateful, because they are based on
 callbacks it is entirely possible to use them from a component of a
 javascript program which is wholly stateless.
 
-something else
---------------
+High-level design
+-----------------
 
 A feature set which is minimal but contain no obvious omissions.
 
@@ -83,22 +85,6 @@ which can be used to request any contiguous part of a response rather
 than the whole. Common in download managers but not REST clients. This
 ability can be used to. Why not this one. Resume on a higher semantic
 level.
-
-delivery methodology
---------------------
-
-Because Kanban focusses on always having a potentially releasable
-product, it mitigates problems which could otherwise lead to
-non-delivery and allows the direction to be changed while the project is
-in progress. For each unit of work (under Kanban, a card), an entire
-vertical slice of planning, design, implementation and reflection must
-be complete before going onto the next card. Alongside each software
-feature, every written chapter will be expanded and refactored in much
-the same way as the code. Just as for well designed software, the order
-of implementation should not be apparent to a user, my plan is that the
-written work should not feel disjointed for having been written
-non-sequentially. I plan to manage the Kanban process using paper only,
-with cards on a physical board.
 
 overall design philosophy and breaking out of big/small tradeoff
 ----------------------------------------------------------------
