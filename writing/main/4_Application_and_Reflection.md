@@ -20,22 +20,6 @@ Interestingly, the mixed paradigm design hasn't changed the top-level design
 very much from how it'd be as a pure OO project (IoC, decorators, event 
 filters, pub/sub etc).
 
-When looking at functional style include this:
----------------------------------------------
-
-V8 and other modern JS engines are often said to be 'near-native' speed, meaning it runs at close to
-the speed of a similarly coded C program. However, this relies on the
-programmer also coding in the style of a C programmer, for example with
-only mono-morphic callsites and without a functional style. Once either
-of those programming techniques is taken up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html].
-When used in a functional style, not 'near-native' in the sense that not
-close to the performance gained by compiling a well designed functional
-language to natively executable code. Depends on style coded in,
-comparison to native somewhat takes C as the description of the
-operation of an idealised CPU rather than an abstract machine capable of
-executing on an actual CPU.
-
 
 
 
@@ -556,12 +540,22 @@ Potential solutions:
 Performance implications of functional javascript
 -------------------------------------------------
 
+V8 and other modern JS engines are often said to be 'near-native' speed, meaning it runs at close to
+the speed of a similarly coded C program. However, this relies on the
+programmer also coding in the style of a C programmer, for example with
+only mono-morphic callsites and without a functional style. Once either
+of those programming techniques is taken up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html] 9571 ms vs 504 ms.
+When used in a functional style, not 'near-native' in the sense that not
+close to the performance gained by compiling a well designed functional
+language to natively executable code. Depends on style coded in,
+comparison to native somewhat takes C as the description of the
+operation of an idealised CPU rather than an abstract machine capable of
+executing on an actual CPU.
+
 (perhaps move to background, or hint at it, eg "although there are still
 some performance implications involved in a functional style, javascript
 may be used in a non-pure functional style") - with link to here
-
-http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html
-9571 ms vs 504 ms
 
 The performance degradation, even with a self-hosted forEach, is due to
 the JIT’s inability to efficiently inline both the closures passed to
