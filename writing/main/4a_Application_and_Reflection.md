@@ -93,8 +93,8 @@ safer.
 API design
 ----------
 
-Micro-lib
----------
+Micro-library
+-------------
 
 What a Micro-library is. What motivates the trend? This library has a
 fairly small set of functionality, it isn't a general purpose
