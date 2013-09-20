@@ -1,14 +1,335 @@
-Application and Reflection 2
-============================
+Application and Reflection 2: makin' it
+=======================================
 
-code design overview
---------------
+Decomposition into components
+-----------------------------
+
+Split up concerns etc
+
+Local event bus
+
+Controller
+
+The problem decomposes nicely into loosely-coupled components, each quite
+detailed but unconcerned with the others. Once these parts are made, bringing
+them together under a simple controller is just a matter of joining the dots.
+
+Code is good when each line feels like a statement of fact rather than a way
+of going about making an intention true.
+
+Content builder: like a decorator/wrapper but event based, not based on
+object wrapping.
 
 ![components of the design](images/placeholder.png)
 
+Inversion of Control
+--------------------
 
-Design of the jsonpath parser
------------------------------
+Aim of creating a micro-library rules out building in a general-purpose
+IoC library.
+
+However, can still follow the general principles.
+
+Why the Observer pattern (cite: des patterns) lends itself well to MVC
+and inversion of control.
+
+What the central controller does; acts as a plumber connecting the
+various parts up. Since oboe is predominantly event/stream based, once
+wired up little intervention is needed from the controller. Ie, A knows
+how to listen for ??? events but is unintested who fired them.
+
+Automated testing
+-----------------
+
+Do it on every save!
+
+![Relationship between various files and test libraries *other half of
+sketch from notebook*](images/placeholder.png)
+
+How automated testing improves what can be written, not just making what
+is written more reliable.
+
+TDD drives development by influencing the design - good design is taken
+as that which is amenable to testing rather than which describes the
+problem domain accurately or solves a problem with minimum resources.
+Amenable to testing often means split into many co-operating parts so
+that each part may be tested via a simple test.
+
+Bt encourageing splitting into co-operating objects, TDD to a certain
+degree is anti-encapsulation. The public object that was extracted as a
+new concern from a larger object now needs public methods whereas before
+nothing was exposed.
+
+![The testing pyramid is a common concept, relying on the assumption
+that verification of small parts provides a solid base from which to
+compose system-level behaviours. A Lot of testing is done on the
+low-level components of the system, whereas for the high-level tests
+only smoke tests are provided.
+\label{testingPyramidFig}](images/pyramid)
+
+Jstd can serve example files but need to write out slowly which it has
+no concept of. Customistation is via configuration rather than by
+plug-in, but even if it were, the threading model is not suitable to
+create this kind of timed output.
+
+Tests include an extremely large file twentyThousandRecords.js to test
+under stress
+
+Why jstd's built in proxy isn't sufficient. An example of a typical Java
+webserver, features thread-based mutlithreading in which threads wait
+for a while response to be received.
+
+Tests deal with the problem of "irreducible complexity" - when a program
+is made out of parts whose correct behaviour cannot be observed without
+all of the program. Allows smaller units to be verified before verifying
+the whole.
+
+Conversely, automated testing allows us to write incomprehensible code
+by making us into more powerful programmers, it is possible building up
+layers of complexity one very small part at a time that we couldn't
+write in a simple stage. Clarity \> cleverness but cleverness has its
+place as well (intriducing new concepts)
+
+Testing via node to give something to test against - slowserver. Proxy.
+JSTD not up to task. Shows how useful node is as a 'network glue'. The
+same as C was once described as a 'thin glue'
+[http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent
+proxy is about 20 lines. Transparent enough to fool JSTD into thinking
+it is connecting directly to its server.
+
+Node comes with very little built in (not even http) but relies on
+libraries written in the language itself to do everything. Could
+implement own http on top of sockets if wanted rather than using the
+provided one.
+
+The test pyramid concept \ref{testingPyramidFig} fits in well with the
+hiding that is provided. Under the testing pyramid only very high level
+behaviours are tested as ??? tests. While this is a lucky co-incidence,
+it is also an unavoidable restriction. Once compiled into a single
+source file, the individual components are hidden, callable only from
+withing their closure. Hence, it would not be possible to test the
+composed parts individually post-concatenation into a single javascript
+file, not even via a workarround for data hiding such as found in Java's
+reflection. Whereas in Java the protection is a means of protecting
+otherwise addressable resources, once a function is trapped inside a
+javascript closure without external exposure it is not just protected
+but, appearing in no namespaces, inherently unreferenceable.
+
+TDD fits well into an object pattern because the software is well
+composed into separate parts. The objects are almost tangible in their
+distinction as separate encapsulated entities. However, the
+multi-paradigm style of my implementation draws much fainter borders
+over the implementation's landscape.
+
+Approach has been to the test the intricate code, then for wiring don't
+have tests to check that things are plumbed together correctly, rather
+rely on this being obvious enough to be detected via a smoke test.
+
+A good test should be able to go unchanged as the source under test is
+refactored. Indeed, the test will be how we know that the code under
+test still works as intended. Experince tells me that testing that A
+listens to B (ie that the controller wires the jsonbuilder up to
+clarinet) produces the kind of test that 'follows the code arround'
+meaning that because it is testing implementation details rather than
+behaviours, whenever the implementation is updated the tests have to be
+updated too.
+
+By testing individual tokens are correct and the use of those tokens as
+a wider expression, am testing the same thing twice. Arguably, redundant
+effort. But may simply be easier to write in that way - software is
+written by a human in a certain order and if we take a bottom-up
+approach to some of that design, each layer is easier to create if we
+first know the layers that it sits on are sound. Writing complex regular
+expressions is still programming and it is more difficult to test them
+completely when wrapped in rather a lot more logic than directly. For
+example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is not
+trivial.
+
+Can test less exhaustively on higher levels if lower ones are well
+tested, testing where it is easier to do whilst giving good guarantees.
+
+Genuine data hiding gets in the way sometimes. Eg, token regexes are
+built from the combination of smaller regualar expressions for clarity
+(long regular expressions are concise but hard to read), and then
+wrapped in functions (why? - explain to generify interface) before being
+exposed. Because the components are hidden in a scope, they are not
+addressable by the tests and therefore cannot be directly tested.
+Reluctantly
+
+One dilemma in implementing the testing is how far to test the more
+generic sections of the codebase as generic components. A purist
+approach to TDD would say
+
+Styles of Programming
+---------------------
+
+"Mixed paradigm" design.
+
+The code presented is the result of the development many prior versions,
+it has never been rewritten in the sense of starting again. Nontheless,
+every part has been complely renewed several times. I am reviewing only
+the final version. Git promotes regular commits, there have been more
+than 500.
+
+some of it is pure functional (jsonPath, controller) ie, only
+semantically different from a Haskell programme others, syntactically
+functional but stateful to fit in with expected APIs etc
+
+JsonPath implementation allows the compilation of complex expressions
+into an executable form, but each part implementing the executable form
+is locally simple. By using recursion, assembling the simple functions
+into a more function expressing a more complex rule also follows as
+being locally simple but gaining a usefully sophisticated behaviour
+through composition of simple parts. Each recursive call of the parser
+identifies one token for non-empty input and then recursively digests
+the rest.
+
+The style of implementation of the generator of functions corresponding
+to json path expressions is reminiscent of a traditional parser
+generator, although rather than generating source, functions are
+dynamically composed. Reflecting on this, parser gens only went to
+source to break out of the ability to compose the expressive power of
+the language itself from inside the language itself. With a functional
+approach, assembly from very small pieces gives a similar level of
+expressivity as writing the logic out as source code.
+
+Why could implement Function\#partial via prototype. Why not going to.
+Is a shame. However, are using prototype for minimal set of polyfills.
+Not general purpose.
+
+Different ways to do currying below:
+
+Partial completion is implemented using the language itself, not
+provided by the language.
+
+Why would we choose 1 over the other? First simpler from caller side,
+second more flexible. Intuitive to call as a single call and can call
+self more easily.
+
+In same cases, first form makes it easier to communicate that the
+completion comes in two parts, for example:
+
+~~~~ {.javascript}
+ namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
+~~~~
+
+There is a construction part (first 3 args) and a usage part (last
+three). Comsume many can only be constructed to ues consume 1 in second
+style because may refer to its own paritally completed version.
+
+In first case, can avoid this:
+`consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);`
+because function factory can have optional arguments so don't have to
+give all of them
+
+Function factory easier to debug. 'Step in' works. With
+partialCompletion have an awkward proxy function that breaks the
+programmer's train of thought as stepping through the code.
+
+Why it is important to consider the frame of mind of the coder (CITEME:
+Hackers and Painters) and not just the elegance of the possible language
+expressions.
+
+If implementing own functional caching, functional cache allows two
+levels of caching. Problematic though, for example no way to clear out
+the cache if memory becomes scarce.
+
+Functional programming tends to lend better to minification than
+OO-style because of untyped record objects (can have any keys).
+
+Lack of consistency in coding (don't write too much, leave to the
+conclusion)
+
+Final consideration of coding: packaging up each unit to export a
+minimal interface. \* Why minimal interfaces are better for minification
+
+JS code style
+-------------
+
+Javascript: not the greatest for 'final' elegant presentation of
+programming. Does allow 'messy' first drafts which can be refactored
+into beautiful code. Ie, can write stateful and refactor in small steps
+towards being stateless. An awareness of beautiful languages lets us
+know the right direction to go in. An ugly language lets us find
+something easy to write that works to get us started. Allows a very
+sketchy program to be written, little more than a programming
+scratchpad.
+
+Without strict typing, hard to know if program is correct without
+running it. In theory (decidability) and in practice (often find errors
+through running and finding errors thrown). Echo FPR: once compiling,
+good typing tends to give a reasonable sureness that the code is
+correct.
+
+Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
+
+Although the streams themselves are stateful, because they are based on
+callbacks it is entirely possible to use them from a component of a
+javascript program which is wholly stateless.
+
+Performance implications of functional javascript (subsume into above?)
+-----------------------------------------------------------------------
+
+V8 and other modern JS engines are often said to be 'near-native' speed,
+meaning it runs at close to the speed of a similarly coded C program.
+However, this relies on the programmer also coding in the style of a C
+programmer, for example with only mono-morphic callsites and without a
+functional style. Once either of those programming techniques is taken
+up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
+9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
+the sense that not close to the performance gained by compiling a well
+designed functional language to natively executable code. Depends on
+style coded in, comparison to native somewhat takes C as the description
+of the operation of an idealised CPU rather than an abstract machine
+capable of executing on an actual CPU.
+
+(perhaps move to background, or hint at it, eg "although there are still
+some performance implications involved in a functional style, javascript
+may be used in a non-pure functional style") - with link to here
+
+The performance degradation, even with a self-hosted forEach, is due to
+the JIT’s inability to efficiently inline both the closures passed to
+forEach
+
+Lambda Lifting, currently not implemented in SpiderMonkey or V8:
+http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
+
+The transformations to enable the above criteria are tedious and are
+surely the purview of the compiler. All that’s needed are brave compiler
+hackers
+
+JS is much faster with "monomorphic call sites"
+
+However, js execution time is not much of a problem,
+
+Preferring functions over constructors (subsume into above section?)
+--------------------------------------------------------------------
+
+What constructors are in js. Any function, but usually an uppercase
+initial char indicates that it is intended to be used as a constructor.
+
+Inheritence is constructed using the language itself. While this is more
+flexible and allows each project to define a bespoke version of
+inherience to suit their particular needs or preferences, it also
+hampers portability more than an 'extends' keyword would.
+
+> So far, the JavaScript community has not agreed on a common
+> inheritance library (which would help tooling and code portability)
+> and it is doubtful that that will ever happen. That means, we’re stuck
+> with constructors under ECMAScript 5.
+> http://www.2ality.com/2013/07/defending-constructors.html
+
+Functions can be like Factories, gives me the flexability to chagne how
+something is created but by exposing a constructor are stuck with using
+'new' to create an instance of exactly one type.
+
+Dart has 'factory' constructors which are called like constructors but
+act like factory functions:
+(http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
+
+Design and implementation of the jsonpath parser
+------------------------------------------------
 
 NB: This consideration of type in json could be in the Background
 section.
@@ -228,7 +549,8 @@ Why this ensured more robustness but also sometimes took more code to
 write, ie couldn't just do if( tail(foo)) if foo could be empty but most
 of the time that would be correct
 
-### mutability problem
+Callback and mutability Problem
+-------------------------------
 
 Stateful controller very easy to test - only 1 function.
 
@@ -252,170 +574,6 @@ Potential solutions:
 -   immutable wrappers.
 -   defensive cloning
 -   defining getter properties
-
-styles of programming
----------------------
-
-The code presented is the result of the development many prior versions,
-it has never been rewritten in the sense of starting again. Nontheless,
-every part has been complely renewed several times. I am reviewing only
-the final version. Git promotes regular commits, there have been more
-than 500.
-
-some of it is pure functional (jsonPath, controller) ie, only
-semantically different from a Haskell programme others, syntactically
-functional but stateful to fit in with expected APIs etc
-
-JsonPath implementation allows the compilation of complex expressions
-into an executable form, but each part implementing the executable form
-is locally simple. By using recursion, assembling the simple functions
-into a more function expressing a more complex rule also follows as
-being locally simple but gaining a usefully sophisticated behaviour
-through composition of simple parts. Each recursive call of the parser
-identifies one token for non-empty input and then recursively digests
-the rest.
-
-The style of implementation of the generator of functions corresponding
-to json path expressions is reminiscent of a traditional parser
-generator, although rather than generating source, functions are
-dynamically composed. Reflecting on this, parser gens only went to
-source to break out of the ability to compose the expressive power of
-the language itself from inside the language itself. With a functional
-approach, assembly from very small pieces gives a similar level of
-expressivity as writing the logic out as source code.
-
-Why could implement Function\#partial via prototype. Why not going to.
-Is a shame. However, are using prototype for minimal set of polyfills.
-Not general purpose.
-
-Different ways to do currying below:
-
-Partial completion is implemented using the language itself, not
-provided by the language.
-
-Why would we choose 1 over the other? First simpler from caller side,
-second more flexible. Intuitive to call as a single call and can call
-self more easily.
-
-In same cases, first form makes it easier to communicate that the
-completion comes in two parts, for example:
-
-~~~~ {.javascript}
- namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
-~~~~
-
-There is a construction part (first 3 args) and a usage part (last
-three). Comsume many can only be constructed to ues consume 1 in second
-style because may refer to its own paritally completed version.
-
-In first case, can avoid this:
-`consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);`
-because function factory can have optional arguments so don't have to
-give all of them
-
-Function factory easier to debug. 'Step in' works. With
-partialCompletion have an awkward proxy function that breaks the
-programmer's train of thought as stepping through the code.
-
-Why it is important to consider the frame of mind of the coder (CITEME:
-Hackers and Painters) and not just the elegance of the possible language
-expressions.
-
-If implementing own functional caching, functional cache allows two
-levels of caching. Problematic though, for example no way to clear out
-the cache if memory becomes scarce.
-
-Functional programming tends to lend better to minification than
-OO-style because of untyped record objects (can have any keys).
-
-Lack of consistency in coding (don't write too much, leave to the
-conclusion)
-
-Final consideration of coding: packaging up each unit to export a
-minimal interface. \* Why minimal interfaces are better for minification
-
-### Performance implications of functional javascript
-
-V8 and other modern JS engines are often said to be 'near-native' speed,
-meaning it runs at close to the speed of a similarly coded C program.
-However, this relies on the programmer also coding in the style of a C
-programmer, for example with only mono-morphic callsites and without a
-functional style. Once either of those programming techniques is taken
-up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
-the sense that not close to the performance gained by compiling a well
-designed functional language to natively executable code. Depends on
-style coded in, comparison to native somewhat takes C as the description
-of the operation of an idealised CPU rather than an abstract machine
-capable of executing on an actual CPU.
-
-(perhaps move to background, or hint at it, eg "although there are still
-some performance implications involved in a functional style, javascript
-may be used in a non-pure functional style") - with link to here
-
-The performance degradation, even with a self-hosted forEach, is due to
-the JIT’s inability to efficiently inline both the closures passed to
-forEach
-
-Lambda Lifting, currently not implemented in SpiderMonkey or V8:
-http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
-
-The transformations to enable the above criteria are tedious and are
-surely the purview of the compiler. All that’s needed are brave compiler
-hackers
-
-JS is much faster with "monomorphic call sites"
-
-However, js execution time is not much of a problem,
-
-JS code style
--------------
-
-Javascript: not the greatest for 'final' elegant presentation of
-programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. Ie, can write stateful and refactor in small steps
-towards being stateless. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
-
-Without strict typing, hard to know if program is correct without
-running it. In theory (decidability) and in practice (often find errors
-through running and finding errors thrown). Echo FPR: once compiling,
-good typing tends to give a reasonable sureness that the code is
-correct.
-
-Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
-
-Although the streams themselves are stateful, because they are based on
-callbacks it is entirely possible to use them from a component of a
-javascript program which is wholly stateless.
-
-### functions over constructors
-
-What constructors are in js. Any function, but usually an uppercase
-initial char indicates that it is intended to be used as a constructor.
-
-Inheritence is constructed using the language itself. While this is more
-flexible and allows each project to define a bespoke version of
-inherience to suit their particular needs or preferences, it also
-hampers portability more than an 'extends' keyword would.
-
-> So far, the JavaScript community has not agreed on a common
-> inheritance library (which would help tooling and code portability)
-> and it is doubtful that that will ever happen. That means, we’re stuck
-> with constructors under ECMAScript 5.
-> http://www.2ality.com/2013/07/defending-constructors.html
-
-Functions can be like Factories, gives me the flexability to chagne how
-something is created but by exposing a constructor are stuck with using
-'new' to create an instance of exactly one type.
-
-Dart has 'factory' constructors which are called like constructors but
-act like factory functions:
-(http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
 
 Packaging the library as a single distributable file
 ----------------------------------------------------
@@ -498,125 +656,8 @@ everything, only through public API.
 
 Uglify. Why not Google Closure Compiler.
 
-automated testing
------------------
-
-![Relationship between various files and test libraries *other half of
-sketch from notebook*](images/placeholder.png)
-
-How automated testing improves what can be written, not just making what
-is written more reliable.
-
-TDD drives development by influencing the design - good design is taken
-as that which is amenable to testing rather than which describes the
-problem domain accurately or solves a problem with minimum resources.
-Amenable to testing often means split into many co-operating parts so
-that each part may be tested via a simple test.
-
-Bt encourageing splitting into co-operating objects, TDD to a certain
-degree is anti-encapsulation. The public object that was extracted as a
-new concern from a larger object now needs public methods whereas before
-nothing was exposed.
-
-![The testing pyramid is a common concept, relying on the assumption
-that verification of small parts provides a solid base from which to
-compose system-level behaviours. A Lot of testing is done on the
-low-level components of the system, whereas for the high-level tests
-only smoke tests are provided.
-\label{testingPyramidFig}](images/pyramid)
-
-Jstd can serve example files but need to write out slowly which it has
-no concept of. Customistation is via configuration rather than by
-plug-in, but even if it were, the threading model is not suitable to
-create this kind of timed output.
-
-Tests include an extremely large file twentyThousandRecords.js to test
-under stress
-
-Why jstd's built in proxy isn't sufficient. An example of a typical Java
-webserver, features thread-based mutlithreading in which threads wait
-for a while response to be received.
-
-Tests deal with the problem of "irreducible complexity" - when a program
-is made out of parts whose correct behaviour cannot be observed without
-all of the program. Allows smaller units to be verified before verifying
-the whole.
-
-Conversely, automated testing allows us to write incomprehensible code
-by making us into more powerful programmers, it is possible building up
-layers of complexity one very small part at a time that we couldn't
-write in a simple stage. Clarity \> cleverness but cleverness has its
-place as well (intriducing new concepts)
-
-Testing via node to give something to test against - slowserver. Proxy.
-JSTD not up to task. Shows how useful node is as a 'network glue'. The
-same as C was once described as a 'thin glue'
-[http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent
-proxy is about 20 lines. Transparent enough to fool JSTD into thinking
-it is connecting directly to its server.
-
-Node comes with very little built in (not even http) but relies on
-libraries written in the language itself to do everything. Could
-implement own http on top of sockets if wanted rather than using the
-provided one.
-
-The test pyramid concept \ref{testingPyramidFig} fits in well with the
-hiding that is provided. Under the testing pyramid only very high level
-behaviours are tested as ??? tests. While this is a lucky co-incidence,
-it is also an unavoidable restriction. Once compiled into a single
-source file, the individual components are hidden, callable only from
-withing their closure. Hence, it would not be possible to test the
-composed parts individually post-concatenation into a single javascript
-file, not even via a workarround for data hiding such as found in Java's
-reflection. Whereas in Java the protection is a means of protecting
-otherwise addressable resources, once a function is trapped inside a
-javascript closure without external exposure it is not just protected
-but, appearing in no namespaces, inherently unreferenceable.
-
-TDD fits well into an object pattern because the software is well
-composed into separate parts. The objects are almost tangible in their
-distinction as separate encapsulated entities. However, the
-multi-paradigm style of my implementation draws much fainter borders
-over the implementation's landscape.
-
-Approach has been to the test the intricate code, then for wiring don't
-have tests to check that things are plumbed together correctly, rather
-rely on this being obvious enough to be detected via a smoke test.
-
-A good test should be able to go unchanged as the source under test is
-refactored. Indeed, the test will be how we know that the code under
-test still works as intended. Experince tells me that testing that A
-listens to B (ie that the controller wires the jsonbuilder up to
-clarinet) produces the kind of test that 'follows the code arround'
-meaning that because it is testing implementation details rather than
-behaviours, whenever the implementation is updated the tests have to be
-updated too.
-
-By testing individual tokens are correct and the use of those tokens as
-a wider expression, am testing the same thing twice. Arguably, redundant
-effort. But may simply be easier to write in that way - software is
-written by a human in a certain order and if we take a bottom-up
-approach to some of that design, each layer is easier to create if we
-first know the layers that it sits on are sound. Writing complex regular
-expressions is still programming and it is more difficult to test them
-completely when wrapped in rather a lot more logic than directly. For
-example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is not
-trivial.
-
-Can test less exhaustively on higher levels if lower ones are well
-tested, testing where it is easier to do whilst giving good guarantees.
-
-Genuine data hiding gets in the way sometimes. Eg, token regexes are
-built from the combination of smaller regualar expressions for clarity
-(long regular expressions are concise but hard to read), and then
-wrapped in functions (why? - explain to generify interface) before being
-exposed. Because the components are hidden in a scope, they are not
-addressable by the tests and therefore cannot be directly tested.
-Reluctantly
-
-One dilemma in implementing the testing is how far to test the more
-generic sections of the codebase as generic components. A purist
-approach to TDD would say
+(not) Resume
+------------
 
 Could implement a resume function for if transmission stops halfway
 
@@ -626,35 +667,14 @@ Could implement a resume function for if transmission stops halfway
    }
 ~~~~
 
-Inversion of Control
---------------------
-
-Aim of creating a micro-library rules out building in a general-purpose
-IoC library.
-
-However, can still follow the general principles.
-
-Why the Observer pattern (cite: des patterns) lends itself well to MVC
-and inversion of control.
-
-What the central controller does; acts as a plumber connecting the
-various parts up. Since oboe is predominantly event/stream based, once
-wired up little intervention is needed from the controller. Ie, A knows
-how to listen for ??? events but is unintested who fired them.
-
-
 support for older browsers
 --------------------------
 
 Still works as well as non-progressive json Could be used for content
 that is inherently streaming (wouldn't make sense without streaming)
 
-### polyfilling
-
 The decline of bad browsers. Incompatibility less of a concern than it
 was.
-
-Node doesn't require, built on v8.
 
 http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the
 new methods discussed in the first two parts, the methods here are all
@@ -667,5 +687,3 @@ Even when only used once, preferable to polyfill as a generic solution
 rather than offer a one-time implementation because it better splits the
 intention of the logic being presented from the mechanisms that that
 logic sits on and, by providing abstraction, elucidates the code.
-
-
