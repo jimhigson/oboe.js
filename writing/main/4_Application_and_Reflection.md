@@ -1,5 +1,6 @@
 Application and Reflection
 ==========================
+
 <!---
 **40 to 60 pages**
 --->
@@ -10,25 +11,21 @@ do-everything library like jQuery so its size will be looked at more
 critically if it is too large. Micro library is the current gold
 standard for compactness. Still, have a lot to do in not very much code.
 
-Relationship between type of a node and its purpose in the document. Purpose is often
-obvious from a combination of URL and type so can disregard the place in the document.
-This structure may be carefully designed but ultimately a looser interpretation of the
-structure can be safer.
+Relationship between type of a node and its purpose in the document.
+Purpose is often obvious from a combination of URL and type so can
+disregard the place in the document. This structure may be carefully
+designed but ultimately a looser interpretation of the structure can be
+safer.
 
+Interestingly, the mixed paradigm design hasn't changed the top-level
+design very much from how it'd be as a pure OO project (IoC, decorators,
+event filters, pub/sub etc).
 
-Interestingly, the mixed paradigm design hasn't changed the top-level design 
-very much from how it'd be as a pure OO project (IoC, decorators, event 
-filters, pub/sub etc).
-
-
-
-
-Why SAX is dumb:
-As a principle, the
-programmer should only have to handle the cases which are interesting to
-them, not wade manually through a haystack in search of a needle, which
-means the library should provide an expressive way of associating the
-nodes of interest with their targetted callbacks.
+Why SAX is dumb: As a principle, the programmer should only have to
+handle the cases which are interesting to them, not wade manually
+through a haystack in search of a needle, which means the library should
+provide an expressive way of associating the nodes of interest with
+their targetted callbacks.
 
 JS code style
 -------------
@@ -77,7 +74,6 @@ getting the whole message at once is no worse than it is now.
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
 
-
 resume on failure
 -----------------
 
@@ -85,7 +81,7 @@ Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
 which can be used to request any contiguous part of a response rather
 than the whole. Common in download managers but not REST clients. This
-ability can be used to. Why not this one. Resume on a higher semantic 
+ability can be used to. Why not this one. Resume on a higher semantic
 level.
 
 delivery methodology
@@ -157,7 +153,6 @@ pure functional language, ie function caches although can be
 implemented, not universal on all functions.
 
 easy to distribute softare (npm etc)
-
 
 creating a losely coupled reader
 --------------------------------
@@ -311,7 +306,8 @@ stack of nodes.
 More important to efficiently detect or efficiently compile the
 patterns?
 
-As discussed in section ???, Sax is difficult to program and not widely used.
+As discussed in section ???, Sax is difficult to program and not widely
+used.
 
 First way to identify an interesting thing is by its location in the
 document. In the absense of node typing beyond the categorisation as
@@ -531,18 +527,19 @@ Potential solutions:
 Performance implications of functional javascript
 -------------------------------------------------
 
-V8 and other modern JS engines are often said to be 'near-native' speed, meaning it runs at close to
-the speed of a similarly coded C program. However, this relies on the
-programmer also coding in the style of a C programmer, for example with
-only mono-morphic callsites and without a functional style. Once either
-of those programming techniques is taken up performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html] 9571 ms vs 504 ms.
-When used in a functional style, not 'near-native' in the sense that not
-close to the performance gained by compiling a well designed functional
-language to natively executable code. Depends on style coded in,
-comparison to native somewhat takes C as the description of the
-operation of an idealised CPU rather than an abstract machine capable of
-executing on an actual CPU.
+V8 and other modern JS engines are often said to be 'near-native' speed,
+meaning it runs at close to the speed of a similarly coded C program.
+However, this relies on the programmer also coding in the style of a C
+programmer, for example with only mono-morphic callsites and without a
+functional style. Once either of those programming techniques is taken
+up performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
+9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
+the sense that not close to the performance gained by compiling a well
+designed functional language to natively executable code. Depends on
+style coded in, comparison to native somewhat takes C as the description
+of the operation of an idealised CPU rather than an abstract machine
+capable of executing on an actual CPU.
 
 (perhaps move to background, or hint at it, eg "although there are still
 some performance implications involved in a functional style, javascript
@@ -678,26 +675,6 @@ Testing post-packaging for small set of smoke tests. Can't test
 everything, only through public API.
 
 Uglify. Why not Google Closure Compiler.
-
-polyfilling
------------
-
-The decline of bad browsers. Incompatability less of a concern than it
-was.
-
-Node doesn't require, built on v8.
-
-http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the
-new methods discussed in the first two parts, the methods here are all
-reproducible using JavaScript itself. Native implementations are simply
-faster and more convenient. Having a uniform API for these operations
-also promotes their usage, making code clearer when shared between
-developers.
-
-Even when only used once, preferable to polyfill as a generic solution
-rather than offer a one-time implementation because it better splits the
-intention of the logic being presented from the mechanisms that that
-logic sits on and, by providing abstraction, elucidates the code.
 
 automated testing
 -----------------
@@ -855,6 +832,25 @@ support for older browsers
 
 Still works as well as non-progressive json Could be used for content
 that is inherently streaming (wouldn't make sense without streaming)
+
+### polyfilling
+
+The decline of bad browsers. Incompatibility less of a concern than it
+was.
+
+Node doesn't require, built on v8.
+
+http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the
+new methods discussed in the first two parts, the methods here are all
+reproducible using JavaScript itself. Native implementations are simply
+faster and more convenient. Having a uniform API for these operations
+also promotes their usage, making code clearer when shared between
+developers.
+
+Even when only used once, preferable to polyfill as a generic solution
+rather than offer a one-time implementation because it better splits the
+intention of the logic being presented from the mechanisms that that
+logic sits on and, by providing abstraction, elucidates the code.
 
 suitability for databases
 -------------------------
