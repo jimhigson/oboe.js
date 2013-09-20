@@ -81,14 +81,14 @@ packets in-order, for out-of-order packets something else happens.
 
 Use best of the capabilities of each.
 
-stability over upgrades
+Stability over upgrades
 -----------------------
 
 why jsonpath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-suitability for databases (really just an inline asside)
+Suitability for databases (really just an inline asside)
 --------------------------------------------------------
 
 Databases offer data one row at a time, not as a big lump.
