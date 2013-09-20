@@ -4,7 +4,7 @@ Application and Reflection
 <!---
 **40 to 60 pages**
 
-@500w, 13,000 to 19,000
+@333w, 13,000 to 19,000
 --->
 
 What a Micro-library is. What motivates the trend? This library has a
