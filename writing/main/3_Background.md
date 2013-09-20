@@ -107,27 +107,26 @@ In most imperative languages attempts at concurrency have focused on
 threaded execution, whereas Node is by design single-threaded. Threads
 are an effective means to speed up parallel computation but not well
 suited to concurrently running tasks which are mostly i/o dependent, in
-which each thread remains waiting for long periods, consuming
-considerable resources, punctuated by occasional short bursts of
-processing. Threading in many languages also requires explicity
-syncrhonisation of any memory to be shared between threads and great
-care and experience is required to avoid non-obvious race conditions.
-Consider for example a thread-based http aggregator; the ratio of
+which each thread spends most of its life waiting, consuming
+considerable resources, occasionally punctuated with short bursts of
+activity. Programming Java safely with threads which share access to mutable objects requires great
+care and experience, otherwise the programmer is liable to create race conditions.
 
-waiting to processing per thread is so high that any gains achieved
-through actual concurrent execution is tiny in comparison. Following
+Consider the example a Java thread-based http aggregator; each 'requester' thread waits for seconds and then processes
+for milliseconds. The ratio of
+waiting to processing is so high that any gains achieved
+through actual concurrent execution of the active phase is pyrrhic. Following
 Node's lead, even traditionally thread-based environments such as Java
-are starting to embrace asynchronous single-threaded programming with
-servers such as Netty. Node instead maintains an event loop and expects
-each task never to wait for io for rather to always make asynchronous
-calls, providing a function to handle the data when available. Unlike
-Erlang, Node does not swap tasks out preemptively, it always waits for
-them to complete, meaning that each task must complete quickly. While
-this might at first seem like an onerous requirement to put on the user.
-In practice the asynchronous nature of the toolkit makes following this
+are starting to embrace asynchronous, single-threaded servers with
+projects such as Netty. Node manages concurrency by maintaining an event loop and expects
+each task never to block. Non-blocking io is used for everything and is callback based.
+Unlike Erlang, Node does not swap tasks out preemptively, it always waits for
+tasks to complete which means that each task must complete quickly. While
+this might at first seem like an onerous requirement to put on the programmer,
+in practice the asynchronous nature of the toolkit makes following this
 requirement more natural than not. Indeed, other than accidental
 non-terminating loops or heavy number-crunching, the lack of any
-blocking functions whatsoever makes it rather difficult to write a node
+blocking io whatsoever makes it rather difficult to write a node
 program whose tasks do not exit quickly.
 
 This is already the model
