@@ -103,7 +103,7 @@ well suited to any application domain where low-latency responses to i/o
 is more of a concern than heavyweight computation. Web applications fit
 well into this niche but they are far from the only domain that does so.
 
-In most programming languages attempts at concurrency have focused on
+In most imperative languages attempts at concurrency have focused on
 threaded execution, whereas Node is by design single-threaded. Threads
 are an effective means to speed up parallel computation but not well
 suited to concurrently running tasks which are mostly i/o dependent, in
