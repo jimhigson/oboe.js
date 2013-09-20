@@ -62,6 +62,13 @@ suspended from a new parent. See \ref{enhancingrest}
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
+Stability over upgrades
+-----------------------
+
+why jsonpath-like syntax allows upgrading message semantics without
+causing problems [SOA] how to guarantee non-breakages? could publish
+'supported queries' that are guaranteed to work
+
 JsonPATH variation
 ------------------
 
@@ -82,13 +89,6 @@ Purpose is often obvious from a combination of URL and type so can
 disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
 safer.
-
-Stability over upgrades
------------------------
-
-why jsonpath-like syntax allows upgrading message semantics without
-causing problems [SOA] how to guarantee non-breakages? could publish
-'supported queries' that are guaranteed to work
 
 API design
 ----------
