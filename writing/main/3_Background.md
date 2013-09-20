@@ -134,8 +134,7 @@ with an event loop is already the model followed inside web browsers, which
 although multi-threaded in some regards, present a single-threaded virtual
 machine in terms of Javascript execution.
 
-, being single
-threaded. A programmer working with Node's single-thread is able to
+A programmer working with Node's single-thread is able to
 switch contexts quickly to achieve a very efficient kind of concurrency
 because of Javascript's support for closures. Because of closures, the
 responsibility to explicitly store current data between an asynchronous
