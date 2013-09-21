@@ -40,50 +40,32 @@ performant as SAX but as easy to program as DOM.
 
 To follow this progressive-but-complete model, identifying the
 interesting parts of a document involves turning the traditional model
-for drilling down inside out. Traditionally the programmer's callback
+for drilling down inside-out. Traditionally the programmer's callback
 receives the document then inside that callback drills down to locate
 the parts that they are interested in. Instead I propose taking the
-drilling down part out from inside the callback and instead wrap the
+drilling-down logic out from inside the callback and instead wrap the
 callback in it. This means that the callback receives selected parts of
 the response which the library has already drilled down to on behalf of
 the programmer.
 
+Whilst JSONPath's existing implementation is only implemented for
+searching over already gathered objects, this kind of searching is just
+one application for the query language. I find that this is a very
+suitable declarative language to use to specify the parts of a response
+that a developer would like to drill-down to given the context of a
+document whose parse is in progress. JSONPath is especially applicable
+because it specifies only 'contained-in/contains' type relationships. On
+encountering any node in a serialised JSON stream, because of the
+depth-first serialisation order I will always have previously seen its
+ancestors. Hence, having written a suitably flexible JSONPath expression
+compiler such that it does not require a complete document, I will have
+enough information to evaluate any expression against any node at the
+time when it is first identified in the document.
 
-
-
-The definition of 'interesting' will be generic and
-accommodating enough so as to apply to any data domain and allow any
-granularity of interest, from large object to individual datums. With
-just a few lines of programming
-
-
-
-Interestingly, the mixed paradigm design hasn't changed the top-level
-design very much from how it'd be as a pure OO project (IoC, decorators,
-event filters, pub/sub etc).
-
-Programming to identify a certain interesting part of a resource today
-should with a high probability still work when applied to future
-releases.
-
-Requires a small amount of discipline on behalf of the service provider:
-Upgrade by adding of semantics only most of the time rather than
-changing existing semantics.
-
-Adding of semantics should could include adding new fields to objects
-(which could themselves contain large sub-trees) or a "push-down"
-refactor in which what was a root node is pushed down a level by being
-suspended from a new parent. See \ref{enhancingrest}
-
-![extended json rest service that still works - maybe do a table instead
-\label{enhancingrest}](images/placeholder)
-
-Stability over upgrades
------------------------
-
-why jsonpath-like syntax allows upgrading message semantics without
-causing problems [SOA] how to guarantee non-breakages? could publish
-'supported queries' that are guaranteed to work
+The definition of 'interesting' will be generic and accommodating enough
+so as to apply to any data domain and allow any granularity of interest,
+from large object to individual datums. With just a few lines of
+programming
 
 JsonPATH variation
 ------------------
@@ -106,6 +88,29 @@ disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
 safer.
 
+![extended json rest service that still works - maybe do a table instead
+\label{enhancingrest}](images/placeholder)
+
+Stability over upgrades
+-----------------------
+
+Programming to identify a certain interesting part of a resource today
+should with a high probability still work when applied to future
+releases.
+
+Requires some discipline on behalf of the service provider: Upgrade by
+adding of semantics only most of the time rather than changing existing
+semantics.
+
+Adding of semantics should could include adding new fields to objects
+(which could themselves contain large sub-trees) or a "push-down"
+refactor in which what was a root node is pushed down a level by being
+suspended from a new parent. See \ref{enhancingrest}
+
+why jsonpath-like syntax allows upgrading message semantics without
+causing problems [SOA] how to guarantee non-breakages? could publish
+'supported queries' that are guaranteed to work
+
 API design
 ----------
 
@@ -117,18 +122,6 @@ fairly small set of functionality, it isn't a general purpose
 do-everything library like jQuery so its size will be looked at more
 critically if it is too large. Micro library is the current gold
 standard for compactness. Still, have a lot to do in not very much code.
-
-Where to target
----------------
-
-targeting node and the browser
-
-Node+browser To use Node.js and
-
-Need to build an abstraction layer over xhr/xhr2/node. Can only work for
-packets in-order, for out-of-order packets something else happens.
-
-Use best of the capabilities of each.
 
 Incorporating existing libraries
 --------------------------------
