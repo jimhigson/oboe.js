@@ -9,8 +9,8 @@ chapter, I propose that a simple design is possible which makes REST
 clients more efficient whilst being no more difficult to program.
 Although simple, this model fits poorly with established vocabulary,
 requiring a transport that sits *somewhere between 'stream' and
-'download'* and a parsing strategy which takes elements from *SAX and
-DOM* but follows neither model.
+'download'* and a parsing strategy which *takes elements from SAX and
+DOM* but follows neither model*.
 
 Implementation in Javascript gives me the widest deployment options,
 covering client-side browser programming, server programming, use in
