@@ -2,7 +2,7 @@ Application and Reflection 1: what is it?
 =========================================
 
 High-level solution
------------------
+-------------------
 
 Doing things faster vs doing things earlier. "Hurry up and wait"
 approach to optimisation.
@@ -11,23 +11,24 @@ A feature set which is minimal but contain no obvious omissions.
 
 On way of looking at it: SAX, but as easy to use as DOM.
 
-Like other ajax libs still callback-based but turn model for drilling down inside out. Instead of the programmer finding the parts
-they want as a part of the general logic of the program, declaratively
-define the interesting parts and have these parts delivered to the
-language logic. Once we make the shift to thinking in this way, it is no
-longer necessary to have the whole resource locally before the
-interesting sub-parts are delivered.
+Like other ajax libs still callback-based but turn model for drilling
+down inside out. Instead of the programmer finding the parts they want
+as a part of the general logic of the program, declaratively define the
+interesting parts and have these parts delivered to the language logic.
+Once we make the shift to thinking in this way, it is no longer
+necessary to have the whole resource locally before the interesting
+sub-parts are delivered.
 
 Under the heading [Anatomy of a SOA client] I deconstructed the way in
 which programming logic is often used to identify the parts of a model
 which are currently interesting and started to look at some declarative
 ways in which these parts can be obtained.
 
-Why better than SAX: As a principle, the programmer should only have to handle
-the cases which are interesting to them, not wade manually through a
-haystack in search of a needle, which means the library should provide
-an expressive way of associating the nodes of interest with their
-targeted callbacks.
+Why better than SAX: As a principle, the programmer should only have to
+handle the cases which are interesting to them, not wade manually
+through a haystack in search of a needle, which means the library should
+provide an expressive way of associating the nodes of interest with
+their targeted callbacks.
 
 In which a callback call is received not just when the whole resource is
 downloaded but for every interesting part which is seen while the
@@ -156,9 +157,10 @@ ability can be used to. Why not this one. Resume on a higher semantic
 level.
 
 Required support for older browsers
---------------------------
+-----------------------------------
 
-Aims not possible to realise but don't want to make devs using lib have to special-case.
+Aims not possible to realise but don't want to make devs using lib have
+to special-case.
 
 Still works as well as non-progressive json Could be used for content
 that is inherently streaming (wouldn't make sense without streaming)
