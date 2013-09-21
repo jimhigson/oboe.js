@@ -10,7 +10,7 @@ clients more efficient whilst being no more difficult to program.
 Although simple, this model fits poorly with established vocabulary,
 requiring a transport that sits *somewhere between 'stream' and
 'download'* and a parsing strategy which *takes elements from SAX and
-DOM* but follows neither model*.
+DOM* but follows neither model\*.
 
 Implementation in Javascript gives me the widest deployment options,
 covering client-side browser programming, server programming, use in
@@ -163,8 +163,8 @@ of the document, the 'isa' relationship between a 'class' tagname and
 it's 'sub-tagname' may be difficult to track. It is likely that if I'm
 unaware of this, I'm not interested in the extended capabilities of the
 subclass and would rather just continue to receive the base superclass
-capabilities as before. Under duck typing this is easy - because the data
-consumer lists the
+capabilities as before. Under duck typing this is easy - because the
+data consumer lists the
 
 Relationship between type of a node and its purpose in the document.
 Purpose is often obvious from a combination of URL and type so can
@@ -198,8 +198,32 @@ causing problems [SOA] how to guarantee non-breakages? could publish
 Incorporating existing libraries
 --------------------------------
 
+Oboe name in tribute to work already done in Clarinet project.
+
 API design
 ----------
+
+Compare to existing libraries such as jQuery. While inevitably
+different, should be similar so far as the purpose is shared.
+Should be easy to change from old way to new way.
+
+Why provide whole-resource callback.
+
+~~~~ {.javascript}
+// some ajaxing using jQuery
+~~~~
+
+~~~~ {.javascript}
+// this API
+
+oboe('url');
+
+~~~~
+
+Detecting Paths, not just nodes. Sometimes gives callback even earlier.
+
+Ability to get the root at any time by doing this.root();
+
 
 Micro-library
 -------------
@@ -212,13 +236,12 @@ do-everything library like jQuery so its size will be looked at more
 critically if it is too large. Micro library is the current gold
 standard for compactness. Still, have a lot to do in not very much code.
 
-This project feels on the edge of what is possible to elegantly do in 5k, so 
-while the limit is somewhat arbitrary, it is an interesting challenge. 
+This project feels on the edge of what is possible to elegantly do in
+5k, so while the limit is somewhat arbitrary, it is an interesting
+challenge.
 
 Handling failures
 -----------------
-
-
 
 Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
@@ -227,9 +250,9 @@ than the whole. Common in download managers but not REST clients. This
 ability can be used to. Why not this one. Resume on a higher semantic
 level.
 
-(not) Resume on failure at byte level but might be worked in on a future version.
-Probably unsafe since can't guarantee the 2nd time requesting a URL will give the
-same response byte-for-byte.
+(not) Resume on failure at byte level but might be worked in on a future
+version. Probably unsafe since can't guarantee the 2nd time requesting a
+URL will give the same response byte-for-byte.
 
 Required support for older browsers
 -----------------------------------

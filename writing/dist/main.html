@@ -438,6 +438,12 @@ http://stackoverflow.com/questions/5751515/official-references-for-default-value
   <p>Include? Compare to Erlang. Waiter model. Node restaurant much
   more efficient use of expensive resources.</p>
 
+  <p>Include? No 'task' class or type, tasks are nothing more than
+  functions, possibly having some values implicitly wrapped up in
+  their closure.</p>
+
+  <p>Include? Easy to distribute software (npm etc)</p>
+
   <p>It is difficult to say to what degree Node's use of Javascript
   is a distraction from the system's principled design aims and to
   what degree it defines the technology. Paradoxically, both may be
@@ -1346,9 +1352,9 @@ analysis* =-->
   which makes REST clients more efficient whilst being no more
   difficult to program. Although simple, this model fits poorly
   with established vocabulary, requiring a transport that sits
-  <strong>somewhere between 'stream' and 'download'</strong> and a
-  parsing strategy which takes elements from <strong>SAX and
-  DOM</strong> but follows neither model.</p>
+  <em>somewhere between 'stream' and 'download'</em> and a parsing
+  strategy which <em>takes elements from SAX and DOM</em> but
+  follows neither model*.</p>
 
   <p>Implementation in Javascript gives me the widest deployment
   options, covering client-side browser programming, server
@@ -1404,7 +1410,9 @@ analysis* =-->
   expression compiler such that it does not require a complete
   document, I will have enough information to evaluate any
   expression against any node at the time when it is first
-  identified in the document.</p>
+  identified in the document. Because XML is also written
+  depth-first, the same logic would apply to an XPath/XML variant
+  of this project.</p>
 
   <p>The definition of 'interesting' will be generic and
   accommodating enough so as to apply to any data domain and allow
@@ -1524,13 +1532,13 @@ analysis* =-->
   document's tag names and collisions are possible where objects
   co-incidentally share property names. In practice however, I find
   the looseness a strength more often than a weakness. Under a
-  tag-based marshalling from an OO language, sub-types are assigned
+  tag-based marshaling from an OO language, sub-types are assigned
   a new tag name and as a consumer of the document, the 'isa'
-  relationship between a 'class' tagname and it's 'sub-tabname' may
+  relationship between a 'class' tagname and it's 'sub-tagname' may
   be difficult to track. It is likely that if I'm unaware of this,
   I'm not interested in the extended capabilities of the subclass
-  and would rather just continue to recieve the base superclass
-  capabilities as before. Under duck typing this is easy - becase
+  and would rather just continue to receive the base superclass
+  capabilities as before. Under duck typing this is easy - because
   the data consumer lists the</p>
 
   <p>Relationship between type of a node and its purpose in the
@@ -1574,28 +1582,6 @@ analysis* =-->
   "header-section-number">4.4</span> Incorporating existing
   libraries</a></h2>
 
-  <p>can justify why js as:</p>
-
-  <p>Most widely displayable.</p>
-
-  <p>Node: asynchronous model built into language already, no
-  'concurrent' library needed. Closures convenient for picking up
-  again where left off.</p>
-
-  <p>Node programs often so asynchronous and callback based they
-  become unclear in structure. Promises approach to avoid
-  pyramid-shaped code and callback spaghetti.</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"co">// example of pyramid code</span></code>
-</pre>
-
-  <p>functional, pure functional possible [FPR] but not as nicely
-  as in a pure functional language, ie function caches although can
-  be implemented, not universal on all functions.</p>
-
-  <p>easy to distribute software (npm etc)</p>
-
   <h2 id="api-design"><a href="#api-design"><span class=
   "header-section-number">4.5</span> API design</a></h2>
 
@@ -1619,8 +1605,6 @@ analysis* =-->
   "#handling-failures"><span class=
   "header-section-number">4.7</span> Handling failures</a></h2>
 
-  <p>(not) Resume on failure</p>
-
   <p>Http 1.1 provides a mechanism for Byte Serving via the
   Accepts-Ranges header [<a href=
   "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5]
@@ -1628,6 +1612,11 @@ analysis* =-->
   rather than the whole. Common in download managers but not REST
   clients. This ability can be used to. Why not this one. Resume on
   a higher semantic level.</p>
+
+  <p>(not) Resume on failure at byte level but might be worked in
+  on a future version. Probably unsafe since can't guarantee the
+  2nd time requesting a URL will give the same response
+  byte-for-byte.</p>
 
   <h2 id="required-support-for-older-browsers"><a href=
   "#required-support-for-older-browsers"><span class=
@@ -1976,7 +1965,17 @@ analysis* =-->
   sureness that the code is correct.</p>
 
   <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
-  promises.</p>
+  promises. Node programs often so asynchronous and callback based
+  they become unclear in structure. Promises approach to avoid
+  pyramid-shaped code and callback spaghetti.</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"co">// example of pyramid code</span></code>
+</pre>
+
+  <p>functional, pure functional possible [FPR] but not as nicely
+  as in a pure functional language, ie function caches although can
+  be implemented, not universal on all functions.</p>
 
   <p>Although the streams themselves are stateful, because they are
   based on callbacks it is entirely possible to use them from a
@@ -2668,6 +2667,12 @@ analysis* =-->
   <p>Built into Dojo Followers on Github Being posted in forums
   (hopefully also listed on blogs) No homepage as of yet other than
   the Github page</p>
+
+  <h2 id="possible-future-work"><a href=
+  "#possible-future-work"><span class=
+  "header-section-number">6.8</span> Possible future work</a></h2>
+
+  <p>Do da XMLs</p>
 
   <h1 id="appendix"><a href="#appendix"><span class=
   "header-section-number">7</span> Appendix</a></h1>
