@@ -157,13 +157,13 @@ fields rather than its position in the document:
 Duck typing is of course a much looser concept than an XML document's
 tag names and collisions are possible where objects co-incidentally
 share property names. In practice however, I find the looseness a
-strength more often than a weakness. Under a tag-based marshalling from
+strength more often than a weakness. Under a tag-based marshaling from
 an OO language, sub-types are assigned a new tag name and as a consumer
 of the document, the 'isa' relationship between a 'class' tagname and
-it's 'sub-tabname' may be difficult to track. It is likely that if I'm
+it's 'sub-tagname' may be difficult to track. It is likely that if I'm
 unaware of this, I'm not interested in the extended capabilities of the
-subclass and would rather just continue to recieve the base superclass
-capabilities as before. Under duck typing this is easy - becase the data
+subclass and would rather just continue to receive the base superclass
+capabilities as before. Under duck typing this is easy - because the data
 consumer lists the
 
 Relationship between type of a node and its purpose in the document.
@@ -198,13 +198,8 @@ causing problems [SOA] how to guarantee non-breakages? could publish
 Incorporating existing libraries
 --------------------------------
 
-
-
-
-
 API design
 ----------
-
 
 Micro-library
 -------------
