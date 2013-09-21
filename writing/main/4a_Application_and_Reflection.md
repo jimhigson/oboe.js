@@ -56,8 +56,7 @@ accommodating enough so as to apply to any data domain and allow any
 granularity of interest, from large object to individual datums. With
 just a few lines of programming
 
-![Over several hops of aggregation, the benefits of finding the
-interesting parts early](images/timeline)
+
 
 Interestingly, the mixed paradigm design hasn't changed the top-level
 design very much from how it'd be as a pure OO project (IoC, decorators,
