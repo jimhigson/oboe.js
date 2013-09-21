@@ -87,7 +87,6 @@ simply being an element node) in the tagName, JSON's objects are all
 simply objects. In JSON the type of a node is usually inferred in one of
 two ways: either, the fieldName in the parent object which references a
 node; or, from the fields that the object has.
-\pagebreak
 
 In the below example, we assign the node the type 'address' because of 
 the parent node's field name. Other than this, these are standard arrays
