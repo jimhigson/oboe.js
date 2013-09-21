@@ -273,6 +273,17 @@ good typing tends to give a reasonable sureness that the code is
 correct.
 
 Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
+Node programs often so asynchronous and callback based they become
+unclear in structure. Promises approach to avoid pyramid-shaped code and
+callback spaghetti.
+
+~~~~ {.javascript}
+// example of pyramid code
+~~~~
+
+functional, pure functional possible [FPR] but not as nicely as in a
+pure functional language, ie function caches although can be
+implemented, not universal on all functions.
 
 Although the streams themselves are stateful, because they are based on
 callbacks it is entirely possible to use them from a component of a

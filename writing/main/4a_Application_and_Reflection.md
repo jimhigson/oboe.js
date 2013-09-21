@@ -198,26 +198,9 @@ causing problems [SOA] how to guarantee non-breakages? could publish
 Incorporating existing libraries
 --------------------------------
 
-can justify why js as:
 
-Most widely displayable.
 
-Node: asynchronous model built into language already, no 'concurrent'
-library needed. Closures convenient for picking up again where left off.
 
-Node programs often so asynchronous and callback based they become
-unclear in structure. Promises approach to avoid pyramid-shaped code and
-callback spaghetti.
-
-~~~~ {.javascript}
-// example of pyramid code
-~~~~
-
-functional, pure functional possible [FPR] but not as nicely as in a
-pure functional language, ie function caches although can be
-implemented, not universal on all functions.
-
-easy to distribute software (npm etc)
 
 API design
 ----------
