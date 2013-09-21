@@ -4,12 +4,40 @@ Application and Reflection 1: what is it?
 High-level solution
 -------------------
 
+Using a combination of the techniques investigated in the previous
+chapter, I propose that a simple design is possible which makes REST
+clients more efficient whilst being no more difficult to program.
+Although simple, this model fits poorly with established vocabulary,
+requiring a transport that sits **somewhere between 'stream' and
+'download'** and a parsing strategy which takes elements from **SAX and
+DOM** but follows neither model.
+
+Implementation in Javascript gives me the widest deployment options,
+covering client-side browser programming, server programming, use in
+command line tools, or any other usage. This context dictates a design
+which is non-blocking, asynchronous and callback based. While influenced
+by the language, the model of REST client proposed here is not limited
+to Javascript or web usage and I intent to comment briefly also on the
+applicability to other platforms.
+
+From DOM we may observe that as a programmer, using a resource is
+simpler when a parsed entity is passed\
+whole to a single callback, rather than the SAX model which requires the
+programmer to infer the entity from a lengthy series of callbacks. From
+observing SAX parsers or progressive HTML rendering, we can say that
+http is more efficient if we no not wait until we have everything before
+we start using the parts that we do have. DOM parsers pass a fully
+parsed node to registered callbacks, whole and ready to use, invariably
+at the root of the parsed document. From the vantage of the library's
+user, my thesis duplicates this convenience but removes one restriction;
+that the node which is passed must be the root. Because the mark-up
+formats we are dealing with are hierarchical and serialised depth-first
+it is possible to fully parse any sub-tree without fully knowing the
+parent node. From these observations we may program a new kind of REST
+client which is as performant as SAX but as easy to program as DOM.
+
 Doing things faster vs doing things earlier. "Hurry up and wait"
 approach to optimisation.
-
-A feature set which is minimal but contain no obvious omissions.
-
-On way of looking at it: SAX, but as easy to use as DOM.
 
 Like other ajax libs still callback-based but turn model for drilling
 down inside out. Instead of the programmer finding the parts they want
@@ -19,10 +47,10 @@ Once we make the shift to thinking in this way, it is no longer
 necessary to have the whole resource locally before the interesting
 sub-parts are delivered.
 
-Under the heading [Anatomy of a SOA client] I deconstructed the way in
-which programming logic is often used to identify the parts of a model
-which are currently interesting and started to look at some declarative
-ways in which these parts can be obtained.
+Under the heading I deconstructed the way in which programming logic is
+often used to identify the parts of a model which are currently
+interesting and started to look at some declarative ways in which these
+parts can be obtained.
 
 Why better than SAX: As a principle, the programmer should only have to
 handle the cases which are interesting to them, not wade manually
