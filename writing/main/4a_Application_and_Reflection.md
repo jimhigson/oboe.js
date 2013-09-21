@@ -70,6 +70,84 @@ programming
 JsonPATH variation
 ------------------
 
+In searching it is common to ask for database-style queries such as 'books costing more than X'.
+However, not searching, selecting from a resource that the programmer
+has requested, where we can expect them to be interested in most of the content. Modify JSONPath for this 
+actual situation. Avoid implementing, at least at first, the language features which are
+less likely to be used and are easily tested for inside the callback. At same time, add features which are
+more likely to be useful for this context.
+
+We impose types on top of JSON/XML markup. Only few basic types defined in the markup languages themselves. 
+Essence of marshaling.
+
+Whereas XML has a pretty good concept of the type of an element (beyond simply being an element node) in the tagName,
+JSON's objects are all simply objects. In JSON the type of a node is usually inferred in one of two ways: either, the 
+fieldName in the parent object which references a node; or, from the fields that the object has.
+
+
+\pagebreak
+~~~~ {.javascript}
+// in the below example, we assign the node the type 'address' because of 
+// the parent node's field name. Other than this, these are standard arrays
+// of strings:
+{
+   name: '',
+   residence:{
+      address:[
+         '', '', ''
+      ]
+   },
+   employer:{
+      name:
+      address:[
+         '', '', ''      
+      ]
+   }   
+}
+
+
+// As a slight variant, when dealing with multiple addresses in an array,
+// it is the grandparent's node field name which indicates the type, the
+// parent being the array containing the multiple addressees:
+
+{
+   residences:{
+      addresses:[
+         ['Beach Hut', 'Secret Island', 'Bahamas']
+      ,  ['', '', '']
+      ,  ['', '', '']
+      ,  ['', '', '']
+      ]
+   }
+}
+
+// In this third example, the field names linking to addresses refer to the
+// relationship between the parent and child nodes rather than the type of the
+// child. The address type is more easily recognised by its list of fields 
+// rather than its position in the document: 
+
+{
+   name: '',
+   residence: {
+      number:'', street:'', town:'' 
+   },   
+   employer:{
+      name: ''
+      premises:[
+         { number:'', street:'', town:'' },
+         { number:'', street:'', town:'' },
+         { number:'', street:'', town:'' }
+      ],
+      registeredOffice:{
+         number:'', street:'', town:''
+      }
+   }
+}  
+
+
+
+~~~~
+
 Duck typing is of course a much looser concept than an XML document's
 tag names and collisions are possible where objects co-incidentally
 share property names. In practice however, I find the looseness a
