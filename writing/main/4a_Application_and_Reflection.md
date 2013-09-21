@@ -18,39 +18,35 @@ command line tools, or any other usage. This context dictates a design
 which is non-blocking, asynchronous and callback based. While influenced
 by the language, the model of REST client proposed here is not limited
 to Javascript or web usage and I intent to comment briefly also on the
-applicability to other platforms.
+applicability to other platforms. Likewise, I have also chosen to focus 
+on JSON although I will also be commenting on the parallel applicability
+of these ideas to XML. 
 
 From DOM we may observe that as a programmer, using a resource is
-simpler when a parsed entity is passed\
-whole to a single callback, rather than the SAX model which requires the
-programmer to infer the entity from a lengthy series of callbacks. From
-observing SAX parsers or progressive HTML rendering, we can say that
-http is more efficient if we no not wait until we have everything before
-we start using the parts that we do have. DOM parsers pass a fully
-parsed node to registered callbacks, whole and ready to use, invariably
-at the root of the parsed document. From the vantage of the library's
-user, my thesis duplicates this convenience but removes one restriction;
-that the node which is passed must be the root. Because the mark-up
-formats we are dealing with are hierarchical and serialised depth-first
-it is possible to fully parse any sub-tree without fully knowing the
-parent node. From these observations we may program a new kind of REST
-client which is as performant as SAX but as easy to program as DOM.
+simpler when a parsed entity is passed whole to a single callback,
+rather than the SAX model which requires the programmer to infer the
+entity from a lengthy series of callbacks. From observing SAX parsers or
+progressive HTML rendering, we can say that http is more efficient if we
+no not wait until we have everything before we start using the parts
+that we do have. DOM parsers pass a fully parsed node to registered
+callbacks, whole and ready to use, invariably at the root of the parsed
+document. From the vantage of the library's user, my thesis duplicates
+this convenience but removes one restriction; that the node which is
+passed must be the root. Because the mark-up formats we are dealing with
+are hierarchical and serialised depth-first it is possible to fully
+parse any sub-tree without fully knowing the parent node. From these
+observations we may program a new kind of REST client which is as
+performant as SAX but as easy to program as DOM.
 
-Doing things faster vs doing things earlier. "Hurry up and wait"
-approach to optimisation.
+To follow this progressive-but-complete model, identifying the interesting 
+parts of a document involves turning the traditional model for drilling
+down inside out. Traditionally the programmer's callback receives the document then
+inside that callback drills down to locate the parts that they are interested in.
+Instead I propose taking the drilling down part out from inside the callback and instead
+wrap the callback in it. This means that the callback receives selected parts of the response 
+which the library has already drilled down to on behalf of the programmer. 
 
-Like other ajax libs still callback-based but turn model for drilling
-down inside out. Instead of the programmer finding the parts they want
-as a part of the general logic of the program, declaratively define the
-interesting parts and have these parts delivered to the language logic.
-Once we make the shift to thinking in this way, it is no longer
-necessary to have the whole resource locally before the interesting
-sub-parts are delivered.
 
-Under the heading I deconstructed the way in which programming logic is
-often used to identify the parts of a model which are currently
-interesting and started to look at some declarative ways in which these
-parts can be obtained.
 
 Why better than SAX: As a principle, the programmer should only have to
 handle the cases which are interesting to them, not wade manually
