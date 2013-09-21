@@ -60,7 +60,9 @@ depth-first serialisation order I will always have previously seen its
 ancestors. Hence, having written a suitably flexible JSONPath expression
 compiler such that it does not require a complete document, I will have
 enough information to evaluate any expression against any node at the
-time when it is first identified in the document.
+time when it is first identified in the document. Because XML is also
+written depth-first, the same logic would apply to an XPath/XML variant
+of this project.
 
 The definition of 'interesting' will be generic and accommodating enough
 so as to apply to any data domain and allow any granularity of interest,
@@ -70,14 +72,15 @@ programming
 JsonPATH variation
 ------------------
 
-In searching it is common to ask for database-style queries such as
-'books costing more than X'. However, not searching, selecting from a
-resource that the programmer has requested, where we can expect them to
-be interested in most of the content. Modify JSONPath for this actual
-situation. Avoid implementing, at least at first, the language features
-which are less likely to be used and are easily tested for inside the
-callback. At same time, add features which are more likely to be useful
-for this context.
+In searching through a model stocked with data is common to ask for
+database-style queries such as 'books costing more than X'. However, not
+searching, selecting from a resource that the programmer has requested,
+probably assembled on their behalf by their parameters where we can
+expect the developer to be interested in most of the content. Modify
+JSONPath for this actual situation. Avoid implementing, at least at
+first, the language features which are less likely to be used and are
+easily tested for inside the callback. At same time, add features which
+are more likely to be useful for this context.
 
 We impose types on top of JSON/XML markup. Only few basic types defined
 in the markup languages themselves. Essence of marshaling.
@@ -88,7 +91,7 @@ simply objects. In JSON the type of a node is usually inferred in one of
 two ways: either, the fieldName in the parent object which references a
 node; or, from the fields that the object has.
 
-In the below example, we assign the node the type 'address' because of 
+In the below example, we assign the node the type 'address' because of
 the parent node's field name. Other than this, these are standard arrays
 of strings:
 
@@ -127,9 +130,9 @@ parent being the array containing the multiple addressees:
 ~~~~
 
 In this third example, the field names linking to addresses refer to the
-relationship between the parent and child nodes rather than the type of the
-child. The address type is more easily recognised by its list of fields 
-rather than its position in the document:
+relationship between the parent and child nodes rather than the type of
+the child. The address type is more easily recognised by its list of
+fields rather than its position in the document:
 
 ~~~~ {.javascript}
 {
@@ -186,30 +189,18 @@ semantics.
 Adding of semantics should could include adding new fields to objects
 (which could themselves contain large sub-trees) or a "push-down"
 refactor in which what was a root node is pushed down a level by being
-suspended from a new parent. See \ref{enhancingrest}
+suspended from a new parent.
 
 why jsonpath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
-
-API design
-----------
-
-Micro-library
--------------
-
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
 
 Incorporating existing libraries
 --------------------------------
 
 can justify why js as:
 
-Most widely deployable.
+Most widely displayable.
 
 Node: asynchronous model built into language already, no 'concurrent'
 library needed. Closures convenient for picking up again where left off.
@@ -222,24 +213,34 @@ callback spaghetti.
 // example of pyramid code
 ~~~~
 
-In comparison to typical Tomcat-style threading model. Threaded model is
-powerful for genuine parallel computation but Wasteful of resources
-where the tasks are more io-bound than cpu-bound. Resources consumed by
-threads while doing nothing but waiting.
-
-Compare to Erlang. Waiter model. Node restaurant much more efficient use
-of expensive resources.
-
 functional, pure functional possible [FPR] but not as nicely as in a
 pure functional language, ie function caches although can be
 implemented, not universal on all functions.
 
-easy to distribute softare (npm etc)
+easy to distribute software (npm etc)
+
+API design
+----------
+
+
+Micro-library
+-------------
+
+5120 bytes.
+
+What a Micro-library is. What motivates the trend? This library has a
+fairly small set of functionality, it isn't a general purpose
+do-everything library like jQuery so its size will be looked at more
+critically if it is too large. Micro library is the current gold
+standard for compactness. Still, have a lot to do in not very much code.
+
+This project feels on the edge of what is possible to elegantly do in 5k, so 
+while the limit is somewhat arbitrary, it is an interesting challenge. 
 
 Handling failures
 -----------------
 
-(not) Resume on failure
+
 
 Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
@@ -247,6 +248,10 @@ which can be used to request any contiguous part of a response rather
 than the whole. Common in download managers but not REST clients. This
 ability can be used to. Why not this one. Resume on a higher semantic
 level.
+
+(not) Resume on failure at byte level but might be worked in on a future version.
+Probably unsafe since can't guarantee the 2nd time requesting a URL will give the
+same response byte-for-byte.
 
 Required support for older browsers
 -----------------------------------

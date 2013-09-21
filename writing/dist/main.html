@@ -433,6 +433,11 @@ http://stackoverflow.com/questions/5751515/official-references-for-default-value
   <h2 id="node.js"><a href="#node.js"><span class=
   "header-section-number">3.2</span> Node.js</a></h2>
 
+  <p>Include? Node not just for servers. CLI tools etc.</p>
+
+  <p>Include? Compare to Erlang. Waiter model. Node restaurant much
+  more efficient use of expensive resources.</p>
+
   <p>It is difficult to say to what degree Node's use of Javascript
   is a distraction from the system's principled design aims and to
   what degree it defines the technology. Paradoxically, both may be
@@ -493,6 +498,70 @@ http://stackoverflow.com/questions/5751515/official-references-for-default-value
   syntax, the implicit storage of this data feels so natural and
   inevitable that looking at the typical program it is often not
   obvious that the responsibility exists at all.</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">
+<span class=
+"co">// Rather than blocking, this function relies on non-blocking io and</span>
+<span class=
+"co">// schedules three tasks, each of which exit quickly, allowing this</span>
+<span class=
+"co">// node instance to continue with other tasks in between. </span>
+<span class=
+"co">// However sophisticated and performant this style of programming, </span>
+<span class=
+"co">// to the developer it is barely more difficult than if a blocking io</span>
+<span class="co">// model were followed. </span>
+
+<span class="kw">function</span> <span class=
+"fu">makeRequest</span>( host, path ) {
+
+   <span class="kw">var</span> options = { <span class=
+"dt">host</span>: host, <span class="dt">path</span>: path };
+   
+   <span class="ot">http</span>.<span class=
+"fu">get</span>(options, <span class=
+"kw">function</span>(response){
+      
+      <span class=
+"co">// This function will be called when the response starts. The callback</span>
+      <span class=
+"co">// having started listening to the response object will quickly exit</span>
+      <span class=
+"co">// as Node tasks are want to do. Because of closures we are able to</span>
+      <span class=
+"co">// access the path variable declared in a containing scope, even after</span>
+      <span class=
+"co">// the containing scope has exited.      </span>
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">"The response has started for "</span> + path);
+   
+      <span class="ot">response</span>.<span class=
+"fu">on</span>(<span class="st">'data'</span>, <span class=
+"kw">function</span>(chunk) {
+      
+         <span class=
+"co">// This function is called each time some data is received from the </span>
+         <span class="co">// http request</span>
+         
+         <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">'Got some response '</span> + chunk);
+       
+      });
+   }).<span class="fu">on</span>(<span class=
+"st">"error"</span>, <span class="kw">function</span>(e){
+   
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">"Got error: "</span> + <span class="ot">e</span>.<span class=
+"fu">message</span>);
+   });
+   
+   <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class="st">"Request has been made"</span>);
+}</code>
+</pre>
 
   <h2 id="streams-in-node"><a href="#streams-in-node"><span class=
   "header-section-number">3.3</span> Streams in Node</a></h2>
@@ -1272,89 +1341,184 @@ analysis* =-->
   "#high-level-solution"><span class=
   "header-section-number">4.1</span> High-level solution</a></h2>
 
-  <p>Doing things faster vs doing things earlier. "Hurry up and
-  wait" approach to optimisation.</p>
+  <p>Using a combination of the techniques investigated in the
+  previous chapter, I propose that a simple design is possible
+  which makes REST clients more efficient whilst being no more
+  difficult to program. Although simple, this model fits poorly
+  with established vocabulary, requiring a transport that sits
+  <strong>somewhere between 'stream' and 'download'</strong> and a
+  parsing strategy which takes elements from <strong>SAX and
+  DOM</strong> but follows neither model.</p>
 
-  <p>A feature set which is minimal but contain no obvious
-  omissions.</p>
+  <p>Implementation in Javascript gives me the widest deployment
+  options, covering client-side browser programming, server
+  programming, use in command line tools, or any other usage. This
+  context dictates a design which is non-blocking, asynchronous and
+  callback based. While influenced by the language, the model of
+  REST client proposed here is not limited to Javascript or web
+  usage and I intent to comment briefly also on the applicability
+  to other platforms. Likewise, I have also chosen to focus on JSON
+  although I will also be commenting on the parallel applicability
+  of these ideas to XML.</p>
 
-  <p>Like other ajax libs still callback-based but turn model for
-  drilling down inside out. Instead of the programmer finding the
-  parts they want as a part of the general logic of the program,
-  declaratively define the interesting parts and have these parts
-  delivered to the language logic. Once we make the shift to
-  thinking in this way, it is no longer necessary to have the whole
-  resource locally before the interesting sub-parts are
-  delivered.</p>
+  <p>From DOM we may observe that as a programmer, using a resource
+  is simpler when a parsed entity is passed whole to a single
+  callback, rather than the SAX model which requires the programmer
+  to infer the entity from a lengthy series of callbacks. From
+  observing SAX parsers or progressive HTML rendering, we can say
+  that http is more efficient if we no not wait until we have
+  everything before we start using the parts that we do have. DOM
+  parsers pass a fully parsed node to registered callbacks, whole
+  and ready to use, invariably at the root of the parsed document.
+  From the vantage of the library's user, my thesis duplicates this
+  convenience but removes one restriction; that the node which is
+  passed must be the root. Because the mark-up formats we are
+  dealing with are hierarchical and serialised depth-first it is
+  possible to fully parse any sub-tree without fully knowing the
+  parent node. From these observations we may program a new kind of
+  REST client which is as performant as SAX but as easy to program
+  as DOM.</p>
 
-  <p>Under the heading [Anatomy of a SOA client] I deconstructed
-  the way in which programming logic is often used to identify the
-  parts of a model which are currently interesting and started to
-  look at some declarative ways in which these parts can be
-  obtained.</p>
+  <p>To follow this progressive-but-complete model, identifying the
+  interesting parts of a document involves turning the traditional
+  model for drilling down inside-out. Traditionally the
+  programmer's callback receives the document then inside that
+  callback drills down to locate the parts that they are interested
+  in. Instead I propose taking the drilling-down logic out from
+  inside the callback and instead wrap the callback in it. This
+  means that the callback receives selected parts of the response
+  which the library has already drilled down to on behalf of the
+  programmer.</p>
 
-  <p>Why not SAX: As a principle, the programmer should only have
-  to handle the cases which are interesting to them, not wade
-  manually through a haystack in search of a needle, which means
-  the library should provide an expressive way of associating the
-  nodes of interest with their targeted callbacks.</p>
+  <p>Whilst JSONPath's existing implementation is only implemented
+  for searching over already gathered objects, this kind of
+  searching is just one application for the query language. I find
+  that this is a very suitable declarative language to use to
+  specify the parts of a response that a developer would like to
+  drill-down to given the context of a document whose parse is in
+  progress. JSONPath is especially applicable because it specifies
+  only 'contained-in/contains' type relationships. On encountering
+  any node in a serialised JSON stream, because of the depth-first
+  serialisation order I will always have previously seen its
+  ancestors. Hence, having written a suitably flexible JSONPath
+  expression compiler such that it does not require a complete
+  document, I will have enough information to evaluate any
+  expression against any node at the time when it is first
+  identified in the document.</p>
 
-  <p>In which a callback call is received not just when the whole
-  resource is downloaded but for every interesting part which is
-  seen while the transfer is ongoing. The definition of
-  'interesting' will be generic and accommodating enough so as to
-  apply to any data domain and allow any granularity of interest,
-  from large object to individual datums. With just a few lines of
-  programming</p>
-
-  <p>Older browsers: getting the whole message at once is no worse
-  than it is now.</p>
-
-  <div class="figure">
-    <img src="images/timeline.png" alt=
-    "Over several hops of aggregation, the benefits of finding the interesting parts early">
-
-    <p class="caption">Over several hops of aggregation, the
-    benefits of finding the interesting parts early</p>
-  </div>
-
-  <p>Interestingly, the mixed paradigm design hasn't changed the
-  top-level design very much from how it'd be as a pure OO project
-  (IoC, decorators, event filters, pub/sub etc).</p>
-
-  <p>Programming to identify a certain interesting part of a
-  resource today should with a high probability still work when
-  applied to future releases.</p>
-
-  <p>Requires a small amount of discipline on behalf of the service
-  provider: Upgrade by adding of semantics only most of the time
-  rather than changing existing semantics.</p>
-
-  <p>Adding of semantics should could include adding new fields to
-  objects (which could themselves contain large sub-trees) or a
-  "push-down" refactor in which what was a root node is pushed down
-  a level by being suspended from a new parent. See</p>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "extended json rest service that still works - maybe do a table instead ">
-
-    <p class="caption">extended json rest service that still works
-    - maybe do a table instead</p>
-  </div>
-
-  <h2 id="stability-over-upgrades"><a href=
-  "#stability-over-upgrades"><span class=
-  "header-section-number">4.2</span> Stability over
-  upgrades</a></h2>
-
-  <p>why jsonpath-like syntax allows upgrading message semantics
-  without causing problems [SOA] how to guarantee non-breakages?
-  could publish 'supported queries' that are guaranteed to work</p>
+  <p>The definition of 'interesting' will be generic and
+  accommodating enough so as to apply to any data domain and allow
+  any granularity of interest, from large object to individual
+  datums. With just a few lines of programming</p>
 
   <h2 id="jsonpath-variation"><a href=
   "#jsonpath-variation"><span class=
-  "header-section-number">4.3</span> JsonPATH variation</a></h2>
+  "header-section-number">4.2</span> JsonPATH variation</a></h2>
+
+  <p>In searching through a model stocked with data is common to
+  ask for database-style queries such as 'books costing more than
+  X'. However, not searching, selecting from a resource that the
+  programmer has requested, probably assembled on their behalf by
+  their parameters where we can expect the developer to be
+  interested in most of the content. Modify JSONPath for this
+  actual situation. Avoid implementing, at least at first, the
+  language features which are less likely to be used and are easily
+  tested for inside the callback. At same time, add features which
+  are more likely to be useful for this context.</p>
+
+  <p>We impose types on top of JSON/XML markup. Only few basic
+  types defined in the markup languages themselves. Essence of
+  marshaling.</p>
+
+  <p>Whereas XML has a pretty good concept of the type of an
+  element (beyond simply being an element node) in the tagName,
+  JSON's objects are all simply objects. In JSON the type of a node
+  is usually inferred in one of two ways: either, the fieldName in
+  the parent object which references a node; or, from the fields
+  that the object has.</p>
+
+  <p>In the below example, we assign the node the type 'address'
+  because of the parent node's field name. Other than this, these
+  are standard arrays of strings:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">{
+   <span class="dt">name</span>: <span class="st">''</span>,
+   <span class="dt">residence</span>: {
+      <span class="dt">address</span>: [
+         <span class="st">''</span>, <span class=
+"st">''</span>, <span class="st">''</span>
+      ]
+   },
+   <span class="dt">employer</span>: {
+      <span class="dt">name</span>: <span class="st">''</span>,
+      <span class="dt">address </span>:[
+         <span class="st">''</span>, <span class=
+"st">''</span>, <span class="st">''</span>      
+      ]
+   }   
+}</code>
+</pre>
+
+  <p>As a slight variant, when dealing with multiple addresses in
+  an array, it is the grandparent's node field name which indicates
+  the type, the parent being the array containing the multiple
+  addressees:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">{
+   <span class="dt">residences</span>: {
+      <span class="dt">addresses</span>: [
+         [<span class="st">'Beach Hut'</span>, <span class=
+"st">'Secret Island'</span>, <span class="st">'Bahamas'</span>]
+      ,  [<span class="st">''</span>, <span class=
+"st">''</span>, <span class="st">''</span>]
+      ,  [<span class="st">''</span>, <span class=
+"st">''</span>, <span class="st">''</span>]
+      ,  [<span class="st">''</span>, <span class=
+"st">''</span>, <span class="st">''</span>]
+      ]
+   }
+}</code>
+</pre>
+
+  <p>In this third example, the field names linking to addresses
+  refer to the relationship between the parent and child nodes
+  rather than the type of the child. The address type is more
+  easily recognised by its list of fields rather than its position
+  in the document:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">{
+   <span class="dt">name</span>: <span class="st">''</span>,
+   <span class="dt">residence</span>: {
+      <span class="dt">number</span>:<span class=
+"st">''</span>, <span class="dt">street</span>:<span class=
+"st">''</span>, <span class="dt">town</span>:<span class=
+"st">''</span> 
+   },   
+   <span class="dt">employer</span>:{
+      <span class="dt">name</span>: <span class="st">''</span>
+      <span class="dt">premises</span>:[
+         { <span class="dt">number</span>:<span class=
+"st">''</span>, <span class="dt">street</span>:<span class=
+"st">''</span>, <span class="dt">town</span>:<span class=
+"st">''</span> },
+         { <span class="dt">number</span>:<span class=
+"st">''</span>, <span class="dt">street</span>:<span class=
+"st">''</span>, <span class="dt">town</span>:<span class=
+"st">''</span> },
+         { <span class="dt">number</span>:<span class=
+"st">''</span>, <span class="dt">street</span>:<span class=
+"st">''</span>, <span class="dt">town</span>:<span class=
+"st">''</span> }
+      ],
+      <span class="dt">registeredOffice</span>:{
+         <span class="dt">number</span>:<span class=
+"st">''</span>, <span class="dt">street</span>:<span class=
+"st">''</span>, <span class="dt">town</span>:<span class=
+"st">''</span>
+      }
+   }
+}  </code>
+</pre>
 
   <p>Duck typing is of course a much looser concept than an XML
   document's tag names and collisions are possible where objects
@@ -1375,48 +1539,44 @@ analysis* =-->
   may be carefully designed but ultimately a looser interpretation
   of the structure can be safer.</p>
 
-  <h2 id="api-design"><a href="#api-design"><span class=
-  "header-section-number">4.4</span> API design</a></h2>
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "extended json rest service that still works - maybe do a table instead ">
 
-  <h2 id="micro-lib"><a href="#micro-lib"><span class=
-  "header-section-number">4.5</span> Micro-lib</a></h2>
+    <p class="caption">extended json rest service that still works
+    - maybe do a table instead</p>
+  </div>
 
-  <p>What a Micro-library is. What motivates the trend? This
-  library has a fairly small set of functionality, it isn't a
-  general purpose do-everything library like jQuery so its size
-  will be looked at more critically if it is too large. Micro
-  library is the current gold standard for compactness. Still, have
-  a lot to do in not very much code.</p>
+  <h2 id="stability-over-upgrades"><a href=
+  "#stability-over-upgrades"><span class=
+  "header-section-number">4.3</span> Stability over
+  upgrades</a></h2>
 
-  <h2 id="where-to-target"><a href="#where-to-target"><span class=
-  "header-section-number">4.6</span> Where to target</a></h2>
+  <p>Programming to identify a certain interesting part of a
+  resource today should with a high probability still work when
+  applied to future releases.</p>
 
-  <p>targeting node and the browser</p>
+  <p>Requires some discipline on behalf of the service provider:
+  Upgrade by adding of semantics only most of the time rather than
+  changing existing semantics.</p>
 
-  <p>Node+browser To use Node.js and</p>
+  <p>Adding of semantics should could include adding new fields to
+  objects (which could themselves contain large sub-trees) or a
+  "push-down" refactor in which what was a root node is pushed down
+  a level by being suspended from a new parent.</p>
 
-  <p>Need to build an abstraction layer over xhr/xhr2/node. Can
-  only work for packets in-order, for out-of-order packets
-  something else happens.</p>
-
-  <p>Use best of the capabilities of each.</p>
-
-  <h2 id="suitability-for-databases-really-just-an-inline-asside">
-  <a href=
-  "#suitability-for-databases-really-just-an-inline-asside"><span class="header-section-number">
-  4.7</span> Suitability for databases (really just an inline
-  asside)</a></h2>
-
-  <p>Databases offer data one row at a time, not as a big lump.</p>
+  <p>why jsonpath-like syntax allows upgrading message semantics
+  without causing problems [SOA] how to guarantee non-breakages?
+  could publish 'supported queries' that are guaranteed to work</p>
 
   <h2 id="incorporating-existing-libraries"><a href=
   "#incorporating-existing-libraries"><span class=
-  "header-section-number">4.8</span> Incorporating existing
+  "header-section-number">4.4</span> Incorporating existing
   libraries</a></h2>
 
   <p>can justify why js as:</p>
 
-  <p>Most widely deployable.</p>
+  <p>Most widely displayable.</p>
 
   <p>Node: asynchronous model built into language already, no
   'concurrent' library needed. Closures convenient for picking up
@@ -1430,24 +1590,34 @@ analysis* =-->
 "co">// example of pyramid code</span></code>
 </pre>
 
-  <p>In comparison to typical Tomcat-style threading model.
-  Threaded model is powerful for genuine parallel computation but
-  Wasteful of resources where the tasks are more io-bound than
-  cpu-bound. Resources consumed by threads while doing nothing but
-  waiting.</p>
-
-  <p>Compare to Erlang. Waiter model. Node restaurant much more
-  efficient use of expensive resources.</p>
-
   <p>functional, pure functional possible [FPR] but not as nicely
   as in a pure functional language, ie function caches although can
   be implemented, not universal on all functions.</p>
 
-  <p>easy to distribute softare (npm etc)</p>
+  <p>easy to distribute software (npm etc)</p>
+
+  <h2 id="api-design"><a href="#api-design"><span class=
+  "header-section-number">4.5</span> API design</a></h2>
+
+  <h2 id="micro-library"><a href="#micro-library"><span class=
+  "header-section-number">4.6</span> Micro-library</a></h2>
+
+  <p>5120 bytes.</p>
+
+  <p>What a Micro-library is. What motivates the trend? This
+  library has a fairly small set of functionality, it isn't a
+  general purpose do-everything library like jQuery so its size
+  will be looked at more critically if it is too large. Micro
+  library is the current gold standard for compactness. Still, have
+  a lot to do in not very much code.</p>
+
+  <p>This project feels on the edge of what is possible to
+  elegantly do in 5k, so while the limit is somewhat arbitrary, it
+  is an interesting challenge.</p>
 
   <h2 id="handling-failures"><a href=
   "#handling-failures"><span class=
-  "header-section-number">4.9</span> Handling failures</a></h2>
+  "header-section-number">4.7</span> Handling failures</a></h2>
 
   <p>(not) Resume on failure</p>
 
@@ -1461,7 +1631,7 @@ analysis* =-->
 
   <h2 id="required-support-for-older-browsers"><a href=
   "#required-support-for-older-browsers"><span class=
-  "header-section-number">4.10</span> Required support for older
+  "header-section-number">4.8</span> Required support for older
   browsers</a></h2>
 
   <p>Aims not possible to realise but don't want to make devs using
@@ -1487,6 +1657,9 @@ analysis* =-->
   better splits the intention of the logic being presented from the
   mechanisms that that logic sits on and, by providing abstraction,
   elucidates the code.</p>
+
+  <p>Older browsers: getting the whole message at once is no worse
+  than it is now.</p>
 
   <h1 id="application-and-reflection-2-makin-it"><a href=
   "#application-and-reflection-2-makin-it"><span class=
@@ -1691,6 +1864,10 @@ analysis* =-->
   <p>"Mixed paradigm" design. But not classical: don't need
   inheritance.</p>
 
+  <p>Interestingly, the mixed paradigm design hasn't changed the
+  top-level design very much from how it'd be as a pure OO project
+  (IoC, decorators, event filters, pub/sub etc).</p>
+
   <p>The code presented is the result of the development many prior
   versions, it has never been rewritten in the sense of starting
   again. Nonetheless, every part has been complely renewed several
@@ -1775,6 +1952,10 @@ analysis* =-->
   <p>Final consideration of coding: packaging up each unit to
   export a minimal interface. * Why minimal interfaces are better
   for minification</p>
+
+  <p>Need to build an abstraction layer over xhr/xhr2/node. Can
+  only work for packets in-order, for out-of-order packets
+  something else happens.</p>
 
   <h2 id="js-code-style"><a href="#js-code-style"><span class=
   "header-section-number">5.6</span> JS code style</a></h2>
@@ -2368,7 +2549,7 @@ analysis* =-->
   an item is not as efficient in immutability as list head-tail
   type storage</p>
 
-  <p>An imutability wrapper might be possible with defineProperty.
+  <p>An immutability wrapper might be possible with defineProperty.
   Can't casually overwrite via assignment but still possible to do
   defineProperty again.</p>
 
@@ -2380,9 +2561,17 @@ analysis* =-->
   Why this is perhaps desirable - transactions, leaving resources
   in a half-complete state.</p>
 
+  <h2 id="suitability-for-databases-really-just-an-inline-asside">
+  <a href=
+  "#suitability-for-databases-really-just-an-inline-asside"><span class="header-section-number">
+  6.2</span> Suitability for databases (really just an inline
+  asside)</a></h2>
+
+  <p>Databases offer data one row at a time, not as a big lump.</p>
+
   <h2 id="development-methodology"><a href=
   "#development-methodology"><span class=
-  "header-section-number">6.2</span> Development
+  "header-section-number">6.3</span> Development
   methodology</a></h2>
 
   <p>Did it help?</p>
@@ -2400,7 +2589,7 @@ analysis* =-->
   possible library.</p>
 
   <h2 id="size"><a href="#size"><span class=
-  "header-section-number">6.3</span> Size</a></h2>
+  "header-section-number">6.4</span> Size</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -2414,7 +2603,7 @@ analysis* =-->
 
   <h2 id="handling-invalid-input"><a href=
   "#handling-invalid-input"><span class=
-  "header-section-number">6.4</span> Handling invalid
+  "header-section-number">6.5</span> Handling invalid
   input</a></h2>
 
   <p>Invalid jsonpaths made from otherwise valid clauses (for
@@ -2445,7 +2634,7 @@ analysis* =-->
 
   <h2 id="comparative-usages"><a href=
   "#comparative-usages"><span class=
-  "header-section-number">6.5</span> Comparative usages</a></h2>
+  "header-section-number">6.6</span> Comparative usages</a></h2>
 
   <p>Interesting article from Clarinet: <a href=
   "http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">
@@ -2474,7 +2663,7 @@ analysis* =-->
 
   <h2 id="community-reaction"><a href=
   "#community-reaction"><span class=
-  "header-section-number">6.6</span> Community reaction</a></h2>
+  "header-section-number">6.7</span> Community reaction</a></h2>
 
   <p>Built into Dojo Followers on Github Being posted in forums
   (hopefully also listed on blogs) No homepage as of yet other than

@@ -169,6 +169,10 @@ Styles of Programming
 
 "Mixed paradigm" design. But not classical: don't need inheritance.
 
+Interestingly, the mixed paradigm design hasn't changed the top-level
+design very much from how it'd be as a pure OO project (IoC, decorators,
+event filters, pub/sub etc).
+
 The code presented is the result of the development many prior versions,
 it has never been rewritten in the sense of starting again. Nonetheless,
 every part has been complely renewed several times. I am reviewing only
@@ -246,6 +250,9 @@ conclusion)
 
 Final consideration of coding: packaging up each unit to export a
 minimal interface. \* Why minimal interfaces are better for minification
+
+Need to build an abstraction layer over xhr/xhr2/node. Can only work for
+packets in-order, for out-of-order packets something else happens.
 
 JS code style
 -------------

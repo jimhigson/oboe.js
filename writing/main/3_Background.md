@@ -71,6 +71,11 @@ micro-optimisations that hurt code readability is a bit silly.
 Node.js
 -------
 
+Include? Node not just for servers. CLI tools etc.
+
+Include? Compare to Erlang. Waiter model. Node restaurant much more efficient use
+of expensive resources.
+
 It is difficult to say to what degree Node's use of Javascript is a
 distraction from the system's principled design aims and to what degree
 it defines the technology. Paradoxically, both may be so. Javascript has
