@@ -9,6 +9,8 @@ approach to optimisation.
 
 A feature set which is minimal but contain no obvious omissions.
 
+On way of looking at it: SAX, but as easy to use as DOM.
+
 Like other ajax libs still callback-based but turn model for drilling down inside out. Instead of the programmer finding the parts
 they want as a part of the general logic of the program, declaratively
 define the interesting parts and have these parts delivered to the
@@ -21,9 +23,7 @@ which programming logic is often used to identify the parts of a model
 which are currently interesting and started to look at some declarative
 ways in which these parts can be obtained.
 
-
-
-Why not SAX: As a principle, the programmer should only have to handle
+Why better than SAX: As a principle, the programmer should only have to handle
 the cases which are interesting to them, not wade manually through a
 haystack in search of a needle, which means the library should provide
 an expressive way of associating the nodes of interest with their
@@ -35,9 +35,6 @@ transfer is ongoing. The definition of 'interesting' will be generic and
 accommodating enough so as to apply to any data domain and allow any
 granularity of interest, from large object to individual datums. With
 just a few lines of programming
-
-Older browsers: getting the whole message at once is no worse than it is
-now.
 
 ![Over several hops of aggregation, the benefits of finding the
 interesting parts early](images/timeline)
@@ -180,3 +177,6 @@ Even when only used once, preferable to polyfill as a generic solution
 rather than offer a one-time implementation because it better splits the
 intention of the logic being presented from the mechanisms that that
 logic sits on and, by providing abstraction, elucidates the code.
+
+Older browsers: getting the whole message at once is no worse than it is
+now.
