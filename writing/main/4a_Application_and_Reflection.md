@@ -18,9 +18,9 @@ command line tools, or any other usage. This context dictates a design
 which is non-blocking, asynchronous and callback based. While influenced
 by the language, the model of REST client proposed here is not limited
 to Javascript or web usage and I intent to comment briefly also on the
-applicability to other platforms. Likewise, I have also chosen to focus 
+applicability to other platforms. Likewise, I have also chosen to focus
 on JSON although I will also be commenting on the parallel applicability
-of these ideas to XML. 
+of these ideas to XML.
 
 From DOM we may observe that as a programmer, using a resource is
 simpler when a parsed entity is passed whole to a single callback,
@@ -38,25 +38,20 @@ parse any sub-tree without fully knowing the parent node. From these
 observations we may program a new kind of REST client which is as
 performant as SAX but as easy to program as DOM.
 
-To follow this progressive-but-complete model, identifying the interesting 
-parts of a document involves turning the traditional model for drilling
-down inside out. Traditionally the programmer's callback receives the document then
-inside that callback drills down to locate the parts that they are interested in.
-Instead I propose taking the drilling down part out from inside the callback and instead
-wrap the callback in it. This means that the callback receives selected parts of the response 
-which the library has already drilled down to on behalf of the programmer. 
+To follow this progressive-but-complete model, identifying the
+interesting parts of a document involves turning the traditional model
+for drilling down inside out. Traditionally the programmer's callback
+receives the document then inside that callback drills down to locate
+the parts that they are interested in. Instead I propose taking the
+drilling down part out from inside the callback and instead wrap the
+callback in it. This means that the callback receives selected parts of
+the response which the library has already drilled down to on behalf of
+the programmer.
 
 
 
-Why better than SAX: As a principle, the programmer should only have to
-handle the cases which are interesting to them, not wade manually
-through a haystack in search of a needle, which means the library should
-provide an expressive way of associating the nodes of interest with
-their targeted callbacks.
 
-In which a callback call is received not just when the whole resource is
-downloaded but for every interesting part which is seen while the
-transfer is ongoing. The definition of 'interesting' will be generic and
+The definition of 'interesting' will be generic and
 accommodating enough so as to apply to any data domain and allow any
 granularity of interest, from large object to individual datums. With
 just a few lines of programming
