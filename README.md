@@ -1,5 +1,6 @@
-**Oboe.js** takes a fresh appraoch to AJAX for web applications by wrapping a progressive interface
-around https's standard request-response model. It glues a transport that sits 
+**Oboe.js**'s goal is to make web applications faster by wrapping https's request-response model
+in a progressive interface.
+It glues a transport that sits 
 **somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
 DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any external dependencies and 
 doesn't care which other libraries you need it to speak to.
