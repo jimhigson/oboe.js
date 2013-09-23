@@ -49,7 +49,21 @@ describe('pub sub', function(){
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerB).toHaveBeenCalled();           
-   });   
+   });
+   
+   it('should have a chainable on function', function(){
+   
+      var events = pubSub(),
+          listenerA = jasmine.createSpy('listenerA'),
+          listenerB = jasmine.createSpy('listenerB');
+      
+      events.on('eventA', listenerA)
+            .on('eventA', listenerB)
+            .fire('eventA');
+      
+      expect(listenerA).toHaveBeenCalled();
+      expect(listenerB).toHaveBeenCalled();           
+   });      
    
    it('should notify of the correct event', function(){
    
