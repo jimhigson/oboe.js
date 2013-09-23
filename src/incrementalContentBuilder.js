@@ -157,6 +157,8 @@ function incrementalContentBuilder( fire) {
          return curNodeFinished( nodeFound(ascent, value) );
       },
       
+      // we make no distinction in how we handle object and arrays closing. For both, interpret as the end
+      // of the current node.
       closeobject: curNodeFinished,
       closearray: curNodeFinished       
    };
