@@ -3,21 +3,9 @@
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
    the context of the call
  */
-function apply(fn, args) {
+function apply(args, fn) {
    return fn.apply(undefined, args);
 }
-
-/*
-   Call each of a list of functions with the same arguments, where the arguments are given as an
-   array. Ignores any return values from the functions.
- */
-function applyAll( fns, args ) {
-
-   fns.forEach(function( fn ){
-      apply(fn, args);
-   });
-}
-
 
 function varArgs(fn){
 
@@ -59,7 +47,7 @@ var lazyUnion = varArgs(function(fns) {
 
       for (var i = 0; i < len(fns); i++) {
 
-         maybeValue = apply(fns[i], params);
+         maybeValue = apply(params, fns[i]);
 
          if( maybeValue ) {
             return maybeValue;

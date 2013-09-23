@@ -8,14 +8,15 @@ function pubSub(){
    return {
 
       on:function( eventId, fn ) {
-         (listeners[eventId] || (listeners[eventId] = [])).push(fn);
-             
-         return this; // chaining                                         
+         
+         listeners[eventId] = cons(fn, listeners[eventId]);
+          
+         return this; // chaining
       }, 
    
       fire:varArgs(function ( eventId, parameters ) {
                
-         listeners[eventId] && applyAll( listeners[eventId] , parameters );
+         listEvery(partialComplete( apply, parameters ), listeners[eventId]);
       })           
    };
 }
