@@ -16,7 +16,10 @@ function pubSub(){
     
       fire:function ( eventId, event ) {
               
-         listEach(partialComplete( apply, event && [event] ), listeners[eventId]);
+         listEach(
+            partialComplete( apply, event && [event] ), 
+            listeners[eventId]
+         );
       }           
    };
 }
