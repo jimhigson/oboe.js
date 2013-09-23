@@ -4,21 +4,9 @@
    Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
    the context of the call
  */
-function apply(fn, args) {
+function apply(args, fn) {
    return fn.apply(undefined, args);
 }
-
-/*
-   Call each of a list of functions with the same arguments, where the arguments are given as an
-   array. Ignores any return values from the functions.
- */
-function applyAll( fns, args ) {
-
-   fns.forEach(function( fn ){
-      apply(fn, args);
-   });
-}
-
 
 function varArgs(fn){
 
@@ -60,7 +48,7 @@ var lazyUnion = varArgs(function(fns) {
 
       for (var i = 0; i < len(fns); i++) {
 
-         maybeValue = apply(fns[i], params);
+         maybeValue = apply(params, fns[i]);
 
          if( maybeValue ) {
             return maybeValue;
@@ -1084,12 +1072,11 @@ var ROOT_PATH = {};
 
 
 /**
- * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
- * 
- * Notify on the given event bus when interesting things happen.
- * 
- * Returns a function which gives access to the content built up so far
- * 
+ * Provide handlers for clarinet's events.
+ * These listeners fire higher-level events related to paths and nodes rather than low-level syntax in the json.
+ * No state is maintained by the handlers, that has been refactored out so that this part of the library can
+ * stay purely functional.
+ *  
  * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
@@ -1225,6 +1212,8 @@ function incrementalContentBuilder( fire) {
          return curNodeFinished( nodeFound(ascent, value) );
       },
       
+      // we make no distinction in how we handle object and arrays closing. For both, interpret as the end
+      // of the current node.
       closeobject: curNodeFinished,
       closearray: curNodeFinished       
    };
@@ -1614,15 +1603,16 @@ function pubSub(){
    return {
 
       on:function( eventId, fn ) {
-         (listeners[eventId] || (listeners[eventId] = [])).push(fn);
-             
-         return this; // chaining                                         
+         
+         listeners[eventId] = cons(fn, listeners[eventId]);
+          
+         return this; // chaining
       }, 
    
-      fire:varArgs(function ( eventId, parameters ) {
+      fire:function ( eventId, event ) {
                
-         listeners[eventId] && applyAll( listeners[eventId] , parameters );
-      })           
+         listEvery(partialComplete( apply, [event] ), listeners[eventId]);
+      }           
    };
 }
 var _S = 0,

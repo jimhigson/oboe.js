@@ -10,7 +10,7 @@ describe('pub sub', function(){
    
    });
    
-   it('should be able to notify a subscribed function', function(){
+   it('should be able to notify a subscribed function without an event object', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
@@ -23,7 +23,7 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalled();
    });
    
-   it('should pass arguments through', function(){
+   it('should pass first argument through as the event', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
@@ -33,7 +33,7 @@ describe('pub sub', function(){
       
       events.fire('somethingHappening', 'a', 'b', 'c');
       
-      expect(listener).toHaveBeenCalledWith('a', 'b', 'c');
+      expect(listener).toHaveBeenCalledWith('a');
    });   
    
    it('should notify of the correct event', function(){

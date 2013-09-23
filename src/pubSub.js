@@ -14,9 +14,9 @@ function pubSub(){
          return this; // chaining
       }, 
    
-      fire:varArgs(function ( eventId, parameters ) {
+      fire:function ( eventId, event ) {
                
-         listEvery(partialComplete( apply, parameters ), listeners[eventId]);
-      })           
+         listEvery(partialComplete( apply, [event] ), listeners[eventId]);
+      }           
    };
 }
