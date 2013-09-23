@@ -35,11 +35,10 @@ function listAsArray(list){
 
 function map(fn, list) {
 
-   if( !list ) {
-      return emptyList;
-   } else {
-      return cons(fn(head(list)), map(fn,tail(list)));
-   }
+   return list
+            ?  cons(fn(head(list)), map(fn,tail(list)))
+            :  emptyList
+            ;
 }
 
 /**
@@ -49,7 +48,8 @@ function foldR(fn, startValue, list) {
       
    return list 
             ?  fn(foldR(fn, startValue, tail(list)), head(list))
-            : startValue;
+            : startValue
+            ;
 }
 
 /* return true if the given function holds for every item in 
