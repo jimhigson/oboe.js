@@ -21,7 +21,7 @@ module.exports = function(config) {
       ,  'src/jsonPathSyntax.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'
-      ,  'src/pubsub.js' 
+      ,  'src/pubSub.js' 
       ,  'src/events.js'  
       ,  'src/instanceController.js'
       ,  'src/browserApi.js'
