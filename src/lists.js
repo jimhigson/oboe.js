@@ -61,6 +61,14 @@ function listEvery(fn, list) {
           fn(head(list)) && listEvery(fn, tail(list));
 }
 
+function listEach(fn, list) {
+
+   if( list ){  
+      fn(head(list));
+      listEvery(fn, tail(list));
+   }
+}
+
 /* convert an array to a list */
 function asList(array){
 
