@@ -36,6 +36,21 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalledWith('a');
    });   
    
+   it('should notify multiple listeners of the same event', function(){
+   
+      var events = pubSub(),
+          listenerA = jasmine.createSpy('listenerA'),
+          listenerB = jasmine.createSpy('listenerB');
+      
+      events.on('eventA', listenerA);
+      events.on('eventA', listenerB);
+      
+      events.fire('eventA');
+      
+      expect(listenerA).toHaveBeenCalled();
+      expect(listenerB).toHaveBeenCalled();           
+   });   
+   
    it('should notify of the correct event', function(){
    
       var events = pubSub(),
