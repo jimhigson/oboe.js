@@ -17,12 +17,11 @@ var ROOT_PATH = {};
 
 
 /**
- * Listen to the given clarinet instance and progressively builds and stores the json based on the callbacks it provides.
- * 
- * Notify on the given event bus when interesting things happen.
- * 
- * Returns a function which gives access to the content built up so far
- * 
+ * Provide handlers for clarinet's events.
+ * These listeners fire higher-level events related to paths and nodes rather than low-level syntax in the json.
+ * No state is maintained by the handlers, that has been refactored out so that this part of the library can
+ * stay purely functional.
+ *  
  * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
  *    or path is found  
  */ 
