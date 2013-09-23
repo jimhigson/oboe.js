@@ -1806,7 +1806,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
                      }
    };
 }
-function start (httpMethodName, url, body, callback, headers){
+function wire (httpMethodName, url, body, callback, headers){
    var eventBus = pubSub();
                
    streamingXhr( eventBus.fire, eventBus.on, 
@@ -1839,7 +1839,7 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          //  else it is:
          //     .doMethod( url, callback )            
          //                                
-         return start(
+         return wire(
                   httpMethodName,
                   firstArg,                                  // url
                   mayHaveRequestBody && arguments[1],        // body
@@ -1850,7 +1850,7 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          // method signature is:
          //    .doMethod({url:u, body:b, complete:c, headers:{...}})
          
-         return start(   
+         return wire(   
                   httpMethodName,
                   firstArg.url,
                   firstArg.body,

@@ -1,4 +1,4 @@
-function start (httpMethodName, url, body, callback, headers){
+function wire (httpMethodName, url, body, callback, headers){
    var eventBus = pubSub();
                
    streamingXhr( eventBus.fire, eventBus.on, 
