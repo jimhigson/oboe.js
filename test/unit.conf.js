@@ -27,9 +27,9 @@ module.exports = function(config) {
       ,  'src/wire.js'
       ,  'src/browserApi.js'
         
-      ,  'test/specs/*unit.spec.js'
-      ,  'test/specs/*component.spec.js'
-//    ,  'test/specs/*integration.spec.js'
+      ,  'test/specs/streamingXhr.unit.spec.js'
+//      ,  'test/specs/*component.spec.js'
+//      ,  'test/specs/*integration.spec.js'
       ],
                             
       // level of logging

@@ -141,7 +141,7 @@ function incrementalContentBuilder( fire) {
             ascentAfterNodeFound
          ;
       },
-   
+    
       openarray: function (ascent) {
          return nodeFound(ascent, []);
       },

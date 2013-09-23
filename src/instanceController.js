@@ -52,7 +52,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    };
 
    /**
-    *  
+    * MOVE OUT, keep call to JSONPATHCOMPILER in here! 
     */
    function addPathOrNodeListener( eventId, pattern, callback ) {
    

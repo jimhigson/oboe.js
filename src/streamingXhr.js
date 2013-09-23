@@ -11,18 +11,19 @@
  * 
  * @param {Function} fire a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
+ * @param {XMLHttpRequest} xhr the xhr to use as the transport
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
  * @param {String|Object} data some content to be sent with the request. Only valid
  *                        if method is POST or PUT.
- * @param {Object} headers the http request headers to send                       
+ * @param {Object} [headers] the http request headers to send                       
  */
-function streamingXhr(fire, on, method, url, data, headers) {
-        
-   var 
-      xhr = new XMLHttpRequest(),
+ 
+// TODO: get xhr as a parameter!
 
-      numberOfCharsAlreadyGivenToCallback = 0;
+function streamingXhr(fire, on, xhr, method, url, data, headers) {
+        
+   var numberOfCharsAlreadyGivenToCallback = 0;
          
    on( ABORTING, function(){
       // when an ABORTING message is put on the event bus abort the ajax request

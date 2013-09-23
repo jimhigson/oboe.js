@@ -917,18 +917,19 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
  * 
  * @param {Function} fire a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
+ * @param {XMLHttpRequest} xhr the xhr to use as the transport
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
  * @param {String|Object} data some content to be sent with the request. Only valid
  *                        if method is POST or PUT.
- * @param {Object} headers the http request headers to send                       
+ * @param {Object} [headers] the http request headers to send                       
  */
-function streamingXhr(fire, on, method, url, data, headers) {
-        
-   var 
-      xhr = new XMLHttpRequest(),
+ 
+// TODO: get xhr as a parameter!
 
-      numberOfCharsAlreadyGivenToCallback = 0;
+function streamingXhr(fire, on, xhr, method, url, data, headers) {
+        
+   var numberOfCharsAlreadyGivenToCallback = 0;
          
    on( ABORTING, function(){
       // when an ABORTING message is put on the event bus abort the ajax request
@@ -1234,7 +1235,7 @@ function incrementalContentBuilder( fire) {
             ascentAfterNodeFound
          ;
       },
-   
+    
       openarray: function (ascent) {
          return nodeFound(ascent, []);
       },
@@ -1718,7 +1719,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    };
 
    /**
-    *  
+    * MOVE OUT, keep call to JSONPATHCOMPILER in here! 
     */
    function addPathOrNodeListener( eventId, pattern, callback ) {
    
@@ -1809,8 +1810,9 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
 function wire (httpMethodName, url, body, callback, headers){
    var eventBus = pubSub();
                
-   streamingXhr( eventBus.fire, eventBus.on, 
-                 httpMethodName, url, body, headers );                              
+   streamingXhr(  eventBus.fire, eventBus.on,
+                  new XMLHttpRequest(), 
+                  httpMethodName, url, body, headers );                              
      
    return instanceController( eventBus.fire, eventBus.on, 
                               clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
