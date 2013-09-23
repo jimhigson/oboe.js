@@ -36,8 +36,8 @@ function listAsArray(list){
 function map(fn, list) {
 
    return list
-            ?  cons(fn(head(list)), map(fn,tail(list)))
-            :  emptyList
+            ? cons(fn(head(list)), map(fn,tail(list)))
+            : emptyList
             ;
 }
 
@@ -47,7 +47,7 @@ function map(fn, list) {
 function foldR(fn, startValue, list) {
       
    return list 
-            ?  fn(foldR(fn, startValue, tail(list)), head(list))
+            ? fn(foldR(fn, startValue, tail(list)), head(list))
             : startValue
             ;
 }
