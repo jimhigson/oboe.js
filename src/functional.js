@@ -21,6 +21,12 @@ function apply(args, fn) {
  * 
  * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
  * 
+ * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction(1, 2, 3); // logs [1,2,3]
+ * 
  * @param fn
  */
 function varArgs(fn){
