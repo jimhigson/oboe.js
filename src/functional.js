@@ -9,6 +9,20 @@ function apply(args, fn) {
    return fn.apply(undefined, args);
 }
 
+/**
+ * Define variable argument functions without all that tedious messing about 
+ * with the arguments object.
+ * 
+ * Eg:
+ * 
+ * var myFunction = varArgs(function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
+ * 
+ * @param fn
+ */
 function varArgs(fn){
 
    // nb: can't use len() here because it is defined using partialComplete which is defined using varargs.
