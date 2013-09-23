@@ -24,6 +24,7 @@ module.exports = function(config) {
       ,  'src/pubSub.js' 
       ,  'src/events.js'  
       ,  'src/instanceController.js'
+      ,  'src/wire.js'
       ,  'src/browserApi.js'
         
       ,  'test/specs/*unit.spec.js'

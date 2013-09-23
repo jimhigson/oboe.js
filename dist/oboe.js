@@ -197,11 +197,10 @@ function listAsArray(list){
 
 function map(fn, list) {
 
-   if( !list ) {
-      return emptyList;
-   } else {
-      return cons(fn(head(list)), map(fn,tail(list)));
-   }
+   return list
+            ? cons(fn(head(list)), map(fn,tail(list)))
+            : emptyList
+            ;
 }
 
 /**
@@ -210,8 +209,9 @@ function map(fn, list) {
 function foldR(fn, startValue, list) {
       
    return list 
-            ?  fn(foldR(fn, startValue, tail(list)), head(list))
-            : startValue;
+            ? fn(foldR(fn, startValue, tail(list)), head(list))
+            : startValue
+            ;
 }
 
 /* return true if the given function holds for every item in 
@@ -223,6 +223,13 @@ function listEvery(fn, list) {
           fn(head(list)) && listEvery(fn, tail(list));
 }
 
+/**
+ * This doesn't make any sense if we're doing pure functional because it doesn't return
+ * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
+ * 
+ * @param fn
+ * @param list
+ */
 function listEach(fn, list) {
 
    if( list ){  
@@ -1642,7 +1649,10 @@ function pubSub(){
     
       fire:function ( eventId, event ) {
               
-         listEach(partialComplete( apply, event && [event] ), listeners[eventId]);
+         listEach(
+            partialComplete( apply, event && [event] ), 
+            listeners[eventId]
+         );
       }           
    };
 }
@@ -1796,6 +1806,16 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
                      }
    };
 }
+function start (httpMethodName, url, body, callback, headers){
+   var eventBus = pubSub();
+               
+   streamingXhr( eventBus.fire, eventBus.on, 
+                 httpMethodName, url, body, headers );                              
+     
+   return instanceController( eventBus.fire, eventBus.on, 
+                              clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
+}
+
 
 // export public API
 window.oboe = {
@@ -1808,17 +1828,7 @@ window.oboe = {
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
    return function(firstArg){
-    
-      function start (url, body, callback, headers){
-         var eventBus = pubSub();
-                     
-         streamingXhr( eventBus.fire, eventBus.on, 
-                       httpMethodName, url, body, headers );                              
-                   
-         return instanceController( eventBus.fire, eventBus.on, 
-                                    clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
-      }
-       
+           
       if (isString(firstArg)) {
       
          // parameters specified as arguments
@@ -1830,6 +1840,7 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          //     .doMethod( url, callback )            
          //                                
          return start(
+                  httpMethodName,
                   firstArg,                                  // url
                   mayHaveRequestBody && arguments[1],        // body
                   arguments[mayHaveRequestBody? 2 : 1]       // callback
@@ -1840,6 +1851,7 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          //    .doMethod({url:u, body:b, complete:c, headers:{...}})
          
          return start(   
+                  httpMethodName,
                   firstArg.url,
                   firstArg.body,
                   firstArg.complete,

@@ -17,6 +17,7 @@ module.exports = function (grunt) {
    ,  'src/pubSub.js'
    ,  'src/events.js'
    ,  'src/instanceController.js'
+   ,  'src/wire.js'
    ,  'src/browserApi.js'
    ];
    
