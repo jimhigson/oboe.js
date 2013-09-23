@@ -27,8 +27,7 @@ describe('pub sub', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
-      
-
+       
       events.on('somethingHappening', listener);
       
       events.fire('somethingHappening', 'a', 'b', 'c');

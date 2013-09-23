@@ -1,13 +1,35 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src for the unconcatenated source
-(function  (window, Object, Array, Error, undefined ) {/*
-   Call a single function with the given arguments.
-   Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
-   the context of the call
+(function  (window, Object, Array, Error, undefined ) {/**
+ * Call a single function with the given arguments.
+ * Basically, a functional-style version of the OO-style Function#apply for when we don't care about
+ * the context of the call.
+ * 
+ * Order of arguments allows partial completion of the arguments to be passed to a function.
  */
 function apply(args, fn) {
    return fn.apply(undefined, args);
 }
 
+/**
+ * Define variable argument functions without all that tedious messing about 
+ * with the arguments object.
+ * 
+ * Eg:
+ * 
+ * var myFunction = varArgs(function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
+ * 
+ * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction(1, 2, 3); // logs [1,2,3]
+ * 
+ * @param fn
+ */
 function varArgs(fn){
 
    // nb: can't use len() here because it is defined using partialComplete which is defined using varargs.
@@ -30,15 +52,15 @@ function varArgs(fn){
 }
 
 /**
- *  Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ * Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ * 
+ * So:
+ *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
+ *      
+ * Is equivalent to: 
+ *      apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
  *  
- *  So:
- *       lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
- *       
- *  Is equivalent to: 
- *       apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
- *   
- *  @returns the first return value that is given that is truthy.
+ * @returns the first return value that is given that is truthy.
  */
 var lazyUnion = varArgs(function(fns) {
 
@@ -70,8 +92,9 @@ function lazyIntersection(fn1, fn2) {
    };   
 }
 
-/** Partially complete the given function by filling it in with all arguments given
- *  after the function itself. Returns the partially completed version.
+/** 
+ * Partially complete the given function by filling it in with all arguments given
+ * after the function itself. Returns the partially completed version.
  */
 var partialComplete = varArgs(function( fn, boundArgs ) {
 
@@ -1605,13 +1628,13 @@ function pubSub(){
       on:function( eventId, fn ) {
          
          listeners[eventId] = cons(fn, listeners[eventId]);
-          
+
          return this; // chaining
       }, 
-   
+    
       fire:function ( eventId, event ) {
                
-         listEvery(partialComplete( apply, [event] ), listeners[eventId]);
+         map(partialComplete( apply, event && [event] ), listeners[eventId]);
       }           
    };
 }

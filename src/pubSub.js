@@ -10,13 +10,13 @@ function pubSub(){
       on:function( eventId, fn ) {
          
          listeners[eventId] = cons(fn, listeners[eventId]);
-          
+
          return this; // chaining
       }, 
-   
+    
       fire:function ( eventId, event ) {
                
-         listEvery(partialComplete( apply, [event] ), listeners[eventId]);
+         map(partialComplete( apply, event && [event] ), listeners[eventId]);
       }           
    };
 }
