@@ -61,6 +61,13 @@ function listEvery(fn, list) {
           fn(head(list)) && listEvery(fn, tail(list));
 }
 
+/**
+ * This doesn't make any sense if we're doing pure functional because it doesn't return
+ * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
+ * 
+ * @param fn
+ * @param list
+ */
 function listEach(fn, list) {
 
    if( list ){  
