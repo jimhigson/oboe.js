@@ -1,7 +1,9 @@
-/*
-   Call a single function with the given arguments.
-   Basically, a more functional version of the slightly more OO Function#apply for when we don't care about
-   the context of the call
+/**
+ * Call a single function with the given arguments.
+ * Basically, a functional-style version of the OO-style Function#apply for when we don't care about
+ * the context of the call.
+ * 
+ * Order of arguments allows partial completion of the arguments to be passed to a function.
  */
 function apply(args, fn) {
    return fn.apply(undefined, args);
