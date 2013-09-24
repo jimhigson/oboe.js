@@ -10,6 +10,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                         
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
          null // this is a GET, no data to send);
@@ -29,6 +30,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                         
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET, no data to send      
@@ -57,6 +59,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                       
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),         
          'GET', 
          '/testServer/tenSlowNumbers',
           null // this is a GET, no data to send      
@@ -78,6 +81,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                        
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),         
          'POST',
          '/testServer/echoBackBody',
          payload       
@@ -99,6 +103,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),         
          'PUT',
           '/testServer/echoBackBody',
           payload       
@@ -121,6 +126,7 @@ describe('streaming xhr integration (real http)', function() {
                               
          streamingHttp(                           
             eventBus.fire, eventBus.on,
+            new XMLHttpRequest(),            
             'GET',
 
             '/testServer/tenSlowNumbers',
@@ -149,6 +155,7 @@ describe('streaming xhr integration (real http)', function() {
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingHttp(              
          eventBus.fire, eventBus.on,
+         new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET: no data to send      
