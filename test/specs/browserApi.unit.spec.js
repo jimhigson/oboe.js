@@ -15,7 +15,7 @@ describe("browser api", function(){
       var callbackPlaceholder = function(){};
    
       beforeEach(function() {
-         spyOn(window, 'streamingXhr');      
+         spyOn(window, 'streamingHttp');      
       });
    
       describe('get', function(){
@@ -24,7 +24,7 @@ describe("browser api", function(){
          
             oboe.doGet('http://example.com/oboez', callbackPlaceholder)
          
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                 jasmine.any(Function),
                 jasmine.any(Function),
                 'GET',
@@ -39,7 +39,7 @@ describe("browser api", function(){
               
             oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'GET',
@@ -57,7 +57,7 @@ describe("browser api", function(){
                         success: callbackPlaceholder, 
                         headers:headers})
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'GET',
@@ -74,7 +74,7 @@ describe("browser api", function(){
               
             oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
           
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'DELETE',
@@ -88,7 +88,7 @@ describe("browser api", function(){
                
             oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'DELETE',
@@ -105,7 +105,7 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'POST',
@@ -119,7 +119,7 @@ describe("browser api", function(){
                
             oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'POST',
@@ -133,7 +133,7 @@ describe("browser api", function(){
                
             oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'POST',
@@ -149,7 +149,7 @@ describe("browser api", function(){
                
             oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
             
-            expect(streamingXhr).toHaveBeenCalledWith(
+            expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
                'PUT',

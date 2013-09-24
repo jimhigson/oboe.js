@@ -17,7 +17,7 @@ module.exports = function(config) {
       ,  'test/libs/*.js'
       ,  'src/libs/clarinet.js'
       ,  'src/clarinetListenerAdaptor.js'
-      ,  'src/streamingXhr.js'
+      ,  'src/streamingHttp.js'
       ,  'src/jsonPathSyntax.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'
@@ -27,9 +27,9 @@ module.exports = function(config) {
       ,  'src/wire.js'
       ,  'src/browserApi.js'
         
-      ,  'test/specs/streamingXhr.unit.spec.js'
-//      ,  'test/specs/*component.spec.js'
-//      ,  'test/specs/*integration.spec.js'
+      ,  'test/specs/*.unit.spec.js'
+      ,  'test/specs/*.component.spec.js'
+//    ,  'test/specs/*integration.spec.js'
       ],
                             
       // level of logging

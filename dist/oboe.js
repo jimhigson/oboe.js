@@ -924,10 +924,7 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
  *                        if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */
- 
-// TODO: get xhr as a parameter!
-
-function streamingXhr(fire, on, xhr, method, url, data, headers) {
+function streamingHttp(fire, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
          
@@ -1810,7 +1807,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
 function wire (httpMethodName, url, body, callback, headers){
    var eventBus = pubSub();
                
-   streamingXhr(  eventBus.fire, eventBus.on,
+   streamingHttp(  eventBus.fire, eventBus.on,
                   new XMLHttpRequest(), 
                   httpMethodName, url, body, headers );                              
      

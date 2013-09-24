@@ -1318,12 +1318,12 @@ describe("oboe component (sXHR stubbed)", function(){
    
    
    beforeEach(function() {
-      sinon.stub(window, 'streamingXhr')
+      sinon.stub(window, 'streamingHttp')
          .returns(sinon.stub());
    })
    
    afterEach(function() {
-      window.streamingXhr.restore();   
+      window.streamingHttp.restore();   
    })   
 
 });

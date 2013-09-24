@@ -18,10 +18,7 @@
  *                        if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */
- 
-// TODO: get xhr as a parameter!
-
-function streamingXhr(fire, on, xhr, method, url, data, headers) {
+function streamingHttp(fire, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
          

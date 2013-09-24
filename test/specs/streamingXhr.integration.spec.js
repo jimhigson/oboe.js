@@ -8,7 +8,7 @@ describe('streaming xhr integration (real http)', function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      streamingXhr(                         
+      streamingHttp(                         
          eventBus.fire, eventBus.on,
          'GET', 
          '/testServer/static/json/smallestPossible.json',
@@ -27,7 +27,7 @@ describe('streaming xhr integration (real http)', function() {
   
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      streamingXhr(                         
+      streamingHttp(                         
          eventBus.fire, eventBus.on,
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
@@ -55,7 +55,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      streamingXhr(                       
+      streamingHttp(                       
          eventBus.fire, eventBus.on,
          'GET', 
          '/testServer/tenSlowNumbers',
@@ -76,7 +76,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      streamingXhr(                        
+      streamingHttp(                        
          eventBus.fire, eventBus.on,
          'POST',
          '/testServer/echoBackBody',
@@ -97,7 +97,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      streamingXhr(
+      streamingHttp(
          eventBus.fire, eventBus.on,
          'PUT',
           '/testServer/echoBackBody',
@@ -119,7 +119,7 @@ describe('streaming xhr integration (real http)', function() {
    if( !internetExplorer || internetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function(queue) {
                               
-         streamingXhr(                           
+         streamingHttp(                           
             eventBus.fire, eventBus.on,
             'GET',
 
@@ -147,7 +147,7 @@ describe('streaming xhr integration (real http)', function() {
       );          
          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
-      streamingXhr(              
+      streamingHttp(              
          eventBus.fire, eventBus.on,
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
