@@ -223,9 +223,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.3748895"
-     inkscape:cx="267.24534"
-     inkscape:cy="642.24313"
+     inkscape:zoom="1.6793005"
+     inkscape:cx="249.56938"
+     inkscape:cy="658.75719"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -923,11 +923,10 @@
        width="744.09448"
        height="1052.3622" />
     <g
-       id="g5157"
-       transform="translate(234.75586,-140)">
+       id="g5204">
       <path
-         transform="matrix(1.344184,0,0,1,-122.68554,-15)"
-         d="m 270,477.36218 c 0,11.0457 -10.07359,20 -22.5,20 -12.42641,0 -22.5,-8.9543 -22.5,-20 0,-11.04569 10.07359,-20 22.5,-20 12.42641,0 22.5,8.95431 22.5,20 z"
+         transform="matrix(1.344184,0,0,1,112.07032,-155)"
+         d="m 270,477.36218 a 22.5,20 0 1 1 -45,0 22.5,20 0 1 1 45,0 z"
          sodipodi:ry="20"
          sodipodi:rx="22.5"
          sodipodi:cy="477.36218"
@@ -938,14 +937,18 @@
       <text
          sodipodi:linespacing="125%"
          id="text5161"
-         y="465.12097"
-         x="210.24414"
+         y="318.87097"
+         x="445"
          style="font-size:10px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
          xml:space="preserve"><tspan
-           y="465.12097"
-           x="210.24414"
+           y="318.87097"
+           x="445"
            id="tspan5163"
-           sodipodi:role="line">???</tspan></text>
+           sodipodi:role="line">callback</tspan><tspan
+           y="331.37097"
+           x="445"
+           sodipodi:role="line"
+           id="tspan5198">adaptor</tspan></text>
     </g>
     <text
        sodipodi:linespacing="125%"
