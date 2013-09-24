@@ -10,7 +10,7 @@
 describe("browser api", function(){
    "use strict";
 
-   describe("propagates through to streaming xhr", function(){
+   describe("propagates through to streaming http", function(){
 
       var callbackPlaceholder = function(){};
    
@@ -27,6 +27,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                 jasmine.any(Function),
                 jasmine.any(Function),
+                jasmine.any(XMLHttpRequest),
                 'GET',
                 'http://example.com/oboez',
                 undefined,
@@ -42,6 +43,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'GET',
                'http://example.com/oboez',
                undefined,
@@ -60,6 +62,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'GET',
                'http://example.com/oboez',
                undefined,
@@ -77,6 +80,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'DELETE',
                'http://example.com/oboez',
                undefined,
@@ -91,6 +95,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),
                'DELETE',
                'http://example.com/oboez',
                undefined,
@@ -108,6 +113,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'POST',
                'http://example.com/oboez',
                'my_data',
@@ -122,6 +128,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'POST',
                'http://example.com/oboez',
                [1,2,3,4,5],
@@ -136,6 +143,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'POST',
                'http://example.com/oboez',
                'my_data',
@@ -152,6 +160,7 @@ describe("browser api", function(){
             expect(streamingHttp).toHaveBeenCalledWith(
                jasmine.any(Function), 
                jasmine.any(Function),
+               jasmine.any(XMLHttpRequest),               
                'PUT',
                'http://example.com/oboez',
                'my_data',
