@@ -223,9 +223,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="236.63135"
-     inkscape:cy="616.12095"
+     inkscape:zoom="2.8"
+     inkscape:cx="247.4239"
+     inkscape:cy="613.74103"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -318,6 +318,25 @@
            id="tspan4538">XHR</tspan></text>
     </g>
     <g
+       id="g4991"
+       transform="translate(15,-69.999997)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4989"
+         d="m 235,257.36218 0,20"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         transform="translate(-5,0)"
+         d="m 245,257.36218 c 0,2.76143 -2.23858,5 -5,5 -2.76142,0 -5,-2.23857 -5,-5 0,-2.76142 2.23858,-5 5,-5 2.76142,0 5,2.23858 5,5 z"
+         sodipodi:ry="5"
+         sodipodi:rx="5"
+         sodipodi:cy="257.36218"
+         sodipodi:cx="240"
+         id="path4987"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         sodipodi:type="arc" />
+    </g>
+    <g
        id="g4522"
        transform="translate(-20,-13.75)">
       <g
@@ -325,7 +344,7 @@
          transform="translate(84.999988,-83.491212)">
         <path
            sodipodi:type="arc"
-           style="color:#000000;fill:none;stroke:#000000;stroke-width:0.83182526;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           style="color:#000000;fill:#ffffff;stroke:#000000;stroke-width:0.83182526000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;fill-opacity:1"
            id="path4478"
            sodipodi:cx="247.5"
            sodipodi:cy="477.36218"
@@ -675,7 +694,7 @@
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-       d="m 180,567.36218 c 25,-5 50,-25 55,-50"
+       d="m 180,567.36218 c 25,-15 35,-30 45,-50"
        id="path4928"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
@@ -703,6 +722,21 @@
            id="tspan4458"
            x="210.24414"
            y="465.12097">browserAPI</tspan></text>
+    </g>
+    <g
+       id="g5004">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 265,187.36218 0,20"
+         id="path4997"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="csc"
+         inkscape:connector-curvature="0"
+         id="path4999"
+         d="m 245,257.36218 c 0,2.76143 -2.23858,5 -5,5 -2.76142,0 -5,-2.23857 -5,-5"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         transform="translate(25,-70)" />
     </g>
   </g>
 </svg>
