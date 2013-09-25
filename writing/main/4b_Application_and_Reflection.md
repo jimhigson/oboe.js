@@ -4,12 +4,12 @@ Application and Reflection 2: makin' it
 Decomposition into components
 -----------------------------
 
-Split up concerns etc
+![*Inter-related components that make up Oboe.js.*, showing flow
+from http transport to registered callbacks. UML facet/receptacle
+notation is used to show the flow of events but a centralised event
+bus which transmits the events is omitted for clarity](images/overallDesign.png)
 
-Local event bus Why? Makes testing easy (just put appropriate event on the
-bus rather than trying to fake calls from linked stubs). Decouples, avoids
-parts having to locate or be passed other parts. Wouldn't scale indefinately,
-does provide something of a mingled-purpose space.  
+Split up concerns etc
 
 Controller
 
@@ -24,10 +24,7 @@ way of going about making an intention true.
 Content builder: like a decorator/wrapper but event based, not based on
 object wrapping.
 
-![*Inter-related components making up Oboe.js.* Those UML notations
-are called facets and receptacles](images/overallDesign.png)
-
-Inversion of Control
+Inversion of Control and communication between parts
 --------------------
 
 Aim of creating a micro-library rules out building in a general-purpose
@@ -42,6 +39,14 @@ What the central controller does; acts as a plumber connecting the
 various parts up. Since oboe is predominantly event/stream based, once
 wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
+
+Local event bus Why? Makes testing easy (just put appropriate event on the
+bus rather than trying to fake calls from linked stubs). Decouples, avoids
+parts having to locate or be passed other parts. Wouldn't scale indefinately,
+does provide something of a mingled-purpose space. Why not more direct event
+passing without a separate event bus (ie, everything as an emitter and reciever
+of events?)  
+
 
 Grunt
 -----
