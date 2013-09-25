@@ -962,7 +962,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
       if( newText ) {
-         fire( HTTP_PROGRESS_EVENT, newText );
+         fire( NEW_CONTENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -987,7 +987,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             // data before we get the load event.
             handleProgress();
             
-            fire( HTTP_DONE_EVENT );
+            fire( END_OF_CONTENT );
          } else {
          
             fire( ERROR_EVENT );
@@ -1659,8 +1659,8 @@ var _S = 0,
     PATH_FOUND = _S++,
     ROOT_FOUND = _S++,
     ERROR_EVENT = _S++,
-    HTTP_PROGRESS_EVENT = _S++,
-    HTTP_DONE_EVENT = _S++,
+    NEW_CONTENT = _S++,
+    END_OF_CONTENT = _S++,
     ABORTING = _S++;
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
@@ -1673,7 +1673,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       rootNode = root;   
    });                         
   
-   on(HTTP_PROGRESS_EVENT,         
+   on(NEW_CONTENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -1688,7 +1688,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       }
    );
    
-   on(HTTP_DONE_EVENT,
+   on(END_OF_CONTENT,
       function() {
                                          
          clarinetParser.close();
@@ -1715,9 +1715,6 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       // end of the json it will throw an error
    };
 
-   /**
-    * MOVE OUT, keep call to JSONPATHCOMPILER in here! 
-    */
    function addPathOrNodeCallback( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
@@ -1725,7 +1722,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function callbackAdaptor( ascent ){ 
+      on( eventId, function( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      

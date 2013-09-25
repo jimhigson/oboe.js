@@ -56,7 +56,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       // On browsers which send progress events for the last bit of the response, if we
       // are responding to the laod event it is now empty         
       if( newText ) {
-         fire( HTTP_PROGRESS_EVENT, newText );
+         fire( NEW_CONTENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -81,7 +81,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             // data before we get the load event.
             handleProgress();
             
-            fire( HTTP_DONE_EVENT );
+            fire( END_OF_CONTENT );
          } else {
          
             fire( ERROR_EVENT );

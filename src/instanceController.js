@@ -9,7 +9,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       rootNode = root;   
    });                         
   
-   on(HTTP_PROGRESS_EVENT,         
+   on(NEW_CONTENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -24,7 +24,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       }
    );
    
-   on(HTTP_DONE_EVENT,
+   on(END_OF_CONTENT,
       function() {
                                          
          clarinetParser.close();
@@ -58,7 +58,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function callbackAdaptor( ascent ){ 
+      on( eventId, function( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      

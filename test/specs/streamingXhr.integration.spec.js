@@ -146,7 +146,7 @@ describe('streaming xhr integration (real http)', function() {
    
    it('does not call back with zero-length data',  function(queue) {
          
-      eventBus.on(HTTP_PROGRESS_EVENT,
+      eventBus.on(NEW_CONTENT,
           function(nextDrip){            
              expect(nextDrip.length).not.toEqual(0);                                                                                     
           }
@@ -209,12 +209,12 @@ describe('streaming xhr integration (real http)', function() {
          }
       });
       
-      eventBus.on(HTTP_PROGRESS_EVENT, function(nextDrip){
+      eventBus.on(NEW_CONTENT, function(nextDrip){
          numberOfProgressCallbacks ++;
          contentReceived += nextDrip;                                                                                     
       });
       
-      eventBus.on(HTTP_DONE_EVENT, requestCompleteListener);
+      eventBus.on(END_OF_CONTENT, requestCompleteListener);
    });
 
 });
