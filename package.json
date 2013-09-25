@@ -39,6 +39,7 @@
     "grunt-contrib-clean": "~0.5.0",
     "doctoc": "~0.4.3",
     "node-simple-router": "~0.4.7",
-    "grunt-concurrent": "~0.3.1"
+    "grunt-concurrent": "~0.3.1",
+    "color": "~0.4.4"
   }
 }
