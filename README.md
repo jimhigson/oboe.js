@@ -529,7 +529,7 @@ it'll just fall back to waiting for the whole response to return, then fire all 
 You don't get streaming but it isn't any worse than if you'd have designed your code to non-streaming AJAX.
 
 I'm able to test in IE thanks to 
-[this rather wonderful script](http://osxdaily.com/2011/09/04/internet-explorer-for-mac-ie7-ie8-ie-9-free/).
+[this rather wonderful script](https://github.com/xdissent/ievms).
 
 ## Running the tests
 
