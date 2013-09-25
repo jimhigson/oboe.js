@@ -51,18 +51,15 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       // end of the json it will throw an error
    };
 
-   /**
-    * MOVE OUT, keep call to JSONPATHCOMPILER in here! 
-    */
-   function addPathOrNodeListener( eventId, pattern, callback ) {
+   function addPathOrNodeCallback( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
    
       // Add a new listener to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function( ascent ){ 
-      
+      on( eventId, function callbackAdaptor( ascent ){ 
+ 
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
          // Possible values for maybeMatchingMapping are now:
@@ -111,7 +108,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
+         addPathOrNodeCallback(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -122,7 +119,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    function addListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeListener(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
+         addPathOrNodeCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
