@@ -358,13 +358,40 @@ Dart has 'factory' constructors which are called like constructors but
 act like factory functions:
 (http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
 
-Design and implementation of the jsonpath parser
+Design and implementation of the JSONPath parser
 ------------------------------------------------
 
 Show evolution of it
 
 NB: This consideration of type in json could be in the Background
 section.
+
+Clause functions. For example, the jsonPath
+`!.$person..{height tShirtSize}` may be expressed functionally in
+Javascript as such:
+
+~~~~ {.javascript}
+var jsonPathEvaluator =
+   statementExpr( 
+      duckTypeClause(
+         consumeMany( 
+            capture(                              // for css4-style '$' notation
+               nameClause( 
+                  rootExpr,                       // '!' at start of JSONPath expression 
+               'person' )
+            )
+      ), ['height', 'tShirtSize'])
+   );      
+~~~~
+
+The above is actually a slight simplification because calls to
+partialComplete are implied. Once this evaluator function has been
+created, testing against a candidate ascent is simply function
+invocation:
+
+~~~~ {.javascript}
+var result = jsonPathEvaluator(ascent);
+~~~~
 
 Why done as a function returning a function (many calls per pattern -
 one for each node found to check for matches).
