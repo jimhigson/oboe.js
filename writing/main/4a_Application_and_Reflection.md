@@ -175,6 +175,58 @@ safer.
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
+
+From old writing we have:
+
+Xml comes with a strong concept of the *type* of an element, the tag
+name is taken as a more immediate fundamental property of the thing than
+the attributes. For example, in automatic json-Java object
+demarshallers, the tag name is always mapped to the Java class. In JSON,
+other than the base types common to most languages (array, object,
+string etc) there is no further concept of type. If we wish to build a
+further understanding of the type of the objects then the realtionship
+with the parent object, expressed by the attribute name, is more likely
+to indicate the type. A second approach is to use duck typing in which
+the relationship of the object to its ancestors is not examined but the
+properties of the object are used instead to communicate an enhanced
+concept of type. For example, we might say that any object with an isbn
+and a title is a book.
+
+A third injection of type into json comes in the form of taking the
+first property of an object as being the tagname. Unsatisfactory,
+objects have an order while serialised as json but once deserialised
+typically have no further order. Clarinet.js seems to follow this
+pattern, notifying of new objects only once the first property's key is
+known so that it may be used to infer type. Can't be used with a
+general-purpose JSON writer tool, nor any JSON writer tool that reads
+from common objects.
+
+First way to identify an interesting thing is by its location in the
+document. In the absense of node typing beyond the categorisation as
+objects, arrays and various primative types, the key immediately mapping
+to the object is often taken as a lose concept of the type of the
+object. Quite fortunately, rather than because of a well considered
+object design, this tends to play well with automatically marshaling of
+domain objects expressed in a Java-style OO language because there is a
+strong tendency for field names -- and by extension, 'get' methods -- to
+be named after the *type* of the field, the name of the type also
+serving as a rough summary of the relationship between two objects. See
+figure \ref{marshallTypeFig} below.
+
+![UML class diagram showing a person class in relationship with an
+address class. In implementation as Java the 'hasAddress' relationship
+would typically be reified as a getAddress method. This co-incidence of
+object type and the name of the field referring to the type lends itself
+well to the tendency for the immediate key before an object to be taken
+as the type when Java models are marshaled into json
+\label{marshallTypeFig}](images/marshall)
+
+By sensible convention, even in a serialisation format with only a loose
+definition of lists, lists contain only items of the same type. This
+gives way to a sister convention, that for lists of items, the key
+immediately linking to the
+
+
 Stability over upgrades
 -----------------------
 
