@@ -21,7 +21,8 @@ way of going about making an intention true.
 Content builder: like a decorator/wrapper but event based, not based on
 object wrapping.
 
-![components of the design](images/placeholder.png)
+![*Inter-related components making up Oboe.js.* Those UML notations
+are called facets and receptacles](images/overallDesign.png)
 
 Inversion of Control
 --------------------
