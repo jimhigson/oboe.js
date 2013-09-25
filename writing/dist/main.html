@@ -1555,6 +1555,64 @@ analysis* =-->
     - maybe do a table instead</p>
   </div>
 
+  <p>From old writing we have:</p>
+
+  <p>Xml comes with a strong concept of the <em>type</em> of an
+  element, the tag name is taken as a more immediate fundamental
+  property of the thing than the attributes. For example, in
+  automatic json-Java object demarshallers, the tag name is always
+  mapped to the Java class. In JSON, other than the base types
+  common to most languages (array, object, string etc) there is no
+  further concept of type. If we wish to build a further
+  understanding of the type of the objects then the realtionship
+  with the parent object, expressed by the attribute name, is more
+  likely to indicate the type. A second approach is to use duck
+  typing in which the relationship of the object to its ancestors
+  is not examined but the properties of the object are used instead
+  to communicate an enhanced concept of type. For example, we might
+  say that any object with an isbn and a title is a book.</p>
+
+  <p>A third injection of type into json comes in the form of
+  taking the first property of an object as being the tagname.
+  Unsatisfactory, objects have an order while serialised as json
+  but once deserialised typically have no further order.
+  Clarinet.js seems to follow this pattern, notifying of new
+  objects only once the first property's key is known so that it
+  may be used to infer type. Can't be used with a general-purpose
+  JSON writer tool, nor any JSON writer tool that reads from common
+  objects.</p>
+
+  <p>First way to identify an interesting thing is by its location
+  in the document. In the absense of node typing beyond the
+  categorisation as objects, arrays and various primative types,
+  the key immediately mapping to the object is often taken as a
+  lose concept of the type of the object. Quite fortunately, rather
+  than because of a well considered object design, this tends to
+  play well with automatically marshaling of domain objects
+  expressed in a Java-style OO language because there is a strong
+  tendency for field names -- and by extension, 'get' methods -- to
+  be named after the <em>type</em> of the field, the name of the
+  type also serving as a rough summary of the relationship between
+  two objects. See figure below.</p>
+
+  <div class="figure">
+    <img src="images/marshall.png" alt=
+    "UML class diagram showing a person class in relationship with an address class. In implementation as Java the 'hasAddress' relationship would typically be reified as a getAddress method. This co-incidence of object type and the name of the field referring to the type lends itself well to the tendency for the immediate key before an object to be taken as the type when Java models are marshaled into json ">
+
+    <p class="caption">UML class diagram showing a person class in
+    relationship with an address class. In implementation as Java
+    the 'hasAddress' relationship would typically be reified as a
+    getAddress method. This co-incidence of object type and the
+    name of the field referring to the type lends itself well to
+    the tendency for the immediate key before an object to be taken
+    as the type when Java models are marshaled into json</p>
+  </div>
+
+  <p>By sensible convention, even in a serialisation format with
+  only a loose definition of lists, lists contain only items of the
+  same type. This gives way to a sister convention, that for lists
+  of items, the key immediately linking to the</p>
+
   <h2 id="stability-over-upgrades"><a href=
   "#stability-over-upgrades"><span class=
   "header-section-number">4.3</span> Stability over
@@ -1582,8 +1640,32 @@ analysis* =-->
   "header-section-number">4.4</span> Incorporating existing
   libraries</a></h2>
 
+  <p>Oboe name in tribute to work already done in Clarinet
+  project.</p>
+
   <h2 id="api-design"><a href="#api-design"><span class=
   "header-section-number">4.5</span> API design</a></h2>
+
+  <p>Compare to existing libraries such as jQuery. While inevitably
+  different, should be similar so far as the purpose is shared.
+  Should be easy to change from old way to new way.</p>
+
+  <p>Why provide whole-resource callback.</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"co">// some ajaxing using jQuery</span></code>
+</pre>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"co">// this API</span>
+
+<span class="fu">oboe</span>(<span class="st">'url'</span>);</code>
+</pre>
+
+  <p>Detecting Paths, not just nodes. Sometimes gives callback even
+  earlier.</p>
+
+  <p>Ability to get the root at any time by doing this.root();</p>
 
   <h2 id="micro-library"><a href="#micro-library"><span class=
   "header-section-number">4.6</span> Micro-library</a></h2>
@@ -1662,7 +1744,11 @@ analysis* =-->
 
   <p>Split up concerns etc</p>
 
-  <p>Local event bus</p>
+  <p>Local event bus Why? Makes testing easy (just put appropriate
+  event on the bus rather than trying to fake calls from linked
+  stubs). Decouples, avoids parts having to locate or be passed
+  other parts. Wouldn't scale indefinately, does provide something
+  of a mingled-purpose space.</p>
 
   <p>Controller</p>
 
@@ -1678,10 +1764,12 @@ analysis* =-->
   based on object wrapping.</p>
 
   <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "components of the design">
+    <img src="images/overallDesign.png" alt=
+    "Inter-related components making up Oboe.js. Those UML notations are called facets and receptacles">
 
-    <p class="caption">components of the design</p>
+    <p class="caption"><em>Inter-related components making up
+    Oboe.js.</em> Those UML notations are called facets and
+    receptacles</p>
   </div>
 
   <h2 id="inversion-of-control"><a href=
@@ -2073,33 +2161,11 @@ analysis* =-->
   <p>NB: This consideration of type in json could be in the
   Background section.</p>
 
-  <p>Xml comes with a strong concept of the <em>type</em> of an
-  element, the tag name is taken as a more immediate fundamental
-  property of the thing than the attributes. For example, in
-  automatic json-Java object demarshallers, the tag name is always
-  mapped to the Java class. In JSON, other than the base types
-  common to most languages (array, object, string etc) there is no
-  further concept of type. If we wish to build a further
-  understanding of the type of the objects then the realtionship
-  with the parent object, expressed by the attribute name, is more
-  likely to indicate the type. A second approach is to use duck
-  typing in which the relationship of the object to its ancestors
-  is not examined but the properties of the object are used instead
-  to communicate an enhanced concept of type. For example, we might
-  say that any object with an isbn and a title is a book.</p>
+  <p>Why done as a function returning a function (many calls per
+  pattern - one for each node found to check for matches).</p>
 
-  <p>A third injection of type into json comes in the form of
-  taking the first property of an object as being the tagname.
-  Unsatisfactory, objects have an order while serialised as json
-  but once deserialised typically have no further order.
-  Clarinet.js seems to follow this pattern, notifying of new
-  objects only once the first property's key is known so that it
-  may be used to infer type. Can't be used with a general-purpose
-  JSON writer tool, nor any JSON writer tool that reads from common
-  objects.</p>
-
-  <p>Design not just for now, design to be stable over future
-  iterations of the software. Agile etc.</p>
+  <p>Match from right-to-left, or, deepest-to-root. Why this way?
+  That's how the patterns work (mostly)</p>
 
   <p>Why an existing jsonPath implmentation couldn't be used: need
   to add new features and need to be able to check against a path
@@ -2110,37 +2176,6 @@ analysis* =-->
 
   <p>As discussed in section ???, Sax is difficult to program and
   not widely used.</p>
-
-  <p>First way to identify an interesting thing is by its location
-  in the document. In the absense of node typing beyond the
-  categorisation as objects, arrays and various primative types,
-  the key immediately mapping to the object is often taken as a
-  lose concept of the type of the object. Quite fortunately, rather
-  than because of a well considered object design, this tends to
-  play well with automatically marshaling of domain objects
-  expressed in a Java-style OO language because there is a stong
-  tendency for field names -- and by extension, 'get' methods -- to
-  be named after the <em>type</em> of the field, the name of the
-  type also serving as a rough summary of the relationship between
-  two objects. See figure below.</p>
-
-  <div class="figure">
-    <img src="images/marshall.png" alt=
-    "UML class diagram showing a person class in relationship with an address class. In implementation as Java the 'hasAddress' relationship would typically be reified as a getAddress method. This co-incidence of object type and the name of the field referring to the type lends itself well to the tendency for the immediate key before an object to be taken as the type when Java models are marshaled into json ">
-
-    <p class="caption">UML class diagram showing a person class in
-    relationship with an address class. In implementation as Java
-    the 'hasAddress' relationship would typically be reified as a
-    getAddress method. This co-incidence of object type and the
-    name of the field referring to the type lends itself well to
-    the tendency for the immediate key before an object to be taken
-    as the type when Java models are marshaled into json</p>
-  </div>
-
-  <p>By sensible convention, even in a serialisation format with
-  only a loose definition of lists, lists contain only items of the
-  same type. This gives way to a sister convention, that for lists
-  of items, the key immediately linking to the</p>
 
   <p>Essentially two ways to identify an interesting node - by
   location (covered by existing jsonpath)</p>
