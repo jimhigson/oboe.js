@@ -176,7 +176,32 @@ safer.
 \label{enhancingrest}](images/placeholder)
 
 
+
+
 From old writing we have:
+
+*CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and $.*
+
+To extend JsonPath to support a concise expression of duck typing, I
+chose a syntax which is similar to fields in jsonFormat:
+
+~~~~ {.javascript}
+
+// the curly braces are my extension to jsonpath"
+var jsonPath = jsonPathCompiler("{name address email}");
+
+// the above jsonPath expression would match this object in json 
+// expression and like all json path expressions the pattern is 
+// quite similar to the object that it matches. The object below 
+// matches because it contains all the fields listed
+// in between the curly braces in the above json path expresson.
+
+var matchingObject = {
+   "name": "...",
+   "address": "...",
+   "email": "...:
+}
+~~~~
 
 Xml comes with a strong concept of the *type* of an element, the tag
 name is taken as a more immediate fundamental property of the thing than
