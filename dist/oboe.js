@@ -1292,7 +1292,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function pathEqualClause(previousExpr, detection ) {
+   function nameClause(previousExpr, detection ) {
 
       // extract meaning from the detection      
       var name = detection[NAME_INDEX],
@@ -1315,7 +1315,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     *    *{spin, taste, colour}
     * 
     * @param {Function} previousExpr
-    * @param {Array} detection
+    * @param {Array} detection strings required, space separated 
     */
    function duckTypeClause(previousExpr, detection) {
 
@@ -1356,7 +1356,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */
-   function consume1(previousExpr) {
+   function skip1(previousExpr) {
    
    
       if( previousExpr == always ) {
@@ -1395,7 +1395,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * @returns {Function} a function which examines the descents on a path from the root of a json to a node
     *                     and decides if there is a match or not
     */   
-   function consumeMany(previousExpr) {
+   function skipMany(previousExpr) {
 
       if( previousExpr == always ) {
          // If there is no previous expression, this consume command is at the start of the jsonPath.
@@ -1411,7 +1411,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
             // the match has suceeded.
           terminalCaseWhenArrivingAtRoot = rootExpr(),
           terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
-          recursiveCase = consume1(consumeManyPartiallyCompleted),
+          recursiveCase = skip1(consumeManyPartiallyCompleted),
           
           cases = lazyUnion(
                      terminalCaseWhenArrivingAtRoot
@@ -1545,8 +1545,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    // a generated parser for that expression     
    var clause = lazyUnion(
 
-      clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, pathEqualClause, consume1 ))        
-   ,  clauseMatcher(doubleDotSyntax  , list(consumeMany))
+      clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, nameClause, skip1 ))        
+   ,  clauseMatcher(doubleDotSyntax  , list(skipMany))
        
        // dot is a separator only (like whitespace in other languages) but rather than special case
        // it, the expressions can be an empty array.
@@ -1648,7 +1648,7 @@ function pubSub(){
       fire:function ( eventId, event ) {
                
          listEach(
-            partialComplete( apply, event ? [event] : [] ), 
+            partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
       }           
@@ -1814,12 +1814,11 @@ function wire (httpMethodName, url, body, callback, headers){
 
 
 // export public API
-window.oboe = {
-   doGet:   apiMethod('GET'),
-   doDelete:apiMethod('DELETE'),
-   doPost:  apiMethod('POST', true),
-   doPut:   apiMethod('PUT', true)
-};
+window.oboe = apiMethod('GET');
+window.oboe.doGet    = apiMethod('GET');
+window.oboe.doDelete = apiMethod('DELETE');
+window.oboe.doPost   = apiMethod('POST', true);
+window.oboe.doPut    =   apiMethod('PUT', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                

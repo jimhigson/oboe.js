@@ -55,7 +55,7 @@ In our webapp we want to download the foods and show them in a webpage. We aren'
 we won't wait for them to be loaded: 
 
 ``` js
-oboe.doGet('/myapp/things.json')
+oboe('/myapp/things.json')
    .onNode('foods.*', function( foodObject ){
    
       // This callback will be called everytime a new object is found in the 
@@ -78,7 +78,7 @@ not the non-foods we can hang up as soon as we have the foods, reducing our prec
 download footprint.
 
 ``` js
-oboe.doGet('/myapp/things.json')
+oboe('/myapp/things.json')
    .onNode({
       'foods.*': function( foodObject ){
    
@@ -127,7 +127,7 @@ page as soon as possible.
 
 ``` js
 var currentPersonElement;
-oboe.doGet('//people.json')
+oboe('//people.json')
    .onPath({'people.*': function(){
       // we don't have the person's details yet but we know we found someone 
       // in the json stream. We can eagerly put their div to the page and 
@@ -159,7 +159,7 @@ I'll assume you already implemented a spinner
 ``` js
 MyApp.showSpinner('#foods');
 
-oboe.doGet('/myapp/things.json')
+oboe('/myapp/things.json')
    .onNode({
       '!.foods.*': function( foodThing ){
          jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
@@ -198,7 +198,7 @@ register a wide-matching pattern and use the path parameter to decide what to do
    // ... other modules ...
 }
 
-oboe.doGet('http://mysocialsite.example.com/homepage.json')
+oboe('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
    .onNode('!.*', function( moduleJson, path ){
    
@@ -237,7 +237,7 @@ given instead to the callback.
 // we are using Angular and have a controller:
 function PeopleListCtrl($scope) {
 
-   oboe.doGet('/myapp/things.json')
+   oboe('/myapp/things.json')
       .onNode('$people[*]', function( peopleLoadedSoFar ){
          
          // This callback will be called with a 1-length array, a 2-length
@@ -254,7 +254,7 @@ function PeopleListCtrl($scope) {
 Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
-oboe.doGet('/myapp/things.json')
+oboe('/myapp/things.json')
    .onNode('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
@@ -265,7 +265,7 @@ oboe.doGet('/myapp/things.json')
 Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
-oboe.doGet('/myapp/things.json')
+oboe('/myapp/things.json')
    .onNode('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
@@ -286,7 +286,7 @@ var things = d3.selectAll('rect.thing');
 // Start downloading some data.
 // Every time we see a new thing in the data stream, use d3 to add an element to our 
 // visualisation. This basic pattern should work for most visualistions built in d3.
-oboe.doGet('/data/things.json')
+oboe('/data/things.json')
    .onNode('$things.*', function( thingsArray ){
             
       things.data(thingsArray)
@@ -309,7 +309,7 @@ Oboe stops on error so won't give any further callbacks.
  
 ``` js
 var currentPersonElement;
-oboe.doGet('people.json')
+oboe('people.json')
    .onPath('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the 
       // json stream, we can use this to eagerly add them to the page:
@@ -329,16 +329,18 @@ oboe.doGet('people.json')
 
 # API
 
-Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and recieve a new Oboe 
+Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and instantiate a new Oboe 
 instance by calling one of these methods:
 
 ```js
+   oboe( String url, [Function doneCallback(wholeResponse)]) // makes a GET request
+   
    oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
    oboe.doPut(    String url, String body, [Function doneCallback(wholeResponse)])
    oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
    oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
    
-// the above methods also accept an options object:
+// the calls above alternatively can accept an options object:
    oboe.doPost({
       url: String,
       body: Object|String,
@@ -526,6 +528,8 @@ The good news is that in older versions of IE Oboe gracefully degrades,
 it'll just fall back to waiting for the whole response to return, then fire all the events together.
 You don't get streaming but it isn't any worse than if you'd have designed your code to non-streaming AJAX.
 
+I'm able to test in IE thanks to 
+[this rather wonderful script](http://osxdaily.com/2011/09/04/internet-explorer-for-mac-ie7-ie8-ie-9-free/).
 
 ## Running the tests
 

@@ -10,43 +10,63 @@
 describe("browser api", function(){
    "use strict";
 
-   describe("propagates through to streaming http", function(){
+   describe("propagates through to wiring function", function(){
 
-      var callbackPlaceholder = function(){};
+      var callbackFunction = function(){};
    
       beforeEach(function() {
-         spyOn(window, 'streamingHttp');      
+         spyOn(window, 'wire');      
       });
+
+      it('exports a usable function for GETs', function(){   
+      
+         oboe('http://example.com/oboez', callbackFunction)
+      
+         expect(wire).toHaveBeenCalledWith(
+             'GET',
+             'http://example.com/oboez',
+             undefined,
+             callbackFunction
+         )      
+      })
+      
+      it('exports a usable function for GETs with a callback function', function(){   
+      
+         oboe('http://example.com/oboez')
+      
+         expect(wire).toHaveBeenCalledWith(
+             'GET',
+             'http://example.com/oboez',
+             undefined,                
+             undefined                
+         )      
+      })      
+
    
       describe('get', function(){
          
          it('works via arguments', function(){   
          
-            oboe.doGet('http://example.com/oboez', callbackPlaceholder)
+            oboe.doGet('http://example.com/oboez', callbackFunction)
          
-            expect(streamingHttp).toHaveBeenCalledWith(
-                jasmine.any(Function),
-                jasmine.any(Function),
-                jasmine.any(XMLHttpRequest),
+            expect(wire).toHaveBeenCalledWith(
                 'GET',
                 'http://example.com/oboez',
                 undefined,
-                undefined                
+                callbackFunction         
             )      
                
          })
             
          it('works via options object', function(){   
               
-            oboe.doGet({url: 'http://example.com/oboez', success: callbackPlaceholder})
+            oboe.doGet({url: 'http://example.com/oboez', complete: callbackFunction})
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(              
                'GET',
                'http://example.com/oboez',
                undefined,
+               callbackFunction,
                undefined
             )   
          })
@@ -56,16 +76,14 @@ describe("browser api", function(){
             var headers = {'X-HEADER-1':'value1', 'X-HEADER-2':'value2'};
             
             oboe.doGet({url: 'http://example.com/oboez', 
-                        success: callbackPlaceholder, 
+                        complete: callbackFunction, 
                         headers:headers})
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(              
                'GET',
                'http://example.com/oboez',
                undefined,
+               callbackFunction,
                headers
             )   
          })         
@@ -75,31 +93,26 @@ describe("browser api", function(){
       describe('delete', function(){
          it('works via arguments', function(){
               
-            oboe.doDelete('http://example.com/oboez', callbackPlaceholder)
+            oboe.doDelete('http://example.com/oboez', callbackFunction)
           
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(
                'DELETE',
                'http://example.com/oboez',
                undefined,
-               undefined               
+               callbackFunction        
             )
          })
          
          it('works via options object', function(){   
                
-            oboe.doDelete({url: 'http://example.com/oboez', success: callbackPlaceholder})
+            oboe.doDelete({url: 'http://example.com/oboez', complete: callbackFunction})
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),
+            expect(wire).toHaveBeenCalledWith(
                'DELETE',
                'http://example.com/oboez',
                undefined,
-               undefined               
+               callbackFunction,
+               undefined
             )   
          })   
       });
@@ -108,46 +121,38 @@ describe("browser api", function(){
       describe('post', function(){
          it('works via arguments', function(){
                
-            oboe.doPost('http://example.com/oboez', 'my_data', callbackPlaceholder)
+            oboe.doPost('http://example.com/oboez', 'my_data', callbackFunction)
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
-               'my_data',
-               undefined               
+               'my_data',               
+               callbackFunction        
             )   
          })
          
          it('can post an object', function(){
                
-            oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackPlaceholder)
+            oboe.doPost('http://example.com/oboez', [1,2,3,4,5], callbackFunction)
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
-               [1,2,3,4,5],
-               undefined               
+               [1,2,3,4,5],               
+               callbackFunction        
             )   
          })   
          
          it('works via options object', function(){   
                
-            oboe.doPost({url: 'http://example.com/oboez', body:'my_data', success: callbackPlaceholder})
+            oboe.doPost({url: 'http://example.com/oboez', body:'my_data', complete: callbackFunction})
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(              
                'POST',
                'http://example.com/oboez',
                'my_data',
-               undefined               
+               callbackFunction,
+               undefined
             )   
          })   
       });
@@ -155,16 +160,13 @@ describe("browser api", function(){
       describe('put', function(){   
          it('can put a string', function(){
                
-            oboe.doPut('http://example.com/oboez', 'my_data', callbackPlaceholder)
+            oboe.doPut('http://example.com/oboez', 'my_data', callbackFunction)
             
-            expect(streamingHttp).toHaveBeenCalledWith(
-               jasmine.any(Function), 
-               jasmine.any(Function),
-               jasmine.any(XMLHttpRequest),               
+            expect(wire).toHaveBeenCalledWith(
                'PUT',
                'http://example.com/oboez',
                'my_data',
-               undefined               
+               callbackFunction
             )   
          })
       });

@@ -1,11 +1,10 @@
 
 // export public API
-window.oboe = {
-   doGet:   apiMethod('GET'),
-   doDelete:apiMethod('DELETE'),
-   doPost:  apiMethod('POST', true),
-   doPut:   apiMethod('PUT', true)
-};
+window.oboe = apiMethod('GET');
+window.oboe.doGet    = apiMethod('GET');
+window.oboe.doDelete = apiMethod('DELETE');
+window.oboe.doPost   = apiMethod('POST', true);
+window.oboe.doPut    =   apiMethod('PUT', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
