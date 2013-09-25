@@ -4,10 +4,10 @@ Application and Reflection 2: makin' it
 Decomposition into components
 -----------------------------
 
-![*Inter-related components that make up Oboe.js.*, showing flow
-from http transport to registered callbacks. UML facet/receptacle
-notation is used to show the flow of events but a centralised event
-bus which transmits the events is omitted for clarity](images/overallDesign.png)
+![*Inter-related components that make up Oboe.js.*, showing flow from
+http transport to registered callbacks. UML facet/receptacle notation is
+used to show the flow of events but a centralised event bus which
+transmits the events is omitted for clarity](images/overallDesign.png)
 
 Split up concerns etc
 
@@ -25,7 +25,7 @@ Content builder: like a decorator/wrapper but event based, not based on
 object wrapping.
 
 Inversion of Control and communication between parts
---------------------
+----------------------------------------------------
 
 Aim of creating a micro-library rules out building in a general-purpose
 IoC library.
@@ -40,13 +40,12 @@ various parts up. Since oboe is predominantly event/stream based, once
 wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
 
-Local event bus Why? Makes testing easy (just put appropriate event on the
-bus rather than trying to fake calls from linked stubs). Decouples, avoids
-parts having to locate or be passed other parts. Wouldn't scale indefinately,
-does provide something of a mingled-purpose space. Why not more direct event
-passing without a separate event bus (ie, everything as an emitter and reciever
-of events?)  
-
+Local event bus Why? Makes testing easy (just put appropriate event on
+the bus rather than trying to fake calls from linked stubs). Decouples,
+avoids parts having to locate or be passed other parts. Wouldn't scale
+indefinately, does provide something of a mingled-purpose space. Why not
+more direct event passing without a separate event bus (ie, everything
+as an emitter and reciever of events?)
 
 Grunt
 -----
@@ -367,11 +366,11 @@ Show evolution of it
 NB: This consideration of type in json could be in the Background
 section.
 
-Why done as a function returning a function (many calls per pattern - one
-for each node found to check for matches).
+Why done as a function returning a function (many calls per pattern -
+one for each node found to check for matches).
 
-Match from right-to-left, or, deepest-to-root. Why this way? That's how the
-patterns work (mostly)
+Match from right-to-left, or, deepest-to-root. Why this way? That's how
+the patterns work (mostly)
 
 Why an existing jsonPath implmentation couldn't be used: need to add new
 features and need to be able to check against a path expressed as a
@@ -382,8 +381,6 @@ patterns?
 
 As discussed in section ???, Sax is difficult to program and not widely
 used.
-
-
 
 Essentially two ways to identify an interesting node - by location
 (covered by existing jsonpath)
