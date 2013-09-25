@@ -4,7 +4,7 @@ Application and Reflection 2: makin' it
 Decomposition into components
 -----------------------------
 
-![*Inter-related components that make up Oboe.js.*, showing flow from
+![**Inter-related components that make up Oboe.js.**, showing flow from
 http transport to registered callbacks. UML facet/receptacle notation is
 used to show the flow of events but a centralised event bus which
 transmits the events is omitted for clarity](images/overallDesign.png)
