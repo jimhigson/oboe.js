@@ -313,6 +313,12 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
+While certainly callback-based, the jQuery is somewhat implicit in being
+event-based. There are no event names separate from the methods which
+add the listeners and there are no event objects, preferring to pass the
+content directly. The names used to add the events (done, fail) are also
+generic, used for any asynchronous requests which may fail.
+
 By method overloading, if the request requires more information than the
 parameter to `jQuery.ajax` may be an object. This pattern of accepting
 function parameters as an object is a common in Javascript for functions
@@ -330,10 +336,6 @@ jQuery.ajax({ url:"resources/shortMessage.txt",
 
 Taking on this style,
 
-jQuery has two ways to specify. Gets around problem having too many
-arguments that might be missed out in different combinations depending
-on the order. Puts behind .ajax, but I don't have to.
-
 ~~~~ {.javascript}
 oboe('resources/someJson.json')
    .node( 'person.name', function(name) {
@@ -344,28 +346,44 @@ oboe('resources/someJson.json')
    });
 ~~~~
 
+http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener
+
+In node.js the code style is more obviously event-based. Listeners are
+added via a \`.on' method with a string event name given as the first
+argument. Adopting this style, my API design for oboe.js also allows
+events to be added as:
+
 ~~~~ {.javascript}
 oboe('resources/someJson.json')
-   .on( 'node', 'person.name', function(){
+   .on( 'node', 'person.name', function() {
    });
 ~~~~
 
-In implementation a duplicative API should require only a minimal degree
-of extra coding because these parts may be expressed in common and their
-scope reduced using partial completion. Because `'!'` is the jsonPath
-for the root of the document, for some callback c, `.done(c)` is a
-synonym for `.node('!', c)` and therefore below a thin interface layer
-may share an implementation. Likewise, `.node` is easily expressible as
-`.on` with the first parameter completed as `'node'`.
+While allowing both styles uncountably creates an API which is larger
+than it needs to be, creating a library which is targeted at both the
+client and server side, I hope this will help adoption by either camp.
+The Two styles are similar enough that a person familiar with one should
+be able to pick up the other without difficulty. In implementation a
+duplicative API should require only a minimal degree of extra coding
+because these parts may be expressed in common and their scope reduced
+using partial completion. Because `'!'` is the jsonPath for the root of
+the document, for some callback c, `.done(c)` is a synonym for
+`.node('!', c)` and therefore below a thin interface layer may share an
+implementation. Likewise, `.node` is easily expressible as a partial
+completion of `.on` with `'node'`.
 
-Also, node style: events added via .on. jQuery only targets client-side
-but I need code to be familar to node or client-side programmers.
+Early callbacks for paths
+-------------------------
 
-http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener
+
 
 Detecting Paths, not just nodes. Sometimes gives callback even earlier.
 
+### root
+
 Ability to get the root at any time by doing this.root();
+
+### errors
 
 Errors
 
