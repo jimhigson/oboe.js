@@ -362,17 +362,17 @@ matters. Consider this JSON:
       "bronze":   {"name": 'Gatlin',  "time": "9.79s"}
    }
 }  
-~~~~ 
+~~~~
 
-Here we can extract the runners by the patterns such as
-`{name time}` or `medalWinners.*` but clearly the location of the
-node in the document is interesting as well as the context. The `path`
-parameter provides this information by way of an array of strings
-plotting the descent from the JSON root to the match, for example
-`['medalWinners', 'gold']`. Similarly, the `ancestors` array is a list
-of the ancestors starting at the immediate parent of the found node and
-ending with the JSON root node. For all but the root node (which has no
-ancestors anyway) the nodes in this list will be only partially parsed.
+Here we can extract the runners by the patterns such as `{name time}` or
+`medalWinners.*` but clearly the location of the node in the document is
+interesting as well as the context. The `path` parameter provides this
+information by way of an array of strings plotting the descent from the
+JSON root to the match, for example `['medalWinners', 'gold']`.
+Similarly, the `ancestors` array is a list of the ancestors starting at
+the immediate parent of the found node and ending with the JSON root
+node. For all but the root node (which has no ancestors anyway) the
+nodes in this list will be only partially parsed.
 
 For the widest context currently available, the whole document as it has
 been parsed so far may be accessed using the `.root` method. Since
@@ -380,16 +380,17 @@ been parsed so far may be accessed using the `.root` method. Since
 per-say, it can be accessed from any code with a reference to the oboe
 object.
 
-http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener
+`http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener`
 
 In node.js the code style is more obviously event-based. Listeners are
-added via a \`.on' method with a string event name given as the first
+added via a `.on` method with a string event name given as the first
 argument. Adopting this style, my API design for oboe.js also allows
 events to be added as:
 
 ~~~~ {.javascript}
 oboe('resources/someJson.json')
-   .on( 'node', 'person.name', function() {
+   .on( 'node', 'medalWinners.*', function(person, path, ancestors) {
+      console.log( person.name + ' won the ' + lastOf(path) + ' medal' );
    });
 ~~~~
 
@@ -406,29 +407,37 @@ the document, for some callback c, `.done(c)` is a synonym for
 implementation. Likewise, `.node` is easily expressible as a partial
 completion of `.on` with `'node'`.
 
-Early callbacks for paths
+Earlier callbacks for paths
 -------------------------
 
-In line with the project's aim of giving callbacks as early as possible,
-sometimes useful work can be done as soon as a node is known to exist
-before we actually know what the contents of the node are. This means
+Following with the project's aim of giving callbacks as early as possible,
+sometimes useful work can be done when a node is known to exist
+but before we have the contents of the node. This means
 that each node found in a JSON document has the potential to trigger
 notifications at two points: when it is first discovered and when it is
-complete. The API can easily allow this by providing a .node
-
-In implementation this should add little extra complication to the code,
-it is simply a matter of allowing the evaluation of the json path
-expressions when items are added to the stack of current nodes in
-addition to when they are removed.
+complete. The API facilitates this by providing a `path` callback
+following much the same pattern as the `node` callback. 
 
 ~~~~ {.javascript}
-oboe('sourceCodeControl/repositoryGraph.json')
-   .on( 'path', 'branch', function() {
-      
+oboe('events.json')
+   .path( 'medalWinners', function() {
+      // We don't know the winners yet but we know we have some so let's
+      // start drawing the table already:    
+      interface.showMedalTable();
+   })
+   .node( 'medalWinners.*', function(person, path) {    
+      interface.addPersonToMedalTable(person, lastOf(path));
+   })
+   .fail( function(){
+      // That didn't work. Revert!
+      interface.hideMedalTable();
    });
 ~~~~
 
-Detecting Paths, not just nodes. Sometimes gives callback even earlier.
+In implementation providing path notifications is a simple matter 
+of allowing the evaluation of the json path expressions when 
+items are added to the stack of current nodes in addition to 
+when they are removed.
 
 ### root
 
