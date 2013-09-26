@@ -282,6 +282,8 @@ done with existing tools such as JSON SAX parsers but that those tools
 are not used because they require too much effort to form a part of most
 developers' everyday toolkit.
 
+Expose single global.
+
 To pursue good ergonomics, I will study successful libraries and, where
 appropriate, copy their APIs. We may assume that the existing libraries
 have already over time come to refined solutions to similar problems.
@@ -328,12 +330,13 @@ jQuery.ajax({ url:"resources/shortMessage.txt",
            });
 ~~~~
 
+Taking on this style, 
+
 jQuery has two ways to specify. Gets around problem having too many
 arguments that might be missed out in different combinations depending
 on the order. Puts behind .ajax, but I don't have to.
 
 ~~~~ {.javascript}
-
 oboe('resources/someJson.json')
    .node( 'person.name', function(name) {
       console.log("got a name " + name);   
@@ -341,14 +344,22 @@ oboe('resources/someJson.json')
    .done( function( wholeJson ) {
       console.log('got everything');
    });
-   
+~~~~
+
+
+
+~~~~ {.javascript}   
 oboe('resources/someJson.json')
    .on( 'node', 'person.name', function(){
    });
 ~~~~
 
-Because `'!'` is the jsonPath for the root of the document, given some
-callback c, `.done(c)` is a synonym for `.node('!', c)`.
+In implementation a duplicative API should require only a minimal degree of extra coding because
+these parts may be expressed in common and their scope reduced using partial completion.
+Because `'!'` is the jsonPath for the root of the document, for some
+callback c, `.done(c)` is a synonym for `.node('!', c)` and therefore below a thin interface
+layer may share an implementation. Likewise, `.node` is easily expressable as `.on` with the
+first parameter completed as `'node'`.
 
 Also, node style: events added via .on. jQuery only targets client-side
 but I need code to be familar to node or client-side programmers.
