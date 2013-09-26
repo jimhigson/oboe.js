@@ -355,7 +355,7 @@ of extra coding because these parts may be expressed in common and their
 scope reduced using partial completion. Because `'!'` is the jsonPath
 for the root of the document, for some callback c, `.done(c)` is a
 synonym for `.node('!', c)` and therefore below a thin interface layer
-may share an implementation. Likewise, `.node` is easily expressable as
+may share an implementation. Likewise, `.node` is easily expressible as
 `.on` with the first parameter completed as `'node'`.
 
 Also, node style: events added via .on. jQuery only targets client-side
