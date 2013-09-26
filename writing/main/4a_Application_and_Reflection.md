@@ -344,6 +344,10 @@ oboe('resources/someJson.json')
    })
    .done( function( wholeJson ) {
       console.log('got everything');
+   })
+   .error( function() {
+      console.log('actually, the download failed. Forget the' + 
+                  ' people I just told you about');
    });
 ~~~~
 
@@ -438,14 +442,6 @@ In implementation providing path notifications is a simple matter
 of allowing the evaluation of the json path expressions when 
 items are added to the stack of current nodes in addition to 
 when they are removed.
-
-### root
-
-Ability to get the root at any time by doing this.root();
-
-### errors
-
-Errors
 
 Micro-library
 -------------
