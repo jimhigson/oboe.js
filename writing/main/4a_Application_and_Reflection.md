@@ -411,8 +411,8 @@ the document, for some callback c, `.done(c)` is a synonym for
 implementation. Likewise, `.node` is easily expressible as a partial
 completion of `.on` with `'node'`.
 
-Earlier callbacks for paths
--------------------------
+Earlier callbacks when paths are matched
+----------------------------------------
 
 Following with the project's aim of giving callbacks as early as possible,
 sometimes useful work can be done when a node is known to exist
@@ -440,8 +440,8 @@ oboe('events.json')
 
 In implementation providing path notifications is a simple matter 
 of allowing the evaluation of the json path expressions when 
-items are added to the stack of current nodes in addition to 
-when they are removed.
+items are pushed to the stack of current nodes in addition to 
+when they are popped.
 
 Micro-library
 -------------
