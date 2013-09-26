@@ -294,6 +294,8 @@ over time. By imitating existing APIs we allow adoption as a series of small, ea
 steps rather than a single leap. This is especially helpful for teams wishing to adopt this project working 
 under Scrum because all tasks must be self-contained and fit within a fairly short timeframe.
 
+
+
 Compare to existing libraries such as jQuery. While inevitably
 different, the mode is same callback-based model of ajax and should be similar so far as the purpose is shared.
 Should be easy to change from old way to new way.
@@ -303,10 +305,7 @@ Why provide whole-resource callback. Can be used as a direct drop-in replacement
 jQuery has two ways to specify. Gets around problem having too many arguments that might be missed out in different
 combinations depending on the order. Puts behind .ajax, but I don't have to.
 
-Also, node style: events added via .on. jQuery only targets client-side but I need code to be familar to
-node or client-side programmers.
 
-http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener
 
 ~~~~ {.javascript}
 // fetching some content via AJAX using jQuery:
@@ -323,10 +322,14 @@ jQuery.ajax("resources/shortMessage.txt")
       
 ~~~~
 
+Because `'!'` is the jsonPath for the root of the document, given some callback c, `.done(c)` is 
+a synonym for `.node('!', c)`.
+
 ~~~~ {.javascript}
 
 oboe('resources/someJson.json')
    .node( 'person.name', function(name) {
+      console.log("got a name " + name);   
    })
    .done( function( wholeJson ) {
       console.log('got everything');
@@ -338,9 +341,17 @@ oboe('resources/someJson.json')
 
 ~~~~
 
+Also, node style: events added via .on. jQuery only targets client-side but I need code to be familar to
+node or client-side programmers.
+
+http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener
+
+
 Detecting Paths, not just nodes. Sometimes gives callback even earlier.
 
 Ability to get the root at any time by doing this.root();
+
+Errors
 
 
 Micro-library
