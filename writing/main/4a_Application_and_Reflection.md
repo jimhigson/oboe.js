@@ -282,50 +282,53 @@ done with existing tools such as JSON SAX parsers but that those tools
 are not used because they require too much effort to form a part of most
 developers' everyday toolkit.
 
-To pursue good ergonomics, successful libraries should be adopted and,
-where appropriate copied. This brings dual benefits. Working in a style
-similar to existing libraries makes the library easier to learn but
-there is also a benefit where, if we create a library which functions
-similarly enough to existing tools, it should be easy to modify an
+To pursue good ergonomics, I will study successful libraries and, where
+appropriate, copy their APIs. We may assume that the existing libraries
+have already over time come to refined solutions to similar problems.
+Working in a style similar to existing libraries also makes the library
+easier to learn. Lastly, if we create a library which functions
+similarly enough to existing tools it should be easy to modify an
 existing project to adopt it. In the most common use cases, it should be
-possible to create a library that works as a direct drop-in replacement.
-Used in this way, no progressive loading would be done but it opens the
-door for the project taking up the library to be refactored towards a
-progressive model over time. By imitating existing APIs we allow
-adoption as a series of small, easily manageable steps rather than a
-single leap. This is especially helpful for teams wishing to adopt this
-project working under Scrum because all tasks must be self-contained and
-fit within a fairly short timeframe.
+possible to create a library with a close functional equivalence that
+can be used as a direct drop-in replacement. Used in this way, no
+progressive loading would be done but it opens the door for the project
+taking up the library to be refactored towards a progressive model over
+time. By imitating existing APIs we allow adoption as a series of small,
+easily manageable steps rather than a single leap. This is especially
+helpful for teams wishing to adopt this project working under Scrum
+because all tasks must be self-contained and fit within a fairly short
+timeframe.
 
-Compare to existing libraries such as jQuery. While inevitably
-different, the mode is same callback-based model of ajax and should be
-similar so far as the purpose is shared. Should be easy to change from
-old way to new way.
-
-Why provide whole-resource callback. Can be used as a direct drop-in
-replacement for incremental adoption.
-
-jQuery has two ways to specify. Gets around problem having too many
-arguments that might be missed out in different combinations depending
-on the order. Puts behind .ajax, but I don't have to.
+jQuery's basic call style for making an AJAX GET request follows:
 
 ~~~~ {.javascript}
-// fetching some content via AJAX using jQuery:
-
 jQuery.ajax("resources/shortMessage.txt")
-   .done(function( data ) {
+   .done(function( text ) {
    
-      console.log( 'I got your message ' + data ); 
+      console.log( 'Got the text: ' + text ); 
    }).
    .fail(function(data) {
 
       console.log( 'the request failed' );      
    });
-      
 ~~~~
 
-Because `'!'` is the jsonPath for the root of the document, given some
-callback c, `.done(c)` is a synonym for `.node('!', c)`.
+By method overloading, if the request requires more information than
+just a URL the first parameter may be an object:
+
+~~~~ {.javascript}
+jQuery.ajax({ url:"resources/shortMessage.txt",
+              accepts: "text/plain",
+              headers: { 'X-MY-COOKIE': '123ABC' }
+           });
+~~~~
+
+Giving function parameters as an object is a common pattern in
+Javascript for functions with a large number of optional arguments.
+
+jQuery has two ways to specify. Gets around problem having too many
+arguments that might be missed out in different combinations depending
+on the order. Puts behind .ajax, but I don't have to.
 
 ~~~~ {.javascript}
 
@@ -341,6 +344,9 @@ oboe('resources/someJson.json')
    .on( 'node', 'person.name', function(){
    });
 ~~~~
+
+Because `'!'` is the jsonPath for the root of the document, given some
+callback c, `.done(c)` is a synonym for `.node('!', c)`.
 
 Also, node style: events added via .on. jQuery only targets client-side
 but I need code to be familar to node or client-side programmers.
