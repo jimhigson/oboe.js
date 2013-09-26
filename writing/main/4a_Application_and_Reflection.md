@@ -268,10 +268,15 @@ why jsonpath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-Incorporating existing libraries
---------------------------------
-
-Oboe name in tribute to work already done in Clarinet project.
+Parsing the JSON
+----------------
+  
+While SAX parsers provide an unfriendly interface to application developers,
+as a starting point for higher-level parsers they work very well (in fact,
+most XML DOM parsers are made in this way). The pre-existing project
+Clarinet is well tested, liberally licenced and compact, meeting the goals
+of this project perfectly. In fact, the name of this project, Oboe.js,
+was chosen in tribute to the value delivered by Clarinet.
 
 API design
 ----------
@@ -312,6 +317,11 @@ jQuery.ajax("resources/shortMessage.txt")
       console.log( 'the request failed' );      
    });
 ~~~~
+
+While for simple web applications usage is much as above,  
+In real world usage on more complex apps jQuery.ajax is often injected 
+into the scope of the code which wants to use it. Easier stubbing so that tests
+don't have to make actual AJAX calls.
 
 While certainly callback-based, the jQuery is somewhat implicit in being
 event-based. There are no event names separate from the methods which
@@ -467,31 +477,41 @@ popped.
 Micro-library
 -------------
 
-5120 bytes.
+Http traffic, especially sending entropy-sparse text formats is often gzipped 
+at point of sending in order to deliver it more quickly, so in measuring a
+download footprint it usually makes more sense to compare post-gzipping.
+A Javascript library qualifies as being *micro* if it is delivered in 5k or less,
+5120 bytes. Micro-libraries also tend to follow the ethos that it is better for a 
+developer to gather together several tiny libraries than one that uses a 
+one-size-fits-all approach. This perhaps echos the unix command line
+tradition of small programs which each do do exactly one thing.   
+This project feels on the edge of what is possible to elegantly do as a 
+micro-library so while the limit is somewhat arbitrary, for the sake of
+adoption smaller is better and keeping below this limit whilst writing
+readable code is an interesting challenge.
 
-What a Micro-library is. What motivates the trend? This library has a
-fairly small set of functionality, it isn't a general purpose
-do-everything library like jQuery so its size will be looked at more
-critically if it is too large. Micro library is the current gold
-standard for compactness. Still, have a lot to do in not very much code.
+Link to micro-js in there somewhere
 
-This project feels on the edge of what is possible to elegantly do in
-5k, so while the limit is somewhat arbitrary, it is an interesting
-challenge.
+Responding to failures
+----------------------
 
-Handling failures
------------------
+*is this section really needed?*
 
+As discussed above in API design, errors due to the transport will cause
+a callback to be returned to the calling application.
+
+Not automatic, just inform user. Most of the time will want to perform
+some kind of rollback from optimistic locking.
+
+I did consider the option of automatially resuming failed requests.
 Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
 header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
 which can be used to request any contiguous part of a response rather
-than the whole. Common in download managers but not REST clients. This
-ability can be used to. Why not this one. Resume on a higher semantic
-level.
+than the whole. However, having examined this option I came to the conclusion
+that this approach would be brittle because it assumes two requests to the
+same URL will give exactly the same response.
 
-(not) Resume on failure at byte level but might be worked in on a future
-version. Probably unsafe since can't guarantee the 2nd time requesting a
-URL will give the same response byte-for-byte.
+A better option 
 
 Required support for older browsers
 -----------------------------------
