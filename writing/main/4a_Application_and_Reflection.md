@@ -351,10 +351,27 @@ oboe('resources/someJson.json')
    });
 ~~~~
 
-Note the path and ancestors parameters in the example above. Most of the
-time being given matching content is enough to be able to react to that
-content. However it is easy to imagine cases where a wider context
-matters. Consider this JSON:
+Because I forsee several patterns being added for most types of JSON
+documents, a shortcut format is also available for adding multiple
+patterns in a single call by using the patterns as the keys and the
+callbacks as the values in a key/value mapping:
+
+~~~~ {.javascript}
+oboe('resources/someJson.json')
+   .node({  
+      'person.name': function(personName, path, ancestors) {
+         console.log("let me tell you about " + name);
+      },
+      'person.address.town': function(townName, path, ancestors) {
+         console.log("they live in " + townName);
+      }
+   });
+~~~~
+
+Note the path and ancestors parameters in the examples above. Most of
+the time giving the callback the matching content is enough to be able
+to act but it is easy to imagine cases where a wider context matters.
+Consider this JSON:
 
 ~~~~ {.javascript}
 { 
@@ -376,7 +393,11 @@ JSON root to the match, for example `['medalWinners', 'gold']`.
 Similarly, the `ancestors` array is a list of the ancestors starting at
 the immediate parent of the found node and ending with the JSON root
 node. For all but the root node (which has no ancestors anyway) the
-nodes in this list will be only partially parsed.
+nodes in this list will be only partially parsed. Being untyped,
+Javascript does not enforce the arity of the callback. Because much of
+the time only the content itself is needed, the API design orders the
+callback parameters to take advantage of the loose typing so that a
+unary function taking only the content may be given.
 
 For the widest context currently available, the whole document as it has
 been parsed so far may be accessed using the `.root` method. Since
@@ -414,13 +435,13 @@ completion of `.on` with `'node'`.
 Earlier callbacks when paths are matched
 ----------------------------------------
 
-Following with the project's aim of giving callbacks as early as possible,
-sometimes useful work can be done when a node is known to exist
-but before we have the contents of the node. This means
-that each node found in a JSON document has the potential to trigger
-notifications at two points: when it is first discovered and when it is
-complete. The API facilitates this by providing a `path` callback
-following much the same pattern as the `node` callback. 
+Following with the project's aim of giving callbacks as early as
+possible, sometimes useful work can be done when a node is known to
+exist but before we have the contents of the node. This means that each
+node found in a JSON document has the potential to trigger notifications
+at two points: when it is first discovered and when it is complete. The
+API facilitates this by providing a `path` callback following much the
+same pattern as the `node` callback.
 
 ~~~~ {.javascript}
 oboe('events.json')
@@ -438,10 +459,10 @@ oboe('events.json')
    });
 ~~~~
 
-In implementation providing path notifications is a simple matter 
-of allowing the evaluation of the json path expressions when 
-items are pushed to the stack of current nodes in addition to 
-when they are popped.
+In implementation providing path notifications is a simple matter of
+allowing the evaluation of the json path expressions when items are
+pushed to the stack of current nodes in addition to when they are
+popped.
 
 Micro-library
 -------------
