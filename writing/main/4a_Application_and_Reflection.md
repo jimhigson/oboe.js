@@ -313,13 +313,13 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
-By method overloading, if the request requires more information than
-just a URL the first parameter may be an object. This pattern of giving
+By method overloading, if the request requires more information than the
+parameter to `jQuery.ajax` may be an object. This pattern of accepting
 function parameters as an object is a common in Javascript for functions
 that take a large number of optional arguments because it makes
 understanding the purpose of each argument easier to understand from the
-call side than if the meaning depended on the position in a linear
-arguments list.
+callsite than if the meaning depended on the position in a linear
+arguments list and the gaps filled in with nulls.
 
 ~~~~ {.javascript}
 jQuery.ajax({ url:"resources/shortMessage.txt",
