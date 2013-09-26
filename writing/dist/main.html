@@ -1557,6 +1557,39 @@ analysis* =-->
 
   <p>From old writing we have:</p>
 
+  <p><em>CSS4-style capturing. Reshuffle 'root' syntax to
+  accommodate ! and $.</em></p>
+
+  <p>To extend JsonPath to support a concise expression of duck
+  typing, I chose a syntax which is similar to fields in
+  jsonFormat:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">
+<span class=
+"co">// the curly braces are my extension to jsonpath"</span>
+<span class="kw">var</span> jsonPath = <span class=
+"fu">jsonPathCompiler</span>(<span class=
+"st">"{name address email}"</span>);
+
+<span class=
+"co">// the above jsonPath expression would match this object in json </span>
+<span class=
+"co">// expression and like all json path expressions the pattern is </span>
+<span class=
+"co">// quite similar to the object that it matches. The object below </span>
+<span class=
+"co">// matches because it contains all the fields listed</span>
+<span class=
+"co">// in between the curly braces in the above json path expresson.</span>
+
+<span class="kw">var</span> matchingObject = {
+   <span class="st">"name"</span>: <span class="st">"..."</span>,
+   <span class="st">"address"</span>: <span class=
+"st">"..."</span>,
+   <span class="st">"email"</span>: <span class="st">"...:</span>
+}</code>
+</pre>
+
   <p>Xml comes with a strong concept of the <em>type</em> of an
   element, the tag name is taken as a more immediate fundamental
   property of the thing than the attributes. For example, in
@@ -1646,29 +1679,207 @@ analysis* =-->
   <h2 id="api-design"><a href="#api-design"><span class=
   "header-section-number">4.5</span> API design</a></h2>
 
-  <p>Compare to existing libraries such as jQuery. While inevitably
-  different, should be similar so far as the purpose is shared.
-  Should be easy to change from old way to new way.</p>
+  <p>In designing the API developer ergonomics are the top
+  priority. This is especially pertinent given that the library
+  does nothing that can't be done with existing tools such as JSON
+  SAX parsers but that those tools are not used because they
+  require too much effort to form a part of most developers'
+  everyday toolkit.</p>
 
-  <p>Why provide whole-resource callback.</p>
+  <p>Expose single global.</p>
+
+  <p>To pursue good ergonomics, I will study successful libraries
+  and, where appropriate, copy their APIs. We may assume that the
+  existing libraries have already over time come to refined
+  solutions to similar problems. Working in a style similar to
+  existing libraries also makes the library easier to learn.
+  Lastly, if we create a library which functions similarly enough
+  to existing tools it should be easy to modify an existing project
+  to adopt it. In the most common use cases, it should be possible
+  to create a library with a close functional equivalence that can
+  be used as a direct drop-in replacement. Used in this way, no
+  progressive loading would be done but it opens the door for the
+  project taking up the library to be refactored towards a
+  progressive model over time. By imitating existing APIs we allow
+  adoption as a series of small, easily manageable steps rather
+  than a single leap. This is especially helpful for teams wishing
+  to adopt this project working under Scrum because all tasks must
+  be self-contained and fit within a fairly short timeframe.</p>
+
+  <p>jQuery's basic call style for making an AJAX GET request
+  follows:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
-"co">// some ajaxing using jQuery</span></code>
+"ot">jQuery</span>.<span class="fu">ajax</span>(<span class=
+"st">"resources/shortMessage.txt"</span>)
+   .<span class="fu">done</span>(<span class=
+"kw">function</span>( text ) {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>( <span class=
+"st">'Got the text: '</span> + text ); 
+   }).
+   .<span class="fu">fail</span>(<span class=
+"kw">function</span>(data) {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>( <span class=
+"st">'the request failed'</span> );      
+   });</code>
 </pre>
+
+  <p>While certainly callback-based, the jQuery is somewhat
+  implicit in being event-based. There are no event names separate
+  from the methods which add the listeners and there are no event
+  objects, preferring to pass the content directly. The names used
+  to add the events (done, fail) are also generic, used for all
+  asynchronous requests. The methods are chainable which allows
+  several listeners to be added in one statement.</p>
+
+  <p>By method overloading, if the request requires more
+  information than the parameter to <code>jQuery.ajax</code> may be
+  an object. This pattern of accepting function parameters as an
+  object is a common in Javascript for functions that take a large
+  number of optional arguments because it makes understanding the
+  purpose of each argument easier to understand from the callsite
+  than if the meaning depended on the position in a linear
+  arguments list and the gaps filled in with nulls.</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
-"co">// this API</span>
+"ot">jQuery</span>.<span class="fu">ajax</span>({ <span class=
+"dt">url</span>:<span class=
+"st">"resources/shortMessage.txt"</span>,
+              <span class="dt">accepts</span>: <span class=
+"st">"text/plain"</span>,
+              <span class="dt">headers</span>: { <span class=
+"st">'X-MY-COOKIE'</span>: <span class="st">'123ABC'</span> }
+           });</code>
+</pre>
 
-<span class="fu">oboe</span>(<span class="st">'url'</span>);</code>
+  <p>Taking on this style,</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">oboe</span>(<span class="st">'resources/someJson.json'</span>)
+   .<span class="fu">node</span>( <span class=
+"st">'person.name'</span>, <span class=
+"kw">function</span>(name, path, ancestors) {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class="st">"got a name "</span> + name);   
+   })
+   .<span class="fu">done</span>( <span class=
+"kw">function</span>( wholeJson ) {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class="st">'got everything'</span>);
+   });</code>
+</pre>
+
+  <p>Note the path and ancestors parameters in the example above.
+  Most of the time being given matching content is enough to be
+  able to react to that content. However it is easy to imagine
+  cases where a wider context matters. Consider this JSON:</p>
+  <pre>
+<code>{ 
+   event: "100m sprint",
+   date: "",
+   "medalWinners": {
+      "gold":     {"name": 'Usain Bolt', "nationality":""},
+      "silver":   {"name": '', "nationality":""},
+      "bronze":   {"name": '', "nationality":""}
+   }
+}   </code>
+</pre>
+
+  <p>Here we can extract the runners by the patterns such as
+  <code>{name nationality}</code> or <code>medalWinners.*</code>
+  but clearly the location of the node in the document is
+  interesting as well as the context. The <code>path</code>
+  parameter provides this information by way of an array of strings
+  plotting the descent from the JSON root to the match, for example
+  <code>['medalWinners', 'gold']</code>. Similarly, the
+  <code>ancestors</code> array is a list of the ancestors starting
+  at the immediate parent of the found node and ending with the
+  JSON root node. For all but the root node (which has no ancestors
+  anyway) the nodes in this list will be only partially parsed.</p>
+
+  <p>For the widest context currently available, the whole document
+  as it has been parsed so far may be accessed using the
+  <code>.root</code> method. Since <code>.root</code> relates to
+  the oboe instance itself rather than the callback per-say, it can
+  be accessed from any code with a reference to the oboe
+  object.</p>
+
+  <p><a href=
+  "http://nodejs.org/docs/latest/api/events.html">http://nodejs.org/docs/latest/api/events.html</a>#events_emitter_on_event_listener</p>
+
+  <p>In node.js the code style is more obviously event-based.
+  Listeners are added via a `.on' method with a string event name
+  given as the first argument. Adopting this style, my API design
+  for oboe.js also allows events to be added as:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">oboe</span>(<span class="st">'resources/someJson.json'</span>)
+   .<span class="fu">on</span>( <span class=
+"st">'node'</span>, <span class=
+"st">'person.name'</span>, <span class="kw">function</span>() {
+   });</code>
+</pre>
+
+  <p>While allowing both styles uncountably creates an API which is
+  larger than it needs to be, creating a library which is targeted
+  at both the client and server side, I hope this will help
+  adoption by either camp. The Two styles are similar enough that a
+  person familiar with one should be able to pick up the other
+  without difficulty. In implementation a duplicative API should
+  require only a minimal degree of extra coding because these parts
+  may be expressed in common and their scope reduced using partial
+  completion. Because <code>'!'</code> is the jsonPath for the root
+  of the document, for some callback c, <code>.done(c)</code> is a
+  synonym for <code>.node('!', c)</code> and therefore below a thin
+  interface layer may share an implementation. Likewise,
+  <code>.node</code> is easily expressible as a partial completion
+  of <code>.on</code> with <code>'node'</code>.</p>
+
+  <h2 id="early-callbacks-for-paths"><a href=
+  "#early-callbacks-for-paths"><span class=
+  "header-section-number">4.6</span> Early callbacks for
+  paths</a></h2>
+
+  <p>In line with the project's aim of giving callbacks as early as
+  possible, sometimes useful work can be done as soon as a node is
+  known to exist before we actually know what the contents of the
+  node are. This means that each node found in a JSON document has
+  the potential to trigger notifications at two points: when it is
+  first discovered and when it is complete. The API can easily
+  allow this by providing a .node</p>
+
+  <p>In implementation this should add little extra complication to
+  the code, it is simply a matter of allowing the evaluation of the
+  json path expressions when items are added to the stack of
+  current nodes in addition to when they are removed.</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">oboe</span>(<span class=
+"st">'sourceCode/repositoryGraph.json'</span>)
+   .<span class="fu">on</span>( <span class=
+"st">'path'</span>, <span class="st">'branch'</span>, <span class=
+"kw">function</span>() {
+      
+   });</code>
 </pre>
 
   <p>Detecting Paths, not just nodes. Sometimes gives callback even
   earlier.</p>
 
+  <h3 id="root"><a href="#root"><span class=
+  "header-section-number">4.6.1</span> root</a></h3>
+
   <p>Ability to get the root at any time by doing this.root();</p>
 
+  <h3 id="errors"><a href="#errors"><span class=
+  "header-section-number">4.6.2</span> errors</a></h3>
+
+  <p>Errors</p>
+
   <h2 id="micro-library"><a href="#micro-library"><span class=
-  "header-section-number">4.6</span> Micro-library</a></h2>
+  "header-section-number">4.7</span> Micro-library</a></h2>
 
   <p>5120 bytes.</p>
 
@@ -1685,7 +1896,7 @@ analysis* =-->
 
   <h2 id="handling-failures"><a href=
   "#handling-failures"><span class=
-  "header-section-number">4.7</span> Handling failures</a></h2>
+  "header-section-number">4.8</span> Handling failures</a></h2>
 
   <p>Http 1.1 provides a mechanism for Byte Serving via the
   Accepts-Ranges header [<a href=
@@ -1702,7 +1913,7 @@ analysis* =-->
 
   <h2 id="required-support-for-older-browsers"><a href=
   "#required-support-for-older-browsers"><span class=
-  "header-section-number">4.8</span> Required support for older
+  "header-section-number">4.9</span> Required support for older
   browsers</a></h2>
 
   <p>Aims not possible to realise but don't want to make devs using
@@ -1742,13 +1953,18 @@ analysis* =-->
   "header-section-number">5.1</span> Decomposition into
   components</a></h2>
 
-  <p>Split up concerns etc</p>
+  <div class="figure">
+    <img src="images/overallDesign.png" alt=
+    "Inter-related components that make up Oboe.js showing flow from http transport to registered callbacks. UML facet/receptacle notation is used to show the flow of events but a centralised event bus which transmits the events is omitted for clarity">
 
-  <p>Local event bus Why? Makes testing easy (just put appropriate
-  event on the bus rather than trying to fake calls from linked
-  stubs). Decouples, avoids parts having to locate or be passed
-  other parts. Wouldn't scale indefinately, does provide something
-  of a mingled-purpose space.</p>
+    <p class="caption"><strong>Inter-related components that make
+    up Oboe.js</strong> showing flow from http transport to
+    registered callbacks. UML facet/receptacle notation is used to
+    show the flow of events but a centralised event bus which
+    transmits the events is omitted for clarity</p>
+  </div>
+
+  <p>Split up concerns etc</p>
 
   <p>Controller</p>
 
@@ -1763,18 +1979,11 @@ analysis* =-->
   <p>Content builder: like a decorator/wrapper but event based, not
   based on object wrapping.</p>
 
-  <div class="figure">
-    <img src="images/overallDesign.png" alt=
-    "Inter-related components making up Oboe.js. Those UML notations are called facets and receptacles">
-
-    <p class="caption"><em>Inter-related components making up
-    Oboe.js.</em> Those UML notations are called facets and
-    receptacles</p>
-  </div>
-
-  <h2 id="inversion-of-control"><a href=
-  "#inversion-of-control"><span class=
-  "header-section-number">5.2</span> Inversion of Control</a></h2>
+  <h2 id="inversion-of-control-and-communication-between-parts">
+  <a href=
+  "#inversion-of-control-and-communication-between-parts"><span class="header-section-number">
+  5.2</span> Inversion of Control and communication between
+  parts</a></h2>
 
   <p>Aim of creating a micro-library rules out building in a
   general-purpose IoC library.</p>
@@ -1789,6 +1998,14 @@ analysis* =-->
   based, once wired up little intervention is needed from the
   controller. Ie, A knows how to listen for ??? events but is
   unintested who fired them.</p>
+
+  <p>Local event bus Why? Makes testing easy (just put appropriate
+  event on the bus rather than trying to fake calls from linked
+  stubs). Decouples, avoids parts having to locate or be passed
+  other parts. Wouldn't scale indefinately, does provide something
+  of a mingled-purpose space. Why not more direct event passing
+  without a separate event bus (ie, everything as an emitter and
+  reciever of events?)</p>
 
   <h2 id="grunt"><a href="#grunt"><span class=
   "header-section-number">5.3</span> Grunt</a></h2>
@@ -2144,8 +2361,8 @@ analysis* =-->
 
   <p>Functions can be like Factories, gives me the flexability to
   chagne how something is created but by exposing a constructor are
-  stuck with using 'new' to create an instance of exactly one
-  type.</p>
+  stuck with using 'new' to create an instance of exactly one type.
+  'new' is inconsistent invocation with rest of language.</p>
 
   <p>Dart has 'factory' constructors which are called like
   constructors but act like factory functions: (<a href=
@@ -2153,13 +2370,61 @@ analysis* =-->
 
   <h2 id="design-and-implementation-of-the-jsonpath-parser">
   <a href="#design-and-implementation-of-the-jsonpath-parser"><span class="header-section-number">
-  5.9</span> Design and implementation of the jsonpath
+  5.9</span> Design and implementation of the JSONPath
   parser</a></h2>
 
-  <p>Show evolution of it</p>
+  <p>Show evolution of it. Like most compilers, first try was just
+  a bunch of regexes that generated a regex to match the pattern.
+  While compact, was unmaintainable. Moved onto functional,
+  stateless Javascript. Lots of refactoring possible because very
+  comprehensively tested.</p>
+
+  <p>Split into tokens and statement builder.</p>
 
   <p>NB: This consideration of type in json could be in the
   Background section.</p>
+
+  <p>Clause functions, each passes onto the next function if it
+  passes. Functions to consume. Can apply more than one test to a
+  single node. Tests generated by clause functions may be against
+  either the immediate path to that node (name clauses) or the node
+  itself (duck-type clauses). For example, the jsonPath
+  <code>!.$person..{height tShirtSize}</code> may be expressed
+  functionally in Javascript as such:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"kw">var</span> jsonPathEvaluator =
+   <span class="fu">statementExpr</span>( 
+      <span class="fu">duckTypeClause</span>(
+         <span class=
+"fu">skipMany</span>(                                <span class=
+"co">// for '..'  </span>
+            <span class=
+"fu">capture</span>(                              <span class=
+"co">// for css4-style '$' notation</span>
+               <span class="fu">nameClause</span>(
+                  <span class=
+"fu">skip1</span>(                          <span class=
+"co">// '.' after '!'  </span>
+                     rootExpr                     <span class=
+"co">// '!' at start of JSONPath expression</span>
+                  ) 
+               <span class="st">'person'</span> )
+            )
+      ), [<span class="st">'height'</span>, <span class=
+"st">'tShirtSize'</span>])
+   );      </code>
+</pre>
+
+  <p>The above is actually a slight simplification because calls to
+  partialComplete are implied. Once this evaluator function has
+  been created, testing against a candidate ascent is simply
+  function invocation:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"kw">var</span> result = <span class=
+"fu">jsonPathEvaluator</span>(ascent);</code>
+</pre>
 
   <p>Why done as a function returning a function (many calls per
   pattern - one for each node found to check for matches).</p>
@@ -2186,37 +2451,6 @@ analysis* =-->
   spec.</p>
 
   <p>Compare duck typing to the tag name in</p>
-
-  <p>To extend JsonPath to support a concise expression of duck
-  typing, I chose a syntax which is similar to fields in
-  jsonFormat:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
-<span class=
-"co">// the curly braces are my extension to jsonpath"</span>
-<span class="kw">let</span> jsonPath = <span class=
-"fu">jsonPathCompiler</span>(<span class=
-"st">"{name, address, email}"</span>);
-
-<span class=
-"co">// the above jsonPath expression would match this object in json expression and </span>
-<span class=
-"co">// like all json path expressions the pattern is quite similar to the object that</span>
-<span class=
-"co">// it matches. The object below matches because it contains all the fields listed</span>
-<span class=
-"co">// in between the curly braces in the above json path expresson.</span>
-
-<span class="kw">let</span> matchingObject = {
-   <span class="st">"name"</span>: <span class="st">"..."</span>,
-   <span class="st">"address"</span>: <span class=
-"st">"..."</span>,
-   <span class="st">"email"</span>: <span class="st">"...:</span>
-}
-
-<span class="fu">jsonPath</span>(matchingObject); <span class=
-"co">// evaluates to true</span></code>
-</pre>
 
   <p>Explain why Haskel/lisp style lists are used rather than
   arrays</p>
@@ -2330,15 +2564,6 @@ analysis* =-->
   languages generally do not forbid it) No Side effects: can type
   expressions into debugger to see evaluation without risk of
   changing program execution.</p>
-
-  <div class="figure">
-    <img src="images/overallDesign.png" alt=
-    "Overall design of Oboe.js. Nodes in the diagram represent division of control so far that it has been split into different files.">
-
-    <p class="caption">Overall design of Oboe.js. Nodes in the
-    diagram represent division of control so far that it has been
-    split into different files.</p>
-  </div>
 
   <p>A refactoring was used to separate logic and state:</p>
 

@@ -317,7 +317,8 @@ While certainly callback-based, the jQuery is somewhat implicit in being
 event-based. There are no event names separate from the methods which
 add the listeners and there are no event objects, preferring to pass the
 content directly. The names used to add the events (done, fail) are also
-generic, used for any asynchronous requests which may fail.
+generic, used for all asynchronous requests. The methods are chainable
+which allows several listeners to be added in one statement.
 
 By method overloading, if the request requires more information than the
 parameter to `jQuery.ajax` may be an object. This pattern of accepting
@@ -338,13 +339,44 @@ Taking on this style,
 
 ~~~~ {.javascript}
 oboe('resources/someJson.json')
-   .node( 'person.name', function(name) {
+   .node( 'person.name', function(name, path, ancestors) {
       console.log("got a name " + name);   
    })
    .done( function( wholeJson ) {
       console.log('got everything');
    });
 ~~~~
+
+Note the path and ancestors parameters in the example above. Most of the
+time being given matching content is enough to be able to react to that
+content. However it is easy to imagine cases where a wider context
+matters. Consider this JSON:
+
+    { 
+       event: "100m sprint",
+       date: "",
+       "medalWinners": {
+          "gold":     {"name": 'Usain Bolt', "nationality":""},
+          "silver":   {"name": '', "nationality":""},
+          "bronze":   {"name": '', "nationality":""}
+       }
+    }   
+
+Here we can extract the runners by the patterns such as
+`{name nationality}` or `medalWinners.*` but clearly the location of the
+node in the document is interesting as well as the context. The `path`
+parameter provides this information by way of an array of strings
+plotting the descent from the JSON root to the match, for example
+`['medalWinners', 'gold']`. Similarly, the `ancestors` array is a list
+of the ancestors starting at the immediate parent of the found node and
+ending with the JSON root node. For all but the root node (which has no
+ancestors anyway) the nodes in this list will be only partially parsed.
+
+For the widest context currently available, the whole document as it has
+been parsed so far may be accessed using the `.root` method. Since
+`.root` relates to the oboe instance itself rather than the callback
+per-say, it can be accessed from any code with a reference to the oboe
+object.
 
 http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener
 
@@ -375,7 +407,24 @@ completion of `.on` with `'node'`.
 Early callbacks for paths
 -------------------------
 
+In line with the project's aim of giving callbacks as early as possible,
+sometimes useful work can be done as soon as a node is known to exist
+before we actually know what the contents of the node are. This means
+that each node found in a JSON document has the potential to trigger
+notifications at two points: when it is first discovered and when it is
+complete. The API can easily allow this by providing a .node
 
+In implementation this should add little extra complication to the code,
+it is simply a matter of allowing the evaluation of the json path
+expressions when items are added to the stack of current nodes in
+addition to when they are removed.
+
+~~~~ {.javascript}
+oboe('sourceCode/repositoryGraph.json')
+   .on( 'path', 'branch', function() {
+      
+   });
+~~~~
 
 Detecting Paths, not just nodes. Sometimes gives callback even earlier.
 
