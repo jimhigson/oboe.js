@@ -175,12 +175,9 @@ safer.
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
-
-
-
 From old writing we have:
 
-*CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and $.*
+*CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.*
 
 To extend JsonPath to support a concise expression of duck typing, I
 chose a syntax which is similar to fields in jsonFormat:
@@ -251,7 +248,6 @@ definition of lists, lists contain only items of the same type. This
 gives way to a sister convention, that for lists of items, the key
 immediately linking to the
 
-
 Stability over upgrades
 -----------------------
 
@@ -280,32 +276,38 @@ Oboe name in tribute to work already done in Clarinet project.
 API design
 ----------
 
-In designing the API developer ergonomics are the top priority. This is especially pertinent given that 
-the library does nothing that can't be done with existing tools such as JSON SAX parsers but that those
-tools are not used because they require too much effort to form a part of most developers' everyday toolkit.  
+In designing the API developer ergonomics are the top priority. This is
+especially pertinent given that the library does nothing that can't be
+done with existing tools such as JSON SAX parsers but that those tools
+are not used because they require too much effort to form a part of most
+developers' everyday toolkit.
 
-To pursue good ergonomics, successful libraries should be adopted and, where appropriate copied.
-This brings dual benefits. Working in a style similar to existing libraries makes the library easier to learn
-but there is also a benefit where, if we create a library which functions similarly enough to existing tools,
-it should be easy to modify an existing project to adopt it. In the most common use cases, it should be possible
-to create a library that works as a direct drop-in replacement. Used in this way, no progressive loading would
-be done but it opens the door for the project taking up the library to be refactored towards a progressive model
-over time. By imitating existing APIs we allow adoption as a series of small, easily manageable
-steps rather than a single leap. This is especially helpful for teams wishing to adopt this project working 
-under Scrum because all tasks must be self-contained and fit within a fairly short timeframe.
-
-
+To pursue good ergonomics, successful libraries should be adopted and,
+where appropriate copied. This brings dual benefits. Working in a style
+similar to existing libraries makes the library easier to learn but
+there is also a benefit where, if we create a library which functions
+similarly enough to existing tools, it should be easy to modify an
+existing project to adopt it. In the most common use cases, it should be
+possible to create a library that works as a direct drop-in replacement.
+Used in this way, no progressive loading would be done but it opens the
+door for the project taking up the library to be refactored towards a
+progressive model over time. By imitating existing APIs we allow
+adoption as a series of small, easily manageable steps rather than a
+single leap. This is especially helpful for teams wishing to adopt this
+project working under Scrum because all tasks must be self-contained and
+fit within a fairly short timeframe.
 
 Compare to existing libraries such as jQuery. While inevitably
-different, the mode is same callback-based model of ajax and should be similar so far as the purpose is shared.
-Should be easy to change from old way to new way.
+different, the mode is same callback-based model of ajax and should be
+similar so far as the purpose is shared. Should be easy to change from
+old way to new way.
 
-Why provide whole-resource callback. Can be used as a direct drop-in replacement for incremental adoption.
+Why provide whole-resource callback. Can be used as a direct drop-in
+replacement for incremental adoption.
 
-jQuery has two ways to specify. Gets around problem having too many arguments that might be missed out in different
-combinations depending on the order. Puts behind .ajax, but I don't have to.
-
-
+jQuery has two ways to specify. Gets around problem having too many
+arguments that might be missed out in different combinations depending
+on the order. Puts behind .ajax, but I don't have to.
 
 ~~~~ {.javascript}
 // fetching some content via AJAX using jQuery:
@@ -322,8 +324,8 @@ jQuery.ajax("resources/shortMessage.txt")
       
 ~~~~
 
-Because `'!'` is the jsonPath for the root of the document, given some callback c, `.done(c)` is 
-a synonym for `.node('!', c)`.
+Because `'!'` is the jsonPath for the root of the document, given some
+callback c, `.done(c)` is a synonym for `.node('!', c)`.
 
 ~~~~ {.javascript}
 
@@ -338,21 +340,18 @@ oboe('resources/someJson.json')
 oboe('resources/someJson.json')
    .on( 'node', 'person.name', function(){
    });
-
 ~~~~
 
-Also, node style: events added via .on. jQuery only targets client-side but I need code to be familar to
-node or client-side programmers.
+Also, node style: events added via .on. jQuery only targets client-side
+but I need code to be familar to node or client-side programmers.
 
-http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener
-
+http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener
 
 Detecting Paths, not just nodes. Sometimes gives callback even earlier.
 
 Ability to get the root at any time by doing this.root();
 
 Errors
-
 
 Micro-library
 -------------
