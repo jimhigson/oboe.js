@@ -1775,24 +1775,32 @@ analysis* =-->
   Most of the time being given matching content is enough to be
   able to react to that content. However it is easy to imagine
   cases where a wider context matters. Consider this JSON:</p>
-  <pre>
-<code>{ 
-   event: "100m sprint",
-   date: "",
-   "medalWinners": {
-      "gold":     {"name": 'Usain Bolt', "nationality":""},
-      "silver":   {"name": '', "nationality":""},
-      "bronze":   {"name": '', "nationality":""}
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">{ 
+   <span class="st">"event"</span>: <span class=
+"st">"mens 100m"</span>,
+   <span class="st">"date"</span>: <span class=
+"st">"5 Aug 2012"</span>,
+   <span class="st">"medalWinners"</span>: {
+      <span class="st">"gold"</span>:     {<span class=
+"st">"name"</span>: <span class="st">'Bolt'</span>,    <span class=
+"st">"time"</span>: <span class="st">"9.63s"</span>},
+      <span class="st">"silver"</span>:   {<span class=
+"st">"name"</span>: <span class="st">'Blake'</span>,   <span class=
+"st">"time"</span>: <span class="st">"9.75s"</span>},
+      <span class="st">"bronze"</span>:   {<span class=
+"st">"name"</span>: <span class="st">'Gatlin'</span>,  <span class=
+"st">"time"</span>: <span class="st">"9.79s"</span>}
    }
-}   </code>
+}  </code>
 </pre>
 
   <p>Here we can extract the runners by the patterns such as
-  <code>{name nationality}</code> or <code>medalWinners.*</code>
-  but clearly the location of the node in the document is
-  interesting as well as the context. The <code>path</code>
-  parameter provides this information by way of an array of strings
-  plotting the descent from the JSON root to the match, for example
+  <code>{name time}</code> or <code>medalWinners.*</code> but
+  clearly the location of the node in the document is interesting
+  as well as the context. The <code>path</code> parameter provides
+  this information by way of an array of strings plotting the
+  descent from the JSON root to the match, for example
   <code>['medalWinners', 'gold']</code>. Similarly, the
   <code>ancestors</code> array is a list of the ancestors starting
   at the immediate parent of the found node and ending with the
@@ -1857,7 +1865,7 @@ analysis* =-->
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "fu">oboe</span>(<span class=
-"st">'sourceCode/repositoryGraph.json'</span>)
+"st">'sourceCodeControl/repositoryGraph.json'</span>)
    .<span class="fu">on</span>( <span class=
 "st">'path'</span>, <span class="st">'branch'</span>, <span class=
 "kw">function</span>() {
