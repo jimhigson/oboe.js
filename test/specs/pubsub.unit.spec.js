@@ -84,6 +84,26 @@ describe('pub sub', function(){
       expect(listenerB).toHaveBeenCalled();      
    });
    
+   it('should handle numberic event codes', function(){
+   
+      var events = pubSub(),
+          listenerA = jasmine.createSpy('listenerA'),
+          listenerB = jasmine.createSpy('listenerB');
+      
+
+      events.on(1, listenerA);
+      events.on(2, listenerB);
+      
+      events.fire(1);
+      
+      expect(listenerA).toHaveBeenCalled();
+      expect(listenerB).not.toHaveBeenCalled();
+      
+      events.fire(2);
+      
+      expect(listenerB).toHaveBeenCalled();      
+   });   
+   
    it('should not crash if asked to fire an event that has no listeners', function(){
    
       var events = pubSub();
