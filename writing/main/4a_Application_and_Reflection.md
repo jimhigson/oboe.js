@@ -306,11 +306,9 @@ jQuery's basic call style for making an AJAX GET request follows:
 ~~~~ {.javascript}
 jQuery.ajax("resources/shortMessage.txt")
    .done(function( text ) {
-   
       console.log( 'Got the text: ' + text ); 
    }).
    .fail(function(data) {
-
       console.log( 'the request failed' );      
    });
 ~~~~
@@ -330,7 +328,7 @@ jQuery.ajax({ url:"resources/shortMessage.txt",
            });
 ~~~~
 
-Taking on this style, 
+Taking on this style,
 
 jQuery has two ways to specify. Gets around problem having too many
 arguments that might be missed out in different combinations depending
@@ -346,20 +344,19 @@ oboe('resources/someJson.json')
    });
 ~~~~
 
-
-
-~~~~ {.javascript}   
+~~~~ {.javascript}
 oboe('resources/someJson.json')
    .on( 'node', 'person.name', function(){
    });
 ~~~~
 
-In implementation a duplicative API should require only a minimal degree of extra coding because
-these parts may be expressed in common and their scope reduced using partial completion.
-Because `'!'` is the jsonPath for the root of the document, for some
-callback c, `.done(c)` is a synonym for `.node('!', c)` and therefore below a thin interface
-layer may share an implementation. Likewise, `.node` is easily expressable as `.on` with the
-first parameter completed as `'node'`.
+In implementation a duplicative API should require only a minimal degree
+of extra coding because these parts may be expressed in common and their
+scope reduced using partial completion. Because `'!'` is the jsonPath
+for the root of the document, for some callback c, `.done(c)` is a
+synonym for `.node('!', c)` and therefore below a thin interface layer
+may share an implementation. Likewise, `.node` is easily expressable as
+`.on` with the first parameter completed as `'node'`.
 
 Also, node style: events added via .on. jQuery only targets client-side
 but I need code to be familar to node or client-side programmers.
