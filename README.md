@@ -454,7 +454,7 @@ It is nice to just have one, simple service for everything.
 Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
 Patches and suggestions most welcome.
 
-The project is designed in for easy testability and has [about 200 cases](/test/specs).
+The project is designed in for easy testability and has [about 250 cases](/test/specs).
 
 BSD licenced.
     
