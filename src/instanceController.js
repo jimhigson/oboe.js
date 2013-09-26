@@ -1,14 +1,15 @@
 /**
  * @param {Function} jsonRoot a function which returns the json root so far
  */
-function instanceController(fire, on, clarinetParser, contentBuilderHandlers, doneCallback) {
+function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
-      
+
+   // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
-   });                         
-  
+   });
+                              
    on(NEW_CONTENT,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
@@ -24,19 +25,13 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
       }
    );
    
-   on(END_OF_CONTENT,
-      function() {
-                                         
-         clarinetParser.close();
-         
-         doneCallback && doneCallback(rootNode);         
-      }
-   );
+   // at the end of the content close the clarinet parser. This will provide an error if the
+   // total content provided was not valid json, ie if not all objects closed properly
+   on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
    
-   /**
-    * If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
-    * being found after we abort in the case where we aborted while reading though an already filled buffer.
-    */
+
+   // If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
+   // being found after we abort in the case where we aborted while reading though an already filled buffer.
    on( ABORTING, function() {
       clarinetListenerAdaptor(clarinetParser, {});
    });   
@@ -116,8 +111,8 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
     * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
     * depending on the argument types
     */       
-   function addListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
-   
+   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+ 
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
       } else {
@@ -128,12 +123,14 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers, do
    }         
 
    return oboeApi = { 
-      onError     :  partialComplete(on, ERROR_EVENT),
-      onPath      :  partialComplete(addListenerApi, PATH_FOUND), 
-      onNode      :  partialComplete(addListenerApi, NODE_FOUND),
-      abort       :  partialComplete(fire, ABORTING),
-      root        :  function rootNodeFunctor() {
-                        return rootNode;
-                     }
+      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
+      node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
+      on    :  addNodeOrPathListenerApi,
+      fail  :  partialComplete(on, ERROR_EVENT),
+      done  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+      abort :  partialComplete(fire, ABORTING),
+      root  :  function rootNodeFunctor() {
+                  return rootNode;
+               }
    };
 }

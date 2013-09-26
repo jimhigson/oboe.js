@@ -15,16 +15,15 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          // parameters specified as arguments
          //
          //  if (mayHaveContext == true) method signature is:
-         //     .doMethod( url, content, callback )
+         //     .doMethod( url, content )
          //
          //  else it is:
-         //     .doMethod( url, callback )            
+         //     .doMethod( url )            
          //                                
          return wire(
                   httpMethodName,
                   firstArg,                                  // url
-                  mayHaveRequestBody && arguments[1],        // body
-                  arguments[mayHaveRequestBody? 2 : 1]       // callback
+                  mayHaveRequestBody && arguments[1]         // body
          );
       } else {
       
@@ -35,7 +34,6 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
                   httpMethodName,
                   firstArg.url,
                   firstArg.body,
-                  firstArg.complete,
                   firstArg.headers 
          );
       }

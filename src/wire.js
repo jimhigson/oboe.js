@@ -1,4 +1,4 @@
-function wire (httpMethodName, url, body, callback, headers){
+function wire (httpMethodName, url, body, headers){
    var eventBus = pubSub();
                
    streamingHttp(  eventBus.fire, eventBus.on,
@@ -6,5 +6,5 @@ function wire (httpMethodName, url, body, callback, headers){
                   httpMethodName, url, body, headers );                              
      
    return instanceController( eventBus.fire, eventBus.on, 
-                              clarinet.parser(), incrementalContentBuilder(eventBus.fire), callback);
+                              clarinet.parser(), incrementalContentBuilder(eventBus.fire) );
 }

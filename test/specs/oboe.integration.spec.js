@@ -80,16 +80,14 @@ describe("oboe integration (real http)", function(){
    })      
    
    it('gives full json to callback when request finishes',  function() {
-            
-      var fullResponse = null;            
+                  
+      var fullResponse = null;
+      function whenDoneFn(obj) {                              
+         fullResponse = obj;               
+      }                  
                            
-      oboe.doGet(                      
-         '/testServer/static/json/firstTenNaturalNumbers.json',
-         
-         function ajaxFinished(obj) {                              
-            fullResponse = obj;               
-         }
-      );   
+      oboe.doGet( '/testServer/static/json/firstTenNaturalNumbers.json')
+         .done(whenDoneFn);   
       
       waitsFor( function(){ return !!fullResponse }, 'the request to complete', ASYNC_TEST_TIMEOUT )
       
@@ -107,12 +105,12 @@ describe("oboe integration (real http)", function(){
             headers: {'x-snarfu':'SNARF', 'x-foo':'BAR'}
          }
 
-      ).onNode( 'x-snarfu', function( headerValue ){
+      ).node( 'x-snarfu', function( headerValue ){
        
          expect( headerValue ).toBe( 'SNARF' )
          countGotBack++;
          
-      }).onNode( 'x-foo', function( headerValue ){
+      }).node( 'x-foo', function( headerValue ){
        
          expect( headerValue ).toBe( 'BAR' )
          countGotBack++;
@@ -121,12 +119,38 @@ describe("oboe integration (real http)", function(){
       waitsFor( function(){ return countGotBack == 2 }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
    })
    
+   it('can listen for nodes via nodejs-style syntax',  function() {
+
+      var countGotBack = 0;
+
+      oboe.doGet(
+         '/testServer/static/json/firstTenNaturalNumbers.json'
+      ).on('node', '!.*', function( number ){
+         countGotBack++;          
+      });         
+      
+      waitsFor( function(){ return countGotBack == 10 }, 'ten callbacks', ASYNC_TEST_TIMEOUT )            
+   })
+   
+   it('can listen for paths via nodejs-style syntax',  function() {
+
+      var countGotBack = 0;
+
+      oboe.doGet(
+         '/testServer/static/json/firstTenNaturalNumbers.json'
+      ).on('path', '!.*', function( number ){
+         countGotBack++;          
+      });         
+      
+      waitsFor( function(){ return countGotBack == 10 }, 'ten callbacks', ASYNC_TEST_TIMEOUT )            
+   })      
+   
    it('fires error on 404',  function() {
 
       var gotError = false
 
-      oboe.doGet('/testServer/doesNotExist')
-      .onError(function(){
+      oboe('/testServer/doesNotExist'
+      ).fail(function(){
       
          gotError = true
       });

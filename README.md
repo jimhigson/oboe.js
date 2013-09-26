@@ -43,7 +43,7 @@ Say we have a resource called things.json that we need to fetch over AJAX:
       {'name':'apple',        'colour':'red'},
       {'name':'nuts',         'colour':'brown'}
    ],
-   non_foods: [
+   "nonFoods": [
       {'name':'brick',        'colour':'red'},
       {'name':'poison',       'colour':'pink'},
       {'name':'broken_glass', 'colour':'green'}
@@ -56,18 +56,16 @@ we won't wait for them to be loaded:
 
 ``` js
 oboe('/myapp/things.json')
-   .onNode('foods.*', function( foodObject ){
+   .node('foods.*', function( foodThing ){
    
       // This callback will be called everytime a new object is found in the 
       // foods array. Oboe won't wait for the download to finish first.
        
-      // Let's use jQuery to show it in the DOM:
-      
-      var newFoodElement = $('<div>')
-                              .text('it is safe to eat ' + foodObject.name)
-                              .css('color', foodObject.colour)
-                                    
-      $('#foods').append(newFoodElement);
+      console.log( foodThing.name + ' is ' + foodThing.colour );
+   })
+   .done( function(things){
+      console.log( 'there are ' + things.foods.length + ' things you can eat ' +
+                   'and ' + things.nonFoods.length + ' that you shouldn\'t.' ); 
    });
 ```
 
@@ -79,7 +77,7 @@ download footprint.
 
 ``` js
 oboe('/myapp/things.json')
-   .onNode({
+   .node({
       'foods.*': function( foodObject ){
    
          alert('go ahead and eat some ' + foodObject.name);
@@ -96,11 +94,11 @@ Want to detect strings or numbers instead of objects? Oboe doesn't care about th
 types in the json so the syntax is the same:
 
 ``` js
-   oboeInstance.onNode({
+   oboeInstance.node({
       'name': function( name ){
-         jQuery('ul#names').append( $('<li>').text(name) );
+         // do something with the name
       },
-      'friendCount':function( numberOfFriends ){
+      'friends.*.name':function( friendsName ){
          // etc etc
       });
 ```
@@ -112,7 +110,7 @@ Sometimes it is more useful to say *what you are trying to find* than *where you
  
 
 ``` js
-   oboeInstance.onNode('{name colour}', function( foodObject ) {   
+   oboeInstance.node('{name colour}', function( foodObject ) {   
       // I'll get called for every object found that 
       // has both a name and a colour   
    };
@@ -121,21 +119,21 @@ Sometimes it is more useful to say *what you are trying to find* than *where you
 
 ## Reacting before we get the whole object
 
-As well as ```.onNode```, you can use ```.onPath``` to be notified when the path is first found, even though we don't yet 
+As well as ```.node```, you can use ```.path``` to be notified when the path is first found, even though we don't yet 
 know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
 page as soon as possible.
 
 ``` js
 var currentPersonElement;
 oboe('//people.json')
-   .onPath({'people.*': function(){
+   .path('people.*', function(){
       // we don't have the person's details yet but we know we found someone 
       // in the json stream. We can eagerly put their div to the page and 
       // then fill it with whatever other data we find:
       currentPersonElement = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onNode({
+   .node({
       'people.*.name': function( name ){
          // we just found out that person's name, lets add it to their div:
          currentPersonElement.append('<span class="name"> + name + </span>');
@@ -160,7 +158,7 @@ I'll assume you already implemented a spinner
 MyApp.showSpinner('#foods');
 
 oboe('/myapp/things.json')
-   .onNode({
+   .node({
       '!.foods.*': function( foodThing ){
          jQuery('#foods').append('<div>').text('it is safe to eat ' + foodThing.name);
       },
@@ -200,7 +198,7 @@ register a wide-matching pattern and use the path parameter to decide what to do
 
 oboe('http://mysocialsite.example.com/homepage.json')
    // note: bang means the root object so this pattern matches any children of the root
-   .onNode('!.*', function( moduleJson, path ){
+   .node('!.*', function( moduleJson, path ){
    
       // This callback will be called with every direct child of the root
       // object but not the sub-objects therein. Because we're coming off
@@ -238,7 +236,7 @@ given instead to the callback.
 function PeopleListCtrl($scope) {
 
    oboe('/myapp/things.json')
-      .onNode('$people[*]', function( peopleLoadedSoFar ){
+      .node('$people[*]', function( peopleLoadedSoFar ){
          
          // This callback will be called with a 1-length array, a 2-length
          // array, a 3-length array etc until the whole thing is loaded 
@@ -255,7 +253,7 @@ Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
 oboe('/myapp/things.json')
-   .onNode('people.$*.email', function( personWithAnEmailAddress ){
+   .node('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
       
@@ -266,7 +264,7 @@ Like css4 stylesheets, this can also be used to express a 'containing' operator.
 
 ``` js
 oboe('/myapp/things.json')
-   .onNode('people.$*.email', function( personWithAnEmailAddress ){
+   .node('people.$*.email', function( personWithAnEmailAddress ){
       
       // here we'll be called back with baz and bax but not Boz.
       
@@ -287,7 +285,7 @@ var things = d3.selectAll('rect.thing');
 // Every time we see a new thing in the data stream, use d3 to add an element to our 
 // visualisation. This basic pattern should work for most visualistions built in d3.
 oboe('/data/things.json')
-   .onNode('$things.*', function( thingsArray ){
+   .node('$things.*', function( thingsArray ){
             
       things.data(thingsArray)
          .enter().append('svg:rect')
@@ -310,13 +308,13 @@ Oboe stops on error so won't give any further callbacks.
 ``` js
 var currentPersonElement;
 oboe('people.json')
-   .onPath('people.*', function(){
+   .path('people.*', function(){
       // we don't have the person's details yet but we know we found someone in the 
       // json stream, we can use this to eagerly add them to the page:
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
-   .onNode('people.*.name', function( name ){
+   .node('people.*.name', function( name ){
       // we just found out that person's name, lets add it to their div:
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
@@ -329,23 +327,22 @@ oboe('people.json')
 
 # API
 
-Oboe exposes a single global at ```window.oboe```. You can start a new AJAX call and instantiate a new Oboe 
-instance by calling one of these methods:
+Oboe exposes a single global at ```window.oboe```. You can start a new AJAX request by 
+calling one of these methods:
 
 ```js
-   oboe( String url, [Function doneCallback(wholeResponse)]) // makes a GET request
+   oboe( String url ) // makes a GET request
    
-   oboe.doGet(    String url, [Function doneCallback(wholeResponse)])
-   oboe.doPut(    String url, String body, [Function doneCallback(wholeResponse)])
-   oboe.doPost(   String url, String body, [Function doneCallback(wholeResponse)])
-   oboe.doDelete( String url, [Function doneCallback(wholeResponse)])
+   oboe.doGet(    String url )
+   oboe.doPut(    String url, String|Object body )
+   oboe.doPost(   String url, String|Object body )
+   oboe.doDelete( String url )
    
-// the calls above alternatively can accept an options object:
+// the calls above alternatively accept an options object:
    oboe.doPost({
       url: String,
       body: Object|String,
-      [complete: Function doneCallback(wholeResponse)],
-      [headers:{ key: value }]
+      headers:{ key: value }
    })         
 ```   
 
@@ -356,28 +353,32 @@ download but this is there for if you need to know when the request is done.
 The returned instance exposes a few chainable methods:
 
 ```js
-   .onNode(String pattern, Function callback(thingFound, String[] path, context))
+   .node(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```.onNode()``` registers our interest in nodes in the JSON which match the given ```pattern```.
+```.node()``` registers our interest in nodes in the JSON which match the given ```pattern```.
 Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
 When the pattern is matched the callback is given the matching node and a path describing where it was found.
    
 ```js
-   .onPath(String pattern, Function callback(thingFound, String[] path, context))
+   .path(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```onPath()``` is the same as ```.onNode()``` except the callback is fired when the *path* matches, not when we have the
-thing. For the same pattern this will always fire before ```.onNode()``` and might be used to get things ready for that call.
+```.path)``` is the same as ```.node()``` except the callback is fired when the *path* matches, not when we have the
+thing. For the same pattern this will always fire before ```.node()``` and might be used to get things ready for that call.
 
-Alternatively, several paths may be give at once to either ```onPath``` or ```onNode```:
+Alternatively, several patterns may be registered at once with either ```.path``` or ```.node```:
 
 ```js
-   .onNode({
-      pattern : callback,
+   .node({
       pattern : callback,
       pattern : callback
    });
+   
+   .path({
+      pattern : callback,
+      pattern : callback
+   });   
 ``` 
 
 ```abort()``` Stops the http call at any time. This is useful if you want to read a json response only as

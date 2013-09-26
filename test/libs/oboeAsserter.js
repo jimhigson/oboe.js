@@ -30,11 +30,10 @@ function givenAnOboeInstance(jsonFileName) {
          asserter.isComplete = true;
       } 
        
-      oboeInstance = oboe.doGet( jsonFileName, 
-                                 requestComplete
-                               );      
+      oboeInstance = oboe.doGet( jsonFileName 
+                               ).done(requestComplete);      
                               
-      oboeInstance.onError(function(e) {
+      oboeInstance.fail(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.
          // Fail the test on getting an error:
          expect(expectingErrors).toBeTruthy();
@@ -51,21 +50,21 @@ function givenAnOboeInstance(jsonFileName) {
       this.andWeAreListeningForNodes = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.spy(callback) : sinon.stub();
       
-         oboeInstance.onNode(pattern, argumentClone(spiedCallback), scope);
+         oboeInstance.node(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
 
       this.andWeAreListeningForPaths = function(pattern, callback, scope) {
          spiedCallback = callback ? sinon.spy(callback) : sinon.stub();      
       
-         oboeInstance.onPath(pattern, argumentClone(spiedCallback), scope);
+         oboeInstance.path(pattern, argumentClone(spiedCallback), scope);
          return this;
       };
       
       this.andWeHaveAFaultyCallbackListeningFor = function(pattern) {
          spiedCallback = sinon.stub().throws();      
       
-         oboeInstance.onPath(pattern, argumentClone(spiedCallback));
+         oboeInstance.path(pattern, argumentClone(spiedCallback));
          return this;
       };      
       
@@ -74,7 +73,7 @@ function givenAnOboeInstance(jsonFileName) {
       
          spiedCallback = sinon.stub();
          
-         oboeInstance.onError(argumentClone(spiedCallback));
+         oboeInstance.fail(argumentClone(spiedCallback));
          return this;
       };
       
@@ -205,7 +204,7 @@ function gaveFinalCallbackWithRootJson(expected) {
    return {
       testAgainst:
          function(callback, oboeInstance, completeJson) { 
-            expect(expected).toEqual(completeJson);         
+            expect(completeJson).toEqual(expected);         
          }
    }
 }

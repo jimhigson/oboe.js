@@ -1,15 +1,17 @@
 describe("oboe component (sXHR stubbed)", function(){
 
   
-   it('has chainable methods',  function() {
+   it('has chainable methods that don\'t explode',  function() {
       // test that nothing forgot to return 'this':
 
       expect(function(){      
-         function noop(){}
+         function fn(){}
          
          oboe.doGet('http://example.com/oboez')
-            .onPath('*', noop).onNode('*', noop).onError(noop).onPath('*', noop)
-            .onPath({'*':noop}).onNode({'*': noop}).onPath({'*':noop});
+            .path('*', fn).node('*', fn).fail(fn).path('*', fn)
+            .path({'*':fn}).node({'*': fn}).path({'*':fn})
+            .on('path','*', fn).on('node','*', fn).fail(fn).on('path','*', fn)
+            .on('path',{'*':fn}).on('node',{'*': fn}).on('path',{'*':fn});            
             
       }).not.toThrow();
    })
@@ -20,7 +22,7 @@ describe("oboe component (sXHR stubbed)", function(){
    describe('empty object detected with bang',  function() {
             
       var callback = jasmine.createSpy('callback');
-      var oboe = anOboe().onNode('!', callback).afterInput('{}')      
+      var oboe = anOboe().node('!', callback).afterInput('{}')      
       giveInput(oboe, '{}');
             
       it( 'should find the empty object at root', function(){            
