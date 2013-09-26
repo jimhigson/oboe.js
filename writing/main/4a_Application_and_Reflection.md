@@ -352,18 +352,20 @@ time being given matching content is enough to be able to react to that
 content. However it is easy to imagine cases where a wider context
 matters. Consider this JSON:
 
-    { 
-       event: "100m sprint",
-       date: "",
-       "medalWinners": {
-          "gold":     {"name": 'Usain Bolt', "nationality":""},
-          "silver":   {"name": '', "nationality":""},
-          "bronze":   {"name": '', "nationality":""}
-       }
-    }   
+~~~~ {.javascript}
+{ 
+   "event": "mens 100m",
+   "date": "5 Aug 2012",
+   "medalWinners": {
+      "gold":     {"name": 'Bolt',    "time": "9.63s"},
+      "silver":   {"name": 'Blake',   "time": "9.75s"},
+      "bronze":   {"name": 'Gatlin',  "time": "9.79s"}
+   }
+}  
+~~~~ 
 
 Here we can extract the runners by the patterns such as
-`{name nationality}` or `medalWinners.*` but clearly the location of the
+`{name time}` or `medalWinners.*` but clearly the location of the
 node in the document is interesting as well as the context. The `path`
 parameter provides this information by way of an array of strings
 plotting the descent from the JSON root to the match, for example
@@ -420,7 +422,7 @@ expressions when items are added to the stack of current nodes in
 addition to when they are removed.
 
 ~~~~ {.javascript}
-oboe('sourceCode/repositoryGraph.json')
+oboe('sourceCodeControl/repositoryGraph.json')
    .on( 'path', 'branch', function() {
       
    });
