@@ -1,9 +1,6 @@
 Application and Reflection 1: what is it?
 =========================================
 
-High-level solution
--------------------
-
 Using a combination of the techniques investigated in the previous
 chapter, I propose that a simple design is possible which makes REST
 clients more efficient whilst being no more difficult to program.
