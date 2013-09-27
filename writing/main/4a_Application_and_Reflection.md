@@ -270,13 +270,14 @@ causing problems [SOA] how to guarantee non-breakages? could publish
 
 Parsing the JSON
 ----------------
-  
-While SAX parsers provide an unfriendly interface to application developers,
-as a starting point for higher-level parsers they work very well (in fact,
-most XML DOM parsers are made in this way). The pre-existing project
-Clarinet is well tested, liberally licenced and compact, meeting the goals
-of this project perfectly. In fact, the name of this project, Oboe.js,
-was chosen in tribute to the value delivered by Clarinet.
+
+While SAX parsers provide an unfriendly interface to application
+developers, as a starting point for higher-level parsers they work very
+well (in fact, most XML DOM parsers are made in this way). The
+pre-existing project Clarinet is well tested, liberally licenced and
+compact, meeting the goals of this project perfectly. In fact, the name
+of this project, Oboe.js, was chosen in tribute to the value delivered
+by Clarinet.
 
 API design
 ----------
@@ -318,10 +319,10 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
-While for simple web applications usage is much as above,  
-In real world usage on more complex apps jQuery.ajax is often injected 
-into the scope of the code which wants to use it. Easier stubbing so that tests
-don't have to make actual AJAX calls.
+While for simple web applications usage is much as above,\
+In real world usage on more complex apps jQuery.ajax is often injected
+into the scope of the code which wants to use it. Easier stubbing so
+that tests don't have to make actual AJAX calls.
 
 While certainly callback-based, the jQuery is somewhat implicit in being
 event-based. There are no event names separate from the methods which
@@ -477,15 +478,16 @@ popped.
 Micro-library
 -------------
 
-Http traffic, especially sending entropy-sparse text formats is often gzipped 
-at point of sending in order to deliver it more quickly, so in measuring a
-download footprint it usually makes more sense to compare post-gzipping.
-A Javascript library qualifies as being *micro* if it is delivered in 5k or less,
-5120 bytes. Micro-libraries also tend to follow the ethos that it is better for a 
-developer to gather together several tiny libraries than one that uses a 
-one-size-fits-all approach. This perhaps echos the unix command line
-tradition of small programs which each do do exactly one thing.   
-This project feels on the edge of what is possible to elegantly do as a 
+Http traffic, especially sending entropy-sparse text formats is often
+gzipped at point of sending in order to deliver it more quickly, so in
+measuring a download footprint it usually makes more sense to compare
+post-gzipping. A Javascript library qualifies as being *micro* if it is
+delivered in 5k or less, 5120 bytes. Micro-libraries also tend to follow
+the ethos that it is better for a developer to gather together several
+tiny libraries than one that uses a one-size-fits-all approach. This
+perhaps echos the unix command line tradition of small programs which
+each do do exactly one thing.\
+This project feels on the edge of what is possible to elegantly do as a
 micro-library so while the limit is somewhat arbitrary, for the sake of
 adoption smaller is better and keeping below this limit whilst writing
 readable code is an interesting challenge.
@@ -503,39 +505,66 @@ a callback to be returned to the calling application.
 Not automatic, just inform user. Most of the time will want to perform
 some kind of rollback from optimistic locking.
 
-I did consider the option of automatially resuming failed requests.
-Http 1.1 provides a mechanism for Byte Serving via the Accepts-Ranges
-header [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5]
-which can be used to request any contiguous part of a response rather
-than the whole. However, having examined this option I came to the conclusion
-that this approach would be brittle because it assumes two requests to the
-same URL will give exactly the same response.
+I did consider the option of automatially resuming failed requests. Http
+1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header
+[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5] which
+can be used to request any contiguous part of a response rather than the
+whole. However, having examined this option I came to the conclusion
+that this approach would be brittle because it assumes two requests to
+the same URL will give exactly the same response.
 
-A better option 
+A better option
 
-Required support for older browsers
------------------------------------
+Fallback support on less-capable platforms
+------------------------------------------
 
-Aims not possible to realise but don't want to make devs using lib have
-to special-case.
+*something about market share and link to figures in an appendix?*
 
-Still works as well as non-progressive json Could be used for content
-that is inherently streaming (wouldn't make sense without streaming)
+Because of differences in the capabilities in browsers, providing a
+streaming REST client is not possible on all browsers. If this were
+possible, it would not have been necessary to invent push pages or long
+polling. Specifically, none but the most recent versions of Internet
+Explorer provide any way to access an AJAX response before it is
+complete. I have taken the design decision that it is ok to degrade on
+these platforms so long as the programmer developing with Oboe.js does
+not have to make special cases for these platforms. Likewise, nor should
+the REST service need be aware of the client, disallowing detecting
+client capabilities and switching transport strategy. Requiring
+branching on either side places extra responsibilities on the programmer
+which they would not otherwise be required to consider whilst viewing
+REST through a non-streaming lens.
 
-The decline of bad browsers. Incompatibility less of a concern than it
-was.
+Given that streaming is not possible on older platforms, I must
+considering the best experience that is possible. We may imagine a
+situation in which the whole download completes followed by all
+listeners being notified from a single Javascript frame of execution.
+While not progressive in any way, this situation is essentially standard
+REST plus JSONPath routing and no less performant than if more
+traditional libraries were used. I find this satisfactory: for the
+majority of users the experience is improved and for the others it is
+made no worse, resulting in a net overall benefit.
 
-http://www.jimmycuadra.com/posts/ecmascript-5-array-methods Unlike the
-new methods discussed in the first two parts, the methods here are all
-reproducible using JavaScript itself. Native implementations are simply
-faster and more convenient. Having a uniform API for these operations
-also promotes their usage, making code clearer when shared between
-developers.
+In the Javascript language itself interoperability is very rarely an
+issue. Javascript's model of prototypical inheritance allows changes to
+be made to the browser's libraries on the fly; as soon as a prototype is
+changed all instances of the type reflect the change even if they has
+already been created (source). Because the base types that come with the
+browser are essentially global, changing them for the use of a single
+codebase is generally deprecated because of the possibility of
+collisions. However, this technique is often used to retrofit new
+standards onto older platforms. For example, the Functional-style Array
+iteration methods remove the need to write C-style for loops and are
+defined in the ECMAScript 5 specification
+http://www.jimmycuadra.com/posts/ecmascript-5-array-methods - all of
+these methods are implementable in pure Javascript. There exist several
+mature pure Javascript projects for browsers which lack native support,
+licenced to allow inclusion in this project (CITE ONE). While I am
+constrained in the ability to accept streaming AJAX in older browsers,
+there is no such restriction on my ability to express my thesis in a
+more modern, functional style of Javascript.
 
-Even when only used once, preferable to polyfill as a generic solution
-rather than offer a one-time implementation because it better splits the
-intention of the logic being presented from the mechanisms that that
-logic sits on and, by providing abstraction, elucidates the code.
-
-Older browsers: getting the whole message at once is no worse than it is
-now.
+Node is highly capable, with no shortcomings that will make Oboe.js
+difficult to implement. It does, however use its own stream API rather
+than emulate the browser API so will require platform-specific
+programming inside the library. This abstraction will be hidden from the
+library user so will not require any special programming on their part.
