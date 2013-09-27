@@ -97,16 +97,16 @@ of strings:
 
 ~~~~ {.javascript}
 {
-   name: '',
-   residence: {
+   name: '...'
+,  residence: {
       address: [
-         '', '', ''
+         '...', '...', '...'
       ]
-   },
-   employer: {
-      name: '',
-      address :[
-         '', '', ''      
+   }
+,  employer: {
+      name: '...'
+   ,  address :[
+         '...', '...', '...'      
       ]
    }   
 }
@@ -120,10 +120,8 @@ parent being the array containing the multiple addressees:
 {
    residences: {
       addresses: [
-         ['Beach Hut', 'Secret Island', 'Bahamas']
-      ,  ['', '', '']
-      ,  ['', '', '']
-      ,  ['', '', '']
+         ['Townhouse', 'Street', 'Some town']      
+      ,  ['Beach Hut', 'Secret Island', 'Bahamas']
       ]
    }
 }
@@ -136,19 +134,19 @@ fields rather than its position in the document:
 
 ~~~~ {.javascript}
 {
-   name: '',
-   residence: {
-      number:'', street:'', town:'' 
-   },   
-   employer:{
-      name: ''
-      premises:[
-         { number:'', street:'', town:'' },
-         { number:'', street:'', town:'' },
-         { number:'', street:'', town:'' }
-      ],
-      registeredOffice:{
-         number:'', street:'', town:''
+   name: '...'
+,  residence: {
+      number:'...', street:'...', town:'...' 
+   }
+,  employer:{
+      name: '...'
+   ,  premises:[
+         { number:'...', street:'...', town:'...' }
+      ,  { number:'...', street:'...', town:'...' }
+      ,  { number:'...', street:'...', town:'...' }
+      ]
+   ,  registeredOffice:{
+         number:'...', street:'...', town:'...'
       }
    }
 }  
@@ -194,9 +192,9 @@ var jsonPath = jsonPathCompiler("{name address email}");
 // in between the curly braces in the above json path expresson.
 
 var matchingObject = {
-   "name": "...",
-   "address": "...",
-   "email": "...:
+   "name": "..."
+,  "address": "..."
+,  "email": "..."
 }
 ~~~~
 
