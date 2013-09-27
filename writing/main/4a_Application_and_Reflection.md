@@ -170,9 +170,6 @@ disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
 safer.
 
-![extended json rest service that still works - maybe do a table instead
-\label{enhancingrest}](images/placeholder)
-
 From old writing we have:
 
 *CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.*
@@ -248,6 +245,9 @@ immediately linking to the
 
 Stability over upgrades
 -----------------------
+
+![extended json rest service that still works - maybe do a table instead
+\label{enhancingrest}](images/placeholder)
 
 Programming to identify a certain interesting part of a resource today
 should with a high probability still work when applied to future
