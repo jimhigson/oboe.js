@@ -70,7 +70,7 @@ from large object to individual datums. With just a few lines of
 programming
 
 JSONPath expressions
-------------------
+--------------------
 
 In searching through a model stocked with data is common to ask for
 database-style queries such as 'books costing more than X'. However, not
@@ -138,8 +138,8 @@ of strings:
 ~~~~
 
 By sensible convention, even in a serialisation format which allows
-lists of disparate types, lists contain only items of equivalent type. This
-gives way to a sister convention seen in the below example, when
+lists of disparate types, lists contain only items of equivalent type.
+This gives way to a sister convention seen in the below example, when
 serialising with multiple addresses in an array, it is the grandparent's
 node field name which indicates the type, the parent being the array
 containing the multiple addressees:
@@ -192,14 +192,13 @@ subclass and would rather just continue to receive the base superclass
 capabilities as before. Under duck typing this is easy - because the
 data consumer lists the
 
-A final concept of type in json comes in the form of taking the
-first property of an object as being the tagname. Unsatisfactory,
-objects have an order while serialised as json but once deserialised
-typically have no further order. Clarinet.js seems to follow this
-pattern, notifying of new objects only once the first property's key is
-known so that it may be used to infer type. Can't be used with a
-general-purpose JSON writer tool, nor any JSON writer tool that reads
-from common objects.
+A final concept of type in json comes in the form of taking the first
+property of an object as being the tagname. Unsatisfactory, objects have
+an order while serialised as json but once deserialised typically have
+no further order. Clarinet.js seems to follow this pattern, notifying of
+new objects only once the first property's key is known so that it may
+be used to infer type. Can't be used with a general-purpose JSON writer
+tool, nor any JSON writer tool that reads from common objects.
 
 Relationship between type of a node and its purpose in the document.
 Purpose is often obvious from a combination of URL and type so can
@@ -212,21 +211,18 @@ chose a syntax which is similar to fields in jsonFormat:
 
 ~~~~ {.javascript}
 
-// the curly braces are my extension to JSONPath"
-var JSONPath = JSONPathCompiler("{name address email}");
-
-// the above JSONPath expression would match this object in json 
-// expression and like all json path expressions the pattern is 
-// quite similar to the object that it matches. The object below 
-// matches because it contains all the fields listed
-// in between the curly braces in the above json path expresson.
-
-var matchingObject = {
+{
    "name": "..."
 ,  "address": "..."
 ,  "email": "..."
 }
 ~~~~
+
+`{name address email}` The above JSONPath expression would match this
+object in json expression and like all json path expressions the pattern
+is quite similar to the object that it matches. The object below matches
+because it contains all the fields listed in between the curly braces in
+the above json path expresson.
 
 CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
 
