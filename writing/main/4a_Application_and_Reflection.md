@@ -69,7 +69,7 @@ so as to apply to any data domain and allow any granularity of interest,
 from large object to individual datums. With just a few lines of
 programming
 
-JsonPATH variation
+JSONPath expressions
 ------------------
 
 In searching through a model stocked with data is common to ask for
@@ -207,15 +207,15 @@ disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
 safer.
 
-To extend JsonPath to support a concise expression of duck typing, I
+To extend JSONPath to support a concise expression of duck typing, I
 chose a syntax which is similar to fields in jsonFormat:
 
 ~~~~ {.javascript}
 
-// the curly braces are my extension to jsonpath"
-var jsonPath = jsonPathCompiler("{name address email}");
+// the curly braces are my extension to JSONPath"
+var JSONPath = JSONPathCompiler("{name address email}");
 
-// the above jsonPath expression would match this object in json 
+// the above JSONPath expression would match this object in json 
 // expression and like all json path expressions the pattern is 
 // quite similar to the object that it matches. The object below 
 // matches because it contains all the fields listed
@@ -257,7 +257,7 @@ Adding of semantics should could include adding new fields to objects
 refactor in which what was a root node is pushed down a level by being
 suspended from a new parent.
 
-why jsonpath-like syntax allows upgrading message semantics without
+why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
@@ -430,7 +430,7 @@ The Two styles are similar enough that a person familiar with one should
 be able to pick up the other without difficulty. In implementation a
 duplicative API should require only a minimal degree of extra coding
 because these parts may be expressed in common and their scope reduced
-using partial completion. Because `'!'` is the jsonPath for the root of
+using partial completion. Because `'!'` is the JSONPath for the root of
 the document, for some callback c, `.done(c)` is a synonym for
 `.node('!', c)` and therefore below a thin interface layer may share an
 implementation. Likewise, `.node` is easily expressible as a partial
