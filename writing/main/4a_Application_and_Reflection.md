@@ -85,11 +85,36 @@ are more likely to be useful for this context.
 We impose types on top of JSON/XML markup. Only few basic types defined
 in the markup languages themselves. Essence of marshaling.
 
+Xml comes with a strong concept of the *type* of an element, the tag
+name is taken as a more immediate fundamental property of the thing than
+the attributes. For example, in automatic json-Java object
+demarshallers, the tag name is always mapped to the Java class. In JSON,
+other than the base types common to most languages (array, object,
+string etc) there is no further concept of type. If we wish to build a
+further understanding of the type of the objects then the realtionship
+with the parent object, expressed by the attribute name, is more likely
+to indicate the type. A second approach is to use duck typing in which
+the relationship of the object to its ancestors is not examined but the
+properties of the object are used instead to communicate an enhanced
+concept of type. For example, we might say that any object with an isbn
+and a title is a book.
+
 Whereas XML has a pretty good concept of the type of an element (beyond
 simply being an element node) in the tagName, JSON's objects are all
 simply objects. In JSON the type of a node is usually inferred in one of
 two ways: either, the fieldName in the parent object which references a
 node; or, from the fields that the object has.
+
+In the absence of node typing beyond the categorisation as objects,
+arrays and various primitive types, the key immediately mapping to the
+object is often taken as a lose concept of the type of the object. Quite
+fortunately, rather than because of a well considered object design,
+this tends to play well with automatically marshaling of domain objects
+expressed in a Java-style OO language because there is a strong tendency
+for field names -- and by extension, 'get' methods -- to be named after
+the *type* of the field, the name of the type also serving as a rough
+summary of the relationship between two objects. See figure
+\ref{marshallTypeFig} below.
 
 In the below example, we assign the node the type 'address' because of
 the parent node's field name. Other than this, these are standard arrays
@@ -112,9 +137,12 @@ of strings:
 }
 ~~~~
 
-As a slight variant, when dealing with multiple addresses in an array,
-it is the grandparent's node field name which indicates the type, the
-parent being the array containing the multiple addressees:
+By sensible convention, even in a serialisation format which allows
+lists of disparate types, lists contain only items of equivalent type. This
+gives way to a sister convention seen in the below example, when
+serialising with multiple addresses in an array, it is the grandparent's
+node field name which indicates the type, the parent being the array
+containing the multiple addressees:
 
 ~~~~ {.javascript}
 {
@@ -164,15 +192,20 @@ subclass and would rather just continue to receive the base superclass
 capabilities as before. Under duck typing this is easy - because the
 data consumer lists the
 
+A final concept of type in json comes in the form of taking the
+first property of an object as being the tagname. Unsatisfactory,
+objects have an order while serialised as json but once deserialised
+typically have no further order. Clarinet.js seems to follow this
+pattern, notifying of new objects only once the first property's key is
+known so that it may be used to infer type. Can't be used with a
+general-purpose JSON writer tool, nor any JSON writer tool that reads
+from common objects.
+
 Relationship between type of a node and its purpose in the document.
 Purpose is often obvious from a combination of URL and type so can
 disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
 safer.
-
-From old writing we have:
-
-*CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.*
 
 To extend JsonPath to support a concise expression of duck typing, I
 chose a syntax which is similar to fields in jsonFormat:
@@ -195,40 +228,7 @@ var matchingObject = {
 }
 ~~~~
 
-Xml comes with a strong concept of the *type* of an element, the tag
-name is taken as a more immediate fundamental property of the thing than
-the attributes. For example, in automatic json-Java object
-demarshallers, the tag name is always mapped to the Java class. In JSON,
-other than the base types common to most languages (array, object,
-string etc) there is no further concept of type. If we wish to build a
-further understanding of the type of the objects then the realtionship
-with the parent object, expressed by the attribute name, is more likely
-to indicate the type. A second approach is to use duck typing in which
-the relationship of the object to its ancestors is not examined but the
-properties of the object are used instead to communicate an enhanced
-concept of type. For example, we might say that any object with an isbn
-and a title is a book.
-
-A third injection of type into json comes in the form of taking the
-first property of an object as being the tagname. Unsatisfactory,
-objects have an order while serialised as json but once deserialised
-typically have no further order. Clarinet.js seems to follow this
-pattern, notifying of new objects only once the first property's key is
-known so that it may be used to infer type. Can't be used with a
-general-purpose JSON writer tool, nor any JSON writer tool that reads
-from common objects.
-
-First way to identify an interesting thing is by its location in the
-document. In the absense of node typing beyond the categorisation as
-objects, arrays and various primative types, the key immediately mapping
-to the object is often taken as a lose concept of the type of the
-object. Quite fortunately, rather than because of a well considered
-object design, this tends to play well with automatically marshaling of
-domain objects expressed in a Java-style OO language because there is a
-strong tendency for field names -- and by extension, 'get' methods -- to
-be named after the *type* of the field, the name of the type also
-serving as a rough summary of the relationship between two objects. See
-figure \ref{marshallTypeFig} below.
+CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
 
 ![UML class diagram showing a person class in relationship with an
 address class. In implementation as Java the 'hasAddress' relationship
@@ -237,11 +237,6 @@ object type and the name of the field referring to the type lends itself
 well to the tendency for the immediate key before an object to be taken
 as the type when Java models are marshaled into json
 \label{marshallTypeFig}](images/marshall)
-
-By sensible convention, even in a serialisation format with only a loose
-definition of lists, lists contain only items of the same type. This
-gives way to a sister convention, that for lists of items, the key
-immediately linking to the
 
 Stability over upgrades
 -----------------------
