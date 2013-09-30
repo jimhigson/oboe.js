@@ -275,8 +275,8 @@ why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-Importing css4-style to JSONPath
---------------------------------
+Importing CSS4 selector capturing to JSONPath
+---------------------------------------------
 
 Sometimes when downloading a collection of items it is less useful to be
 given each element individually than being kept up to date as the
@@ -290,16 +290,16 @@ Expressing a 'contained in' relationship comes naturally to JSONPath,
 but no provision is made for a 'containing' relationship. Cascading
 Style Sheets, or CSS, the web's styling language has long shared this
 restriction but a recent proposal, currently at Editor's Draft
-stage[@css4] provides an elegant means to cover this gap. Rather than
+stage [@css4] provides an elegant means to cover this gap. Rather than
 add an explicit 'containing' relationship, the css4 proposal observes
 that css selectors have previously only allowed selection of the
 right-most of the terms given, allowing only the deepest element
 mentioned to be selected. This restriction is removed by allowing terms
-may be prefixed with `$` in order to make them capturing: in the absence 
-of an explicitly capturing term the right-most continues to capture. Whereas 
-`form.important input.mandatory` selects for styling mandatory inputs inside 
-important forms, `$form.important input.mandatory' selects important 
-forms with mandatory fields.
+may be prefixed with `$` in order to make them capturing: in the absence
+of an explicitly capturing term the right-most continues to capture.
+Whereas `form.important input.mandatory` selects for styling mandatory
+inputs inside important forms, `$form.important input.mandatory`
+selects important forms with mandatory fields.
 
 Parsing the JSON
 ----------------
