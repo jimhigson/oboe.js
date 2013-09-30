@@ -358,8 +358,8 @@ Dart has 'factory' constructors which are called like constructors but
 act like factory functions:
 (http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
 
-Design and implementation of the JSONPath parser
-------------------------------------------------
+JSONPath Implementation
+-----------------------
 
 Show evolution of it. Like most compilers, first try was just a bunch of
 regexes that generated a regex to match the pattern. While compact, was
