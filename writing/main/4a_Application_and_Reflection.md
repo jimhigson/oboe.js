@@ -86,8 +86,6 @@ it is better to deliver only the features I am reasonably certain will
 be well used but keep open the ability to add more later should it be
 required.
 
-### Types and JSON
-
 JSON markup describes only a few basic types. On a certain level this is
 also true for XML -- most nodes are of either type Elements or Text.
 However, the XML metamodel provides tagnames, essentially a built-in
