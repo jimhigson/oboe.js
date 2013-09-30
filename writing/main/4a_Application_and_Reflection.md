@@ -88,8 +88,8 @@ required.
 
 ### Types and JSON
 
-JSON markup describes only a few basic types. This is true on a certain
-level for XML -- most nodes are of either type Element or TextNode.
+JSON markup describes only a few basic types. On a certain level this is
+also true for XML -- most nodes are of either type Elements or Text.
 However, the XML metamodel provides tagnames, essentially a built-in
 Element sub-typing mechanism. Floating above this distinction, a reader
 abstracting over the details of the markup may forget that a node is an
@@ -108,6 +108,23 @@ without further sub-types. In the scope of this dissertation, since
 selecting on type is desirable, my JSONPath variant must be able to
 handle various levels of specificity of selection for the sake of type
 imposition.
+
+~~~~{.xml}
+<!--  XML leaves no doubt as to the labels we give to the types
+      of the nodes. This is a 'person' -->
+<person  name='...' gender="male"
+         age="45" height="175cm" profession="architect">
+</person>
+~~~~
+~~~~{.javascript}
+/*    JSON meanwhile provides no such concrete concept. This node's
+      type might be 'thing', 'animal', 'human', 'man', 'architect',
+      'artist' or any other of many overlapping impositions depending 
+      on what purpose the document it is read for */
+{  "name":"...", "gender":"male", "age":"45" 
+   "height":"175cm" "profession":"architect">
+}         
+~~~~
 
 In the absence of node typing beyond the categorisation as objects,
 arrays and various primitive types, the key immediately mapping to the
