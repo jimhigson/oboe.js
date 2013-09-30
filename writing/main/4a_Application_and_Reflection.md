@@ -108,6 +108,13 @@ distinguish types at various levels of specificity; whilst my selection
 language will have no inbuilt concept of type, the aim is to support
 programmers in creating their own.
 
+*integrate with above or discard* 
+Relationship between type of a node and its purpose in the document.
+Purpose is often obvious from a combination of URL and type so can
+disregard the place in the document. This structure may be carefully
+designed but ultimately a looser interpretation of the structure can be
+safer.
+
 ~~~~ {.xml}
 <!--  XML leaves no doubt as to the labels we give to the types
       of the nodes. This is a 'person' -->
@@ -226,6 +233,9 @@ That is to say, type is individualistically communicated by the object itself ra
 the relationships described by its containing ancestors. JSONPath comes with no such 
 expressivity but I find this idea so simple and useful that I have decided to introduce it. 
 
+
+
+
 To extend JSONPath to support a concise expression of duck typing, I
 chose a syntax which is similar to fields in jsonFormat:
 
@@ -252,11 +262,7 @@ new objects only once the first property's key is known so that it may
 be used to infer type. Can't be used with a general-purpose JSON writer
 tool, nor any JSON writer tool that reads from common objects.
 
-Relationship between type of a node and its purpose in the document.
-Purpose is often obvious from a combination of URL and type so can
-disregard the place in the document. This structure may be carefully
-designed but ultimately a looser interpretation of the structure can be
-safer.
+
 
 #css4
 
