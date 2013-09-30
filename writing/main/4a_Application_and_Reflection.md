@@ -66,8 +66,8 @@ so as to apply to any data domain and allow any granularity of interest,
 from large object to individual datums. With just a few lines of
 programming
 
-JSONPath an types
------------------
+JSONPath and types
+------------------
 
 Given its use to identify interesting parts of a document, not all of
 the published JSONPath spec is useful. Parts of a document will be
