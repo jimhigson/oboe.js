@@ -7,7 +7,7 @@ clients more efficient whilst being no more difficult to program.
 Although simple, this model fits poorly with established vocabulary,
 requiring a transport that sits *somewhere between 'stream' and
 'download'* and a parsing strategy which *takes elements from SAX and
-DOM* but follows neither model\*.
+DOM* but follows neither model.
 
 Implementation in Javascript gives me the widest deployment options,
 covering client-side browser programming, server programming, use in
@@ -470,15 +470,17 @@ measuring a download footprint it usually makes more sense to compare
 post-gzipping. A Javascript library qualifies as being *micro* if it is
 delivered in 5k or less, 5120 bytes. Micro-libraries also tend to follow
 the ethos that it is better for a developer to gather together several
-tiny libraries than one that uses a one-size-fits-all approach. This
-perhaps echos the unix command line tradition of small programs which
-each do do exactly one thing.\
-This project feels on the edge of what is possible to elegantly do as a
-micro-library so while the limit is somewhat arbitrary, for the sake of
-adoption smaller is better and keeping below this limit whilst writing
-readable code is an interesting challenge.
-
-Link to micro-js in there somewhere
+tiny libraries than one that uses a one-size-fits-all approach, perhaps
+echoing the unix command line tradition of small programs which each do
+do exactly one thing. Javascript Micro-libraries are listed at [^1],
+which includes this project. Oboe.js feels on the edge of what is
+possible to elegantly do as a micro-library so while the limit is
+somewhat arbitrary, for the sake of adoption smaller is better and
+keeping below this limit whilst writing readable code is an interesting
+challenge. As well as being a small library, in the spirit of a
+micro-library a project should impose as few restrictions as possible on
+its use and be designed to be completely agnostic as to which other
+libraries or programming styles that it is used with.
 
 Responding to failures
 ----------------------
@@ -554,3 +556,5 @@ difficult to implement. It does, however use its own stream API rather
 than emulate the browser API so will require platform-specific
 programming inside the library. This abstraction will be hidden from the
 library user so will not require any special programming on their part.
+
+[^1]: http://microjs.com/
