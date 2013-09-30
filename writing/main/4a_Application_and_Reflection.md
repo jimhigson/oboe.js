@@ -93,8 +93,8 @@ in the markup languages themselves. Essence of marshaling.
 
 Xml comes with a strong concept of the *type* of an element, the tag
 name is taken as a more immediate fundamental property of the thing than
-the attributes. For example, in automatic json-Java object
-demarshallers, the tag name is always mapped to the Java class. In JSON,
+the attributes. For example, in automatic JSON-Java object
+demarshallers, the tag name is mapped to the Java class. In JSON,
 other than the base types common to most languages (array, object,
 string etc) there is no further concept of type. If we wish to build a
 further understanding of the type of the objects then the realtionship
