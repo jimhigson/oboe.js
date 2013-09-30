@@ -88,24 +88,26 @@ required.
 
 ### Type in JSON
 
-We impose types on top of JSON/XML markup. Only few basic types defined
-in the markup languages themselves. Essence of marshaling.
-
-Xml comes with a strong concept of the *type* of an element, the tag
-name is taken as a more immediate fundamental property of the thing than
-the attributes. For example, in automatic JSON-Java object
-demarshallers, the tag name is mapped to the Java class. In JSON,
-other than the base types common to most languages (array, object,
-string etc) there is no further concept of type. If we wish to build a
-further understanding of the type of the objects then the realtionship
-with the parent object, expressed by the attribute name, is more likely
-to indicate the type.
-
-Whereas XML has a pretty good concept of the type of an element (beyond
-simply being an element node) in the tagName, JSON's objects are all
-simply objects. In JSON the type of a node is usually inferred in one of
-two ways: either, the fieldName in the parent object which references a
-node; or, from the fields that the object has.
+JSON markup describes only a few basic types. This is true on a certain
+level for XML -- most nodes are of either type Element or TextNode.
+However, the XML metamodel provides tagnames, essentially a built-in
+Element sub-typing mechanism. Floating above this distinction, a reader
+abstracting over the details of the markup may forget that a node is an
+Element instance and describe it as an instance of its tagname, without
+considering that the tagname is a sub-type of Element. JSON comes with
+no such built-in type description language. On top of JSON's largely
+typeless model we often place a concept of type. Drawing parallels with
+the physical world, this imposition of type is the responsibility of the
+observer, rather than of the observed. A document reader has a free
+choice of the taxonomy they will use to impose type on the parts of the
+document, and this decision will vary depending on the purpose of the
+reader. The specificity required of a taxonomy differs by the level of
+involvement in a field, whereas 'watch' may be a reasonable type to most
+data consumers, to a horologist it is unlikely to be satisfactory
+without further sub-types. In the scope of this dissertation, since
+selecting on type is desirable, my JSONPath variant must be able to
+handle various levels of specificity of selection for the sake of type
+imposition.
 
 In the absence of node typing beyond the categorisation as objects,
 arrays and various primitive types, the key immediately mapping to the
