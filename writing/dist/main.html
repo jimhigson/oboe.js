@@ -1338,10 +1338,9 @@ analysis* =-->
 @333w, 13,000 to 19,000
 =-->
 
-  <h1 id="application-and-reflection"><a href=
-  "#application-and-reflection"><span class=
-  "header-section-number">4</span> Application and
-  Reflection:</a></h1>
+  <h1 id="design-and-reflection"><a href=
+  "#design-and-reflection"><span class=
+  "header-section-number">4</span> Design and Reflection:</a></h1>
 
   <p>Using a combination of the techniques investigated in the
   previous chapter, I propose that a simple design is possible
@@ -1350,7 +1349,7 @@ analysis* =-->
   with established vocabulary, requiring a transport that sits
   <em>somewhere between 'stream' and 'download'</em> and a parsing
   strategy which <em>takes elements from SAX and DOM</em> but
-  follows neither model*.</p>
+  follows neither model.</p>
 
   <p>Implementation in Javascript gives me the widest deployment
   options, covering client-side browser programming, server
@@ -1415,46 +1414,93 @@ analysis* =-->
   any granularity of interest, from large object to individual
   datums. With just a few lines of programming</p>
 
-  <h2 id="jsonpath-expressions"><a href=
-  "#jsonpath-expressions"><span class=
-  "header-section-number">4.1</span> JSONPath expressions</a></h2>
+  <h2 id="jsonpath-and-types"><a href=
+  "#jsonpath-and-types"><span class=
+  "header-section-number">4.1</span> JSONPath and types</a></h2>
 
-  <p>In searching through a model stocked with data is common to
-  ask for database-style queries such as 'books costing more than
-  X'. However, not searching, selecting from a resource that the
-  programmer has requested, probably assembled on their behalf by
-  their parameters where we can expect the developer to be
-  interested in most of the content. Modify JSONPath for this
-  actual situation. Avoid implementing, at least at first, the
-  language features which are less likely to be used and are easily
-  tested for inside the callback. At same time, add features which
-  are more likely to be useful for this context.</p>
+  <p>Given its use to identify interesting parts of a document, not
+  all of the published JSONPath spec is useful. Parts of a document
+  will be considered interesting because of their type, position,
+  or both. This contrasts with filter-type queries such as 'books
+  costing less than X'. Examining REST responses it is likely we
+  will not be explicitly searching through a full model but rather
+  selecting from a resource subset that the programmer requested,
+  assembled on their behalf using their parameters so we can expect
+  the developer to be interested in most of the content. In
+  creating a new JSONPath implementation, I have chosen to follow
+  the published spec only loosely, thereby avoiding writing
+  unnecessary code. This is especially the case, as in the books
+  example above whereby a user of the library could easily add the
+  filter in the callback itself. Following the principle of writing
+  less, better I feel it is better to deliver only the features I
+  am reasonably certain will be well used but keep open the ability
+  to add more later should it be required.</p>
 
-  <p>We impose types on top of JSON/XML markup. Only few basic
-  types defined in the markup languages themselves. Essence of
-  marshaling.</p>
+  <p>JSON markup describes only a few basic types. On a certain
+  level this is also true for XML -- most nodes are of either type
+  Elements or Text. However, the XML metamodel provides tagnames,
+  essentially a built-in Element sub-typing mechanism. Floating
+  above this distinction, a reader abstracting over the details of
+  the markup may forget that a node is an Element instance and
+  describe it as an instance of its tagname, without considering
+  that the tagname is a sub-type of Element. JSON comes with no
+  such built-in type description language. On top of JSON's largely
+  typeless model we often place a concept of type. Drawing
+  parallels with the physical world, this imposition of type is the
+  responsibility of the observer, rather than of the observed. A
+  document reader has a free choice of the taxonomy they will use
+  to impose type on the parts of the document, and this decision
+  will vary depending on the purpose of the reader. The specificity
+  required of a taxonomy differs by the level of involvement in a
+  field, whereas 'watch' may be a reasonable type to most data
+  consumers, to a horologist it is unlikely to be satisfactory
+  without further sub-types. In the scope of this dissertation,
+  since selecting on type is desirable, my JSONPath variant must be
+  able to distinguish types at various levels of specificity;
+  whilst my selection language will have no inbuilt concept of
+  type, the aim is to support programmers in creating their
+  own.</p>
 
-  <p>Xml comes with a strong concept of the <em>type</em> of an
-  element, the tag name is taken as a more immediate fundamental
-  property of the thing than the attributes. For example, in
-  automatic json-Java object demarshallers, the tag name is always
-  mapped to the Java class. In JSON, other than the base types
-  common to most languages (array, object, string etc) there is no
-  further concept of type. If we wish to build a further
-  understanding of the type of the objects then the realtionship
-  with the parent object, expressed by the attribute name, is more
-  likely to indicate the type. A second approach is to use duck
-  typing in which the relationship of the object to its ancestors
-  is not examined but the properties of the object are used instead
-  to communicate an enhanced concept of type. For example, we might
-  say that any object with an isbn and a title is a book.</p>
-
-  <p>Whereas XML has a pretty good concept of the type of an
-  element (beyond simply being an element node) in the tagName,
-  JSON's objects are all simply objects. In JSON the type of a node
-  is usually inferred in one of two ways: either, the fieldName in
-  the parent object which references a node; or, from the fields
-  that the object has.</p>
+  <p><em>integrate with above or discard, maybe move to
+  compatibility with future versions</em> Relationship between type
+  of a node and its purpose in the document (or, perhaps, the
+  purpose the reader wishes to put it to). Purpose is often obvious
+  from a combination of URL and type so can disregard the place in
+  the document. This structure may be carefully designed but
+  ultimately a looser interpretation of the structure can be
+  safer.</p>
+  <pre class="sourceCode xml">
+<code class="sourceCode xml"><span class=
+"co">&lt;!--  XML leaves no doubt as to the labels we give to the types</span>
+<span class=
+"co">      of the nodes. This is a 'person' --&gt;</span>
+<span class="kw">&lt;person</span><span class=
+"ot">  name=</span><span class="st">'...'</span><span class=
+"ot"> gender=</span><span class="st">"male"</span>
+<span class="ot">         age=</span><span class=
+"st">"45"</span><span class="ot"> height=</span><span class=
+"st">"175cm"</span><span class="ot"> profession=</span><span class=
+"st">"architect"</span><span class="kw">&gt;</span>
+<span class="kw">&lt;/person&gt;</span></code>
+</pre>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"co">/*    JSON meanwhile provides no such concrete concept. This node's</span>
+<span class=
+"co">      type might be 'thing', 'animal', 'human', 'man', 'architect',</span>
+<span class=
+"co">      'artist' or any other of many overlapping impositions depending </span>
+<span class=
+"co">      on what purpose the document it is read for */</span>
+{  <span class="st">"name"</span>:<span class=
+"st">"..."</span>, <span class="st">"gender"</span>:<span class=
+"st">"male"</span>, <span class="st">"age"</span>:<span class=
+"st">"45"</span> 
+   <span class="st">"height"</span>:<span class=
+"st">"175cm"</span> <span class=
+"st">"profession"</span>:<span class="st">"architect"</span>&gt;
+}         </code>
+</pre>
 
   <p>In the absence of node typing beyond the categorisation as
   objects, arrays and various primitive types, the key immediately
@@ -1468,9 +1514,9 @@ analysis* =-->
   serving as a rough summary of the relationship between two
   objects. See figure below.</p>
 
-  <p>In the below example, we assign the node the type 'address'
-  because of the parent node's field name. Other than this, these
-  are standard arrays of strings:</p>
+  <p>In the below example, we impose the the type 'address' because
+  of the parent node's field name. Other than this, these are
+  standard arrays of strings:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
    <span class="dt">name</span>: <span class="st">'...'</span>
@@ -1490,19 +1536,21 @@ analysis* =-->
 }</code>
 </pre>
 
-  <p>By sensible convention, even in a serialisation format which
-  allows lists of disparate types, lists contain only items of
-  equivalent type. This gives way to a sister convention seen in
-  the below example, when serialising with multiple addresses in an
-  array, it is the grandparent's node field name which indicates
-  the type, the parent being the array containing the multiple
-  addressees:</p>
+  <p>Although, being loosely typed, in Javascript there is no
+  protection against using arrays to contain disparate object, by
+  sensible convention the items will usually be of some common
+  type. Likewise in JSON, although type is a loose concept, on some
+  level the elements of an array will generally be of the same
+  type. This allows a sister convention seen in the below example,
+  whereby each of a list of items are typed according to the key in
+  the grandparent node which maps to the array.</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
    <span class="dt">residences</span>: {
       <span class="dt">addresses</span>: [
          [<span class="st">'Townhouse'</span>, <span class=
-"st">'Street'</span>, <span class="st">'Some town'</span>]      
+"st">'Underground street'</span>, <span class=
+"st">'Far away town'</span>]      
       ,  [<span class="st">'Beach Hut'</span>, <span class=
 "st">'Secret Island'</span>, <span class="st">'Bahamas'</span>]
       ]
@@ -1510,11 +1558,15 @@ analysis* =-->
 }</code>
 </pre>
 
-  <p>In this third example, the field names linking to addresses
-  refer to the relationship between the parent and child nodes
-  rather than the type of the child. The address type is more
-  easily recognised by its list of fields rather than its position
-  in the document:</p>
+  <p>The pluralisation of 'address' to 'addresses' above may be a
+  problem to a reader wishing to detect address nodes. I considered
+  introducing an 'or' syntax for this situation, resembling
+  <code>address|addresses.*</code> but instead decided this
+  problem, while related to type, is simpler to solve outside of
+  the JSONPath language. A programmer may simply use two JSONPaths
+  mapping to the same callback function.</p>
+
+  <p>In the below example typing is trickier still.</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
    <span class="dt">name</span>: <span class="st">'...'</span>
@@ -1550,74 +1602,64 @@ analysis* =-->
 }  </code>
 </pre>
 
-  <p>Duck typing is of course a much looser concept than an XML
-  document's tag names and collisions are possible where objects
-  co-incidentally share property names. In practice however, I find
-  the looseness a strength more often than a weakness. Under a
-  tag-based marshaling from an OO language, sub-types are assigned
-  a new tag name and as a consumer of the document, the 'isa'
-  relationship between a 'class' tagname and it's 'sub-tagname' may
-  be difficult to track. It is likely that if I'm unaware of this,
-  I'm not interested in the extended capabilities of the subclass
-  and would rather just continue to receive the base superclass
-  capabilities as before. Under duck typing this is easy - because
-  the data consumer lists the</p>
+  <p>The properties holding addresses are named by the relationship
+  between the parent and child nodes rather than the type of the
+  child. There are two ways we may be able to select objects out as
+  addresses. Firstly, because of an ontology which subtypes
+  'residence', 'premises', and 'office' as places with addresses.
+  More simply, we may import the idea of duck typing from Python
+  programing.</p>
 
-  <p>A final concept of type in json comes in the form of taking
-  the first property of an object as being the tagname.
-  Unsatisfactory, objects have an order while serialised as json
-  but once deserialised typically have no further order.
-  Clarinet.js seems to follow this pattern, notifying of new
-  objects only once the first property's key is known so that it
-  may be used to infer type. Can't be used with a general-purpose
-  JSON writer tool, nor any JSON writer tool that reads from common
-  objects.</p>
+  <blockquote>
+    <p>In other words, don't check whether it IS-a duck: check
+    whether it QUACKS-like-a duck, WALKS-like-a duck, etc, etc,
+    depending on exactly what subset of duck-like behaviour you
+    need to play your language-games with.</p>
+  </blockquote>
 
-  <p>Relationship between type of a node and its purpose in the
-  document. Purpose is often obvious from a combination of URL and
-  type so can disregard the place in the document. This structure
-  may be carefully designed but ultimately a looser interpretation
-  of the structure can be safer.</p>
+  <p>Discussion of typing in Python language, 2000. <a href=
+  "https://groups.google.com/forum/?hl=en">https://groups.google.com/forum/?hl=en</a>#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ</p>
 
-  <p>To extend JSONPath to support a concise expression of duck
-  typing, I chose a syntax which is similar to fields in
-  jsonFormat:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
-{
-   <span class="st">"name"</span>: <span class="st">"..."</span>
-,  <span class="st">"address"</span>: <span class="st">"..."</span>
-,  <span class="st">"email"</span>: <span class="st">"..."</span>
-}</code>
-</pre>
+  <p>A 'duck-definition' of address might be any object which has a
+  number, street and town. That is to say, type is
+  individualistically communicated by the object itself rather than
+  by examining the relationships described by its containing
+  ancestors. JSONPath comes with no such expressivity but I find
+  this idea so simple and useful that I have decided to create one.
+  The JSONPath language is designed to resemble programmatic
+  Javascript access but Javascript has no syntax for a list of
+  value-free properties. The closest available is the object
+  literal format; my duck-type syntax is a simplification with
+  values and commas omitted. In the case of the addresses a
+  duck-type expression would be written as <code>{number street
+  town}</code>. Generally, when identifying items of a type from a
+  document it makes sense if the type expression is contravariant
+  so that sub-types are also selected. If we consider that we
+  create a sub-duck-type when we add to a list of required fields
+  and super-duck-types when we remove them, we have a non-tree
+  shaped type space with root type <code>{}</code> which matches
+  any object. Therefore, the fields specified need not be an
+  exhaustive list of the object's properties.</p>
 
-  <p><code>{name address email}</code> The above JSONPath
-  expression would match this object in json expression and like
-  all json path expressions the pattern is quite similar to the
-  object that it matches. The object below matches because it
-  contains all the fields listed in between the curly braces in the
-  above json path expresson.</p>
+  <p>The various means of discerning type which are constructable
+  need not be used exclusively. For example, <code>aaa{bbb
+  ccc}</code> is a valid construction combining duck typing and the
+  relationship with the parent object.</p>
 
-  <p>CSS4-style capturing. Reshuffle 'root' syntax to accommodate !
-  and $.</p>
+  <h2 id="jsonpath-improving-stability-over-upgrades"><a href=
+  "#jsonpath-improving-stability-over-upgrades"><span class=
+  "header-section-number">4.2</span> JSONPath improving stability
+  over upgrades</a></h2>
 
-  <div class="figure">
-    <img src="images/marshall.png" alt=
-    "UML class diagram showing a person class in relationship with an address class. In implementation as Java the 'hasAddress' relationship would typically be reified as a getAddress method. This co-incidence of object type and the name of the field referring to the type lends itself well to the tendency for the immediate key before an object to be taken as the type when Java models are marshaled into json ">
+  <p><em>need to look at this an check doesn't duplicate rest of
+  diss</em>.</p>
 
-    <p class="caption">UML class diagram showing a person class in
-    relationship with an address class. In implementation as Java
-    the 'hasAddress' relationship would typically be reified as a
-    getAddress method. This co-incidence of object type and the
-    name of the field referring to the type lends itself well to
-    the tendency for the immediate key before an object to be taken
-    as the type when Java models are marshaled into json</p>
-  </div>
+  <ul>
+    <li>Use of <code>..</code> over <code>.</code></li>
 
-  <h2 id="stability-over-upgrades"><a href=
-  "#stability-over-upgrades"><span class=
-  "header-section-number">4.2</span> Stability over
-  upgrades</a></h2>
+    <li>Keep this short. Might not need diagram if time
+    presses.</li>
+  </ul>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -1644,9 +1686,49 @@ analysis* =-->
   without causing problems [SOA] how to guarantee non-breakages?
   could publish 'supported queries' that are guaranteed to work</p>
 
-  <h2 id="parsing-the-json"><a href=
-  "#parsing-the-json"><span class="header-section-number">4.3</span>
-  Parsing the JSON</a></h2>
+  <h2 id="importing-css4-selector-capturing-to-oboe-jsonpath">
+  <a href=
+  "#importing-css4-selector-capturing-to-oboe-jsonpath"><span class="header-section-number">
+  4.3</span> Importing CSS4 selector capturing to Oboe
+  JSONPath</a></h2>
+
+  <p>Sometimes when downloading a collection of items it is less
+  useful to be given each element individually than being kept up
+  to date as the collection is expanded. Certain Javascript
+  libraries such as d3.js and Angular interface more naturally with
+  arrays of items than individual entities. To allow integration
+  with these libraries, on receiving an array of items it is useful
+  to be repeatedly passed the same containing array whenever a new
+  element is concatenated onto it.</p>
+
+  <p>Expressing a 'contained in' relationship comes naturally to
+  JSONPath, but no provision is made for a 'containing'
+  relationship. Cascading Style Sheets, or CSS, the web's styling
+  language has long shared this restriction but a recent proposal,
+  currently at Editor's Draft stage <span class="citation">(Etemad
+  and Atkins 2013)</span> provides an elegant means to cover this
+  gap. Rather than add an explicit 'containing' relationship, the
+  css4 proposal observes that css selectors have previously only
+  allowed selection of the right-most of the terms given, allowing
+  only the deepest element mentioned to be selected. This
+  restriction is removed by allowing terms may be prefixed with
+  <code>$</code> in order to make them capturing: in the absence of
+  an explicitly capturing term the right-most continues to capture.
+  Whereas <code>form.important input.mandatory</code> selects for
+  styling mandatory inputs inside important forms,
+  <code>$form.important input.mandatory</code> selects important
+  forms with mandatory fields.</p>
+
+  <p>Importing the CSS4 dollar into Oboe's JSONPath should make it
+  much easier to integrate with libraries which treat arrays as
+  their basic unit of operation and uses a syntax which the
+  majority of web developers are likely to be familiar with over
+  the next few years.</p>
+
+  <h2 id="parsing-the-json-response"><a href=
+  "#parsing-the-json-response"><span class=
+  "header-section-number">4.4</span> Parsing the JSON
+  Response</a></h2>
 
   <p>While SAX parsers provide an unfriendly interface to
   application developers, as a starting point for higher-level
@@ -1657,7 +1739,7 @@ analysis* =-->
   was chosen in tribute to the value delivered by Clarinet.</p>
 
   <h2 id="api-design"><a href="#api-design"><span class=
-  "header-section-number">4.4</span> API design</a></h2>
+  "header-section-number">4.5</span> API design</a></h2>
 
   <p>In designing the API developer ergonomics are the top
   priority. This is especially pertinent given that the library
@@ -1764,7 +1846,7 @@ analysis* =-->
    });</code>
 </pre>
 
-  <p>Because I forsee several patterns being added for most types
+  <p>Because I foresee several patterns being added for most types
   of JSON documents, a shortcut format is also available for adding
   multiple patterns in a single call by using the patterns as the
   keys and the callbacks as the values in a key/value mapping:</p>
@@ -1874,7 +1956,7 @@ analysis* =-->
 
   <h2 id="earlier-callbacks-when-paths-are-matched"><a href=
   "#earlier-callbacks-when-paths-are-matched"><span class=
-  "header-section-number">4.5</span> Earlier callbacks when paths
+  "header-section-number">4.6</span> Earlier callbacks when paths
   are matched</a></h2>
 
   <p>Following with the project's aim of giving callbacks as early
@@ -1917,8 +1999,10 @@ analysis* =-->
   when items are pushed to the stack of current nodes in addition
   to when they are popped.</p>
 
-  <h2 id="micro-library"><a href="#micro-library"><span class=
-  "header-section-number">4.6</span> Micro-library</a></h2>
+  <h2 id="oboe.js-as-a-micro-library"><a href=
+  "#oboe.js-as-a-micro-library"><span class=
+  "header-section-number">4.7</span> Oboe.js as a
+  Micro-Library</a></h2>
 
   <p>Http traffic, especially sending entropy-sparse text formats
   is often gzipped at point of sending in order to deliver it more
@@ -1927,46 +2011,60 @@ analysis* =-->
   qualifies as being <em>micro</em> if it is delivered in 5k or
   less, 5120 bytes. Micro-libraries also tend to follow the ethos
   that it is better for a developer to gather together several tiny
-  libraries than one that uses a one-size-fits-all approach. This
-  perhaps echos the unix command line tradition of small programs
-  which each do do exactly one thing.<br>
-  This project feels on the edge of what is possible to elegantly
-  do as a micro-library so while the limit is somewhat arbitrary,
-  for the sake of adoption smaller is better and keeping below this
-  limit whilst writing readable code is an interesting
-  challenge.</p>
+  libraries than one that uses a one-size-fits-all approach,
+  perhaps echoing the unix command line tradition of small programs
+  which each do do exactly one thing. Javascript Micro-libraries
+  are listed at,<sup><a href="#fn4" class="footnoteRef" id="fnref4"
+  name="fnref4">4</a></sup> which includes this project. Oboe.js
+  feels on the edge of what is possible to elegantly do as a
+  micro-library so while the limit is somewhat arbitrary, for the
+  sake of adoption smaller is better and keeping below this limit
+  whilst writing readable code is an interesting challenge. As well
+  as being a small library, in the spirit of a micro-library a
+  project should impose as few restrictions as possible on its use
+  and be designed to be completely agnostic as to which other
+  libraries or programming styles that it is used with.</p>
 
-  <p>Link to micro-js in there somewhere</p>
-
-  <h2 id="responding-to-failures"><a href=
-  "#responding-to-failures"><span class=
-  "header-section-number">4.7</span> Responding to
+  <h2 id="handling-transport-failures"><a href=
+  "#handling-transport-failures"><span class=
+  "header-section-number">4.8</span> Handling transport
   failures</a></h2>
 
-  <p><em>is this section really needed?</em></p>
+  <p>Oboe should allow requests to fail while the response is being
+  received without necessarily losing the part that was
+  successfully received.</p>
 
-  <p>As discussed above in API design, errors due to the transport
-  will cause a callback to be returned to the calling
-  application.</p>
-
-  <p>Not automatic, just inform user. Most of the time will want to
-  perform some kind of rollback from optimistic locking.</p>
-
-  <p>I did consider the option of automatially resuming failed
-  requests. Http 1.1 provides a mechanism for Byte Serving via the
-  Accepts-Ranges header [<a href=
+  <p>Researching error handing, I considered the option of
+  automatically resuming failed requests without intervention from
+  the containing application. Http 1.1 provides a mechanism for
+  Byte Serving via the <code>Accepts-Ranges</code> header [<a href=
   "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5]
-  which can be used to request any contiguous part of a response
-  rather than the whole. However, having examined this option I
-  came to the conclusion that this approach would be brittle
-  because it assumes two requests to the same URL will give exactly
-  the same response.</p>
+  which is used to request any contiguous fragment of a resource --
+  in our case, the part that we missed when the download failed.
+  Having examined this option I came to the conclusion that it
+  would encourage brittle systems because it assumes two requests
+  to the same URL will give byte-wise equal responses.</p>
 
-  <p>A better option</p>
+  <p>A deeper problem is that Oboe cannot know the correct
+  behaviour when a request fails so this is better left to the
+  containing applications. Generally on request failure, two
+  behaviours may be anticipated. If the actions performed in
+  response to data received up to time of failure remain valid in
+  the absence of a full transmission, their effects may be kept and
+  a URL may be constructed to request just the lost part.
+  Alternatively, under optimistic locking, the application
+  developer may choose to perform rollback. In either case,
+  responding to errors beyond informing the calling application is
+  outside of Oboe's scope.</p>
+
+  <p>IO errors in a non-blocking system cannot be handled via
+  exception throwing because the call which will later cause an
+  error will no longer be on the stack at the time that the error
+  occurs. Error-events will be used instead.</p>
 
   <h2 id="fallback-support-on-less-capable-platforms"><a href=
   "#fallback-support-on-less-capable-platforms"><span class=
-  "header-section-number">4.8</span> Fallback support on
+  "header-section-number">4.9</span> Fallback support on
   less-capable platforms</a></h2>
 
   <p><em>something about market share and link to figures in an
@@ -2449,10 +2547,10 @@ analysis* =-->
   constructors but act like factory functions: (<a href=
   "http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html">http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html</a>#ch02-constructor-factory)</p>
 
-  <h2 id="design-and-implementation-of-the-jsonpath-parser">
-  <a href="#design-and-implementation-of-the-jsonpath-parser"><span class="header-section-number">
-  5.9</span> Design and implementation of the JSONPath
-  parser</a></h2>
+  <h2 id="jsonpath-implementation"><a href=
+  "#jsonpath-implementation"><span class=
+  "header-section-number">5.9</span> JSONPath
+  Implementation</a></h2>
 
   <p>Show evolution of it. Like most compilers, first try was just
   a bunch of regexes that generated a regex to match the pattern.
@@ -3035,6 +3133,11 @@ analysis* =-->
   "http://json.org" title=
   "http://json.org">http://json.org</a>.</p>
 
+  <p>Etemad, Elika J, and Tab Atkins. 2013.
+  &acirc;&euro;&oelig;Selectors Level 4.&acirc;&euro; <a href=
+  "http://dev.w3.org/csswg/selectors4/" title=
+  "http://dev.w3.org/csswg/selectors4/">http://dev.w3.org/csswg/selectors4/</a>.</p>
+
   <p>Fielding, R. T. 2000. &acirc;&euro;&oelig;Principled design of
   the modern Web architecture.&acirc;&euro;</p>
 
@@ -3112,10 +3215,8 @@ analysis* =-->
       </li>
 
       <li id="fn2">
-        <p>Rather confusingly, X11 would call the <em>server</em>
-        the <em>client</em> but I use terms here by their more
-        cannonical meaning such that the client is the machine the
-        user is actually interacting with.<a href=
+        <p><a href=
+        "http://microjs.com/">Http://microjs.com/</a>.<a href=
         "#fnref2">&acirc;&dagger;&copy;</a></p>
       </li>
 
@@ -3123,6 +3224,12 @@ analysis* =-->
         <p>See <a href=
         "http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html">
         http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html</a>.<a href="#fnref3">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn4">
+        <p><a href=
+        "http://microjs.com/">Http://microjs.com/</a>.<a href=
+        "#fnref4">&acirc;&dagger;&copy;</a></p>
       </li>
     </ol>
   </div>
