@@ -242,7 +242,7 @@ chose a syntax which is similar to fields in jsonFormat:
 object in json expression and like all json path expressions the pattern
 is quite similar to the object that it matches. The object below matches
 because it contains all the fields listed in between the curly braces in
-the above json path expresson.
+the above json path expression.
 
 A final concept of type in json comes in the form of taking the first
 property of an object as being the tagname. Unsatisfactory, objects have
