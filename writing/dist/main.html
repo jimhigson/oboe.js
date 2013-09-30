@@ -1338,14 +1338,10 @@ analysis* =-->
 @333w, 13,000 to 19,000
 =-->
 
-  <h1 id="application-and-reflection-1-what-is-it"><a href=
-  "#application-and-reflection-1-what-is-it"><span class=
-  "header-section-number">4</span> Application and Reflection 1:
-  what is it?</a></h1>
-
-  <h2 id="high-level-solution"><a href=
-  "#high-level-solution"><span class=
-  "header-section-number">4.1</span> High-level solution</a></h2>
+  <h1 id="application-and-reflection"><a href=
+  "#application-and-reflection"><span class=
+  "header-section-number">4</span> Application and
+  Reflection:</a></h1>
 
   <p>Using a combination of the techniques investigated in the
   previous chapter, I propose that a simple design is possible
@@ -1419,9 +1415,9 @@ analysis* =-->
   any granularity of interest, from large object to individual
   datums. With just a few lines of programming</p>
 
-  <h2 id="jsonpath-variation"><a href=
-  "#jsonpath-variation"><span class=
-  "header-section-number">4.2</span> JsonPATH variation</a></h2>
+  <h2 id="jsonpath-expressions"><a href=
+  "#jsonpath-expressions"><span class=
+  "header-section-number">4.1</span> JSONPath expressions</a></h2>
 
   <p>In searching through a model stocked with data is common to
   ask for database-style queries such as 'books costing more than
@@ -1438,6 +1434,21 @@ analysis* =-->
   types defined in the markup languages themselves. Essence of
   marshaling.</p>
 
+  <p>Xml comes with a strong concept of the <em>type</em> of an
+  element, the tag name is taken as a more immediate fundamental
+  property of the thing than the attributes. For example, in
+  automatic json-Java object demarshallers, the tag name is always
+  mapped to the Java class. In JSON, other than the base types
+  common to most languages (array, object, string etc) there is no
+  further concept of type. If we wish to build a further
+  understanding of the type of the objects then the realtionship
+  with the parent object, expressed by the attribute name, is more
+  likely to indicate the type. A second approach is to use duck
+  typing in which the relationship of the object to its ancestors
+  is not examined but the properties of the object are used instead
+  to communicate an enhanced concept of type. For example, we might
+  say that any object with an isbn and a title is a book.</p>
+
   <p>Whereas XML has a pretty good concept of the type of an
   element (beyond simply being an element node) in the tagName,
   JSON's objects are all simply objects. In JSON the type of a node
@@ -1445,44 +1456,55 @@ analysis* =-->
   the parent object which references a node; or, from the fields
   that the object has.</p>
 
+  <p>In the absence of node typing beyond the categorisation as
+  objects, arrays and various primitive types, the key immediately
+  mapping to the object is often taken as a lose concept of the
+  type of the object. Quite fortunately, rather than because of a
+  well considered object design, this tends to play well with
+  automatically marshaling of domain objects expressed in a
+  Java-style OO language because there is a strong tendency for
+  field names -- and by extension, 'get' methods -- to be named
+  after the <em>type</em> of the field, the name of the type also
+  serving as a rough summary of the relationship between two
+  objects. See figure below.</p>
+
   <p>In the below example, we assign the node the type 'address'
   because of the parent node's field name. Other than this, these
   are standard arrays of strings:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
-   <span class="dt">name</span>: <span class="st">''</span>,
-   <span class="dt">residence</span>: {
+   <span class="dt">name</span>: <span class="st">'...'</span>
+,  <span class="dt">residence</span>: {
       <span class="dt">address</span>: [
-         <span class="st">''</span>, <span class=
-"st">''</span>, <span class="st">''</span>
+         <span class="st">'...'</span>, <span class=
+"st">'...'</span>, <span class="st">'...'</span>
       ]
-   },
-   <span class="dt">employer</span>: {
-      <span class="dt">name</span>: <span class="st">''</span>,
-      <span class="dt">address </span>:[
-         <span class="st">''</span>, <span class=
-"st">''</span>, <span class="st">''</span>      
+   }
+,  <span class="dt">employer</span>: {
+      <span class="dt">name</span>: <span class="st">'...'</span>
+   ,  <span class="dt">address </span>:[
+         <span class="st">'...'</span>, <span class=
+"st">'...'</span>, <span class="st">'...'</span>      
       ]
    }   
 }</code>
 </pre>
 
-  <p>As a slight variant, when dealing with multiple addresses in
-  an array, it is the grandparent's node field name which indicates
+  <p>By sensible convention, even in a serialisation format which
+  allows lists of disparate types, lists contain only items of
+  equivalent type. This gives way to a sister convention seen in
+  the below example, when serialising with multiple addresses in an
+  array, it is the grandparent's node field name which indicates
   the type, the parent being the array containing the multiple
   addressees:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
    <span class="dt">residences</span>: {
       <span class="dt">addresses</span>: [
-         [<span class="st">'Beach Hut'</span>, <span class=
+         [<span class="st">'Townhouse'</span>, <span class=
+"st">'Street'</span>, <span class="st">'Some town'</span>]      
+      ,  [<span class="st">'Beach Hut'</span>, <span class=
 "st">'Secret Island'</span>, <span class="st">'Bahamas'</span>]
-      ,  [<span class="st">''</span>, <span class=
-"st">''</span>, <span class="st">''</span>]
-      ,  [<span class="st">''</span>, <span class=
-"st">''</span>, <span class="st">''</span>]
-      ,  [<span class="st">''</span>, <span class=
-"st">''</span>, <span class="st">''</span>]
       ]
    }
 }</code>
@@ -1495,34 +1517,34 @@ analysis* =-->
   in the document:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{
-   <span class="dt">name</span>: <span class="st">''</span>,
-   <span class="dt">residence</span>: {
+   <span class="dt">name</span>: <span class="st">'...'</span>
+,  <span class="dt">residence</span>: {
       <span class="dt">number</span>:<span class=
-"st">''</span>, <span class="dt">street</span>:<span class=
-"st">''</span>, <span class="dt">town</span>:<span class=
-"st">''</span> 
-   },   
-   <span class="dt">employer</span>:{
-      <span class="dt">name</span>: <span class="st">''</span>
-      <span class="dt">premises</span>:[
+"st">'...'</span>, <span class="dt">street</span>:<span class=
+"st">'...'</span>, <span class="dt">town</span>:<span class=
+"st">'...'</span> 
+   }
+,  <span class="dt">employer</span>:{
+      <span class="dt">name</span>: <span class="st">'...'</span>
+   ,  <span class="dt">premises</span>:[
          { <span class="dt">number</span>:<span class=
-"st">''</span>, <span class="dt">street</span>:<span class=
-"st">''</span>, <span class="dt">town</span>:<span class=
-"st">''</span> },
-         { <span class="dt">number</span>:<span class=
-"st">''</span>, <span class="dt">street</span>:<span class=
-"st">''</span>, <span class="dt">town</span>:<span class=
-"st">''</span> },
-         { <span class="dt">number</span>:<span class=
-"st">''</span>, <span class="dt">street</span>:<span class=
-"st">''</span>, <span class="dt">town</span>:<span class=
-"st">''</span> }
-      ],
-      <span class="dt">registeredOffice</span>:{
+"st">'...'</span>, <span class="dt">street</span>:<span class=
+"st">'...'</span>, <span class="dt">town</span>:<span class=
+"st">'...'</span> }
+      ,  { <span class="dt">number</span>:<span class=
+"st">'...'</span>, <span class="dt">street</span>:<span class=
+"st">'...'</span>, <span class="dt">town</span>:<span class=
+"st">'...'</span> }
+      ,  { <span class="dt">number</span>:<span class=
+"st">'...'</span>, <span class="dt">street</span>:<span class=
+"st">'...'</span>, <span class="dt">town</span>:<span class=
+"st">'...'</span> }
+      ]
+   ,  <span class="dt">registeredOffice</span>:{
          <span class="dt">number</span>:<span class=
-"st">''</span>, <span class="dt">street</span>:<span class=
-"st">''</span>, <span class="dt">town</span>:<span class=
-"st">''</span>
+"st">'...'</span>, <span class="dt">street</span>:<span class=
+"st">'...'</span>, <span class="dt">town</span>:<span class=
+"st">'...'</span>
       }
    }
 }  </code>
@@ -1541,72 +1563,8 @@ analysis* =-->
   capabilities as before. Under duck typing this is easy - because
   the data consumer lists the</p>
 
-  <p>Relationship between type of a node and its purpose in the
-  document. Purpose is often obvious from a combination of URL and
-  type so can disregard the place in the document. This structure
-  may be carefully designed but ultimately a looser interpretation
-  of the structure can be safer.</p>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "extended json rest service that still works - maybe do a table instead ">
-
-    <p class="caption">extended json rest service that still works
-    - maybe do a table instead</p>
-  </div>
-
-  <p>From old writing we have:</p>
-
-  <p><em>CSS4-style capturing. Reshuffle 'root' syntax to
-  accommodate ! and $.</em></p>
-
-  <p>To extend JsonPath to support a concise expression of duck
-  typing, I chose a syntax which is similar to fields in
-  jsonFormat:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
-<span class=
-"co">// the curly braces are my extension to jsonpath"</span>
-<span class="kw">var</span> jsonPath = <span class=
-"fu">jsonPathCompiler</span>(<span class=
-"st">"{name address email}"</span>);
-
-<span class=
-"co">// the above jsonPath expression would match this object in json </span>
-<span class=
-"co">// expression and like all json path expressions the pattern is </span>
-<span class=
-"co">// quite similar to the object that it matches. The object below </span>
-<span class=
-"co">// matches because it contains all the fields listed</span>
-<span class=
-"co">// in between the curly braces in the above json path expresson.</span>
-
-<span class="kw">var</span> matchingObject = {
-   <span class="st">"name"</span>: <span class="st">"..."</span>,
-   <span class="st">"address"</span>: <span class=
-"st">"..."</span>,
-   <span class="st">"email"</span>: <span class="st">"...:</span>
-}</code>
-</pre>
-
-  <p>Xml comes with a strong concept of the <em>type</em> of an
-  element, the tag name is taken as a more immediate fundamental
-  property of the thing than the attributes. For example, in
-  automatic json-Java object demarshallers, the tag name is always
-  mapped to the Java class. In JSON, other than the base types
-  common to most languages (array, object, string etc) there is no
-  further concept of type. If we wish to build a further
-  understanding of the type of the objects then the realtionship
-  with the parent object, expressed by the attribute name, is more
-  likely to indicate the type. A second approach is to use duck
-  typing in which the relationship of the object to its ancestors
-  is not examined but the properties of the object are used instead
-  to communicate an enhanced concept of type. For example, we might
-  say that any object with an isbn and a title is a book.</p>
-
-  <p>A third injection of type into json comes in the form of
-  taking the first property of an object as being the tagname.
+  <p>A final concept of type in json comes in the form of taking
+  the first property of an object as being the tagname.
   Unsatisfactory, objects have an order while serialised as json
   but once deserialised typically have no further order.
   Clarinet.js seems to follow this pattern, notifying of new
@@ -1615,18 +1573,33 @@ analysis* =-->
   JSON writer tool, nor any JSON writer tool that reads from common
   objects.</p>
 
-  <p>First way to identify an interesting thing is by its location
-  in the document. In the absense of node typing beyond the
-  categorisation as objects, arrays and various primative types,
-  the key immediately mapping to the object is often taken as a
-  lose concept of the type of the object. Quite fortunately, rather
-  than because of a well considered object design, this tends to
-  play well with automatically marshaling of domain objects
-  expressed in a Java-style OO language because there is a strong
-  tendency for field names -- and by extension, 'get' methods -- to
-  be named after the <em>type</em> of the field, the name of the
-  type also serving as a rough summary of the relationship between
-  two objects. See figure below.</p>
+  <p>Relationship between type of a node and its purpose in the
+  document. Purpose is often obvious from a combination of URL and
+  type so can disregard the place in the document. This structure
+  may be carefully designed but ultimately a looser interpretation
+  of the structure can be safer.</p>
+
+  <p>To extend JSONPath to support a concise expression of duck
+  typing, I chose a syntax which is similar to fields in
+  jsonFormat:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">
+{
+   <span class="st">"name"</span>: <span class="st">"..."</span>
+,  <span class="st">"address"</span>: <span class="st">"..."</span>
+,  <span class="st">"email"</span>: <span class="st">"..."</span>
+}</code>
+</pre>
+
+  <p><code>{name address email}</code> The above JSONPath
+  expression would match this object in json expression and like
+  all json path expressions the pattern is quite similar to the
+  object that it matches. The object below matches because it
+  contains all the fields listed in between the curly braces in the
+  above json path expresson.</p>
+
+  <p>CSS4-style capturing. Reshuffle 'root' syntax to accommodate !
+  and $.</p>
 
   <div class="figure">
     <img src="images/marshall.png" alt=
@@ -1641,15 +1614,18 @@ analysis* =-->
     as the type when Java models are marshaled into json</p>
   </div>
 
-  <p>By sensible convention, even in a serialisation format with
-  only a loose definition of lists, lists contain only items of the
-  same type. This gives way to a sister convention, that for lists
-  of items, the key immediately linking to the</p>
-
   <h2 id="stability-over-upgrades"><a href=
   "#stability-over-upgrades"><span class=
-  "header-section-number">4.3</span> Stability over
+  "header-section-number">4.2</span> Stability over
   upgrades</a></h2>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "extended json rest service that still works - maybe do a table instead ">
+
+    <p class="caption">extended json rest service that still works
+    - maybe do a table instead</p>
+  </div>
 
   <p>Programming to identify a certain interesting part of a
   resource today should with a high probability still work when
@@ -1664,20 +1640,24 @@ analysis* =-->
   "push-down" refactor in which what was a root node is pushed down
   a level by being suspended from a new parent.</p>
 
-  <p>why jsonpath-like syntax allows upgrading message semantics
+  <p>why JSONPath-like syntax allows upgrading message semantics
   without causing problems [SOA] how to guarantee non-breakages?
   could publish 'supported queries' that are guaranteed to work</p>
 
-  <h2 id="incorporating-existing-libraries"><a href=
-  "#incorporating-existing-libraries"><span class=
-  "header-section-number">4.4</span> Incorporating existing
-  libraries</a></h2>
+  <h2 id="parsing-the-json"><a href=
+  "#parsing-the-json"><span class="header-section-number">4.3</span>
+  Parsing the JSON</a></h2>
 
-  <p>Oboe name in tribute to work already done in Clarinet
-  project.</p>
+  <p>While SAX parsers provide an unfriendly interface to
+  application developers, as a starting point for higher-level
+  parsers they work very well (in fact, most XML DOM parsers are
+  made in this way). The pre-existing project Clarinet is well
+  tested, liberally licenced and compact, meeting the goals of this
+  project perfectly. In fact, the name of this project, Oboe.js,
+  was chosen in tribute to the value delivered by Clarinet.</p>
 
   <h2 id="api-design"><a href="#api-design"><span class=
-  "header-section-number">4.5</span> API design</a></h2>
+  "header-section-number">4.4</span> API design</a></h2>
 
   <p>In designing the API developer ergonomics are the top
   priority. This is especially pertinent given that the library
@@ -1726,6 +1706,11 @@ analysis* =-->
    });</code>
 </pre>
 
+  <p>While for simple web applications usage is much as above,<br>
+  In real world usage on more complex apps jQuery.ajax is often
+  injected into the scope of the code which wants to use it. Easier
+  stubbing so that tests don't have to make actual AJAX calls.</p>
+
   <p>While certainly callback-based, the jQuery is somewhat
   implicit in being event-based. There are no event names separate
   from the methods which add the listeners and there are no event
@@ -1768,13 +1753,44 @@ analysis* =-->
 "kw">function</span>( wholeJson ) {
       <span class="ot">console</span>.<span class=
 "fu">log</span>(<span class="st">'got everything'</span>);
+   })
+   .<span class="fu">error</span>( <span class=
+"kw">function</span>() {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">'actually, the download failed. Forget the'</span> + 
+                  <span class=
+"st">' people I just told you about'</span>);
    });</code>
 </pre>
 
-  <p>Note the path and ancestors parameters in the example above.
-  Most of the time being given matching content is enough to be
-  able to react to that content. However it is easy to imagine
-  cases where a wider context matters. Consider this JSON:</p>
+  <p>Because I forsee several patterns being added for most types
+  of JSON documents, a shortcut format is also available for adding
+  multiple patterns in a single call by using the patterns as the
+  keys and the callbacks as the values in a key/value mapping:</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">oboe</span>(<span class="st">'resources/someJson.json'</span>)
+   .<span class="fu">node</span>({  
+      <span class="st">'person.name'</span>: <span class=
+"kw">function</span>(personName, path, ancestors) {
+         <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">"let me tell you about "</span> + name);
+      },
+      <span class="st">'person.address.town'</span>: <span class=
+"kw">function</span>(townName, path, ancestors) {
+         <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class=
+"st">"they live in "</span> + townName);
+      }
+   });</code>
+</pre>
+
+  <p>Note the path and ancestors parameters in the examples above.
+  Most of the time giving the callback the matching content is
+  enough to be able to act but it is easy to imagine cases where a
+  wider context matters. Consider this JSON:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">{ 
    <span class="st">"event"</span>: <span class=
@@ -1805,7 +1821,12 @@ analysis* =-->
   <code>ancestors</code> array is a list of the ancestors starting
   at the immediate parent of the found node and ending with the
   JSON root node. For all but the root node (which has no ancestors
-  anyway) the nodes in this list will be only partially parsed.</p>
+  anyway) the nodes in this list will be only partially parsed.
+  Being untyped, Javascript does not enforce the arity of the
+  callback. Because much of the time only the content itself is
+  needed, the API design orders the callback parameters to take
+  advantage of the loose typing so that a unary function taking
+  only the content may be given.</p>
 
   <p>For the widest context currently available, the whole document
   as it has been parsed so far may be accessed using the
@@ -1814,19 +1835,25 @@ analysis* =-->
   be accessed from any code with a reference to the oboe
   object.</p>
 
-  <p><a href=
-  "http://nodejs.org/docs/latest/api/events.html">http://nodejs.org/docs/latest/api/events.html</a>#events_emitter_on_event_listener</p>
+  <p>
+  <code>http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener</code></p>
 
   <p>In node.js the code style is more obviously event-based.
-  Listeners are added via a `.on' method with a string event name
-  given as the first argument. Adopting this style, my API design
-  for oboe.js also allows events to be added as:</p>
+  Listeners are added via a <code>.on</code> method with a string
+  event name given as the first argument. Adopting this style, my
+  API design for oboe.js also allows events to be added as:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "fu">oboe</span>(<span class="st">'resources/someJson.json'</span>)
    .<span class="fu">on</span>( <span class=
 "st">'node'</span>, <span class=
-"st">'person.name'</span>, <span class="kw">function</span>() {
+"st">'medalWinners.*'</span>, <span class=
+"kw">function</span>(person, path, ancestors) {
+      <span class="ot">console</span>.<span class=
+"fu">log</span>( <span class="ot">person</span>.<span class=
+"fu">name</span> + <span class=
+"st">' won the '</span> + <span class=
+"fu">lastOf</span>(path) + <span class="st">' medal'</span> );
    });</code>
 </pre>
 
@@ -1838,123 +1865,169 @@ analysis* =-->
   without difficulty. In implementation a duplicative API should
   require only a minimal degree of extra coding because these parts
   may be expressed in common and their scope reduced using partial
-  completion. Because <code>'!'</code> is the jsonPath for the root
+  completion. Because <code>'!'</code> is the JSONPath for the root
   of the document, for some callback c, <code>.done(c)</code> is a
   synonym for <code>.node('!', c)</code> and therefore below a thin
   interface layer may share an implementation. Likewise,
   <code>.node</code> is easily expressible as a partial completion
   of <code>.on</code> with <code>'node'</code>.</p>
 
-  <h2 id="early-callbacks-for-paths"><a href=
-  "#early-callbacks-for-paths"><span class=
-  "header-section-number">4.6</span> Early callbacks for
-  paths</a></h2>
+  <h2 id="earlier-callbacks-when-paths-are-matched"><a href=
+  "#earlier-callbacks-when-paths-are-matched"><span class=
+  "header-section-number">4.5</span> Earlier callbacks when paths
+  are matched</a></h2>
 
-  <p>In line with the project's aim of giving callbacks as early as
-  possible, sometimes useful work can be done as soon as a node is
-  known to exist before we actually know what the contents of the
-  node are. This means that each node found in a JSON document has
-  the potential to trigger notifications at two points: when it is
-  first discovered and when it is complete. The API can easily
-  allow this by providing a .node</p>
-
-  <p>In implementation this should add little extra complication to
-  the code, it is simply a matter of allowing the evaluation of the
-  json path expressions when items are added to the stack of
-  current nodes in addition to when they are removed.</p>
+  <p>Following with the project's aim of giving callbacks as early
+  as possible, sometimes useful work can be done when a node is
+  known to exist but before we have the contents of the node. This
+  means that each node found in a JSON document has the potential
+  to trigger notifications at two points: when it is first
+  discovered and when it is complete. The API facilitates this by
+  providing a <code>path</code> callback following much the same
+  pattern as the <code>node</code> callback.</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
-"fu">oboe</span>(<span class=
-"st">'sourceCodeControl/repositoryGraph.json'</span>)
-   .<span class="fu">on</span>( <span class=
-"st">'path'</span>, <span class="st">'branch'</span>, <span class=
-"kw">function</span>() {
-      
+"fu">oboe</span>(<span class="st">'events.json'</span>)
+   .<span class="fu">path</span>( <span class=
+"st">'medalWinners'</span>, <span class="kw">function</span>() {
+      <span class=
+"co">// We don't know the winners yet but we know we have some so let's</span>
+      <span class=
+"co">// start drawing the table already:    </span>
+      <span class="kw">interface</span>.<span class=
+"fu">showMedalTable</span>();
+   })
+   .<span class="fu">node</span>( <span class=
+"st">'medalWinners.*'</span>, <span class=
+"kw">function</span>(person, path) {    
+      <span class="kw">interface</span>.<span class=
+"fu">addPersonToMedalTable</span>(person, <span class=
+"fu">lastOf</span>(path));
+   })
+   .<span class="fu">fail</span>( <span class=
+"kw">function</span>(){
+      <span class="co">// That didn't work. Revert!</span>
+      <span class="kw">interface</span>.<span class=
+"fu">hideMedalTable</span>();
    });</code>
 </pre>
 
-  <p>Detecting Paths, not just nodes. Sometimes gives callback even
-  earlier.</p>
-
-  <h3 id="root"><a href="#root"><span class=
-  "header-section-number">4.6.1</span> root</a></h3>
-
-  <p>Ability to get the root at any time by doing this.root();</p>
-
-  <h3 id="errors"><a href="#errors"><span class=
-  "header-section-number">4.6.2</span> errors</a></h3>
-
-  <p>Errors</p>
+  <p>In implementation providing path notifications is a simple
+  matter of allowing the evaluation of the json path expressions
+  when items are pushed to the stack of current nodes in addition
+  to when they are popped.</p>
 
   <h2 id="micro-library"><a href="#micro-library"><span class=
-  "header-section-number">4.7</span> Micro-library</a></h2>
+  "header-section-number">4.6</span> Micro-library</a></h2>
 
-  <p>5120 bytes.</p>
+  <p>Http traffic, especially sending entropy-sparse text formats
+  is often gzipped at point of sending in order to deliver it more
+  quickly, so in measuring a download footprint it usually makes
+  more sense to compare post-gzipping. A Javascript library
+  qualifies as being <em>micro</em> if it is delivered in 5k or
+  less, 5120 bytes. Micro-libraries also tend to follow the ethos
+  that it is better for a developer to gather together several tiny
+  libraries than one that uses a one-size-fits-all approach. This
+  perhaps echos the unix command line tradition of small programs
+  which each do do exactly one thing.<br>
+  This project feels on the edge of what is possible to elegantly
+  do as a micro-library so while the limit is somewhat arbitrary,
+  for the sake of adoption smaller is better and keeping below this
+  limit whilst writing readable code is an interesting
+  challenge.</p>
 
-  <p>What a Micro-library is. What motivates the trend? This
-  library has a fairly small set of functionality, it isn't a
-  general purpose do-everything library like jQuery so its size
-  will be looked at more critically if it is too large. Micro
-  library is the current gold standard for compactness. Still, have
-  a lot to do in not very much code.</p>
+  <p>Link to micro-js in there somewhere</p>
 
-  <p>This project feels on the edge of what is possible to
-  elegantly do in 5k, so while the limit is somewhat arbitrary, it
-  is an interesting challenge.</p>
+  <h2 id="responding-to-failures"><a href=
+  "#responding-to-failures"><span class=
+  "header-section-number">4.7</span> Responding to
+  failures</a></h2>
 
-  <h2 id="handling-failures"><a href=
-  "#handling-failures"><span class=
-  "header-section-number">4.8</span> Handling failures</a></h2>
+  <p><em>is this section really needed?</em></p>
 
-  <p>Http 1.1 provides a mechanism for Byte Serving via the
+  <p>As discussed above in API design, errors due to the transport
+  will cause a callback to be returned to the calling
+  application.</p>
+
+  <p>Not automatic, just inform user. Most of the time will want to
+  perform some kind of rollback from optimistic locking.</p>
+
+  <p>I did consider the option of automatially resuming failed
+  requests. Http 1.1 provides a mechanism for Byte Serving via the
   Accepts-Ranges header [<a href=
   "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a>#sec14.5]
   which can be used to request any contiguous part of a response
-  rather than the whole. Common in download managers but not REST
-  clients. This ability can be used to. Why not this one. Resume on
-  a higher semantic level.</p>
+  rather than the whole. However, having examined this option I
+  came to the conclusion that this approach would be brittle
+  because it assumes two requests to the same URL will give exactly
+  the same response.</p>
 
-  <p>(not) Resume on failure at byte level but might be worked in
-  on a future version. Probably unsafe since can't guarantee the
-  2nd time requesting a URL will give the same response
-  byte-for-byte.</p>
+  <p>A better option</p>
 
-  <h2 id="required-support-for-older-browsers"><a href=
-  "#required-support-for-older-browsers"><span class=
-  "header-section-number">4.9</span> Required support for older
-  browsers</a></h2>
+  <h2 id="fallback-support-on-less-capable-platforms"><a href=
+  "#fallback-support-on-less-capable-platforms"><span class=
+  "header-section-number">4.8</span> Fallback support on
+  less-capable platforms</a></h2>
 
-  <p>Aims not possible to realise but don't want to make devs using
-  lib have to special-case.</p>
+  <p><em>something about market share and link to figures in an
+  appendix?</em></p>
 
-  <p>Still works as well as non-progressive json Could be used for
-  content that is inherently streaming (wouldn't make sense without
-  streaming)</p>
+  <p>Because of differences in the capabilities in browsers,
+  providing a streaming REST client is not possible on all
+  browsers. If this were possible, it would not have been necessary
+  to invent push pages or long polling. Specifically, none but the
+  most recent versions of Internet Explorer provide any way to
+  access an AJAX response before it is complete. I have taken the
+  design decision that it is ok to degrade on these platforms so
+  long as the programmer developing with Oboe.js does not have to
+  make special cases for these platforms. Likewise, nor should the
+  REST service need be aware of the client, disallowing detecting
+  client capabilities and switching transport strategy. Requiring
+  branching on either side places extra responsibilities on the
+  programmer which they would not otherwise be required to consider
+  whilst viewing REST through a non-streaming lens.</p>
 
-  <p>The decline of bad browsers. Incompatibility less of a concern
-  than it was.</p>
+  <p>Given that streaming is not possible on older platforms, I
+  must considering the best experience that is possible. We may
+  imagine a situation in which the whole download completes
+  followed by all listeners being notified from a single Javascript
+  frame of execution. While not progressive in any way, this
+  situation is essentially standard REST plus JSONPath routing and
+  no less performant than if more traditional libraries were used.
+  I find this satisfactory: for the majority of users the
+  experience is improved and for the others it is made no worse,
+  resulting in a net overall benefit.</p>
 
-  <p><a href=
+  <p>In the Javascript language itself interoperability is very
+  rarely an issue. Javascript's model of prototypical inheritance
+  allows changes to be made to the browser's libraries on the fly;
+  as soon as a prototype is changed all instances of the type
+  reflect the change even if they has already been created
+  (source). Because the base types that come with the browser are
+  essentially global, changing them for the use of a single
+  codebase is generally deprecated because of the possibility of
+  collisions. However, this technique is often used to retrofit new
+  standards onto older platforms. For example, the Functional-style
+  Array iteration methods remove the need to write C-style for
+  loops and are defined in the ECMAScript 5 specification <a href=
   "http://www.jimmycuadra.com/posts/ecmascript-5-array-methods">http://www.jimmycuadra.com/posts/ecmascript-5-array-methods</a>
-  Unlike the new methods discussed in the first two parts, the
-  methods here are all reproducible using JavaScript itself. Native
-  implementations are simply faster and more convenient. Having a
-  uniform API for these operations also promotes their usage,
-  making code clearer when shared between developers.</p>
+  - all of these methods are implementable in pure Javascript.
+  There exist several mature pure Javascript projects for browsers
+  which lack native support, licenced to allow inclusion in this
+  project (CITE ONE). While I am constrained in the ability to
+  accept streaming AJAX in older browsers, there is no such
+  restriction on my ability to express my thesis in a more modern,
+  functional style of Javascript.</p>
 
-  <p>Even when only used once, preferable to polyfill as a generic
-  solution rather than offer a one-time implementation because it
-  better splits the intention of the logic being presented from the
-  mechanisms that that logic sits on and, by providing abstraction,
-  elucidates the code.</p>
+  <p>Node is highly capable, with no shortcomings that will make
+  Oboe.js difficult to implement. It does, however use its own
+  stream API rather than emulate the browser API so will require
+  platform-specific programming inside the library. This
+  abstraction will be hidden from the library user so will not
+  require any special programming on their part.</p>
 
-  <p>Older browsers: getting the whole message at once is no worse
-  than it is now.</p>
-
-  <h1 id="application-and-reflection-2-makin-it"><a href=
-  "#application-and-reflection-2-makin-it"><span class=
-  "header-section-number">5</span> Application and Reflection 2:
-  makin' it</a></h1>
+  <h1 id="implementation"><a href="#implementation"><span class=
+  "header-section-number">5</span> Implementation</a></h1>
 
   <h2 id="decomposition-into-components"><a href=
   "#decomposition-into-components"><span class=

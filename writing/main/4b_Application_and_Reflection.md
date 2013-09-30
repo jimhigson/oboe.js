@@ -1,5 +1,5 @@
-Application and Reflection 2: makin' it
-=======================================
+Implementation
+==============
 
 Decomposition into components
 -----------------------------
