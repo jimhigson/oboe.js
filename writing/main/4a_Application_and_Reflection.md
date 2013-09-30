@@ -86,7 +86,7 @@ it is better to deliver only the features I am reasonably certain will
 be well used but keep open the ability to add more later should it be
 required.
 
-### Type in JSON
+### Types and JSON
 
 JSON markup describes only a few basic types. This is true on a certain
 level for XML -- most nodes are of either type Element or TextNode.
