@@ -513,8 +513,8 @@ allowing the evaluation of the json path expressions when items are
 pushed to the stack of current nodes in addition to when they are
 popped.
 
-Micro-library
--------------
+Oboe.js as a Micro-Library
+--------------------------
 
 Http traffic, especially sending entropy-sparse text formats is often
 gzipped at point of sending in order to deliver it more quickly, so in
