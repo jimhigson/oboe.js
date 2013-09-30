@@ -275,8 +275,8 @@ why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-Importing CSS4 selector capturing to JSONPath
----------------------------------------------
+Importing CSS4 selector capturing to Oboe JSONPath
+--------------------------------------------------
 
 Sometimes when downloading a collection of items it is less useful to be
 given each element individually than being kept up to date as the
@@ -289,22 +289,22 @@ array whenever a new element is concatenated onto it.
 Expressing a 'contained in' relationship comes naturally to JSONPath,
 but no provision is made for a 'containing' relationship. Cascading
 Style Sheets, or CSS, the web's styling language has long shared this
-restriction but a recent proposal, currently at Editor's Draft
-stage [@css4] provides an elegant means to cover this gap. Rather than
-add an explicit 'containing' relationship, the css4 proposal observes
-that css selectors have previously only allowed selection of the
-right-most of the terms given, allowing only the deepest element
-mentioned to be selected. This restriction is removed by allowing terms
-may be prefixed with `$` in order to make them capturing: in the absence
-of an explicitly capturing term the right-most continues to capture.
-Whereas `form.important input.mandatory` selects for styling mandatory
-inputs inside important forms, `$form.important input.mandatory`
-selects important forms with mandatory fields.
+restriction but a recent proposal, currently at Editor's Draft stage
+[@css4] provides an elegant means to cover this gap. Rather than add an
+explicit 'containing' relationship, the css4 proposal observes that css
+selectors have previously only allowed selection of the right-most of
+the terms given, allowing only the deepest element mentioned to be
+selected. This restriction is removed by allowing terms may be prefixed
+with `$` in order to make them capturing: in the absence of an
+explicitly capturing term the right-most continues to capture. Whereas
+`form.important input.mandatory` selects for styling mandatory inputs
+inside important forms, `$form.important input.mandatory` selects
+important forms with mandatory fields.
 
-Importing the CSS4 dollar into Oboe's JSONPath should make it much easier
-to integrate with libraries which treat arrays as their basic unit of
-operation and uses a syntax which the majority of web developers are likely
-to be familiar with over the next few years.   
+Importing the CSS4 dollar into Oboe's JSONPath should make it much
+easier to integrate with libraries which treat arrays as their basic
+unit of operation and uses a syntax which the majority of web developers
+are likely to be familiar with over the next few years.
 
 Parsing the JSON Response
 -------------------------
@@ -400,7 +400,7 @@ oboe('resources/someJson.json')
    });
 ~~~~
 
-Because I forsee several patterns being added for most types of JSON
+Because I foresee several patterns being added for most types of JSON
 documents, a shortcut format is also available for adding multiple
 patterns in a single call by using the patterns as the keys and the
 callbacks as the values in a key/value mapping:
@@ -534,26 +534,37 @@ micro-library a project should impose as few restrictions as possible on
 its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
 
-Responding to failures
-----------------------
+Handling transport failures
+---------------------------
 
-*is this section really needed?*
+Oboe should allow requests to fail while the response is being received
+without necessarily losing the part that was successfully received.
 
-As discussed above in API design, errors due to the transport will cause
-a callback to be returned to the calling application.
-
-Not automatic, just inform user. Most of the time will want to perform
-some kind of rollback from optimistic locking.
-
-I did consider the option of automatially resuming failed requests. Http
-1.1 provides a mechanism for Byte Serving via the Accepts-Ranges header
+Researching error handing, I considered the option of automatically
+resuming failed requests without intervention from the containing
+application. Http 1.1 provides a mechanism for Byte Serving via the
+`Accepts-Ranges` header
 [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5] which
-can be used to request any contiguous part of a response rather than the
-whole. However, having examined this option I came to the conclusion
-that this approach would be brittle because it assumes two requests to
-the same URL will give exactly the same response.
+is used to request any contiguous fragment of a resource -- in our case,
+the part that we missed when the download failed. Having examined this
+option I came to the conclusion that it would encourage brittle systems
+because it assumes two requests to the same URL will give byte-wise
+equal responses.
 
-A better option
+A deeper problem is that Oboe cannot know the correct behaviour when a
+request fails so this is better left to the containing applications.
+Generally on request failure, two behaviours may be anticipated. If the
+actions performed in response to data received up to time of failure
+remain valid in the absence of a full transmission, their effects may be
+kept and a URL may be constructed to request just the lost part.
+Alternatively, under optimistic locking, the application developer may
+choose to perform rollback. In either case, responding to errors beyond
+informing the calling application is outside of Oboe's scope.
+
+IO errors in a non-blocking system cannot be handled via exception
+throwing because the call which will later cause an error will no longer
+be on the stack at the time that the error occurs. Error-events will be
+used instead.
 
 Fallback support on less-capable platforms
 ------------------------------------------
