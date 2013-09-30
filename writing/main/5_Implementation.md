@@ -262,9 +262,6 @@ minimal interface. \* Why minimal interfaces are better for minification
 Need to build an abstraction layer over xhr/xhr2/node. Can only work for
 packets in-order, for out-of-order packets something else happens.
 
-JS code style
--------------
-
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
 into beautiful code. Ie, can write stateful and refactor in small steps
