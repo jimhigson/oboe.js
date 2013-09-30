@@ -1,5 +1,5 @@
-Application and Reflection:
-===========================
+Design and Reflection:
+======================
 
 Using a combination of the techniques investigated in the previous
 chapter, I propose that a simple design is possible which makes REST
