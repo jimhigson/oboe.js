@@ -255,6 +255,11 @@ combining duck typing and the relationship with the parent object.
 JSONPath improving stability over upgrades
 ------------------------------------------
 
+*need to look at this an check doesn't duplicate rest of diss*.
+
+* Use of `..` over `.`
+* Keep this short. Might not need diagram if time presses.  
+
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
 
