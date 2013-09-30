@@ -640,13 +640,3 @@ everything, only through public API.
 
 Uglify. Why not Google Closure Compiler.
 
-Resume (not)
-------------
-
-Could implement a resume function for if transmission stops halfway
-
-~~~~ {.javascript}
-   .onError( error ) {
-      this.resume();
-   }
-~~~~
