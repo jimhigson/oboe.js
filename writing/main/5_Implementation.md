@@ -24,34 +24,7 @@ way of going about making an intention true.
 Content builder: like a decorator/wrapper but event based, not based on
 object wrapping.
 
-Inversion of Control and communication between parts
-----------------------------------------------------
-
-Aim of creating a micro-library rules out building in a general-purpose
-IoC library.
-
-However, can still follow the general principles.
-
-Why the Observer pattern (cite: des patterns) lends itself well to MVC
-and inversion of control.
-
-What the central controller does; acts as a plumber connecting the
-various parts up. Since oboe is predominantly event/stream based, once
-wired up little intervention is needed from the controller. Ie, A knows
-how to listen for ??? events but is unintested who fired them.
-
-Local event bus Why? Makes testing easy (just put appropriate event on
-the bus rather than trying to fake calls from linked stubs). Decouples,
-avoids parts having to locate or be passed other parts. Wouldn't scale
-indefinately, does provide something of a mingled-purpose space. Why not
-more direct event passing without a separate event bus (ie, everything
-as an emitter and reciever of events?)
-
-Grunt
------
-
-Automated testing
------------------
+### Automated testing
 
 Do it on every save!
 
@@ -77,7 +50,7 @@ that verification of small parts provides a solid base from which to
 compose system-level behaviours. A Lot of testing is done on the
 low-level components of the system, whereas for the high-level tests
 only smoke tests are provided.
-\label{testingPyramidFig}](images/pyramid)
+\\label{testingPyramidFig}](images/pyramid)
 
 Jstd can serve example files but need to write out slowly which it has
 no concept of. Customistation is via configuration rather than by
@@ -172,6 +145,114 @@ One dilemma in implementing the testing is how far to test the more
 generic sections of the codebase as generic components. A purist
 approach to TDD would say
 
+Grunt
+-----
+
+### Packaging the library as a single distributable file
+
+![packaging of many javascript files into multiple single-file packages.
+The packages are individually targeted at different execution contexts,
+either browsers or node *get from notebook, split sketch diagram in
+half*](images/placeholder.png)
+
+-   One file for browser and node is common.
+-   say how this is done
+-   why not doing this (adds bloat, inhibits micro-lib)
+-   extra challenges
+-   http adaptor is different
+-   packaging is different
+-   two distributable files, for node minification is not important so
+    don't do to help debugging.
+
+Composition of several source files into a distributable binary-like
+text file
+
+Why distributed javascript is more like a binary than a source file.
+Licencing implications? Would be (maybe) under GPL. Not so under BSD.
+
+Inherent hiding by wrapping in a scope.
+
+Names of functions and variable names which are provably not possible to
+reference are lost for the sake of reduction of size of the source.
+
+Packaging for node or browser. No need to minify for node but
+concatenation still done for ease of inclusion in projects
+
+~~~~ {.javascript}
+typical pattern for packaging to work in either a node.js server or a web browser
+~~~~
+
+Packaging for use in frameworks.
+
+-   Many frameworks already come with a wrapper arround the browser's
+    inbuilt ajax capabilities
+-   they don't add to the capabilities but present a nicer interface
+
+-   I'm not doing it but others are 
+-   browser-packaged version should
+    be use agnostic and therefore amenable to packaging in this way
+
+Why uglify
+
+-   Covers whole language, not just a well-advised subset.
+-   Closure compiler works over a subset of javascript rather than the
+    whole language.
+
+Why not require. Bits on what rq is can go into B&R section. *Some of
+this can move into 3\_Background.md*
+
+-   What it is
+-   Why so popular
+-   Why a loader is necessary - js doesn't come with an import statement
+-   How it can be done in the language itself without an import
+    statement
+-   Meant more for AMD than for single-load code
+-   Situations AMD is good for - large site, most visitors don't need
+    all the code loaded
+-   Depends on run-time component to be loaded even after code has been
+    optimised
+-   Small compatible versions exist that just do loading (almond)\
+-   Why ultimately not suitable for a library like this - would require
+    user to use Require before adopting it.
+
+Browserify is closer.
+
+-   Why it is better for some projects
+-   Very nearly meets my needs
+-   But http-compatability
+    (https://github.com/substack/http-browserify), while complete
+    enough, isn't compact enough to not push project over micro-library
+    size
+
+Testing post-packaging for small set of smoke tests. Can't test
+everything, only through public API.
+
+Uglify. Why not Google Closure Compiler. Java, ack. Closure might be
+better.
+
+Dependency injection and communication between parts
+----------------------------------------------------
+
+Aim of creating a micro-library rules out building in a general-purpose
+IoC library.
+
+However, can still follow the general principles.
+
+Why the Observer pattern (cite: des patterns) lends itself well to MVC
+and inversion of control.
+
+What the central controller does; acts as a plumber connecting the
+various parts up. Since oboe is predominantly event/stream based, once
+wired up little intervention is needed from the controller. Ie, A knows
+how to listen for ??? events but is unintested who fired them.
+
+Local event bus Why? Makes testing easy (just put appropriate event on
+the bus rather than trying to fake calls from linked stubs). Decouples,
+avoids parts having to locate or be passed other parts. Wouldn't scale
+indefinately, does provide something of a mingled-purpose space. Why not
+more direct event passing without a separate event bus (ie, everything
+as an emitter and reciever of events?)
+
 Styles of Programming
 ---------------------
 
@@ -257,7 +338,9 @@ Lack of consistency in coding (don't write too much, leave to the
 conclusion)
 
 Final consideration of coding: packaging up each unit to export a
-minimal interface. \* Why minimal interfaces are better for minification
+minimal interface. 
+
+* Why minimal interfaces are better for minification
 
 Need to build an abstraction layer over xhr/xhr2/node. Can only work for
 packets in-order, for out-of-order packets something else happens.
@@ -294,8 +377,7 @@ Although the streams themselves are stateful, because they are based on
 callbacks it is entirely possible to use them from a component of a
 javascript program which is wholly stateless.
 
-Performance implications of functional javascript (subsume into above?)
------------------------------------------------------------------------
+### Performance implications of functional javascript
 
 V8 and other modern JS engines are often said to be 'near-native' speed,
 meaning it runs at close to the speed of a similarly coded C program.
@@ -330,8 +412,7 @@ JS is much faster with "monomorphic call sites"
 
 However, js execution time is not much of a problem,
 
-Preferring functions over constructors (subsume into above section?)
---------------------------------------------------------------------
+### Preferring functions over constructors (subsume into above section?)
 
 What constructors are in js. Any function, but usually an uppercase
 initial char indicates that it is intended to be used as a constructor.
@@ -349,7 +430,8 @@ hampers portability more than an 'extends' keyword would.
 
 Functions can be like Factories, gives me the flexability to chagne how
 something is created but by exposing a constructor are stuck with using
-'new' to create an instance of exactly one type. 'new' is inconsistent invocation with rest of language.
+'new' to create an instance of exactly one type. 'new' is inconsistent
+invocation with rest of language.
 
 Dart has 'factory' constructors which are called like constructors but
 act like factory functions:
@@ -369,12 +451,11 @@ NB: This consideration of type in json could be in the Background
 section.
 
 Clause functions, each passes onto the next function if it passes.
-Functions to consume. Can apply more than one test to
-a single node. Tests generated by clause functions may be against either
-the immediate path to that node (name clauses) or the node itself
-(duck-type clauses). For example, the jsonPath
-`!.$person..{height tShirtSize}` may be expressed functionally in
-Javascript as such:
+Functions to consume. Can apply more than one test to a single node.
+Tests generated by clause functions may be against either the immediate
+path to that node (name clauses) or the node itself (duck-type clauses).
+For example, the jsonPath `!.$person..{height tShirtSize}` may be
+expressed functionally in Javascript as such:
 
 ~~~~ {.javascript}
 var jsonPathEvaluator =
@@ -401,8 +482,6 @@ invocation:
 var result = jsonPathEvaluator(ascent);
 ~~~~
 
-
-
 Why done as a function returning a function (many calls per pattern -
 one for each node found to check for matches).
 
@@ -427,7 +506,6 @@ standard (ala tag names in XML). or by a loose concept of type which is
 not well supported by existing jsonpath spec.
 
 Compare duck typing to the tag name in
-
 
 Explain why Haskel/lisp style lists are used rather than arrays
 
@@ -512,7 +590,7 @@ A refactoring was used to separate logic and state:
 -   Refactor until there is just one stateful item
 -   This means that that item is reassigned rather than mutated
 -   Make stateless by making all functions take and return an instance
-    of that item\
+    of that item
 -   Replace all assignment of the single stateful var with a return
     statement
 -   Create a simple, separate stateful controller that just updates the
@@ -555,85 +633,3 @@ Potential solutions:
 -   immutable wrappers.
 -   defensive cloning
 -   defining getter properties
-
-Packaging the library as a single distributable file
-----------------------------------------------------
-
-![packaging of many javascript files into multiple single-file packages.
-The packages are individually targeted at different execution contexts,
-either browsers or node *get from notebook, split sketch diagram in
-half*](images/placeholder.png)
-
--   One file for browser and node is common.
--   say how this is done
--   why not doing this (adds bloat, inhibits micro-lib)
--   extra challenges
--   http adaptor is different
--   packaging is different
--   two distributable files, for node minification is not important so
-    don't do to help debugging.
-
-Composition of several source files into a distributable binary-like
-text file
-
-Why distributed javascript is more like a binary than a source file.
-Licencing implications? Would be (maybe) under GPL. Not so under BSD.
-
-Inherent hiding by wrapping in a scope.
-
-Names of functions and variable names which are provably not possible to
-reference are lost for the sake of reduction of size of the source.
-
-Packaging for node or browser. No need to minify for node but
-concatenation still done for ease of inclusion in projects
-
-~~~~ {.javascript}
-typical pattern for packaging to work in either a node.js server or a web browser
-~~~~
-
-Packaging for use in frameworks.
-
--   Many frameworks already come with a wrapper arround the browser's
-    inbuilt ajax capabilities
--   they don't add to the capabilities but present a nicer interface
-
--   I'm not doing it but others are \*\* browser-packaged version should
-    be use agnostic and therefore amenable to packaging in this way
-
-Why uglify
-
--   Covers whole language, not just a well-advised subset.
--   Closure compiler works over a subset of javascript rather than the
-    whole language.
-
-Why not require. Bits on what rq is can go into B&R section. *Some of
-this can move into 3\_Background.md*
-
--   What it is
--   Why so popular
--   Why a loader is necessary - js doesn't come with an import statement
--   How it can be done in the language itself without an import
-    statement
--   Meant more for AMD than for single-load code
--   Situations AMD is good for - large site, most visitors don't need
-    all the code loaded
--   Depends on run-time component to be loaded even after code has been
-    optimised
--   Small compatible versions exist that just do loading (almond)\
--   Why ultimately not suitable for a library like this - would require
-    user to use Require before adopting it.
-
-Browserify is closer.
-
--   Why it is better for some projects
--   Very nearly meets my needs
--   But http-compatability
-    (https://github.com/substack/http-browserify), while complete
-    enough, isn't compact enough to not push project over micro-library
-    size
-
-Testing post-packaging for small set of smoke tests. Can't test
-everything, only through public API.
-
-Uglify. Why not Google Closure Compiler.
-
