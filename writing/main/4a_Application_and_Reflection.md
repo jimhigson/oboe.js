@@ -108,9 +108,9 @@ distinguish types at various levels of specificity; whilst my selection
 language will have no inbuilt concept of type, the aim is to support
 programmers in creating their own.
 
-*integrate with above or discard, maybe move to compatibility with future versions* 
-Relationship between type of a node and its purpose in the document
-(or, perhaps, the purpose the reader wishes to put it to).
+*integrate with above or discard, maybe move to compatibility with
+future versions* Relationship between type of a node and its purpose in
+the document (or, perhaps, the purpose the reader wishes to put it to).
 Purpose is often obvious from a combination of URL and type so can
 disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
@@ -145,9 +145,9 @@ the *type* of the field, the name of the type also serving as a rough
 summary of the relationship between two objects. See figure
 \ref{marshallTypeFig} below.
 
-In the below example, we impose the the type 'address' because of
-the parent node's field name. Other than this, these are standard arrays
-of strings:
+In the below example, we impose the the type 'address' because of the
+parent node's field name. Other than this, these are standard arrays of
+strings:
 
 ~~~~ {.javascript}
 {
@@ -218,8 +218,8 @@ The properties holding addresses are named by the relationship between
 the parent and child nodes rather than the type of the child. There are
 two ways we may be able to select objects out as addresses. Firstly,
 because of an ontology which subtypes 'residence', 'premises', and
-'office' as places with addresses. More simply, we may import the 
-idea of duck typing from Python programing.
+'office' as places with addresses. More simply, we may import the idea
+of duck typing from Python programing.
 
 > In other words, don't check whether it IS-a duck: check whether it
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
@@ -227,30 +227,33 @@ idea of duck typing from Python programing.
 > language-games with.
 
 Discussion of typing in Python language, 2000.
-https://groups.google.com/forum/?hl=en#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ
+https://groups.google.com/forum/?hl=en\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ
 
-A 'duck-definition' of address might be any object which has a number, street and town.
-That is to say, type is individualistically communicated by the object itself rather than by examining 
-the relationships described by its containing ancestors. JSONPath comes with no such 
-expressivity but I find this idea so simple and useful that I have decided to create one.
-The JSONPath language is designed to resemble programmatic Javascript access but Javascript
-has no syntax for a list of value-free properties. The closest available is the object literal 
-format; my duck-type syntax is a simplification with values and commas omitted. In the case 
-of the addresses a duck-type expression would be written as `{number street town}`. 
- 
----------------------------------------------------------------
+A 'duck-definition' of address might be any object which has a number,
+street and town. That is to say, type is individualistically
+communicated by the object itself rather than by examining the
+relationships described by its containing ancestors. JSONPath comes with
+no such expressivity but I find this idea so simple and useful that I
+have decided to create one. The JSONPath language is designed to
+resemble programmatic Javascript access but Javascript has no syntax for
+a list of value-free properties. The closest available is the object
+literal format; my duck-type syntax is a simplification with values and
+commas omitted. In the case of the addresses a duck-type expression
+would be written as `{number street town}`. Generally, when identifying
+items of a type from a document it makes sense if the type expression is
+contravariant so that sub-types are also selected. If we consider that
+we create a sub-duck-type when we add to a list of required fields and
+super-duck-types when we remove them, we have a non-tree shaped type
+space with root type `{}` which matches any object. Therefore, the
+fields specified need not be an exhaustive list of the object's
+properties.
 
-A final concept of type in json comes in the form of taking the first
-property of an object as being the tagname. Unsatisfactory, objects have
-an order while serialised as json but once deserialised typically have
-no further order. Clarinet.js seems to follow this pattern, notifying of
-new objects only once the first property's key is known so that it may
-be used to infer type. Can't be used with a general-purpose JSON writer
-tool, nor any JSON writer tool that reads from common objects.
+The various means of discerning type which are constructable need not 
+be used exclusively. For example, `aaa{bbb ccc}` is a valid construction 
+combining duck typing and the relationship with the parent object.
 
-
-
-#css4
+css4
+====
 
 CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
 
