@@ -1,3 +1,9 @@
+<!---
+Chapter 4+5 40 to 60 pages
+
+@333w/p, 13,000 to 19,000
+--->
+
 Design and Reflection:
 ======================
 
