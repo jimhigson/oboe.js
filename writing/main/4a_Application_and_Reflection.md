@@ -69,15 +69,24 @@ programming
 JSONPath expressions
 --------------------
 
-In searching through a model stocked with data is common to ask for
-database-style queries such as 'books costing more than X'. However, not
-searching, selecting from a resource that the programmer has requested,
-probably assembled on their behalf by their parameters where we can
-expect the developer to be interested in most of the content. Modify
-JSONPath for this actual situation. Avoid implementing, at least at
-first, the language features which are less likely to be used and are
-easily tested for inside the callback. At same time, add features which
-are more likely to be useful for this context.
+Given its use to identify interesting parts of a document, not all of
+the published JSONPath spec is useful. Parts of a document will be
+considered interesting because of their type, position, or both. This
+contrasts with filter-type queries such as 'books costing less than X'.
+Examining REST responses it is likely we will not be explicitly
+searching through a full model but rather selecting from a resource
+subset that the programmer requested, assembled on their behalf using
+their parameters so we can expect the developer to be interested in most
+of the content. In creating a new JSONPath implementation, I have chosen
+to follow the published spec only loosely, thereby avoiding writing
+unnecessary code. This is especially the case, as in the books example
+above whereby a user of the library could easily add the filter in the
+callback itself. Following the principle of writing less, better I feel
+it is better to deliver only the features I am reasonably certain will
+be well used but keep open the ability to add more later should it be
+required.
+
+### Type in JSON
 
 We impose types on top of JSON/XML markup. Only few basic types defined
 in the markup languages themselves. Essence of marshaling.
