@@ -106,17 +106,19 @@ involvement in a field, whereas 'watch' may be a reasonable type to most
 data consumers, to a horologist it is unlikely to be satisfactory
 without further sub-types. In the scope of this dissertation, since
 selecting on type is desirable, my JSONPath variant must be able to
-handle various levels of specificity of selection for the sake of type
-imposition.
+distinguish types at various levels of specificity; whilst my selection
+language will have no inbuilt concept of type, the aim is to support
+programmers in creating their own.
 
-~~~~{.xml}
+~~~~ {.xml}
 <!--  XML leaves no doubt as to the labels we give to the types
       of the nodes. This is a 'person' -->
 <person  name='...' gender="male"
          age="45" height="175cm" profession="architect">
 </person>
 ~~~~
-~~~~{.javascript}
+
+~~~~ {.javascript}
 /*    JSON meanwhile provides no such concrete concept. This node's
       type might be 'thing', 'animal', 'human', 'man', 'architect',
       'artist' or any other of many overlapping impositions depending 
@@ -157,6 +159,9 @@ of strings:
    }   
 }
 ~~~~
+
+Although, being loosely typed, in Javascript there is no protection
+against
 
 By sensible convention, even in a serialisation format which allows
 lists of disparate types, lists contain only items of equivalent type.
