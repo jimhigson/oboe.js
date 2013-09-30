@@ -99,11 +99,7 @@ other than the base types common to most languages (array, object,
 string etc) there is no further concept of type. If we wish to build a
 further understanding of the type of the objects then the realtionship
 with the parent object, expressed by the attribute name, is more likely
-to indicate the type. A second approach is to use duck typing in which
-the relationship of the object to its ancestors is not examined but the
-properties of the object are used instead to communicate an enhanced
-concept of type. For example, we might say that any object with an isbn
-and a title is a book.
+to indicate the type.
 
 Whereas XML has a pretty good concept of the type of an element (beyond
 simply being an element node) in the tagName, JSON's objects are all
@@ -185,6 +181,12 @@ fields rather than its position in the document:
    }
 }  
 ~~~~
+
+A second approach is to use duck typing in which the relationship of the
+object to its ancestors is not examined but the properties of the object
+are used instead to communicate an enhanced concept of type. For
+example, we might say that any object with an isbn and a title is a
+book.
 
 Duck typing is of course a much looser concept than an XML document's
 tag names and collisions are possible where objects co-incidentally
