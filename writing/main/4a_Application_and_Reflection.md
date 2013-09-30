@@ -301,8 +301,13 @@ Whereas `form.important input.mandatory` selects for styling mandatory
 inputs inside important forms, `$form.important input.mandatory`
 selects important forms with mandatory fields.
 
-Parsing the JSON
-----------------
+Importing the CSS4 dollar into Oboe's JSONPath should make it much easier
+to integrate with libraries which treat arrays as their basic unit of
+operation and uses a syntax which the majority of web developers are likely
+to be familiar with over the next few years.   
+
+Parsing the JSON Response
+-------------------------
 
 While SAX parsers provide an unfriendly interface to application
 developers, as a starting point for higher-level parsers they work very
