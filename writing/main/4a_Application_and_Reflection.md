@@ -66,8 +66,8 @@ so as to apply to any data domain and allow any granularity of interest,
 from large object to individual datums. With just a few lines of
 programming
 
-JSONPath expressions
---------------------
+JSONPath an types
+-----------------
 
 Given its use to identify interesting parts of a document, not all of
 the published JSONPath spec is useful. Parts of a document will be
@@ -252,20 +252,7 @@ The various means of discerning type which are constructable need not
 be used exclusively. For example, `aaa{bbb ccc}` is a valid construction 
 combining duck typing and the relationship with the parent object.
 
-css4
-====
-
-CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
-
-![UML class diagram showing a person class in relationship with an
-address class. In implementation as Java the 'hasAddress' relationship
-would typically be reified as a getAddress method. This co-incidence of
-object type and the name of the field referring to the type lends itself
-well to the tendency for the immediate key before an object to be taken
-as the type when Java models are marshaled into json
-\label{marshallTypeFig}](images/marshall)
-
-Stability over upgrades
+JSONPath improving stability over upgrades
 -----------------------
 
 ![extended json rest service that still works - maybe do a table instead
@@ -287,6 +274,13 @@ suspended from a new parent.
 why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
+
+JsonPath css4-style syntax
+--------------------------
+
+'contained in' comes naturally. Less so 'containing'.
+
+CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
 
 Parsing the JSON
 ----------------
