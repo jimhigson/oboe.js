@@ -108,8 +108,9 @@ distinguish types at various levels of specificity; whilst my selection
 language will have no inbuilt concept of type, the aim is to support
 programmers in creating their own.
 
-*integrate with above or discard* 
-Relationship between type of a node and its purpose in the document.
+*integrate with above or discard, maybe move to compatibility with future versions* 
+Relationship between type of a node and its purpose in the document
+(or, perhaps, the purpose the reader wishes to put it to).
 Purpose is often obvious from a combination of URL and type so can
 disregard the place in the document. This structure may be carefully
 designed but ultimately a looser interpretation of the structure can be
@@ -144,7 +145,7 @@ the *type* of the field, the name of the type also serving as a rough
 summary of the relationship between two objects. See figure
 \ref{marshallTypeFig} below.
 
-In the below example, we assign the node the type 'address' because of
+In the below example, we impose the the type 'address' because of
 the parent node's field name. Other than this, these are standard arrays
 of strings:
 
@@ -231,28 +232,13 @@ https://groups.google.com/forum/?hl=en#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5H
 A 'duck-definition' of address might be any object which has a number, street and town.
 That is to say, type is individualistically communicated by the object itself rather than by examining 
 the relationships described by its containing ancestors. JSONPath comes with no such 
-expressivity but I find this idea so simple and useful that I have decided to introduce it. 
-
-
-
-
-To extend JSONPath to support a concise expression of duck typing, I
-chose a syntax which is similar to fields in jsonFormat:
-
-~~~~ {.javascript}
-
-{
-   "name": "..."
-,  "address": "..."
-,  "email": "..."
-}
-~~~~
-
-`{name address email}` The above JSONPath expression would match this
-object in json expression and like all json path expressions the pattern
-is quite similar to the object that it matches. The object below matches
-because it contains all the fields listed in between the curly braces in
-the above json path expression.
+expressivity but I find this idea so simple and useful that I have decided to create one.
+The JSONPath language is designed to resemble programmatic Javascript access but Javascript
+has no syntax for a list of value-free properties. The closest available is the object literal 
+format; my duck-type syntax is a simplification with values and commas omitted. In the case 
+of the addresses a duck-type expression would be written as `{number street town}`. 
+ 
+---------------------------------------------------------------
 
 A final concept of type in json comes in the form of taking the first
 property of an object as being the tagname. Unsatisfactory, objects have
