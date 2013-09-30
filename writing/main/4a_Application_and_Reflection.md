@@ -159,30 +159,32 @@ of strings:
 ~~~~
 
 Although, being loosely typed, in Javascript there is no protection
-against
-
-By sensible convention, even in a serialisation format which allows
-lists of disparate types, lists contain only items of equivalent type.
-This gives way to a sister convention seen in the below example, when
-serialising with multiple addresses in an array, it is the grandparent's
-node field name which indicates the type, the parent being the array
-containing the multiple addressees:
+against using arrays to contain disparate object, by sensible convention
+the items will usually be of some common type. Likewise in JSON,
+although type is a loose concept, on some level the elements of an array
+will generally be of the same type. This allows a sister convention seen
+in the below example, whereby each of a list of items are typed
+according to the key in the grandparent node which maps to the array.
 
 ~~~~ {.javascript}
 {
    residences: {
       addresses: [
-         ['Townhouse', 'Street', 'Some town']      
+         ['Townhouse', 'Underground street', 'Far away town']      
       ,  ['Beach Hut', 'Secret Island', 'Bahamas']
       ]
    }
 }
 ~~~~
 
-In this third example, the field names linking to addresses refer to the
-relationship between the parent and child nodes rather than the type of
-the child. The address type is more easily recognised by its list of
-fields rather than its position in the document:
+The pluralisation of 'address' to 'addresses' above may be a problem to
+a reader wishing to detect address nodes. I considered introducing an
+'or' syntax for this situation, resembling `address|addresses.*` but
+instead decided this problem, while related to type, is simpler to solve
+outside of the JSONPath language. A programmer may simply use two
+JSONPaths mapping to the same callback function.
+
+In the below example typing is trickier still.
 
 ~~~~ {.javascript}
 {
@@ -204,37 +206,25 @@ fields rather than its position in the document:
 }  
 ~~~~
 
-A second approach is to use duck typing in which the relationship of the
-object to its ancestors is not examined but the properties of the object
-are used instead to communicate an enhanced concept of type. For
-example, we might say that any object with an isbn and a title is a
-book.
+The properties holding addresses are named by the relationship between
+the parent and child nodes rather than the type of the child. There are
+two ways we may be able to select objects out as addresses. Firstly,
+because of an ontology which subtypes 'residence', 'premises', and
+'office' as places with addresses. More simply, we may import the 
+idea of duck typing from Python programing.
 
-Duck typing is of course a much looser concept than an XML document's
-tag names and collisions are possible where objects co-incidentally
-share property names. In practice however, I find the looseness a
-strength more often than a weakness. Under a tag-based marshaling from
-an OO language, sub-types are assigned a new tag name and as a consumer
-of the document, the 'isa' relationship between a 'class' tagname and
-it's 'sub-tagname' may be difficult to track. It is likely that if I'm
-unaware of this, I'm not interested in the extended capabilities of the
-subclass and would rather just continue to receive the base superclass
-capabilities as before. Under duck typing this is easy - because the
-data consumer lists the
+> In other words, don't check whether it IS-a duck: check whether it
+> QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
+> what subset of duck-like behaviour you need to play your
+> language-games with.
 
-A final concept of type in json comes in the form of taking the first
-property of an object as being the tagname. Unsatisfactory, objects have
-an order while serialised as json but once deserialised typically have
-no further order. Clarinet.js seems to follow this pattern, notifying of
-new objects only once the first property's key is known so that it may
-be used to infer type. Can't be used with a general-purpose JSON writer
-tool, nor any JSON writer tool that reads from common objects.
+Discussion of typing in Python language, 2000.
+https://groups.google.com/forum/?hl=en#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ
 
-Relationship between type of a node and its purpose in the document.
-Purpose is often obvious from a combination of URL and type so can
-disregard the place in the document. This structure may be carefully
-designed but ultimately a looser interpretation of the structure can be
-safer.
+A 'duck-definition' of address might be any object which has a number, street and town.
+That is to say, type is individualistically communicated by the object itself rather than by examining 
+the relationships described by its containing ancestors. JSONPath comes with no such 
+expressivity but I find this idea so simple and useful that I have decided to introduce it. 
 
 To extend JSONPath to support a concise expression of duck typing, I
 chose a syntax which is similar to fields in jsonFormat:
@@ -253,6 +243,22 @@ object in json expression and like all json path expressions the pattern
 is quite similar to the object that it matches. The object below matches
 because it contains all the fields listed in between the curly braces in
 the above json path expresson.
+
+A final concept of type in json comes in the form of taking the first
+property of an object as being the tagname. Unsatisfactory, objects have
+an order while serialised as json but once deserialised typically have
+no further order. Clarinet.js seems to follow this pattern, notifying of
+new objects only once the first property's key is known so that it may
+be used to infer type. Can't be used with a general-purpose JSON writer
+tool, nor any JSON writer tool that reads from common objects.
+
+Relationship between type of a node and its purpose in the document.
+Purpose is often obvious from a combination of URL and type so can
+disregard the place in the document. This structure may be carefully
+designed but ultimately a looser interpretation of the structure can be
+safer.
+
+#css4
 
 CSS4-style capturing. Reshuffle 'root' syntax to accommodate ! and \$.
 
