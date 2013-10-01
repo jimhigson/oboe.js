@@ -48,7 +48,7 @@ still on a whole-system level where only smoke tests are
 provided.](images/pyramid)
 
 The testing itself is a non-trivial undertaking with 80% of code written
-for this project being test specification. Based on the idea that a
+for this project being test specifications. Based on the idea that a
 correct system must be built from individually correct units, the
 majority of the specifications are unit tests, putting each unit under
 the microscope and describing the correct behaviour as completely as
