@@ -11,6 +11,12 @@ oboe instance but have no role once it is running are omitted. UML
 facet/receptacle notation is used to show the flow of events with event
 names in capitals.](images/overallDesign.png)
 
+Oboe's architecture has been designed to so that I may have as much
+confidence as possible regarding the correct working of the library
+through automated testing. Designing a system to be amenable to testing
+in this case meant splitting into many co-operating parts each with an
+easily specified remit.
+
 Although there is limited encapsulation to follow an OO-style
 arrangement, data is hidden. Outside of Oboe, only a restricted public
 API is exposed. Not only are the internals inaccessible, they are
@@ -31,6 +37,9 @@ central hub and everything else hanging off it as spokes.
 Automated testing
 -----------------
 
+Automated testing improves what can be written, not just making what is
+written more reliable.
+
 ![The testing pyramid is a common concept, relying on the assumption
 that verification of small parts provides a solid base from which to
 compose system-level behaviours. A Lot of testing is done on the
@@ -38,20 +47,17 @@ low-level components of the system, less on the component level and less
 still on a whole-system level where only smoke tests are
 provided.](images/pyramid)
 
-Oboe's architecture has been designed to so that I may have as much
-confidence as possible regarding the correct working of the library
-through automated testing. The testing itself is a non-trivial
-undertaking with 80% of code written for this project being test
-specification. Based on the idea that a correct system must be built
-from individually correct units, the majority of the specifications are
-unit tests, putting each unit under the microscope and describing the
-correct behaviour as completely as possible. Correct components are not
-useful unless they are correctly composed. Component tests zoom out from
-individual components to the library as a whole, falsifying only the
-http traffic. At the apex of the test pyramid are a small number of
-integration tests. Running these tests automatically spins up actual
-REST services so that the correct behaviour given real http may be
-examined.
+The testing itself is a non-trivial undertaking with 80% of code written
+for this project being test specification. Based on the idea that a
+correct system must be built from individually correct units, the
+majority of the specifications are unit tests, putting each unit under
+the microscope and describing the correct behaviour as completely as
+possible. Correct components are not useful unless they are correctly
+composed. Component tests zoom out from individual components to the
+library as a whole, falsifying only the http traffic. At the apex of the
+test pyramid are a small number of integration tests. Running these
+tests automatically spins up actual REST services so that the correct
+behaviour given real http may be examined.
 
 The desirable to be amenable to testing influences the boundaries on
 which the application is split into separately implemented components.
@@ -93,15 +99,6 @@ modifying the built in types for tests opens up the possibilities of
 changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
-
-How automated testing improves what can be written, not just making what
-is written more reliable.
-
-TDD drives development by influencing the design - good design is taken
-as that which is amenable to testing rather than which describes the
-problem domain accurately or solves a problem with minimum resources.
-Amenable to testing often means split into many co-operating parts so
-that each part may be tested via a simple test.
 
 Bt encourageing splitting into co-operating objects, TDD to a certain
 degree is anti-encapsulation. The public object that was extracted as a
