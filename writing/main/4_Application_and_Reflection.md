@@ -405,7 +405,7 @@ oboe('resources/someJson.json')
    .done( function( wholeJson ) {
       console.log('got everything');
    })
-   .error( function() {
+   .fail( function() {
       console.log('actually, the download failed. Forget the' + 
                   ' people I just told you about');
    });

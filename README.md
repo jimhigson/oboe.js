@@ -318,7 +318,7 @@ oboe('people.json')
       // we just found out that person's name, lets add it to their div:
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
-   .onError(function( email ){
+   .fail(function( email ){
       // oops, that didn't go so well. instead of leaving this dude half on the page,
       // remove them altogether
       currentPersonElement.remove();
@@ -387,7 +387,7 @@ callbacks, even if the underlying xhr already has additional content buffered.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
 
 ```js
-   .onError(callback(Error e))
+   .fail(callback(Error e))
 ```
 
 Supply a callback for when something goes wrong
