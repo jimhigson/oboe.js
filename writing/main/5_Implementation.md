@@ -64,8 +64,8 @@ which the application is split into separately implemented components.
 Black-box unit testing of a stateful unit is difficult; because of
 side-effects it may later react differently to the same calls. For this
 reason where state is required it is stored in very simple state-storing
-units with program logic removed. The logic may then be separately
-expressed as functions which transition from one state to the next.
+units with intricate program logic removed. The logic may then be separately
+expressed as functions which map from one state to the next.
 Although comprehensive coverage is of course impossible and tests are
 inevitably incomplete, for whatever results the functions give while
 under test, uninfluenced by state I can be sure that they will continue
