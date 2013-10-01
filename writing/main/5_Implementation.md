@@ -38,10 +38,10 @@ Automated testing
 -----------------
 
 Automated testing improves what can be written, not just making what is
-written more reliable. Tests deal with the problem of "irreducible complexity" - when a program
-is made out of parts whose correct behaviour cannot be observed without
-all of the program. Allows smaller units to be verified before verifying
-the whole.
+written more reliable. Tests deal with the problem of "irreducible
+complexity" - when a program is made out of parts whose correct
+behaviour cannot be observed without all of the program. Allows smaller
+units to be verified before verifying the whole.
 
 ![The testing pyramid is a common concept, relying on the assumption
 that verification of small parts provides a solid base from which to
@@ -55,14 +55,14 @@ for this project being test specifications. Based on the idea that a
 correct system must be built from individually correct units, the
 majority of the specifications are unit tests, putting each unit under
 the microscope and describing the correct behaviour as completely as
-possible. Component tests zoom out from examining individual components to focus on their
-correct composition, falsifying only the http traffic. To avoid testing implementation
-details the component tests do not look at the means of coupling between the code units
-but rather check for the behaviours which should emerge as a consequence of 
-their composition. At the apex of the
-test pyramid are a small number of integration tests. These
-tests check all of Oboe, automatically spinning up a REST service 
-so that the correctness of the whole library may be examined against an 
+possible. Component tests zoom out from examining individual components
+to focus on their correct composition, falsifying only the http traffic.
+To avoid testing implementation details the component tests do not look
+at the means of coupling between the code units but rather check for the
+behaviours which should emerge as a consequence of their composition. At
+the apex of the test pyramid are a small number of integration tests.
+These tests check all of Oboe, automatically spinning up a REST service
+so that the correctness of the whole library may be examined against an
 actual server.
 
 The desirable to be amenable to testing influences the boundaries on
@@ -106,9 +106,9 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Test http server (but not how initiated or how tasks are ran).
-Tests include an extremely large file twentyThousandRecords.js to test
-under stress
+Test http server (but not how initiated or how tasks are ran). Tests
+include an extremely large file twentyThousandRecords.js to test under
+stress
 
 Continuous integration and running tasks
 ----------------------------------------
@@ -531,18 +531,17 @@ to slice the string and match all tokens with regexes starting with '\^'
 in order to track the current location.
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
 
-Syntax tokens tested separately. Broad, broad base to this pyramid - two levels
-of unit testing.
-By testing individual tokens are correct and the use of those tokens as
-a wider expression, am testing the same thing twice. Arguably, redundant
-effort. But may simply be easier to write in that way - software is
-written by a human in a certain order and if we take a bottom-up
-approach to some of that design, each layer is easier to create if we
-first know the layers that it sits on are sound. Writing complex regular
-expressions is still programming and it is more difficult to test them
-completely when wrapped in rather a lot more logic than directly. For
-example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is not
-trivial.
+Syntax tokens tested separately. Broad, broad base to this pyramid - two
+levels of unit testing. By testing individual tokens are correct and the
+use of those tokens as a wider expression, am testing the same thing
+twice. Arguably, redundant effort. But may simply be easier to write in
+that way - software is written by a human in a certain order and if we
+take a bottom-up approach to some of that design, each layer is easier
+to create if we first know the layers that it sits on are sound. Writing
+complex regular expressions is still programming and it is more
+difficult to test them completely when wrapped in rather a lot more
+logic than directly. For example, a regex which matches "{a,b}" or "{a}"
+but not "{a,}" is not trivial.
 
 Incrementally building up the content
 -------------------------------------
