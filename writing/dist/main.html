@@ -1333,9 +1333,9 @@ analysis* =-->
   <p>JSTD, as a Java program, is difficult to start via Grunt. Also
   an issue that Grunt post-dates Karma by enough that JSTD doesn't
   have the attention of the Grunt community.</p><!---
-**40 to 60 pages**
+Chapter 4+5 40 to 60 pages
 
-@333w, 13,000 to 19,000
+@333w/p, 13,000 to 19,000
 =-->
 
   <h1 id="design-and-reflection"><a href=
@@ -2127,71 +2127,65 @@ analysis* =-->
   <h1 id="implementation"><a href="#implementation"><span class=
   "header-section-number">5</span> Implementation</a></h1>
 
-  <h2 id="decomposition-into-components"><a href=
-  "#decomposition-into-components"><span class=
-  "header-section-number">5.1</span> Decomposition into
-  components</a></h2>
+  <h2 id="components-of-the-project"><a href=
+  "#components-of-the-project"><span class=
+  "header-section-number">5.1</span> Components of the
+  project</a></h2>
 
   <div class="figure">
     <img src="images/overallDesign.png" alt=
-    "Inter-related components that make up Oboe.js showing flow from http transport to registered callbacks. UML facet/receptacle notation is used to show the flow of events but a centralised event bus which transmits the events is omitted for clarity">
+    "Major components that make up Oboe.js showing flow from http transport to registered callbacks. Every component is not shown here. Particularly, components whose responsibility it is to initialise the oboe instance but have no role once it is running are omitted. UML facet/receptacle notation is used to show the flow of events with event names in capitals.">
 
-    <p class="caption"><strong>Inter-related components that make
-    up Oboe.js</strong> showing flow from http transport to
-    registered callbacks. UML facet/receptacle notation is used to
-    show the flow of events but a centralised event bus which
-    transmits the events is omitted for clarity</p>
+    <p class="caption"><strong>Major components that make up
+    Oboe.js</strong> showing flow from http transport to registered
+    callbacks. Every component is not shown here. Particularly,
+    components whose responsibility it is to initialise the oboe
+    instance but have no role once it is running are omitted. UML
+    facet/receptacle notation is used to show the flow of events
+    with event names in capitals.</p>
   </div>
 
-  <p>Split up concerns etc</p>
+  <p>Although there is limited encapsulation to follow an OO-style
+  arrangement, data is hidden. Outside of Oboe, only a restricted
+  public API is exposed. Not only are the internals inaccessible,
+  they are unaddressable. With no references attached to any
+  external data structures, most data exists only as captured
+  within closures.</p>
 
-  <p>Controller</p>
+  <p>Internally, communication between components is facilitated by
+  an event bus which is local to to Oboe instance, with most
+  components interacting solely by picking up events, processing
+  them and publishing further events in response. Essentially,
+  Oboe's architecture plots a fairly linear path through a series
+  of simple units from data being received to the containing
+  application being notified. An event bus removes the need for
+  each unit to know the next, giving a highly decoupled shape to
+  the library.</p>
 
-  <p>The problem decomposes nicely into loosely-coupled components,
-  each quite detailed but unconcerned with the others. Once these
-  parts are made, bringing them together under a simple controller
-  is just a matter of joining the dots.</p>
-
-  <p>Code is good when each line feels like a statement of fact
-  rather than a way of going about making an intention true.</p>
-
-  <p>Content builder: like a decorator/wrapper but event based, not
-  based on object wrapping.</p>
-
-  <h2 id="inversion-of-control-and-communication-between-parts">
-  <a href=
-  "#inversion-of-control-and-communication-between-parts"><span class="header-section-number">
-  5.2</span> Inversion of Control and communication between
-  parts</a></h2>
-
-  <p>Aim of creating a micro-library rules out building in a
-  general-purpose IoC library.</p>
-
-  <p>However, can still follow the general principles.</p>
-
-  <p>Why the Observer pattern (cite: des patterns) lends itself
-  well to MVC and inversion of control.</p>
-
-  <p>What the central controller does; acts as a plumber connecting
-  the various parts up. Since oboe is predominantly event/stream
-  based, once wired up little intervention is needed from the
-  controller. Ie, A knows how to listen for ??? events but is
-  unintested who fired them.</p>
-
-  <p>Local event bus Why? Makes testing easy (just put appropriate
-  event on the bus rather than trying to fake calls from linked
-  stubs). Decouples, avoids parts having to locate or be passed
-  other parts. Wouldn't scale indefinately, does provide something
-  of a mingled-purpose space. Why not more direct event passing
-  without a separate event bus (ie, everything as an emitter and
-  reciever of events?)</p>
-
-  <h2 id="grunt"><a href="#grunt"><span class=
-  "header-section-number">5.3</span> Grunt</a></h2>
-
-  <h2 id="automated-testing"><a href=
+  <h3 id="automated-testing"><a href=
   "#automated-testing"><span class=
-  "header-section-number">5.4</span> Automated testing</a></h2>
+  "header-section-number">5.1.1</span> Automated testing</a></h3>
+
+  <p>Oboe's architecture has been designed to allow as confident
+  testing as possible. Black-box unit testing of a stateful unit is
+  difficult; because of side-effects it may later react differently
+  to the same calls. For this reason where state is required it is
+  stored in very simple state-storing units with program logic
+  removed. The logic may then be separately expressed as functions
+  which transition from one state to the next. Although
+  comprehensive coverage is of course impossible and tests are
+  inevitably incomplete, for whatever results the functions give
+  while under test, uninfluenced by state I can be sure that they
+  will continue to give in any future situation. The separate unit
+  holding the state is trivial to test, having exactly one
+  responsibility: to store the result of a function call and later
+  pass that result to the next function. This approach clearly
+  breaks with object oriented style encapsulation by not hiding
+  data behind the logic which acts on them but I feel the departure
+  is worthwhile for the greater certainty it allows over the
+  correct functioning of the program.</p>
+
+  <p>Dependency injection.</p>
 
   <p>Do it on every save!</p>
 
@@ -2220,14 +2214,14 @@ analysis* =-->
 
   <div class="figure">
     <img src="images/pyramid.png" alt=
-    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. ">
+    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, whereas for the high-level tests only smoke tests are provided. \label{testingPyramidFig}">
 
     <p class="caption">The testing pyramid is a common concept,
     relying on the assumption that verification of small parts
     provides a solid base from which to compose system-level
     behaviours. A Lot of testing is done on the low-level
     components of the system, whereas for the high-level tests only
-    smoke tests are provided.</p>
+    smoke tests are provided. \label{testingPyramidFig}</p>
   </div>
 
   <p>Jstd can serve example files but need to write out slowly
@@ -2261,11 +2255,6 @@ analysis* =-->
   "http://www.catb.org/esr/writings/taoup/html/ch04s03.html">http://www.catb.org/esr/writings/taoup/html/ch04s03.html</a>].
   Transparent proxy is about 20 lines. Transparent enough to fool
   JSTD into thinking it is connecting directly to its server.</p>
-
-  <p>Node comes with very little built in (not even http) but
-  relies on libraries written in the language itself to do
-  everything. Could implement own http on top of sockets if wanted
-  rather than using the provided one.</p>
 
   <p>The test pyramid concept fits in well with the hiding that is
   provided. Under the testing pyramid only very high level
@@ -2330,12 +2319,191 @@ analysis* =-->
   more generic sections of the codebase as generic components. A
   purist approach to TDD would say</p>
 
+  <h2 id="grunt"><a href="#grunt"><span class=
+  "header-section-number">5.2</span> Grunt</a></h2>
+
+  <h3 id="packaging-the-library-as-a-single-distributable-file">
+  <a href=
+  "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
+  5.2.1</span> Packaging the library as a single distributable
+  file</a></h3>
+
+  <div class="figure">
+    <img src="images/placeholder.png" alt=
+    "packaging of many javascript files into multiple single-file packages. The packages are individually targeted at different execution contexts, either browsers or node get from notebook, split sketch diagram in half">
+
+    <p class="caption">packaging of many javascript files into
+    multiple single-file packages. The packages are individually
+    targeted at different execution contexts, either browsers or
+    node <em>get from notebook, split sketch diagram in
+    half</em></p>
+  </div>
+
+  <ul>
+    <li>One file for browser and node is common.</li>
+
+    <li>say how this is done</li>
+
+    <li>why not doing this (adds bloat, inhibits micro-lib)</li>
+
+    <li>extra challenges</li>
+
+    <li>http adaptor is different</li>
+
+    <li>packaging is different</li>
+
+    <li>two distributable files, for node minification is not
+    important so don't do to help debugging.</li>
+  </ul>
+
+  <p>Composition of several source files into a distributable
+  binary-like text file</p>
+
+  <p>Why distributed javascript is more like a binary than a source
+  file. Licencing implications? Would be (maybe) under GPL. Not so
+  under BSD.</p>
+
+  <p>Inherent hiding by wrapping in a scope.</p>
+
+  <p>Names of functions and variable names which are provably not
+  possible to reference are lost for the sake of reduction of size
+  of the source.</p>
+
+  <p>Packaging for node or browser. No need to minify for node but
+  concatenation still done for ease of inclusion in projects</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript">typical pattern <span class=
+"kw">for</span> packaging to work <span class=
+"kw">in</span> either a <span class="ot">node</span>.<span class=
+"fu">js</span> <span class="fu">server</span> <span class=
+"fu">or</span> <span class="fu">a</span> <span class=
+"fu">web</span> <span class="fu">browser</span></code>
+</pre>
+
+  <p>Packaging for use in frameworks.</p>
+
+  <ul>
+    <li>Many frameworks already come with a wrapper arround the
+    browser's inbuilt ajax capabilities</li>
+
+    <li>
+      <p>they don't add to the capabilities but present a nicer
+      interface</p>
+    </li>
+
+    <li>I'm not doing it but others are</li>
+
+    <li>
+      <p>browser-packaged version should be use agnostic and
+      therefore amenable to packaging in this way</p>
+    </li>
+  </ul>
+
+  <p>Why uglify</p>
+
+  <ul>
+    <li>Covers whole language, not just a well-advised subset.</li>
+
+    <li>Closure compiler works over a subset of javascript rather
+    than the whole language.</li>
+  </ul>
+
+  <p>Why not require. Bits on what rq is can go into B&amp;R
+  section. <em>Some of this can move into 3_Background.md</em></p>
+
+  <ul>
+    <li>What it is</li>
+
+    <li>Why so popular</li>
+
+    <li>Why a loader is necessary - js doesn't come with an import
+    statement</li>
+
+    <li>How it can be done in the language itself without an import
+    statement</li>
+
+    <li>Meant more for AMD than for single-load code</li>
+
+    <li>Situations AMD is good for - large site, most visitors
+    don't need all the code loaded</li>
+
+    <li>Depends on run-time component to be loaded even after code
+    has been optimised</li>
+
+    <li>Small compatible versions exist that just do loading
+    (almond)<br></li>
+
+    <li>Why ultimately not suitable for a library like this - would
+    require user to use Require before adopting it.</li>
+  </ul>
+
+  <p>Browserify is closer.</p>
+
+  <ul>
+    <li>Why it is better for some projects</li>
+
+    <li>Very nearly meets my needs</li>
+
+    <li>But http-compatability (<a href=
+    "https://github.com/substack/http-browserify">https://github.com/substack/http-browserify</a>),
+    while complete enough, isn't compact enough to not push project
+    over micro-library size</li>
+  </ul>
+
+  <p>Testing post-packaging for small set of smoke tests. Can't
+  test everything, only through public API.</p>
+
+  <p>Uglify. Why not Google Closure Compiler. Java, ack. Closure
+  might be better.</p>
+
+  <h2 id="dependency-injection-and-communication-between-parts">
+  <a href=
+  "#dependency-injection-and-communication-between-parts"><span class="header-section-number">
+  5.3</span> Dependency injection and communication between
+  parts</a></h2>
+
+  <p>One such example is a late refactor so that sXHR is passed an
+  XHR rather than creating one itself. Actual code not simpler but
+  tests where much simpler - didn't have to override XHR
+  constructor etc. Downside is more difficult to create an sXHR
+  since client has to create two objects. The objects it depends on
+  are no longer an implementation detail but a part of sXHR's
+  API.</p>
+
+  <p>Aim of creating a micro-library rules out building in a
+  general-purpose IoC library.</p>
+
+  <p>However, can still follow the general principles.</p>
+
+  <p>Why the Observer pattern (cite: des patterns) lends itself
+  well to MVC and inversion of control.</p>
+
+  <p>What the central controller does; acts as a plumber connecting
+  the various parts up. Since oboe is predominantly event/stream
+  based, once wired up little intervention is needed from the
+  controller. Ie, A knows how to listen for ??? events but is
+  unintested who fired them.</p>
+
+  <p>Local event bus Why? Makes testing easy (just put appropriate
+  event on the bus rather than trying to fake calls from linked
+  stubs). Decouples, avoids parts having to locate or be passed
+  other parts. Wouldn't scale indefinately, does provide something
+  of a mingled-purpose space. Why not more direct event passing
+  without a separate event bus (ie, everything as an emitter and
+  reciever of events?)</p>
+
   <h2 id="styles-of-programming"><a href=
   "#styles-of-programming"><span class=
-  "header-section-number">5.5</span> Styles of Programming</a></h2>
+  "header-section-number">5.4</span> Styles of Programming</a></h2>
+
+  <p>Code is good when each line feels like a statement of fact
+  rather than a way of going about making an intention true.</p>
 
   <p>"Mixed paradigm" design. But not classical: don't need
   inheritance.</p>
+
+  <p>How doing data hiding in JS without copying an OO concept of
+  data hiding.</p>
 
   <p>Interestingly, the mixed paradigm design hasn't changed the
   top-level design very much from how it'd be as a pure OO project
@@ -2423,15 +2591,15 @@ analysis* =-->
   the conclusion)</p>
 
   <p>Final consideration of coding: packaging up each unit to
-  export a minimal interface. * Why minimal interfaces are better
-  for minification</p>
+  export a minimal interface.</p>
+
+  <ul>
+    <li>Why minimal interfaces are better for minification</li>
+  </ul>
 
   <p>Need to build an abstraction layer over xhr/xhr2/node. Can
   only work for packets in-order, for out-of-order packets
   something else happens.</p>
-
-  <h2 id="js-code-style"><a href="#js-code-style"><span class=
-  "header-section-number">5.6</span> JS code style</a></h2>
 
   <p>Javascript: not the greatest for 'final' elegant presentation
   of programming. Does allow 'messy' first drafts which can be
@@ -2465,13 +2633,11 @@ analysis* =-->
   based on callbacks it is entirely possible to use them from a
   component of a javascript program which is wholly stateless.</p>
 
-  <h2 id=
-  "performance-implications-of-functional-javascript-subsume-into-above">
+  <h3 id="performance-implications-of-functional-javascript">
   <a href=
-  "#performance-implications-of-functional-javascript-subsume-into-above">
-  <span class="header-section-number">5.7</span> Performance
-  implications of functional javascript (subsume into
-  above?)</a></h2>
+  "#performance-implications-of-functional-javascript"><span class=
+  "header-section-number">5.4.1</span> Performance implications of
+  functional javascript</a></h3>
 
   <p>V8 and other modern JS engines are often said to be
   'near-native' speed, meaning it runs at close to the speed of a
@@ -2511,13 +2677,13 @@ analysis* =-->
 
   <p>However, js execution time is not much of a problem,</p>
 
-  <h2 id=
+  <h3 id=
   "preferring-functions-over-constructors-subsume-into-above-section">
   <a href=
   "#preferring-functions-over-constructors-subsume-into-above-section">
-  <span class="header-section-number">5.8</span> Preferring
+  <span class="header-section-number">5.4.2</span> Preferring
   functions over constructors (subsume into above
-  section?)</a></h2>
+  section?)</a></h3>
 
   <p>What constructors are in js. Any function, but usually an
   uppercase initial char indicates that it is intended to be used
@@ -2549,7 +2715,7 @@ analysis* =-->
 
   <h2 id="jsonpath-implementation"><a href=
   "#jsonpath-implementation"><span class=
-  "header-section-number">5.9</span> JSONPath
+  "header-section-number">5.5</span> JSONPath
   Implementation</a></h2>
 
   <p>Show evolution of it. Like most compilers, first try was just
@@ -2692,8 +2858,14 @@ analysis* =-->
 
   <h2 id="incrementally-building-up-the-content"><a href=
   "#incrementally-building-up-the-content"><span class=
-  "header-section-number">5.10</span> Incrementally building up the
+  "header-section-number">5.6</span> Incrementally building up the
   content</a></h2>
+
+  <p>Content builder: variant of Adaptor pattern that is event
+  based, not based on object wrapping and propagating calls. Pushed
+  to, not pulled from. Hides a few Clarinet perculiarities such as
+  the field name given with the open object and internally
+  normalises this by handling as if it were two events.</p>
 
   <p>Like SAX, calls from clarinet are entirely 'context free'. Ie,
   am told that there is a new object but without the preceding
@@ -2755,7 +2927,7 @@ analysis* =-->
     mutated</li>
 
     <li>Make stateless by making all functions take and return an
-    instance of that item<br></li>
+    instance of that item</li>
 
     <li>Replace all assignment of the single stateful var with a
     return statement</li>
@@ -2779,7 +2951,7 @@ analysis* =-->
 
   <h2 id="callback-and-mutability-problem"><a href=
   "#callback-and-mutability-problem"><span class=
-  "header-section-number">5.11</span> Callback and mutability
+  "header-section-number">5.7</span> Callback and mutability
   Problem</a></h2>
 
   <p>Stateful controller very easy to test - only 1 function.</p>
@@ -2812,151 +2984,6 @@ analysis* =-->
 
     <li>defining getter properties</li>
   </ul>
-
-  <h2 id="packaging-the-library-as-a-single-distributable-file">
-  <a href=
-  "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  5.12</span> Packaging the library as a single distributable
-  file</a></h2>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "packaging of many javascript files into multiple single-file packages. The packages are individually targeted at different execution contexts, either browsers or node get from notebook, split sketch diagram in half">
-
-    <p class="caption">packaging of many javascript files into
-    multiple single-file packages. The packages are individually
-    targeted at different execution contexts, either browsers or
-    node <em>get from notebook, split sketch diagram in
-    half</em></p>
-  </div>
-
-  <ul>
-    <li>One file for browser and node is common.</li>
-
-    <li>say how this is done</li>
-
-    <li>why not doing this (adds bloat, inhibits micro-lib)</li>
-
-    <li>extra challenges</li>
-
-    <li>http adaptor is different</li>
-
-    <li>packaging is different</li>
-
-    <li>two distributable files, for node minification is not
-    important so don't do to help debugging.</li>
-  </ul>
-
-  <p>Composition of several source files into a distributable
-  binary-like text file</p>
-
-  <p>Why distributed javascript is more like a binary than a source
-  file. Licencing implications? Would be (maybe) under GPL. Not so
-  under BSD.</p>
-
-  <p>Inherent hiding by wrapping in a scope.</p>
-
-  <p>Names of functions and variable names which are provably not
-  possible to reference are lost for the sake of reduction of size
-  of the source.</p>
-
-  <p>Packaging for node or browser. No need to minify for node but
-  concatenation still done for ease of inclusion in projects</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">typical pattern <span class=
-"kw">for</span> packaging to work <span class=
-"kw">in</span> either a <span class="ot">node</span>.<span class=
-"fu">js</span> <span class="fu">server</span> <span class=
-"fu">or</span> <span class="fu">a</span> <span class=
-"fu">web</span> <span class="fu">browser</span></code>
-</pre>
-
-  <p>Packaging for use in frameworks.</p>
-
-  <ul>
-    <li>Many frameworks already come with a wrapper arround the
-    browser's inbuilt ajax capabilities</li>
-
-    <li>
-      <p>they don't add to the capabilities but present a nicer
-      interface</p>
-    </li>
-
-    <li>
-      <p>I'm not doing it but others are ** browser-packaged
-      version should be use agnostic and therefore amenable to
-      packaging in this way</p>
-    </li>
-  </ul>
-
-  <p>Why uglify</p>
-
-  <ul>
-    <li>Covers whole language, not just a well-advised subset.</li>
-
-    <li>Closure compiler works over a subset of javascript rather
-    than the whole language.</li>
-  </ul>
-
-  <p>Why not require. Bits on what rq is can go into B&amp;R
-  section. <em>Some of this can move into 3_Background.md</em></p>
-
-  <ul>
-    <li>What it is</li>
-
-    <li>Why so popular</li>
-
-    <li>Why a loader is necessary - js doesn't come with an import
-    statement</li>
-
-    <li>How it can be done in the language itself without an import
-    statement</li>
-
-    <li>Meant more for AMD than for single-load code</li>
-
-    <li>Situations AMD is good for - large site, most visitors
-    don't need all the code loaded</li>
-
-    <li>Depends on run-time component to be loaded even after code
-    has been optimised</li>
-
-    <li>Small compatible versions exist that just do loading
-    (almond)<br></li>
-
-    <li>Why ultimately not suitable for a library like this - would
-    require user to use Require before adopting it.</li>
-  </ul>
-
-  <p>Browserify is closer.</p>
-
-  <ul>
-    <li>Why it is better for some projects</li>
-
-    <li>Very nearly meets my needs</li>
-
-    <li>But http-compatability (<a href=
-    "https://github.com/substack/http-browserify">https://github.com/substack/http-browserify</a>),
-    while complete enough, isn't compact enough to not push project
-    over micro-library size</li>
-  </ul>
-
-  <p>Testing post-packaging for small set of smoke tests. Can't
-  test everything, only through public API.</p>
-
-  <p>Uglify. Why not Google Closure Compiler.</p>
-
-  <h2 id="resume-not"><a href="#resume-not"><span class=
-  "header-section-number">5.13</span> Resume (not)</a></h2>
-
-  <p>Could implement a resume function for if transmission stops
-  halfway</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript">   .<span class=
-"fu">onError</span>( error ) {
-      <span class="kw">this</span>.<span class=
-"fu">resume</span>();
-   }</code>
-</pre>
 
   <h1 id="conclusion"><a href="#conclusion"><span class=
   "header-section-number">6</span> Conclusion</a></h1><!---
