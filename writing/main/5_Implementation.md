@@ -1,30 +1,58 @@
 Implementation
 ==============
 
-Decomposition into components
------------------------------
+Components of the project
+-------------------------
 
 ![**Inter-related components that make up Oboe.js** showing flow from
-http transport to registered callbacks. UML facet/receptacle notation is
-used to show the flow of events but a centralised event bus which
-transmits the events is omitted for clarity](images/overallDesign.png)
+http transport to registered callbacks. Every component is not shown
+here, particularly, components whose responsibility it is to initialise
+the oboe instance but have no part once it has started running are
+omitted. UML facet/receptacle notation is used to show the flow of
+events, with event names as capitals. Events are dispatched via a local
+event bus but this component is not shown for
+clarity.](images/overallDesign.png)
 
-Split up concerns etc
+I have found that the problem decomposes nicely into loosely-coupled
+components, each quite unconcerned with its neighbours. The component
+boundaries have been drawn to give a maximum separation of concerns
+whilst also allowing a high degree of certainly with regards to
+correctness.
 
-Controller
+Black-box unit testing of a stateful unit is difficult; because of
+side-effects it may later react differently to the same calls. For this
+reason where state is required it is stored in very simple state-storing
+units with program logic removed. The logic may then be separately
+expressed as functions which transition from one state to the next.
+Although comprehensive coverage is of course impossible and tests are
+inevitably incomplete, for whatever results the functions give while
+under test, uninfluenced by state I can be sure that they will continue
+to give in any future situation. The separate unit holding the state is
+trivial to test, having exactly one responsibility: to store the result
+of a function call and later pass that result to the next function. This
+approach clearly breaks with object oriented style encapsulation by not
+hiding data behind the logic which acts on them but I feel the departure
+is worthwhile for the greater certainty it allows over the correct
+functioning of the program.
 
-The problem decomposes nicely into loosely-coupled components, each
-quite detailed but unconcerned with the others. Once these parts are
-made, bringing them together under a simple controller is just a matter
-of joining the dots.
+Although there is limited encapsulation as per an OO-style arrangement,
+data is hidden. Outside of Oboe, only a restricted public API is
+exposed. Not only are the internals inaccessible, they are
+unaddressable. With no references attached to any external data
+structures, most data exists only as captured within closures.
 
-Code is good when each line feels like a statement of fact rather than a
-way of going about making an intention true.
-
-Content builder: like a decorator/wrapper but event based, not based on
-object wrapping.
+Communication between components is facilitated by an event bus which is
+local to to Oboe instance, with most components interacting solely by
+picking up events, processing them and publishing further events in
+response. Essentially, Oboe's architecture plots a fairly linear path
+through a series of simple units from data being received to the
+containing application being notified. An event bus removes the need for
+each unit to know the next, giving a highly decoupled shape to the
+library.
 
 ### Automated testing
+
+Dependency injection. Why a bus and not direct listening.
 
 Do it on every save!
 
@@ -81,11 +109,6 @@ same as C was once described as a 'thin glue'
 [http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent
 proxy is about 20 lines. Transparent enough to fool JSTD into thinking
 it is connecting directly to its server.
-
-Node comes with very little built in (not even http) but relies on
-libraries written in the language itself to do everything. Could
-implement own http on top of sockets if wanted rather than using the
-provided one.
 
 The test pyramid concept \ref{testingPyramidFig} fits in well with the
 hiding that is provided. Under the testing pyramid only very high level
@@ -188,9 +211,9 @@ Packaging for use in frameworks.
     inbuilt ajax capabilities
 -   they don't add to the capabilities but present a nicer interface
 
--   I'm not doing it but others are 
--   browser-packaged version should
-    be use agnostic and therefore amenable to packaging in this way
+-   I'm not doing it but others are
+-   browser-packaged version should be use agnostic and therefore
+    amenable to packaging in this way
 
 Why uglify
 
@@ -233,6 +256,13 @@ better.
 Dependency injection and communication between parts
 ----------------------------------------------------
 
+One such example is a late refactor so that sXHR is passed an XHR rather
+than creating one itself. Actual code not simpler but tests where much
+simpler - didn't have to override XHR constructor etc. Downside is more
+difficult to create an sXHR since client has to create two objects. The
+objects it depends on are no longer an implementation detail but a part
+of sXHR's API.
+
 Aim of creating a micro-library rules out building in a general-purpose
 IoC library.
 
@@ -256,7 +286,13 @@ as an emitter and reciever of events?)
 Styles of Programming
 ---------------------
 
+Code is good when each line feels like a statement of fact rather than a
+way of going about making an intention true.
+
 "Mixed paradigm" design. But not classical: don't need inheritance.
+
+How doing data hiding in JS without copying an OO concept of data
+hiding.
 
 Interestingly, the mixed paradigm design hasn't changed the top-level
 design very much from how it'd be as a pure OO project (IoC, decorators,
@@ -338,9 +374,9 @@ Lack of consistency in coding (don't write too much, leave to the
 conclusion)
 
 Final consideration of coding: packaging up each unit to export a
-minimal interface. 
+minimal interface.
 
-* Why minimal interfaces are better for minification
+-   Why minimal interfaces are better for minification
 
 Need to build an abstraction layer over xhr/xhr2/node. Can only work for
 packets in-order, for out-of-order packets something else happens.
@@ -548,6 +584,12 @@ in order to track the current location.
 
 Incrementally building up the content
 -------------------------------------
+
+Content builder: variant of Adaptor pattern that is event based, not
+based on object wrapping and propagating calls. Pushed to, not pulled
+from. Hides a few Clarinet perculiarities such as the field name given
+with the open object and internally normalises this by handling as if it
+were two events.
 
 Like SAX, calls from clarinet are entirely 'context free'. Ie, am told
 that there is a new object but without the preceding calls the root
