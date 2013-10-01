@@ -110,15 +110,16 @@ Test http server (but not how initiated or how tasks are ran). Tests
 include an extremely large file twentyThousandRecords.js to test under
 stress
 
-Continuous integration and running tasks
-----------------------------------------
+Task running through Grunt
+--------------------------
 
 Do tests on every save!
 
 ![Relationship between various files and test libraries *other half of
 sketch from notebook*](images/placeholder.png)
 
-### Packaging the library as a single distributable file
+Packaging as a single distributable file
+----------------------------------------
 
 ![packaging of many javascript files into multiple single-file packages.
 The packages are individually targeted at different execution contexts,
