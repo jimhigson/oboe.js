@@ -39,12 +39,12 @@ provided.](images/pyramid)
 Oboe's architecture has been designed to so that I may have as much
 confidence as possible regarding the correct working of the library
 through automated testing. The testing itself is a non-trivial
-undertaking with 80% of code written for this project being test specification.
-Based on the idea that a correct system must be built from individually
-correct units, the majority of the specifications are unit tests,
-putting each unit under the microscope and describing the correct
-behaviour as completely as possible. Correct components are not useful
-unless they are correctly composed. Component tests zoom out from
+undertaking with 80% of code written for this project being test
+specification. Based on the idea that a correct system must be built
+from individually correct units, the majority of the specifications are
+unit tests, putting each unit under the microscope and describing the
+correct behaviour as completely as possible. Correct components are not
+useful unless they are correctly composed. Component tests zoom out from
 individual components to the library as a whole, falsifying only the
 http traffic. At the apex of the test pyramid are a small number of
 integration tests. Running these tests automatically spins up actual
@@ -69,7 +69,8 @@ hiding data behind the logic which acts on them but I feel the departure
 is worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
-Largely for the sake of testing Oboe has also embraced Dependency injection.
+Largely for the sake of testing Oboe has also embraced Dependency
+injection.
 
 One such example is a late refactor so that sXHR is passed an XHR rather
 than creating one itself. Actual code not simpler but tests where much
@@ -281,13 +282,13 @@ wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
 
 Why the Observer pattern (cite: des patterns) lends itself well to MVC
-and inversion of control.
-Local event bus Why? Makes testing easy (just put appropriate event on
-the bus rather than trying to fake calls from linked stubs). Decouples,
-avoids parts having to locate or be passed other parts. Wouldn't scale
-indefinately, does provide something of a mingled-purpose space. Why not
-more direct event passing without a separate event bus (ie, everything
-as an emitter and reciever of events?)
+and inversion of control. Local event bus Why? Makes testing easy (just
+put appropriate event on the bus rather than trying to fake calls from
+linked stubs). Decouples, avoids parts having to locate or be passed
+other parts. Wouldn't scale indefinately, does provide something of a
+mingled-purpose space. Why not more direct event passing without a
+separate event bus (ie, everything as an emitter and reciever of
+events?)
 
 Styles of Programming
 ---------------------
