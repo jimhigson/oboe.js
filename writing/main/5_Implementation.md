@@ -26,13 +26,17 @@ structures, most data exists only as captured within closures.
 Internally, communication between components is facilitated by an event
 bus which is local to to Oboe instance, with most components interacting
 solely by picking up events, processing them and publishing further
-events in response. Essentially, Oboe's architecture plots a fairly
-linear path through a series of simple units from data being received to
-the containing application being notified. An event bus removes the need
-for each unit to know the next, giving a highly decoupled shape to the
-library. This form does not lend itself nicely to UML expression
-however, giving a very unhelpful diagram shape with an event bus as a
-central hub and everything else hanging off it as spokes.
+events in response. Essentially, Oboe's architecture resembles a fairly
+linear pipeline visiting a series of units, starting with http data and
+sometimes ending with callbacks being notified. This use of an event bus
+is a variation on the Observer pattern which removes the need for each
+unit to obtain a reference to the previous one so that it may observe
+it, giving a highly decoupled shape to the library. Once everything is
+wired into the bus very little central control is required and the
+larger behaviours emerge as the consequence of this interaction between
+finer ones. One downside is perhaps that a central event bus does not
+lend itself to a UML class diagram, giving a diagram shape with an event
+bus as a central hub and everything else hanging off it as spokes.
 
 Automated testing
 -----------------
@@ -118,7 +122,7 @@ interact with Oboe through the public API alone as an application author
 would and try some tricky cases. For example, requesting ten numbers but
 registering a listener against the fifth and aborting the request on
 seeing it. The correct behaviour is to get no callback for the sixth,
-even when running on platforms where the http is buffered so that all 
+even when running on platforms where the http is buffered so that all
 ten will have already been downloaded.
 
 Task running through Grunt
@@ -223,28 +227,6 @@ everything, only through public API.
 
 Uglify. Why not Google Closure Compiler. Java, ack. Closure might be
 better.
-
-Dependency injection and communication between parts
-----------------------------------------------------
-
-Aim of creating a micro-library rules out building in a general-purpose
-IoC library.
-
-However, can still follow the general principles.
-
-What the central controller does; acts as a plumber connecting the
-various parts up. Since oboe is predominantly event/stream based, once
-wired up little intervention is needed from the controller. Ie, A knows
-how to listen for ??? events but is unintested who fired them.
-
-Why the Observer pattern (cite: des patterns) lends itself well to MVC
-and inversion of control. Local event bus Why? Makes testing easy (just
-put appropriate event on the bus rather than trying to fake calls from
-linked stubs). Decouples, avoids parts having to locate or be passed
-other parts. Wouldn't scale indefinately, does provide something of a
-mingled-purpose space. Why not more direct event passing without a
-separate event bus (ie, everything as an emitter and reciever of
-events?)
 
 Styles of Programming
 ---------------------
