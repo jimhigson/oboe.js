@@ -24,7 +24,9 @@ events in response. Essentially, Oboe's architecture plots a fairly
 linear path through a series of simple units from data being received to
 the containing application being notified. An event bus removes the need
 for each unit to know the next, giving a highly decoupled shape to the
-library.
+library. This form does not lend itself nicely to UML expression
+however, giving a very unhelpful diagram shape with an event bus as a
+central hub and everything else hanging off it as spokes.
 
 Automated testing
 -----------------
@@ -69,20 +71,28 @@ hiding data behind the logic which acts on them but I feel the departure
 is worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
-Largely for the sake of testing Oboe has also embraced Dependency
-injection.
-
-One such example is a late refactor so that sXHR is passed an XHR rather
-than creating one itself. Actual code not simpler but tests where much
-simpler - didn't have to override XHR constructor etc. Downside is more
-difficult to create an sXHR since client has to create two objects. The
-objects it depends on are no longer an implementation detail but a part
-of sXHR's API.
-
-Do it on every save!
-
-![Relationship between various files and test libraries *other half of
-sketch from notebook*](images/placeholder.png)
+Largely for the sake of testing Oboe has also embraced dependency
+injection. This means that components do not create the further
+components that they require but rather rely on them being provided by
+an external wiring. The file `wire.js` performs the actual injection.
+One such example is the streamingHttp component which hides various
+incompatible http implementations by publishing their downloaded content
+progressively via the event bus. This unit does not know how to create
+the underlying browser XHR which it hides. Undoubtedly, by not
+instantiating its own dependencies a it presents a less friendly
+interface, although this is mitigated somewhat by the interface being
+purely internal, the objects it depends on are no longer a hidden
+implementation detail but exposed as a part of the component's API. The
+advantage of dependency injection here is that unit testing is much
+simpler. Unit tests should test exactly one behaviour of one unit. Were
+the streaming http object to create its own transport, that part would
+also be under test, plus whichever external service that it connects to.
+Because Javascript allows redefinition of built in types, this could be
+avoided by overwriting the XHR constructor to return a mock but
+modifying the built in types for tests opens up the possibilities of
+changes leaking between cases. Dependency injection allows a much
+simpler test style because it is trivial to inject a stub in place of
+the XHR.
 
 How automated testing improves what can be written, not just making what
 is written more reliable.
@@ -161,20 +171,13 @@ trivial.
 Can test less exhaustively on higher levels if lower ones are well
 tested, testing where it is easier to do whilst giving good guarantees.
 
-Genuine data hiding gets in the way sometimes. Eg, token regexes are
-built from the combination of smaller regualar expressions for clarity
-(long regular expressions are concise but hard to read), and then
-wrapped in functions (why? - explain to generify interface) before being
-exposed. Because the components are hidden in a scope, they are not
-addressable by the tests and therefore cannot be directly tested.
-Reluctantly
+Continuous integration and running tasks
+----------------------------------------
 
-One dilemma in implementing the testing is how far to test the more
-generic sections of the codebase as generic components. A purist
-approach to TDD would say
+Do tests on every save!
 
-Grunt
------
+![Relationship between various files and test libraries *other half of
+sketch from notebook*](images/placeholder.png)
 
 ### Packaging the library as a single distributable file
 
