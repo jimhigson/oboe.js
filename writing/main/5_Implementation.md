@@ -4,22 +4,32 @@ Implementation
 Components of the project
 -------------------------
 
-![**Inter-related components that make up Oboe.js** showing flow from
+![**Major components that make up Oboe.js** showing flow from
 http transport to registered callbacks. Every component is not shown
-here, particularly, components whose responsibility it is to initialise
-the oboe instance but have no part once it has started running are
+here. Particularly, components whose responsibility it is to initialise
+the oboe instance but have no role once it is running are
 omitted. UML facet/receptacle notation is used to show the flow of
-events, with event names as capitals. Events are dispatched via a local
-event bus but this component is not shown for
-clarity.](images/overallDesign.png)
+events with event names in capitals.](images/overallDesign.png)
 
-I have found that the problem decomposes nicely into loosely-coupled
-components, each quite unconcerned with its neighbours. The component
-boundaries have been drawn to give a maximum separation of concerns
-whilst also allowing a high degree of certainly with regards to
-correctness.
+Although there is limited encapsulation to follow an OO-style arrangement,
+data is hidden. Outside of Oboe, only a restricted public API is
+exposed. Not only are the internals inaccessible, they are
+unaddressable. With no references attached to any external data
+structures, most data exists only as captured within closures.
 
-Black-box unit testing of a stateful unit is difficult; because of
+Internally, communication between components is facilitated by an event bus which is
+local to to Oboe instance, with most components interacting solely by
+picking up events, processing them and publishing further events in
+response. Essentially, Oboe's architecture plots a fairly linear path
+through a series of simple units from data being received to the
+containing application being notified. An event bus removes the need for
+each unit to know the next, giving a highly decoupled shape to the
+library.
+
+### Automated testing
+
+Oboe's architecture has been designed to allow as
+confident testing as possible. Black-box unit testing of a stateful unit is difficult; because of
 side-effects it may later react differently to the same calls. For this
 reason where state is required it is stored in very simple state-storing
 units with program logic removed. The logic may then be separately
@@ -33,26 +43,9 @@ of a function call and later pass that result to the next function. This
 approach clearly breaks with object oriented style encapsulation by not
 hiding data behind the logic which acts on them but I feel the departure
 is worthwhile for the greater certainty it allows over the correct
-functioning of the program.
+functioning of the program.   
 
-Although there is limited encapsulation as per an OO-style arrangement,
-data is hidden. Outside of Oboe, only a restricted public API is
-exposed. Not only are the internals inaccessible, they are
-unaddressable. With no references attached to any external data
-structures, most data exists only as captured within closures.
-
-Communication between components is facilitated by an event bus which is
-local to to Oboe instance, with most components interacting solely by
-picking up events, processing them and publishing further events in
-response. Essentially, Oboe's architecture plots a fairly linear path
-through a series of simple units from data being received to the
-containing application being notified. An event bus removes the need for
-each unit to know the next, giving a highly decoupled shape to the
-library.
-
-### Automated testing
-
-Dependency injection. Why a bus and not direct listening.
+Dependency injection.
 
 Do it on every save!
 

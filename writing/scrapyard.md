@@ -13,3 +13,20 @@ of implementation should not be apparent to a user, my plan is that the
 written work should not feel disjointed for having been written
 non-sequentially. I plan to manage the Kanban process using paper only,
 with cards on a physical board.
+
+node libraries
+--------------
+
+Node comes with very little built in (not even http) but relies on
+libraries written in the language itself to do everything. Could
+implement own http on top of sockets if wanted rather than using the
+provided one.
+
+components
+----------
+
+I have found that the problem decomposes nicely into loosely-coupled
+components, each quite unconcerned with its neighbours. The component
+boundaries have been drawn to give a maximum separation of concerns
+whilst also allowing a high degree of certainly with regards to
+correctness.
