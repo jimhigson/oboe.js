@@ -61,3 +61,10 @@ clarinet) produces the kind of test that 'follows the code arround' as it is edi
 meaning that because it is testing implementation details rather than
 behaviours, whenever the implementation is updated the tests have to be
 updated too.
+
+tdd and oo
+----------
+
+TDD fits well into an object pattern because the software is well
+composed into separate parts. The objects are almost tangible in their
+distinction as separate encapsulated entities.

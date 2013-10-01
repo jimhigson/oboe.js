@@ -38,7 +38,10 @@ Automated testing
 -----------------
 
 Automated testing improves what can be written, not just making what is
-written more reliable.
+written more reliable. Tests deal with the problem of "irreducible complexity" - when a program
+is made out of parts whose correct behaviour cannot be observed without
+all of the program. Allows smaller units to be verified before verifying
+the whole.
 
 ![The testing pyramid is a common concept, relying on the assumption
 that verification of small parts provides a solid base from which to
@@ -52,12 +55,15 @@ for this project being test specifications. Based on the idea that a
 correct system must be built from individually correct units, the
 majority of the specifications are unit tests, putting each unit under
 the microscope and describing the correct behaviour as completely as
-possible. Correct components are not useful unless they are correctly
-composed. Component tests zoom out from individual components to the
-library as a whole, falsifying only the http traffic. At the apex of the
-test pyramid are a small number of integration tests. Running these
-tests automatically spins up actual REST services so that the correct
-behaviour given real http may be examined.
+possible. Component tests zoom out from examining individual components to focus on their
+correct composition, falsifying only the http traffic. To avoid testing implementation
+details the component tests do not look at the means of coupling between the code units
+but rather check for the behaviours which should emerge as a consequence of 
+their composition. At the apex of the
+test pyramid are a small number of integration tests. These
+tests check all of Oboe, automatically spinning up a REST service 
+so that the correctness of the whole library may be examined against an 
+actual server.
 
 The desirable to be amenable to testing influences the boundaries on
 which the application is split into separately implemented components.
@@ -100,52 +106,9 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Test http server (but not how initiated or how tasks are ran)
-
--------------
-
-Jstd can serve example files but need to write out slowly which it has
-no concept of. Customistation is via configuration rather than by
-plug-in, but even if it were, the threading model is not suitable to
-create this kind of timed output.
-
+Test http server (but not how initiated or how tasks are ran).
 Tests include an extremely large file twentyThousandRecords.js to test
 under stress
-
-Why jstd's built in proxy isn't sufficient. An example of a typical Java
-webserver, features thread-based mutlithreading in which threads wait
-for a while response to be received.
-
-Tests deal with the problem of "irreducible complexity" - when a program
-is made out of parts whose correct behaviour cannot be observed without
-all of the program. Allows smaller units to be verified before verifying
-the whole.
-
-TDD fits well into an object pattern because the software is well
-composed into separate parts. The objects are almost tangible in their
-distinction as separate encapsulated entities. However, the
-multi-paradigm style of my implementation draws much fainter borders
-over the implementation's landscape.
-
-Approach has been to the test the intricate code, then for wiring don't
-have tests to check that things are plumbed together correctly, rather
-rely on this being obvious enough to be detected via a smoke test.
-
-
-
-By testing individual tokens are correct and the use of those tokens as
-a wider expression, am testing the same thing twice. Arguably, redundant
-effort. But may simply be easier to write in that way - software is
-written by a human in a certain order and if we take a bottom-up
-approach to some of that design, each layer is easier to create if we
-first know the layers that it sits on are sound. Writing complex regular
-expressions is still programming and it is more difficult to test them
-completely when wrapped in rather a lot more logic than directly. For
-example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is not
-trivial.
-
-Can test less exhaustively on higher levels if lower ones are well
-tested, testing where it is easier to do whilst giving good guarantees.
 
 Continuous integration and running tasks
 ----------------------------------------
@@ -567,6 +530,19 @@ would allow much more elegant matching. Only alternative is cumersome:
 to slice the string and match all tokens with regexes starting with '\^'
 in order to track the current location.
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
+
+Syntax tokens tested separately. Broad, broad base to this pyramid - two levels
+of unit testing.
+By testing individual tokens are correct and the use of those tokens as
+a wider expression, am testing the same thing twice. Arguably, redundant
+effort. But may simply be easier to write in that way - software is
+written by a human in a certain order and if we take a bottom-up
+approach to some of that design, each layer is easier to create if we
+first know the layers that it sits on are sound. Writing complex regular
+expressions is still programming and it is more difficult to test them
+completely when wrapped in rather a lot more logic than directly. For
+example, a regex which matches "{a,b}" or "{a}" but not "{a,}" is not
+trivial.
 
 Incrementally building up the content
 -------------------------------------
