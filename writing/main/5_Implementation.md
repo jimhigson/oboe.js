@@ -100,10 +100,9 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Bt encourageing splitting into co-operating objects, TDD to a certain
-degree is anti-encapsulation. The public object that was extracted as a
-new concern from a larger object now needs public methods whereas before
-nothing was exposed.
+Test http server (but not how initiated or how tasks are ran)
+
+-------------
 
 Jstd can serve example files but need to write out slowly which it has
 no concept of. Customistation is via configuration rather than by
@@ -122,19 +121,6 @@ is made out of parts whose correct behaviour cannot be observed without
 all of the program. Allows smaller units to be verified before verifying
 the whole.
 
-Conversely, automated testing allows us to write incomprehensible code
-by making us into more powerful programmers, it is possible building up
-layers of complexity one very small part at a time that we couldn't
-write in a simple stage. Clarity \> cleverness but cleverness has its
-place as well (intriducing new concepts)
-
-Testing via node to give something to test against - slowserver. Proxy.
-JSTD not up to task. Shows how useful node is as a 'network glue'. The
-same as C was once described as a 'thin glue'
-[http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent
-proxy is about 20 lines. Transparent enough to fool JSTD into thinking
-it is connecting directly to its server.
-
 TDD fits well into an object pattern because the software is well
 composed into separate parts. The objects are almost tangible in their
 distinction as separate encapsulated entities. However, the
@@ -145,14 +131,7 @@ Approach has been to the test the intricate code, then for wiring don't
 have tests to check that things are plumbed together correctly, rather
 rely on this being obvious enough to be detected via a smoke test.
 
-A good test should be able to go unchanged as the source under test is
-refactored. Indeed, the test will be how we know that the code under
-test still works as intended. Experince tells me that testing that A
-listens to B (ie that the controller wires the jsonbuilder up to
-clarinet) produces the kind of test that 'follows the code arround'
-meaning that because it is testing implementation details rather than
-behaviours, whenever the implementation is updated the tests have to be
-updated too.
+
 
 By testing individual tokens are correct and the use of those tokens as
 a wider expression, am testing the same thing twice. Arguably, redundant
