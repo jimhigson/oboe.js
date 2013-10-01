@@ -393,53 +393,28 @@ describe('jsonPath', function(){
             )).not.toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});                                    
          });
          
+         
          it('can construct the root duck type', function(){
          
             var rootJson = {  
-                  people:{                           
-                     jack:{                               
-                        name:  'Jack'
-                     ,  email: 'jack@example.com'
-                     }
+               people:{                           
+                  jack:{                               
+                     name:  'Jack'
+                  ,  email: 'jack@example.com'
                   }
-               },
-               testAscent = asAscent(
-                              [          'people',          'jack'                 ], 
-                              [rootJson, rootJson.people,   rootJson.people.jack   ]
-                            ),
-                            
-               results = matchOf( '{}' ).against( testAscent );                                 
-                            
-         
-            expect( results )
-               .toSpecifyNode('Jack');
-               
-            expect( results )
-               .toSpecifyNode('jack@example.com');               
-
-            expect( results )
-               .toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});
-               
-            expect( results )
-               .toSpecifyNode(
-                  {                           
-                     jack:{                               
-                        name:  'Jack'
-                     ,  email: 'jack@example.com'}
-                  }
-            );
+               }
+            };    
             
-            expect( results )
-               .toSpecifyNode({
-                   people:{                           
-                      jack:{                               
-                         name:  'Jack'
-                      ,  email: 'jack@example.com'
-                      }
-                   }
-                }
-            );                    
-         });                  
+            expect( matchOf( '{}' ).against( 
+                                               
+               asAscent(
+                   [          'people',          'jack'                 ], 
+                   [rootJson, rootJson.people,   rootJson.people.jack   ]
+               )
+             
+            )).toSpecifyNode({name:  'Jack',  email: 'jack@example.com'});
+                             
+         });              
       
          it('does not match if not all fields are there', function(){
          
