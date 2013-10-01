@@ -106,14 +106,27 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Test http server (but not how initiated or how tasks are ran). Tests
-include an extremely large file twentyThousandRecords.js to test under
-stress
+Asserter test design pattern and BDD style. Tests otherwise repetitive.
+
+Integration tests run against a node service which returns known content
+according to known timings, somewhat emulating downloading via a slow
+internet connection. For example, the url `/tenSlowNumbers` writes out a
+JSON array of the first ten natural numbers at a rate of one per second,
+while `/echoBackHeaders` writes back the http headers that it received
+as a JSON object. The test specifications which use these services
+interact with Oboe through the public API alone as an application author
+would and try some tricky cases. For example, requesting ten numbers but
+registering a listener against the fifth and aborting the request on
+seeing it. The correct behaviour is to get no callback for the sixth,
+even when running on platforms where the http is buffered so that all 
+ten will have already been downloaded.
 
 Task running through Grunt
 --------------------------
 
-Do tests on every save!
+Run tests on every save! - all but integration which are too slow.
+
+Start server when integration tests are needed.
 
 ![Relationship between various files and test libraries *other half of
 sketch from notebook*](images/placeholder.png)
