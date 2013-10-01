@@ -4,52 +4,55 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js** showing flow from
-http transport to registered callbacks. Every component is not shown
-here. Particularly, components whose responsibility it is to initialise
-the oboe instance but have no role once it is running are
-omitted. UML facet/receptacle notation is used to show the flow of
-events with event names in capitals.](images/overallDesign.png)
+![**Major components that make up Oboe.js** showing flow from http
+transport to registered callbacks. Every component is not shown here.
+Particularly, components whose responsibility it is to initialise the
+oboe instance but have no role once it is running are omitted. UML
+facet/receptacle notation is used to show the flow of events with event
+names in capitals.](images/overallDesign.png)
 
-Although there is limited encapsulation to follow an OO-style arrangement,
-data is hidden. Outside of Oboe, only a restricted public API is
-exposed. Not only are the internals inaccessible, they are
+Although there is limited encapsulation to follow an OO-style
+arrangement, data is hidden. Outside of Oboe, only a restricted public
+API is exposed. Not only are the internals inaccessible, they are
 unaddressable. With no references attached to any external data
 structures, most data exists only as captured within closures.
 
-Internally, communication between components is facilitated by an event bus which is
-local to to Oboe instance, with most components interacting solely by
-picking up events, processing them and publishing further events in
-response. Essentially, Oboe's architecture plots a fairly linear path
-through a series of simple units from data being received to the
-containing application being notified. An event bus removes the need for
-each unit to know the next, giving a highly decoupled shape to the
+Internally, communication between components is facilitated by an event
+bus which is local to to Oboe instance, with most components interacting
+solely by picking up events, processing them and publishing further
+events in response. Essentially, Oboe's architecture plots a fairly
+linear path through a series of simple units from data being received to
+the containing application being notified. An event bus removes the need
+for each unit to know the next, giving a highly decoupled shape to the
 library.
 
-### Automated testing
+Automated testing
+-----------------
+
+![The testing pyramid is a common concept, relying on the assumption
+that verification of small parts provides a solid base from which to
+compose system-level behaviours. A Lot of testing is done on the
+low-level components of the system, less on the component level and less
+still on a whole-system level where only smoke tests are
+provided.](images/pyramid)
 
 Oboe's architecture has been designed to so that I may have as much
 confidence as possible regarding the correct working of the library
-through automated testing. The testing itself is a non-trivial undertaking.
-Three-quarters of the code written for this project is test specification, with
-only one-quarter dedicated to distributable code. The majority of the
-specifications
+through automated testing. The testing itself is a non-trivial
+undertaking with 80% of code written for this project being test specification.
+Based on the idea that a correct system must be built from individually
+correct units, the majority of the specifications are unit tests,
+putting each unit under the microscope and describing the correct
+behaviour as completely as possible. Correct components are not useful
+unless they are correctly composed. Component tests zoom out from
+individual components to the library as a whole, falsifying only the
+http traffic. At the apex of the test pyramid are a small number of
+integration tests. Running these tests automatically spins up actual
+REST services so that the correct behaviour given real http may be
+examined.
 
-The test pyramid concept \ref{testingPyramidFig} fits in well with the
-hiding that is provided. Under the testing pyramid only very high level
-behaviours are tested as ??? tests. While this is a lucky co-incidence,
-it is also an unavoidable restriction. Once compiled into a single
-source file, the individual components are hidden, callable only from
-withing their closure. Hence, it would not be possible to test the
-composed parts individually post-concatenation into a single javascript
-file, not even via a workarround for data hiding such as found in Java's
-reflection. Whereas in Java the protection is a means of protecting
-otherwise addressable resources, once a function is trapped inside a
-javascript closure without external exposure it is not just protected
-but, appearing in no namespaces, inherently unreferenceable. 
-
-The desirable to be amenable to testing influences the boundaries on which the application
-is split into separately implemented components. 
+The desirable to be amenable to testing influences the boundaries on
+which the application is split into separately implemented components.
 Black-box unit testing of a stateful unit is difficult; because of
 side-effects it may later react differently to the same calls. For this
 reason where state is required it is stored in very simple state-storing
@@ -64,9 +67,16 @@ of a function call and later pass that result to the next function. This
 approach clearly breaks with object oriented style encapsulation by not
 hiding data behind the logic which acts on them but I feel the departure
 is worthwhile for the greater certainty it allows over the correct
-functioning of the program.   
+functioning of the program.
 
-Dependency injection.
+Largely for the sake of testing Oboe has also embraced Dependency injection.
+
+One such example is a late refactor so that sXHR is passed an XHR rather
+than creating one itself. Actual code not simpler but tests where much
+simpler - didn't have to override XHR constructor etc. Downside is more
+difficult to create an sXHR since client has to create two objects. The
+objects it depends on are no longer an implementation detail but a part
+of sXHR's API.
 
 Do it on every save!
 
@@ -86,13 +96,6 @@ Bt encourageing splitting into co-operating objects, TDD to a certain
 degree is anti-encapsulation. The public object that was extracted as a
 new concern from a larger object now needs public methods whereas before
 nothing was exposed.
-
-![The testing pyramid is a common concept, relying on the assumption
-that verification of small parts provides a solid base from which to
-compose system-level behaviours. A Lot of testing is done on the
-low-level components of the system, whereas for the high-level tests
-only smoke tests are provided.
-\\label{testingPyramidFig}](images/pyramid)
 
 Jstd can serve example files but need to write out slowly which it has
 no concept of. Customistation is via configuration rather than by
@@ -123,8 +126,6 @@ same as C was once described as a 'thin glue'
 [http://www.catb.org/esr/writings/taoup/html/ch04s03.html]. Transparent
 proxy is about 20 lines. Transparent enough to fool JSTD into thinking
 it is connecting directly to its server.
-
-
 
 TDD fits well into an object pattern because the software is well
 composed into separate parts. The objects are almost tangible in their
@@ -180,6 +181,16 @@ Grunt
 The packages are individually targeted at different execution contexts,
 either browsers or node *get from notebook, split sketch diagram in
 half*](images/placeholder.png)
+
+Once compiled into a single source file, the individual components are
+hidden, callable only from withing their closure. Hence, it would not be
+possible to test the composed parts individually post-concatenation into
+a single javascript file, not even via a workarround for data hiding
+such as found in Java's reflection. Whereas in Java the protection is a
+means of protecting otherwise addressable resources, once a function is
+trapped inside a javascript closure without external exposure it is not
+just protected but, appearing in no namespaces, inherently
+unreferenceable.
 
 -   One file for browser and node is common.
 -   say how this is done
@@ -259,26 +270,18 @@ better.
 Dependency injection and communication between parts
 ----------------------------------------------------
 
-One such example is a late refactor so that sXHR is passed an XHR rather
-than creating one itself. Actual code not simpler but tests where much
-simpler - didn't have to override XHR constructor etc. Downside is more
-difficult to create an sXHR since client has to create two objects. The
-objects it depends on are no longer an implementation detail but a part
-of sXHR's API.
-
 Aim of creating a micro-library rules out building in a general-purpose
 IoC library.
 
 However, can still follow the general principles.
-
-Why the Observer pattern (cite: des patterns) lends itself well to MVC
-and inversion of control.
 
 What the central controller does; acts as a plumber connecting the
 various parts up. Since oboe is predominantly event/stream based, once
 wired up little intervention is needed from the controller. Ie, A knows
 how to listen for ??? events but is unintested who fired them.
 
+Why the Observer pattern (cite: des patterns) lends itself well to MVC
+and inversion of control.
 Local event bus Why? Makes testing easy (just put appropriate event on
 the bus rather than trying to fake calls from linked stubs). Decouples,
 avoids parts having to locate or be passed other parts. Wouldn't scale
@@ -289,8 +292,8 @@ as an emitter and reciever of events?)
 Styles of Programming
 ---------------------
 
-Programming is finished when each line reads as a statement of fact rather than
-the means of making the statement so.
+Programming is finished when each line reads as a statement of fact
+rather than the means of making the statement so.
 
 "Mixed paradigm" design. But not classical: don't need inheritance.
 
