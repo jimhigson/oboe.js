@@ -28,8 +28,29 @@ library.
 
 ### Automated testing
 
-Oboe's architecture has been designed to allow as
-confident testing as possible. Black-box unit testing of a stateful unit is difficult; because of
+Oboe's architecture has been designed to so that I may have as much
+confidence as possible regarding the correct working of the library
+through automated testing. The testing itself is a non-trivial undertaking.
+Three-quarters of the code written for this project is test specification, with
+only one-quarter dedicated to distributable code. The majority of the
+specifications
+
+The test pyramid concept \ref{testingPyramidFig} fits in well with the
+hiding that is provided. Under the testing pyramid only very high level
+behaviours are tested as ??? tests. While this is a lucky co-incidence,
+it is also an unavoidable restriction. Once compiled into a single
+source file, the individual components are hidden, callable only from
+withing their closure. Hence, it would not be possible to test the
+composed parts individually post-concatenation into a single javascript
+file, not even via a workarround for data hiding such as found in Java's
+reflection. Whereas in Java the protection is a means of protecting
+otherwise addressable resources, once a function is trapped inside a
+javascript closure without external exposure it is not just protected
+but, appearing in no namespaces, inherently unreferenceable. 
+
+The desirable to be amenable to testing influences the boundaries on which the application
+is split into separately implemented components. 
+Black-box unit testing of a stateful unit is difficult; because of
 side-effects it may later react differently to the same calls. For this
 reason where state is required it is stored in very simple state-storing
 units with program logic removed. The logic may then be separately
@@ -103,18 +124,7 @@ same as C was once described as a 'thin glue'
 proxy is about 20 lines. Transparent enough to fool JSTD into thinking
 it is connecting directly to its server.
 
-The test pyramid concept \ref{testingPyramidFig} fits in well with the
-hiding that is provided. Under the testing pyramid only very high level
-behaviours are tested as ??? tests. While this is a lucky co-incidence,
-it is also an unavoidable restriction. Once compiled into a single
-source file, the individual components are hidden, callable only from
-withing their closure. Hence, it would not be possible to test the
-composed parts individually post-concatenation into a single javascript
-file, not even via a workarround for data hiding such as found in Java's
-reflection. Whereas in Java the protection is a means of protecting
-otherwise addressable resources, once a function is trapped inside a
-javascript closure without external exposure it is not just protected
-but, appearing in no namespaces, inherently unreferenceable.
+
 
 TDD fits well into an object pattern because the software is well
 composed into separate parts. The objects are almost tangible in their
@@ -279,8 +289,8 @@ as an emitter and reciever of events?)
 Styles of Programming
 ---------------------
 
-Code is good when each line feels like a statement of fact rather than a
-way of going about making an intention true.
+Programming is finished when each line reads as a statement of fact rather than
+the means of making the statement so.
 
 "Mixed paradigm" design. But not classical: don't need inheritance.
 
