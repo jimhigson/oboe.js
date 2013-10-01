@@ -125,15 +125,27 @@ seeing it. The correct behaviour is to get no callback for the sixth,
 even when running on platforms where the http is buffered so that all
 ten will have already been downloaded.
 
-Task running through Grunt
---------------------------
+Running the tests
+-----------------
 
-Run tests on every save! - all but integration which are too slow.
-
-Start server when integration tests are needed.
-
-![Relationship between various files and test libraries *other half of
+![**Relationship between various files and test libraries** *other half of
 sketch from notebook*](images/placeholder.png)
+
+The tests are Grunt Javascript task runner, Karma. Spec files. Naming to separate into unit, 
+component and integration tests. 
+Watch source files and run unit and component tests on every save - all but integration which are too slow and run on demand.
+Automatically also testing the built size of the library.
+A small, focussed prorject like this one has much more rewriting than writing and is
+helpful mostly when making small refactorings, can see instantly if the new code is valid.
+Also useful to keep an eye on the size of Oboe to qualify as a micro-library on a line-by-line
+basis.
+
+Grunt start test server when integration tests are needed. Because both are node,
+creating the test server as a Grunt plugin is quite a simple undertaking.
+
+Run integration tests against built package. Because the internals are not accessible
+once built it is not possible to run fine-grained tests that assert individual units. 
+
 
 Packaging as a single distributable file
 ----------------------------------------
