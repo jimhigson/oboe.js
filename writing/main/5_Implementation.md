@@ -564,21 +564,20 @@ syntax would be:
 String -> Ascent -> JsonPathMatchResult
 ~~~~
 
-This design contrasts with the reference JSONPath implementation which
-provides a first order function and as such freshly reinterprets the
-JSONPath string each time it is invoked. The match result is either a
+The match result is either a
 failure to match, or a hit, with the node that matched. In the case of
 path matching, the node may currently be unknown.
 
 The usage profile for JSONPath expressions in Oboe is to be compiled
 once and then evaluated many times, once for each node encountered
-whilst parsing the JSON. Because it is performed perhaps hundreds of
+while parsing the JSON. Because it is performed perhaps hundreds of
 times per file the most pressing performance consideration is for
-matching to execute quickly.
+matching to execute quickly. This design contrasts with the reference 
+JSONPath implementation which
+provides a first order function and as such freshly reinterprets the
+JSONPath string each time it is invoked.
 
-Why done as a function returning a function (many calls per pattern -
-one for each node found to check for matches). More important to
-efficiently detect than compile the patterns.
+-----------------------------------
 
 Clause functions, examines head of the ascent and passes onto the next
 function if it passes. `skip1` and `skipMany` tail the ascent and pass
