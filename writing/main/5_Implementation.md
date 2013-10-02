@@ -133,37 +133,38 @@ of sketch from notebook*](images/placeholder.png)
 
 The Grunt task runner was used to automate routine tasks such as
 executing the tests and building. Unit and component tests run
-automatically whenever a source file changed. This is a small, tightly focused project so
-the majority of time programming is spent refactoring already working
-code. Running tests on save provides quick feedback so that mistakes are
-found as soon as they are made. Agile practitioners emphasise the
-importance of tests that execute quickly [@cleancode P314, T9], the 220
-unit and component tests run in less than a second so discovering
-mistakes is near instant. If the "content of any medium is always
-another medium” [@media p8], we might say that the content of
-programming is the program that is realised by its execution. A person working
-in arts and crafts sees the thing as they work but a programmer will usually not
-see the execution simultaneously as they program. Conway observed that
-an artisan works by transform-in-place 
-"start with the working material in place and you step by step transform it into its 
+automatically whenever a source file changed. This is a small, tightly
+focused project so the majority of time programming is spent refactoring
+already working code. Running tests on save provides quick feedback so
+that mistakes are found as soon as they are made. Agile practitioners
+emphasise the importance of tests that execute quickly [@cleancode P314,
+T9], the 220 unit and component tests run in less than a second so
+discovering mistakes is near instant. If the "content of any medium is
+always another medium” [@media p8], we might say that the content of
+programming is the program that is realised by its execution. A person
+working in arts and crafts sees the thing as they work but a programmer
+will usually not see the execution simultaneously as they program.
+Conway observed that an artisan works by transform-in-place "start with
+the working material in place and you step by step transform it into its
 final form" whereas software is created through intermediate proxies,
-and attempts to close this gap by merging programming with the results of programming [@humanize side8-9].
-When we bring together the medium and the message the cost of small experimentation is very low and
-I feel that programming becomes more explorative and expressive.
+and attempts to close this gap by merging programming with the results
+of programming [@humanize side8-9]. When we bring together the medium
+and the message the cost of small experimentation is very low and I feel
+that programming becomes more explorative and expressive.
 
-The integration tests are
-not run on save because they intentionally simulate slow transfers
-and take some time to run. 
+The integration tests are not run on save because they intentionally
+simulate slow transfers and take some time to run.
 
 As well as correct execution, the project is required to not surpass a
-certain size so on save the code is also compressed and the size reported.
+certain size so on save the code is also compressed and the size
+reported.
 
 Karma. Spec files.
 
-Naming to separate into unit, component and integration tests. 
+Naming to separate into unit, component and integration tests.
 
-Automatically also testing the built size of the library. Useful to
-keep an eye on the size of Oboe to qualify as a micro-library on a
+Automatically also testing the built size of the library. Useful to keep
+an eye on the size of Oboe to qualify as a micro-library on a
 line-by-line basis.
 
 Grunt start test server when integration tests are needed. Because both
