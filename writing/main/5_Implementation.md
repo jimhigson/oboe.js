@@ -110,8 +110,6 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Asserter test design pattern and BDD style. Tests otherwise repetitive.
-
 Integration tests run against a node service which returns known content
 according to known timings, somewhat emulating downloading via a slow
 internet connection. For example, the url `/tenSlowNumbers` writes out a
