@@ -188,6 +188,9 @@ they not have a build process of their own, a single file is also much faster
 to transfer to their users, mostly because of the cost of establishing connections
 and the http overhead.
 
+Javascript files are read in series by the browser, so there is an equivalence
+if the files are concatenated into a single source following the same series. 
+
 Simplest possible solution. Downside is have to manually maintain list
 of source in order. Can't walk a graph.
 
