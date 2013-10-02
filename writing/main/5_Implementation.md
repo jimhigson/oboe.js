@@ -152,28 +152,23 @@ of programming [@humanize side8-9]. When we bring together the medium
 and the message the cost of small experimentation is very low and I feel
 that programming becomes more explorative and expressive.
 
-The integration tests are not run on save because they intentionally
-simulate slow transfers and take some time to run.
-
 As well as correct execution, the project is required to not surpass a
 certain size so on save the code is also compressed and the size
-reported.
+reported. Automatically also testing the built size of the library.
+Useful to keep an eye on the size of Oboe to qualify as a micro-library
+on a line-by-line basis.
 
-Karma. Spec files.
-
-Naming to separate into unit, component and integration tests.
-
-Automatically also testing the built size of the library. Useful to keep
-an eye on the size of Oboe to qualify as a micro-library on a
-line-by-line basis.
-
-Grunt start test server when integration tests are needed. Because both
-are node, creating the test server as a Grunt plugin is quite a simple
-undertaking.
-
-Run integration tests against built package. Because the internals are
-not accessible once built it is not possible to run fine-grained tests
-that assert individual units.
+The integration tests are not run on save because they intentionally
+simulate slow transfers and take some time to run. The integration tests
+are used as a final check against built code before a branch in git can
+be merged into the master. Once the code has been packaged for
+distribution the internals are no longer visible the integration tests
+which are coded against the public API are the only runnable tests.
+While these tests don't individually test every component, they are
+designed to exercise the whole codebase so that a mistake in any
+component will be visible through them. Grunt executes the build,
+including starting up the test REST services that give the integration
+tests something to fetch.
 
 Packaging as a single distributable file
 ----------------------------------------
@@ -182,16 +177,6 @@ Packaging as a single distributable file
 The packages are individually targeted at different execution contexts,
 either browsers or node *get from notebook, split sketch diagram in
 half*](images/placeholder.png)
-
-Once compiled into a single source file, the individual components are
-hidden, callable only from withing their closure. Hence, it would not be
-possible to test the composed parts individually post-concatenation into
-a single javascript file, not even via a workarround for data hiding
-such as found in Java's reflection. Whereas in Java the protection is a
-means of protecting otherwise addressable resources, once a function is
-trapped inside a javascript closure without external exposure it is not
-just protected but, appearing in no namespaces, inherently
-unreferenceable.
 
 -   One file for browser and node is common.
 -   say how this is done
