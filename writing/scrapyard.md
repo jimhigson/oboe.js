@@ -68,3 +68,8 @@ tdd and oo
 TDD fits well into an object pattern because the software is well
 composed into separate parts. The objects are almost tangible in their
 distinction as separate encapsulated entities.
+
+
+![Diagram showing why list is more memory efficient - multiple handles
+into same structure with different starts, contrast with same as an
+array](images/placeholder)
