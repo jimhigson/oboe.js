@@ -37,18 +37,17 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     *                     and decides if there is a match or not
     */
    function nameClause(previousExpr, detection ) {
-
-      // extract meaning from the detection      
+     
       var name = detection[NAME_INDEX],
             
-          condition = ( !name || name == '*' ) 
+          matchesName = ( !name || name == '*' ) 
                            ?  always
                            :  function(ascent){return headKey(ascent) == name};
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return lazyIntersection(condition, previousExpr);
+      return lazyIntersection(matchesName, previousExpr);
    }
 
    /**
