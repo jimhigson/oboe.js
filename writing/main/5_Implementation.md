@@ -169,12 +169,18 @@ tests something to fetch.
 Packaging as a single distributable file
 ----------------------------------------
 
-![packaging of many javascript files into multiple single-file packages.
-The packages are individually targeted at different execution contexts,
-either browsers or node *get from notebook, split sketch diagram in
-half*](images/placeholder.png)
+![**Packaging of many javascript files into multiple single-file
+packages.** The packages are individually targeted at different
+execution contexts, either browsers or node *get from notebook, split
+sketch diagram in half*](images/placeholder.png)
 
--   One file for browser and node is common.
+Composition of several source files into a functionally equivalent but
+much smaller distributable text file. Obfuscation is a side-effect,
+somewhat like object code. Names of functions and variable names which
+are provably not possible to reference are reduced to one char for the
+sake of reduction of size of the source.
+
+-   Single file for both browser and node is common.
 -   say how this is done
 -   why not doing this (adds bloat, inhibits micro-lib)
 -   extra challenges
@@ -183,16 +189,7 @@ half*](images/placeholder.png)
 -   two distributable files, for node minification is not important so
     don't do to help debugging.
 
-Composition of several source files into a distributable binary-like
-text file
-
-Why distributed javascript is more like a binary than a source file.
-Licencing implications? Would be (maybe) under GPL. Not so under BSD.
-
 Inherent hiding by wrapping in a scope.
-
-Names of functions and variable names which are provably not possible to
-reference are lost for the sake of reduction of size of the source.
 
 Packaging for node or browser. No need to minify for node but
 concatenation still done for ease of inclusion in projects
@@ -201,21 +198,12 @@ concatenation still done for ease of inclusion in projects
 typical pattern for packaging to work in either a node.js server or a web browser
 ~~~~
 
-Packaging for use in frameworks.
-
--   Many frameworks already come with a wrapper arround the browser's
-    inbuilt ajax capabilities
--   they don't add to the capabilities but present a nicer interface
-
--   I'm not doing it but others are
--   browser-packaged version should be use agnostic and therefore
-    amenable to packaging in this way
-
 Why uglify
 
 -   Covers whole language, not just a well-advised subset.
 -   Closure compiler works over a subset of javascript rather than the
-    whole language.
+    whole language. Difficult/impossible to prove very much in highly
+    dynamic languages like JS.
 
 Why not require. Bits on what rq is can go into B&R section. *Some of
 this can move into 3\_Background.md*
