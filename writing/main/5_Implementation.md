@@ -174,8 +174,6 @@ packages.** The packages are individually targeted at different
 execution contexts, either browsers or node *get from notebook, split
 sketch diagram in half*](images/placeholder.png)
 
-### Reduction to a single file
-
 As an interpreted language, Javascript may of course be ran directly
 without any prior compilation. While running the same code as I see in
 the editor is convenient while programming, it is much less so for
