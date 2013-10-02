@@ -245,19 +245,19 @@ presenting browser APIs as the Node equivalents. Browserify's http
 adaptor[^1] is complete but more verbose compared to Oboe's version[^2].
 
 As well as combining into a single file, Javascript source can made
-significantly smaller by removing comments and reducing unexposed names
-to a single character. For Oboe the popular library *Uglify* is used for
-minification. Uglify performs only surface optimisations, operating on
-the AST level but concentrating mostly on shorter syntax. I also
-considered Google's Closure compiler. Closure resembles a traditional
-compiler optimiser by leveraging a deeper understanding to search for
-smaller representations. However, this comes at the cost of safety.
+significantly smaller by removing comments and reducing inaccessible
+tokens to a single character. For Oboe the popular library *Uglify* is
+used for minification. Uglify performs only surface optimisations,
+operating on the AST level but concentrating mostly on compact syntax. I
+also considered Google's Closure compiler. Closure resembles a
+traditional compiler optimiser by leveraging a deeper understanding to
+search for smaller representations, unfortunately at the cost of safety.
 Decidability in highly dynamic languages is often impossible and Closure
 operates on a well-advised subset of Javascript, delivering no
-reasonable guarantee of equivalence if code is not written as the
+reasonable guarantee of equivalence when code is not written as the
 Closure authors expected. Integration tests should catch any such
 failures but for the time being I have a limited appetite for a workflow
-which forces me to be suspicious of the build process.
+which forces me to be suspicious of the project's build process.
 
 Styles of Programming
 ---------------------
