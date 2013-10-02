@@ -1836,7 +1836,7 @@ Chapter 4+5 40 to 60 pages
       <span class="ot">console</span>.<span class=
 "fu">log</span>(<span class="st">'got everything'</span>);
    })
-   .<span class="fu">error</span>( <span class=
+   .<span class="fu">fail</span>( <span class=
 "kw">function</span>() {
       <span class="ot">console</span>.<span class=
 "fu">log</span>(<span class=
@@ -2162,14 +2162,18 @@ Chapter 4+5 40 to 60 pages
   an event bus which is local to to Oboe instance, with most
   components interacting solely by picking up events, processing
   them and publishing further events in response. Essentially,
-  Oboe's architecture plots a fairly linear path through a series
-  of simple units from data being received to the containing
-  application being notified. An event bus removes the need for
-  each unit to know the next, giving a highly decoupled shape to
-  the library. This form does not lend itself nicely to UML
-  expression however, giving a very unhelpful diagram shape with an
-  event bus as a central hub and everything else hanging off it as
-  spokes.</p>
+  Oboe's architecture resembles a fairly linear pipeline visiting a
+  series of units, starting with http data and sometimes ending
+  with callbacks being notified. This use of an event bus is a
+  variation on the Observer pattern which removes the need for each
+  unit to obtain a reference to the previous one so that it may
+  observe it, giving a highly decoupled shape to the library. Once
+  everything is wired into the bus very little central control is
+  required and the larger behaviours emerge as the consequence of
+  this interaction between finer ones. One downside is perhaps that
+  a central event bus does not lend itself to a UML class diagram,
+  giving a diagram shape with an event bus as a central hub and
+  everything else hanging off it as spokes.</p>
 
   <h2 id="automated-testing"><a href=
   "#automated-testing"><span class=
@@ -2257,30 +2261,83 @@ Chapter 4+5 40 to 60 pages
   injection allows a much simpler test style because it is trivial
   to inject a stub in place of the XHR.</p>
 
-  <p>Test http server (but not how initiated or how tasks are ran).
-  Tests include an extremely large file twentyThousandRecords.js to
-  test under stress</p>
+  <p>Asserter test design pattern and BDD style. Tests otherwise
+  repetitive.</p>
 
-  <h2 id="continuous-integration-and-running-tasks"><a href=
-  "#continuous-integration-and-running-tasks"><span class=
-  "header-section-number">5.3</span> Continuous integration and
-  running tasks</a></h2>
+  <p>Integration tests run against a node service which returns
+  known content according to known timings, somewhat emulating
+  downloading via a slow internet connection. For example, the url
+  <code>/tenSlowNumbers</code> writes out a JSON array of the first
+  ten natural numbers at a rate of one per second, while
+  <code>/echoBackHeaders</code> writes back the http headers that
+  it received as a JSON object. The test specifications which use
+  these services interact with Oboe through the public API alone as
+  an application author would and try some tricky cases. For
+  example, requesting ten numbers but registering a listener
+  against the fifth and aborting the request on seeing it. The
+  correct behaviour is to get no callback for the sixth, even when
+  running on platforms where the http is buffered so that all ten
+  will have already been downloaded.</p>
 
-  <p>Do tests on every save!</p>
+  <h2 id="running-the-tests"><a href=
+  "#running-the-tests"><span class=
+  "header-section-number">5.3</span> Running the tests</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
     "Relationship between various files and test libraries other half of sketch from notebook">
 
-    <p class="caption">Relationship between various files and test
-    libraries <em>other half of sketch from notebook</em></p>
+    <p class="caption"><strong>Relationship between various files
+    and test libraries</strong> <em>other half of sketch from
+    notebook</em></p>
   </div>
 
-  <h3 id="packaging-the-library-as-a-single-distributable-file">
-  <a href=
-  "#packaging-the-library-as-a-single-distributable-file"><span class="header-section-number">
-  5.3.1</span> Packaging the library as a single distributable
-  file</a></h3>
+  <p>The Grunt task runner was used to automate routine tasks such
+  as executing the tests and building. Unit and component tests run
+  automatically whenever a source file changed. The integration
+  tests are not run in this way because they intentionally simulate
+  slow transfers and take some time to run. This is a small,
+  tightly focused project so the majority of time programming is
+  spent refactoring already working code. Running tests on save
+  provides quick feedback so that mistakes are found as soon as
+  they are made. Agile practitioners emphasise the importance of
+  tests that execute quickly <span class="citation">(Martin 2008,
+  T9)</span>, the 220 unit and component tests run in less than a
+  second so discovering mistakes is near instant.</p>
+
+  <p>If the "content of any medium is always another
+  medium&acirc;&euro; <span class="citation">(McLuhan 1964
+  p8)</span>, we might say that the content of programming is the
+  program that is realised by its execution. A Painter always sees
+  the image as they paint but a programmer will usually not see the
+  execution as they program. By closing this gap between the medium
+  and the message the cost of small experimentation is very low and
+  I feel my programming becomes more exploitative and
+  expressive.</p>
+
+  <p>The tests are Grunt Javascript task runner, Karma. Spec files.
+  Naming to separate into unit, component and integration tests.
+  Watch source files and run unit and component tests on every save
+  - all but integration which are too slow and run on demand.
+  Automatically also testing the built size of the library. A
+  small, focussed prorject like this one has much more rewriting
+  than writing and is helpful mostly when making small
+  refactorings, can see instantly if the new code is valid. Also
+  useful to keep an eye on the size of Oboe to qualify as a
+  micro-library on a line-by-line basis.</p>
+
+  <p>Grunt start test server when integration tests are needed.
+  Because both are node, creating the test server as a Grunt plugin
+  is quite a simple undertaking.</p>
+
+  <p>Run integration tests against built package. Because the
+  internals are not accessible once built it is not possible to run
+  fine-grained tests that assert individual units.</p>
+
+  <h2 id="packaging-as-a-single-distributable-file"><a href=
+  "#packaging-as-a-single-distributable-file"><span class=
+  "header-section-number">5.4</span> Packaging as a single
+  distributable file</a></h2>
 
   <div class="figure">
     <img src="images/placeholder.png" alt=
@@ -2420,32 +2477,6 @@ Chapter 4+5 40 to 60 pages
 
   <p>Uglify. Why not Google Closure Compiler. Java, ack. Closure
   might be better.</p>
-
-  <h2 id="dependency-injection-and-communication-between-parts">
-  <a href=
-  "#dependency-injection-and-communication-between-parts"><span class="header-section-number">
-  5.4</span> Dependency injection and communication between
-  parts</a></h2>
-
-  <p>Aim of creating a micro-library rules out building in a
-  general-purpose IoC library.</p>
-
-  <p>However, can still follow the general principles.</p>
-
-  <p>What the central controller does; acts as a plumber connecting
-  the various parts up. Since oboe is predominantly event/stream
-  based, once wired up little intervention is needed from the
-  controller. Ie, A knows how to listen for ??? events but is
-  unintested who fired them.</p>
-
-  <p>Why the Observer pattern (cite: des patterns) lends itself
-  well to MVC and inversion of control. Local event bus Why? Makes
-  testing easy (just put appropriate event on the bus rather than
-  trying to fake calls from linked stubs). Decouples, avoids parts
-  having to locate or be passed other parts. Wouldn't scale
-  indefinately, does provide something of a mingled-purpose space.
-  Why not more direct event passing without a separate event bus
-  (ie, everything as an emitter and reciever of events?)</p>
 
   <h2 id="styles-of-programming"><a href=
   "#styles-of-programming"><span class=
@@ -3155,6 +3186,13 @@ Chapter 4+5 40 to 60 pages
   title=
   "[https://blog.twitter.com/2012/improving-performance-twittercom]">
   [https://blog.twitter.com/2012/improving-performance-twittercom]</a>.</p>
+
+  <p>Martin, Robert &acirc;&euro;&oelig;Uncle Bob.&acirc;&euro;
+  2008. <em>Clean Code: A Handbook of Agile Software
+  Craftsmanship</em>.</p>
+
+  <p>McLuhan, Marshall. 1964. <em>Understanding Media: The
+  Extensions of Man</em>.</p>
 
   <p>Mullany, Michael. 2013. &acirc;&euro;&oelig;5 Myths About
   Mobile Web Performance.&acirc;&euro; <a href=

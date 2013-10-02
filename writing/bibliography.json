@@ -292,17 +292,54 @@
       },
       "type":"webpage"
    },
-   
+
    {
       "id":"css4",
       "title":"Selectors Level 4",
-      "author":[               
-         { "family": "Etemad", "given":"Elika J"},
-         { "family": "Atkins", "given":"Tab"}
+      "author":[
+         {
+            "family":"Etemad",
+            "given":"Elika J"
+         },
+         {
+            "family":"Atkins",
+            "given":"Tab"
+         }
       ],
-      "issued": { "date-parts":[ [2013] ] },
-      "type":"webpage" ,
-      "url": "http://dev.w3.org/csswg/selectors4/"                 
+      "issued":{
+         "date-parts":[
+            [2013]
+         ]
+      },
+      "type":"webpage",
+      "url":"http://dev.w3.org/csswg/selectors4/"
+   },
+
+   {
+      "id":"media",
+      "title":"Understanding Media: The Extensions of Man",
+      "author":[
+         {
+            "family":"McLuhan",
+            "given":"Marshall"
+         }
+      ],
+      "issued":{
+         "date-parts":[
+            [1964]
+         ]
+      },
+      "type":"book"
+   },
+   
+   {
+      "id":"cleancode",
+      "title":"Clean Code: A Handbook of Agile Software Craftsmanship",
+      "author":[         
+         { "family": "Martin", "given":"Robert 'Uncle Bob'"}
+      ],
+      "issued": { "date-parts":[ [2008] ] },
+      "type":"book"                  
    }
 
 ]

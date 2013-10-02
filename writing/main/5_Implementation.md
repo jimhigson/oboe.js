@@ -128,24 +128,44 @@ ten will have already been downloaded.
 Running the tests
 -----------------
 
-![**Relationship between various files and test libraries** *other half of
-sketch from notebook*](images/placeholder.png)
+![**Relationship between various files and test libraries** *other half
+of sketch from notebook*](images/placeholder.png)
 
-The tests are Grunt Javascript task runner, Karma. Spec files. Naming to separate into unit, 
-component and integration tests. 
-Watch source files and run unit and component tests on every save - all but integration which are too slow and run on demand.
-Automatically also testing the built size of the library.
-A small, focussed prorject like this one has much more rewriting than writing and is
-helpful mostly when making small refactorings, can see instantly if the new code is valid.
-Also useful to keep an eye on the size of Oboe to qualify as a micro-library on a line-by-line
-basis.
+The Grunt task runner was used to automate routine tasks such as
+executing the tests and building. Unit and component tests run
+automatically whenever a source file changed. The integration tests are
+not run in this way because they intentionally simulate slow transfers
+and take some time to run. This is a small, tightly focused project so
+the majority of time programming is spent refactoring already working
+code. Running tests on save provides quick feedback so that mistakes are
+found as soon as they are made. Agile practitioners emphasise the
+importance of tests that execute quickly [@cleancode P314, T9], the 220
+unit and component tests run in less than a second so discovering
+mistakes is near instant. If the "content of any medium is always
+another medium” [@media p8], we might say that the content of
+programming is the program that is realised by its execution. A Painter
+always sees the image as they paint but a programmer will usually not
+see the execution as they program. By closing this gap between the
+medium and the message the cost of small experimentation is very low and
+I feel my programming becomes more exploitative and expressive.
 
-Grunt start test server when integration tests are needed. Because both are node,
-creating the test server as a Grunt plugin is quite a simple undertaking.
+The tests are Grunt Javascript task runner, Karma. Spec files. Naming to
+separate into unit, component and integration tests. Watch source files
+and run unit and component tests on every save - all but integration
+which are too slow and run on demand. Automatically also testing the
+built size of the library. A small, tightly focused pprojectlike this one has
+much more rewriting than writing and is helpful mostly when making small
+refactorings, can see instantly if the new code is valid. Also useful to
+keep an eye on the size of Oboe to qualify as a micro-library on a
+line-by-line basis.
 
-Run integration tests against built package. Because the internals are not accessible
-once built it is not possible to run fine-grained tests that assert individual units. 
+Grunt start test server when integration tests are needed. Because both
+are node, creating the test server as a Grunt plugin is quite a simple
+undertaking.
 
+Run integration tests against built package. Because the internals are
+not accessible once built it is not possible to run fine-grained tests
+that assert individual units.
 
 Packaging as a single distributable file
 ----------------------------------------

@@ -1,0 +1,20 @@
+
+
+http://rfrn.org/~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html
+9571 ms vs 504 ms
+
+Also: copy that guy's website dude!
+
+
+The performance degradation, even with a self-hosted forEach, is due to the JIT’s inability to efficiently 
+inline both the closures passed to forEach
+
+Lambda Lifting, currently not implemented in SpiderMonkey or V8:
+http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
+
+The transformations to enable the above criteria are tedious and are surely the purview of the compiler. 
+All that’s needed are brave compiler hackers
+
+JS is much faster with "monomorphic call sites"
+
+However, js execution time is not much of a problem, 
