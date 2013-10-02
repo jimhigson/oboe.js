@@ -174,36 +174,22 @@ packages.** The packages are individually targeted at different
 execution contexts, either browsers or node *get from notebook, split
 sketch diagram in half*](images/placeholder.png)
 
-Composition of several source files into a functionally equivalent but
-much smaller distributable text file. Obfuscation is a side-effect,
-somewhat like object code. Names of functions and variable names which
-are provably not possible to reference are reduced to one char for the
-sake of reduction of size of the source.
+### Reduction to a single file
 
--   Single file for both browser and node is common.
--   say how this is done
--   why not doing this (adds bloat, inhibits micro-lib)
--   extra challenges
--   http adaptor is different
--   packaging is different
--   two distributable files, for node minification is not important so
-    don't do to help debugging.
+As an interpreted language, Javascript may of course be ran directly
+without any prior compilation. While running the same code as I see in
+the editor is convenient while programming, it is much less so for
+distribution. Although the languages imposes no compulsory build phase,
+in practice one is necessary. Dependency managers have not yet become
+standard for client-side web development (although Bower is looking good)
+so most files are manually downloaded. For a developer wishing to include my
+library in their own project a single file is much more convenient. Should
+they not have a build process of their own, a single file is also much faster
+to transfer to their users, mostly because of the cost of establishing connections
+and the http overhead.
 
-Inherent hiding by wrapping in a scope.
-
-Packaging for node or browser. No need to minify for node but
-concatenation still done for ease of inclusion in projects
-
-~~~~ {.javascript}
-typical pattern for packaging to work in either a node.js server or a web browser
-~~~~
-
-Why uglify
-
--   Covers whole language, not just a well-advised subset.
--   Closure compiler works over a subset of javascript rather than the
-    whole language. Difficult/impossible to prove very much in highly
-    dynamic languages like JS.
+Simplest possible solution. Downside is have to manually maintain list
+of source in order. Can't walk a graph.
 
 Why not require. Bits on what rq is can go into B&R section. *Some of
 this can move into 3\_Background.md*
@@ -231,11 +217,34 @@ Browserify is closer.
     enough, isn't compact enough to not push project over micro-library
     size
 
-Testing post-packaging for small set of smoke tests. Can't test
-everything, only through public API.
+### Minification
 
-Uglify. Why not Google Closure Compiler. Java, ack. Closure might be
-better.
+Composition of several source files into a functionally equivalent but
+much smaller distributable text file. Obfuscation is a side-effect,
+somewhat like object code. Names of functions and variable names which
+are provably not possible to reference are reduced to one char for the
+sake of reduction of size of the source.
+
+-   Single file for both browser and node is common.
+-   say how this is done
+-   why not doing this (adds bloat, inhibits micro-lib)
+-   extra challenges
+-   http adaptor is different
+-   packaging is different
+-   two distributable files, for node minification is not important so
+    don't do to help debugging.
+
+Inherent hiding by wrapping in a scope.
+
+Packaging for node or browser. No need to minify for node but
+concatenation still done for ease of inclusion in projects
+
+Why uglify
+
+-   Covers whole language, not just a well-advised subset.
+-   Closure compiler works over a subset of javascript rather than the
+    whole language. Difficult/impossible to prove very much in highly
+    dynamic languages like JS.
 
 Styles of Programming
 ---------------------
