@@ -181,15 +181,16 @@ without any prior compilation. While running the same code as I see in
 the editor is convenient while programming, it is much less so for
 distribution. Although the languages imposes no compulsory build phase,
 in practice one is necessary. Dependency managers have not yet become
-standard for client-side web development (although Bower is looking good)
-so most files are manually downloaded. For a developer wishing to include my
-library in their own project a single file is much more convenient. Should
-they not have a build process of their own, a single file is also much faster
-to transfer to their users, mostly because of the cost of establishing connections
-and the http overhead.
+standard for client-side web development (although Bower is looking
+good) so most files are manually downloaded. For a developer wishing to
+include my library in their own project a single file is much more
+convenient. Should they not have a build process of their own, a single
+file is also much faster to transfer to their users, mostly because of
+the cost of establishing connections and the http overhead.
 
-Javascript files are read in series by the browser, so there is an equivalence
-if the files are concatenated into a single source following the same series. 
+Javascript files are read in series by the browser, so there is an
+equivalence if the files are concatenated into a single source following
+the same series.
 
 Simplest possible solution. Downside is have to manually maintain list
 of source in order. Can't walk a graph.
