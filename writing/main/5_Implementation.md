@@ -188,38 +188,57 @@ convenient. Should they not have a build process of their own, a single
 file is also much faster to transfer to their users, mostly because of
 the cost of establishing connections and the http overhead.
 
-Javascript files are read in series by the browser, so there is an
-equivalence if the files are concatenated into a single source following
-the same series.
+Javascript files are interpreted in series by the browser so
+dependencies must come before dependants, tricks for circular
+dependencies notwithstanding. Unsurprisingly, files concatenated in the
+same order as they would be delivered to the browser will be
+functionally equivalent to the same files delivered separately. Several
+tools are available to automate this stage of the build process,
+including the topological sort of the dependency digraph that finds a
+working concatenation order.
 
-Simplest possible solution. Downside is have to manually maintain list
-of source in order. Can't walk a graph.
+Early in this project I chose Require.js although it was later abandoned
+because I found it to be too heavyweight. Javascript as a language
+doesn't have an import statement so Require implements importing in
+Javascript itself as a normally executable function. When running raw
+source, this function AJAXes in the imported source but Require also has
+an 'optimise mode' which uses static analysis to deduce a workable
+source order and concatenates into a single file. This of course is
+impossible in the general case and if, for example, the import is
+subject to branching require falls back to lazy loading, fetching only
+when needed. In practice undecidability isn't an issue because importing
+is typically unconditional and may even be an advantage in larger
+projects. To speed up initial loading of larger web applications,
+*Asynchronous Module Definition* (AMD) imports rarely-loaded
+functionality in response to events, resisting static analysis and so
+downloading the code only as it is needed.
 
-Why not require. Bits on what rq is can go into B&R section. *Some of
-this can move into 3\_Background.md*
+I hoped to use Require's `optimise` to generate my distributable
+Javascript library. However, require's structure necessitates that calls
+to the importing functions stay in the code and that the require.js
+run-time component is available to facilitate these calls. For a small
+project I found this constant-size overhead too large in relation to the
+rest of the project. Require also prefers to be used as the sole means
+of loading scripts meaning that Oboe would not fit naturally into web
+applications not already using require. Overall, Require seems more
+suited to developing whole applications than programming libraries.
 
--   What it is
--   Why so popular
--   Why a loader is necessary - js doesn't come with an import statement
--   How it can be done in the language itself without an import
-    statement
--   Meant more for AMD than for single-load code
--   Situations AMD is good for - large site, most visitors don't need
-    all the code loaded
--   Depends on run-time component to be loaded even after code has been
-    optimised
--   Small compatible versions exist that just do loading (almond)\
--   Why ultimately not suitable for a library like this - would require
-    user to use Require before adopting it.
+Rather than look further for sophisticated means to perform
+concatenation, having abandoned require I decided to pick up the
+simplest tool which could possibly work. With only 15 source Javascript
+files manually finding a working order by drawing a graph on paper isn't
+a daunting task. As new files are added it is simple to find a place to
+insert them into the list.
 
-Browserify is closer.
-
--   Why it is better for some projects
--   Very nearly meets my needs
--   But http-compatability
-    (https://github.com/substack/http-browserify), while complete
-    enough, isn't compact enough to not push project over micro-library
-    size
+For future consideration there is Browserify. This library reverses the
+'browser first' image of Javascript by converting applications targeted
+at Node into a single file efficiently packaged for delivery to a web
+browser, conceptually making Node the primary environment for Javascript
+and adapting browser execution to match. Significantly, require leaves
+no trace of itself in the concatenated Javascript other than Adaptors
+presenting browser APIs as the Node equivalents. Browserify's http
+adaptor[^1] is complete but slightly verbose compared to the Oboe
+version[^2].
 
 ### Minification
 
@@ -654,3 +673,9 @@ Potential solutions:
 -   immutable wrappers.
 -   defensive cloning
 -   defining getter properties
+
+[^1]: https://github.com/substack/http-browserify
+
+[^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js
+    I can't claim superior programming ability, this version is shorter
+    because it is not a generic solution
