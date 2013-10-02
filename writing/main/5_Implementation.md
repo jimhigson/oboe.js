@@ -445,18 +445,16 @@ Dart has 'factory' constructors which are called like constructors but
 act like factory functions:
 (http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
 
-JSONPath Implementation
------------------------
+Oboe JSONPath Implementation
+----------------------------
 
-Show evolution of it. Like most compilers, first try was just a bunch of
-regexes that generated a regex to match the pattern. While compact, was
-unmaintainable. Moved onto functional, stateless Javascript. Lots of
-refactoring possible because very comprehensively tested.
-
-Split into tokens and statement builder.
-
-NB: This consideration of type in json could be in the Background
-section.
+Not surprisingly given its importance, the JSONPath implementation is
+one of the most refactored and considered parts of the Oboe codebase.
+Like many small languages, on the first commit it was little more than a
+series of regular expressions[^3] but has slowly evolved into a
+featureful, efficient and wholly stateless implementation[^4]. The
+extent of the rewriting was possible because the correct behaviour is
+well defined by test specifications[^5].
 
 Clause functions, each passes onto the next function if it passes.
 Functions to consume. Can apply more than one test to a single node.
@@ -493,27 +491,14 @@ var result = jsonPathEvaluator(ascent);
 Why done as a function returning a function (many calls per pattern -
 one for each node found to check for matches).
 
-Match from right-to-left, or, deepest-to-root. Why this way? That's how
-the patterns work (mostly)
-
-Why an existing jsonPath implmentation couldn't be used: need to add new
-features and need to be able to check against a path expressed as a
-stack of nodes.
+Match from right-to-left, or, leaf-to-root. Why this way? That's how the
+patterns work (mostly)
 
 More important to efficiently detect or efficiently compile the
 patterns?
 
 As discussed in section ???, Sax is difficult to program and not widely
 used.
-
-Essentially two ways to identify an interesting node - by location
-(covered by existing jsonpath)
-
-Why duck typing is desirable in absense of genuine types in the json
-standard (ala tag names in XML). or by a loose concept of type which is
-not well supported by existing jsonpath spec.
-
-Compare duck typing to the tag name in
 
 Explain why Haskel/lisp style lists are used rather than arrays
 
@@ -548,6 +533,8 @@ array](images/placeholder)
     transform into array on the boundary between Oboe.js and the outside
     world (at same time, strip off special 'root path' token)
 
+#### tokenising
+
 In parser, can't use 'y' flag to the regualr expression engine which
 would allow much more elegant matching. Only alternative is cumersome:
 to slice the string and match all tokens with regexes starting with '\^'
@@ -565,6 +552,10 @@ complex regular expressions is still programming and it is more
 difficult to test them completely when wrapped in rather a lot more
 logic than directly. For example, a regex which matches "{a,b}" or "{a}"
 but not "{a,}" is not trivial.
+
+Split into tokens and statement builder. Testing intermediate. JSONPath
+engine not strictly unit tested since it depends on other units. Case of
+shape of tests not following the shape of the code.
 
 Incrementally building up the content
 -------------------------------------
@@ -665,3 +656,14 @@ Potential solutions:
 [^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js
     I can't claim superior programming ability, this version is shorter
     because it is not a generic solution
+
+[^3]: JSONPath compiler from the first commit can be found at line 159 here:
+    https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js#L159
+
+[^4]: for contrast, the current source can be found at
+    https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
+
+[^5]: The current tests are viewable at 
+    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
+    and
+    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
