@@ -223,12 +223,15 @@ of loading scripts meaning that Oboe would not fit naturally into web
 applications not already using require. Overall, Require seems more
 suited to developing whole applications than programming libraries.
 
-Rather than look further for sophisticated means to perform
-concatenation, having abandoned require I decided to pick up the
-simplest tool which could possibly work. With only 15 source Javascript
+Having abandoned require rather than look for another sophisticated means to perform
+concatenation I decided to pick up the simplest tool which could possibly work, a Grunt
+module which works like the unix `cat` command. With only 15 source Javascript
 files manually finding a working order by drawing a graph on paper isn't
 a daunting task. As new files are added it is simple to find a place to
-insert them into the list.
+insert them into the list. I adjusted each Javascript file to, when loaded directly, place its API
+in the global namespace, then post-concatenation wrapped the combined in a single
+function, converting the APIs inside the function from global to the scope of that function,
+thereby hiding the implementation for code outside of Oboe.
 
 For future consideration there is Browserify. This library reverses the
 'browser first' image of Javascript by converting applications targeted
@@ -237,37 +240,21 @@ browser, conceptually making Node the primary environment for Javascript
 and adapting browser execution to match. Significantly, require leaves
 no trace of itself in the concatenated Javascript other than Adaptors
 presenting browser APIs as the Node equivalents. Browserify's http
-adaptor[^1] is complete but slightly verbose compared to the Oboe
+adaptor[^1] is complete but more verbose compared to Oboe's
 version[^2].
 
-### Minification
-
-Composition of several source files into a functionally equivalent but
-much smaller distributable text file. Obfuscation is a side-effect,
-somewhat like object code. Names of functions and variable names which
-are provably not possible to reference are reduced to one char for the
-sake of reduction of size of the source.
-
--   Single file for both browser and node is common.
--   say how this is done
--   why not doing this (adds bloat, inhibits micro-lib)
--   extra challenges
--   http adaptor is different
--   packaging is different
--   two distributable files, for node minification is not important so
-    don't do to help debugging.
-
-Inherent hiding by wrapping in a scope.
-
-Packaging for node or browser. No need to minify for node but
-concatenation still done for ease of inclusion in projects
-
-Why uglify
-
--   Covers whole language, not just a well-advised subset.
--   Closure compiler works over a subset of javascript rather than the
-    whole language. Difficult/impossible to prove very much in highly
-    dynamic languages like JS.
+As well as combining into a single file, Javascript source can made significantly
+smaller whilst safely maintaining equivalence by removing comments and reducing unexposed 
+names to a single character. For Oboe the popular library *Uglify* is used for 
+minification. Uglify performs only surface optimisations, operating mostly on the syntactic
+level. In future Google's Closure Compiler may . Closure works more like a traditional compiler optimiser by using a deeper
+understanding to search for a smaller representations. However, this comes at the cost of
+safety. Decidability in highly dynamic languages is often impossible and Closure
+operates on a well-advised subset of Javascript, delivering no reasonable guarantee 
+of equivalance where the language is not used as the Closure authors expected.
+Integration tests would catch these failures but for the time being my appetite for
+a workflow which forces me to be suspicious of my build process is limited. 
+ 
 
 Styles of Programming
 ---------------------
