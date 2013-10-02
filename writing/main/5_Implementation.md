@@ -133,8 +133,10 @@ of sketch from notebook*](images/placeholder.png)
 
 The Grunt task runner was used to automate routine tasks such as
 executing the tests and building. Unit and component tests run
-automatically whenever a source file changed. This is a small, tightly
-focused project so the majority of time programming is spent refactoring
+automatically whenever a source file changes. As well as being correct 
+execution, the project is required to not surpass a certain size so
+the built size is also checked. As a small, tightly
+focused project the majority of programming is refactoring
 already working code. Running tests on save provides quick feedback so
 that mistakes are found as soon as they are made. Agile practitioners
 emphasise the importance of tests that execute quickly [@cleancode P314,
@@ -151,12 +153,6 @@ and attempts to close this gap by merging programming with the results
 of programming [@humanize side8-9]. When we bring together the medium
 and the message the cost of small experimentation is very low and I feel
 that programming becomes more explorative and expressive.
-
-As well as correct execution, the project is required to not surpass a
-certain size so on save the code is also compressed and the size
-reported. Automatically also testing the built size of the library.
-Useful to keep an eye on the size of Oboe to qualify as a micro-library
-on a line-by-line basis.
 
 The integration tests are not run on save because they intentionally
 simulate slow transfers and take some time to run. The integration tests
