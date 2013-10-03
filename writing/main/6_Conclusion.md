@@ -121,3 +121,14 @@ Possible future work
 ------------
 
 Do da XMLs
+
+Benchmarking
+-------
+
+Complex JSONPAth tested against JSON with approx 2,000 nodes, finding 100 matches.
+Real http, full stack Oboe.
+
+Firefox: 547ms
+Chrome: 237ms
+Safari: 231ms
+IE8: 3048ms
