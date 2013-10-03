@@ -107,14 +107,16 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   function next(valueSoFar, curFn) {  
-      return curFn(valueSoFar);   
+   var fnsList = arrayAsList(fns);
+
+   function next(params, curFn) {  
+      return [apply(params, curFn)];   
    }
    
-   return function(startValue){
+   return varArgs(function(startParams){
      
-      return foldR(next, startValue, asList(fns));
-   }
+      return foldR(next, startParams, fnsList)[0];
+   });
 });
 
 /**
@@ -156,19 +158,109 @@ function hasAllProperties(fieldList, o) {
 
    return      (o instanceof Object) 
             &&
-               listEvery(function (field) {         
+               all(function (field) {         
                   return (field in o);         
                }, fieldList);
 }
 
 function cons(x, xs) {
-   return [x, xs];
+   
+   // Lists are all immutable. Object.freeze provides this in newer Javascript engines.
+   // Otherwise, freeze should have been polyfilled to act as an identity function.
+   return Object.freeze({h:x, t:xs});
 }
 
-var head = attr(0);
-var tail = attr(1);
+var head = attr('h');
+var tail = attr('t');
 var emptyList = null;
 
+/** Converts an array to a list 
+ * 
+ *  asList([a,b,c]) = cons(a,cons(b,cons(c,emptyList))); 
+ **/
+function arrayAsList(array){
+
+   var l = emptyList;
+
+   for( var i = array.length ; i--; ) {
+      l = cons(array[i], l);      
+   }
+
+   return l;   
+}
+
+/**
+ * A varargs version of as List
+ * 
+ *  asList(a,b,c) = cons(a,cons(b,cons(c,emptyList)));
+ */
+var list = varArgs(arrayAsList);
+
+/**
+ * Convert a list back to a js native array
+ */
+function listAsArray(list){
+
+   return foldR( function(arraySoFar, listItem){
+      
+      arraySoFar.unshift(listItem);
+      return arraySoFar;
+           
+   }, [], list );
+   
+}
+
+/**
+ * Map a function over a list 
+ */
+function map(fn, list) {
+
+   return list
+            ? cons(fn(head(list)), map(fn,tail(list)))
+            : emptyList
+            ;
+}
+
+/**
+ * foldR implementation. Reduce a list down to a single value.
+ * 
+ * @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR(fn, startValue, list) {
+      
+   return list 
+            ? fn(foldR(fn, startValue, tail(list)), head(list))
+            : startValue
+            ;
+}
+
+/** 
+ * Returns true if the given function holds for every item in 
+ * the list, false otherwise 
+ */
+function all(fn, list) {
+   
+   return !list || 
+          fn(head(list)) && all(fn, tail(list));
+}
+
+/**
+ * Apply a function to every item in a list
+ * 
+ * This doesn't make any sense if we're doing pure functional because it doesn't return
+ * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
+ */
+function each(fn, list) {
+
+   if( list ){  
+      fn(head(list));
+      all(fn, tail(list));
+   }
+}
+
+/**
+ * Reverse the order of a list
+ */
 function reverseList(list){
 
    // js re-implementation of 3rd solution from:
@@ -183,75 +275,6 @@ function reverseList(list){
 
    return reverseInner(list, emptyList);
 }
-
-function listAsArray(list){
-
-   return foldR( function(arraySoFar, listItem){
-      
-      arraySoFar.unshift(listItem);
-      return arraySoFar;
-           
-   }, [], list );
-   
-}
-
-function map(fn, list) {
-
-   return list
-            ? cons(fn(head(list)), map(fn,tail(list)))
-            : emptyList
-            ;
-}
-
-/**
-   @pram {Function} fn     (rightEval, curVal) -> result 
- */
-function foldR(fn, startValue, list) {
-      
-   return list 
-            ? fn(foldR(fn, startValue, tail(list)), head(list))
-            : startValue
-            ;
-}
-
-/* return true if the given function holds for every item in 
- * the list 
- */
-function listEvery(fn, list) {
-   
-   return !list || 
-          fn(head(list)) && listEvery(fn, tail(list));
-}
-
-/**
- * This doesn't make any sense if we're doing pure functional because it doesn't return
- * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
- * 
- * @param fn
- * @param list
- */
-function listEach(fn, list) {
-
-   if( list ){  
-      fn(head(list));
-      listEvery(fn, tail(list));
-   }
-}
-
-/* convert an array to a list */
-function asList(array){
-
-   var l = emptyList;
-
-   for( var i = array.length ; i--; ) {
-      l = cons(array[i], l);      
-   }
-
-   return l;   
-}
-
-var list = varArgs(asList);
-
 
 /** 
  * If no implementation of a method called (methodName) exists fill it in with the
@@ -310,6 +333,9 @@ polyfill(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
    }
 });   
 
+if( !Object.freeze ) {
+   Object.freeze = function(o){ return o }; 
+}
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
@@ -1153,11 +1179,11 @@ function incrementalContentBuilder( fire) {
                  
       var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
-          previouslyUnmappedKey  = keyOf( head( arrayConsistentAscent));
+          previouslyUnmappedName = keyOf( head( arrayConsistentAscent));
           
-      appendBuiltContent( ancestorBranches, previouslyUnmappedKey, newDeepestNode );
+      appendBuiltContent( ancestorBranches, previouslyUnmappedName, newDeepestNode );
                                                                                                          
-      return cons( mapping( previouslyUnmappedKey, newDeepestNode ), ancestorBranches);                                                                          
+      return cons( namedNode( previouslyUnmappedName, newDeepestNode ), ancestorBranches);                                                                          
    }
 
 
@@ -1175,28 +1201,28 @@ function incrementalContentBuilder( fire) {
     * @param {String|Number} key
     * @param {Object|Array|String|Number|null} node a value found in the json
     */
-   function mapping(key, node) {
+   function namedNode(key, node) {
       return {key:key, node:node};
    }
      
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number|Object} newDeepestKey the key. If we are in an array will be a number, otherwise a string. May
+    * @param {String|Number|Object} newDeepestName the key. If we are in an array will be a number, otherwise a string. May
     *    take the special value ROOT_PATH if the root node has just been found
     * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathFound(ascent, newDeepestKey, maybeNewDeepestNode) {
+   function pathFound(ascent, newDeepestName, maybeNewDeepestNode) {
 
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( ascent, newDeepestKey, maybeNewDeepestNode );
+         appendBuiltContent( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
+      var ascentWithNewPath = cons( namedNode( newDeepestName, maybeNewDeepestNode), ascent);
      
       fire( PATH_FOUND, ascentWithNewPath);
  
@@ -1240,13 +1266,10 @@ function incrementalContentBuilder( fire) {
       // called by Clarinet when keys are found in objects               
       key: pathFound,
       
-      value: function (ascent, value) {
-   
-         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once 
-         // since they can't have descendants.
-                                 
-         return curNodeFinished( nodeFound(ascent, value) );
-      },
+      // Called by Clarinet when primitive values are found, ie Strings and Numbers.
+      // because these are always leaves in the JSON, we find and finish the node in one
+      // step, which can be expressed as functional composition:  
+      value: compose( curNodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing. For both, interpret as the end
       // of the current node.
@@ -1280,11 +1303,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var headKey = compose(keyOf, head);
                    
    /**
-    * Expression for a named path node, expressed as:
+    * Expression for a named path node, expressed like:
     *    foo
-    *    ["foo"]
+    *    ["bar"]
     *    [2]
-    *    
+    *        
     *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
     *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
     *    matches, it delegates the remaining matching to the next function in the chain.       
@@ -1293,18 +1316,17 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     *                     and decides if there is a match or not
     */
    function nameClause(previousExpr, detection ) {
-
-      // extract meaning from the detection      
+     
       var name = detection[NAME_INDEX],
             
-          condition = ( !name || name == '*' ) 
+          matchesName = ( !name || name == '*' ) 
                            ?  always
                            :  function(ascent){return headKey(ascent) == name};
      
       /**
        * @returns {Object|false} either the object that was found, or false if nothing was found
        */
-      return lazyIntersection(condition, previousExpr);
+      return lazyIntersection(matchesName, previousExpr);
    }
 
    /**
@@ -1325,7 +1347,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return previousExpr; // don't wrap at all, return given expr as-is
       }
 
-      var hasAllrequiredFields = partialComplete(hasAllProperties, asList(fieldListStr.split(/\W+/))),
+      var hasAllrequiredFields = partialComplete(hasAllProperties, arrayAsList(fieldListStr.split(/\W+/))),
           isMatch = compose( hasAllrequiredFields, nodeOf, head );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -1543,7 +1565,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                    
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
-   var clause = lazyUnion(
+   var clauseForJsonPath = lazyUnion(
 
       clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, nameClause, skip1 ))        
    ,  clauseMatcher(doubleDotSyntax  , list(skipMany))
@@ -1595,7 +1617,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Note that this function's signature matches the onSuccess callback to compileTokenIfMatches, meaning that
     * compileTokenIfMatches is able to make our recursive call back to here for us.
     */
-   function compileJsonPathToFunction( jsonPath, parserGeneratedSoFar ) {
+   function compileJsonPathToFunction( uncompiledJsonPath, parserGeneratedSoFar ) {
 
       /**
        * Called when a matching token is found. 
@@ -1610,9 +1632,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        * valid to recur onto an empty string (there's a tokenExpr for that) but it is not
        * valid to recur past that point. 
        */
-      var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
+      var onFind = uncompiledJsonPath? compileJsonPathToFunction : returnFoundParser;
                    
-      return clause(jsonPath, parserGeneratedSoFar, onFind);                              
+      return clauseForJsonPath(uncompiledJsonPath, parserGeneratedSoFar, onFind);                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's
@@ -1647,7 +1669,7 @@ function pubSub(){
     
       fire:function ( eventId, event ) {
                
-         listEach(
+         each(
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
