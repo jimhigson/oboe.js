@@ -5,7 +5,8 @@ Conclusion
 **1 to 5 pages**
 --->
 
-Doing things faster vs doing things earlier. "Hurry up and wait" approach to optimisation.
+Doing things faster vs doing things earlier. "Hurry up and wait"
+approach to optimisation.
 
 weaknesses
 ----------
@@ -118,17 +119,21 @@ Built into Dojo Followers on Github Being posted in forums (hopefully
 also listed on blogs) No homepage as of yet other than the Github page
 
 Possible future work
-------------
+--------------------
 
 Do da XMLs
 
 Benchmarking
--------
+------------
 
-Complex JSONPAth tested against JSON with approx 2,000 nodes, finding 100 matches.
-Real http, full stack Oboe.
+Complex JSONPAth tested against JSON with approx 2,000 nodes, finding
+100 matches. Real http, full stack Oboe.
 
-Firefox: 547ms
-Chrome: 237ms
-Safari: 231ms
-IE8: 3048ms
+  Browser                                       Time
+  ----------------------------------------- --------
+  Firefox 24.0.0 (Mac OS X 10.7)               547ms
+  Chrome 30.0.1599 (Mac OS X 10.7.5)           237ms
+  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)      431ms
+  Safari 6.0.5 (Mac OS X 10.7.5)               231ms
+  IE 8.0.0 (Windows XP)                       3048ms
+
