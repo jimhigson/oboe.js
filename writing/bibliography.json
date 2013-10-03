@@ -349,8 +349,8 @@
          { "family": "Conway", "given":"Mel"}
       ],
       "url":"http://melconway.com/Home/pdf/humanize.pdf",
-      "issued": { "date-parts":[ [] ] },
-      "type":"presentation"                  
+      "issued": { "date-parts":[ [2004] ] },
+      "type":"book"
    }
 
 ]
