@@ -593,17 +593,17 @@ the tail, thus moving evaluation of the ascent one node up the parsed
 JSON tree. Similarly, there is a `skipMany` which maps onto the `..` syntax
 and recursively consumes nodes until it can find a match in the next clause.
 
-As an example, the jsonPath `!.$person..{height tShirtSize}` once compiled to
+As an example, the pattern `!.$person..{height tShirtSize}` once compiled to
 a Javascript functional representation would roughly resemble this:
 
 ~~~~ {.javascript}
 statementExpr(             // wrapper, added when JSONPath is zero-length 
-   duckTypeClause(         // {height tShirtSize}
-      skipMany(            // for '..'  
-         capture(          // for css4-style '$' notation
-            nameClause(    // for 'person'
-               skip1(      // '.' after '!'  
-                  rootExpr // '!' at start of JSONPath expression
+   duckTypeClause(         // token 6, {height tShirtSize}
+      skipMany(            // token 5, '..'  
+         capture(          // token 4, css4-style '$' notation
+            nameClause(    // token 3, 'person'
+               skip1(      // token 2, '.'  
+                  rootExpr // token 1, '!' at start of JSONPath expression
                ) 
             'person' )
          )
