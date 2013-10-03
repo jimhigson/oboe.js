@@ -106,7 +106,7 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   var fnsList = asList(fns);
+   var fnsList = arrayAsList(fns);
 
    function next(params, curFn) {  
       return [apply(params, curFn)];   

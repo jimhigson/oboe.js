@@ -16,7 +16,7 @@ function pubSub(){
     
       fire:function ( eventId, event ) {
                
-         listEach(
+         each(
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );

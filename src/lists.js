@@ -13,7 +13,7 @@ var emptyList = null;
  * 
  *  asList([a,b,c]) = cons(a,cons(b,cons(c,emptyList))); 
  **/
-function asList(array){
+function arrayAsList(array){
 
    var l = emptyList;
 
@@ -29,7 +29,7 @@ function asList(array){
  * 
  *  asList(a,b,c) = cons(a,cons(b,cons(c,emptyList)));
  */
-var list = varArgs(asList);
+var list = varArgs(arrayAsList);
 
 /**
  * Convert a list back to a js native array
@@ -73,10 +73,10 @@ function foldR(fn, startValue, list) {
  * Returns true if the given function holds for every item in 
  * the list, false otherwise 
  */
-function listEvery(fn, list) {
+function all(fn, list) {
    
    return !list || 
-          fn(head(list)) && listEvery(fn, tail(list));
+          fn(head(list)) && all(fn, tail(list));
 }
 
 /**
@@ -85,11 +85,11 @@ function listEvery(fn, list) {
  * This doesn't make any sense if we're doing pure functional because it doesn't return
  * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
  */
-function listEach(fn, list) {
+function each(fn, list) {
 
    if( list ){  
       fn(head(list));
-      listEvery(fn, tail(list));
+      all(fn, tail(list));
    }
 }
 

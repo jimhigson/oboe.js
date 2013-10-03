@@ -42,12 +42,12 @@ describe("Lists", function(){
    
    it("can convert non empty list to an array", function(){
    
-      expect( listAsArray( asList(['a','b','c']) ) ).toEqual( ['a','b','c'] );
+      expect( listAsArray( arrayAsList(['a','b','c']) ) ).toEqual( ['a','b','c'] );
    });
    
    it("can convert empty array to list", function() {
    
-      expect( listAsArray( asList([]) ) ).toEqual( [] );
+      expect( listAsArray( arrayAsList([]) ) ).toEqual( [] );
    });
    
    it("can assert every item in a list holds for a given test", function(){
@@ -69,10 +69,10 @@ describe("Lists", function(){
          return n <= 10;
       }                           
       
-      expect( listEvery(isANumber,                l )).toBe(true);
-      expect( listEvery(isOdd,                    l )).toBe(false);
-      expect( listEvery(isLessThanTen,            l )).toBe(false);
-      expect( listEvery(isLessThanOrEqualToTen,   l )).toBe(true);   
+      expect( all(isANumber,                l )).toBe(true);
+      expect( all(isOdd,                    l )).toBe(false);
+      expect( all(isLessThanTen,            l )).toBe(false);
+      expect( all(isLessThanOrEqualToTen,   l )).toBe(true);   
    });
    
    it("can fold list where order doesnt matter", function(){

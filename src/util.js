@@ -38,7 +38,7 @@ function hasAllProperties(fieldList, o) {
 
    return      (o instanceof Object) 
             &&
-               listEvery(function (field) {         
+               all(function (field) {         
                   return (field in o);         
                }, fieldList);
 }
