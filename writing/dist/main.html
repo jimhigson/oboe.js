@@ -2592,24 +2592,6 @@ Chapter 4+5 40 to 60 pages
   response emmit a smaller vocabulary of two, creating an adaptor
   over pushes rather that pulls.</p>
 
-  <p>There are some peculiarities of Clarinet, these are kept as
-  local as possible. Such as the field name given with the open
-  object and internally normalises this by handling as if it were
-  two events.</p>
-
-  <h3 id="what-jp-matching-requires."><a href=
-  "#what-jp-matching-requires."><span class=
-  "header-section-number">5.6.1</span> What JP matching
-  requires.</a></h3>
-
-  <div class="figure">
-    <img src="images/ascent.png" alt=
-    "List representation of an ascent from leaf to root of a JSON tree ">
-
-    <p class="caption">List representation of an ascent from leaf
-    to root of a JSON tree</p>
-  </div>
-
   <p>To perform matching on JSONPath expressions, the controller
   requires the path from the root of the document to the current
   node is required, this is provided in the NODE_FOUND and
@@ -2644,66 +2626,52 @@ Chapter 4+5 40 to 60 pages
   an empty path it passes the path to each builder function and
   stores the result to be given to the next one.</p>
 
-  <p>The representation of the path to the current node is stored
-  as a singly linked list, defined recursively as a series of
-  immutable items. See figure . The list is ordered with the JSON
-  root at the far end of the tail and the current node at the head.
-  This order was chosen because as we traverse the JSON the current
-  node is appended and removed many times whereas the root is
-  immutable; all updates to the path are at the head end where it
-  is computationally very cheap.</p>
+  <div class="figure">
+    <img src="images/ascent.png" alt=
+    "List representation of an ascent from leaf to root of a JSON tree. Note the special ROOT token which represents the path mapping to the root node (of course nothing maps to the root) - this is an object, taking advantage of object identity to ensure that the token is unequal to anything but itself. This list form is built up by the incremental content builder and is the format that compiled JSONPath expressions test against for matches ">
 
-  <p>Each list element holds the field name which referenced the
-  node in the parent object to the node and the node itself.</p>
+    <p class="caption">List representation of an ascent from leaf
+    to root of a JSON tree. Note the special ROOT token which
+    represents the path mapping to the root node (of course nothing
+    maps to the root) - this is an object, taking advantage of
+    object identity to ensure that the token is unequal to anything
+    but itself. This list form is built up by the incremental
+    content builder and is the format that compiled JSONPath
+    expressions test against for matches</p>
+  </div>
 
-  <p>singly linked list: recursive data structure where each
-  element is a head and tail.</p>
+  <p>The path of the current node is maintained as a singly linked
+  list, with each list element holding the field name and the node
+  and the node itself, see figure . The list is arranged with the
+  JSON root at the far end and the current node at the head. As we
+  traverse the JSON the current node is appended and removed many
+  times whereas the root is immutable. This ordering was chosen
+  because it is computationally very efficient since all updates to
+  the list are at the head. Each link in the list is immutable,
+  enforced by newer Javascript engines as frozen
+  objects.<sup><a href="#fn7" class="footnoteRef" id="fnref7" name=
+  "fnref7">7</a></sup></p>
 
-  <p>Each list item holds</p>
+  <p>Linked lists were chosen in preference to the more
+  conventional approach of using native Javascript Arrays for
+  several reasons. Firstly, I find this area of the program more
+  easy to test and debug given immutable data structures. Treating
+  the native Arrays as immutable would be very expensive because on
+  each change to the path the array contents would have to be
+  copied to a new array. As well as promoting mutability, most
+  Javascript virtual machines are quite poor at array growing and
+  shrinking so for collections whose size changes often are
+  outperformed by linked lists. Finally, this is a very convenient
+  format for the JSONPath engine to perform matching on as will be
+  discussed in the next section. The Javascript file lists.js
+  implements the lists with some appropriate recursive operations:
+  <code>map</code>, <code>foldR</code>, <code>all</code>.</p>
 
-  <p>JS poor at Arrays which grow/shrink. Also not very functional
-  if arrays are modified and highly inefficient to use them in an
-  immutable style and copy on every mutation. Random access to
-  middle not required, only at one end.</p>
-
-  <p>Good for testing against JSONPath since</p>
-
-  <p>Changed into normal array before handing to outside world.</p>
-
-  <p>Although paths are normally represented starting</p>
-
-  <p>Why upside down (ascent, not descent). Changes are cheaper at
-  head of list than tail. Head changes as move through doc, tail
-  doesn't.</p>
-
-  <h3 id="what-clarinet-provides."><a href=
-  "#what-clarinet-provides."><span class=
-  "header-section-number">5.6.2</span> What Clarinet
-  provides.</a></h3>
-
-  <p>Because Clarinet is a SAX parser, the calls that I receive
-  from it are entirely context free; it is my responsibility to
-  build this context.</p>
-
-  <p>Luckily, it should be easy to see that building up this
-  context is a simple matter of maintaining a stack describing the
-  descent from the root node to the current node.</p>
-
-  <h3 id="bridging-between-the-two.-the-split."><a href=
-  "#bridging-between-the-two.-the-split."><span class=
-  "header-section-number">5.6.3</span> Bridging between the two.
-  The split.</a></h3>
-
-  <p>Single piece of state: the ascent.</p>
-
-  <p>jsonPath parser gets the output from the
-  incrementalParsedContent, minimally routed there by the
-  controller.</p>
-
-  <p>On first attempt at ICB, had two stacks, both arrays, plus
-  reference to current node, current key and root node. After
-  refactorings, just one list was enough. Why single-argument
-  functions are helpful (composition etc)</p>
+  <p>Because it is more common to quote paths as descents rather
+  than ascent, on the boundary to the outside world Oboe reverses
+  the order and, because Javascript programmers will not be
+  familiar with this structure, converts to arrays.</p>
+  <hr>
 
   <p>Stateless makes using a debugger easier - can look back in
   stack trace and because of no reassignment, can see the whole,
@@ -2714,82 +2682,6 @@ Chapter 4+5 40 to 60 pages
   expressions into debugger to see evaluation without risk of
   changing program execution.</p>
 
-  <p>A refactoring was used to separate logic and state:</p>
-
-  <ul>
-    <li>Take stateful code</li>
-
-    <li>Refactor until there is just one stateful item</li>
-
-    <li>This means that that item is reassigned rather than
-    mutated</li>
-
-    <li>Make stateless by making all functions take and return an
-    instance of that item</li>
-
-    <li>Replace all assignment of the single stateful var with a
-    return statement</li>
-
-    <li>Create a simple, separate stateful controller that just
-    updates the state to that returned from the calls</li>
-  </ul>
-
-  <p>Very testable code because stateless - once correct for params
-  under test, will always be correct. Nowhere for bad data to hide
-  in the program.</p>
-
-  <p>How do notifications fit into this?</p>
-
-  <p>By going to List-style, enforced that functions fail when not
-  able to give an answer. Js default is to return the special
-  'undefined' value. Why this ensured more robustness but also
-  sometimes took more code to write, ie couldn't just do if(
-  tail(foo)) if foo could be empty but most of the time that would
-  be correct</p>
-
-  <p>Explain why Haskel/lisp style lists are used rather than
-  arrays</p>
-
-  <ul>
-    <li>In parser clauses, lots of 'do this then go to the next
-    function with the rest'.</li>
-
-    <li>Normal arrays extremely inefficient to make a copy with one
-    item popped off the start</li>
-
-    <li>Link to FastList on github</li>
-
-    <li>For sake of micro-library, implemented tiny list code with
-    very bare needed</li>
-
-    <li>Alternative (first impl) was to pass an index around</li>
-
-    <li>But clause fns don't really care about indexes, they care
-    about top of the list.</li>
-
-    <li>Slight advantage to index: allows going past the start for
-    the root path (which doesn't have any index) instead, have to
-    use a special value to keep node and path list of the same
-    length</li>
-
-    <li>Special token for root, takes advantage of object identity
-    to make certain that cannot clash with something from the json.
-    Better than '<strong>root</strong>' or similar which could
-    clash. String in js not considered distinct, any two strings
-    with identical character sequences are indistinguishable.</li>
-  </ul>
-
-  <p>Anti-list: nothing is quite so small when making a
-  mircro-library as using the types built into the language, coming
-  as they are for zero bytes.</p>
-
-  <ul>
-    <li>For recognisably with existing code, use lists internally
-    but transform into array on the boundary between Oboe.js and
-    the outside world (at same time, strip off special 'root path'
-    token)</li>
-  </ul>
-
   <h2 id="oboe-jsonpath-implementation"><a href=
   "#oboe-jsonpath-implementation"><span class=
   "header-section-number">5.7</span> Oboe JSONPath
@@ -2799,13 +2691,13 @@ Chapter 4+5 40 to 60 pages
   implementation is one of the most refactored and considered parts
   of the Oboe codebase. Like many small languages, on the first
   commit it was little more than a series of regular
-  expressions<sup><a href="#fn7" class="footnoteRef" id="fnref7"
-  name="fnref7">7</a></sup> but has slowly evolved into a
-  featureful and efficient implementation<sup><a href="#fn8" class=
-  "footnoteRef" id="fnref8" name="fnref8">8</a></sup>. The extent
+  expressions<sup><a href="#fn8" class="footnoteRef" id="fnref8"
+  name="fnref8">8</a></sup> but has slowly evolved into a
+  featureful and efficient implementation<sup><a href="#fn9" class=
+  "footnoteRef" id="fnref9" name="fnref9">9</a></sup>. The extent
   of the rewriting was possible because the correct behaviour is
-  well defined by test specifications<sup><a href="#fn9" class=
-  "footnoteRef" id="fnref9" name="fnref9">9</a></sup>.</p>
+  well defined by test specifications<sup><a href="#fn10" class=
+  "footnoteRef" id="fnref10" name="fnref10">10</a></sup>.</p>
 
   <p>The JSONPath compiler exposes a single higher-order function
   to the rest of Oboe. This function takes a JSONPath as a String
@@ -2902,8 +2794,8 @@ Chapter 4+5 40 to 60 pages
   JSONPath strings contain a common start they could share the
   inner parts of their functional expression. Although Javascript
   doesn't come with functional caching, it can be added using the
-  language itself.<sup><a href="#fn10" class="footnoteRef" id=
-  "fnref10" name="fnref10">10</a></sup> I suspect, however, that
+  language itself.<sup><a href="#fn11" class="footnoteRef" id=
+  "fnref11" name="fnref11">11</a></sup> I suspect, however, that
   hashing the parameters might be slower than performing the
   matching. Although the parameters are all immutable and could in
   theory be hashed by object identity, in practice there is no way
@@ -2918,8 +2810,8 @@ Chapter 4+5 40 to 60 pages
   outside the tokenizer and only functions are exposed to the main
   body of the compiler. The regular expressions all start with
   <code>^</code> so that they only match at the head of the string.
-  A more elegant alternative is the 'y'<sup><a href="#fn11" class=
-  "footnoteRef" id="fnref11" name="fnref11">11</a></sup> flag but
+  A more elegant alternative is the 'y'<sup><a href="#fn12" class=
+  "footnoteRef" id="fnref12" name="fnref12">12</a></sup> flag but
   as of now this lacks wide browser support.</p>
 
   <p>By verifying the tokens through their own unit tests it is
@@ -2944,42 +2836,6 @@ Chapter 4+5 40 to 60 pages
     the previous function. Include the statementExpr pointing to
     the last clause</p>
   </div>
-
-  <h2 id="callback-and-mutability-problem"><a href=
-  "#callback-and-mutability-problem"><span class=
-  "header-section-number">5.8</span> Callback and mutability
-  Problem</a></h2>
-
-  <p>Stateful controller very easy to test - only 1 function.</p>
-
-  <p>Javascript provides no way to decalre an object with 'cohorts'
-  who are allowed to change it whereas others cannot - vars may be
-  hidden via use of scope and closures (CITE: crockford) but
-  attributes are either mutable or immutable.</p>
-
-  <p>Why this is a problem.</p>
-
-  <ul>
-    <li>bugs likely to be attributied to oboe because they'll be in
-    a future <em>frame of execution</em>. But user error.</li>
-  </ul>
-
-  <p>Potential solutions:</p>
-
-  <ul>
-    <li>full functional-style immutability. Don't change the
-    objects, just have a function that returns a new one with one
-    extra property. Problem - language not optimised for this. A
-    lot of copying. Still doesn't stop callback receiver from
-    changing the state of hte object given. (CITE: optimisations
-    other languages use)</li>
-
-    <li>immutable wrappers.</li>
-
-    <li>defensive cloning</li>
-
-    <li>defining getter properties</li>
-  </ul>
 
   <h1 id="conclusion"><a href="#conclusion"><span class=
   "header-section-number">6</span> Conclusion</a></h1><!---
@@ -3335,37 +3191,49 @@ Chapter 4+5 40 to 60 pages
       </li>
 
       <li id="fn7">
-        <p>JSONPath compiler from the first commit can be found at
-        line 159 here: <a href=
-        "https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js">
-        https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js</a>#L159.<a href="#fnref7">&acirc;&dagger;&copy;</a></p>
+        <p>See <a href=
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/Object/freeze">
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze</a>.
+        Although older engines don't provide any ability to create
+        immutable objects at run-time, we can be fairly certain
+        that the code does not mutate these objects or the tests
+        would fail when run in environments which are able to
+        enforce this.<a href=
+        "#fnref7">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn8">
-        <p>For contrast, the current source can be found at
-        <a href="https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js">
-        https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js</a>.<a href="#fnref8">&acirc;&dagger;&copy;</a></p>
+        <p>JSONPath compiler from the first commit can be found at
+        line 159 here: <a href=
+        "https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js">
+        https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js</a>#L159.<a href="#fnref8">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn9">
+        <p>For contrast, the current source can be found at
+        <a href="https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js">
+        https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js</a>.<a href="#fnref9">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn10">
         <p>The current tests are viewable at <a href=
         "https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js">
         https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js</a>
         and <a href=
         "https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js">
-        https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js</a>.<a href="#fnref9">&acirc;&dagger;&copy;</a></p>
-      </li>
-
-      <li id="fn10">
-        <p>Probably the best known example being
-        <code>memoize</code> from Underscore.js: <a href=
-        "http://underscorejs.org/">http://underscorejs.org/</a>#memoize.<a href="#fnref10">&acirc;&dagger;&copy;</a></p>
+        https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js</a>.<a href="#fnref10">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn11">
+        <p>Probably the best known example being
+        <code>memoize</code> from Underscore.js: <a href=
+        "http://underscorejs.org/">http://underscorejs.org/</a>#memoize.<a href="#fnref11">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn12">
         <p><a href=
         "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">
-        Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref11">&acirc;&dagger;&copy;</a></p>
+        Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref12">&acirc;&dagger;&copy;</a></p>
       </li>
     </ol>
   </div>
