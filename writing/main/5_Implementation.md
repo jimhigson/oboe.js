@@ -439,8 +439,8 @@ space because I don't have to think four-dimensionally projecting my
 mind forwards and back in time to different values that were there when
 the variable was used. The lack of side effects means I can try explore
 new commands in the debugger's CLI without worrying about breaking the
-execution of the program. As well as promoting mutability, most
-Javascript virtual machines are quite poor at array growing and
+execution of the program. Most
+Javascript virtual machines are also quite poor at array growing and
 shrinking so for collections whose size changes often are outperformed
 by linked lists. Finally, this is a very convenient format for the
 JSONPath engine to perform matching on as will be discussed in the next
