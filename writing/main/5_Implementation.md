@@ -442,7 +442,12 @@ JSONPath engine to perform matching on as will be discussed in the next
 section. The Javascript file lists.js implements the lists with some
 appropriate recursive operations: `map`, `foldR`, `all`.
 
-Changed into normal array before handing to outside world.
+Because it is more common to quote paths as descents rather than ascent, 
+on the boundary to the outside world Oboe reverses the order and, because
+Javascript programmers will not be familiar with this structure, converts
+to arrays.  
+
+* * * * *
 
 ### What Clarinet provides.
 
@@ -456,8 +461,6 @@ root node to the current node.
 ### Bridging between the two. The split.
 
 Single piece of state: the ascent.
-
-
 
 Stateless makes using a debugger easier - can look back in stack trace
 and because of no reassignment, can see the whole, unchanged state of
