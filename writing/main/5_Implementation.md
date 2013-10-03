@@ -566,35 +566,41 @@ String -> Ascent -> JsonPathMatchResult
 
 The match result is either a failure to match, or a hit, with the node
 that matched. In the case of path matching, the node may currently be
-unknown.
+unknown. If the pattern has a clause prefixed with `$`, the node matching
+that clause is captured and returned as the result. Otherwise, the last
+clause is implicitly capturing.
 
 The usage profile for JSONPath expressions in Oboe is to be compiled
 once and then evaluated many times, once for each node encountered while
-parsing the JSON. Because it is performed perhaps hundreds of times per
-file the most pressing performance consideration is for matching to
-execute quickly. The design here contrasts with JSONPath's reference
+parsing the JSON. Because matching is performed perhaps hundreds of
+times per file the most pressing performance consideration is for
+matching to execute quickly, the time required to compile is relatively
+unimportant. Oboe's JSONPath design contrasts with JSONPath's reference
 implementation which, because it provides a first order function,
 freshly reinterprets the JSONPath string each time it is invoked.
 
-The compilation is performed by recursively by examining the left-most side
-of the string for a JSONPath clause. For each kind of clause there is 
-a function which matches ascents against that clause, for example by
-checking the name field. By partial completion this function is specialised
-to match against one particular name. Once a clause function is generated, 
-compilation recurs by passing to itself the remaining unparsed portion of 
-the JSONPath string. This continues until it is called with a zero-length
-JSONPath. On each recursive call the clause function is wrapped in the result 
-from the next recursive call, resulting ultimately in a linked series of clause 
-functions. When evaluated against an ascent, each clause functions examines the
-head of the ascent and passes the ascent onto the next function if it passes.
-A special clause functions, `skip1` is used for the `.` syntax and places
-no condition on the head of the ascent but passes on to the next clause only 
-the tail, thus moving evaluation of the ascent one node up the parsed 
-JSON tree. Similarly, there is a `skipMany` which maps onto the `..` syntax
-and recursively consumes nodes until it can find a match in the next clause.
+The compilation is performed by recursively by examining the left-most
+side of the string for a JSONPath clause. For each kind of clause there
+is a function which matches ascents against that clause, for example by
+checking the name field. By partial completion this function is
+specialised to match against one particular name. Once a clause function
+is generated, compilation recurs by passing to itself the remaining
+unparsed portion of the JSONPath string. This continues until it is
+called with a zero-length JSONPath. On each recursive call the clause
+function is wrapped in the result from the next recursive call,
+resulting ultimately in a linked series of clause functions. When
+evaluated against an ascent, each clause functions examines the head of
+the ascent and passes the ascent onto the next function if it passes. A
+special clause functions, `skip1` is used for the `.` syntax and places
+no condition on the head of the ascent but passes on to the next clause
+only the tail, thus moving evaluation of the ascent one node up the
+parsed JSON tree. Similarly, there is a `skipMany` which maps onto the
+`..` syntax and recursively consumes nodes until it can find a match in
+the next clause.
 
-As an example, the pattern `!.$person..{height tShirtSize}` once compiled to
-a Javascript functional representation would roughly resemble this:
+As an example, the pattern `!.$person..{height tShirtSize}` once
+compiled to a Javascript functional representation would roughly
+resemble this:
 
 ~~~~ {.javascript}
 statementExpr(             // wrapper, added when JSONPath is zero-length 
@@ -611,21 +617,26 @@ statementExpr(             // wrapper, added when JSONPath is zero-length
 )      
 ~~~~
 
-No functional cache in JS but would be safe to implement one given only
-using a side-effect free subset of the language.
-
-### how compile the JPs?
-
-Match from right-to-left, or, leaf-to-root. Why this way? That's how the
-patterns work (mostly)
+Since I am only using a side-effect free subset of Javascript for this
+segment of Oboe it would be safe to use a functional cache. As well as
+saving time by avoiding repeated execution, this could potentially also
+save memory because where two JSONPath strings contain a common start
+they could share the inner parts of their functional expression.
+Although Javascript doesn't come with functional caching, it can be
+added using the language itself [^6]. I suspect, however, that hashing
+the parameters might be slower than performing the matching. Although the
+parameters are all immutable and could in theory be hashed by object identity,
+in practice there is no way to access an object id from inside the language
+so any hash of a node parsed out of JSON would have to walk the entire 
+subtree described by that node.
 
 ### tokenising
 
-In parser, can't use 'y' flag to the regualr expression engine which
-would allow much more elegant matching. Only alternative is cumersome:
-to slice the string and match all tokens with regexes starting with '\^'
-in order to track the current location.
-[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
+The JSONPath tokenisation is split out into its own separately tested file.
+The tokenisation implementation is based on regular expressions since they are the simplest
+formalisation able to express the patterns required, but this details is hidden
+to the outside the tokenizer and only functions are exposed to the main body
+of the compiler.
 
 Syntax tokens tested separately. Broad, broad base to this pyramid - two
 levels of unit testing. By testing individual tokens are correct and the
@@ -642,6 +653,12 @@ but not "{a,}" is not trivial.
 Split into tokens and statement builder. Testing intermediate. JSONPath
 engine not strictly unit tested since it depends on other units. Case of
 shape of tests not following the shape of the code.
+
+In parser, can't use 'y' flag to the regualr expression engine which
+would allow much more elegant matching. Only alternative is cumersome:
+to slice the string and match all tokens with regexes starting with '\^'
+in order to track the current location.
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
 
 Callback and mutability Problem
 -------------------------------
@@ -686,3 +703,6 @@ Potential solutions:
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
+
+[^6]: Probably the best known example being `memoize` from
+    Underscore.js: http://underscorejs.org/\#memoize
