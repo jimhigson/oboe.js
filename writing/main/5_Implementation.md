@@ -9,7 +9,7 @@ transport to registered callbacks. Every component is not shown here.
 Particularly, components whose responsibility it is to initialise the
 oboe instance but have no role once it is running are omitted. UML
 facet/receptacle notation is used to show the flow of events with event
-names in capitals.](images/overallDesign.png)
+names in capitals. \label{overallDesign}](images/overallDesign.png)
 
 Oboe's architecture has been designed to so that I may have as much
 confidence as possible regarding the correct working of the library
@@ -69,23 +69,22 @@ These tests check all of Oboe, automatically spinning up a REST service
 so that the correctness of the whole library may be examined against an
 actual server.
 
-The desirable to be amenable to testing influences the boundaries on
-which the application is split into separately implemented components.
-Black-box unit testing of a stateful unit is difficult; because of
-side-effects it may later react differently to the same calls. For this
-reason where state is required it is stored in very simple state-storing
-units with intricate program logic removed. The logic may then be
-separately expressed as functions which map from one state to the next.
-Although comprehensive coverage is of course impossible and tests are
-inevitably incomplete, for whatever results the functions give while
-under test, uninfluenced by state I can be sure that they will continue
-to give in any future situation. The separate unit holding the state is
-trivial to test, having exactly one responsibility: to store the result
-of a function call and later pass that result to the next function. This
-approach clearly breaks with object oriented style encapsulation by not
-hiding data behind the logic which acts on them but I feel the departure
-is worthwhile for the greater certainty it allows over the correct
-functioning of the program.
+The desire to be amenable to testing influences the boundaries on which
+the application splits into components. Black-box unit testing of a
+stateful unit is difficult; because of side-effects it may later react
+differently to the same calls. For this reason where state is required
+it is stored in very simple state-storing units with intricate program
+logic removed. The logic may then be separately expressed as functions
+which map from one state to the next. Although comprehensive coverage is
+of course impossible and tests are inevitably incomplete, for whatever
+results the functions give while under test, uninfluenced by state I can
+be sure that they will continue to give in any future situation. The
+separate unit holding the state is trivial to test, having exactly one
+responsibility: to store the result of a function call and later pass
+that result to the next function. This approach clearly breaks with
+object oriented style encapsulation by not hiding data behind the logic
+which acts on them but I feel the departure is worthwhile for the
+greater certainty it allows over the correct functioning of the program.
 
 Largely for the sake of testing Oboe has also embraced dependency
 injection. This means that components do not create the further
@@ -369,13 +368,31 @@ act like factory functions:
 Incrementally building up the content
 -------------------------------------
 
+As shown in figure \ref{overallDesign}, there is an incremental content
+builder and ascent tracer which handle the output from the Clarinet JSON
+SAX parser. Taken together, these might be considered as a variant of
+the Adaptor pattern, providing to the controller a simpler interface
+than is presented by Clarinet. However, this is not the paradigm of the
+pattern; it is even-driven rather than call-driven: we receive six kinds
+of event and in response emmit a smaller vocabulary of two, so in this
+regard it is a simplifying push adaptor.
+
+### What JP matching requires.
+
+### What Clarinet provides.
+
+### Bridging between the two. The split.
+
+
+Single piece of state: the ascent.
+
 Content builder: variant of Adaptor pattern that is event based, not
 based on object wrapping and propagating calls. Pushed to, not pulled
 from. Hides a few Clarinet perculiarities such as the field name given
 with the open object and internally normalises this by handling as if it
 were two events.
 
-Like SAX, calls from clarinet are entirely 'context free'. Ie, am told
+Calls from clarinet are entirely 'context free'. Ie, am told
 that there is a new object but without the preceding calls the root
 object is indistinguishable from a deeply nested object. Luckily, it
 should be easy to see that building up this context is a simple matter
