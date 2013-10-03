@@ -62,11 +62,11 @@ function incrementalContentBuilder( fire) {
                  
       var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
-          previouslyUnmappedKey  = keyOf( head( arrayConsistentAscent));
+          previouslyUnmappedName = keyOf( head( arrayConsistentAscent));
           
-      appendBuiltContent( ancestorBranches, previouslyUnmappedKey, newDeepestNode );
+      appendBuiltContent( ancestorBranches, previouslyUnmappedName, newDeepestNode );
                                                                                                          
-      return cons( mapping( previouslyUnmappedKey, newDeepestNode ), ancestorBranches);                                                                          
+      return cons( namedNode( previouslyUnmappedName, newDeepestNode ), ancestorBranches);                                                                          
    }
 
 
@@ -84,28 +84,28 @@ function incrementalContentBuilder( fire) {
     * @param {String|Number} key
     * @param {Object|Array|String|Number|null} node a value found in the json
     */
-   function mapping(key, node) {
+   function namedNode(key, node) {
       return {key:key, node:node};
    }
      
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number|Object} newDeepestKey the key. If we are in an array will be a number, otherwise a string. May
+    * @param {String|Number|Object} newDeepestName the key. If we are in an array will be a number, otherwise a string. May
     *    take the special value ROOT_PATH if the root node has just been found
     * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] usually this won't be known so can be undefined.
     *    can't use null because null is a valid value in some json
     **/  
-   function pathFound(ascent, newDeepestKey, maybeNewDeepestNode) {
+   function pathFound(ascent, newDeepestName, maybeNewDeepestNode) {
 
       if( ascent ) { // if not root
       
          // if we have the key but (unless adding to an array) no known value yet, at least put 
          // that key in the output but against no defined value:      
-         appendBuiltContent( ascent, newDeepestKey, maybeNewDeepestNode );
+         appendBuiltContent( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons( mapping( newDeepestKey, maybeNewDeepestNode), ascent);
+      var ascentWithNewPath = cons( namedNode( newDeepestName, maybeNewDeepestNode), ascent);
      
       fire( PATH_FOUND, ascentWithNewPath);
  
