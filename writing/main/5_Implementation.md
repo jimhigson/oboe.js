@@ -388,20 +388,27 @@ internally normalises this by handling as if it were two events.
 
 ![Ascent taken from some JSON](images/placeholder)
 
-To perform matching on JSONPath expressions, the path from the root of
-the document to the current node is required. For each Clarinet event
-the incremental content builder provides\
-a function which takes the current path and returns the path after the
-event. For example, the `objectopen` and `arrayopen` events add new
-items to the path, whereas `closeobject` and `closearray` remove them.
-Internally, the event handlers are created from the combination of a
-smaller number of more basic handlers since Oboe is largely
-indiscriminate regarding the type of nodes found in the JSON. Clarinet
-emits the `value` event when it encounters a String or Number. Because
-primitive nodes are always leaves these are internally handled as a node
+To perform matching on JSONPath expressions, the controller requires the path from the root of
+the document to the current node is required, this is provided in the NODE_FOUND and PATH_FOUND
+events emited from the incremental content builder. For each Clarinet event
+this builder provides
+a corresponding function which takes the current path and returns the path after the
+event has been applied. For example, the `objectopen` and `arrayopen` events add new
+items to the path, whereas `closeobject` and `closearray` remove them. Over the course of
+the parse of the whole JSON file the path in this way will visit every node, allowing
+each to be tested against the registered JSONPath expressions.
+Internally, the builder's event handlers are created from the combination of a
+smaller number of more basic reusable handlers; Oboe is largely
+indiscriminate regarding the type of nodes found in the JSON whereas Clarinet's events
+often differ only in the type of node that was encountered.
+This reuse of smaller instructions to build up larger ones is slightly reminiscent
+of the use of composed micro-instructions in CISC CPU design to implement the chip's
+higher-level instructions. 
+Consider the `value` 
+event which is fired when Clarinet encounters a String or Number, because
+primitive nodes are always leaves the internal handling is as a node
 which instantaneously starts and ends, expressed programmatically as the
-functional composition of the `nodeFound` and `curNodeFinished`
-handlers.
+functional composition of the `nodeFound` and `curNodeFinished` handlers.
 
 Although paths are normally represented starting
 
