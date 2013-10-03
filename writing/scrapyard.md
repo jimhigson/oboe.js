@@ -131,3 +131,12 @@ implemented, not universal on all functions.
 Although the streams themselves are stateful, because they are based on
 callbacks it is entirely possible to use them from a component of a
 javascript program which is wholly stateless.
+
+"Mixed paradigm" design. But not classical: don't need inheritance.
+
+JSONPath
+--------
+
+There is a construction part (first 3 args) and a usage part (last
+three). Comsume many can only be constructed to ues consume 1 in second
+style because may refer to its own paritally completed version.

@@ -261,8 +261,6 @@ Styles of Programming
 Programming is finished when each line reads as a statement of fact
 rather than the means of making the statement so.
 
-"Mixed paradigm" design. But not classical: don't need inheritance.
-
 How doing data hiding in JS without copying an OO concept of data
 hiding.
 
@@ -292,10 +290,6 @@ expressivity as writing the logic out as source code.
 Why could implement Function\#partial via prototype. Why not going to.
 Is a shame. However, are using prototype for minimal set of polyfills.
 Not general purpose.
-
-There is a construction part (first 3 args) and a usage part (last
-three). Comsume many can only be constructed to ues consume 1 in second
-style because may refer to its own paritally completed version.
 
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
