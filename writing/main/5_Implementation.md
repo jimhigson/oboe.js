@@ -51,8 +51,8 @@ units to be verified before verifying the whole.
 that verification of small parts provides a solid base from which to
 compose system-level behaviours. A Lot of testing is done on the
 low-level components of the system, less on the component level and less
-still on a whole-system level where only smoke tests are
-provided.](images/pyramid)
+still on a whole-system level where only smoke tests are provided.
+\label{testpyramid}](images/pyramid)
 
 The testing itself is a non-trivial undertaking with 80% of code written
 for this project being test specifications. Based on the idea that a
@@ -528,7 +528,6 @@ through composition of simple parts. Each recursive call of the parser
 identifies one token for non-empty input and then recursively digests
 the rest.
 
-
 As an example, the pattern `!.$person..{height tShirtSize}` once
 compiled to a Javascript functional representation would roughly
 resemble this:
@@ -561,39 +560,25 @@ identity, in practice there is no way to access an object id from inside
 the language so any hash of a node parsed out of JSON would have to walk
 the entire subtree described by that node.
 
-### tokenising
+The JSONPath tokenisation is split out into its own file and separately
+tested. The tokenisation implementation is based on regular expressions,
+they are the simplest form able to express the clause patterns. The
+regular expressions are hidden to the outside the tokenizer and only
+functions are exposed to the main body of the compiler. The regular
+expressions all start with `^` so that they only match at the start of
+the string. A neater alternative would be the 'y' [^7] flag but
+unfortunately this does not yet have wide browser support.
 
-The JSONPath tokenisation is split out into its own separately tested
-file. The tokenisation implementation is based on regular expressions
-since they are the simplest formalisation able to express the patterns
-required, but this detail is hidden to the outside the tokenizer and
-only functions are exposed to the main body of the compiler.
-
-By verifying the tokens through their own unit tests it is simpler to thoroughly specify the tokenisation
-that if it were done through the full JSONPath engine. 
-
-
-Syntax tokens tested separately. Broad, broad base to this pyramid - two
-levels of unit testing. By testing individual tokens are correct and the
-use of those tokens as a wider expression, am testing the same thing
-twice. Arguably, redundant effort. But may simply be easier to write in
-that way - software is written by a human in a certain order and if we
-take a bottom-up approach to some of that design, each layer is easier
-to create if we first know the layers that it sits on are sound. Writing
-complex regular expressions is still programming and it is more
-difficult to test them completely when wrapped in rather a lot more
-logic than directly. For example, a regex which matches "{a,b}" or "{a}"
-but not "{a,}" is not trivial.
-
-Split into tokens and statement builder. Testing intermediate. JSONPath
-engine not strictly unit tested since it depends on other units. Case of
-shape of tests not following the shape of the code.
-
-In parser, can't use 'y' flag to the regualr expression engine which
-would allow much more elegant matching. Only alternative is cumersome:
-to slice the string and match all tokens with regexes starting with '\^'
-in order to track the current location.
-[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions]
+By verifying the tokens through their own unit tests it is simpler to
+thoroughly specify the tokenisation, producing simpler failure messages
+than if it were done through the full JSONPath engine. We might consider
+the unit test layer of the pyramid (figure \ref{testpyramid}) is further
+split into two sub-layers. Arguably, the upper of these sub-layer is not
+a unit test because it is verifying two units together. There is some
+redundancy with the tokens being tested both individually and as full
+expressions. I maintain that this is the best approach regardless
+because stubbing out the tokenizer functions would be a considerable
+effort and would not improve the rigor of the JSONPath specification.
 
 Callback and mutability Problem
 -------------------------------
@@ -641,3 +626,5 @@ Potential solutions:
 
 [^6]: Probably the best known example being `memoize` from
     Underscore.js: http://underscorejs.org/\#memoize
+
+[^7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
