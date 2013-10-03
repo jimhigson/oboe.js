@@ -411,9 +411,12 @@ path to each builder function and stores the result to be given to the
 next one.
 
 ![List representation of an ascent from leaf to root of a JSON tree.
-This is the representation which is built up by the incremental content
-builder and also that compiled JSONPath expressions are tested against
-for matches \label{ascent}](images/ascent.png)
+Note the special ROOT token which represents the path mapping to the
+root node (of course nothing maps to the root) - this is an object,
+taking advantage of object identity to ensure that the token is unequal
+to anything but itself. This list form is built up by the incremental
+content builder and is the format that compiled JSONPath expressions
+test against for matches \label{ascent}](images/ascent.png)
 
 The path of the current node is maintained as a singly linked list, with
 each list element holding the field name and the node and the node
@@ -438,12 +441,12 @@ JSONPath engine to perform matching on as will be discussed in the next
 section. The Javascript file lists.js implements the lists with some
 appropriate recursive operations: `map`, `foldR`, `all`.
 
-Because it is more common to quote paths as descents rather than ascent, 
-on the boundary to the outside world Oboe reverses the order and, because
-Javascript programmers will not be familiar with this structure, converts
-to arrays.  
+Because it is more common to quote paths as descents rather than ascent,
+on the boundary to the outside world Oboe reverses the order and,
+because Javascript programmers will not be familiar with this structure,
+converts to arrays.
 
---------------
+* * * * *
 
 Stateless makes using a debugger easier - can look back in stack trace
 and because of no reassignment, can see the whole, unchanged state of
@@ -452,59 +455,6 @@ no chance of reassignment (some code style guides recommend not to
 reassign parameters but imperative languages generally do not forbid it)
 No Side effects: can type expressions into debugger to see evaluation
 without risk of changing program execution.
-
-A refactoring was used to separate logic and state:
-
--   Take stateful code
--   Refactor until there is just one stateful item
--   This means that that item is reassigned rather than mutated
--   Make stateless by making all functions take and return an instance
-    of that item
--   Replace all assignment of the single stateful var with a return
-    statement
--   Create a simple, separate stateful controller that just updates the
-    state to that returned from the calls
-
-Very testable code because stateless - once correct for params under
-test, will always be correct. Nowhere for bad data to hide in the
-program.
-
-How do notifications fit into this?
-
-By going to List-style, enforced that functions fail when not able to
-give an answer. Js default is to return the special 'undefined' value.
-Why this ensured more robustness but also sometimes took more code to
-write, ie couldn't just do if( tail(foo)) if foo could be empty but most
-of the time that would be correct
-
-Explain why Haskel/lisp style lists are used rather than arrays
-
--   In parser clauses, lots of 'do this then go to the next function
-    with the rest'.
--   Normal arrays extremely inefficient to make a copy with one item
-    popped off the start
--   Link to FastList on github
--   For sake of micro-library, implemented tiny list code with very bare
-    needed
--   Alternative (first impl) was to pass an index around
--   But clause fns don't really care about indexes, they care about top
-    of the list.
--   Slight advantage to index: allows going past the start for the root
-    path (which doesn't have any index) instead, have to use a special
-    value to keep node and path list of the same length
--   Special token for root, takes advantage of object identity to make
-    certain that cannot clash with something from the json. Better than
-    '**root**' or similar which could clash. String in js not considered
-    distinct, any two strings with identical character sequences are
-    indistinguishable.
-
-Anti-list: nothing is quite so small when making a mircro-library as
-using the types built into the language, coming as they are for zero
-bytes.
-
--   For recognisably with existing code, use lists internally but
-    transform into array on the boundary between Oboe.js and the outside
-    world (at same time, strip off special 'root path' token)
 
 Oboe JSONPath Implementation
 ----------------------------
