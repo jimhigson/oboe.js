@@ -386,11 +386,6 @@ internally normalises this by handling as if it were two events.
 
 ### What JP matching requires.
 
-![List representation of an ascent from leaf to root of a JSON tree.
-This is the representation which is built up by the incremental content
-builder and also that compiled JSONPath expressions are tested against
-for matches \label{ascent}](images/ascent.png)
-
 To perform matching on JSONPath expressions, the controller requires the
 path from the root of the document to the current node is required, this
 is provided in the NODE\_FOUND and PATH\_FOUND events emitted from the
@@ -421,35 +416,31 @@ as a holder for this data, starting from an empty path it passes the
 path to each builder function and stores the result to be given to the
 next one.
 
-The representation of the path to the current node is stored as a singly
-linked list, defined recursively as a series of immutable items. See
-figure \ref{ascent}. The list is ordered with the JSON root at the far
-end of the tail and the current node at the head. This order was chosen
+![List representation of an ascent from leaf to root of a JSON tree.
+This is the representation which is built up by the incremental content
+builder and also that compiled JSONPath expressions are tested against
+for matches \label{ascent}](images/ascent.png)
+
+The representation of the path to the current node is as a singly linked
+list, see figure \ref{ascent}. The list is arranged with the JSON root
+at the far end and the current node at the head. This order was chosen
 because as we traverse the JSON the current node is appended and removed
-many times whereas the root is immutable; all updates to the path are at
-the head end where it is computationally very cheap.
+many times whereas the root is immutable, this is computationally very
+cheap since all updates to the path are at the head. Each list element
+holds the field name which referenced the node in the parent object to
+the node and the node itself.
 
-Each list element holds the field name which referenced the node in the
-parent object to the node and the node itself.
-
-singly linked list: recursive data structure where each element is a
-head and tail.
-
-Each list item holds
+Linked lists were chosen over the more conventional Javascript approach
+of using the build in Arrays because
 
 JS poor at Arrays which grow/shrink. Also not very functional if arrays
 are modified and highly inefficient to use them in an immutable style
 and copy on every mutation. Random access to middle not required, only
 at one end.
 
-Good for testing against JSONPath since
-
 Changed into normal array before handing to outside world.
 
-Although paths are normally represented starting
-
-Why upside down (ascent, not descent). Changes are cheaper at head of
-list than tail. Head changes as move through doc, tail doesn't.
+Good for testing against JSONPath since
 
 ### What Clarinet provides.
 
