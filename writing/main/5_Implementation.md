@@ -431,30 +431,26 @@ objects [^3].
 Linked lists were chosen in preference to the more conventional approach
 of using native Javascript Arrays for several reasons. Firstly, I find
 this area of the program more easy to test and debug given immutable
-data structures. Treating the native Arrays as immutable would be very
-expensive because on each change to the path the array contents would
-have to be copied to a new array. As well as promoting mutability, most
+data structures. Handling native Arrays without mutating would be very
+expensive because on each new path the array would have to be copied
+rather than edited in-place. Unpicking a stack trace is easier if I know
+that every value revealed is the value that has always occupied that
+space because I don't have to think four-dimensionally projecting my
+mind forwards and back in time to different values that were there when
+the variable was used. The lack of side effects means I can try explore
+new commands in the debugger's CLI without worrying about breaking the
+execution of the program. As well as promoting mutability, most
 Javascript virtual machines are quite poor at array growing and
 shrinking so for collections whose size changes often are outperformed
 by linked lists. Finally, this is a very convenient format for the
 JSONPath engine to perform matching on as will be discussed in the next
-section. The Javascript file lists.js implements the lists with some
-appropriate recursive operations: `map`, `foldR`, `all`.
+section. The Javascript file lists.js implements the list functions:
+`cons`, `head`, `tail`, `map`, `foldR`, `all`.
 
 Because it is more common to quote paths as descents rather than ascent,
 on the boundary to the outside world Oboe reverses the order and,
 because Javascript programmers will not be familiar with this structure,
 converts to arrays.
-
-* * * * *
-
-Stateless makes using a debugger easier - can look back in stack trace
-and because of no reassignment, can see the whole, unchanged state of
-the parent call. What the params are now are what they always have been,
-no chance of reassignment (some code style guides recommend not to
-reassign parameters but imperative languages generally do not forbid it)
-No Side effects: can type expressions into debugger to see evaluation
-without risk of changing program execution.
 
 Oboe JSONPath Implementation
 ----------------------------
