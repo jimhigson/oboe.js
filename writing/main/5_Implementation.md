@@ -577,32 +577,6 @@ effort and would not improve the rigor of the JSONPath specification.
 partially completed to link back to the previous function. Include the
 statementExpr pointing to the last clause](images/placeholder)
 
-Callback and mutability Problem
--------------------------------
-
-Stateful controller very easy to test - only 1 function.
-
-Javascript provides no way to decalre an object with 'cohorts' who are
-allowed to change it whereas others cannot - vars may be hidden via use
-of scope and closures (CITE: crockford) but attributes are either
-mutable or immutable.
-
-Why this is a problem.
-
--   bugs likely to be attributied to oboe because they'll be in a future
-    *frame of execution*. But user error.
-
-Potential solutions:
-
--   full functional-style immutability. Don't change the objects, just
-    have a function that returns a new one with one extra property.
-    Problem - language not optimised for this. A lot of copying. Still
-    doesn't stop callback receiver from changing the state of hte object
-    given. (CITE: optimisations other languages use)
--   immutable wrappers.
--   defensive cloning
--   defining getter properties
-
 [^1]: https://github.com/substack/http-browserify
 
 [^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js

@@ -162,3 +162,57 @@ entirely context free; it is my responsibility to build this context.
 Luckily, it should be easy to see that building up this context is a
 simple matter of maintaining a stack describing the descent from the
 root node to the current node.
+
+Making stateless
+----------------
+
+A refactoring was used to separate logic and state:
+
+-   Take stateful code
+-   Refactor until there is just one stateful item
+-   This means that that item is reassigned rather than mutated
+-   Make stateless by making all functions take and return an instance
+    of that item
+-   Replace all assignment of the single stateful var with a return
+    statement
+-   Create a simple, separate stateful controller that just updates the
+    state to that returned from the calls
+    
+Very testable code because stateless - once correct for params under
+test, will always be correct. Nowhere for bad data to hide in the
+program.
+
+lists are fail-fast
+-------------------
+
+By going to List-style, enforced that functions fail when not able to
+give an answer. Js default is to return the special 'undefined' value.
+Why this ensured more robustness but also sometimes took more code to
+write, ie couldn't just do if( tail(foo)) if foo could be empty but most
+of the time that would be correct
+
+Callback and mutability Problem
+-------------------------------
+
+Stateful controller very easy to test - only 1 function.
+
+Javascript provides no way to decalre an object with 'cohorts' who are
+allowed to change it whereas others cannot - vars may be hidden via use
+of scope and closures (CITE: crockford) but attributes are either
+mutable or immutable.
+
+Why this is a problem.
+
+-   bugs likely to be attributied to oboe because they'll be in a future
+    *frame of execution*. But user error.
+
+Potential solutions:
+
+-   full functional-style immutability. Don't change the objects, just
+    have a function that returns a new one with one extra property.
+    Problem - language not optimised for this. A lot of copying. Still
+    doesn't stop callback receiver from changing the state of hte object
+    given. (CITE: optimisations other languages use)
+-   immutable wrappers.
+-   defensive cloning
+-   defining getter properties
