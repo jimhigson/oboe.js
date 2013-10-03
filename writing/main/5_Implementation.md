@@ -383,6 +383,8 @@ regard it is a simplifying push adaptor.
 
 ### Bridging between the two. The split.
 
+Why upside down. Changes are cheaper at head of list than tail.
+
 
 Single piece of state: the ascent.
 
