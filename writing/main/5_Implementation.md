@@ -566,9 +566,9 @@ String -> Ascent -> JsonPathMatchResult
 
 The match result is either a failure to match, or a hit, with the node
 that matched. In the case of path matching, the node may currently be
-unknown. If the pattern has a clause prefixed with `$`, the node matching
-that clause is captured and returned as the result. Otherwise, the last
-clause is implicitly capturing.
+unknown. If the pattern has a clause prefixed with `$`, the node
+matching that clause is captured and returned as the result. Otherwise,
+the last clause is implicitly capturing.
 
 The usage profile for JSONPath expressions in Oboe is to be compiled
 once and then evaluated many times, once for each node encountered while
@@ -624,19 +624,19 @@ save memory because where two JSONPath strings contain a common start
 they could share the inner parts of their functional expression.
 Although Javascript doesn't come with functional caching, it can be
 added using the language itself [^6]. I suspect, however, that hashing
-the parameters might be slower than performing the matching. Although the
-parameters are all immutable and could in theory be hashed by object identity,
-in practice there is no way to access an object id from inside the language
-so any hash of a node parsed out of JSON would have to walk the entire 
-subtree described by that node.
+the parameters might be slower than performing the matching. Although
+the parameters are all immutable and could in theory be hashed by object
+identity, in practice there is no way to access an object id from inside
+the language so any hash of a node parsed out of JSON would have to walk
+the entire subtree described by that node.
 
 ### tokenising
 
-The JSONPath tokenisation is split out into its own separately tested file.
-The tokenisation implementation is based on regular expressions since they are the simplest
-formalisation able to express the patterns required, but this details is hidden
-to the outside the tokenizer and only functions are exposed to the main body
-of the compiler.
+The JSONPath tokenisation is split out into its own separately tested
+file. The tokenisation implementation is based on regular expressions
+since they are the simplest formalisation able to express the patterns
+required, but this details is hidden to the outside the tokenizer and
+only functions are exposed to the main body of the compiler.
 
 Syntax tokens tested separately. Broad, broad base to this pyramid - two
 levels of unit testing. By testing individual tokens are correct and the
