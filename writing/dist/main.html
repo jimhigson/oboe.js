@@ -2188,7 +2188,7 @@ Chapter 4+5 40 to 60 pages
 
   <div class="figure">
     <img src="images/pyramid.png" alt=
-    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided.">
+    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided. ">
 
     <p class="caption">The testing pyramid is a common concept,
     relying on the assumption that verification of small parts
@@ -2448,9 +2448,6 @@ Chapter 4+5 40 to 60 pages
   <p>Programming is finished when each line reads as a statement of
   fact rather than the means of making the statement so.</p>
 
-  <p>"Mixed paradigm" design. But not classical: don't need
-  inheritance.</p>
-
   <p>How doing data hiding in JS without copying an OO concept of
   data hiding.</p>
 
@@ -2462,22 +2459,12 @@ Chapter 4+5 40 to 60 pages
   versions, it has never been rewritten in the sense of starting
   again. Nonetheless, every part has been complely renewed several
   times. I am reviewing only the final version. Git promotes
-  regular commits, there have been more than 500.</p>
+  regular commits, there have been more than 1000.</p>
 
   <p>some of it is pure functional (jsonPath, controller) ie, only
   semantically different from a Haskell programme others,
   syntactically functional but stateful to fit in with expected
   APIs etc</p>
-
-  <p>JsonPath implementation allows the compilation of complex
-  expressions into an executable form, but each part implementing
-  the executable form is locally simple. By using recursion,
-  assembling the simple functions into a more function expressing a
-  more complex rule also follows as being locally simple but
-  gaining a usefully sophisticated behaviour through composition of
-  simple parts. Each recursive call of the parser identifies one
-  token for non-empty input and then recursively digests the
-  rest.</p>
 
   <p>The style of implementation of the generator of functions
   corresponding to json path expressions is reminiscent of a
@@ -2493,63 +2480,6 @@ Chapter 4+5 40 to 60 pages
   going to. Is a shame. However, are using prototype for minimal
   set of polyfills. Not general purpose.</p>
 
-  <p>Different ways to do currying below:</p>
-
-  <p>Partial completion is implemented using the language itself,
-  not provided by the language.</p>
-
-  <p>Why would we choose 1 over the other? First simpler from
-  caller side, second more flexible. Intuitive to call as a single
-  call and can call self more easily.</p>
-
-  <p>In same cases, first form makes it easier to communicate that
-  the completion comes in two parts, for example:</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript"> <span class=
-"fu">namedNodeExpr</span>(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )</code>
-</pre>
-
-  <p>There is a construction part (first 3 args) and a usage part
-  (last three). Comsume many can only be constructed to ues consume
-  1 in second style because may refer to its own paritally
-  completed version.</p>
-
-  <p>In first case, can avoid this: <code>consume1(
-  partialComplete(consumeMany, previousExpr, undefined, undefined),
-  undefined, undefined, pathStack, nodeStack, stackIndex);</code>
-  because function factory can have optional arguments so don't
-  have to give all of them</p>
-
-  <p>Function factory easier to debug. 'Step in' works. With
-  partialCompletion have an awkward proxy function that breaks the
-  programmer's train of thought as stepping through the code.</p>
-
-  <p>Why it is important to consider the frame of mind of the coder
-  (CITEME: Hackers and Painters) and not just the elegance of the
-  possible language expressions.</p>
-
-  <p>If implementing own functional caching, functional cache
-  allows two levels of caching. Problematic though, for example no
-  way to clear out the cache if memory becomes scarce.</p>
-
-  <p>Functional programming tends to lend better to minification
-  than OO-style because of untyped record objects (can have any
-  keys).</p>
-
-  <p>Lack of consistency in coding (don't write too much, leave to
-  the conclusion)</p>
-
-  <p>Final consideration of coding: packaging up each unit to
-  export a minimal interface.</p>
-
-  <ul>
-    <li>Why minimal interfaces are better for minification</li>
-  </ul>
-
-  <p>Need to build an abstraction layer over xhr/xhr2/node. Can
-  only work for packets in-order, for out-of-order packets
-  something else happens.</p>
-
   <p>Javascript: not the greatest for 'final' elegant presentation
   of programming. Does allow 'messy' first drafts which can be
   refactored into beautiful code. Ie, can write stateful and
@@ -2564,23 +2494,6 @@ Chapter 4+5 40 to 60 pages
   (often find errors through running and finding errors thrown).
   Echo FPR: once compiling, good typing tends to give a reasonable
   sureness that the code is correct.</p>
-
-  <p>Criticisms of Node. Esp from Erlang etc devs. Pyramid code and
-  promises. Node programs often so asynchronous and callback based
-  they become unclear in structure. Promises approach to avoid
-  pyramid-shaped code and callback spaghetti.</p>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"co">// example of pyramid code</span></code>
-</pre>
-
-  <p>functional, pure functional possible [FPR] but not as nicely
-  as in a pure functional language, ie function caches although can
-  be implemented, not universal on all functions.</p>
-
-  <p>Although the streams themselves are stateful, because they are
-  based on callbacks it is entirely possible to use them from a
-  component of a javascript program which is wholly stateless.</p>
 
   <h3 id="performance-implications-of-functional-javascript">
   <a href=
@@ -2815,12 +2728,12 @@ Chapter 4+5 40 to 60 pages
   well defined by test specifications<sup><a href="#fn9" class=
   "footnoteRef" id="fnref9" name="fnref9">9</a></sup>.</p>
 
-  <p>The JSONPath compiler exposes a single function to the rest of
-  Oboe. This function takes a JSONPath as a String and, proving it
-  is a valid expression, returns a function which tests for matches
-  to the JSONPath. Both the compiler and the functions that it
-  generates benefit from being stateless. The type of the compiler,
-  expressed as Haskell syntax would be:</p>
+  <p>The JSONPath compiler exposes a single higher-order function
+  to the rest of Oboe. This function takes a JSONPath as a String
+  and, proving it is a valid expression, returns a function which
+  tests for matches to the JSONPath. Both the compiler and the
+  functions that it generates benefit from being stateless. The
+  type of the compiler, expressed as Haskell syntax would be:</p>
   <pre class="sourceCode haskell">
 <code class="sourceCode haskell"><span class=
 "dt">String</span> <span class="ot">-&gt;</span> <span class=
@@ -2828,35 +2741,73 @@ Chapter 4+5 40 to 60 pages
 "dt">JsonPathMatchResult</span></code>
 </pre>
 
-  <p>Differs from the reference implementation of JSONPath which
-  does not provide a function.</p>
+  <p>The match result is either a failure to match, or a hit, with
+  the node that matched. In the case of path matching, the node may
+  currently be unknown. If the pattern has a clause prefixed with
+  <code>$</code>, the node matching that clause is captured and
+  returned as the result. Otherwise, the last clause is implicitly
+  capturing.</p>
 
-  <p>Why done as a function returning a function (many calls per
-  pattern - one for each node found to check for matches). More
-  important to efficiently detect than compile the patterns.</p>
+  <p>The usage profile for JSONPath expressions in Oboe is to be
+  compiled once and then evaluated many times, once for each node
+  encountered while parsing the JSON. Because matching is performed
+  perhaps hundreds of times per file the most pressing performance
+  consideration is for matching to execute quickly, the time
+  required to compile is relatively unimportant. Oboe's JSONPath
+  design contrasts with JSONPath's reference implementation which,
+  because it provides a first order function, freshly reinterprets
+  the JSONPath string each time it is invoked.</p>
 
-  <p>Clause functions, each passes onto the next function if it
-  passes. Functions to consume. Can apply more than one test to a
-  single node. Tests generated by clause functions may be against
-  either the immediate path to that node (name clauses) or the node
-  itself (duck-type clauses). For example, the jsonPath
-  <code>!.$person..{height tShirtSize}</code> may be expressed
-  functionally in Javascript roughly as:</p>
+  <p>The compilation is performed by recursively by examining the
+  left-most side of the string for a JSONPath clause. For each kind
+  of clause there is a function which matches ascents against that
+  clause, for example by checking the name field. By partial
+  completion this function is specialised to match against one
+  particular name. Once a clause function is generated, compilation
+  recurs by passing to itself the remaining unparsed portion of the
+  JSONPath string. This continues until it is called with a
+  zero-length JSONPath. On each recursive call the clause function
+  is wrapped in the result from the next recursive call, resulting
+  ultimately in a linked series of clause functions. When evaluated
+  against an ascent, each clause functions examines the head of the
+  ascent and passes the ascent onto the next function if it passes.
+  A special clause functions, <code>skip1</code> is used for the
+  <code>.</code> syntax and places no condition on the head of the
+  ascent but passes on to the next clause only the tail, thus
+  moving evaluation of the ascent one node up the parsed JSON tree.
+  Similarly, there is a <code>skipMany</code> which maps onto the
+  <code>..</code> syntax and recursively consumes nodes until it
+  can find a match in the next clause.</p>
+
+  <p>JsonPath implementation allows the compilation of complex
+  expressions into an executable form, but each part implementing
+  the executable form is locally simple. By using recursion,
+  assembling the simple functions into a more function expressing a
+  more complex rule also follows as being locally simple but
+  gaining a usefully sophisticated behaviour through composition of
+  simple parts. Each recursive call of the parser identifies one
+  token for non-empty input and then recursively digests the
+  rest.</p>
+
+  <p>As an example, the pattern <code>!.$person..{height
+  tShirtSize}</code> once compiled to a Javascript functional
+  representation would roughly resemble this:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
-"fu">statementExpr</span>( 
-   <span class=
-"fu">duckTypeClause</span>(              <span class="co">// {height tShirtSize}</span>
-      <span class=
-"fu">skipMany</span>(                 <span class="co">// for '..'  </span>
-         <span class=
-"fu">capture</span>(               <span class="co">// for css4-style '$' notation</span>
-            <span class=
-"fu">nameClause</span>(         <span class="co">// for 'person'</span>
-               <span class=
-"fu">skip1</span>(           <span class="co">// '.' after '!'  </span>
-                  rootExpr      <span class=
-"co">// '!' at start of JSONPath expression</span>
+"fu">statementExpr</span>(             <span class=
+"co">// wrapper, added when JSONPath is zero-length </span>
+   <span class="fu">duckTypeClause</span>(         <span class=
+"co">// token 6, {height tShirtSize}</span>
+      <span class="fu">skipMany</span>(            <span class=
+"co">// token 5, '..'  </span>
+         <span class="fu">capture</span>(          <span class=
+"co">// token 4, css4-style '$' notation</span>
+            <span class="fu">nameClause</span>(    <span class=
+"co">// token 3, 'person'</span>
+               <span class="fu">skip1</span>(      <span class=
+"co">// token 2, '.'  </span>
+                  rootExpr <span class=
+"co">// token 1, '!' at start of JSONPath expression</span>
                ) 
             <span class="st">'person'</span> )
          )
@@ -2865,41 +2816,46 @@ Chapter 4+5 40 to 60 pages
 )      </code>
 </pre>
 
-  <h3 id="how-compile-the-jps"><a href=
-  "#how-compile-the-jps"><span class=
-  "header-section-number">5.7.1</span> how compile the
-  JPs?</a></h3>
+  <p>Since I am only using a side-effect free subset of Javascript
+  for this segment of Oboe it would be safe to use a functional
+  cache. As well as saving time by avoiding repeated execution,
+  this could potentially also save memory because where two
+  JSONPath strings contain a common start they could share the
+  inner parts of their functional expression. Although Javascript
+  doesn't come with functional caching, it can be added using the
+  language itself.<sup><a href="#fn10" class="footnoteRef" id=
+  "fnref10" name="fnref10">10</a></sup> I suspect, however, that
+  hashing the parameters might be slower than performing the
+  matching. Although the parameters are all immutable and could in
+  theory be hashed by object identity, in practice there is no way
+  to access an object id from inside the language so any hash of a
+  node parsed out of JSON would have to walk the entire subtree
+  described by that node.</p>
 
-  <p>Match from right-to-left, or, leaf-to-root. Why this way?
-  That's how the patterns work (mostly)</p>
+  <p>The JSONPath tokenisation is split out into its own file and
+  separately tested. The tokenisation implementation is based on
+  regular expressions, they are the simplest form able to express
+  the clause patterns. The regular expressions are hidden to the
+  outside the tokenizer and only functions are exposed to the main
+  body of the compiler. The regular expressions all start with
+  <code>^</code> so that they only match at the start of the
+  string. A neater alternative would be the 'y'<sup><a href="#fn11"
+  class="footnoteRef" id="fnref11" name="fnref11">11</a></sup> flag
+  but unfortunately this does not yet have wide browser
+  support.</p>
 
-  <h3 id="tokenising"><a href="#tokenising"><span class=
-  "header-section-number">5.7.2</span> tokenising</a></h3>
-
-  <p>In parser, can't use 'y' flag to the regualr expression engine
-  which would allow much more elegant matching. Only alternative is
-  cumersome: to slice the string and match all tokens with regexes
-  starting with '^' in order to track the current location.
-  [<a href=
-  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>]</p>
-
-  <p>Syntax tokens tested separately. Broad, broad base to this
-  pyramid - two levels of unit testing. By testing individual
-  tokens are correct and the use of those tokens as a wider
-  expression, am testing the same thing twice. Arguably, redundant
-  effort. But may simply be easier to write in that way - software
-  is written by a human in a certain order and if we take a
-  bottom-up approach to some of that design, each layer is easier
-  to create if we first know the layers that it sits on are sound.
-  Writing complex regular expressions is still programming and it
-  is more difficult to test them completely when wrapped in rather
-  a lot more logic than directly. For example, a regex which
-  matches "{a,b}" or "{a}" but not "{a,}" is not trivial.</p>
-
-  <p>Split into tokens and statement builder. Testing intermediate.
-  JSONPath engine not strictly unit tested since it depends on
-  other units. Case of shape of tests not following the shape of
-  the code.</p>
+  <p>By verifying the tokens through their own unit tests it is
+  simpler to thoroughly specify the tokenisation, producing simpler
+  failure messages than if it were done through the full JSONPath
+  engine. We might consider the unit test layer of the pyramid
+  (figure ) is further split into two sub-layers. Arguably, the
+  upper of these sub-layer is not a unit test because it is
+  verifying two units together. There is some redundancy with the
+  tokens being tested both individually and as full expressions. I
+  maintain that this is the best approach regardless because
+  stubbing out the tokenizer functions would be a considerable
+  effort and would not improve the rigor of the JSONPath
+  specification.</p>
 
   <h2 id="callback-and-mutability-problem"><a href=
   "#callback-and-mutability-problem"><span class=
@@ -3261,6 +3217,18 @@ Chapter 4+5 40 to 60 pages
         and <a href=
         "https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js">
         https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js</a>.<a href="#fnref9">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn10">
+        <p>Probably the best known example being
+        <code>memoize</code> from Underscore.js: <a href=
+        "http://underscorejs.org/">http://underscorejs.org/</a>#memoize.<a href="#fnref10">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn11">
+        <p><a href=
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">
+        Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref11">&acirc;&dagger;&copy;</a></p>
       </li>
     </ol>
   </div>
