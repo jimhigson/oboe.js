@@ -411,6 +411,39 @@ handling is as a node which instantaneously starts and ends, expressed
 programmatically as the functional composition of the `nodeFound` and
 `curNodeFinished` handlers.
 
+Although the builder functions are stateless, ultimately the state regarding
+the current path needs to be stored between clarinet calls. This is handled
+by the ascent tracker. This tiny component merely serves as a holder for this data,
+starting from an empty path it passes the path to each builder function and stores
+the result to be given to the next one.
+
+![An ascent build from partial JSON \label{ascent}](images/placeholder) 
+
+The representation of the path to the current node is stored as a singly linked list,
+defined recursively as a series of immutable items. See figure \ref{ascent}.
+The list is ordered with the JSON root at the far end of the tail and the current node
+at the head. This order was chosen because as we traverse the 
+JSON the current node is appended and removed many times whereas the root is immutable;
+all updates to the path are at the head end where it is computationally very cheap.
+
+Each list element holds the field name which referenced the node in the parent object 
+to the node and the node itself.     
+
+
+
+singly linked list: recursive data structure where each element is a head and tail.
+
+Each list item holds 
+
+JS poor at Arrays which grow/shrink. Also not very functional if arrays are
+modified and highly inefficient to use them in an immutable style and copy on every mutation.
+Random access to middle not required, only at one end.
+
+Good for testing against JSONPath since 
+
+Changed into normal array before handing to outside world.
+
+
 Although paths are normally represented starting
 
 Why upside down (ascent, not descent). Changes are cheaper at head of
