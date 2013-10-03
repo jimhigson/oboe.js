@@ -1,18 +1,30 @@
 
 describe("Lists", function(){
+
+   "use strict";
+  
+   var listA   = cons('a', emptyList);
+   var listBA  = cons('b', listA);
+   var listCBA = cons('c', listBA);  
   
    it("can use cons, head and tail", function() {
-      var emptyList = emptyList;
-      
-      var listA   = cons('a', emptyList);
-      var listBA  = cons('b', listA);
-      var listCBA = cons('c', listBA);
-      
+            
       expect(head(listCBA)).toBe('c');
       expect(head(tail(listCBA))).toBe('b'); 
       expect(head(tail(tail(listCBA)))).toBe('a');
    });
 
+   it("freezes lists on supporting browsers", function() {   
+   
+      if( Object.freeze && Object.isFrozen ) {
+
+         expect( listA ).toBeFrozen();         
+         expect( listBA ).toBeFrozen();         
+         expect( listCBA ).toBeFrozen();         
+      }
+   
+   });
+   
 
    it("can convert to an array", function() {
    
@@ -99,5 +111,15 @@ describe("Lists", function(){
       // if order were wrong, might give c(b(a(x)))
                
       expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
+   });
+   
+   beforeEach(function(){
+      this.addMatchers({
+         toBeFrozen: function(){
+            var obj = this.actual;
+            
+            return Object.isFrozen(obj);
+         }   
+      });
    });
 });

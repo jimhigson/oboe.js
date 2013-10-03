@@ -2,6 +2,7 @@
 function cons(x, xs) {
    
    // Lists are all immutable. Object.freeze provides this in newer Javascript engines.
+   // Otherwise, freeze should have been polyfilled to act as an identity function.
    return Object.freeze({h:x, t:xs});
 }
 

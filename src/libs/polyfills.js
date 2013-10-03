@@ -55,3 +55,5 @@ polyfill(Function, 'bind', function( context /*, arg1, arg2 ... */ ){
       return f.apply(context, arguments);
    }
 });   
+
+polyfill(Object, 'freeze', function(o){ return o });
