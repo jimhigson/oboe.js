@@ -7,13 +7,14 @@ module.exports = function(config) {
       basePath : '..',
       
       // list of files / patterns to load in the browser
-      files : [   
-         'test/libs/sinon.js'
+      files : [
+         'test/libs/es5-shim.js'        
+      ,  'test/libs/es5-sham.js'        
+      ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
       ,  'dist/oboe.min.js'
       
-      ,  'test/specs/polyfills.spec.js'
       ,  'test/specs/oboe.integration.spec.js'
       ],
       

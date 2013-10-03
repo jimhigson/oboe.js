@@ -8,12 +8,12 @@ module.exports = function(config) {
       
       // list of files / patterns to load in the browser
       files : [   
-         'test/libs/sinon.js'
+         'test/libs/es5-shim.js'        
+      ,  'test/libs/es5-sham.js'              
+      ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
-      ,  'dist/oboe.js'
-      
-      ,  'test/specs/polyfills.spec.js'
+      ,  'dist/oboe.js'      
       ,  'test/specs/oboe.integration.spec.js'
       ],
       

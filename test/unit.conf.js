@@ -8,7 +8,8 @@ module.exports = function(config) {
       
       // list of files / patterns to load in the browser
       files : [           
-         'src/libs/polyfills.js'        
+         'test/libs/es5-shim.js'        
+      ,  'test/libs/es5-sham.js'        
       ,  'src/functional.js'
       ,  'src/util.js'
       ,  'src/lists.js' 

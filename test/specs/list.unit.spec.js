@@ -14,18 +14,16 @@ describe("Lists", function(){
       expect(head(tail(tail(listCBA)))).toBe('a');
    });
 
-   it("freezes lists on supporting browsers", function() {   
-   
-      if( Object.freeze && Object.isFrozen ) {
+   if( !internetExplorer || internetExplorer >= 9 ) {
 
+      it("freezes lists on supporting browsers", function() {   
+                  
          expect( listA ).toBeFrozen();         
          expect( listBA ).toBeFrozen();         
-         expect( listCBA ).toBeFrozen();         
-      }
+         expect( listCBA ).toBeFrozen();                     
+      })
+   }
    
-   });
-   
-
    it("can convert to an array", function() {
    
       var listCBA = cons('c', cons('b', cons('a', emptyList)));

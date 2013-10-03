@@ -7,7 +7,6 @@ module.exports = function (grunt) {
       'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
-   ,  'src/libs/polyfills.js'
    ,  'src/libs/clarinet.js'               
    ,  'src/clarinetListenerAdaptor.js'
    ,  'src/streamingHttp.js'

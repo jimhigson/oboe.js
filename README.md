@@ -518,7 +518,7 @@ Browsers with Full support are:
 
 Browsers with partial support:
 
-* Internet explorer 8 and 9
+* Internet explorer 8 and 9, given appropriate shims for ECMAScript 5](https://github.com/kriskowal/es5-shim/blob/master/es5-sham.js)
  
 Unfortunately, IE before version 10 
 [doesn't provide any convenient way to read an http request while it is in progress](http://blogs.msdn.com/b/ieinternals/archive/2010/04/06/comet-streaming-in-internet-explorer-with-xmlhttprequest-and-xdomainrequest.aspx).
