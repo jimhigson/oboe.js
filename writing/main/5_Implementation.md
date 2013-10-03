@@ -397,7 +397,7 @@ handlers are created from the combination of a smaller number of more basic hand
 Oboe is largely indiscriminate regarding the type of nodes found in the JSON.
 Clarinet fires `valuefound` when it encounters a String or Number. 
 Because primative nodes are always leaves these are internally handled as a node which 
-instantaneously starts and ends, expressed programatically as the functional composition 
+instantaneously starts and ends, expressed programmatically as the functional composition 
 of the `nodeFound` and `curNodeFinished` handlers.
 
 Although paths are normally represented starting 
