@@ -374,25 +374,16 @@ SAX parser. Taken together, these might be considered as a variant of
 the Adaptor pattern, providing to the controller a simpler interface
 than is presented by Clarinet. However, this is not the paradigm of the
 pattern; it is even-driven rather than call-driven: we receive six kinds
-of event and in response emmit a smaller vocabulary of two, so in this
-regard it is a simplifying push adaptor.
+of event and in response emmit a smaller vocabulary of two.
+
+Hides a few Clarinet perculiarities are kept as local as possible.
+Such as the field name given
+with the open object and internally normalises this by handling as if it
+were two events.
 
 ### What JP matching requires.
 
 ### What Clarinet provides.
-
-### Bridging between the two. The split.
-
-Why upside down. Changes are cheaper at head of list than tail.
-
-
-Single piece of state: the ascent.
-
-Content builder: variant of Adaptor pattern that is event based, not
-based on object wrapping and propagating calls. Pushed to, not pulled
-from. Hides a few Clarinet perculiarities such as the field name given
-with the open object and internally normalises this by handling as if it
-were two events.
 
 Calls from clarinet are entirely 'context free'. Ie, am told
 that there is a new object but without the preceding calls the root
@@ -401,20 +392,17 @@ should be easy to see that building up this context is a simple matter
 of maintaining a stack describing the descent from the root node to the
 current node.
 
+### Bridging between the two. The split.
+
+Why upside down (ascent, not descent). Changes are cheaper at head of list than tail.
+Head changes as move through doc, tail doesn't.
+
+Single piece of state: the ascent.
+
 jsonPath parser gets the output from the incrementalParsedContent,
 minimally routed there by the controller.
 
-![Show a call into a compiled jsonPath to explain coming from
-incrementalParsedContent with two lists, ie the paths and the objects
-and how they relate to each other. Can use links to show that object
-list contains objects that contain others on the list. Aubergine etc
-example might be a good one](images/placeholder)
-
-Explain match starting from end of candidate path
-
-![Some kind of diagram showing jsonPath expressions and functions
-partially completed to link back to the previous function. Include the
-statementExpr pointing to the last clause](images/placeholder)
+![Ascent taken from some JSON](images/placeholder)
 
 On first attempt at ICB, had two stacks, both arrays, plus reference to
 current node, current key and root node. After refactorings, just one
@@ -598,6 +586,10 @@ redundancy with the tokens being tested both individually and as full
 expressions. I maintain that this is the best approach regardless
 because stubbing out the tokenizer functions would be a considerable
 effort and would not improve the rigor of the JSONPath specification.
+
+![Some kind of diagram showing jsonPath expressions and functions
+partially completed to link back to the previous function. Include the
+statementExpr pointing to the last clause](images/placeholder)
 
 Callback and mutability Problem
 -------------------------------
