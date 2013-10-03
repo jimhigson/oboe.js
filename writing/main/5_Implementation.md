@@ -386,7 +386,7 @@ internally normalises this by handling as if it were two events.
 
 ### What JP matching requires.
 
-![Ascent taken from some JSON](images/placeholder)
+![List representation of an ascent from leaf to root of a JSON tree \label{ascent}](images/ascent.png)
 
 To perform matching on JSONPath expressions, the controller requires the
 path from the root of the document to the current node is required, this
@@ -416,8 +416,6 @@ the current path needs to be stored between clarinet calls. This is handled
 by the ascent tracker. This tiny component merely serves as a holder for this data,
 starting from an empty path it passes the path to each builder function and stores
 the result to be given to the next one.
-
-![An ascent build from partial JSON \label{ascent}](images/placeholder) 
 
 The representation of the path to the current node is stored as a singly linked list,
 defined recursively as a series of immutable items. See figure \ref{ascent}.
