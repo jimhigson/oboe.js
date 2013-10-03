@@ -274,20 +274,11 @@ The code presented is the result of the development many prior versions,
 it has never been rewritten in the sense of starting again. Nonetheless,
 every part has been complely renewed several times. I am reviewing only
 the final version. Git promotes regular commits, there have been more
-than 500.
+than 1000.
 
 some of it is pure functional (jsonPath, controller) ie, only
 semantically different from a Haskell programme others, syntactically
 functional but stateful to fit in with expected APIs etc
-
-JsonPath implementation allows the compilation of complex expressions
-into an executable form, but each part implementing the executable form
-is locally simple. By using recursion, assembling the simple functions
-into a more function expressing a more complex rule also follows as
-being locally simple but gaining a usefully sophisticated behaviour
-through composition of simple parts. Each recursive call of the parser
-identifies one token for non-empty input and then recursively digests
-the rest.
 
 The style of implementation of the generator of functions corresponding
 to json path expressions is reminiscent of a traditional parser
@@ -302,56 +293,9 @@ Why could implement Function\#partial via prototype. Why not going to.
 Is a shame. However, are using prototype for minimal set of polyfills.
 Not general purpose.
 
-Different ways to do currying below:
-
-Partial completion is implemented using the language itself, not
-provided by the language.
-
-Why would we choose 1 over the other? First simpler from caller side,
-second more flexible. Intuitive to call as a single call and can call
-self more easily.
-
-In same cases, first form makes it easier to communicate that the
-completion comes in two parts, for example:
-
-~~~~ {.javascript}
- namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
-~~~~
-
 There is a construction part (first 3 args) and a usage part (last
 three). Comsume many can only be constructed to ues consume 1 in second
 style because may refer to its own paritally completed version.
-
-In first case, can avoid this:
-`consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);`
-because function factory can have optional arguments so don't have to
-give all of them
-
-Function factory easier to debug. 'Step in' works. With
-partialCompletion have an awkward proxy function that breaks the
-programmer's train of thought as stepping through the code.
-
-Why it is important to consider the frame of mind of the coder (CITEME:
-Hackers and Painters) and not just the elegance of the possible language
-expressions.
-
-If implementing own functional caching, functional cache allows two
-levels of caching. Problematic though, for example no way to clear out
-the cache if memory becomes scarce.
-
-Functional programming tends to lend better to minification than
-OO-style because of untyped record objects (can have any keys).
-
-Lack of consistency in coding (don't write too much, leave to the
-conclusion)
-
-Final consideration of coding: packaging up each unit to export a
-minimal interface.
-
--   Why minimal interfaces are better for minification
-
-Need to build an abstraction layer over xhr/xhr2/node. Can only work for
-packets in-order, for out-of-order packets something else happens.
 
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
@@ -367,23 +311,6 @@ running it. In theory (decidability) and in practice (often find errors
 through running and finding errors thrown). Echo FPR: once compiling,
 good typing tends to give a reasonable sureness that the code is
 correct.
-
-Criticisms of Node. Esp from Erlang etc devs. Pyramid code and promises.
-Node programs often so asynchronous and callback based they become
-unclear in structure. Promises approach to avoid pyramid-shaped code and
-callback spaghetti.
-
-~~~~ {.javascript}
-// example of pyramid code
-~~~~
-
-functional, pure functional possible [FPR] but not as nicely as in a
-pure functional language, ie function caches although can be
-implemented, not universal on all functions.
-
-Although the streams themselves are stateful, because they are based on
-callbacks it is entirely possible to use them from a component of a
-javascript program which is wholly stateless.
 
 ### Performance implications of functional javascript
 
@@ -598,6 +525,16 @@ parsed JSON tree. Similarly, there is a `skipMany` which maps onto the
 `..` syntax and recursively consumes nodes until it can find a match in
 the next clause.
 
+JsonPath implementation allows the compilation of complex expressions
+into an executable form, but each part implementing the executable form
+is locally simple. By using recursion, assembling the simple functions
+into a more function expressing a more complex rule also follows as
+being locally simple but gaining a usefully sophisticated behaviour
+through composition of simple parts. Each recursive call of the parser
+identifies one token for non-empty input and then recursively digests
+the rest.
+
+
 As an example, the pattern `!.$person..{height tShirtSize}` once
 compiled to a Javascript functional representation would roughly
 resemble this:
@@ -635,8 +572,12 @@ the entire subtree described by that node.
 The JSONPath tokenisation is split out into its own separately tested
 file. The tokenisation implementation is based on regular expressions
 since they are the simplest formalisation able to express the patterns
-required, but this details is hidden to the outside the tokenizer and
+required, but this detail is hidden to the outside the tokenizer and
 only functions are exposed to the main body of the compiler.
+
+By verifying the tokens through their own unit tests it is simpler to thoroughly specify the tokenisation
+that if it were done through the full JSONPath engine. 
+
 
 Syntax tokens tested separately. Broad, broad base to this pyramid - two
 levels of unit testing. By testing individual tokens are correct and the

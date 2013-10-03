@@ -73,3 +73,61 @@ distinction as separate encapsulated entities.
 ![Diagram showing why list is more memory efficient - multiple handles
 into same structure with different starts, contrast with same as an
 array](images/placeholder)
+
+code style
+----------
+
+Different ways to do currying below:
+
+Partial completion is implemented using the language itself, not
+provided by the language.
+
+Why would we choose 1 over the other? First simpler from caller side,
+second more flexible. Intuitive to call as a single call and can call
+self more easily.
+
+In same cases, first form makes it easier to communicate that the
+completion comes in two parts, for example:
+
+~~~~ {.javascript}
+ namedNodeExpr(previousExpr, capturing, name, pathStack, nodeStack, stackIndex )
+~~~~
+
+In first case, can avoid this:
+`consume1( partialComplete(consumeMany, previousExpr, undefined, undefined), undefined, undefined, pathStack, nodeStack, stackIndex);`
+because function factory can have optional arguments so don't have to
+give all of them
+
+Function factory easier to debug. 'Step in' works. With
+partialCompletion have an awkward proxy function that breaks the
+programmer's train of thought as stepping through the code.
+
+Why it is important to consider the frame of mind of the coder (CITEME:
+Hackers and Painters) and not just the elegance of the possible language
+expressions.
+
+If implementing own functional caching, functional cache allows two
+levels of caching. Problematic though, for example no way to clear out
+the cache if memory becomes scarce.
+
+Functional programming tends to lend better to minification than
+OO-style because of untyped record objects (can have any keys).
+
+Lack of consistency in coding (don't write too much, leave to the
+conclusion)
+
+Final consideration of coding: packaging up each unit to export a
+minimal interface.
+
+-   Why minimal interfaces are better for minification
+
+Need to build an abstraction layer over xhr/xhr2/node. Can only work for
+packets in-order, for out-of-order packets something else happens.
+
+functional, pure functional possible [FPR] but not as nicely as in a
+pure functional language, ie function caches although can be
+implemented, not universal on all functions.
+
+Although the streams themselves are stateful, because they are based on
+callbacks it is entirely possible to use them from a component of a
+javascript program which is wholly stateless.
