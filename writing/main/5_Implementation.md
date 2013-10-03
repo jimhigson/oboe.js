@@ -384,8 +384,6 @@ There are some peculiarities of Clarinet, these are kept as local as
 possible. Such as the field name given with the open object and
 internally normalises this by handling as if it were two events.
 
-### What JP matching requires.
-
 To perform matching on JSONPath expressions, the controller requires the
 path from the root of the document to the current node is required, this
 is provided in the NODE\_FOUND and PATH\_FOUND events emitted from the
