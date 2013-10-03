@@ -140,3 +140,11 @@ JSONPath
 There is a construction part (first 3 args) and a usage part (last
 three). Comsume many can only be constructed to ues consume 1 in second
 style because may refer to its own paritally completed version.
+
+ICB evolution
+-------------
+
+On first attempt at ICB, had two stacks, both arrays, plus reference to
+current node, current key and root node. After refactorings, just one
+list was enough. Why single-argument functions are helpful (composition
+etc)

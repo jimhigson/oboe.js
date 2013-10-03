@@ -457,13 +457,7 @@ root node to the current node.
 
 Single piece of state: the ascent.
 
-jsonPath parser gets the output from the incrementalParsedContent,
-minimally routed there by the controller.
 
-On first attempt at ICB, had two stacks, both arrays, plus reference to
-current node, current key and root node. After refactorings, just one
-list was enough. Why single-argument functions are helpful (composition
-etc)
 
 Stateless makes using a debugger easier - can look back in stack trace
 and because of no reassignment, can see the whole, unchanged state of
