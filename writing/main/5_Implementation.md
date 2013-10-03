@@ -558,16 +558,16 @@ the parameters might be slower than performing the matching. Although
 the parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
 the language so any hash of a node parsed out of JSON would have to walk
-the entire subtree described by that node.
+the entire subtree rooted from that node.
 
 The JSONPath tokenisation is split out into its own file and separately
 tested. The tokenisation implementation is based on regular expressions,
 they are the simplest form able to express the clause patterns. The
 regular expressions are hidden to the outside the tokenizer and only
 functions are exposed to the main body of the compiler. The regular
-expressions all start with `^` so that they only match at the start of
-the string. A neater alternative would be the 'y' [^7] flag but
-unfortunately this does not yet have wide browser support.
+expressions all start with `^` so that they only match at the head of
+the string. A more elegant alternative is the 'y' [^7] flag but as of
+now this lacks wide browser support.
 
 By verifying the tokens through their own unit tests it is simpler to
 thoroughly specify the tokenisation, producing simpler failure messages
