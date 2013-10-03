@@ -421,26 +421,30 @@ This is the representation which is built up by the incremental content
 builder and also that compiled JSONPath expressions are tested against
 for matches \label{ascent}](images/ascent.png)
 
-The representation of the path to the current node is as a singly linked
-list, see figure \ref{ascent}. The list is arranged with the JSON root
-at the far end and the current node at the head. This order was chosen
-because as we traverse the JSON the current node is appended and removed
-many times whereas the root is immutable, this is computationally very
-cheap since all updates to the path are at the head. Each list element
-holds the field name which referenced the node in the parent object to
-the node and the node itself.
+The path of the current node is maintained as a singly linked list, with
+each list element holding the field name and the node and the node
+itself, see figure \ref{ascent}. The list is arranged with the JSON root
+at the far end and the current node at the head. As we traverse the JSON
+the current node is appended and removed many times whereas the root is
+immutable. This ordering was chosen because it is computationally very
+efficient since all updates to the list are at the head. Each link in
+the list is immutable, enforced by newer Javascript engines as frozen
+objects [^3].
 
-Linked lists were chosen over the more conventional Javascript approach
-of using the build in Arrays because
-
-JS poor at Arrays which grow/shrink. Also not very functional if arrays
-are modified and highly inefficient to use them in an immutable style
-and copy on every mutation. Random access to middle not required, only
-at one end.
+Linked lists were chosen in preference to the more conventional approach
+of using native Javascript Arrays for several reasons. Firstly, I find
+this area of the program more easy to test and debug given immutable
+data structures. Treating the native Arrays as immutable would be very
+expensive because on each change to the path the array contents would
+have to be copied to a new array. As well as promoting mutability, most
+Javascript virtual machines are quite poor at array growing and
+shrinking so for collections whose size changes often are outperformed
+by linked lists. Finally, this is a very convenient format for the
+JSONPath engine to perform matching on as will be discussed in the next
+section. The Javascript file lists.js implements the lists with some
+appropriate recursive operations: `map`, `foldR`, `all`.
 
 Changed into normal array before handing to outside world.
-
-Good for testing against JSONPath since
 
 ### What Clarinet provides.
 
@@ -530,10 +534,10 @@ Oboe JSONPath Implementation
 Not surprisingly given its importance, the JSONPath implementation is
 one of the most refactored and considered parts of the Oboe codebase.
 Like many small languages, on the first commit it was little more than a
-series of regular expressions[^3] but has slowly evolved into a
-featureful and efficient implementation[^4]. The extent of the rewriting
+series of regular expressions[^4] but has slowly evolved into a
+featureful and efficient implementation[^5]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
-specifications[^5].
+specifications[^6].
 
 The JSONPath compiler exposes a single higher-order function to the rest
 of Oboe. This function takes a JSONPath as a String and, proving it is a
@@ -614,7 +618,7 @@ saving time by avoiding repeated execution, this could potentially also
 save memory because where two JSONPath strings contain a common start
 they could share the inner parts of their functional expression.
 Although Javascript doesn't come with functional caching, it can be
-added using the language itself [^6]. I suspect, however, that hashing
+added using the language itself [^7]. I suspect, however, that hashing
 the parameters might be slower than performing the matching. Although
 the parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
@@ -627,7 +631,7 @@ they are the simplest form able to express the clause patterns. The
 regular expressions are hidden to the outside the tokenizer and only
 functions are exposed to the main body of the compiler. The regular
 expressions all start with `^` so that they only match at the head of
-the string. A more elegant alternative is the 'y' [^7] flag but as of
+the string. A more elegant alternative is the 'y' [^8] flag but as of
 now this lacks wide browser support.
 
 By verifying the tokens through their own unit tests it is simpler to
@@ -677,19 +681,26 @@ Potential solutions:
     I can't claim superior programming ability, this version is shorter
     because it is not a generic solution
 
-[^3]: JSONPath compiler from the first commit can be found at line 159
+[^3]: See
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
+    Although older engines don't provide any ability to create immutable
+    objects at run-time, we can be fairly certain that the code does not
+    mutate these objects or the tests would fail when run in
+    environments which are able to enforce this.
+
+[^4]: JSONPath compiler from the first commit can be found at line 159
     here:
     https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
 
-[^4]: for contrast, the current source can be found at
+[^5]: for contrast, the current source can be found at
     https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
 
-[^5]: The current tests are viewable at
+[^6]: The current tests are viewable at
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^6]: Probably the best known example being `memoize` from
+[^7]: Probably the best known example being `memoize` from
     Underscore.js: http://underscorejs.org/\#memoize
 
-[^7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^8]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
