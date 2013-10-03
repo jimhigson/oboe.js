@@ -106,12 +106,14 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
 
 var compose = varArgs(function(fns) {
 
-   function next(valueSoFar, curFn) {  
-      return curFn(valueSoFar);   
+   var fnsList = asList(fns);
+
+   function next(params, curFn) {  
+      return [apply(params, curFn)];   
    }
    
-   return function(startValue){
+   return varArgs(function(startParams){
      
-      return foldR(next, startValue, asList(fns));
-   }
+      return foldR(next, startParams, fnsList)[0];
+   });
 });

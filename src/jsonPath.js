@@ -24,11 +24,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var headKey = compose(keyOf, head);
                    
    /**
-    * Expression for a named path node, expressed as:
+    * Expression for a named path node, expressed like:
     *    foo
-    *    ["foo"]
+    *    ["bar"]
     *    [2]
-    *    
+    *        
     *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
     *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
     *    matches, it delegates the remaining matching to the next function in the chain.       
@@ -286,7 +286,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                    
    // A list of functions which test if a string matches the required patter and, if it does, returns
    // a generated parser for that expression     
-   var clause = lazyUnion(
+   var clauseForJsonPath = lazyUnion(
 
       clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, nameClause, skip1 ))        
    ,  clauseMatcher(doubleDotSyntax  , list(skipMany))
@@ -338,7 +338,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
     * Note that this function's signature matches the onSuccess callback to compileTokenIfMatches, meaning that
     * compileTokenIfMatches is able to make our recursive call back to here for us.
     */
-   function compileJsonPathToFunction( jsonPath, parserGeneratedSoFar ) {
+   function compileJsonPathToFunction( uncompiledJsonPath, parserGeneratedSoFar ) {
 
       /**
        * Called when a matching token is found. 
@@ -353,9 +353,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
        * valid to recur onto an empty string (there's a tokenExpr for that) but it is not
        * valid to recur past that point. 
        */
-      var onFind = jsonPath? compileJsonPathToFunction : returnFoundParser;
+      var onFind = uncompiledJsonPath? compileJsonPathToFunction : returnFoundParser;
                    
-      return clause(jsonPath, parserGeneratedSoFar, onFind);                              
+      return clauseForJsonPath(uncompiledJsonPath, parserGeneratedSoFar, onFind);                              
    }
 
    // all the above is now captured in the closure of this immediately-called function. let's

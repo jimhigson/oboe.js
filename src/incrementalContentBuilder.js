@@ -149,13 +149,10 @@ function incrementalContentBuilder( fire) {
       // called by Clarinet when keys are found in objects               
       key: pathFound,
       
-      value: function (ascent, value) {
-   
-         // Called for strings, numbers, boolean, null etc. These nodes are declared found and finished at once 
-         // since they can't have descendants.
-                                 
-         return curNodeFinished( nodeFound(ascent, value) );
-      },
+      // Called by Clarinet when primitive values are found, ie Strings and Numbers.
+      // because these are always leaves in the JSON, we find and finish the node in one
+      // step, which can be expressed as functional composition:  
+      value: compose( curNodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing. For both, interpret as the end
       // of the current node.
