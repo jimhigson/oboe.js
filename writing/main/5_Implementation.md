@@ -390,7 +390,7 @@ internally normalises this by handling as if it were two events.
 
 To perform matching on JSONPath expressions, the controller requires the
 path from the root of the document to the current node is required, this
-is provided in the NODE\_FOUND and PATH\_FOUND events emited from the
+is provided in the NODE\_FOUND and PATH\_FOUND events emitted from the
 incremental content builder. For each Clarinet event this builder
 provides a corresponding function which takes the current path and
 returns the path after the event has been applied. For example, the
