@@ -380,10 +380,6 @@ call-driven: we receive six kinds of event and in response emmit a
 smaller vocabulary of two, creating an adaptor over pushes rather that
 pulls.
 
-There are some peculiarities of Clarinet, these are kept as local as
-possible. Such as the field name given with the open object and
-internally normalises this by handling as if it were two events.
-
 To perform matching on JSONPath expressions, the controller requires the
 path from the root of the document to the current node is required, this
 is provided in the NODE\_FOUND and PATH\_FOUND events emitted from the
@@ -447,20 +443,7 @@ on the boundary to the outside world Oboe reverses the order and, because
 Javascript programmers will not be familiar with this structure, converts
 to arrays.  
 
-* * * * *
-
-### What Clarinet provides.
-
-Because Clarinet is a SAX parser, the calls that I receive from it are
-entirely context free; it is my responsibility to build this context.
-
-Luckily, it should be easy to see that building up this context is a
-simple matter of maintaining a stack describing the descent from the
-root node to the current node.
-
-### Bridging between the two. The split.
-
-Single piece of state: the ascent.
+--------------
 
 Stateless makes using a debugger easier - can look back in stack trace
 and because of no reassignment, can see the whole, unchanged state of

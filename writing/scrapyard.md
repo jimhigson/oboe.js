@@ -148,3 +148,17 @@ On first attempt at ICB, had two stacks, both arrays, plus reference to
 current node, current key and root node. After refactorings, just one
 list was enough. Why single-argument functions are helpful (composition
 etc)
+
+Clarinet
+--------
+
+There are some peculiarities of Clarinet, these are kept as local as
+possible. Such as the field name given with the open object and
+internally normalises this by handling as if it were two events.
+
+Because Clarinet is a SAX parser, the calls that I receive from it are
+entirely context free; it is my responsibility to build this context.
+
+Luckily, it should be easy to see that building up this context is a
+simple matter of maintaining a stack describing the descent from the
+root node to the current node.
