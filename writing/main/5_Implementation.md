@@ -395,8 +395,8 @@ For example, the `objectopen` and `arrayopen` events add new items to the path,
 whereas `closeobject` and `closearray` remove them. Internally, the event
 handlers are created from the combination of a smaller number of more basic handlers since
 Oboe is largely indiscriminate regarding the type of nodes found in the JSON.
-Clarinet fires `valuefound` when it encounters a String or Number. 
-Because primative nodes are always leaves these are internally handled as a node which 
+Clarinet emits the `value` event when it encounters a String or Number. 
+Because primitive nodes are always leaves these are internally handled as a node which 
 instantaneously starts and ends, expressed programmatically as the functional composition 
 of the `nodeFound` and `curNodeFinished` handlers.
 
