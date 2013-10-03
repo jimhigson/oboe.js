@@ -100,7 +100,7 @@ describe("oboe integration (real http)", function(){
 
       var countGotBack = 0;
 
-      oboe.doGet(                      
+      oboe(                      
          {  url: '/testServer/echoBackHeaders',
             headers: {'x-snarfu':'SNARF', 'x-foo':'BAR'}
          }
@@ -119,11 +119,29 @@ describe("oboe integration (real http)", function(){
       waitsFor( function(){ return countGotBack == 2 }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
    })
    
+   it('is benchmarked', function() {
+      var startTime = new Date().valueOf();
+      var doneFn = jasmine.createSpy('done');
+      var callCount = 0;
+   
+      oboe('/testServer/static/json/oneHundredRecords.json')
+         .node('!.$result..{age name company}', function(){callCount++})
+         .done( doneFn );
+          
+      waitsFor( function(){ return doneFn.calls.length == 1 }, 'the request to complete', ASYNC_TEST_TIMEOUT )
+      
+      runs( function(){
+         expect(callCount).toBe(100);
+         console.log('took ' + ((new Date().valueOf()) - startTime) + 'ms to evaluate a complex ' +
+            'expression 100 times');  
+      });                
+   })
+   
    it('can listen for nodes via nodejs-style syntax',  function() {
 
       var countGotBack = 0;
 
-      oboe.doGet(
+      oboe(
          '/testServer/static/json/firstTenNaturalNumbers.json'
       ).on('node', '!.*', function( number ){
          countGotBack++;          
@@ -136,7 +154,7 @@ describe("oboe integration (real http)", function(){
 
       var countGotBack = 0;
 
-      oboe.doGet(
+      oboe(
          '/testServer/static/json/firstTenNaturalNumbers.json'
       ).on('path', '!.*', function( number ){
          countGotBack++;          
