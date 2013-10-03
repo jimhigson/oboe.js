@@ -374,46 +374,48 @@ As shown in figure \ref{overallDesign}, there is an incremental content
 builder and ascent tracer which handle the output from the Clarinet JSON
 SAX parser. Taken together, these might be considered as a variant of
 the Adaptor pattern, providing to the controller a simpler interface
-than is presented by Clarinet. However, this is not a model implementation of the
-pattern; it is even-driven rather than call-driven: we receive six kinds
-of event and in response emmit a smaller vocabulary of two, creating an
-adaptor over pushes rather that pulls.
+than is presented by Clarinet. However, this is not a model
+implementation of the pattern; it is even-driven rather than
+call-driven: we receive six kinds of event and in response emmit a
+smaller vocabulary of two, creating an adaptor over pushes rather that
+pulls.
 
-There are some peculiarities of Clarinet, these are kept as local as possible.
-Such as the field name given with the open object and internally 
-normalises this by handling as if it were two events.
+There are some peculiarities of Clarinet, these are kept as local as
+possible. Such as the field name given with the open object and
+internally normalises this by handling as if it were two events.
 
 ### What JP matching requires.
 
 ![Ascent taken from some JSON](images/placeholder)
 
-To perform matching on JSONPath expressions, the path from the root of the 
-document to the current node is required. For each Clarinet event the incremental content builder
-provides  
-a function which takes the current path and returns the path after the event.
-For example, the `objectopen` and `arrayopen` events add new items to the path,
-whereas `closeobject` and `closearray` remove them. Internally, the event
-handlers are created from the combination of a smaller number of more basic handlers since
-Oboe is largely indiscriminate regarding the type of nodes found in the JSON.
-Clarinet emits the `value` event when it encounters a String or Number. 
-Because primitive nodes are always leaves these are internally handled as a node which 
-instantaneously starts and ends, expressed programmatically as the functional composition 
-of the `nodeFound` and `curNodeFinished` handlers.
+To perform matching on JSONPath expressions, the path from the root of
+the document to the current node is required. For each Clarinet event
+the incremental content builder provides\
+a function which takes the current path and returns the path after the
+event. For example, the `objectopen` and `arrayopen` events add new
+items to the path, whereas `closeobject` and `closearray` remove them.
+Internally, the event handlers are created from the combination of a
+smaller number of more basic handlers since Oboe is largely
+indiscriminate regarding the type of nodes found in the JSON. Clarinet
+emits the `value` event when it encounters a String or Number. Because
+primitive nodes are always leaves these are internally handled as a node
+which instantaneously starts and ends, expressed programmatically as the
+functional composition of the `nodeFound` and `curNodeFinished`
+handlers.
 
-Although paths are normally represented starting 
+Although paths are normally represented starting
 
-Why upside down (ascent, not descent). Changes are cheaper at head of list than tail.
-Head changes as move through doc, tail doesn't.
+Why upside down (ascent, not descent). Changes are cheaper at head of
+list than tail. Head changes as move through doc, tail doesn't.
 
 ### What Clarinet provides.
 
 Because Clarinet is a SAX parser, the calls that I receive from it are
-entirely context free; it is my responsibility to build this context. 
+entirely context free; it is my responsibility to build this context.
 
-Luckily, it
-should be easy to see that building up this context is a simple matter
-of maintaining a stack describing the descent from the root node to the
-current node.
+Luckily, it should be easy to see that building up this context is a
+simple matter of maintaining a stack describing the descent from the
+root node to the current node.
 
 ### Bridging between the two. The split.
 
