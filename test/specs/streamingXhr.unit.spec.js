@@ -62,12 +62,7 @@ describe("streamingHttp", function(){
       
       
       function xhrStub() {
-         return {
-            abort: jasmine.createSpy('abort'),
-            open: jasmine.createSpy('open'),
-            setRequestHeader: jasmine.createSpy('setRequestHeader'),
-            send: jasmine.createSpy('send')
-         };
+         return jasmine.createSpyObj('xhr', ['abort', 'open', 'setRequestHeader', 'send']);
       }
    });   
                
