@@ -2134,15 +2134,15 @@ Chapter 4+5 40 to 60 pages
 
   <div class="figure">
     <img src="images/overallDesign.png" alt=
-    "Major components that make up Oboe.js showing flow from http transport to registered callbacks. Every component is not shown here. Particularly, components whose responsibility it is to initialise the oboe instance but have no role once it is running are omitted. UML facet/receptacle notation is used to show the flow of events with event names in capitals. ">
+    "Major components that make up Oboe.js illustrating program flow from http transport to registered callbacks. Every component is not shown here. Particularly, components whose responsibility it is to initialise the oboe instance but have no role once it is running are omitted. UML facet/receptacle notation is used to show the flow of events with event names in capitals. ">
 
     <p class="caption"><strong>Major components that make up
-    Oboe.js</strong> showing flow from http transport to registered
-    callbacks. Every component is not shown here. Particularly,
-    components whose responsibility it is to initialise the oboe
-    instance but have no role once it is running are omitted. UML
-    facet/receptacle notation is used to show the flow of events
-    with event names in capitals.</p>
+    Oboe.js</strong> illustrating program flow from http transport
+    to registered callbacks. Every component is not shown here.
+    Particularly, components whose responsibility it is to
+    initialise the oboe instance but have no role once it is
+    running are omitted. UML facet/receptacle notation is used to
+    show the flow of events with event names in capitals.</p>
   </div>
 
   <p>Oboe's architecture has been designed to so that I may have as
@@ -2151,27 +2151,20 @@ Chapter 4+5 40 to 60 pages
   amenable to testing in this case meant splitting into many
   co-operating parts each with an easily specified remit.</p>
 
-  <p>Although there is limited encapsulation to follow an OO-style
-  arrangement, data is hidden. Outside of Oboe, only a restricted
-  public API is exposed. Not only are the internals inaccessible,
-  they are unaddressable. With no references attached to any
-  external data structures, most data exists only as captured
-  within closures.</p>
-
   <p>Internally, communication between components is facilitated by
-  an event bus which is local to to Oboe instance, with most
-  components interacting solely by picking up events, processing
-  them and publishing further events in response. Essentially,
-  Oboe's architecture resembles a fairly linear pipeline visiting a
-  series of units, starting with http data and sometimes ending
-  with callbacks being notified. This use of an event bus is a
-  variation on the Observer pattern which removes the need for each
-  unit to obtain a reference to the previous one so that it may
-  observe it, giving a highly decoupled shape to the library. Once
-  everything is wired into the bus very little central control is
-  required and the larger behaviours emerge as the consequence of
-  this interaction between finer ones. One downside is perhaps that
-  a central event bus does not lend itself to a UML class diagram,
+  an event bus which is local to to Oboe instance. Most components
+  interact solely by picking up events, processing them and
+  publishing further events in response. Essentially, Oboe's
+  architecture resembles a fairly linear pipeline visiting a series
+  of units, starting with http data and sometimes ending with
+  callbacks being notified. This use of an event bus is a variation
+  on the Observer pattern which removes the need for each unit to
+  obtain a reference to the previous one so that it may observe it,
+  giving a highly decoupled shape to the library. Once everything
+  is wired into the bus very little central control is required and
+  the larger behaviours emerge as the consequence of this
+  interaction between finer ones. One downside is perhaps that a
+  central event bus does not lend itself to a UML class diagram,
   giving a diagram shape with an event bus as a central hub and
   everything else hanging off it as spokes.</p>
 
@@ -2211,29 +2204,32 @@ Chapter 4+5 40 to 60 pages
   means of coupling between the code units but rather check for the
   behaviours which should emerge as a consequence of their
   composition. At the apex of the test pyramid are a small number
-  of integration tests. These tests check all of Oboe,
-  automatically spinning up a REST service so that the correctness
-  of the whole library may be examined against an actual
-  server.</p>
+  of integration tests. These verify Oboe as a black box without
+  any knowledge of, or access to the internals, using only the APIs
+  which are exposed to application programmers. When running the
+  integration tests a REST service is first spun up so that
+  correctness of the whole library may be examined against an
+  actual server.</p>
 
   <p>The desire to be amenable to testing influences the boundaries
-  on which the application splits into components. Black-box unit
-  testing of a stateful unit is difficult; because of side-effects
-  it may later react differently to the same calls. For this reason
-  where state is required it is stored in very simple state-storing
-  units with intricate program logic removed. The logic may then be
-  separately expressed as functions which map from one state to the
-  next. Although comprehensive coverage is of course impossible and
-  tests are inevitably incomplete, for whatever results the
-  functions give while under test, uninfluenced by state I can be
-  sure that they will continue to give in any future situation. The
-  separate unit holding the state is trivial to test, having
-  exactly one responsibility: to store the result of a function
-  call and later pass that result to the next function. This
-  approach clearly breaks with object oriented style encapsulation
-  by not hiding data behind the logic which acts on them but I feel
-  the departure is worthwhile for the greater certainty it allows
-  over the correct functioning of the program.</p>
+  on which the application splits into components. Confidently
+  black box testing a stateful unit as is difficult; because of
+  side-effects it may later react differently to the same calls.
+  For this reason where state is required it is stored in very
+  simple state-storing units with intricate program logic removed.
+  The logic may then be separately expressed as functions which map
+  from one state to the next. Although comprehensive coverage is of
+  course impossible and tests are inevitably incomplete, for
+  whatever results the functions give while under test,
+  uninfluenced by state I can be sure that they will continue to
+  give in any future situation. The separate unit holding the state
+  is trivial to test, having exactly one responsibility: to store
+  the result of a function call and later pass that result to the
+  next function. This approach clearly breaks with object oriented
+  style encapsulation by not hiding data behind the logic which
+  acts on them but I feel the departure is worthwhile for the
+  greater certainty it allows over the correct functioning of the
+  program.</p>
 
   <p>Largely for the sake of testing Oboe has also embraced
   dependency injection. This means that components do not create
@@ -2273,7 +2269,8 @@ Chapter 4+5 40 to 60 pages
   against the fifth and aborting the request on seeing it. The
   correct behaviour is to get no callback for the sixth, even when
   running on platforms where the http is buffered so that all ten
-  will have already been downloaded.</p>
+  will have already been downloaded. <em>ref apx for
+  streamsource</em></p>
 
   <h2 id="running-the-tests"><a href=
   "#running-the-tests"><span class=
@@ -2330,7 +2327,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="packaging-as-a-single-distributable-file"><a href=
   "#packaging-as-a-single-distributable-file"><span class=
-  "header-section-number">5.4</span> Packaging as a single
+  "header-section-number">5.4</span> Packaging as a single,
   distributable file</a></h2>
 
   <div class="figure">
@@ -2359,56 +2356,60 @@ Chapter 4+5 40 to 60 pages
   http overhead.</p>
 
   <p>Javascript files are interpreted in series by the browser so
-  dependencies must come before dependants, tricks for circular
-  dependencies notwithstanding. Unsurprisingly, files concatenated
-  in the same order as they would be delivered to the browser will
-  be functionally equivalent to the same files delivered
-  separately. Several tools are available to automate this stage of
-  the build process, including the topological sort of the
-  dependency digraph that finds a working concatenation order.</p>
+  load-time dependencies must precede dependants. Unsurprisingly,
+  separate files once concatenated following the same order as
+  delivered to the browser will load more quickly but are
+  functionally equivalent, at least barring syntax errors. Several
+  tools exist to automate this stage of the build process,
+  incorporating a topological sort of the dependency digraph in
+  order to find a working concatenation order.</p>
 
-  <p>Early in this project I chose Require.js although it was later
-  abandoned because I found it to be too heavyweight. Javascript as
-  a language doesn't have an import statement so Require implements
-  importing in Javascript itself as a normally executable function.
-  When running raw source, this function AJAXes in the imported
-  source but Require also has an 'optimise mode' which uses static
-  analysis to deduce a workable source order and concatenates into
-  a single file. This of course is impossible in the general case
-  and if, for example, the import is subject to branching require
-  falls back to lazy loading, fetching only when needed. In
-  practice undecidability isn't an issue because importing is
-  typically unconditional and may even be an advantage in larger
-  projects. To speed up initial loading of larger web applications,
-  <em>Asynchronous Module Definition</em> (AMD) imports
-  rarely-loaded functionality in response to events, resisting
-  static analysis and so downloading the code only as it is
-  needed.</p>
+  <p>Early in this project I chose <em>Require.js</em> although I
+  later moved on because it was too heavyweight. Javascript as a
+  language doesn't have an import statement. Require contributes
+  the importing ability to Javascript from inside the language
+  sandbox as the <code>require</code> function, a standard
+  asynchronous call. Calls to <code>require</code> AJAX in and
+  execute the imported source, returning any exported symbols by a
+  callback. For non-trivial applications this mode is intended
+  mostly for debugging; because a network hop is involved the
+  protocol is chatty and slowed by highly latent calls between
+  modules. For efficient delivery Require also has the
+  <code>optimise</code> command which concatenates into a single
+  file by using static analysis to deduce a workable source order.
+  Because <code>require</code> may appear anywhere in the source,
+  this in the general case is of course undecidable so Require
+  falls back to lazy loading. In practice undecidability isn't a
+  problem because imports are generally not subject to branching.
+  In larger webapps lazy loading speeding up the initial page load
+  and is actually an advantage. The technique of <em>Asynchronous
+  Module Definition</em> (AMD) intentionally imports rarely-loaded
+  modules in response to events. By resisting the static analysis
+  the units will not be downloaded until they are needed.</p>
 
-  <p>I hoped to use Require's <code>optimise</code> to generate my
-  distributable Javascript library. However, require's structure
-  necessitates that calls to the importing functions stay in the
-  code and that the require.js run-time component is available to
-  facilitate these calls. For a small project I found this
-  constant-size overhead too large in relation to the rest of the
-  project. Require also prefers to be used as the sole means of
-  loading scripts meaning that Oboe would not fit naturally into
-  web applications not already using require. Overall, Require
-  seems more suited to developing whole applications than
-  programming libraries.</p>
+  <p>AMD is mostly of interest to web applications with a central
+  hub but also some rarely used parts. Oboe does not fit this
+  profile: everybody who uses it will use all of the library.
+  Regardless, I hoped to use <code>optimise</code> to generate my
+  combined Javascript file. Even after optimisation, Require's
+  design necessitates that calls to <code>require</code> stay in
+  the code and that the require.js run-time component is available
+  to handle these calls. For a micro-library a ???k overhead was
+  too large to accommodate. Overall, Require seems more suited to
+  developing stand-alone applications than programming
+  libraries.</p>
 
-  <p>Having abandoned require rather than look for another
-  sophisticated means to perform concatenation I decided to pick up
-  the simplest tool which could possibly work, a Grunt module which
-  works like the unix <code>cat</code> command. With only 15 source
-  Javascript files manually finding a working order by drawing a
-  graph on paper isn't a daunting task. As new files are added it
-  is simple to find a place to insert them into the list. I
-  adjusted each Javascript file to, when loaded directly, place its
-  API in the global namespace, then post-concatenation wrapped the
-  combined in a single function, converting the APIs inside the
-  function from global to the scope of that function, thereby
-  hiding the implementation for code outside of Oboe.</p>
+  <p>Having abandoned Require, I decided to pick up the simplest
+  tool which could possibly work. With only 15 source files and a
+  fairly sparse dependency graph finding a working order on paper
+  wasn't a daunting task. Combined with a Grunt analogue to the
+  unix <code>cat</code> command I quickly had a working build
+  process. I adjusted each Javascript file to, when loaded
+  directly, place its API in the global namespace, then
+  post-concatenation wrapped the combined in a single function,
+  converting the APIs inside the function from global to the scope
+  of that function, thereby hiding the implementation for code
+  outside of Oboe.</p>
 
   <p>For future consideration there is Browserify. This library
   reverses the 'browser first' image of Javascript by converting
@@ -2444,138 +2445,65 @@ Chapter 4+5 40 to 60 pages
   "#styles-of-programming"><span class=
   "header-section-number">5.5</span> Styles of Programming</a></h2>
 
-  <p>Built own functional libs and list library (compose, fold
-  etc)</p>
+  <p><em>moved into here</em></p>
 
-  <p>Programming is finished when each line reads as a statement of
-  fact rather than the means of making the statement so.</p>
+  <p>Although there is limited encapsulation to follow an OO-style
+  arrangement, data is hidden. Outside of Oboe, only a restricted
+  public API is exposed. Not only are the internals inaccessible,
+  they are unaddressable. With no references attached to any
+  external data structures, most data exists only as captured
+  within closures.</p>
 
-  <p>How doing data hiding in JS without copying an OO concept of
-  data hiding.</p>
+  <p>The implementation of Oboe is mixed paradigm. Events flow
+  throughout the whole library but in terms of code style the
+  components are a mix of procedural, functional and
+  object-oriented programming. Object orientation is used only to
+  wrap the library in an Object-oriented public API and as a
+  tuple-like store for multiple values. Constructors are not used,
+  nor is there any inheritance or notable polymorphism. Closures,
+  not objects, are used as the primary means of data storage and
+  hiding. Many of the entities painted in figure map onto no
+  single, addressable language construct and exist only as a set of
+  event handlers trapped inside the same closure, taking advantage
+  of the fact that their reachability from some event emitter
+  prevents required parameters from being garbage collected.
+  Although only sparingly OO, the high-level design's
+  componentisation hasn't departed from how it might be implemented
+  in an OO metamodel and is Object Oriented design patterns remain
+  influential despite being only loosely followed.</p>
 
-  <p>Interestingly, the mixed paradigm design hasn't changed the
-  top-level design very much from how it'd be as a pure OO project
-  (IoC, decorators, event filters, pub/sub etc).</p>
+  <p>Because of the pressures on code size I decided not to use a
+  general purpose functional library and instead create my own with
+  only the parts that I need; see functional.js. Functional
+  programming in Javascript is known to be slower than other
+  styles, particularly under Firefox because it lacks Lambda
+  Lifting and other similar optimisations <span class=
+  "citation">(Guo 2013)</span>. Considering to what degree
+  performance concerns should dissuade us from a functional style,
+  we may consider the library's execution context. Because of the
+  single-threaded model any application's Javascript execution is
+  in between frames serving concurrent concerns so to minimise the
+  impact on latency for the other tasks it is important that no
+  task occupies the CPU for very long. On the browser about 16ms is
+  a fair maximum, allowing painting to occur at 60 frames per
+  second. In Node there is no hard limit but any CPU-hogging task
+  degrades the responsiveness of other responses. Context switching
+  imposes a very low overhead and responsive sharing generally
+  proffers many small frames over a few larger ones. In any case,
+  server-side tasks especially are more often i/o bound than CPU
+  bound. Oboe's progressive design naturally splits tasks which
+  would otherwise be performed in a single frame over many. For
+  example, parsing and marshaling. Although the overall computation
+  may be higher, the total performance of the system should be
+  improved.</p>
 
-  <p>The code presented is the result of the development many prior
-  versions, it has never been rewritten in the sense of starting
-  again. Nonetheless, every part has been complely renewed several
-  times. I am reviewing only the final version. Git promotes
-  regular commits, there have been more than 1000.</p>
-
-  <p>some of it is pure functional (jsonPath, controller) ie, only
-  semantically different from a Haskell programme others,
-  syntactically functional but stateful to fit in with expected
-  APIs etc</p>
-
-  <p>The style of implementation of the generator of functions
-  corresponding to json path expressions is reminiscent of a
-  traditional parser generator, although rather than generating
-  source, functions are dynamically composed. Reflecting on this,
-  parser gens only went to source to break out of the ability to
-  compose the expressive power of the language itself from inside
-  the language itself. With a functional approach, assembly from
-  very small pieces gives a similar level of expressivity as
-  writing the logic out as source code.</p>
-
-  <p>Why could implement Function#partial via prototype. Why not
-  going to. Is a shame. However, are using prototype for minimal
-  set of polyfills. Not general purpose.</p>
-
-  <p>Javascript: not the greatest for 'final' elegant presentation
-  of programming. Does allow 'messy' first drafts which can be
-  refactored into beautiful code. Ie, can write stateful and
-  refactor in small steps towards being stateless. An awareness of
-  beautiful languages lets us know the right direction to go in. An
-  ugly language lets us find something easy to write that works to
-  get us started. Allows a very sketchy program to be written,
-  little more than a programming scratchpad.</p>
-
-  <p>Without strict typing, hard to know if program is correct
-  without running it. In theory (decidability) and in practice
-  (often find errors through running and finding errors thrown).
-  Echo FPR: once compiling, good typing tends to give a reasonable
-  sureness that the code is correct.</p>
-
-  <h3 id="performance-implications-of-functional-javascript">
-  <a href=
-  "#performance-implications-of-functional-javascript"><span class=
-  "header-section-number">5.5.1</span> Performance implications of
-  functional javascript</a></h3>
-
-  <p>V8 and other modern JS engines are often said to be
-  'near-native' speed, meaning it runs at close to the speed of a
-  similarly coded C program. However, this relies on the programmer
-  also coding in the style of a C programmer, for example with only
-  mono-morphic callsites and without a functional style. Once
-  either of those programming techniques is taken up performance
-  drops rapidly [<a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-  9571 ms vs 504 ms. When used in a functional style, not
-  'near-native' in the sense that not close to the performance
-  gained by compiling a well designed functional language to
-  natively executable code. Depends on style coded in, comparison
-  to native somewhat takes C as the description of the operation of
-  an idealised CPU rather than an abstract machine capable of
-  executing on an actual CPU.</p>
-
-  <p>(perhaps move to background, or hint at it, eg "although there
-  are still some performance implications involved in a functional
-  style, javascript may be used in a non-pure functional style") -
-  with link to here</p>
-
-  <p>The performance degradation, even with a self-hosted forEach,
-  is due to the JIT&acirc;&euro;&trade;s inability to efficiently
-  inline both the closures passed to forEach</p>
-
-  <p>Lambda Lifting, currently not implemented in SpiderMonkey or
-  V8: <a href=
-  "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346">
-  http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346</a></p>
-
-  <p>The transformations to enable the above criteria are tedious
-  and are surely the purview of the compiler. All
-  that&acirc;&euro;&trade;s needed are brave compiler hackers</p>
-
-  <p>JS is much faster with "monomorphic call sites"</p>
-
-  <p>However, js execution time is not much of a problem,</p>
-
-  <h3 id=
-  "preferring-functions-over-constructors-subsume-into-above-section">
-  <a href=
-  "#preferring-functions-over-constructors-subsume-into-above-section">
-  <span class="header-section-number">5.5.2</span> Preferring
-  functions over constructors (subsume into above
-  section?)</a></h3>
-
-  <p>What constructors are in js. Any function, but usually an
-  uppercase initial char indicates that it is intended to be used
-  as a constructor.</p>
-
-  <p>Inheritence is constructed using the language itself. While
-  this is more flexible and allows each project to define a bespoke
-  version of inherience to suit their particular needs or
-  preferences, it also hampers portability more than an 'extends'
-  keyword would.</p>
-
-  <blockquote>
-    <p>So far, the JavaScript community has not agreed on a common
-    inheritance library (which would help tooling and code
-    portability) and it is doubtful that that will ever happen.
-    That means, we&acirc;&euro;&trade;re stuck with constructors
-    under ECMAScript 5. <a href=
-    "http://www.2ality.com/2013/07/defending-constructors.html">http://www.2ality.com/2013/07/defending-constructors.html</a></p>
-  </blockquote>
-
-  <p>Functions can be like Factories, gives me the flexability to
-  chagne how something is created but by exposing a constructor are
-  stuck with using 'new' to create an instance of exactly one type.
-  'new' is inconsistent invocation with rest of language.</p>
-
-  <p>Dart has 'factory' constructors which are called like
-  constructors but act like factory functions: (<a href=
-  "http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html">http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html</a>#ch02-constructor-factory)</p>
+  <p>Javascript is of course an imperative language but over many
+  iterations Oboe has tended towards a declarative style. In
+  incrementalContentBuilder.js programming was initially stateful
+  and procedural, reading like the instructions to perform a task.
+  Over many refactors the flavour of the code has changed, the
+  reading now tending towards a description of desired
+  behaviour.</p>
 
   <h2 id="incrementally-building-up-the-content"><a href=
   "#incrementally-building-up-the-content"><span class=
@@ -2584,40 +2512,46 @@ Chapter 4+5 40 to 60 pages
 
   <p>As shown in figure , there is an incremental content builder
   and ascent tracer which handle the output from the Clarinet JSON
-  SAX parser. Taken together, these might be considered as a
-  variant of the Adaptor pattern, providing to the controller a
-  simpler interface than is presented by Clarinet. However, this is
-  not a model implementation of the pattern; it is even-driven
-  rather than call-driven: we receive six kinds of event and in
-  response emmit a smaller vocabulary of two, creating an adaptor
-  over pushes rather that pulls.</p>
+  SAX parser. Taken together, these might be considered a variant
+  of the Adaptor pattern, providing to the controller a simpler
+  interface than is presented by Clarinet. However, this is not the
+  model implementation of the pattern; the adapted interface is
+  even-driven rather than call-driven: we receive six kinds of
+  event and in response emmit from a narrower vocabulary of
+  two.</p>
 
-  <p>To perform matching on JSONPath expressions, the controller
-  requires the path from the root of the document to the current
-  node is required, this is provided in the NODE_FOUND and
-  PATH_FOUND events emitted from the incremental content builder.
-  For each Clarinet event this builder provides a corresponding
-  function which takes the current path and returns the path after
+  <p>To evaluate JSONPath expressions the controller requires a
+  path to the current JSON node, the node itself, and any ancestor
+  nodes. This is delivered by the incremental content builder as
+  the payload of the NODE_FOUND and PATH_FOUND events. For each
+  Clarinet event the builder provides a corresponding function
+  which, working from the current path, returns the next path after
   the event has been applied. For example, the
-  <code>objectopen</code> and <code>arrayopen</code> events add new
-  items to the path, whereas <code>closeobject</code> and
-  <code>closearray</code> remove them. Over the course of the parse
-  of the whole JSON file the path in this way will visit every
-  node, allowing each to be tested against the registered JSONPath
-  expressions. Internally, the builder's event handlers are created
-  from the combination of a smaller number of more basic reusable
-  handlers; Oboe is largely indiscriminate regarding the type of
-  nodes found in the JSON whereas Clarinet's events often differ
-  only in the type of node that was encountered. This reuse of
-  smaller instructions to build up larger ones is slightly
-  reminiscent of the use of composed micro-instructions in CISC CPU
-  design to implement the chip's higher-level instructions.
-  Consider the <code>value</code> event which is fired when
-  Clarinet encounters a String or Number, because primitive nodes
-  are always leaves the internal handling is as a node which
-  instantaneously starts and ends, expressed programmatically as
-  the functional composition of the <code>nodeFound</code> and
-  <code>curNodeFinished</code> handlers.</p>
+  <code>objectopen</code> and <code>arrayopen</code> events move
+  the current node deeper in the document and are handled by adding
+  new items to the path, whereas for <code>closeobject</code> and
+  <code>closearray</code> we remove one. Over the course of parsing
+  a complete JSON file the path will in this way be manipulated to
+  visit every node, allowing each to be tested against the
+  registered JSONPath expressions. Internally, the builder's event
+  handlers are declared as the combination of a smaller number of
+  basic reusable handler parts. Oboe is largely unconcerned
+  regarding a JSON node's type so given that several of the
+  Clarinet events differ only by the type of the nodes they
+  announce, Oboe is able to generify their handling by composing
+  from a common pool of handler-parts. Picking up
+  <code>openobject</code> and <code>openarray</code> events, both
+  fall through to the same 'nodeFound', differing only in a
+  parameter. Similarly, consider the <code>value</code> event which
+  is fired when Clarinet encounters a String or Number. Because
+  primitive nodes are always leaves the builder regards this as a
+  node which instantaneously starts and ends, handled
+  programmatically as the functional composition of the
+  <code>nodeFound</code> and <code>curNodeFinished</code>. The
+  reuse of smaller instructions to build up larger ones is perhaps
+  slightly reminiscent of CISC CPU design in which
+  micro-instructions are combined to implement the chip's
+  advertised interface.</p>
 
   <p>Although the builder functions are stateless, ultimately the
   state regarding the current path needs to be stored between
@@ -2758,8 +2692,8 @@ Chapter 4+5 40 to 60 pages
   rest.</p>
 
   <p>As an example, the pattern <code>!.$person..{height
-  tShirtSize}</code> once compiled to a Javascript functional
-  representation would roughly resemble this:</p>
+  tShirtSize}</code> once compiled would roughly resemble the
+  Javascript functional representation below:</p>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "fu">statementExpr</span>(             <span class=
@@ -3080,6 +3014,13 @@ Chapter 4+5 40 to 60 pages
 
   <p>Graham, Paul. 2004. <em>The Other Road Ahead</em>.
   O&acirc;&euro;&trade;Reilly and Associates.</p>
+
+  <p>Guo, shu-yu. 2013. &acirc;&euro;&oelig;Two Reasons Functional
+  Style Is Slow in SpiderMonkey.&acirc;&euro; <a href=
+  "http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html"
+  title=
+  "http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html">
+  http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html</a>.</p>
 
   <p>Hopkins, Don. 1994. <em>The X-Windows Disaster</em>. Hungry
   Minds.</p>
