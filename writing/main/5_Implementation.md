@@ -267,7 +267,7 @@ Closures, not objects, are used as the primary means of data storage and
 hiding. Many of the entities painted in figure \ref{overallDesign} map
 onto no single, addressable language construct and exist only as a set
 of event handlers trapped inside the same closure, taking advantage of
-the fact that their reachability from some event emitter\
+the fact that their reachability from some event emitter
 prevents their required parameters from being garbage collected.
 Although only sparingly OO, the high-level design's componentisation
 hasn't departed from how it might be implemented in an OO metamodel and
