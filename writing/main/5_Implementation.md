@@ -319,36 +319,39 @@ Incrementally building up the content
 
 As shown in figure \ref{overallDesign}, there is an incremental content
 builder and ascent tracer which handle the output from the Clarinet JSON
-SAX parser. Taken together, these might be considered as a variant of
+SAX parser. Taken together, these might be considered a variant of
 the Adaptor pattern, providing to the controller a simpler interface
-than is presented by Clarinet. However, this is not a model
-implementation of the pattern; it is even-driven rather than
-call-driven: we receive six kinds of event and in response emmit a
-smaller vocabulary of two, creating an adaptor over pushes rather that
-pulls.
+than is presented by Clarinet. However, this is not the model
+implementation of the pattern; the adapted interface is even-driven rather than
+call-driven: we receive six kinds of event and in response emmit from a 
+narrower vocabulary of two.
 
-To perform matching on JSONPath expressions, the controller requires the
-path from the root of the document to the current node is required, this
-is provided in the NODE\_FOUND and PATH\_FOUND events emitted from the
-incremental content builder. For each Clarinet event this builder
-provides a corresponding function which takes the current path and
-returns the path after the event has been applied. For example, the
-`objectopen` and `arrayopen` events add new items to the path, whereas
-`closeobject` and `closearray` remove them. Over the course of the parse
-of the whole JSON file the path in this way will visit every node,
+To evaluate JSONPath expressions the controller requires a
+path to the current JSON node, the node itself, and any ancestor nodes. This
+is delivered by the incremental content builder as the payload of the NODE\_FOUND and 
+PATH\_FOUND events. For each Clarinet event the builder
+provides a corresponding function which, working from the current path, 
+returns the next path after the event has been applied. For example, the
+`objectopen` and `arrayopen` events move the current node deeper in the document and 
+are handled by adding new items to the path, whereas for 
+`closeobject` and `closearray` we remove one. Over the course of parsing
+a complete JSON file the path will in this way be manipulated to visit every node,
 allowing each to be tested against the registered JSONPath expressions.
-Internally, the builder's event handlers are created from the
-combination of a smaller number of more basic reusable handlers; Oboe is
-largely indiscriminate regarding the type of nodes found in the JSON
-whereas Clarinet's events often differ only in the type of node that was
-encountered. This reuse of smaller instructions to build up larger ones
-is slightly reminiscent of the use of composed micro-instructions in
-CISC CPU design to implement the chip's higher-level instructions.
-Consider the `value` event which is fired when Clarinet encounters a
-String or Number, because primitive nodes are always leaves the internal
-handling is as a node which instantaneously starts and ends, expressed
+Internally, the builder's event handlers are declared as the
+combination of a smaller number of basic reusable handler parts. Oboe is
+largely unconcerned regarding a JSON node's type so given that 
+several of the Clarinet events differ only by the type of the nodes they announce,
+Oboe is able to generify their handling by composing from a common pool of handler-parts.
+Picking up `openobject` and `openarray` events, both fall through to the same 'nodeFound',
+differing only in a parameter.
+Similarly, consider the `value` event which is fired when Clarinet encounters a
+String or Number. Because primitive nodes are always leaves the builder
+regards this as a node which instantaneously starts and ends, handled
 programmatically as the functional composition of the `nodeFound` and
-`curNodeFinished` handlers.
+`curNodeFinished`.
+The reuse of smaller instructions to build up larger ones
+is perhaps slightly reminiscent of CISC CPU design in which micro-instructions are
+combined to implement the chip's advertised interface.
 
 Although the builder functions are stateless, ultimately the state
 regarding the current path needs to be stored between clarinet calls.
@@ -465,8 +468,8 @@ identifies one token for non-empty input and then recursively digests
 the rest.
 
 As an example, the pattern `!.$person..{height tShirtSize}` once
-compiled to a Javascript functional representation would roughly
-resemble this:
+compiled would roughly resemble the Javascript functional representation 
+below:
 
 ~~~~ {.javascript}
 statementExpr(             // wrapper, added when JSONPath is zero-length 
