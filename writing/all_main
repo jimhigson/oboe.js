@@ -8,3 +8,8 @@ for f in $(ls main/*.md | sort); do
    cat $f
    echo; echo
 done
+
+for f in $(ls appendix/*.md | sort); do 
+   cat $f
+   echo; echo
+done

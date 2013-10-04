@@ -1,5 +1,9 @@
 #!/bin/sh
 
+
+
+./gen_source_appendix
+
 pandoc proposal.md -o dist/proposal.html
 
 echo made proposal html

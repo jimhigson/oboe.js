@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Simple shell script. Reads all of the file in the main directory in order, and writes out their contents
+# with two newlines seperating the individual files.
+# With thanks to: http://stackoverflow.com/questions/2576693/linux-merging-multiple-files-each-on-a-new-line 
+
+cd ../src
+
+SRC_FILES=$(ls *.js | sort) 
+
+cd ../writing
+
+for JS_FILE_NAME in $SRC_FILES; do
+   MD_FILE=appendix/$JS_FILE_NAME.md
+   
+   echo "will package source for appendix $MD_FILE"
+
+   touch $MD_FILE
+   
+   echo > $MD_FILE             
+   echo $JS_FILE_NAME >> $MD_FILE
+   echo "---" >> $MD_FILE
+   echo >> $MD_FILE    
+   
+   echo "~~~~ {.javascript}" >> $MD_FILE
+   cat ../src/$JS_FILE_NAME >> $MD_FILE
+   echo >> $MD_FILE
+   echo "~~~~" >> $MD_FILE
+   echo >> $MD_FILE                 
+     
+   #cat $f
+   #echo; echo
+done
