@@ -257,45 +257,51 @@ which forces me to be suspicious of the project's build process.
 Styles of Programming
 ---------------------
 
-The implementation of Oboe is mixed paradigm. Events flow
-throughout the whole library but in terms of code style the components 
-are a mix of procedural, functional and object-oriented programming.
-Object orientation is used only to wrap the library in an Object-oriented public API
-and as a tuple-like store for multiple values. Constructors are not used, nor is
-there any inheritance or notable polymorphism. 
-Closures, not objects, are used as the primary means of data storage
-and hiding. Many of the entities painted in figure \ref{overallDesign}
-map onto no single, addressable language construct and exist only as
-a set of event handlers trapped inside the same closure, 
-taking advantage of the fact that their reachability from some event emitter  
+The implementation of Oboe is mixed paradigm. Events flow throughout the
+whole library but in terms of code style the components are a mix of
+procedural, functional and object-oriented programming. Object
+orientation is used only to wrap the library in an Object-oriented
+public API and as a tuple-like store for multiple values. Constructors
+are not used, nor is there any inheritance or notable polymorphism.
+Closures, not objects, are used as the primary means of data storage and
+hiding. Many of the entities painted in figure \ref{overallDesign} map
+onto no single, addressable language construct and exist only as a set
+of event handlers trapped inside the same closure, taking advantage of
+the fact that their reachability from some event emitter\
 prevents their required parameters from being garbage collected.
-Although only sparingly OO, the high-level design's componentisation hasn't departed
-from how it might be implemented in an OO metamodel and is Object Oriented design patterns
-remain influential despite being only loosely followed.
+Although only sparingly OO, the high-level design's componentisation
+hasn't departed from how it might be implemented in an OO metamodel and
+is Object Oriented design patterns remain influential despite being only
+loosely followed.
 
-Because of the pressures on code size I decided not to use a general purpose
-functional library and instead create my own with only the parts that
-I need. See functional.js. 
+Because of the pressures on code size I decided not to use a general
+purpose functional library and instead create my own with only the parts
+that I need; see functional.js.
 
-Refactoring. Programming is finished when each line reads as a statement of fact
-rather than the means of making the statement so.
+Javascript is of course an imperative language but over many iterations
+Oboe has tended towards a declarative style. In
+incrementalContentBuilder.js programming was initially stateful and
+procedural, reading like the instructions to perform a task. Over many
+refactors the flavour of the code has changed, the reading now tending
+towards a description of desired behaviour.
 
 ### Performance considerations
 
-Functional programming in Javascript is known to be slower than other styles,
-particularly under Firefox [@functionalSpiderMonkey]. Modern JS engines employ various 
-stragegies to compile to machine code before running and are  
-often said to achieve 'near-native' speeds, meaning it runs at close to the speed of 
-a similarly coded C program. However, this comparison relies on the source being 
-written in a style similar to of a C program.
+Functional programming in Javascript is known to be slower than other
+styles, particularly under Firefox [@functionalSpiderMonkey]. Modern JS
+engines employ various stragegies to compile to machine code before
+running and are\
+often said to achieve 'near-native' speeds, meaning it runs at close to
+the speed of a similarly coded C program. However, this comparison
+relies on the source being written in a style similar to of a C program.
 
-Have used a functional style despite it being less performant on most Javascript
-engines. Js execution time is not much of a problem so long as order of complexity
-is kept under control.
+Have used a functional style despite it being less performant on most
+Javascript engines. Js execution time is not much of a problem so long
+as order of complexity is kept under control.
 
-, for example with only mono-morphic callsites and without a
-functional style. Once either of those programming techniques is taken
-up performance drops rapidly
+, for example with only mono-morphic callsites and without a functional
+style. Once either of those programming techniques is taken up
+performance drops rapidly
 [http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
 9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
 the sense that not close to the performance gained by compiling a well
@@ -317,8 +323,9 @@ hackers
 
 JS is much faster with "monomorphic call sites"
 
-Use of lists may be faster overall, but also generate more garbage which can be worse where
-smooth frame rates are more important than total throughput.
+Use of lists may be faster overall, but also generate more garbage which
+can be worse where smooth frame rates are more important than total
+throughput.
 
 Incrementally building up the content
 -------------------------------------
