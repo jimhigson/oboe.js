@@ -57,10 +57,10 @@ A good test should be able to go unchanged as the source under test is
 refactored. Indeed, the test will be how we know that the code under
 test still works as intended. Experince tells me that testing that A
 listens to B (ie that the controller wires the jsonbuilder up to
-clarinet) produces the kind of test that 'follows the code arround' as it is edited
-meaning that because it is testing implementation details rather than
-behaviours, whenever the implementation is updated the tests have to be
-updated too.
+clarinet) produces the kind of test that 'follows the code arround' as
+it is edited meaning that because it is testing implementation details
+rather than behaviours, whenever the implementation is updated the tests
+have to be updated too.
 
 tdd and oo
 ----------
@@ -68,7 +68,6 @@ tdd and oo
 TDD fits well into an object pattern because the software is well
 composed into separate parts. The objects are almost tangible in their
 distinction as separate encapsulated entities.
-
 
 ![Diagram showing why list is more memory efficient - multiple handles
 into same structure with different starts, contrast with same as an
@@ -163,6 +162,15 @@ Luckily, it should be easy to see that building up this context is a
 simple matter of maintaining a stack describing the descent from the
 root node to the current node.
 
+evolution
+---------
+
+The code presented is the result of the development many prior versions,
+it has never been rewritten in the sense of starting again. Nonetheless,
+every part has been complely renewed several times. I am reviewing only
+the final version. Git promotes regular commits, there have been more
+than 1000.
+
 Making stateless
 ----------------
 
@@ -177,7 +185,7 @@ A refactoring was used to separate logic and state:
     statement
 -   Create a simple, separate stateful controller that just updates the
     state to that returned from the calls
-    
+
 Very testable code because stateless - once correct for params under
 test, will always be correct. Nowhere for bad data to hide in the
 program.
@@ -216,3 +224,58 @@ Potential solutions:
 -   immutable wrappers.
 -   defensive cloning
 -   defining getter properties
+
+Preferring functions over constructors (subsume into above section?)
+--------------------------------------------------------------------
+
+What constructors are in js. Any function, but usually an uppercase
+initial char indicates that it is intended to be used as a constructor.
+
+Inheritence is constructed using the language itself. While this is more
+flexible and allows each project to define a bespoke version of
+inherience to suit their particular needs or preferences, it also
+hampers portability more than an 'extends' keyword would.
+
+> So far, the JavaScript community has not agreed on a common
+> inheritance library (which would help tooling and code portability)
+> and it is doubtful that that will ever happen. That means, we’re stuck
+> with constructors under ECMAScript 5.
+> http://www.2ality.com/2013/07/defending-constructors.html
+
+Functions can be like Factories, gives me the flexability to chagne how
+something is created but by exposing a constructor are stuck with using
+'new' to create an instance of exactly one type. 'new' is inconsistent
+invocation with rest of language.
+
+Dart has 'factory' constructors which are called like constructors but
+act like factory functions:
+(http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
+
+compiling JSONPath
+------------------
+
+The style of implementation of the generator of functions corresponding
+to json path expressions is reminiscent of a traditional parser
+generator, although rather than generating source, functions are
+dynamically composed. Reflecting on this, parser gens only went to
+source to break out of the ability to compose the expressive power of
+the language itself from inside the language itself. With a functional
+approach, assembly from very small pieces gives a similar level of
+expressivity as writing the logic out as source code.
+
+JS language 
+-----------
+
+Javascript: not the greatest for 'final' elegant presentation of
+programming. Does allow 'messy' first drafts which can be refactored
+into beautiful code. An awareness of beautiful languages lets us
+know the right direction to go in. An ugly language lets us find
+something easy to write that works to get us started. Allows a very
+sketchy program to be written, little more than a programming
+scratchpad.
+
+Without strict typing, hard to know if program is correct without
+running it. In theory (decidability) and in practice (often find errors
+through running and finding errors thrown). Echo FPR: once compiling,
+good typing tends to give a reasonable sureness that the code is
+correct.

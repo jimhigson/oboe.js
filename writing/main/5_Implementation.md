@@ -257,62 +257,43 @@ which forces me to be suspicious of the project's build process.
 Styles of Programming
 ---------------------
 
-Built own functional libs and list library (compose, fold etc)
+The implementation of Oboe is mixed paradigm. Events flow
+throughout the whole library but in terms of code style the components 
+are a mix of procedural, functional and object-oriented programming.
+Object orientation is used only to wrap the library in an Object-oriented public API
+and as a tuple-like store for multiple values. Constructors are not used, nor is
+there any inheritance or notable polymorphism. 
+Closures, not objects, are used as the primary means of data storage
+and hiding. Many of the entities painted in figure \ref{overallDesign}
+map onto no single, addressable language construct and exist only as
+a set of event handlers trapped inside the same closure, 
+taking advantage of the fact that their reachability from some event emitter  
+prevents their required parameters from being garbage collected.
+Although only sparingly OO, the high-level design's componentisation hasn't departed
+from how it might be implemented in an OO metamodel and is Object Oriented design patterns
+remain influential despite being only loosely followed.
 
-Programming is finished when each line reads as a statement of fact
+Because of the pressures on code size I decided not to use a general purpose
+functional library and instead create my own with only the parts that
+I need. See functional.js. 
+
+Refactoring. Programming is finished when each line reads as a statement of fact
 rather than the means of making the statement so.
 
-How doing data hiding in JS without copying an OO concept of data
-hiding.
+### Performance considerations
 
-Interestingly, the mixed paradigm design hasn't changed the top-level
-design very much from how it'd be as a pure OO project (IoC, decorators,
-event filters, pub/sub etc).
+Functional programming in Javascript is known to be slower than other styles,
+particularly under Firefox [@functionalSpiderMonkey]. Modern JS engines employ various 
+stragegies to compile to machine code before running and are  
+often said to achieve 'near-native' speeds, meaning it runs at close to the speed of 
+a similarly coded C program. However, this comparison relies on the source being 
+written in a style similar to of a C program.
 
-The code presented is the result of the development many prior versions,
-it has never been rewritten in the sense of starting again. Nonetheless,
-every part has been complely renewed several times. I am reviewing only
-the final version. Git promotes regular commits, there have been more
-than 1000.
+Have used a functional style despite it being less performant on most Javascript
+engines. Js execution time is not much of a problem so long as order of complexity
+is kept under control.
 
-some of it is pure functional (jsonPath, controller) ie, only
-semantically different from a Haskell programme others, syntactically
-functional but stateful to fit in with expected APIs etc
-
-The style of implementation of the generator of functions corresponding
-to json path expressions is reminiscent of a traditional parser
-generator, although rather than generating source, functions are
-dynamically composed. Reflecting on this, parser gens only went to
-source to break out of the ability to compose the expressive power of
-the language itself from inside the language itself. With a functional
-approach, assembly from very small pieces gives a similar level of
-expressivity as writing the logic out as source code.
-
-Why could implement Function\#partial via prototype. Why not going to.
-Is a shame. However, are using prototype for minimal set of polyfills.
-Not general purpose.
-
-Javascript: not the greatest for 'final' elegant presentation of
-programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. Ie, can write stateful and refactor in small steps
-towards being stateless. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
-
-Without strict typing, hard to know if program is correct without
-running it. In theory (decidability) and in practice (often find errors
-through running and finding errors thrown). Echo FPR: once compiling,
-good typing tends to give a reasonable sureness that the code is
-correct.
-
-### Performance implications of functional javascript
-
-V8 and other modern JS engines are often said to be 'near-native' speed,
-meaning it runs at close to the speed of a similarly coded C program.
-However, this relies on the programmer also coding in the style of a C
-programmer, for example with only mono-morphic callsites and without a
+, for example with only mono-morphic callsites and without a
 functional style. Once either of those programming techniques is taken
 up performance drops rapidly
 [http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
@@ -322,10 +303,6 @@ designed functional language to natively executable code. Depends on
 style coded in, comparison to native somewhat takes C as the description
 of the operation of an idealised CPU rather than an abstract machine
 capable of executing on an actual CPU.
-
-(perhaps move to background, or hint at it, eg "although there are still
-some performance implications involved in a functional style, javascript
-may be used in a non-pure functional style") - with link to here
 
 The performance degradation, even with a self-hosted forEach, is due to
 the JIT’s inability to efficiently inline both the closures passed to
@@ -340,32 +317,8 @@ hackers
 
 JS is much faster with "monomorphic call sites"
 
-However, js execution time is not much of a problem,
-
-### Preferring functions over constructors (subsume into above section?)
-
-What constructors are in js. Any function, but usually an uppercase
-initial char indicates that it is intended to be used as a constructor.
-
-Inheritence is constructed using the language itself. While this is more
-flexible and allows each project to define a bespoke version of
-inherience to suit their particular needs or preferences, it also
-hampers portability more than an 'extends' keyword would.
-
-> So far, the JavaScript community has not agreed on a common
-> inheritance library (which would help tooling and code portability)
-> and it is doubtful that that will ever happen. That means, we’re stuck
-> with constructors under ECMAScript 5.
-> http://www.2ality.com/2013/07/defending-constructors.html
-
-Functions can be like Factories, gives me the flexability to chagne how
-something is created but by exposing a constructor are stuck with using
-'new' to create an instance of exactly one type. 'new' is inconsistent
-invocation with rest of language.
-
-Dart has 'factory' constructors which are called like constructors but
-act like factory functions:
-(http://www.dartlang.org/docs/dart-up-and-running/contents/ch02.html\#ch02-constructor-factory)
+Use of lists may be faster overall, but also generate more garbage which can be worse where
+smooth frame rates are more important than total throughput.
 
 Incrementally building up the content
 -------------------------------------
