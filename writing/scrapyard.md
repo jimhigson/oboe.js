@@ -279,3 +279,27 @@ running it. In theory (decidability) and in practice (often find errors
 through running and finding errors thrown). Echo FPR: once compiling,
 good typing tends to give a reasonable sureness that the code is
 correct.
+
+Aphorisms
+---------
+
+Programming is finished when each line reads as a necessary statement,
+not pleading to make the obvious so.
+
+Compilers, functional
+---------------------
+
+, for example with only mono-morphic callsites and without a functional
+style. Once either of those programming techniques is taken up
+performance drops rapidly
+[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
+9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
+the sense that not close to the performance gained by compiling a well
+designed functional language to natively executable code. Depends on
+style coded in, comparison to native somewhat takes C as the description
+of the operation of an idealised CPU rather than an abstract machine
+capable of executing on an actual CPU.
+
+The performance degradation, even with a self-hosted forEach, is due to
+the JIT’s inability to efficiently inline both the closures passed to
+forEach

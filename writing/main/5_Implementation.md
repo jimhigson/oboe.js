@@ -276,7 +276,13 @@ loosely followed.
 
 Because of the pressures on code size I decided not to use a general
 purpose functional library and instead create my own with only the parts
-that I need; see functional.js.
+that I need; see functional.js. Functional programming in Javascript is 
+known to be slower than other styles, particularly under Firefox [@functionalSpiderMonkey]
+because it lacks Lambda Lifting and other similar optimisations.
+A constant drag on JS execution time is not much of a problem so long
+as order of complexity is kept under control. Keep track of performance.
+Often, throughput is less of a worry than 'spikes' in processing. Oboe's
+design naturally spreads computation evenly over a long period of time.
 
 Javascript is of course an imperative language but over many iterations
 Oboe has tended towards a declarative style. In
@@ -285,47 +291,7 @@ procedural, reading like the instructions to perform a task. Over many
 refactors the flavour of the code has changed, the reading now tending
 towards a description of desired behaviour.
 
-### Performance considerations
-
-Functional programming in Javascript is known to be slower than other
-styles, particularly under Firefox [@functionalSpiderMonkey]. Modern JS
-engines employ various stragegies to compile to machine code before
-running and are\
-often said to achieve 'near-native' speeds, meaning it runs at close to
-the speed of a similarly coded C program. However, this comparison
-relies on the source being written in a style similar to of a C program.
-
-Have used a functional style despite it being less performant on most
-Javascript engines. Js execution time is not much of a problem so long
-as order of complexity is kept under control.
-
-, for example with only mono-morphic callsites and without a functional
-style. Once either of those programming techniques is taken up
-performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
-the sense that not close to the performance gained by compiling a well
-designed functional language to natively executable code. Depends on
-style coded in, comparison to native somewhat takes C as the description
-of the operation of an idealised CPU rather than an abstract machine
-capable of executing on an actual CPU.
-
-The performance degradation, even with a self-hosted forEach, is due to
-the JIT’s inability to efficiently inline both the closures passed to
-forEach
-
-Lambda Lifting, currently not implemented in SpiderMonkey or V8:
 http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
-
-The transformations to enable the above criteria are tedious and are
-surely the purview of the compiler. All that’s needed are brave compiler
-hackers
-
-JS is much faster with "monomorphic call sites"
-
-Use of lists may be faster overall, but also generate more garbage which
-can be worse where smooth frame rates are more important than total
-throughput.
 
 Incrementally building up the content
 -------------------------------------
