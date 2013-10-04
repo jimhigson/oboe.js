@@ -4,12 +4,13 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js** showing flow from http
-transport to registered callbacks. Every component is not shown here.
-Particularly, components whose responsibility it is to initialise the
-oboe instance but have no role once it is running are omitted. UML
-facet/receptacle notation is used to show the flow of events with event
-names in capitals. \label{overallDesign}](images/overallDesign.png)
+![**Major components that make up Oboe.js** illustrating program flow
+from http transport to registered callbacks. Every component is not
+shown here. Particularly, components whose responsibility it is to
+initialise the oboe instance but have no role once it is running are
+omitted. UML facet/receptacle notation is used to show the flow of
+events with event names in capitals.
+\label{overallDesign}](images/overallDesign.png)
 
 Oboe's architecture has been designed to so that I may have as much
 confidence as possible regarding the correct working of the library
@@ -17,17 +18,11 @@ through automated testing. Designing a system to be amenable to testing
 in this case meant splitting into many co-operating parts each with an
 easily specified remit.
 
-Although there is limited encapsulation to follow an OO-style
-arrangement, data is hidden. Outside of Oboe, only a restricted public
-API is exposed. Not only are the internals inaccessible, they are
-unaddressable. With no references attached to any external data
-structures, most data exists only as captured within closures.
-
 Internally, communication between components is facilitated by an event
-bus which is local to to Oboe instance, with most components interacting
-solely by picking up events, processing them and publishing further
-events in response. Essentially, Oboe's architecture resembles a fairly
-linear pipeline visiting a series of units, starting with http data and
+bus which is local to to Oboe instance. Most components interact solely
+by picking up events, processing them and publishing further events in
+response. Essentially, Oboe's architecture resembles a fairly linear
+pipeline visiting a series of units, starting with http data and
 sometimes ending with callbacks being notified. This use of an event bus
 is a variation on the Observer pattern which removes the need for each
 unit to obtain a reference to the previous one so that it may observe
@@ -65,26 +60,29 @@ To avoid testing implementation details the component tests do not look
 at the means of coupling between the code units but rather check for the
 behaviours which should emerge as a consequence of their composition. At
 the apex of the test pyramid are a small number of integration tests.
-These tests check all of Oboe, automatically spinning up a REST service
-so that the correctness of the whole library may be examined against an
-actual server.
+These verify Oboe as a black box without any knowledge of, or access to
+the internals, using only the APIs which are exposed to application
+programmers. When running the integration tests a REST service is first
+spun up so that correctness of the whole library may be examined against
+an actual server.
 
 The desire to be amenable to testing influences the boundaries on which
-the application splits into components. Black-box unit testing of a
-stateful unit is difficult; because of side-effects it may later react
-differently to the same calls. For this reason where state is required
-it is stored in very simple state-storing units with intricate program
-logic removed. The logic may then be separately expressed as functions
-which map from one state to the next. Although comprehensive coverage is
-of course impossible and tests are inevitably incomplete, for whatever
-results the functions give while under test, uninfluenced by state I can
-be sure that they will continue to give in any future situation. The
-separate unit holding the state is trivial to test, having exactly one
-responsibility: to store the result of a function call and later pass
-that result to the next function. This approach clearly breaks with
-object oriented style encapsulation by not hiding data behind the logic
-which acts on them but I feel the departure is worthwhile for the
-greater certainty it allows over the correct functioning of the program.
+the application splits into components. Confidently black box testing a
+stateful unit as is difficult; because of side-effects it may later
+react differently to the same calls. For this reason where state is
+required it is stored in very simple state-storing units with intricate
+program logic removed. The logic may then be separately expressed as
+functions which map from one state to the next. Although comprehensive
+coverage is of course impossible and tests are inevitably incomplete,
+for whatever results the functions give while under test, uninfluenced
+by state I can be sure that they will continue to give in any future
+situation. The separate unit holding the state is trivial to test,
+having exactly one responsibility: to store the result of a function
+call and later pass that result to the next function. This approach
+clearly breaks with object oriented style encapsulation by not hiding
+data behind the logic which acts on them but I feel the departure is
+worthwhile for the greater certainty it allows over the correct
+functioning of the program.
 
 Largely for the sake of testing Oboe has also embraced dependency
 injection. This means that components do not create the further
@@ -120,7 +118,7 @@ would and try some tricky cases. For example, requesting ten numbers but
 registering a listener against the fifth and aborting the request on
 seeing it. The correct behaviour is to get no callback for the sixth,
 even when running on platforms where the http is buffered so that all
-ten will have already been downloaded.
+ten will have already been downloaded. *ref apx for streamsource*
 
 Running the tests
 -----------------
@@ -163,8 +161,8 @@ component will be visible through them. Grunt executes the build,
 including starting up the test REST services that give the integration
 tests something to fetch.
 
-Packaging as a single distributable file
-----------------------------------------
+Packaging as a single, distributable file
+-----------------------------------------
 
 ![**Packaging of many javascript files into multiple single-file
 packages.** The packages are individually targeted at different
@@ -183,48 +181,53 @@ convenient. Should they not have a build process of their own, a single
 file is also much faster to transfer to their users, mostly because of
 the cost of establishing connections and the http overhead.
 
-Javascript files are interpreted in series by the browser so
-dependencies must come before dependants, tricks for circular
-dependencies notwithstanding. Unsurprisingly, files concatenated in the
-same order as they would be delivered to the browser will be
-functionally equivalent to the same files delivered separately. Several
-tools are available to automate this stage of the build process,
-including the topological sort of the dependency digraph that finds a
+Javascript files are interpreted in series by the browser so load-time
+dependencies must precede dependants. Unsurprisingly, separate files 
+once concatenated following the same order as delivered to the browser 
+will load more quickly but are functionally equivalent,
+at least barring syntax errors. Several
+tools exist to automate this stage of the build process,
+incorporating a topological sort of the dependency digraph in order to find a
 working concatenation order.
 
-Early in this project I chose Require.js although it was later abandoned
-because I found it to be too heavyweight. Javascript as a language
-doesn't have an import statement so Require implements importing in
-Javascript itself as a normally executable function. When running raw
-source, this function AJAXes in the imported source but Require also has
-an 'optimise mode' which uses static analysis to deduce a workable
-source order and concatenates into a single file. This of course is
-impossible in the general case and if, for example, the import is
-subject to branching require falls back to lazy loading, fetching only
-when needed. In practice undecidability isn't an issue because importing
-is typically unconditional and may even be an advantage in larger
-projects. To speed up initial loading of larger web applications,
-*Asynchronous Module Definition* (AMD) imports rarely-loaded
-functionality in response to events, resisting static analysis and so
-downloading the code only as it is needed.
+Early in this project I chose *Require.js* although I later moved on because it was too
+heavyweight. Javascript as a language
+doesn't have an import statement. Require contributes the importing ability to
+Javascript from inside the language sandbox as the `require` function, 
+a standard asynchronous call.
+Calls to `require` AJAX in and execute the imported source, returning
+any exported symbols by a callback. For non-trivial applications this mode 
+is intended mostly for debugging; because a network hop is involved 
+the protocol is chatty and slowed by highly latent calls between modules.
+For efficient delivery Require also has
+the `optimise` command which concatenates into a single file by using static 
+analysis to deduce a workable source order. Because `require` may appear anywhere
+in the source, this in the general case is of course
+undecidable so Require falls back to lazy loading.
+In practice undecidability isn't a problem because imports are generally 
+not subject to branching. In larger
+webapps lazy loading speeding up the initial page load and is actually an advantage.
+The technique of *Asynchronous Module Definition* (AMD) intentionally imports 
+rarely-loaded modules in response to events. By resisting the static analysis the units
+will not be downloaded until they are needed.
 
-I hoped to use Require's `optimise` to generate my distributable
-Javascript library. However, require's structure necessitates that calls
-to the importing functions stay in the code and that the require.js
-run-time component is available to facilitate these calls. For a small
-project I found this constant-size overhead too large in relation to the
-rest of the project. Require also prefers to be used as the sole means
-of loading scripts meaning that Oboe would not fit naturally into web
-applications not already using require. Overall, Require seems more
-suited to developing whole applications than programming libraries.
+AMD is mostly of interest to web applications with a central hub but also some 
+rarely used parts. Oboe does not fit this profile: everybody who uses it will
+use all of the library. Regardless, I hoped to use `optimise` to 
+generate my combined
+Javascript file. Even after optimisation, Require's design necessitates that calls
+to `require` stay in the code and that the require.js
+run-time component is available to handle these calls. For a micro-library
+a ???k overhead was too large to accommodate.
+Overall, Require seems more suited to developing stand-alone
+applications than programming libraries.
 
-Having abandoned require rather than look for another sophisticated
-means to perform concatenation I decided to pick up the simplest tool
-which could possibly work, a Grunt module which works like the unix
-`cat` command. With only 15 source Javascript files manually finding a
-working order by drawing a graph on paper isn't a daunting task. As new
-files are added it is simple to find a place to insert them into the
-list. I adjusted each Javascript file to, when loaded directly, place
+Having abandoned Require, I decided to pick up the simplest tool
+which could possibly work. With only 15 source files and a fairly sparse dependency graph
+finding a working order on paper wasn't a daunting task.
+Combined with a Grunt analogue to the unix `cat` command I quickly had
+a working build process. 
+I adjusted each Javascript file to, when loaded directly, place
 its API in the global namespace, then post-concatenation wrapped the
 combined in a single function, converting the APIs inside the function
 from global to the scope of that function, thereby hiding the
@@ -257,6 +260,14 @@ which forces me to be suspicious of the project's build process.
 Styles of Programming
 ---------------------
 
+*moved into here*
+
+Although there is limited encapsulation to follow an OO-style
+arrangement, data is hidden. Outside of Oboe, only a restricted public
+API is exposed. Not only are the internals inaccessible, they are
+unaddressable. With no references attached to any external data
+structures, most data exists only as captured within closures.
+
 The implementation of Oboe is mixed paradigm. Events flow throughout the
 whole library but in terms of code style the components are a mix of
 procedural, functional and object-oriented programming. Object
@@ -267,22 +278,34 @@ Closures, not objects, are used as the primary means of data storage and
 hiding. Many of the entities painted in figure \ref{overallDesign} map
 onto no single, addressable language construct and exist only as a set
 of event handlers trapped inside the same closure, taking advantage of
-the fact that their reachability from some event emitter
-prevents their required parameters from being garbage collected.
-Although only sparingly OO, the high-level design's componentisation
-hasn't departed from how it might be implemented in an OO metamodel and
-is Object Oriented design patterns remain influential despite being only
-loosely followed.
+the fact that their reachability from some event emitter prevents
+required parameters from being garbage collected. Although only
+sparingly OO, the high-level design's componentisation hasn't departed
+from how it might be implemented in an OO metamodel and is Object
+Oriented design patterns remain influential despite being only loosely
+followed.
 
 Because of the pressures on code size I decided not to use a general
 purpose functional library and instead create my own with only the parts
-that I need; see functional.js. Functional programming in Javascript is 
-known to be slower than other styles, particularly under Firefox [@functionalSpiderMonkey]
-because it lacks Lambda Lifting and other similar optimisations.
-A constant drag on JS execution time is not much of a problem so long
-as order of complexity is kept under control. Keep track of performance.
-Often, throughput is less of a worry than 'spikes' in processing. Oboe's
-design naturally spreads computation evenly over a long period of time.
+that I need; see functional.js. Functional programming in Javascript is
+known to be slower than other styles, particularly under Firefox because
+it lacks Lambda Lifting and other similar optimisations
+[@functionalSpiderMonkey]. Considering to what degree performance
+concerns should dissuade us from a functional style, we may consider the
+library's execution context. Because of the single-threaded model any
+application's Javascript execution is in between frames serving
+concurrent concerns so to minimise the impact on latency for the other
+tasks it is important that no task occupies the CPU for very long. On
+the browser about 16ms is a fair maximum, allowing painting to occur at
+60 frames per second. In Node there is no hard limit but any CPU-hogging
+task degrades the responsiveness of other responses. Context switching
+imposes a very low overhead and responsive sharing generally proffers
+many small frames over a few larger ones. In any case, server-side tasks
+especially are more often i/o bound than CPU bound. Oboe's progressive
+design naturally splits tasks which would otherwise be performed in a
+single frame over many. For example, parsing and marshaling. Although
+the overall computation may be higher, the total performance of the
+system should be improved.
 
 Javascript is of course an imperative language but over many iterations
 Oboe has tended towards a declarative style. In
@@ -290,8 +313,6 @@ incrementalContentBuilder.js programming was initially stateful and
 procedural, reading like the instructions to perform a task. Over many
 refactors the flavour of the code has changed, the reading now tending
 towards a description of desired behaviour.
-
-http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.48.4346
 
 Incrementally building up the content
 -------------------------------------
