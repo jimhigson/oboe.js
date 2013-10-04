@@ -351,6 +351,17 @@
       "url":"http://melconway.com/Home/pdf/humanize.pdf",
       "issued": { "date-parts":[ [2004] ] },
       "type":"book"
+   },
+   
+   {
+      "id":"functionalSpiderMonkey",
+      "title":"Two Reasons Functional Style Is Slow in SpiderMonkey",
+      "author":[         
+         { "family": "Guo", "given":"shu-yu"}
+      ],
+      "url":"http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html",
+      "issued": { "date-parts":[ [2013] ] },
+      "type":"webpage"                  
    }
 
 ]
