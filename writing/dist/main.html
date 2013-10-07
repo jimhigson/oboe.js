@@ -2975,11 +2975,8 @@ Chapter 4+5 40 to 60 pages
   <h1 id="appendix"><a href="#appendix"><span class=
   "header-section-number">7</span> Appendix</a></h1>
 
-  <h1 id="bibliography"><a href="#bibliography"><span class=
-  "header-section-number">8</span> Bibliography</a></h1>
-
   <h2 id="browserapi.js"><a href="#browserapi.js"><span class=
-  "header-section-number">8.1</span> browserApi.js</a></h2>
+  "header-section-number">7.1</span> browserApi.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
 <span class="co">// export public API</span>
@@ -3052,7 +3049,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="clarinetlisteneradaptor.js"><a href=
   "#clarinetlisteneradaptor.js"><span class=
-  "header-section-number">8.2</span>
+  "header-section-number">7.2</span>
   clarinetListenerAdaptor.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
@@ -3083,7 +3080,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="events.js"><a href="#events.js"><span class=
-  "header-section-number">8.3</span> events.js</a></h2>
+  "header-section-number">7.3</span> events.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "kw">var</span> _S = <span class="dv">0</span>,
@@ -3101,7 +3098,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="functional.js"><a href="#functional.js"><span class=
-  "header-section-number">8.4</span> functional.js</a></h2>
+  "header-section-number">7.4</span> functional.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -3287,7 +3284,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="incrementalcontentbuilder.js"><a href=
   "#incrementalcontentbuilder.js"><span class=
-  "header-section-number">8.5</span>
+  "header-section-number">7.5</span>
   incrementalContentBuilder.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
@@ -3545,7 +3542,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="instancecontroller.js"><a href=
   "#instancecontroller.js"><span class=
-  "header-section-number">8.6</span> instanceController.js</a></h2>
+  "header-section-number">7.6</span> instanceController.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * </span><span class=
@@ -3757,7 +3754,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="jsonpath.js"><a href="#jsonpath.js"><span class=
-  "header-section-number">8.7</span> jsonPath.js</a></h2>
+  "header-section-number">7.7</span> jsonPath.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -4362,7 +4359,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="jsonpathsyntax.js"><a href=
   "#jsonpathsyntax.js"><span class=
-  "header-section-number">8.8</span> jsonPathSyntax.js</a></h2>
+  "header-section-number">7.8</span> jsonPathSyntax.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "kw">var</span> jsonPathSyntax = (<span class=
@@ -4524,7 +4521,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="lists.js"><a href="#lists.js"><span class=
-  "header-section-number">8.9</span> lists.js</a></h2>
+  "header-section-number">7.9</span> lists.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
 <span class="kw">function</span> <span class=
@@ -4554,15 +4551,9 @@ Chapter 4+5 40 to 60 pages
 <span class="kw">function</span> <span class=
 "fu">arrayAsList</span>(array){
 
-   <span class="kw">var</span> l = emptyList;
-
-   <span class="kw">for</span>( <span class=
-"kw">var</span> i = <span class="ot">array</span>.<span class=
-"fu">length</span> ; i--; ) {
-      l = <span class="fu">cons</span>(array[i], l);      
-   }
-
-   <span class="kw">return</span> l;   
+   <span class="kw">return</span> <span class=
+"fu">reverseList</span>( <span class="ot">array</span>.<span class=
+"fu">reduce</span>(cons, emptyList) );    
 }
 
 <span class="co">/**</span>
@@ -4685,7 +4676,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="pubsub.js"><a href="#pubsub.js"><span class=
-  "header-section-number">8.10</span> pubSub.js</a></h2>
+  "header-section-number">7.10</span> pubSub.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -4722,7 +4713,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="streaminghttp.js"><a href=
-  "#streaminghttp.js"><span class="header-section-number">8.11</span>
+  "#streaminghttp.js"><span class="header-section-number">7.11</span>
   streamingHttp.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
@@ -4895,7 +4886,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="util.js"><a href="#util.js"><span class=
-  "header-section-number">8.12</span> util.js</a></h2>
+  "header-section-number">7.12</span> util.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
 <span class="co">/**</span>
@@ -4974,7 +4965,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="wire.js"><a href="#wire.js"><span class=
-  "header-section-number">8.13</span> wire.js</a></h2>
+  "header-section-number">7.13</span> wire.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "kw">function</span> <span class=
@@ -4999,6 +4990,9 @@ Chapter 4+5 40 to 60 pages
 "ot">eventBus</span>.<span class="fu">fire</span>) );
 }</code>
 </pre>
+
+  <h1 id="bibliography"><a href="#bibliography"><span class=
+  "header-section-number">8</span> Bibliography</a></h1>
 
   <p>Ahuvia, Yogev. 2013. &acirc;&euro;&oelig;Design Patterns:
   Infinite Scrolling: Let&acirc;&euro;&trade;s Get To The Bottom Of
