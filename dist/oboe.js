@@ -11,6 +11,17 @@ function apply(args, fn) {
 }
 
 /**
+ * Swap the order of parameters to a binary function
+ * 
+ * A bit like this flip: http://zvon.org/other/haskell/Outputprelude/flip_f.html
+ */
+function flip(fn){
+   return function(a, b){
+      return fn(b,a);
+   }
+}
+
+/**
  * Define variable argument functions without all that tedious messing about 
  * with the arguments object.
  * 
@@ -162,37 +173,65 @@ function hasAllProperties(fieldList, o) {
                   return (field in o);         
                }, fieldList);
 }
-
+/**
+ * Like cons in LISP
+ */
 function cons(x, xs) {
    
-   // Lists are all immutable. Object.freeze provides this in newer Javascript engines.
-   // Otherwise, freeze should have been polyfilled to act as an identity function.
-   return Object.freeze({h:x, t:xs});
-}
-
-var head = attr('h');
-var tail = attr('t');
-var emptyList = null;
-
-/** Converts an array to a list 
- * 
- *  asList([a,b,c]) = cons(a,cons(b,cons(c,emptyList))); 
- **/
-function arrayAsList(array){
-
-   var l = emptyList;
-
-   for( var i = array.length ; i--; ) {
-      l = cons(array[i], l);      
-   }
-
-   return l;   
+   // Internally lists are linked 2-element JS arrays. 
+   // So that lists are all immutable we Object.freeze in newer Javascript engines.
+   // In older engines freeze should have been polyfilled with the identity function.
+   return Object.freeze([x,xs]);
 }
 
 /**
- * A varargs version of as List
+ * The empty list
+ */
+var emptyList = null,
+
+/**
+ * Get the head of a list.
  * 
- *  asList(a,b,c) = cons(a,cons(b,cons(c,emptyList)));
+ * Ie, head(cons(a,b)) = a
+ */
+    head = attr(0),
+
+/**
+ * Get the tail of a list.
+ * 
+ * Ie, head(cons(a,b)) = a
+ */
+    tail = attr(1);
+
+
+/** 
+ * Converts an array to a list 
+ * 
+ *    asList([a,b,c])
+ * 
+ * is equivalent to:
+ *    
+ *    cons(a, cons(b, cons(c, emptyList))) 
+ **/
+function arrayAsList(inputArray){
+
+   return reverseList( 
+      inputArray.reduce(
+         flip(cons),
+         emptyList 
+      )
+   );
+}
+
+/**
+ * A varargs version of arrayAsList. Works a bit like list
+ * in LISP.
+ * 
+ *    list(a,b,c) 
+ *    
+ * is equivalent to:
+ * 
+ *    cons(a, cons(b, cons(c, emptyList)))
  */
 var list = varArgs(arrayAsList);
 
@@ -261,16 +300,16 @@ function each(fn, list) {
 /**
  * Reverse the order of a list
  */
-function reverseList(list){
+function reverseList(list){ 
 
    // js re-implementation of 3rd solution from:
    //    http://www.haskell.org/haskellwiki/99_questions/Solutions/5
-   function reverseInner( list, reversed ) {
+   function reverseInner( list, reversedAlready ) {
       if( !list ) {
-         return reversed;
+         return reversedAlready;
       }
       
-      return reverseInner(tail(list), cons(head(list), reversed))
+      return reverseInner(tail(list), cons(head(list), reversedAlready))
    }
 
    return reverseInner(list, emptyList);
@@ -1083,11 +1122,12 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( fire) {
 
-   function checkForMissedArrayKey( possiblyInconsistentAscent, newDeepestNode) {
+   function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
-      // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
-      // is for objects)
-      // so we need to notify of the paths when we find the items:
+      // for values in arrays we aren't pre-warned of the coming paths (Clarinet gives 
+      // no call to onkey like it does for values in objects) so if we are in an array 
+      // we need to create this path ourselves. The key will be len(parentNode) because
+      // array keys are always sequential numbers.
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
@@ -1116,7 +1156,7 @@ function incrementalContentBuilder( fire) {
 
       // we discovered a non-root node
                  
-      var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
+      var arrayConsistentAscent  = arrayIndicesAreKeys( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
           previouslyUnmappedName = keyOf( head( arrayConsistentAscent));
           
@@ -1772,7 +1812,6 @@ function wire (httpMethodName, url, body, headers){
                               clarinet.parser(), incrementalContentBuilder(eventBus.fire) );
 }
 
-
 // export public API
 window.oboe          = apiMethod('GET');
 window.oboe.doGet    = window.oboe;
@@ -1811,8 +1850,5 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
                   firstArg.headers 
          );
       }
-                                                   
    };
-}   
-
-})(window, Object, Array, Error);
+}   })(window, Object, Array, Error);

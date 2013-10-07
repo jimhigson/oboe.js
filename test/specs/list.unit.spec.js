@@ -45,14 +45,14 @@ describe("Lists", function(){
       var naturals = cons(1, cons(2, cons(3, emptyList)));
       var evens = cons(2, cons(4, cons(6, emptyList)));
       
-      function doubleIt(n){return n * 2}
+      function doubleit(n){return n * 2}
       
-      expect( map(doubleIt, naturals) ).toEqual( evens );
+      expect( map(doubleit, naturals) ).toEqual( evens );
    });
-   
+      
    it("can convert non empty list to an array", function(){
-   
-      expect( listAsArray( arrayAsList(['a','b','c']) ) ).toEqual( ['a','b','c'] );
+      
+      expect( listAsArray( list('a','b','c') ) ).toEqual( ['a','b','c'] );
    });
    
    it("can convert empty array to list", function() {
@@ -60,7 +60,7 @@ describe("Lists", function(){
       expect( listAsArray( arrayAsList([]) ) ).toEqual( [] );
    });
    
-   it("can assert every item in a list holds for a given test", function(){
+   it("can assert every xitem in a list holds for a given test", function(){
       var l = list(1,2,3,4,5,6,7,8,9,10);
                
       function isANumber(n) {

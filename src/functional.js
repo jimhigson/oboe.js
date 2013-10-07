@@ -10,6 +10,17 @@ function apply(args, fn) {
 }
 
 /**
+ * Swap the order of parameters to a binary function
+ * 
+ * A bit like this flip: http://zvon.org/other/haskell/Outputprelude/flip_f.html
+ */
+function flip(fn){
+   return function(a, b){
+      return fn(b,a);
+   }
+}
+
+/**
  * Define variable argument functions without all that tedious messing about 
  * with the arguments object.
  * 

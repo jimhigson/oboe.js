@@ -27,11 +27,12 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( fire) {
 
-   function checkForMissedArrayKey( possiblyInconsistentAscent, newDeepestNode) {
+   function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
-      // for arrays we aren't pre-warned of the coming paths (there is no call to onkey like there 
-      // is for objects)
-      // so we need to notify of the paths when we find the items:
+      // for values in arrays we aren't pre-warned of the coming paths (Clarinet gives 
+      // no call to onkey like it does for values in objects) so if we are in an array 
+      // we need to create this path ourselves. The key will be len(parentNode) because
+      // array keys are always sequential numbers.
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
@@ -60,7 +61,7 @@ function incrementalContentBuilder( fire) {
 
       // we discovered a non-root node
                  
-      var arrayConsistentAscent  = checkForMissedArrayKey( ascent, newDeepestNode),      
+      var arrayConsistentAscent  = arrayIndicesAreKeys( ascent, newDeepestNode),      
           ancestorBranches       = tail( arrayConsistentAscent),
           previouslyUnmappedName = keyOf( head( arrayConsistentAscent));
           

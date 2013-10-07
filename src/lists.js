@@ -1,34 +1,62 @@
-
+/**
+ * Like cons in LISP
+ */
 function cons(x, xs) {
    
-   // Lists are all immutable. Object.freeze provides this in newer Javascript engines.
-   // Otherwise, freeze should have been polyfilled to act as an identity function.
-   return Object.freeze({h:x, t:xs});
-}
-
-var head = attr('h');
-var tail = attr('t');
-var emptyList = null;
-
-/** Converts an array to a list 
- * 
- *  asList([a,b,c]) = cons(a,cons(b,cons(c,emptyList))); 
- **/
-function arrayAsList(array){
-
-   var l = emptyList;
-
-   for( var i = array.length ; i--; ) {
-      l = cons(array[i], l);      
-   }
-
-   return l;   
+   // Internally lists are linked 2-element JS arrays. 
+   // So that lists are all immutable we Object.freeze in newer Javascript engines.
+   // In older engines freeze should have been polyfilled with the identity function.
+   return Object.freeze([x,xs]);
 }
 
 /**
- * A varargs version of as List
+ * The empty list
+ */
+var emptyList = null,
+
+/**
+ * Get the head of a list.
  * 
- *  asList(a,b,c) = cons(a,cons(b,cons(c,emptyList)));
+ * Ie, head(cons(a,b)) = a
+ */
+    head = attr(0),
+
+/**
+ * Get the tail of a list.
+ * 
+ * Ie, head(cons(a,b)) = a
+ */
+    tail = attr(1);
+
+
+/** 
+ * Converts an array to a list 
+ * 
+ *    asList([a,b,c])
+ * 
+ * is equivalent to:
+ *    
+ *    cons(a, cons(b, cons(c, emptyList))) 
+ **/
+function arrayAsList(inputArray){
+
+   return reverseList( 
+      inputArray.reduce(
+         flip(cons),
+         emptyList 
+      )
+   );
+}
+
+/**
+ * A varargs version of arrayAsList. Works a bit like list
+ * in LISP.
+ * 
+ *    list(a,b,c) 
+ *    
+ * is equivalent to:
+ * 
+ *    cons(a, cons(b, cons(c, emptyList)))
  */
 var list = varArgs(arrayAsList);
 
@@ -97,16 +125,16 @@ function each(fn, list) {
 /**
  * Reverse the order of a list
  */
-function reverseList(list){
+function reverseList(list){ 
 
    // js re-implementation of 3rd solution from:
    //    http://www.haskell.org/haskellwiki/99_questions/Solutions/5
-   function reverseInner( list, reversed ) {
+   function reverseInner( list, reversedAlready ) {
       if( !list ) {
-         return reversed;
+         return reversedAlready;
       }
       
-      return reverseInner(tail(list), cons(head(list), reversed))
+      return reverseInner(tail(list), cons(head(list), reversedAlready))
    }
 
    return reverseInner(list, emptyList);
