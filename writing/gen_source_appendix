@@ -1,14 +1,16 @@
 #!/bin/sh
 
-# Simple shell script. Reads all of the file in the main directory in order, and writes out their contents
-# with two newlines seperating the individual files.
-# With thanks to: http://stackoverflow.com/questions/2576693/linux-merging-multiple-files-each-on-a-new-line 
+# This script generates the markdown versions of the Javascript source so that
+# Pandoc can later turn them into a PDF.
 
 cd ../src
 
 APPENDIX_MARKDOWN_DIR=main/7_Appendix
 
 SRC_FILES=$(ls *.js | sort) 
+
+
+FIRST=1
 
 cd ../writing
 
@@ -19,8 +21,15 @@ for JS_FILE_NAME in $SRC_FILES; do
 
    touch $MD_FILE
    
-   echo > $MD_FILE             
-   echo "\pagebreak" >> $MD_FILE    
+   echo > $MD_FILE  
+   
+   if [ $FIRST -ne 1 ]
+   then
+      echo "\pagebreak" >> $MD_FILE      
+   fi
+   
+   FIRST=0    
+       
    echo >> $MD_FILE         
    echo $JS_FILE_NAME >> $MD_FILE
    echo "---" >> $MD_FILE
