@@ -42,12 +42,12 @@ complexity" - when a program is made out of parts whose correct
 behaviour cannot be observed without all of the program. Allows smaller
 units to be verified before verifying the whole.
 
-![The testing pyramid is a common concept, relying on the assumption
+![**The test pyramid**. Relying on the assumption
 that verification of small parts provides a solid base from which to
 compose system-level behaviours. A Lot of testing is done on the
 low-level components of the system, less on the component level and less
 still on a whole-system level where only smoke tests are provided.
-\label{testpyramid}](images/pyramid)
+\label{testpyramid}](images/testPyramid.png)
 
 The testing itself is a non-trivial undertaking with 80% of code written
 for this project being test specifications. Based on the idea that a
