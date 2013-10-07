@@ -9,6 +9,41 @@ function apply(args, fn) {
    return fn.apply(undefined, args);
 }
 
+/** 
+ * Partially complete the given function by filling it in with all arguments given
+ * after the function itself. Returns the partially completed version.
+ */
+var partialComplete = varArgs(function( fn, boundArgs ) {
+
+      return varArgs(function( callArgs ) {
+               
+         return fn.apply(this, boundArgs.concat(callArgs));
+      }); 
+   }),
+
+/**
+ * Compose zero or more functions:
+ * 
+ *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))
+ * 
+ * The last (inner-most) function may take more than one parameter:
+ * 
+ *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
+ */
+   compose = varArgs(function(fns) {
+
+      var fnsList = arrayAsList(fns);
+   
+      function next(params, curFn) {  
+         return [apply(params, curFn)];   
+      }
+      
+      return varArgs(function(startParams){
+        
+         return foldR(next, startParams, fnsList)[0];
+      });
+   });
+
 /**
  * Swap the order of parameters to a binary function
  * 
@@ -102,29 +137,3 @@ function lazyIntersection(fn1, fn2) {
    };   
 }
 
-/** 
- * Partially complete the given function by filling it in with all arguments given
- * after the function itself. Returns the partially completed version.
- */
-var partialComplete = varArgs(function( fn, boundArgs ) {
-
-   return varArgs(function( callArgs ) {
-            
-      return fn.apply(this, boundArgs.concat(callArgs));
-   }); 
-});
-
-
-var compose = varArgs(function(fns) {
-
-   var fnsList = arrayAsList(fns);
-
-   function next(params, curFn) {  
-      return [apply(params, curFn)];   
-   }
-   
-   return varArgs(function(startParams){
-     
-      return foldR(next, startParams, fnsList)[0];
-   });
-});
