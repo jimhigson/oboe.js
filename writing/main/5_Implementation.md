@@ -260,14 +260,6 @@ which forces me to be suspicious of the project's build process.
 Styles of Programming
 ---------------------
 
-*moved into here*
-
-Although there is limited encapsulation to follow an OO-style
-arrangement, data is hidden. Outside of Oboe, only a restricted public
-API is exposed. Not only are the internals inaccessible, they are
-unaddressable. With no references attached to any external data
-structures, most data exists only as captured within closures.
-
 The implementation of Oboe is mixed paradigm. Events flow throughout the
 whole library but in terms of code style the components are a mix of
 procedural, functional and object-oriented programming. Object
@@ -279,9 +271,11 @@ hiding. Many of the entities painted in figure \ref{overallDesign} map
 onto no single, addressable language construct and exist only as a set
 of event handlers trapped inside the same closure, taking advantage of
 the fact that their reachability from some event emitter prevents
-required parameters from being garbage collected. Although only
+required parameters from being garbage collected. From outside the closure
+hidden values are not only private as would be seen in an OO model,
+they are inherently unaddressable. Although only
 sparingly OO, the high-level design's componentisation hasn't departed
-from how it might be implemented in an OO metamodel and is Object
+from how it might be implemented in an OO metamodel and Object
 Oriented design patterns remain influential despite being only loosely
 followed.
 
