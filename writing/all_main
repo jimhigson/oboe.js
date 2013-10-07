@@ -4,12 +4,9 @@
 # with two newlines seperating the individual files.
 # With thanks to: http://stackoverflow.com/questions/2576693/linux-merging-multiple-files-each-on-a-new-line 
 
-for f in $(ls main/*.md | sort); do 
-   cat $f
-   echo; echo
-done
+FILE_LIST=$(find main -name "*.md" | sort)
 
-for f in $(ls appendix/*.md | sort); do 
+for f in $FILE_LIST; do 
    cat $f
    echo; echo
 done

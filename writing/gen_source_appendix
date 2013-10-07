@@ -6,18 +6,22 @@
 
 cd ../src
 
+APPENDIX_MARKDOWN_DIR=main/7_Appendix
+
 SRC_FILES=$(ls *.js | sort) 
 
 cd ../writing
 
 for JS_FILE_NAME in $SRC_FILES; do
-   MD_FILE=appendix/$JS_FILE_NAME.md
+   MD_FILE=$APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
    
    echo "will package source for appendix $MD_FILE"
 
    touch $MD_FILE
    
    echo > $MD_FILE             
+   echo "\pagebreak" >> $MD_FILE    
+   echo >> $MD_FILE         
    echo $JS_FILE_NAME >> $MD_FILE
    echo "---" >> $MD_FILE
    echo >> $MD_FILE    
@@ -28,6 +32,4 @@ for JS_FILE_NAME in $SRC_FILES; do
    echo "~~~~" >> $MD_FILE
    echo >> $MD_FILE                 
      
-   #cat $f
-   #echo; echo
 done
