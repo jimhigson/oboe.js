@@ -2180,16 +2180,15 @@ Chapter 4+5 40 to 60 pages
   whole.</p>
 
   <div class="figure">
-    <img src="images/pyramid.png" alt=
-    "The testing pyramid is a common concept, relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided. ">
+    <img src="images/testPyramid.png" alt=
+    "The test pyramid. Relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided. ">
 
-    <p class="caption">The testing pyramid is a common concept,
-    relying on the assumption that verification of small parts
-    provides a solid base from which to compose system-level
-    behaviours. A Lot of testing is done on the low-level
-    components of the system, less on the component level and less
-    still on a whole-system level where only smoke tests are
-    provided.</p>
+    <p class="caption"><strong>The test pyramid</strong>. Relying
+    on the assumption that verification of small parts provides a
+    solid base from which to compose system-level behaviours. A Lot
+    of testing is done on the low-level components of the system,
+    less on the component level and less still on a whole-system
+    level where only smoke tests are provided.</p>
   </div>
 
   <p>The testing itself is a non-trivial undertaking with 80% of
@@ -2978,8 +2977,8 @@ Chapter 4+5 40 to 60 pages
   <h2 id="browserapi.js"><a href="#browserapi.js"><span class=
   "header-section-number">7.1</span> browserApi.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
-<span class="co">// export public API</span>
+<code class="sourceCode javascript"><span class=
+"co">// export public API</span>
 <span class="ot">window</span>.<span class=
 "fu">oboe</span>          = <span class=
 "fu">apiMethod</span>(<span class="st">'GET'</span>);
@@ -3041,10 +3040,8 @@ Chapter 4+5 40 to 60 pages
 "fu">headers</span> 
          );
       }
-                                                   
    };
-}   
-</code>
+}   </code>
 </pre>
 
   <h2 id="clarinetlisteneradaptor.js"><a href=
@@ -3115,6 +3112,74 @@ Chapter 4+5 40 to 60 pages
    <span class="kw">return</span> <span class=
 "ot">fn</span>.<span class="fu">apply</span>(<span class=
 "kw">undefined</span>, args);
+}
+
+<span class="co">/** </span>
+<span class=
+"co"> * Partially complete the given function by filling it in with all arguments given</span>
+<span class=
+"co"> * after the function itself. Returns the partially completed version.</span>
+<span class="co"> */</span>
+<span class="kw">var</span> partialComplete = <span class=
+"fu">varArgs</span>(<span class=
+"kw">function</span>( fn, boundArgs ) {
+
+      <span class="kw">return</span> <span class=
+"fu">varArgs</span>(<span class="kw">function</span>( callArgs ) {
+               
+         <span class="kw">return</span> <span class=
+"ot">fn</span>.<span class="fu">apply</span>(<span class=
+"kw">this</span>, <span class="ot">boundArgs</span>.<span class=
+"fu">concat</span>(callArgs));
+      }); 
+   }),
+
+<span class="co">/**</span>
+<span class="co"> * Compose zero or more functions:</span>
+<span class="co"> * </span>
+<span class=
+"co"> *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))</span>
+<span class="co"> * </span>
+<span class=
+"co"> * The last (inner-most) function may take more than one parameter:</span>
+<span class="co"> * </span>
+<span class=
+"co"> *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))</span>
+<span class="co"> */</span>
+   compose = <span class="fu">varArgs</span>(<span class=
+"kw">function</span>(fns) {
+
+      <span class="kw">var</span> fnsList = <span class=
+"fu">arrayAsList</span>(fns);
+   
+      <span class="kw">function</span> <span class=
+"fu">next</span>(params, curFn) {  
+         <span class="kw">return</span> [<span class=
+"fu">apply</span>(params, curFn)];   
+      }
+      
+      <span class="kw">return</span> <span class=
+"fu">varArgs</span>(<span class="kw">function</span>(startParams){
+        
+         <span class="kw">return</span> <span class=
+"fu">foldR</span>(next, startParams, fnsList)[<span class=
+"dv">0</span>];
+      });
+   });
+
+<span class="co">/**</span>
+<span class=
+"co"> * Swap the order of parameters to a binary function</span>
+<span class="co"> * </span>
+<span class=
+"co"> * A bit like this flip: http://zvon.org/other/haskell/Outputprelude/flip_f.html</span>
+<span class="co"> */</span>
+<span class="kw">function</span> <span class="fu">flip</span>(fn){
+   <span class="kw">return</span> <span class=
+"kw">function</span>(a, b){
+      <span class="kw">return</span> <span class=
+"fu">fn</span>(b,a);
+   }
 }
 
 <span class="co">/**</span>
@@ -3238,48 +3303,7 @@ Chapter 4+5 40 to 60 pages
 "fu">fn2</span>(param);
    };   
 }
-
-<span class="co">/** </span>
-<span class=
-"co"> * Partially complete the given function by filling it in with all arguments given</span>
-<span class=
-"co"> * after the function itself. Returns the partially completed version.</span>
-<span class="co"> */</span>
-<span class="kw">var</span> partialComplete = <span class=
-"fu">varArgs</span>(<span class=
-"kw">function</span>( fn, boundArgs ) {
-
-   <span class="kw">return</span> <span class=
-"fu">varArgs</span>(<span class="kw">function</span>( callArgs ) {
-            
-      <span class="kw">return</span> <span class=
-"ot">fn</span>.<span class="fu">apply</span>(<span class=
-"kw">this</span>, <span class="ot">boundArgs</span>.<span class=
-"fu">concat</span>(callArgs));
-   }); 
-});
-
-
-<span class="kw">var</span> compose = <span class=
-"fu">varArgs</span>(<span class="kw">function</span>(fns) {
-
-   <span class="kw">var</span> fnsList = <span class=
-"fu">arrayAsList</span>(fns);
-
-   <span class="kw">function</span> <span class=
-"fu">next</span>(params, curFn) {  
-      <span class="kw">return</span> [<span class=
-"fu">apply</span>(params, curFn)];   
-   }
-   
-   <span class="kw">return</span> <span class=
-"fu">varArgs</span>(<span class="kw">function</span>(startParams){
-     
-      <span class="kw">return</span> <span class=
-"fu">foldR</span>(next, startParams, fnsList)[<span class=
-"dv">0</span>];
-   });
-});</code>
+</code>
 </pre>
 
   <h2 id="incrementalcontentbuilder.js"><a href=
@@ -4523,44 +4547,75 @@ Chapter 4+5 40 to 60 pages
   <h2 id="lists.js"><a href="#lists.js"><span class=
   "header-section-number">7.9</span> lists.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
+<code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co"> * Like cons in LISP</span>
+<span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">cons</span>(x, xs) {
    
    <span class=
-"co">// Lists are all immutable. Object.freeze provides this in newer Javascript engines.</span>
+"co">// Internally lists are linked 2-element JS arrays. </span>
    <span class=
-"co">// Otherwise, freeze should have been polyfilled to act as an identity function.</span>
+"co">// So that lists are all immutable we Object.freeze in newer Javascript engines.</span>
+   <span class=
+"co">// In older engines freeze should have been polyfilled with the identity function.</span>
    <span class="kw">return</span> <span class=
-"ot">Object</span>.<span class="fu">freeze</span>({<span class=
-"dt">h</span>:x, <span class="dt">t</span>:xs});
-}
-
-<span class="kw">var</span> head = <span class=
-"fu">attr</span>(<span class="st">'h'</span>);
-<span class="kw">var</span> tail = <span class=
-"fu">attr</span>(<span class="st">'t'</span>);
-<span class="kw">var</span> emptyList = <span class=
-"kw">null</span>;
-
-<span class="co">/** Converts an array to a list </span>
-<span class="co"> * </span>
-<span class=
-"co"> *  asList([a,b,c]) = cons(a,cons(b,cons(c,emptyList))); </span>
-<span class="co"> **/</span>
-<span class="kw">function</span> <span class=
-"fu">arrayAsList</span>(array){
-
-   <span class="kw">return</span> <span class=
-"fu">reverseList</span>( <span class="ot">array</span>.<span class=
-"fu">reduce</span>(cons, emptyList) );    
+"ot">Object</span>.<span class="fu">freeze</span>([x,xs]);
 }
 
 <span class="co">/**</span>
-<span class="co"> * A varargs version of as List</span>
+<span class="co"> * The empty list</span>
+<span class="co"> */</span>
+<span class="kw">var</span> emptyList = <span class=
+"kw">null</span>,
+
+<span class="co">/**</span>
+<span class="co"> * Get the head of a list.</span>
 <span class="co"> * </span>
+<span class="co"> * Ie, head(cons(a,b)) = a</span>
+<span class="co"> */</span>
+    head = <span class="fu">attr</span>(<span class="dv">0</span>),
+
+<span class="co">/**</span>
+<span class="co"> * Get the tail of a list.</span>
+<span class="co"> * </span>
+<span class="co"> * Ie, head(cons(a,b)) = a</span>
+<span class="co"> */</span>
+    tail = <span class="fu">attr</span>(<span class="dv">1</span>);
+
+
+<span class="co">/** </span>
+<span class="co"> * Converts an array to a list </span>
+<span class="co"> * </span>
+<span class="co"> *    asList([a,b,c])</span>
+<span class="co"> * </span>
+<span class="co"> * is equivalent to:</span>
+<span class="co"> *    </span>
+<span class="co"> *    cons(a, cons(b, cons(c, emptyList))) </span>
+<span class="co"> **/</span>
+<span class="kw">function</span> <span class=
+"fu">arrayAsList</span>(inputArray){
+
+   <span class="kw">return</span> <span class=
+"fu">reverseList</span>( 
+      <span class="ot">inputArray</span>.<span class=
+"fu">reduce</span>(
+         <span class="fu">flip</span>(cons),
+         emptyList 
+      )
+   );
+}
+
+<span class="co">/**</span>
 <span class=
-"co"> *  asList(a,b,c) = cons(a,cons(b,cons(c,emptyList)));</span>
+"co"> * A varargs version of arrayAsList. Works a bit like list</span>
+<span class="co"> * in LISP.</span>
+<span class="co"> * </span>
+<span class="co"> *    list(a,b,c) </span>
+<span class="co"> *    </span>
+<span class="co"> * is equivalent to:</span>
+<span class="co"> * </span>
+<span class="co"> *    cons(a, cons(b, cons(c, emptyList)))</span>
 <span class="co"> */</span>
 <span class="kw">var</span> list = <span class=
 "fu">varArgs</span>(arrayAsList);
@@ -4652,22 +4707,22 @@ Chapter 4+5 40 to 60 pages
 <span class="co"> * Reverse the order of a list</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
-"fu">reverseList</span>(list){
+"fu">reverseList</span>(list){ 
 
    <span class=
 "co">// js re-implementation of 3rd solution from:</span>
    <span class=
 "co">//    http://www.haskell.org/haskellwiki/99_questions/Solutions/5</span>
    <span class="kw">function</span> <span class=
-"fu">reverseInner</span>( list, reversed ) {
+"fu">reverseInner</span>( list, reversedAlready ) {
       <span class="kw">if</span>( !list ) {
-         <span class="kw">return</span> reversed;
+         <span class="kw">return</span> reversedAlready;
       }
       
       <span class="kw">return</span> <span class=
 "fu">reverseInner</span>(<span class=
 "fu">tail</span>(list), <span class="fu">cons</span>(<span class=
-"fu">head</span>(list), reversed))
+"fu">head</span>(list), reversedAlready))
    }
 
    <span class="kw">return</span> <span class=
