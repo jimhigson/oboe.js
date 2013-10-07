@@ -16,6 +16,7 @@ module.exports = function(config) {
       ,  'dist/oboe.min.js'
       
       ,  'test/specs/oboe.integration.spec.js'
+      ,  'test/specs/oboe.performance.spec.js'
       ],
       
       // level of logging
