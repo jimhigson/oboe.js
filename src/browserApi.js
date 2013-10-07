@@ -1,4 +1,3 @@
-
 // export public API
 window.oboe          = apiMethod('GET');
 window.oboe.doGet    = window.oboe;
@@ -37,7 +36,5 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
                   firstArg.headers 
          );
       }
-                                                   
    };
 }   
-
