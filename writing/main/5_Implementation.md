@@ -42,11 +42,11 @@ complexity" - when a program is made out of parts whose correct
 behaviour cannot be observed without all of the program. Allows smaller
 units to be verified before verifying the whole.
 
-![**The test pyramid**. Relying on the assumption
-that verification of small parts provides a solid base from which to
-compose system-level behaviours. A Lot of testing is done on the
-low-level components of the system, less on the component level and less
-still on a whole-system level where only smoke tests are provided.
+![**The test pyramid**. Relying on the assumption that verification of
+small parts provides a solid base from which to compose system-level
+behaviours. A Lot of testing is done on the low-level components of the
+system, less on the component level and less still on a whole-system
+level where only smoke tests are provided.
 \label{testpyramid}](images/testPyramid.png)
 
 The testing itself is a non-trivial undertaking with 80% of code written
@@ -182,56 +182,52 @@ file is also much faster to transfer to their users, mostly because of
 the cost of establishing connections and the http overhead.
 
 Javascript files are interpreted in series by the browser so load-time
-dependencies must precede dependants. Unsurprisingly, separate files 
-once concatenated following the same order as delivered to the browser 
-will load more quickly but are functionally equivalent,
-at least barring syntax errors. Several
-tools exist to automate this stage of the build process,
-incorporating a topological sort of the dependency digraph in order to find a
-working concatenation order.
+dependencies must precede dependants. Unsurprisingly, separate files
+once concatenated following the same order as delivered to the browser
+will load more quickly but are functionally equivalent, at least barring
+syntax errors. Several tools exist to automate this stage of the build
+process, incorporating a topological sort of the dependency digraph in
+order to find a working concatenation order.
 
-Early in this project I chose *Require.js* although I later moved on because it was too
-heavyweight. Javascript as a language
-doesn't have an import statement. Require contributes the importing ability to
-Javascript from inside the language sandbox as the `require` function, 
-a standard asynchronous call.
-Calls to `require` AJAX in and execute the imported source, returning
-any exported symbols by a callback. For non-trivial applications this mode 
-is intended mostly for debugging; because a network hop is involved 
-the protocol is chatty and slowed by highly latent calls between modules.
-For efficient delivery Require also has
-the `optimise` command which concatenates into a single file by using static 
-analysis to deduce a workable source order. Because `require` may appear anywhere
-in the source, this in the general case is of course
-undecidable so Require falls back to lazy loading.
-In practice undecidability isn't a problem because imports are generally 
-not subject to branching. In larger
-webapps lazy loading speeding up the initial page load and is actually an advantage.
-The technique of *Asynchronous Module Definition* (AMD) intentionally imports 
-rarely-loaded modules in response to events. By resisting the static analysis the units
-will not be downloaded until they are needed.
+Early in this project I chose *Require.js* although I later moved on
+because it was too heavyweight. Javascript as a language doesn't have an
+import statement. Require contributes the importing ability to
+Javascript from inside the language sandbox as the `require` function, a
+standard asynchronous call. Calls to `require` AJAX in and execute the
+imported source, returning any exported symbols by a callback. For
+non-trivial applications this mode is intended mostly for debugging;
+because a network hop is involved the protocol is chatty and slowed by
+highly latent calls between modules. For efficient delivery Require also
+has the `optimise` command which concatenates into a single file by
+using static analysis to deduce a workable source order. Because
+`require` may appear anywhere in the source, this in the general case is
+of course undecidable so Require falls back to lazy loading. In practice
+undecidability isn't a problem because imports are generally not subject
+to branching. In larger webapps lazy loading speeding up the initial
+page load and is actually an advantage. The technique of *Asynchronous
+Module Definition* (AMD) intentionally imports rarely-loaded modules in
+response to events. By resisting the static analysis the units will not
+be downloaded until they are needed.
 
-AMD is mostly of interest to web applications with a central hub but also some 
-rarely used parts. Oboe does not fit this profile: everybody who uses it will
-use all of the library. Regardless, I hoped to use `optimise` to 
-generate my combined
-Javascript file. Even after optimisation, Require's design necessitates that calls
-to `require` stay in the code and that the require.js
-run-time component is available to handle these calls. For a micro-library
-a ???k overhead was too large to accommodate.
-Overall, Require seems more suited to developing stand-alone
-applications than programming libraries.
+AMD is mostly of interest to web applications with a central hub but
+also some rarely used parts. Oboe does not fit this profile: everybody
+who uses it will use all of the library. Regardless, I hoped to use
+`optimise` to generate my combined Javascript file. Even after
+optimisation, Require's design necessitates that calls to `require` stay
+in the code and that the require.js run-time component is available to
+handle these calls. For a micro-library a ???k overhead was too large to
+accommodate. Overall, Require seems more suited to developing
+stand-alone applications than programming libraries.
 
-Having abandoned Require, I decided to pick up the simplest tool
-which could possibly work. With only 15 source files and a fairly sparse dependency graph
-finding a working order on paper wasn't a daunting task.
-Combined with a Grunt analogue to the unix `cat` command I quickly had
-a working build process. 
-I adjusted each Javascript file to, when loaded directly, place
-its API in the global namespace, then post-concatenation wrapped the
-combined in a single function, converting the APIs inside the function
-from global to the scope of that function, thereby hiding the
-implementation for code outside of Oboe.
+Having abandoned Require, I decided to pick up the simplest tool which
+could possibly work. With only 15 source files and a fairly sparse
+dependency graph finding a working order on paper wasn't a daunting
+task. Combined with a Grunt analogue to the unix `cat` command I quickly
+had a working build process. I adjusted each Javascript file to, when
+loaded directly, place its API in the global namespace, then
+post-concatenation wrapped the combined in a single function, converting
+the APIs inside the function from global to the scope of that function,
+thereby hiding the implementation for code outside of Oboe.
 
 For future consideration there is Browserify. This library reverses the
 'browser first' image of Javascript by converting applications targeted
@@ -271,13 +267,12 @@ hiding. Many of the entities painted in figure \ref{overallDesign} map
 onto no single, addressable language construct and exist only as a set
 of event handlers trapped inside the same closure, taking advantage of
 the fact that their reachability from some event emitter prevents
-required parameters from being garbage collected. From outside the closure
-hidden values are not only private as would be seen in an OO model,
-they are inherently unaddressable. Although only
-sparingly OO, the high-level design's componentisation hasn't departed
-from how it might be implemented in an OO metamodel and Object
-Oriented design patterns remain influential despite being only loosely
-followed.
+required parameters from being garbage collected. From outside the
+closure hidden values are not only private as would be seen in an OO
+model, they are inherently unaddressable. Although only sparingly OO,
+the high-level design's componentisation hasn't departed from how it
+might be implemented in an OO metamodel and Object Oriented design
+patterns remain influential despite being only loosely followed.
 
 Because of the pressures on code size I decided not to use a general
 purpose functional library and instead create my own with only the parts
@@ -313,39 +308,39 @@ Incrementally building up the content
 
 As shown in figure \ref{overallDesign}, there is an incremental content
 builder and ascent tracer which handle the output from the Clarinet JSON
-SAX parser. Taken together, these might be considered a variant of
-the Adaptor pattern, providing to the controller a simpler interface
-than is presented by Clarinet. However, this is not the model
-implementation of the pattern; the adapted interface is even-driven rather than
-call-driven: we receive six kinds of event and in response emmit from a 
+SAX parser. Taken together, these might be considered a variant of the
+Adaptor pattern, providing to the controller a simpler interface than is
+presented by Clarinet. However, this is not the model implementation of
+the pattern; the adapted interface is even-driven rather than
+call-driven: we receive six kinds of event and in response emmit from a
 narrower vocabulary of two.
 
-To evaluate JSONPath expressions the controller requires a
-path to the current JSON node, the node itself, and any ancestor nodes. This
-is delivered by the incremental content builder as the payload of the NODE\_FOUND and 
-PATH\_FOUND events. For each Clarinet event the builder
-provides a corresponding function which, working from the current path, 
+To evaluate JSONPath expressions the controller requires a path to the
+current JSON node, the node itself, and any ancestor nodes. This is
+delivered by the incremental content builder as the payload of the
+NODE\_FOUND and PATH\_FOUND events. For each Clarinet event the builder
+provides a corresponding function which, working from the current path,
 returns the next path after the event has been applied. For example, the
-`objectopen` and `arrayopen` events move the current node deeper in the document and 
-are handled by adding new items to the path, whereas for 
+`objectopen` and `arrayopen` events move the current node deeper in the
+document and are handled by adding new items to the path, whereas for
 `closeobject` and `closearray` we remove one. Over the course of parsing
-a complete JSON file the path will in this way be manipulated to visit every node,
-allowing each to be tested against the registered JSONPath expressions.
-Internally, the builder's event handlers are declared as the
-combination of a smaller number of basic reusable handler parts. Oboe is
-largely unconcerned regarding a JSON node's type so given that 
-several of the Clarinet events differ only by the type of the nodes they announce,
-Oboe is able to generify their handling by composing from a common pool of handler-parts.
-Picking up `openobject` and `openarray` events, both fall through to the same 'nodeFound',
-differing only in a parameter.
-Similarly, consider the `value` event which is fired when Clarinet encounters a
-String or Number. Because primitive nodes are always leaves the builder
-regards this as a node which instantaneously starts and ends, handled
-programmatically as the functional composition of the `nodeFound` and
-`curNodeFinished`.
-The reuse of smaller instructions to build up larger ones
-is perhaps slightly reminiscent of CISC CPU design in which micro-instructions are
-combined to implement the chip's advertised interface.
+a complete JSON file the path will in this way be manipulated to visit
+every node, allowing each to be tested against the registered JSONPath
+expressions. Internally, the builder's event handlers are declared as
+the combination of a smaller number of basic reusable handler parts.
+Oboe is largely unconcerned regarding a JSON node's type so given that
+several of the Clarinet events differ only by the type of the nodes they
+announce, Oboe is able to generify their handling by composing from a
+common pool of handler-parts. Picking up `openobject` and `openarray`
+events, both fall through to the same 'nodeFound', differing only in a
+parameter. Similarly, consider the `value` event which is fired when
+Clarinet encounters a String or Number. Because primitive nodes are
+always leaves the builder regards this as a node which instantaneously
+starts and ends, handled programmatically as the functional composition
+of the `nodeFound` and `curNodeFinished`. The reuse of smaller
+instructions to build up larger ones is perhaps slightly reminiscent of
+CISC CPU design in which micro-instructions are combined to implement
+the chip's advertised interface.
 
 Although the builder functions are stateless, ultimately the state
 regarding the current path needs to be stored between clarinet calls.
@@ -462,7 +457,7 @@ identifies one token for non-empty input and then recursively digests
 the rest.
 
 As an example, the pattern `!.$person..{height tShirtSize}` once
-compiled would roughly resemble the Javascript functional representation 
+compiled would roughly resemble the Javascript functional representation
 below:
 
 ~~~~ {.javascript}
