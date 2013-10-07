@@ -15,7 +15,7 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="testPyramid.svg"
-   inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/ascent.png"
+   inkscape:export-filename="/Users/jimhigson/Sites/progressivejson/writing/images/testPyramid.png"
    inkscape:export-xdpi="599.89001"
    inkscape:export-ydpi="599.89001">
   <defs
@@ -232,9 +232,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.6793005"
-     inkscape:cx="385.38998"
-     inkscape:cy="737.95089"
+     inkscape:zoom="1.1874448"
+     inkscape:cx="471.91136"
+     inkscape:cy="751.42547"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -680,5 +680,35 @@
          x="280"
          sodipodi:role="line"
          id="tspan4401">verify the whole library</tspan></text>
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path4657"
+       d="m 545,177.36218 c 0,0 10,70 -45,95"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+    <rect
+       style="opacity:0.98999999;color:#000000;fill:#d2b8b8;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.99999982;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4628"
+       width="80"
+       height="70.000015"
+       x="500"
+       y="117.36218"
+       rx="0"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="620"
+       y="148.36218"
+       id="text4647"
+       sodipodi:linespacing="125%"><tspan
+         id="tspan4651"
+         sodipodi:role="line"
+         x="620"
+         y="148.36218">performance tests monitor</tspan><tspan
+         sodipodi:role="line"
+         x="620"
+         y="165.86218"
+         id="tspan4655">for a worsening in library speed</tspan></text>
   </g>
 </svg>
