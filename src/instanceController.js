@@ -1,6 +1,10 @@
 /**
- * @param {Function} jsonRoot a function which returns the json root so far
+ * This file implements a light-touch central controller for an instance 
+ * of Oboe which provides the methods used for interacting with the instance 
+ * from the calling app.
  */
+ 
+ 
 function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
@@ -18,20 +22,22 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
             
             clarinetParser.write(nextDrip);            
          } catch(e) { 
-            // we don't have to do anything here because we always assign a .onerror
-            // to clarinet which will have already been called by the time this 
-            // exception is thrown.                
+            /* we don't have to do anything here because we always assign
+               a .onerror to clarinet which will have already been called 
+               by the time this exception is thrown. */                
          }
       }
    );
    
-   // at the end of the content close the clarinet parser. This will provide an error if the
-   // total content provided was not valid json, ie if not all objects closed properly
+   /* At the end of the http content close the clarinet parser.
+      This will provide an error if the total content provided was not 
+      valid json, ie if not all arrays, objects and Strings closed properly */
    on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
    
 
-   // If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
-   // being found after we abort in the case where we aborted while reading though an already filled buffer.
+   /* If we abort this Oboe's request stop listening to the clarinet parser. 
+      This prevents more tokens being found after we abort in the case where 
+      we aborted during processing of an already filled buffer. */
    on( ABORTING, function() {
       clarinetListenerAdaptor(clarinetParser, {});
    });   
@@ -50,56 +56,64 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
    
-      // Add a new listener to the eventBus.
+      // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
       on( eventId, function( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
-         // Possible values for maybeMatchingMapping are now:
-         //
-         //    false: 
-         //       we did not match 
-         //
-         //    an object/array/string/number/null: 
-         //       that node is the one that matched. Because json can have nulls, this can 
-         //       be null.
-         //
-         //    undefined: like above, but we don't have the node yet. ie, we know there is a
-         //       node that matches but we don't know if it is an array, object, string
-         //       etc yet so we can't say anything about it. Null isn't used here because
-         //       it would be indistinguishable from us finding a node with a value of
-         //       null.
+         /* Possible values for maybeMatchingMapping are now:
+
+            false: 
+               we did not match 
+  
+            an object/array/string/number/null: 
+               we matched and have the node that matched.
+               Because nulls are valid json values this can be null.
+  
+            undefined: 
+               we matched but don't have the matching node yet.
+               ie, we know there is an upcoming node that matches but we 
+               can't say anything else about it. 
+         */
          if( maybeMatchingMapping !== false ) {                                 
 
-            try{              
-               notifyCallback(callback, maybeMatchingMapping, ascent);
-            } catch(e) {
-               // an error could have happened in the callback. Put it
-               // on the event bus 
-               fire(ERROR_EVENT, e);
-            }               
+            notifyCallback(callback, maybeMatchingMapping, ascent);                           
          }
       });   
    }   
    
    function notifyCallback(callback, matchingMapping, ascent) {
-      // We're now calling back to outside of oboe where there is no concept of the
-      // functional-style lists that we are using internally so convert into standard
-      // arrays. Reverse the order because it is more natural to receive in order 
-      // "root to leaf" than "leaf to root"             
+      /* 
+         We're now calling back to outside of oboe where the Lisp-style 
+         lists that we are using internally will not be recognised 
+         so convert to standard arrays. 
+  
+         Also, reverse the order because it is more common to list paths 
+         "root to leaf" than "leaf to root" 
+      */
             
       var descent     = reverseList(ascent),
       
-            // for the path list, also need to remove the last item which is the special
-            // token for the 'path' to the root node
+          // To make a path, strip off the last item which is the special
+          // ROOT_PATH token for the 'path' to the root node
           path       = listAsArray(tail(map(keyOf,descent))),
           ancestors  = listAsArray(map(nodeOf, descent)); 
       
-      callback( nodeOf(matchingMapping), path, ancestors );  
+      try{
+      
+         callback( nodeOf(matchingMapping), path, ancestors );   
+      }catch(e)  {
+      
+         // An error occured during the callback, publish it on the event bus 
+         fire(ERROR_EVENT, e);
+      }          
    }
-  
+
+   /**
+    * Add several listeners at a time, from a map
+    */
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
@@ -108,20 +122,28 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
    }    
       
    /**
-    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
-    * depending on the argument types
+    * implementation behind .onPath() and .onNode()
     */       
-   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap,
+                                      callback, callbackContext ){
  
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
+         addPathOrNodeCallback( 
+            eventId, 
+            jsonPathOrListenerMap, 
+            callback.bind(callbackContext||oboeApi)
+         );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
       
       return this; // chaining
-   }         
+   }
 
+   /**
+    * Construct and return the public API of the Oboe instance to be 
+    * returned to the calling application
+    */
    return oboeApi = { 
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),

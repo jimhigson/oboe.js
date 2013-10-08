@@ -1317,23 +1317,24 @@ function incrementalContentBuilder( fire) {
    };
 }
 /**
- * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate
- * paths for matches. The candidate paths are arrays of strings representing the path from the root of the parsed json to
- * some node in the json.
+ * The jsonPath evaluator compiler used for Oboe.js. 
  * 
- * Naming convention (like erlang) is to start unused variables with an underscore, to avoid confusion with accidental non-use.
- * This is usually where several functions need to keep the same signature but not all use all of the parameters.
+ * One function is exposed. This function takes a String JSONPath spec and 
+ * returns a function to test candidate ascents for matches.
  * 
- * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the
- * same value for the same arguments and no variables are reassigned.
- * 
- *   String jsonPath -> (List ascent) -> Boolean|Object
- *    
- * The returned function returns false if there was no match, the node which was captured (using $)
- * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.
+ *  String jsonPath -> (List ascent) -> Boolean|Object
+ *
+ * This file is coded in a pure functional style. That is, no function has 
+ * side effects, every function evaluates to the same value for the same 
+ * arguments and no variables are reassigned.
  */  
-// the call to jsonPathSyntax injects the syntaxes that are needed inside the compiler
-var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax, dotSyntax, bangSyntax, emptySyntax ) {
+// the call to jsonPathSyntax injects the token syntaxes that are needed 
+// inside the compiler
+var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, 
+                                                doubleDotSyntax, 
+                                                dotSyntax,
+                                                bangSyntax,
+                                                emptySyntax ) {
 
    var CAPTURING_INDEX = 1;
    var NAME_INDEX = 2;
@@ -1342,17 +1343,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
    var headKey = compose(keyOf, head);
                    
    /**
-    * Expression for a named path node, expressed like:
+    * Create an evaluator function for a named path node, expressed in the
+    * JSONPath like:
     *    foo
     *    ["bar"]
-    *    [2]
-    *        
-    *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser
-    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath
-    *    matches, it delegates the remaining matching to the next function in the chain.       
-    * 
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
+    *    [2]   
     */
    function nameClause(previousExpr, detection ) {
      
@@ -1362,127 +1357,128 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
                            ?  always
                            :  function(ascent){return headKey(ascent) == name};
      
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */
+
       return lazyIntersection(matchesName, previousExpr);
    }
 
    /**
-    * Expression for a duck-typed node, expressed like:
+    * Create an evaluator function for a a duck-typed node, expressed like:
     * 
     *    {spin, taste, colour}
     *    .particle{spin, taste, colour}
     *    *{spin, taste, colour}
-    * 
-    * @param {Function} previousExpr
-    * @param {Array} detection strings required, space separated 
     */
    function duckTypeClause(previousExpr, detection) {
 
       var fieldListStr = detection[FIELD_LIST_INDEX];
 
-      if (!fieldListStr) {
-         return previousExpr; // don't wrap at all, return given expr as-is
-      }
+      if (!fieldListStr) 
+         return previousExpr; // don't wrap at all, return given expr as-is      
 
-      var hasAllrequiredFields = partialComplete(hasAllProperties, arrayAsList(fieldListStr.split(/\W+/))),
-          isMatch = compose( hasAllrequiredFields, nodeOf, head );
+      var hasAllrequiredFields = partialComplete(
+                                    hasAllProperties, 
+                                    arrayAsList(fieldListStr.split(/\W+/))
+                                 ),
+                                 
+          isMatch =  compose( 
+                        hasAllrequiredFields, 
+                        nodeOf, 
+                        head
+                     );
 
       return lazyIntersection(isMatch, previousExpr);
    }
 
    /**
-    * Expression for $
-    * 
-    * @param previousExpr
+    * Expression for $, returns the evaluator function
     */
    function capture( previousExpr, detection ) {
 
       // extract meaning from the detection      
       var capturing = !!detection[CAPTURING_INDEX];
 
-      if (!capturing) {         
-         return previousExpr; // don't wrap at all, return given expr as-is
-      }
+      if (!capturing)          
+         return previousExpr; // don't wrap at all, return given expr as-is      
       
       return lazyIntersection(previousExpr, head);
             
    }            
       
    /**
-    * Moves onto the next item on the lists. Doesn't map neatly onto any particular language feature but
-    * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)
+    * Create an evaluator function that moves onto the next item on the 
+    * lists. This function is the place where the logic to move up a 
+    * level in the ascent exists. 
     * 
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
+    * Eg, for JSONPath ".foo" we need skip1(nameClause(always, [,'foo']))
     */
    function skip1(previousExpr) {
    
    
       if( previousExpr == always ) {
-         // If there is no previous expression, this consume command is at the start of the jsonPath.
-         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
-         // it, we default to true. 
-         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
-         // '..*'            
+         /* If there is no previous expression this consume command 
+            is at the start of the jsonPath.
+            Since JSONPath specifies what we'd like to find but not 
+            necessarily everything leading down to it, when running
+            out of JSONPath to check against we default to true */
          return always;
       }
 
+      /** return true if the ascent we have contains only the JSON root,
+       *  false otherwise
+       */
       function notAtRoot(ascent){
          return headKey(ascent) != ROOT_PATH;
       }
       
       return lazyIntersection(
-               // If we're already at the root but there are more expressions to satisfy,
-               // can't consume any more. No match.
-               
-               // This check is why none of the other exprs have to be able to handle empty lists;
-               // only consume1 moves onto the next token and it refuses to do so once it reaches
-               // the list item in the list.       
+               /* If we're already at the root but there are more 
+                  expressions to satisfy, can't consume any more. No match.
+
+                  This check is why none of the other exprs have to be able 
+                  to handle empty lists; skip1 is the only evaluator that 
+                  moves onto the next token and it refuses to do so once it 
+                  reaches the last item in the list. */
                notAtRoot,
                
-               // consider the next bit of the ascent by passing only the tail to the previous
-               // expression 
+               /* We are not at the root of the ascent yet.
+                  Move to the next level of the ascent by handing only 
+                  the tail to the previous expression */ 
                compose(previousExpr, tail) 
       );
                                                                                                                
    }   
    
    /**
-    * Expression for the .. (double dot) token. Consumes zero or more tokens from the input, the fewest that
-    * are required for the previousExpr to match.
-    * 
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
+    * Create an evaluator function for the .. (double dot) token. Consumes
+    * zero or more levels of the ascent, the fewest that are required to find
+    * a match when given to previousExpr.
     */   
    function skipMany(previousExpr) {
 
       if( previousExpr == always ) {
-         // If there is no previous expression, this consume command is at the start of the jsonPath.
-         // since jsonPath specifies what we'd like to find but not necessarily everything leading up to
-         // it, we default to true. 
-         // This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,
-         // '..*'            
+         /* If there is no previous expression this consume command 
+            is at the start of the jsonPath.
+            Since JSONPath specifies what we'd like to find but not 
+            necessarily everything leading down to it, when running
+            out of JSONPath to check against we default to true */            
          return always;
       }
           
       var 
-            // jsonPath .. is equivalent to !.. so if .. reaches the root
-            // the match has suceeded.
+          // In JSONPath .. is equivalent to !.. so if .. reaches the root
+          // the match has succeeded. Ie, we might write ..foo or !..foo
+          // and both should match identically.
           terminalCaseWhenArrivingAtRoot = rootExpr(),
           terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
-          recursiveCase = skip1(consumeManyPartiallyCompleted),
+          recursiveCase = skip1(skipManyInner),
           
           cases = lazyUnion(
                      terminalCaseWhenArrivingAtRoot
                   ,  terminalCaseWhenPreviousExpressionIsSatisfied
                   ,  recursiveCase
                   );                        
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */            
-      function consumeManyPartiallyCompleted(ascent) {
+            
+      function skipManyInner(ascent) {
       
          if( !ascent ) {
             // have gone past the start, not a match:         
@@ -1492,199 +1488,197 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, doubleDotSyntax,
          return cases(ascent);
       }
       
-      return consumeManyPartiallyCompleted;
+      return skipManyInner;
    }      
    
    /**
-    * Expression for $ - matches only the root element of the json
-    * 
-    * @returns {Object|false} either the object that was found, or false if nothing was found         
+    * Generate an evaluator for ! - matches only the root element of the json
+    * and ignores any previous expressions since nothing may precede !. 
     */   
    function rootExpr() {
-   
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */   
+      
       return function(ascent){
          return headKey(ascent) == ROOT_PATH;
       };
    }   
          
    /**
-    * Expression for the empty string. As the jsonPath parser generates the path parser, it will eventually
-    * run out of tokens and get to the empty string. So, all generated parsers will be wrapped in this function.
+    * Generate a statement wrapper to sit around the outermost 
+    * clause evaluator.
     * 
-    * @returns {Function} a function which examines the descents on a path from the root of a json to a node
-    *                     and decides if there is a match or not
+    * Handles the case where the capturing is implicit because the JSONPath
+    * did not contain a '$' by returning the last node.
     */   
    function statementExpr(lastClause) {
-   
-      /**
-       * @returns {Object|false} either the object that was found, or false if nothing was found
-       */   
+      
       return function(ascent) {
    
-         // kick off the parsing by passing through to the lastExpression
+         // kick off the evaluation by passing through to the last clause
          var exprMatch = lastClause(ascent);
-                               
-         // Returning exactly true indicates that there has been a match but no node is captured. 
-         // By default, the node at the start of the lists gets returned. Just like in css4 selector 
-         // spec, if there is no $, the last node in the selector is the one being styled.                      
+                                                     
          return exprMatch === true ? head(ascent) : exprMatch;
       };
    }      
                           
    /**
-    * For when a token match has been found. Compiles the parser for that token.
-    * If called with a zero-length list of 
+    * For when a token has been found in the JSONPath input.
+    * Compiles the parser for that token and returns in combination with the
+    * parser already generated.
     * 
-    * When partially completed with an expression function, can be used as the parserGenerator
-    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.
-    * 
-    * @param {Function} exprs zero or more expressions that parses this token 
+    * @param {Function} exprs  a list of the clause evaluator generators for
+    *                          the token that was found
     * @param {Function} parserGeneratedSoFar the parser already found
-    * @param {Array} detection the match given by the regex engine when the feature was found
+    * @param {Array} detection the match given by the regex engine when 
+    *                          the feature was found
     */
    function expressionsReader( exprs, parserGeneratedSoFar, detection ) {
                      
-      // note that if exprs is zero-length, fold will pass back 
-      // parserGeneratedSoFar so we don't need to treat this as a special case
-      return foldR( function( parserGeneratedSoFar, expr ){
+      // if exprs is zero-length foldR will pass back the 
+      // parserGeneratedSoFar as-is so we don't need to treat 
+      // this as a special case
       
-         return expr(parserGeneratedSoFar, detection);
-                     
-      }, parserGeneratedSoFar, exprs );                     
+      return   foldR( 
+                  function( parserGeneratedSoFar, expr ){
+         
+                     return expr(parserGeneratedSoFar, detection);
+                  }, 
+                  parserGeneratedSoFar, 
+                  exprs
+               );                     
 
    }
 
-   /** If jsonPath matches the given regular expression pattern, return a partially completed version of expr
-    *  which is ready to be used as a jsonPath parser. 
+   /** 
+    *  If jsonPath matches the given detector function, creates a function which
+    *  evaluates against every clause in the clauseEvaluatorGenerators. The
+    *  created function is propagated to the onSuccess function, along with
+    *  the remaining unparsed JSONPath substring.
     *  
-    *  This function is designed to be partially completed with the pattern and expr, leaving a function
-    *  which can be stored in the tokenExprs array. tokenExpr(pattern, expr) is a shorthand for this
-    *  partial completion.
+    *  The intended use is to create a clauseMatcher by filling in
+    *  the first two arguments, thus providing a function that knows
+    *  some syntax to match and what kind of generator to create if it
+    *  finds it. The parameter list once completed is:
     *  
-    *  Returns undefined on no match
+    *    (jsonPath, parserGeneratedSoFar, onSuccess)
     *  
-    * @param {Function} detector a function which can examine a jsonPath and returns an object describing the match
-    *                   if there is a match for our particular feature at the start of the jsonPath.
-    * @param {Function[]} exprs
-    * 
-    * @param {String} jsonPath
-    * 
-    * @param {Function} parserGeneratedSoFar
-    * 
-    * @param {Function(Function, String)} onSuccess a function to pass the generated parser to if one can be made,
-    *    also passes the remaining string from jsonPath that is still to parse
-    * 
-    * @return {*|undefined}
+    *  onSuccess may be compileJsonPathToFunction, to recursively continue 
+    *  parsing after finding a match or returnFoundParser to stop here.
     */
-   function generateClauseReaderIfJsonPathMatchesRegex(detector, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
-      var detected = detector(jsonPath);
+   function generateClauseReaderIfTokenFound (
+     
+                        tokenDetector, clauseEvaluatorGenerators,
+                         
+                        jsonPath, parserGeneratedSoFar, onSuccess) {
+                        
+      var detected = tokenDetector(jsonPath);
 
       if(detected) {
-         var compiledParser = expressionsReader(exprs, parserGeneratedSoFar, detected),
+         var compiledParser = expressionsReader(
+                                 clauseEvaluatorGenerators, 
+                                 parserGeneratedSoFar, 
+                                 detected
+                              ),
          
-             unparsedJsonPath = jsonPath.substr(len(detected[0]));                
+             remainingUnparsedJsonPath = jsonPath.substr(len(detected[0]));                
                                
-         return onSuccess(unparsedJsonPath, compiledParser);
+         return onSuccess(remainingUnparsedJsonPath, compiledParser);
       }         
    }
                  
    /**
-    * Generate a function which parses the pattern in the given regex. If matches, returns a parser
-    * generated from that token that processes the given expr, otherwise returns no value (undefined).
-    * 
-    * @returns {Function(Function parserGeneratedSoFar, Function onSucess)}
+    * Partially completes generateClauseReaderIfTokenFound above. 
     */
-   function clauseMatcher(detector, exprs) {
+   function clauseMatcher(tokenDetector, exprs) {
         
-      return partialComplete( generateClauseReaderIfJsonPathMatchesRegex, detector, exprs );
+      return   partialComplete( 
+                  generateClauseReaderIfTokenFound, 
+                  tokenDetector, 
+                  exprs 
+               );
    }
-                   
-   // A list of functions which test if a string matches the required patter and, if it does, returns
-   // a generated parser for that expression     
+
+   /**
+    * clauseForJsonPath is a function which attempts to match against 
+    * several clause matchers in order until one matches. If non match the
+    * jsonPath expression is invalid and an error is thrown.
+    * 
+    * The parameter list is the same as a single clauseMatcher:
+    * 
+    *    (jsonPath, parserGeneratedSoFar, onSuccess)
+    */     
    var clauseForJsonPath = lazyUnion(
 
-      clauseMatcher(pathNodeSyntax   , list(capture, duckTypeClause, nameClause, skip1 ))        
-   ,  clauseMatcher(doubleDotSyntax  , list(skipMany))
+      clauseMatcher(pathNodeSyntax   , list( capture, 
+                                             duckTypeClause, 
+                                             nameClause, 
+                                             skip1 ))
+                                                     
+   ,  clauseMatcher(doubleDotSyntax  , list( skipMany))
        
-       // dot is a separator only (like whitespace in other languages) but rather than special case
-       // it, the expressions can be an empty array.
+       // dot is a separator only (like whitespace in other languages) but 
+       // rather than make it a special case, use an empty list of 
+       // expressions when this token is found
    ,  clauseMatcher(dotSyntax        , list() )  
                                                                                       
-   ,  clauseMatcher(bangSyntax       , list(capture, rootExpr))             
-   ,  clauseMatcher(emptySyntax      , list(statementExpr))
+   ,  clauseMatcher(bangSyntax       , list( capture,
+                                             rootExpr))
+                                                          
+   ,  clauseMatcher(emptySyntax      , list( statementExpr))
    
-   ,   // if none of the above worked, we need to fail by throwing an error
-      function (jsonPath) {
+   ,  function (jsonPath) {
          throw Error('"' + jsonPath + '" could not be tokenised')      
       }
    );
 
 
    /**
-    * This value is one possible value for the onSuccess argument of compileTokenToParserIfMatches.
-    * When this function is passed, compileTokenToParserIfMatches simply returns the compiledParser that it
-    * made, regardless of if there is any remaining jsonPath to be compiled.
+    * One of two possible values for the onSuccess argument of 
+    * generateClauseReaderIfTokenFound.
     * 
-    * The other possible value is compileJsonPathToFunction, which causes it to recursively compile
-    * the rest of the string.
-    * 
-    * @param {String} _remainingJsonPath since this function never recurs, anything left over is ignored.
-    * @param {Function} compiledParser
+    * When this function is used, generateClauseReaderIfTokenFound simply 
+    * returns the compiledParser that it made, regardless of if there is 
+    * any remaining jsonPath to be compiled.
     */
    function returnFoundParser(_remainingJsonPath, compiledParser){ 
       return compiledParser 
    }     
               
-   /** 
-    * Recursively compile a jsonPath into a function.
-    * Each recursive call wraps the parser generated by its inner calls.
-    * We parse the jsonPath spec from left to right, generating a parser which parses the found paths from 
-    * right to left (or, deepest to shallowest path names).
+   /**
+    * Recursively compile a JSONPath expression.
     * 
-    *    (String jsonPath, ((String[], Object[]) -> (Object|Boolean))) -> ((String[], Object[]) -> (Object|Boolean))
-    *    
-    * or, if we consider Expr = ((String[], Object[]) -> (Object|Boolean)) it can be expressed more simply as:
-    * 
-    *    (String jsonPath, Expr) -> Expr
-    *    
-    * In practice, an Expr is any of the functions from tokenExprs[*].expr after being partially completed by 
-    * filling in the first three arguments
-    * 
-    * Note that this function's signature matches the onSuccess callback to compileTokenIfMatches, meaning that
-    * compileTokenIfMatches is able to make our recursive call back to here for us.
+    * This function serves as one of two possible values for the onSuccess 
+    * argument of generateClauseReaderIfTokenFound, meaning continue to
+    * recursively compile. Otherwise, returnFoundParser is given and
+    * compilation terminates.
     */
    function compileJsonPathToFunction( uncompiledJsonPath, parserGeneratedSoFar ) {
 
       /**
-       * Called when a matching token is found. 
-       * 
-       * @param {Function} parser the parser that has just been compiled
-       * @param {String} remaining the remaining jsonPath that has not been compiled yet
-       * 
-       * On finding a match, we want to either continue parsing using a recursive call to compileJsonPathToFunction
-       * or we want to stop and just return the parser that we've found so far.
-       * 
-       * We use the jsonPath rather than the remaining to branch on here because it is
-       * valid to recur onto an empty string (there's a tokenExpr for that) but it is not
-       * valid to recur past that point. 
+       * On finding a match, if there is remaining text to be compiled
+       * we want to either continue parsing using a recursive call to 
+       * compileJsonPathToFunction. Otherwise, we want to stop and return 
+       * the parser that we have found so far.
        */
-      var onFind = uncompiledJsonPath? compileJsonPathToFunction : returnFoundParser;
+      var onFind =      uncompiledJsonPath
+                     ?  compileJsonPathToFunction 
+                     :  returnFoundParser;
                    
       return clauseForJsonPath(uncompiledJsonPath, parserGeneratedSoFar, onFind);                              
    }
 
-   // all the above is now captured in the closure of this immediately-called function. let's
-   // return the function we wish to expose globally:
+   /**
+    * This is the function that we expose to the rest of the library.
+    */
    return function(jsonPath){
         
       try {
          // Kick off the recursive parsing of the jsonPath 
          return compileJsonPathToFunction(jsonPath, always);
+         
       } catch( e ) {
-         throw Error('Could not compile "' + jsonPath + '" because ' + e.message);
+         throw Error( 'Could not compile "' + jsonPath + 
+                      '" because ' + e.message
+         );
       }
    }
 
@@ -1734,8 +1728,12 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     END_OF_CONTENT = _S++,
     ABORTING = _S++;
 /**
- * @param {Function} jsonRoot a function which returns the json root so far
+ * This file implements a light-touch central controller for an instance 
+ * of Oboe which provides the methods used for interacting with the instance 
+ * from the calling app.
  */
+ 
+ 
 function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
@@ -1753,20 +1751,22 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
             
             clarinetParser.write(nextDrip);            
          } catch(e) { 
-            // we don't have to do anything here because we always assign a .onerror
-            // to clarinet which will have already been called by the time this 
-            // exception is thrown.                
+            /* we don't have to do anything here because we always assign
+               a .onerror to clarinet which will have already been called 
+               by the time this exception is thrown. */                
          }
       }
    );
    
-   // at the end of the content close the clarinet parser. This will provide an error if the
-   // total content provided was not valid json, ie if not all objects closed properly
+   /* At the end of the http content close the clarinet parser.
+      This will provide an error if the total content provided was not 
+      valid json, ie if not all arrays, objects and Strings closed properly */
    on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
    
 
-   // If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens
-   // being found after we abort in the case where we aborted while reading though an already filled buffer.
+   /* If we abort this Oboe's request stop listening to the clarinet parser. 
+      This prevents more tokens being found after we abort in the case where 
+      we aborted during processing of an already filled buffer. */
    on( ABORTING, function() {
       clarinetListenerAdaptor(clarinetParser, {});
    });   
@@ -1785,56 +1785,64 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
    
-      // Add a new listener to the eventBus.
+      // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
       on( eventId, function( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
-         // Possible values for maybeMatchingMapping are now:
-         //
-         //    false: 
-         //       we did not match 
-         //
-         //    an object/array/string/number/null: 
-         //       that node is the one that matched. Because json can have nulls, this can 
-         //       be null.
-         //
-         //    undefined: like above, but we don't have the node yet. ie, we know there is a
-         //       node that matches but we don't know if it is an array, object, string
-         //       etc yet so we can't say anything about it. Null isn't used here because
-         //       it would be indistinguishable from us finding a node with a value of
-         //       null.
+         /* Possible values for maybeMatchingMapping are now:
+
+            false: 
+               we did not match 
+  
+            an object/array/string/number/null: 
+               we matched and have the node that matched.
+               Because nulls are valid json values this can be null.
+  
+            undefined: 
+               we matched but don't have the matching node yet.
+               ie, we know there is an upcoming node that matches but we 
+               can't say anything else about it. 
+         */
          if( maybeMatchingMapping !== false ) {                                 
 
-            try{              
-               notifyCallback(callback, maybeMatchingMapping, ascent);
-            } catch(e) {
-               // an error could have happened in the callback. Put it
-               // on the event bus 
-               fire(ERROR_EVENT, e);
-            }               
+            notifyCallback(callback, maybeMatchingMapping, ascent);                           
          }
       });   
    }   
    
    function notifyCallback(callback, matchingMapping, ascent) {
-      // We're now calling back to outside of oboe where there is no concept of the
-      // functional-style lists that we are using internally so convert into standard
-      // arrays. Reverse the order because it is more natural to receive in order 
-      // "root to leaf" than "leaf to root"             
+      /* 
+         We're now calling back to outside of oboe where the Lisp-style 
+         lists that we are using internally will not be recognised 
+         so convert to standard arrays. 
+  
+         Also, reverse the order because it is more common to list paths 
+         "root to leaf" than "leaf to root" 
+      */
             
       var descent     = reverseList(ascent),
       
-            // for the path list, also need to remove the last item which is the special
-            // token for the 'path' to the root node
+          // To make a path, strip off the last item which is the special
+          // ROOT_PATH token for the 'path' to the root node
           path       = listAsArray(tail(map(keyOf,descent))),
           ancestors  = listAsArray(map(nodeOf, descent)); 
       
-      callback( nodeOf(matchingMapping), path, ancestors );  
+      try{
+      
+         callback( nodeOf(matchingMapping), path, ancestors );   
+      }catch(e)  {
+      
+         // An error occured during the callback, publish it on the event bus 
+         fire(ERROR_EVENT, e);
+      }          
    }
-  
+
+   /**
+    * Add several listeners at a time, from a map
+    */
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
@@ -1843,20 +1851,28 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
    }    
       
    /**
-    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  
-    * depending on the argument types
+    * implementation behind .onPath() and .onNode()
     */       
-   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap,
+                                      callback, callbackContext ){
  
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeCallback(eventId, jsonPathOrListenerMap, callback.bind(callbackContext||oboeApi));
+         addPathOrNodeCallback( 
+            eventId, 
+            jsonPathOrListenerMap, 
+            callback.bind(callbackContext||oboeApi)
+         );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
       
       return this; // chaining
-   }         
+   }
 
+   /**
+    * Construct and return the public API of the Oboe instance to be 
+    * returned to the calling application
+    */
    return oboeApi = { 
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
