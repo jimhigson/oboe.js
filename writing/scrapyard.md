@@ -289,17 +289,35 @@ not pleading to make the obvious so.
 Compilers, functional
 ---------------------
 
-, for example with only mono-morphic callsites and without a functional
-style. Once either of those programming techniques is taken up
-performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
-the sense that not close to the performance gained by compiling a well
-designed functional language to natively executable code. Depends on
-style coded in, comparison to native somewhat takes C as the description
-of the operation of an idealised CPU rather than an abstract machine
-capable of executing on an actual CPU.
-
 The performance degradation, even with a self-hosted forEach, is due to
 the JIT’s inability to efficiently inline both the closures passed to
 forEach
+
+Development methodology
+-----------------------
+
+Did it help?
+
+Switched several times. Could have started with winning side? Tension
+between choosing latest and greatest (promising much) or old established
+solution alraedy experienced with but with known problems. Judging if
+problems will become too much of a hinderence and underestimating the
+flaws. JSTD was yesterday's latest and greatest but Karma genuinely is
+great. In end, right solution was found despite not being found in most
+direct way.
+
+Packaging was a lot of work but has delivered the most concise possible
+library.
+
+Community reaction
+------------------
+
+Built into Dojo Followers on Github Being posted in forums (hopefully
+also listed on blogs) No homepage as of yet other than the Github page
+
+Http blargh
+----------
+
+Aborting http request may not stop processing on the server. Why this is
+perhaps desirable - transactions, leaving resources in a half-complete
+state.
