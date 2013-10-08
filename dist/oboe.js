@@ -1,18 +1,72 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src for the unconcatenated source
 (function  (window, Object, Array, Error, undefined ) {/**
- * Call a single function with the given arguments.
- * Basically, a functional-style version of the OO-style Function#apply for when we don't care about
- * the context of the call.
+ * This file declares various pieces of functional programming.
  * 
- * Order of arguments allows partial completion of the arguments to be passed to a function.
+ * This isn't a general purpose functional library, to keep things small it
+ * has just the parts useful for Oboe.js.
+ */
+
+
+/**
+ * Call a single function with the given arguments array.
+ * Basically, a functional-style version of the OO-style Function#apply for 
+ * when we don't care about the context ('this') of the call.
+ * 
+ * The order of arguments allows partial completion of the arguments array
  */
 function apply(args, fn) {
    return fn.apply(undefined, args);
 }
 
+/**
+ * Define variable argument functions but cut out all that tedious messing about 
+ * with the arguments object. Delivers the variable-length part of the arguments
+ * list as an array.
+ * 
+ * Eg:
+ * 
+ * var myFunction = varArgs(
+ *    function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
+ *       console.log( variableNumberOfArguments );
+ *    }
+ * )
+ * 
+ * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
+ * 
+ * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction(1, 2, 3); // logs [1,2,3]
+ * 
+ */
+function varArgs(fn){
+
+   var numberOfFixedArguments = fn.length -1;
+         
+   return function(){
+   
+      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
+      
+          argumentsToFunction = Array.prototype.slice.call(arguments);
+          
+      // remove the last n element from the array and append it onto the end of
+      // itself as a sub-array
+      argumentsToFunction.push( 
+         argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments)
+      );   
+      
+      return fn.apply( this, argumentsToFunction );
+   }       
+}
+
 /** 
- * Partially complete the given function by filling it in with all arguments given
- * after the function itself. Returns the partially completed version.
+ * Partially complete a function.
+ * 
+ * Eg: 
+ *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );
+ *    
+ *    add3(4) // gives 7
  */
 var partialComplete = varArgs(function( fn, boundArgs ) {
 
@@ -57,54 +111,16 @@ function flip(fn){
 }
 
 /**
- * Define variable argument functions without all that tedious messing about 
- * with the arguments object.
- * 
- * Eg:
- * 
- * var myFunction = varArgs(function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
- *    console.log( variableNumberOfArguments );
- * })
- * 
- * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
- * 
- * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
- *    console.log( variableNumberOfArguments );
- * })
- * 
- * myFunction(1, 2, 3); // logs [1,2,3]
- * 
- * @param fn
- */
-function varArgs(fn){
-
-   // nb: can't use len() here because it is defined using partialComplete which is defined using varargs.
-   // While recursive definition is possible in js, it is a stateful language and at this point there is no way
-   // that len can be defined
-   var numberOfFixedArguments = fn.length -1;
-         
-   return function(){
-   
-      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
-      
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
-      // remove the end of the array and push it back onto itself as a sub-array (sometimes to implement a functional
-      // machine we have to sit on top of a *very* non-functional one)
-      argumentsToFunction.push( argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments) );   
-      
-      return fn.apply( this, argumentsToFunction );
-   }       
-}
-
-/**
- * Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ * Call a list of functions with the same args until one returns a 
+ * truthy result. Similar to the || operator.
  * 
  * So:
  *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
  *      
  * Is equivalent to: 
- *      apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
+ *      apply([p1, p2 ... pn], f1) || 
+ *      apply([p1, p2 ... pn], f2) || 
+ *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  
  *  
  * @returns the first return value that is given that is truthy.
  */
@@ -126,9 +142,10 @@ var lazyUnion = varArgs(function(fns) {
 });
 
 /**
- * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
- * first non-truthy one.
+ * Create a function which is the intersection of two other functions.
  * 
+ * Like the && operator, if the first is truthy, the second is never called,
+ * otherwise the return value from the second is returned.
  */
 function lazyIntersection(fn1, fn2) {
 
@@ -901,8 +918,15 @@ if(typeof FastList === 'function') {
 })(typeof exports === "undefined" ? clarinet = {} : exports);
 
 
-/* 
- * Assign listeners to clarinet.
+/** 
+ * A bridge used to assign stateless functions to listen to clarinet.
+ * 
+ * As well as the parameter from clarinet, each callback will also be passed
+ * the result of the last callback.
+ * 
+ * This may also be used to clear all listeners by assigning zero handlers:
+ * 
+ *    clarinetListenerAdaptor( clarinet, {} )
  */
 function clarinetListenerAdaptor(clarinetParser, handlers){
     
@@ -1103,41 +1127,51 @@ var jsonPathSyntax = (function() {
    }; 
 
 }());
+/** 
+ * This file provides various listeners which can be used to build up
+ * a changing ascent based on the callbacks provided by Clarinet. It listens
+ * to the low-level events from Clarinet and fires higher-level ones.
+ *  
+ * The building up is stateless so to track a JSON file
+ * clarinetListenerAdaptor.js is required to store the ascent state
+ * between calls.
+ */
+
+
 var keyOf = attr('key');
 var nodeOf = attr('node');
 
 
-/**
- * A special value to use in the path list to represent the path 'to' a root object (which doesn't really
- * have any path). This prevents the need for special-casing detection of the root object and allows it
- * to be treated like any other object. We might think of this as being similar to the 'unnamed root'
- * domain ".", eg if I go to http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates the 
- * unnamed root of the DNS.
+/** 
+ * A special value to use in the path list to represent the path 'to' a root 
+ * object (which doesn't really have any path). This prevents the need for 
+ * special-casing detection of the root object and allows it to be treated 
+ * like any other object. We might think of this as being similar to the 
+ * 'unnamed root' domain ".", eg if I go to 
+ * http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates 
+ * the unnamed root of the DNS.
  * 
- * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be
- * distinct, therefore no other object can possibly clash with this one. Strings, numbers etc provide
- * no such guarantee.
- */
-var ROOT_PATH = {}; 
+ * This is kept as an object to take advantage that in Javascript's OO objects 
+ * are guaranteed to be distinct, therefore no other object can possibly clash 
+ * with this one. Strings, numbers etc provide no such guarantee. 
+ **/
+var ROOT_PATH = {};
 
 
 /**
- * Provide handlers for clarinet's events.
- * These listeners fire higher-level events related to paths and nodes rather than low-level syntax in the json.
- * No state is maintained by the handlers, that has been refactored out so that this part of the library can
- * stay purely functional.
- *  
- * @param {Function} fire a handle on an event bus to fire higher level events on when a new node 
- *    or path is found  
+ * Create a new set of handlers for clarinet's events, bound to the fire 
+ * function given.  
  */ 
 function incrementalContentBuilder( fire) {
 
+
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
-      // for values in arrays we aren't pre-warned of the coming paths (Clarinet gives 
-      // no call to onkey like it does for values in objects) so if we are in an array 
-      // we need to create this path ourselves. The key will be len(parentNode) because
-      // array keys are always sequential numbers.
+      /* for values in arrays we aren't pre-warned of the coming paths 
+         (Clarinet gives no call to onkey like it does for values in objects) 
+         so if we are in an array we need to create this path ourselves. The 
+         key will be len(parentNode) because array keys are always sequential 
+         numbers. */
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
@@ -1148,13 +1182,7 @@ function incrementalContentBuilder( fire) {
          possiblyInconsistentAscent // nothing needed, return unchanged
       ;
    }
-
-   /**
-    * Manage the state and notifications for when a new node is found.
-    *  
-    * @param {*} newDeepestNode the thing that has been found in the json
-    * @function
-    */                 
+                 
    function nodeFound( ascent, newDeepestNode ) {
       
       if( !ascent ) {
@@ -1170,14 +1198,22 @@ function incrementalContentBuilder( fire) {
           ancestorBranches       = tail( arrayConsistentAscent),
           previouslyUnmappedName = keyOf( head( arrayConsistentAscent));
           
-      appendBuiltContent( ancestorBranches, previouslyUnmappedName, newDeepestNode );
+      appendBuiltContent( 
+         ancestorBranches, 
+         previouslyUnmappedName, 
+         newDeepestNode 
+      );
                                                                                                          
-      return cons( namedNode( previouslyUnmappedName, newDeepestNode ), ancestorBranches);                                                                          
+      return cons( 
+               namedNode( previouslyUnmappedName, newDeepestNode ), 
+               ancestorBranches
+      );                                                                          
    }
 
 
    /**
-    * Add a new value to the top-level object which has been already output   
+    * Add a new value to the object we are building up to represent the
+    * parsed JSON
     */
    function appendBuiltContent( ancestorBranches, key, node ){
      
@@ -1197,17 +1233,20 @@ function incrementalContentBuilder( fire) {
    /**
     * For when we find a new key in the json.
     * 
-    * @param {String|Number|Object} newDeepestName the key. If we are in an array will be a number, otherwise a string. May
-    *    take the special value ROOT_PATH if the root node has just been found
-    * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] usually this won't be known so can be undefined.
-    *    can't use null because null is a valid value in some json
+    * @param {String|Number|Object} newDeepestName the key. If we are in an 
+    *    array will be a number, otherwise a string. May take the special 
+    *    value ROOT_PATH if the root node has just been found
+    *    
+    * @param {String|Number|Object|Array|Null|undefined} [maybeNewDeepestNode] 
+    *    usually this won't be known so can be undefined. Can't use null 
+    *    to represent unknown because null is a valid value in JSON
     **/  
    function pathFound(ascent, newDeepestName, maybeNewDeepestNode) {
 
       if( ascent ) { // if not root
       
-         // if we have the key but (unless adding to an array) no known value yet, at least put 
-         // that key in the output but against no defined value:      
+         // If we have the key but (unless adding to an array) no known value
+         // yet. Put that key in the output but against no defined value:      
          appendBuiltContent( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
@@ -1220,7 +1259,7 @@ function incrementalContentBuilder( fire) {
 
 
    /**
-    * manages the state and notifications for when the current node has ended
+    * For when the current node ends
     */
    function curNodeFinished( ascent ) {
 
@@ -1231,17 +1270,27 @@ function incrementalContentBuilder( fire) {
    }      
                  
    return { 
+
       openobject : function (ascent, firstKey) {
 
          var ascentAfterNodeFound = nodeFound(ascent, {});         
-         
-         // It'd be odd but firstKey could be the empty string like {'':'foo'}. This is valid json even though it 
-         // isn't very nice. So can't do !firstKey here, have to compare against undefined
+
+         /* It is a perculiarity of Clarinet that for non-empty objects it
+            gives the first key with the openobject event instead of
+            in a subsequent key event.
+                      
+            firstKey could be the empty string in a JSON object like 
+            {'':'foo'} which is technically valid.
+            
+            So can't check with !firstKey, have to see if has any 
+            defined value. */
          return defined(firstKey)
          ?          
-            // We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey
-            // perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the
-            // value because we haven't seen that far into the json yet          
+            /* We know the first key of the newly parsed object. Notify that 
+               path has been found but don't put firstKey permanently onto 
+               pathList yet because we haven't identified what is at that key 
+               yet. Give null as the value because we haven't seen that far 
+               into the json yet */
             pathFound(ascentAfterNodeFound, firstKey)
          :
             ascentAfterNodeFound
@@ -1255,13 +1304,14 @@ function incrementalContentBuilder( fire) {
       // called by Clarinet when keys are found in objects               
       key: pathFound,
       
-      // Called by Clarinet when primitive values are found, ie Strings and Numbers.
-      // because these are always leaves in the JSON, we find and finish the node in one
-      // step, which can be expressed as functional composition:  
+      /* Emitted by Clarinet when primitive values are found, ie Strings,
+         Numbers, and null.
+         Because these are always leaves in the JSON, we find and finish the 
+         node in one step, expressed as functional composition: */
       value: compose( curNodeFinished, nodeFound ),
       
-      // we make no distinction in how we handle object and arrays closing. For both, interpret as the end
-      // of the current node.
+      // we make no distinction in how we handle object and arrays closing.
+      // For both, interpret as the end of the current node.
       closeobject: curNodeFinished,
       closearray: curNodeFinished       
    };
@@ -1665,11 +1715,19 @@ function pubSub(){
       }           
    };
 }
-var _S = 0,
-    // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature in public API, therefore are strings
+/**
+ * This file declares some constants to use as names for event types.
+ */
+
+var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature 
+    // in the public API via .on('node', ...) or .on('path', ...)
+    // so these events are strings
     NODE_FOUND    = 'node',  
-    PATH_FOUND    = 'path',        
-    // these are never exported, so are numbers:
+    PATH_FOUND    = 'path',   
+         
+    // these events are never exported so are kept as 
+    // the smallest possible representation, numbers:
+    _S = 0,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
     NEW_CONTENT = _S++,

@@ -1,17 +1,71 @@
 /**
- * Call a single function with the given arguments.
- * Basically, a functional-style version of the OO-style Function#apply for when we don't care about
- * the context of the call.
+ * This file declares various pieces of functional programming.
  * 
- * Order of arguments allows partial completion of the arguments to be passed to a function.
+ * This isn't a general purpose functional library, to keep things small it
+ * has just the parts useful for Oboe.js.
+ */
+
+
+/**
+ * Call a single function with the given arguments array.
+ * Basically, a functional-style version of the OO-style Function#apply for 
+ * when we don't care about the context ('this') of the call.
+ * 
+ * The order of arguments allows partial completion of the arguments array
  */
 function apply(args, fn) {
    return fn.apply(undefined, args);
 }
 
+/**
+ * Define variable argument functions but cut out all that tedious messing about 
+ * with the arguments object. Delivers the variable-length part of the arguments
+ * list as an array.
+ * 
+ * Eg:
+ * 
+ * var myFunction = varArgs(
+ *    function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
+ *       console.log( variableNumberOfArguments );
+ *    }
+ * )
+ * 
+ * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
+ * 
+ * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
+ *    console.log( variableNumberOfArguments );
+ * })
+ * 
+ * myFunction(1, 2, 3); // logs [1,2,3]
+ * 
+ */
+function varArgs(fn){
+
+   var numberOfFixedArguments = fn.length -1;
+         
+   return function(){
+   
+      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
+      
+          argumentsToFunction = Array.prototype.slice.call(arguments);
+          
+      // remove the last n element from the array and append it onto the end of
+      // itself as a sub-array
+      argumentsToFunction.push( 
+         argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments)
+      );   
+      
+      return fn.apply( this, argumentsToFunction );
+   }       
+}
+
 /** 
- * Partially complete the given function by filling it in with all arguments given
- * after the function itself. Returns the partially completed version.
+ * Partially complete a function.
+ * 
+ * Eg: 
+ *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );
+ *    
+ *    add3(4) // gives 7
  */
 var partialComplete = varArgs(function( fn, boundArgs ) {
 
@@ -56,54 +110,16 @@ function flip(fn){
 }
 
 /**
- * Define variable argument functions without all that tedious messing about 
- * with the arguments object.
- * 
- * Eg:
- * 
- * var myFunction = varArgs(function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){
- *    console.log( variableNumberOfArguments );
- * })
- * 
- * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]
- * 
- * var myOtherFunction = varArgs(function( variableNumberOfArguments ){
- *    console.log( variableNumberOfArguments );
- * })
- * 
- * myFunction(1, 2, 3); // logs [1,2,3]
- * 
- * @param fn
- */
-function varArgs(fn){
-
-   // nb: can't use len() here because it is defined using partialComplete which is defined using varargs.
-   // While recursive definition is possible in js, it is a stateful language and at this point there is no way
-   // that len can be defined
-   var numberOfFixedArguments = fn.length -1;
-         
-   return function(){
-   
-      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
-      
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
-      // remove the end of the array and push it back onto itself as a sub-array (sometimes to implement a functional
-      // machine we have to sit on top of a *very* non-functional one)
-      argumentsToFunction.push( argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments) );   
-      
-      return fn.apply( this, argumentsToFunction );
-   }       
-}
-
-/**
- * Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript
+ * Call a list of functions with the same args until one returns a 
+ * truthy result. Similar to the || operator.
  * 
  * So:
  *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
  *      
  * Is equivalent to: 
- *      apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  
+ *      apply([p1, p2 ... pn], f1) || 
+ *      apply([p1, p2 ... pn], f2) || 
+ *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  
  *  
  * @returns the first return value that is given that is truthy.
  */
@@ -125,9 +141,10 @@ var lazyUnion = varArgs(function(fns) {
 });
 
 /**
- * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the
- * first non-truthy one.
+ * Create a function which is the intersection of two other functions.
  * 
+ * Like the && operator, if the first is truthy, the second is never called,
+ * otherwise the return value from the second is returned.
  */
 function lazyIntersection(fn1, fn2) {
 
