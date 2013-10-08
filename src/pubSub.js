@@ -1,5 +1,9 @@
 /**
- * isn't this the smallest little pub-sub library you've ever seen?
+ * Isn't this the cutest little pub-sub you've ever seen?
+ * 
+ * Does not allow unsubscription because is never needed inside Oboe.
+ * Instead, when an Oboe instance is finished the whole of it should be
+ * available for GC'ing.
  */
 function pubSub(){
 

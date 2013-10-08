@@ -1,39 +1,45 @@
 var jsonPathSyntax = (function() {
-
-   // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
-   // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
-   // allowing new token regexes to match.
-   //    For all regular expressions:
-   //       The first subexpression is the $ (if the token is eligible to capture)
-   //       The second subexpression is the name of the expected path node (if the token may have a name)
-
-
-   /** Allows exporting of a regular expression as a generified function interface by encapsulating just the exec
-    *  function
-    *  
-    *  Could also be expressed as:
-    *    Function.prototype.bind.bind(RegExp.prototype.exec),
-    *    
-    *  But that's far too confusing! (and not even smaller once minified and gzipped)
-    *  
-    *  @type {Function}
-    *  
-    *  @param {RegExp} regex the regular expression to export
-    *  
-    *  @returns a function which is equivalent to calling exec on that regular expression
+ 
+   var
+   
+   /** 
+    * Export a regular expression as a simple function by exposing just 
+    * the Regex#exec. This allows regex tests to be used under the same 
+    * interface as differently implemented tests, or for a user of the
+    * tests to not concern themselves with their implementation as regular
+    * expressions.
+    * 
+    * This could also be expressed point-free as:
+    *   Function.prototype.bind.bind(RegExp.prototype.exec),
+    *   
+    * But that's far too confusing! (and not even smaller once minified 
+    * and gzipped)
     */
-   var regexDescriptor =   function regexDescriptor(regex) {
-                              return regex.exec.bind(regex);
-                           }, 
-  
-       jsonPathClause =    varArgs(function( componentRegexes ) {
-           
-                              componentRegexes.unshift(/^/);
-                           
-                              return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
-                           }),
+       regexDescriptor = function regexDescriptor(regex) {
+            return regex.exec.bind(regex);
+       }
+       
+   /**
+    * Join several regular expressions and express as a function.
+    * This allows the token patterns to reuse component regular expressions
+    * instead of being expressed in full using huge and confusing regular
+    * expressions.
+    */       
+   ,   jsonPathClause = varArgs(function( componentRegexes ) {
 
-       possiblyCapturing =           /(\$?)/
+            // The regular expressions all start with ^ because we 
+            // only want to find matches at the start of the 
+            // JSONPath fragment we are inspecting           
+            componentRegexes.unshift(/^/);
+            
+            return   regexDescriptor(
+                        RegExp(
+                           componentRegexes.map(attr('source')).join('')
+                        )
+                     );
+       })
+       
+   ,   possiblyCapturing =           /(\$?)/
    ,   namedNode =                   /([\w-_]+|\*)/
    ,   namePlaceholder =             /()/
    ,   nodeInArrayNotation =         /\["([^"]+)"\]/
@@ -41,34 +47,58 @@ var jsonPathSyntax = (function() {
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/
     
-                  
-   ,   jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                       //   foo or *
+
+       //   foo or *                  
+   ,   jsonPathNamedNodeInObjectNotation   = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                namedNode, 
+                                                optionalFieldList
+                                             )
+                                             
+       //   ["foo"]   
+   ,   jsonPathNamedNodeInArrayNotation    = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                nodeInArrayNotation, 
+                                                optionalFieldList
+                                             )  
+
+       //   [2] or [*]       
+   ,   jsonPathNumberedNodeInArrayNotation = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                numberedNodeInArrayNotation, 
+                                                optionalFieldList
+                                             )
+
+       //   {a b c}      
+   ,   jsonPathPureDuckTyping              = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                namePlaceholder, 
+                                                fieldList
+                                             )
    
-   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, nodeInArrayNotation, optionalFieldList)
-                                                                                       //   ["foo"]  
-       
-   ,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [2] or [*]
-      
-   ,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
+       //   ..
+   ,   jsonPathDoubleDot                   = jsonPathClause(/\.\./)                  
    
-   ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
+       //   .
+   ,   jsonPathDot                         = jsonPathClause(/\./)                    
    
-   ,   jsonPathDot                           = jsonPathClause(/\./)                    //   .
+       //   !
+   ,   jsonPathBang                        = jsonPathClause(
+                                                possiblyCapturing, 
+                                                /!/
+                                             )  
    
-   ,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)  //   !
-   
-   ,   emptyString                           = jsonPathClause(/$/)                     //   nada!
+       //   nada!
+   ,   emptyString                         = jsonPathClause(/$/)                     
    
    ;
    
   
-   /* we export only a single function. When called, this function injects into a scope the
-      descriptor functions from this scope which we want to make available elsewhere. 
+   /* We export only a single function. When called, this function injects 
+      into another function the descriptors from above.             
     */
    return function (fn){      
-      return fn( 
+      return fn(      
          lazyUnion(
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation

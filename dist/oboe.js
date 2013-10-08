@@ -156,12 +156,14 @@ function lazyIntersection(fn1, fn2) {
 }
 
 
+/**
+ * This file defines some loosely associated syntactic sugar for 
+ * Javascript programming 
+ */
+
 
 /**
  * Returns true if the given candidate is of type T
- * 
- * @param {Function} T
- * @param {*} maybeSomething
  */
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
@@ -174,10 +176,16 @@ var attr = partialComplete(partialComplete, pluck),
     len = attr('length'),    
     isString = partialComplete(isOfType, String);
 
-/** I don't like saying foo !=== undefined very much because of the double-negative. I find
- *  defined(foo) easier to read.
- *  
- * @param {*} value anything
+/** 
+ * I don't like saying this:
+ * 
+ *    foo !=== undefined
+ *    
+ * because of the double-negative. I find this:
+ * 
+ *    defined(foo)
+ *    
+ * easier to read.
  */ 
 function defined( value ) {
    return value !== undefined;
@@ -186,11 +194,9 @@ function defined( value ) {
 function always(){return true}
 
 /**
- * Returns true if object o has a key named like every property in the properties array.
- * Will give false if any are missing, or if o is not an object.
- * 
- * @param {Object} o
- * @param {String[]} fieldList
+ * Returns true if object o has a key named like every property in 
+ * the properties array. Will give false if any are missing, or if o 
+ * is not an object.
  */
 function hasAllProperties(fieldList, o) {
 
@@ -201,13 +207,17 @@ function hasAllProperties(fieldList, o) {
                }, fieldList);
 }
 /**
- * Like cons in LISP
+ * Like cons in Lisp
  */
 function cons(x, xs) {
    
-   // Internally lists are linked 2-element JS arrays. 
-   // So that lists are all immutable we Object.freeze in newer Javascript engines.
-   // In older engines freeze should have been polyfilled with the identity function.
+   /* Internally lists are linked 2-element Javascript arrays.
+    
+      So that lists are all immutable we Object.freeze in newer 
+      Javascript runtimes.
+      
+      In older engines freeze should have been polyfilled as the 
+      identity function. */
    return Object.freeze([x,xs]);
 }
 
@@ -313,8 +323,9 @@ function all(fn, list) {
 /**
  * Apply a function to every item in a list
  * 
- * This doesn't make any sense if we're doing pure functional because it doesn't return
- * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
+ * This doesn't make any sense if we're doing pure functional because 
+ * it doesn't return anything. Hence, this is only really useful if fn 
+ * has side-effects. 
  */
 function each(fn, list) {
 
@@ -943,40 +954,41 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
    });
 }
 /**
- * An xhr wrapper that calls a callback whenever some more of the
- * response is available, without waiting for all of it.
+ * An wrapper around the browser XmlHttpRequest object that raises an 
+ * event whenever a new part of the response is available.
  * 
- * This probably needs more development and testing more than most other parts 
- * of Oboe.
- *    
- * Fetch something over ajax, calling back as often as new data is available.
- * 
- * None of the parameters are optional.
- * 
+ * In older browsers progressive reading is impossible so all the 
+ * content is given in a single call. For newer ones several events
+ * should be raised, allowing progressive interpretation of the response.
+ *      
  * @param {Function} fire a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} xhr the xhr to use as the transport
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
  * @param {String} url
- * @param {String|Object} data some content to be sent with the request. Only valid
- *                        if method is POST or PUT.
+ * @param {String|Object} data some content to be sent with the request.
+ *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */
 function streamingHttp(fire, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
-         
+
+   // When an ABORTING message is put on the event bus abort 
+   // the ajax request         
    on( ABORTING, function(){
-      // when an ABORTING message is put on the event bus abort the ajax request
-   
-      // if we keep the state change listener, aborting gives it a callback the same as
-      // a successful request so null it out.
+  
+      // if we keep the onreadystatechange while aborting the XHR gives 
+      // a callback like a successful call so first remove this listener
+      // by assigning null:
       xhr.onreadystatechange = null;
+            
       xhr.abort();
    });
 
-   /** Given a value from the user to send as the request body, return in a form
-    *  that is suitable to sending over the wire. Returns either a string, or null.        
+   /** Given a value from the user to send as the request body, return in
+    *  a form that is suitable to sending over the wire. Returns either a 
+    *  string, or null.        
     */
    function validatedRequestBody( body ) {
       if( !body )
@@ -994,11 +1006,13 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       var textSoFar = xhr.responseText,
           newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
       
-      // give the new text to the callback.
-      // on older browsers, the new text will alwasys be the whole response. 
-      // On newer/better ones it'll be just the little bit that we got since last time.
-      // On browsers which send progress events for the last bit of the response, if we
-      // are responding to the laod event it is now empty         
+      
+      /* Raise the event for new text.
+      
+         On older browsers, the new text is the whole response. 
+         On newer/better ones, the fragment part that we got since 
+         last progress. */
+         
       if( newText ) {
          fire( NEW_CONTENT, newText );
       } 
@@ -1006,7 +1020,8 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
    
-   if('onprogress' in xhr){
+   
+   if('onprogress' in xhr){  // detect browser support for progressive delivery
       xhr.onprogress = handleProgress;
    }
    
@@ -1018,11 +1033,12 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          var sucessful = String(xhr.status)[0] == 2;
          
          if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is fired when a response is complete before the
-            // onload. We need to always do handleInput in case we get the load but have
-            // not had a final progress event. This may change in future but let's take the safest
-            // approach and assume we might not have received a progress event for every bit of
-            // data before we get the load event.
+            // In Chrome 29 (not 28) no onprogress is fired when a response
+            // is complete before the onload. We need to always do handleInput
+            // in case we get the load but have not had a final progress event.
+            // This looks like a bug and may change in future but let's take
+            // the safest approach and assume we might not have received a 
+            // progress event for each part of the response
             handleProgress();
             
             fire( END_OF_CONTENT );
@@ -1043,41 +1059,47 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
 }
 
 var jsonPathSyntax = (function() {
-
-   // The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath
-   // spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, 
-   // allowing new token regexes to match.
-   //    For all regular expressions:
-   //       The first subexpression is the $ (if the token is eligible to capture)
-   //       The second subexpression is the name of the expected path node (if the token may have a name)
-
-
-   /** Allows exporting of a regular expression as a generified function interface by encapsulating just the exec
-    *  function
-    *  
-    *  Could also be expressed as:
-    *    Function.prototype.bind.bind(RegExp.prototype.exec),
-    *    
-    *  But that's far too confusing! (and not even smaller once minified and gzipped)
-    *  
-    *  @type {Function}
-    *  
-    *  @param {RegExp} regex the regular expression to export
-    *  
-    *  @returns a function which is equivalent to calling exec on that regular expression
+ 
+   var
+   
+   /** 
+    * Export a regular expression as a simple function by exposing just 
+    * the Regex#exec. This allows regex tests to be used under the same 
+    * interface as differently implemented tests, or for a user of the
+    * tests to not concern themselves with their implementation as regular
+    * expressions.
+    * 
+    * This could also be expressed point-free as:
+    *   Function.prototype.bind.bind(RegExp.prototype.exec),
+    *   
+    * But that's far too confusing! (and not even smaller once minified 
+    * and gzipped)
     */
-   var regexDescriptor =   function regexDescriptor(regex) {
-                              return regex.exec.bind(regex);
-                           }, 
-  
-       jsonPathClause =    varArgs(function( componentRegexes ) {
-           
-                              componentRegexes.unshift(/^/);
-                           
-                              return regexDescriptor(RegExp(componentRegexes.map(attr('source')).join('')));
-                           }),
+       regexDescriptor = function regexDescriptor(regex) {
+            return regex.exec.bind(regex);
+       }
+       
+   /**
+    * Join several regular expressions and express as a function.
+    * This allows the token patterns to reuse component regular expressions
+    * instead of being expressed in full using huge and confusing regular
+    * expressions.
+    */       
+   ,   jsonPathClause = varArgs(function( componentRegexes ) {
 
-       possiblyCapturing =           /(\$?)/
+            // The regular expressions all start with ^ because we 
+            // only want to find matches at the start of the 
+            // JSONPath fragment we are inspecting           
+            componentRegexes.unshift(/^/);
+            
+            return   regexDescriptor(
+                        RegExp(
+                           componentRegexes.map(attr('source')).join('')
+                        )
+                     );
+       })
+       
+   ,   possiblyCapturing =           /(\$?)/
    ,   namedNode =                   /([\w-_]+|\*)/
    ,   namePlaceholder =             /()/
    ,   nodeInArrayNotation =         /\["([^"]+)"\]/
@@ -1085,34 +1107,58 @@ var jsonPathSyntax = (function() {
    ,   fieldList =                      /{([\w ]*?)}/
    ,   optionalFieldList =           /(?:{([\w ]*?)})?/
     
-                  
-   ,   jsonPathNamedNodeInObjectNotation     = jsonPathClause(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                       //   foo or *
+
+       //   foo or *                  
+   ,   jsonPathNamedNodeInObjectNotation   = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                namedNode, 
+                                                optionalFieldList
+                                             )
+                                             
+       //   ["foo"]   
+   ,   jsonPathNamedNodeInArrayNotation    = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                nodeInArrayNotation, 
+                                                optionalFieldList
+                                             )  
+
+       //   [2] or [*]       
+   ,   jsonPathNumberedNodeInArrayNotation = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                numberedNodeInArrayNotation, 
+                                                optionalFieldList
+                                             )
+
+       //   {a b c}      
+   ,   jsonPathPureDuckTyping              = jsonPathClause( 
+                                                possiblyCapturing, 
+                                                namePlaceholder, 
+                                                fieldList
+                                             )
    
-   ,   jsonPathNamedNodeInArrayNotation      = jsonPathClause(possiblyCapturing, nodeInArrayNotation, optionalFieldList)
-                                                                                       //   ["foo"]  
-       
-   ,   jsonPathNumberedNodeInArrayNotation   = jsonPathClause(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                       //   [2] or [*]
-      
-   ,   jsonPathPureDuckTyping                = jsonPathClause(possiblyCapturing, namePlaceholder, fieldList)
+       //   ..
+   ,   jsonPathDoubleDot                   = jsonPathClause(/\.\./)                  
    
-   ,   jsonPathDoubleDot                     = jsonPathClause(/\.\./)                  //   ..
+       //   .
+   ,   jsonPathDot                         = jsonPathClause(/\./)                    
    
-   ,   jsonPathDot                           = jsonPathClause(/\./)                    //   .
+       //   !
+   ,   jsonPathBang                        = jsonPathClause(
+                                                possiblyCapturing, 
+                                                /!/
+                                             )  
    
-   ,   jsonPathBang                          = jsonPathClause(possiblyCapturing, /!/)  //   !
-   
-   ,   emptyString                           = jsonPathClause(/$/)                     //   nada!
+       //   nada!
+   ,   emptyString                         = jsonPathClause(/$/)                     
    
    ;
    
   
-   /* we export only a single function. When called, this function injects into a scope the
-      descriptor functions from this scope which we want to make available elsewhere. 
+   /* We export only a single function. When called, this function injects 
+      into another function the descriptors from above.             
     */
    return function (fn){      
-      return fn( 
+      return fn(      
          lazyUnion(
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation
@@ -1175,12 +1221,16 @@ function incrementalContentBuilder( fire) {
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      return isOfType( Array, parentNode)
-      ?
-         pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode)
-      :  
-         possiblyInconsistentAscent // nothing needed, return unchanged
-      ;
+      return      isOfType( Array, parentNode)
+               ?
+                  pathFound(  possiblyInconsistentAscent, 
+                              len(parentNode), 
+                              newDeepestNode
+                  )
+               :  
+                  // nothing needed, return unchanged
+                  possiblyInconsistentAscent 
+               ;
    }
                  
    function nodeFound( ascent, newDeepestNode ) {
@@ -1250,7 +1300,11 @@ function incrementalContentBuilder( fire) {
          appendBuiltContent( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons( namedNode( newDeepestName, maybeNewDeepestNode), ascent);
+      var ascentWithNewPath = cons( 
+                                 namedNode( newDeepestName, 
+                                            maybeNewDeepestNode), 
+                                 ascent
+                              );
      
       fire( PATH_FOUND, ascentWithNewPath);
  
@@ -1651,7 +1705,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     * recursively compile. Otherwise, returnFoundParser is given and
     * compilation terminates.
     */
-   function compileJsonPathToFunction( uncompiledJsonPath, parserGeneratedSoFar ) {
+   function compileJsonPathToFunction( uncompiledJsonPath, 
+                                       parserGeneratedSoFar ) {
 
       /**
        * On finding a match, if there is remaining text to be compiled
@@ -1663,7 +1718,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                      ?  compileJsonPathToFunction 
                      :  returnFoundParser;
                    
-      return clauseForJsonPath(uncompiledJsonPath, parserGeneratedSoFar, onFind);                              
+      return   clauseForJsonPath( 
+                  uncompiledJsonPath, 
+                  parserGeneratedSoFar, 
+                  onFind
+               );                              
    }
 
    /**
@@ -1685,7 +1744,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 });
 
 /**
- * isn't this the smallest little pub-sub library you've ever seen?
+ * Isn't this the cutest little pub-sub you've ever seen?
+ * 
+ * Does not allow unsubscription because is never needed inside Oboe.
+ * Instead, when an Oboe instance is finished the whole of it should be
+ * available for GC'ing.
  */
 function pubSub(){
 
@@ -1885,15 +1948,25 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
                }
    };
 }
+/**
+ * This file sits just behind the API which is used to attain a new
+ * Oboe instance. It creates the new components that are required
+ * and introduces them to each other.
+ */
+
 function wire (httpMethodName, url, body, headers){
+
    var eventBus = pubSub();
                
    streamingHttp(  eventBus.fire, eventBus.on,
                   new XMLHttpRequest(), 
                   httpMethodName, url, body, headers );                              
      
-   return instanceController( eventBus.fire, eventBus.on, 
-                              clarinet.parser(), incrementalContentBuilder(eventBus.fire) );
+   return instanceController( 
+               eventBus.fire, eventBus.on, 
+               clarinet.parser(), 
+               incrementalContentBuilder(eventBus.fire) 
+   );
 }
 
 // export public API

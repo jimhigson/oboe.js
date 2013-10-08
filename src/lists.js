@@ -1,11 +1,15 @@
 /**
- * Like cons in LISP
+ * Like cons in Lisp
  */
 function cons(x, xs) {
    
-   // Internally lists are linked 2-element JS arrays. 
-   // So that lists are all immutable we Object.freeze in newer Javascript engines.
-   // In older engines freeze should have been polyfilled with the identity function.
+   /* Internally lists are linked 2-element Javascript arrays.
+    
+      So that lists are all immutable we Object.freeze in newer 
+      Javascript runtimes.
+      
+      In older engines freeze should have been polyfilled as the 
+      identity function. */
    return Object.freeze([x,xs]);
 }
 
@@ -111,8 +115,9 @@ function all(fn, list) {
 /**
  * Apply a function to every item in a list
  * 
- * This doesn't make any sense if we're doing pure functional because it doesn't return
- * anything. Hence, this is only really useful for callbacks if fn has side-effects. 
+ * This doesn't make any sense if we're doing pure functional because 
+ * it doesn't return anything. Hence, this is only really useful if fn 
+ * has side-effects. 
  */
 function each(fn, list) {
 

@@ -46,12 +46,16 @@ function incrementalContentBuilder( fire) {
 
       var parentNode = nodeOf( head( possiblyInconsistentAscent));
       
-      return isOfType( Array, parentNode)
-      ?
-         pathFound( possiblyInconsistentAscent, len(parentNode), newDeepestNode)
-      :  
-         possiblyInconsistentAscent // nothing needed, return unchanged
-      ;
+      return      isOfType( Array, parentNode)
+               ?
+                  pathFound(  possiblyInconsistentAscent, 
+                              len(parentNode), 
+                              newDeepestNode
+                  )
+               :  
+                  // nothing needed, return unchanged
+                  possiblyInconsistentAscent 
+               ;
    }
                  
    function nodeFound( ascent, newDeepestNode ) {
@@ -121,7 +125,11 @@ function incrementalContentBuilder( fire) {
          appendBuiltContent( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
-      var ascentWithNewPath = cons( namedNode( newDeepestName, maybeNewDeepestNode), ascent);
+      var ascentWithNewPath = cons( 
+                                 namedNode( newDeepestName, 
+                                            maybeNewDeepestNode), 
+                                 ascent
+                              );
      
       fire( PATH_FOUND, ascentWithNewPath);
  

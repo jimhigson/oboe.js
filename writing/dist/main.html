@@ -1741,6 +1741,10 @@ Chapter 4+5 40 to 60 pages
   <h2 id="api-design"><a href="#api-design"><span class=
   "header-section-number">4.5</span> API design</a></h2>
 
+  <p><em>API allows body to be given as Object and converts into
+  JSON because it is anticipated that REST services which emmit
+  JSON will also accept it</em></p>
+
   <p>In designing the API developer ergonomics are the top
   priority. This is especially pertinent given that the library
   does nothing that can't be done with existing tools such as JSON
@@ -1748,7 +1752,7 @@ Chapter 4+5 40 to 60 pages
   require too much effort to form a part of most developers'
   everyday toolkit.</p>
 
-  <p>Expose single global.</p>
+  <p><em>Expose single global.</em></p>
 
   <p>To pursue good ergonomics, I will study successful libraries
   and, where appropriate, copy their APIs. We may assume that the
@@ -3043,8 +3047,19 @@ Chapter 4+5 40 to 60 pages
   clarinetListenerAdaptor.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
-<span class="co">/* </span>
-<span class="co"> * Assign listeners to clarinet.</span>
+<span class="co">/** </span>
+<span class=
+"co"> * A bridge used to assign stateless functions to listen to clarinet.</span>
+<span class="co"> * </span>
+<span class=
+"co"> * As well as the parameter from clarinet, each callback will also be passed</span>
+<span class="co"> * the result of the last callback.</span>
+<span class="co"> * </span>
+<span class=
+"co"> * This may also be used to clear all listeners by assigning zero handlers:</span>
+<span class="co"> * </span>
+<span class=
+"co"> *    clarinetListenerAdaptor( clarinet, {} )</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">clarinetListenerAdaptor</span>(clarinetParser, handlers){
@@ -3072,14 +3087,24 @@ Chapter 4+5 40 to 60 pages
   <h2 id="events.js"><a href="#events.js"><span class=
   "header-section-number">7.3</span> events.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"kw">var</span> _S = <span class="dv">0</span>,
+<code class="sourceCode javascript"><span class="co">/**</span>
+<span class=
+"co"> * This file declares some constants to use as names for event types.</span>
+<span class="co"> */</span>
+
+<span class="kw">var</span> <span class=
+"co">// NODE_FOUND, PATH_FOUND and ERROR_EVENT feature </span>
     <span class=
-"co">// NODE_FOUND, PATH_FOUND and ERROR_EVENT feature in public API, therefore are strings</span>
+"co">// in the public API via .on('node', ...) or .on('path', ...)</span>
+    <span class="co">// so these events are strings</span>
     NODE_FOUND    = <span class="st">'node'</span>,  
-    PATH_FOUND    = <span class="st">'path'</span>,        
+    PATH_FOUND    = <span class="st">'path'</span>,   
+         
     <span class=
-"co">// these are never exported, so are numbers:</span>
+"co">// these events are never exported so are kept as </span>
+    <span class=
+"co">// the smallest possible representation, numbers:</span>
+    _S = <span class="dv">0</span>,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
     NEW_CONTENT = _S++,
@@ -3092,13 +3117,24 @@ Chapter 4+5 40 to 60 pages
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
-"co"> * Call a single function with the given arguments.</span>
-<span class=
-"co"> * Basically, a functional-style version of the OO-style Function#apply for when we don't care about</span>
-<span class="co"> * the context of the call.</span>
+"co"> * This file declares various pieces of functional programming.</span>
 <span class="co"> * </span>
 <span class=
-"co"> * Order of arguments allows partial completion of the arguments to be passed to a function.</span>
+"co"> * This isn't a general purpose functional library, to keep things small it</span>
+<span class="co"> * has just the parts useful for Oboe.js.</span>
+<span class="co"> */</span>
+
+
+<span class="co">/**</span>
+<span class=
+"co"> * Call a single function with the given arguments array.</span>
+<span class=
+"co"> * Basically, a functional-style version of the OO-style Function#apply for </span>
+<span class=
+"co"> * when we don't care about the context ('this') of the call.</span>
+<span class="co"> * </span>
+<span class=
+"co"> * The order of arguments allows partial completion of the arguments array</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">apply</span>(args, fn) {
@@ -3107,11 +3143,76 @@ Chapter 4+5 40 to 60 pages
 "kw">undefined</span>, args);
 }
 
+<span class="co">/**</span>
+<span class=
+"co"> * Define variable argument functions but cut out all that tedious messing about </span>
+<span class=
+"co"> * with the arguments object. Delivers the variable-length part of the arguments</span>
+<span class="co"> * list as an array.</span>
+<span class="co"> * </span>
+<span class="co"> * Eg:</span>
+<span class="co"> * </span>
+<span class="co"> * var myFunction = varArgs(</span>
+<span class=
+"co"> *    function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){</span>
+<span class=
+"co"> *       console.log( variableNumberOfArguments );</span>
+<span class="co"> *    }</span>
+<span class="co"> * )</span>
+<span class="co"> * </span>
+<span class=
+"co"> * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]</span>
+<span class="co"> * </span>
+<span class=
+"co"> * var myOtherFunction = varArgs(function( variableNumberOfArguments ){</span>
+<span class=
+"co"> *    console.log( variableNumberOfArguments );</span>
+<span class="co"> * })</span>
+<span class="co"> * </span>
+<span class="co"> * myFunction(1, 2, 3); // logs [1,2,3]</span>
+<span class="co"> * </span>
+<span class="co"> */</span>
+<span class="kw">function</span> <span class=
+"fu">varArgs</span>(fn){
+
+   <span class=
+"kw">var</span> numberOfFixedArguments = <span class="ot">fn</span>.<span class="fu">length</span> -<span class="dv">1</span>;
+         
+   <span class="kw">return</span> <span class=
+"kw">function</span>(){
+   
+      <span class=
+"kw">var</span> numberOfVaraibleArguments = <span class=
+"ot">arguments</span>.<span class=
+"fu">length</span> - numberOfFixedArguments,
+      
+          argumentsToFunction = <span class=
+"ot">Array</span>.<span class="ot">prototype</span>.<span class=
+"ot">slice</span>.<span class="fu">call</span>(arguments);
+          
+      <span class=
+"co">// remove the last n element from the array and append it onto the end of</span>
+      <span class="co">// itself as a sub-array</span>
+      <span class="ot">argumentsToFunction</span>.<span class=
+"fu">push</span>( 
+         <span class="ot">argumentsToFunction</span>.<span class=
+"fu">splice</span>(numberOfFixedArguments, numberOfVaraibleArguments)
+      );   
+      
+      <span class="kw">return</span> <span class=
+"ot">fn</span>.<span class="fu">apply</span>( <span class=
+"kw">this</span>, argumentsToFunction );
+   }       
+}
+
 <span class="co">/** </span>
+<span class="co"> * Partially complete a function.</span>
+<span class="co"> * </span>
+<span class="co"> * Eg: </span>
 <span class=
-"co"> * Partially complete the given function by filling it in with all arguments given</span>
-<span class=
-"co"> * after the function itself. Returns the partially completed version.</span>
+"co"> *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );</span>
+<span class="co"> *    </span>
+<span class="co"> *    add3(4) // gives 7</span>
 <span class="co"> */</span>
 <span class="kw">var</span> partialComplete = <span class=
 "fu">varArgs</span>(<span class=
@@ -3177,81 +3278,19 @@ Chapter 4+5 40 to 60 pages
 
 <span class="co">/**</span>
 <span class=
-"co"> * Define variable argument functions without all that tedious messing about </span>
-<span class="co"> * with the arguments object.</span>
-<span class="co"> * </span>
-<span class="co"> * Eg:</span>
-<span class="co"> * </span>
+"co"> * Call a list of functions with the same args until one returns a </span>
 <span class=
-"co"> * var myFunction = varArgs(function( fixedArgument, otherFixedArgument, variableNumberOfArguments ){</span>
-<span class=
-"co"> *    console.log( variableNumberOfArguments );</span>
-<span class="co"> * })</span>
-<span class="co"> * </span>
-<span class=
-"co"> * myFunction('a', 'b', 1, 2, 3); // logs [1,2,3]</span>
-<span class="co"> * </span>
-<span class=
-"co"> * var myOtherFunction = varArgs(function( variableNumberOfArguments ){</span>
-<span class=
-"co"> *    console.log( variableNumberOfArguments );</span>
-<span class="co"> * })</span>
-<span class="co"> * </span>
-<span class="co"> * myFunction(1, 2, 3); // logs [1,2,3]</span>
-<span class="co"> * </span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">fn</span>
-<span class="co"> */</span>
-<span class="kw">function</span> <span class=
-"fu">varArgs</span>(fn){
-
-   <span class=
-"co">// nb: can't use len() here because it is defined using partialComplete which is defined using varargs.</span>
-   <span class=
-"co">// While recursive definition is possible in js, it is a stateful language and at this point there is no way</span>
-   <span class="co">// that len can be defined</span>
-   <span class=
-"kw">var</span> numberOfFixedArguments = <span class="ot">fn</span>.<span class="fu">length</span> -<span class="dv">1</span>;
-         
-   <span class="kw">return</span> <span class=
-"kw">function</span>(){
-   
-      <span class=
-"kw">var</span> numberOfVaraibleArguments = <span class=
-"ot">arguments</span>.<span class=
-"fu">length</span> - numberOfFixedArguments,
-      
-          argumentsToFunction = <span class=
-"ot">Array</span>.<span class="ot">prototype</span>.<span class=
-"ot">slice</span>.<span class="fu">call</span>(arguments);
-          
-      <span class=
-"co">// remove the end of the array and push it back onto itself as a sub-array (sometimes to implement a functional</span>
-      <span class=
-"co">// machine we have to sit on top of a *very* non-functional one)</span>
-      <span class="ot">argumentsToFunction</span>.<span class=
-"fu">push</span>( <span class=
-"ot">argumentsToFunction</span>.<span class=
-"fu">splice</span>(numberOfFixedArguments, numberOfVaraibleArguments) );   
-      
-      <span class="kw">return</span> <span class=
-"ot">fn</span>.<span class="fu">apply</span>( <span class=
-"kw">this</span>, argumentsToFunction );
-   }       
-}
-
-<span class="co">/**</span>
-<span class=
-"co"> * Call a list of functions with the same args until one returns a truthy result. Equivalent to || in javascript</span>
+"co"> * truthy result. Similar to the || operator.</span>
 <span class="co"> * </span>
 <span class="co"> * So:</span>
 <span class=
 "co"> *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )</span>
 <span class="co"> *      </span>
 <span class="co"> * Is equivalent to: </span>
+<span class="co"> *      apply([p1, p2 ... pn], f1) || </span>
+<span class="co"> *      apply([p1, p2 ... pn], f2) || </span>
 <span class=
-"co"> *      apply(f1, [p1, p2 ... pn]) || apply(f2, [p1, p2 ... pn]) || apply(f3, [p1, p2 ... pn]) ... apply(fn, [p1, p2 ... pn])  </span>
+"co"> *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  </span>
 <span class="co"> *  </span>
 <span class="co"> * </span><span class=
 "kw">@returns</span><span class=
@@ -3281,9 +3320,12 @@ Chapter 4+5 40 to 60 pages
 
 <span class="co">/**</span>
 <span class=
-"co"> * Call a list of functions, so long as they continue to return a truthy result. Returns the last result, or the</span>
-<span class="co"> * first non-truthy one.</span>
+"co"> * Create a function which is the intersection of two other functions.</span>
 <span class="co"> * </span>
+<span class=
+"co"> * Like the &amp;&amp; operator, if the first is truthy, the second is never called,</span>
+<span class=
+"co"> * otherwise the return value from the second is returned.</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">lazyIntersection</span>(fn1, fn2) {
@@ -3304,88 +3346,95 @@ Chapter 4+5 40 to 60 pages
   "header-section-number">7.5</span>
   incrementalContentBuilder.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"kw">var</span> keyOf = <span class="fu">attr</span>(<span class=
-"st">'key'</span>);
+<code class="sourceCode javascript"><span class="co">/** </span>
+<span class=
+"co"> * This file provides various listeners which can be used to build up</span>
+<span class=
+"co"> * a changing ascent based on the callbacks provided by Clarinet. It listens</span>
+<span class=
+"co"> * to the low-level events from Clarinet and fires higher-level ones.</span>
+<span class="co"> *  </span>
+<span class=
+"co"> * The building up is stateless so to track a JSON file</span>
+<span class=
+"co"> * clarinetListenerAdaptor.js is required to store the ascent state</span>
+<span class="co"> * between calls.</span>
+<span class="co"> */</span>
+
+
+<span class="kw">var</span> keyOf = <span class=
+"fu">attr</span>(<span class="st">'key'</span>);
 <span class="kw">var</span> nodeOf = <span class=
 "fu">attr</span>(<span class="st">'node'</span>);
 
 
-<span class="co">/**</span>
+<span class="co">/** </span>
 <span class=
-"co"> * A special value to use in the path list to represent the path 'to' a root object (which doesn't really</span>
+"co"> * A special value to use in the path list to represent the path 'to' a root </span>
 <span class=
-"co"> * have any path). This prevents the need for special-casing detection of the root object and allows it</span>
+"co"> * object (which doesn't really have any path). This prevents the need for </span>
 <span class=
-"co"> * to be treated like any other object. We might think of this as being similar to the 'unnamed root'</span>
+"co"> * special-casing detection of the root object and allows it to be treated </span>
 <span class=
-"co"> * domain ".", eg if I go to http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates the </span>
-<span class="co"> * unnamed root of the DNS.</span>
+"co"> * like any other object. We might think of this as being similar to the </span>
+<span class=
+"co"> * 'unnamed root' domain ".", eg if I go to </span>
+<span class=
+"co"> * http://en.wikipedia.org./wiki/En/Main_page the dot after 'org' deliminates </span>
+<span class="co"> * the unnamed root of the DNS.</span>
 <span class="co"> * </span>
 <span class=
-"co"> * This is kept as an object to take advantage that in an OO language, objects are guaranteed to be</span>
+"co"> * This is kept as an object to take advantage that in Javascript's OO objects </span>
 <span class=
-"co"> * distinct, therefore no other object can possibly clash with this one. Strings, numbers etc provide</span>
-<span class="co"> * no such guarantee.</span>
-<span class="co"> */</span>
-<span class="kw">var</span> ROOT_PATH = {}; 
+"co"> * are guaranteed to be distinct, therefore no other object can possibly clash </span>
+<span class=
+"co"> * with this one. Strings, numbers etc provide no such guarantee. </span>
+<span class="co"> **/</span>
+<span class="kw">var</span> ROOT_PATH = {};
 
 
 <span class="co">/**</span>
-<span class="co"> * Provide handlers for clarinet's events.</span>
 <span class=
-"co"> * These listeners fire higher-level events related to paths and nodes rather than low-level syntax in the json.</span>
-<span class=
-"co"> * No state is maintained by the handlers, that has been refactored out so that this part of the library can</span>
-<span class="co"> * stay purely functional.</span>
-<span class="co"> *  </span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class=
-"co"> fire a handle on an event bus to fire higher level events on when a new node </span>
-<span class="co"> *    or path is found  </span>
+"co"> * Create a new set of handlers for clarinet's events, bound to the fire </span>
+<span class="co"> * function given.  </span>
 <span class="co"> */</span> 
 <span class="kw">function</span> <span class=
 "fu">incrementalContentBuilder</span>( fire) {
+
 
    <span class="kw">function</span> <span class=
 "fu">arrayIndicesAreKeys</span>( possiblyInconsistentAscent, newDeepestNode) {
    
       <span class=
-"co">// for values in arrays we aren't pre-warned of the coming paths (Clarinet gives </span>
-      <span class=
-"co">// no call to onkey like it does for values in objects) so if we are in an array </span>
-      <span class=
-"co">// we need to create this path ourselves. The key will be len(parentNode) because</span>
-      <span class=
-"co">// array keys are always sequential numbers.</span>
+"co">/* for values in arrays we aren't pre-warned of the coming paths </span>
+<span class=
+"co">         (Clarinet gives no call to onkey like it does for values in objects) </span>
+<span class=
+"co">         so if we are in an array we need to create this path ourselves. The </span>
+<span class=
+"co">         key will be len(parentNode) because array keys are always sequential </span>
+<span class="co">         numbers. */</span>
 
       <span class="kw">var</span> parentNode = <span class=
 "fu">nodeOf</span>( <span class=
 "fu">head</span>( possiblyInconsistentAscent));
       
-      <span class="kw">return</span> <span class=
+      <span class="kw">return</span>      <span class=
 "fu">isOfType</span>( Array, parentNode)
-      ?
-         <span class=
-"fu">pathFound</span>( possiblyInconsistentAscent, <span class=
-"fu">len</span>(parentNode), newDeepestNode)
-      :  
-         possiblyInconsistentAscent <span class=
+               ?
+                  <span class=
+"fu">pathFound</span>(  possiblyInconsistentAscent, 
+                              <span class=
+"fu">len</span>(parentNode), 
+                              newDeepestNode
+                  )
+               :  
+                  <span class=
 "co">// nothing needed, return unchanged</span>
-      ;
+                  possiblyInconsistentAscent 
+               ;
    }
-
-   <span class="co">/**</span>
-<span class=
-"co">    * Manage the state and notifications for when a new node is found.</span>
-<span class="co">    *  </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{*}</span><span class=
-"co"> newDeepestNode the thing that has been found in the json</span>
-<span class="co">    * </span>@function
-<span class="co">    */</span>                 
+                 
    <span class="kw">function</span> <span class=
 "fu">nodeFound</span>( ascent, newDeepestNode ) {
       
@@ -3408,18 +3457,24 @@ Chapter 4+5 40 to 60 pages
 "fu">keyOf</span>( <span class=
 "fu">head</span>( arrayConsistentAscent));
           
-      <span class=
-"fu">appendBuiltContent</span>( ancestorBranches, previouslyUnmappedName, newDeepestNode );
+      <span class="fu">appendBuiltContent</span>( 
+         ancestorBranches, 
+         previouslyUnmappedName, 
+         newDeepestNode 
+      );
                                                                                                          
-      <span class="kw">return</span> <span class=
-"fu">cons</span>( <span class=
-"fu">namedNode</span>( previouslyUnmappedName, newDeepestNode ), ancestorBranches);                                                                          
+      <span class="kw">return</span> <span class="fu">cons</span>( 
+               <span class=
+"fu">namedNode</span>( previouslyUnmappedName, newDeepestNode ), 
+               ancestorBranches
+      );                                                                          
    }
 
 
    <span class="co">/**</span>
 <span class=
-"co">    * Add a new value to the top-level object which has been already output   </span>
+"co">    * Add a new value to the object we are building up to represent the</span>
+<span class="co">    * parsed JSON</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">appendBuiltContent</span>( ancestorBranches, key, node ){
@@ -3452,15 +3507,20 @@ Chapter 4+5 40 to 60 pages
 <span class="co">    * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{String|Number|Object}</span><span class=
-"co"> newDeepestName the key. If we are in an array will be a number, otherwise a string. May</span>
+"co"> newDeepestName the key. If we are in an </span>
 <span class=
-"co">    *    take the special value ROOT_PATH if the root node has just been found</span>
+"co">    *    array will be a number, otherwise a string. May take the special </span>
+<span class=
+"co">    *    value ROOT_PATH if the root node has just been found</span>
+<span class="co">    *    </span>
 <span class="co">    * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{String|Number|Object|Array|Null|undefined}</span><span class=
-"co"> [maybeNewDeepestNode] usually this won't be known so can be undefined.</span>
+"co"> [maybeNewDeepestNode] </span>
 <span class=
-"co">    *    can't use null because null is a valid value in some json</span>
+"co">    *    usually this won't be known so can be undefined. Can't use null </span>
+<span class=
+"co">    *    to represent unknown because null is a valid value in JSON</span>
 <span class="co">    **/</span>  
    <span class="kw">function</span> <span class=
 "fu">pathFound</span>(ascent, newDeepestName, maybeNewDeepestNode) {
@@ -3469,16 +3529,20 @@ Chapter 4+5 40 to 60 pages
 "co">// if not root</span>
       
          <span class=
-"co">// if we have the key but (unless adding to an array) no known value yet, at least put </span>
+"co">// If we have the key but (unless adding to an array) no known value</span>
          <span class=
-"co">// that key in the output but against no defined value:      </span>
+"co">// yet. Put that key in the output but against no defined value:      </span>
          <span class=
 "fu">appendBuiltContent</span>( ascent, newDeepestName, maybeNewDeepestNode );
       }
    
       <span class="kw">var</span> ascentWithNewPath = <span class=
-"fu">cons</span>( <span class=
-"fu">namedNode</span>( newDeepestName, maybeNewDeepestNode), ascent);
+"fu">cons</span>( 
+                                 <span class=
+"fu">namedNode</span>( newDeepestName, 
+                                            maybeNewDeepestNode), 
+                                 ascent
+                              );
      
       <span class="fu">fire</span>( PATH_FOUND, ascentWithNewPath);
  
@@ -3487,8 +3551,7 @@ Chapter 4+5 40 to 60 pages
 
 
    <span class="co">/**</span>
-<span class=
-"co">    * manages the state and notifications for when the current node has ended</span>
+<span class="co">    * For when the current node ends</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">curNodeFinished</span>( ascent ) {
@@ -3502,26 +3565,40 @@ Chapter 4+5 40 to 60 pages
    }      
                  
    <span class="kw">return</span> { 
+
       <span class="dt">openobject </span>: <span class=
 "kw">function</span> (ascent, firstKey) {
 
          <span class=
 "kw">var</span> ascentAfterNodeFound = <span class=
 "fu">nodeFound</span>(ascent, {});         
-         
+
          <span class=
-"co">// It'd be odd but firstKey could be the empty string like {'':'foo'}. This is valid json even though it </span>
-         <span class=
-"co">// isn't very nice. So can't do !firstKey here, have to compare against undefined</span>
+"co">/* It is a perculiarity of Clarinet that for non-empty objects it</span>
+<span class=
+"co">            gives the first key with the openobject event instead of</span>
+<span class="co">            in a subsequent key event.</span>
+<span class="co">                      </span>
+<span class=
+"co">            firstKey could be the empty string in a JSON object like </span>
+<span class=
+"co">            {'':'foo'} which is technically valid.</span>
+<span class="co">            </span>
+<span class=
+"co">            So can't check with !firstKey, have to see if has any </span>
+<span class="co">            defined value. */</span>
          <span class="kw">return</span> <span class=
 "fu">defined</span>(firstKey)
          ?          
             <span class=
-"co">// We know the first key of the newly parsed object. Notify that path has been found but don't put firstKey</span>
-            <span class=
-"co">// perminantly onto pathList yet because we haven't identified what is at that key yet. Give null as the</span>
-            <span class=
-"co">// value because we haven't seen that far into the json yet          </span>
+"co">/* We know the first key of the newly parsed object. Notify that </span>
+<span class=
+"co">               path has been found but don't put firstKey permanently onto </span>
+<span class=
+"co">               pathList yet because we haven't identified what is at that key </span>
+<span class=
+"co">               yet. Give null as the value because we haven't seen that far </span>
+<span class="co">               into the json yet */</span>
             <span class=
 "fu">pathFound</span>(ascentAfterNodeFound, firstKey)
          :
@@ -3540,17 +3617,19 @@ Chapter 4+5 40 to 60 pages
       <span class="dt">key</span>: pathFound,
       
       <span class=
-"co">// Called by Clarinet when primitive values are found, ie Strings and Numbers.</span>
-      <span class=
-"co">// because these are always leaves in the JSON, we find and finish the node in one</span>
-      <span class=
-"co">// step, which can be expressed as functional composition:  </span>
+"co">/* Emitted by Clarinet when primitive values are found, ie Strings,</span>
+<span class="co">         Numbers, and null.</span>
+<span class=
+"co">         Because these are always leaves in the JSON, we find and finish the </span>
+<span class=
+"co">         node in one step, expressed as functional composition: */</span>
       <span class="dt">value</span>: <span class=
 "fu">compose</span>( curNodeFinished, nodeFound ),
       
       <span class=
-"co">// we make no distinction in how we handle object and arrays closing. For both, interpret as the end</span>
-      <span class="co">// of the current node.</span>
+"co">// we make no distinction in how we handle object and arrays closing.</span>
+      <span class=
+"co">// For both, interpret as the end of the current node.</span>
       <span class="dt">closeobject</span>: curNodeFinished,
       <span class="dt">closearray</span>: curNodeFinished       
    };
@@ -3562,11 +3641,14 @@ Chapter 4+5 40 to 60 pages
   "header-section-number">7.6</span> instanceController.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class=
-"co"> jsonRoot a function which returns the json root so far</span>
+<span class=
+"co"> * This file implements a light-touch central controller for an instance </span>
+<span class=
+"co"> * of Oboe which provides the methods used for interacting with the instance </span>
+<span class="co"> * from the calling app.</span>
 <span class="co"> */</span>
+ 
+ 
 <span class="kw">function</span> <span class=
 "fu">instanceController</span>(fire, on, clarinetParser, contentBuilderHandlers) {
   
@@ -3590,28 +3672,32 @@ Chapter 4+5 40 to 60 pages
 "fu">write</span>(nextDrip);            
          } <span class="kw">catch</span>(e) { 
             <span class=
-"co">// we don't have to do anything here because we always assign a .onerror</span>
-            <span class=
-"co">// to clarinet which will have already been called by the time this </span>
-            <span class=
-"co">// exception is thrown.                </span>
+"co">/* we don't have to do anything here because we always assign</span>
+<span class=
+"co">               a .onerror to clarinet which will have already been called </span>
+<span class=
+"co">               by the time this exception is thrown. */</span>                
          }
       }
    );
    
    <span class=
-"co">// at the end of the content close the clarinet parser. This will provide an error if the</span>
-   <span class=
-"co">// total content provided was not valid json, ie if not all objects closed properly</span>
+"co">/* At the end of the http content close the clarinet parser.</span>
+<span class=
+"co">      This will provide an error if the total content provided was not </span>
+<span class=
+"co">      valid json, ie if not all arrays, objects and Strings closed properly */</span>
    <span class="fu">on</span>(END_OF_CONTENT, <span class=
 "ot">clarinetParser</span>.<span class=
 "ot">close</span>.<span class="fu">bind</span>(clarinetParser));
    
 
    <span class=
-"co">// If we abort this Oboe's request stop listening to the clarinet parser. This prevents more tokens</span>
-   <span class=
-"co">// being found after we abort in the case where we aborted while reading though an already filled buffer.</span>
+"co">/* If we abort this Oboe's request stop listening to the clarinet parser. </span>
+<span class=
+"co">      This prevents more tokens being found after we abort in the case where </span>
+<span class=
+"co">      we aborted during processing of an already filled buffer. */</span>
    <span class="fu">on</span>( ABORTING, <span class=
 "kw">function</span>() {
       <span class=
@@ -3641,7 +3727,7 @@ Chapter 4+5 40 to 60 pages
 "fu">jsonPathCompiler</span>( pattern );
    
       <span class=
-"co">// Add a new listener to the eventBus.</span>
+"co">// Add a new callback adaptor to the eventBus.</span>
       <span class=
 "co">// This listener first checks that he pattern matches then if it does, </span>
       <span class="co">// passes it onto the callback. </span>
@@ -3653,61 +3739,58 @@ Chapter 4+5 40 to 60 pages
 "fu">matchesJsonPath</span>( ascent );
      
          <span class=
-"co">// Possible values for maybeMatchingMapping are now:</span>
-         <span class="co">//</span>
-         <span class="co">//    false: </span>
-         <span class="co">//       we did not match </span>
-         <span class="co">//</span>
-         <span class=
-"co">//    an object/array/string/number/null: </span>
-         <span class=
-"co">//       that node is the one that matched. Because json can have nulls, this can </span>
-         <span class="co">//       be null.</span>
-         <span class="co">//</span>
-         <span class=
-"co">//    undefined: like above, but we don't have the node yet. ie, we know there is a</span>
-         <span class=
-"co">//       node that matches but we don't know if it is an array, object, string</span>
-         <span class=
-"co">//       etc yet so we can't say anything about it. Null isn't used here because</span>
-         <span class=
-"co">//       it would be indistinguishable from us finding a node with a value of</span>
-         <span class="co">//       null.</span>
+"co">/* Possible values for maybeMatchingMapping are now:</span>
+
+<span class="co">            false: </span>
+<span class="co">               we did not match </span>
+<span class="co">  </span>
+<span class=
+"co">            an object/array/string/number/null: </span>
+<span class=
+"co">               we matched and have the node that matched.</span>
+<span class=
+"co">               Because nulls are valid json values this can be null.</span>
+<span class="co">  </span>
+<span class="co">            undefined: </span>
+<span class=
+"co">               we matched but don't have the matching node yet.</span>
+<span class=
+"co">               ie, we know there is an upcoming node that matches but we </span>
+<span class=
+"co">               can't say anything else about it. </span>
+<span class="co">         */</span>
          <span class=
 "kw">if</span>( maybeMatchingMapping !== <span class=
 "kw">false</span> ) {                                 
 
-            <span class="kw">try</span>{              
-               <span class=
-"fu">notifyCallback</span>(callback, maybeMatchingMapping, ascent);
-            } <span class="kw">catch</span>(e) {
-               <span class=
-"co">// an error could have happened in the callback. Put it</span>
-               <span class="co">// on the event bus </span>
-               <span class="fu">fire</span>(ERROR_EVENT, e);
-            }               
+            <span class=
+"fu">notifyCallback</span>(callback, maybeMatchingMapping, ascent);                           
          }
       });   
    }   
    
    <span class="kw">function</span> <span class=
 "fu">notifyCallback</span>(callback, matchingMapping, ascent) {
-      <span class=
-"co">// We're now calling back to outside of oboe where there is no concept of the</span>
-      <span class=
-"co">// functional-style lists that we are using internally so convert into standard</span>
-      <span class=
-"co">// arrays. Reverse the order because it is more natural to receive in order </span>
-      <span class=
-"co">// "root to leaf" than "leaf to root"             </span>
+      <span class="co">/* </span>
+<span class=
+"co">         We're now calling back to outside of oboe where the Lisp-style </span>
+<span class=
+"co">         lists that we are using internally will not be recognised </span>
+<span class="co">         so convert to standard arrays. </span>
+<span class="co">  </span>
+<span class=
+"co">         Also, reverse the order because it is more common to list paths </span>
+<span class=
+"co">         "root to leaf" than "leaf to root" </span>
+<span class="co">      */</span>
             
       <span class="kw">var</span> descent     = <span class=
 "fu">reverseList</span>(ascent),
       
-            <span class=
-"co">// for the path list, also need to remove the last item which is the special</span>
-            <span class=
-"co">// token for the 'path' to the root node</span>
+          <span class=
+"co">// To make a path, strip off the last item which is the special</span>
+          <span class=
+"co">// ROOT_PATH token for the 'path' to the root node</span>
           path       = <span class=
 "fu">listAsArray</span>(<span class="fu">tail</span>(<span class=
 "fu">map</span>(keyOf,descent))),
@@ -3715,10 +3798,22 @@ Chapter 4+5 40 to 60 pages
 "fu">listAsArray</span>(<span class=
 "fu">map</span>(nodeOf, descent)); 
       
-      <span class="fu">callback</span>( <span class=
-"fu">nodeOf</span>(matchingMapping), path, ancestors );  
+      <span class="kw">try</span>{
+      
+         <span class="fu">callback</span>( <span class=
+"fu">nodeOf</span>(matchingMapping), path, ancestors );   
+      }<span class="kw">catch</span>(e)  {
+      
+         <span class=
+"co">// An error occured during the callback, publish it on the event bus </span>
+         <span class="fu">fire</span>(ERROR_EVENT, e);
+      }          
    }
-  
+
+   <span class="co">/**</span>
+<span class=
+"co">    * Add several listeners at a time, from a map</span>
+<span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">addListenersMap</span>(eventId, listenerMap) {
    
@@ -3731,16 +3826,20 @@ Chapter 4+5 40 to 60 pages
       
    <span class="co">/**</span>
 <span class=
-"co">    * implementation behind .onPath() and .onNode(): add one or several listeners in one call  </span>
-<span class="co">    * depending on the argument types</span>
+"co">    * implementation behind .onPath() and .onNode()</span>
 <span class="co">    */</span>       
    <span class="kw">function</span> <span class=
-"fu">addNodeOrPathListenerApi</span>( eventId, jsonPathOrListenerMap, callback, callbackContext ){
+"fu">addNodeOrPathListenerApi</span>( eventId, jsonPathOrListenerMap,
+                                      callback, callbackContext ){
  
       <span class="kw">if</span>( <span class=
 "fu">isString</span>(jsonPathOrListenerMap) ) {
-         <span class=
-"fu">addPathOrNodeCallback</span>(eventId, jsonPathOrListenerMap, <span class="ot">callback</span>.<span class="fu">bind</span>(callbackContext||oboeApi));
+         <span class="fu">addPathOrNodeCallback</span>( 
+            eventId, 
+            jsonPathOrListenerMap, 
+            <span class="ot">callback</span>.<span class=
+"fu">bind</span>(callbackContext||oboeApi)
+         );
       } <span class="kw">else</span> {
          <span class=
 "fu">addListenersMap</span>(eventId, jsonPathOrListenerMap);
@@ -3748,8 +3847,13 @@ Chapter 4+5 40 to 60 pages
       
       <span class="kw">return</span> <span class=
 "kw">this</span>; <span class="co">// chaining</span>
-   }         
+   }
 
+   <span class="co">/**</span>
+<span class=
+"co">    * Construct and return the public API of the Oboe instance to be </span>
+<span class="co">    * returned to the calling application</span>
+<span class="co">    */</span>
    <span class="kw">return</span> oboeApi = { 
       <span class="dt">path  </span>:  <span class=
 "fu">partialComplete</span>(addNodeOrPathListenerApi, PATH_FOUND), 
@@ -3775,34 +3879,33 @@ Chapter 4+5 40 to 60 pages
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
-"co"> * One function is exposed. This function takes a jsonPath spec (as a string) and returns a function to test candidate</span>
-<span class=
-"co"> * paths for matches. The candidate paths are arrays of strings representing the path from the root of the parsed json to</span>
-<span class="co"> * some node in the json.</span>
+"co"> * The jsonPath evaluator compiler used for Oboe.js. </span>
 <span class="co"> * </span>
 <span class=
-"co"> * Naming convention (like erlang) is to start unused variables with an underscore, to avoid confusion with accidental non-use.</span>
+"co"> * One function is exposed. This function takes a String JSONPath spec and </span>
 <span class=
-"co"> * This is usually where several functions need to keep the same signature but not all use all of the parameters.</span>
+"co"> * returns a function to test candidate ascents for matches.</span>
 <span class="co"> * </span>
 <span class=
-"co"> * This file is coded in a pure functional style. That is, no function has side effects, every function evaluates to the</span>
+"co"> *  String jsonPath -&gt; (List ascent) -&gt; Boolean|Object</span>
+<span class="co"> *</span>
 <span class=
-"co"> * same value for the same arguments and no variables are reassigned.</span>
-<span class="co"> * </span>
+"co"> * This file is coded in a pure functional style. That is, no function has </span>
 <span class=
-"co"> *   String jsonPath -&gt; (List ascent) -&gt; Boolean|Object</span>
-<span class="co"> *    </span>
+"co"> * side effects, every function evaluates to the same value for the same </span>
 <span class=
-"co"> * The returned function returns false if there was no match, the node which was captured (using $)</span>
-<span class=
-"co"> * if any expressions in the jsonPath are capturing, or true if there is a match but no capture.</span>
+"co"> * arguments and no variables are reassigned.</span>
 <span class="co"> */</span>  
 <span class=
-"co">// the call to jsonPathSyntax injects the syntaxes that are needed inside the compiler</span>
+"co">// the call to jsonPathSyntax injects the token syntaxes that are needed </span>
+<span class="co">// inside the compiler</span>
 <span class="kw">var</span> jsonPathCompiler = <span class=
 "fu">jsonPathSyntax</span>(<span class=
-"kw">function</span> (pathNodeSyntax, doubleDotSyntax, dotSyntax, bangSyntax, emptySyntax ) {
+"kw">function</span> (pathNodeSyntax, 
+                                                doubleDotSyntax, 
+                                                dotSyntax,
+                                                bangSyntax,
+                                                emptySyntax ) {
 
    <span class="kw">var</span> CAPTURING_INDEX = <span class=
 "dv">1</span>;
@@ -3816,23 +3919,11 @@ Chapter 4+5 40 to 60 pages
                    
    <span class="co">/**</span>
 <span class=
-"co">    * Expression for a named path node, expressed like:</span>
+"co">    * Create an evaluator function for a named path node, expressed in the</span>
+<span class="co">    * JSONPath like:</span>
 <span class="co">    *    foo</span>
 <span class="co">    *    ["bar"]</span>
-<span class="co">    *    [2]</span>
-<span class="co">    *        </span>
-<span class=
-"co">    *    All other fooExpr functions follow this same signature. My means of function factories, we end up with a parser</span>
-<span class=
-"co">    *    in which each function has a reference to the previous one. Once a function is happy that its part of the jsonPath</span>
-<span class=
-"co">    *    matches, it delegates the remaining matching to the next function in the chain.       </span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Function} a function which examines the descents on a path from the root of a json to a node</span>
-<span class=
-"co">    *                     and decides if there is a match or not</span>
+<span class="co">    *    [2]   </span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">nameClause</span>(previousExpr, detection ) {
@@ -3847,30 +3938,18 @@ Chapter 4+5 40 to 60 pages
 "kw">return</span> <span class=
 "fu">headKey</span>(ascent) == name};
      
-      <span class="co">/**</span>
-<span class="co">       * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Object|false} either the object that was found, or false if nothing was found</span>
-<span class="co">       */</span>
+
       <span class="kw">return</span> <span class=
 "fu">lazyIntersection</span>(matchesName, previousExpr);
    }
 
    <span class="co">/**</span>
 <span class=
-"co">    * Expression for a duck-typed node, expressed like:</span>
+"co">    * Create an evaluator function for a a duck-typed node, expressed like:</span>
 <span class="co">    * </span>
 <span class="co">    *    {spin, taste, colour}</span>
 <span class="co">    *    .particle{spin, taste, colour}</span>
 <span class="co">    *    *{spin, taste, colour}</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class="co"> previousExpr</span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Array}</span><span class=
-"co"> detection strings required, space separated </span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">duckTypeClause</span>(previousExpr, detection) {
@@ -3878,31 +3957,34 @@ Chapter 4+5 40 to 60 pages
       <span class=
 "kw">var</span> fieldListStr = detection[FIELD_LIST_INDEX];
 
-      <span class="kw">if</span> (!fieldListStr) {
+      <span class="kw">if</span> (!fieldListStr) 
          <span class="kw">return</span> previousExpr; <span class=
-"co">// don't wrap at all, return given expr as-is</span>
-      }
+"co">// don't wrap at all, return given expr as-is      </span>
 
       <span class=
 "kw">var</span> hasAllrequiredFields = <span class=
-"fu">partialComplete</span>(hasAllProperties, <span class=
+"fu">partialComplete</span>(
+                                    hasAllProperties, 
+                                    <span class=
 "fu">arrayAsList</span>(<span class=
 "ot">fieldListStr</span>.<span class="fu">split</span>(<span class=
 "ot">/</span><span class="bn">\W</span><span class=
-"fl">+</span><span class="ot">/</span>))),
-          isMatch = <span class=
-"fu">compose</span>( hasAllrequiredFields, nodeOf, head );
+"fl">+</span><span class="ot">/</span>))
+                                 ),
+                                 
+          isMatch =  <span class="fu">compose</span>( 
+                        hasAllrequiredFields, 
+                        nodeOf, 
+                        head
+                     );
 
       <span class="kw">return</span> <span class=
 "fu">lazyIntersection</span>(isMatch, previousExpr);
    }
 
    <span class="co">/**</span>
-<span class="co">    * Expression for $</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">previousExpr</span>
+<span class=
+"co">    * Expression for $, returns the evaluator function</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">capture</span>( previousExpr, detection ) {
@@ -3912,10 +3994,9 @@ Chapter 4+5 40 to 60 pages
       <span class=
 "kw">var</span> capturing = !!detection[CAPTURING_INDEX];
 
-      <span class="kw">if</span> (!capturing) {         
+      <span class="kw">if</span> (!capturing)          
          <span class="kw">return</span> previousExpr; <span class=
-"co">// don't wrap at all, return given expr as-is</span>
-      }
+"co">// don't wrap at all, return given expr as-is      </span>
       
       <span class="kw">return</span> <span class=
 "fu">lazyIntersection</span>(previousExpr, head);
@@ -3924,15 +4005,13 @@ Chapter 4+5 40 to 60 pages
       
    <span class="co">/**</span>
 <span class=
-"co">    * Moves onto the next item on the lists. Doesn't map neatly onto any particular language feature but</span>
+"co">    * Create an evaluator function that moves onto the next item on the </span>
 <span class=
-"co">    * is a requirement for many. Eg, for jsnPath ".foo" we need consume1(exprWithNameSpecified)</span>
+"co">    * lists. This function is the place where the logic to move up a </span>
+<span class="co">    * level in the ascent exists. </span>
 <span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Function} a function which examines the descents on a path from the root of a json to a node</span>
 <span class=
-"co">    *                     and decides if there is a match or not</span>
+"co">    * Eg, for JSONPath ".foo" we need skip1(nameClause(always, [,'foo']))</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">skip1</span>(previousExpr) {
@@ -3940,16 +4019,22 @@ Chapter 4+5 40 to 60 pages
    
       <span class="kw">if</span>( previousExpr == always ) {
          <span class=
-"co">// If there is no previous expression, this consume command is at the start of the jsonPath.</span>
-         <span class=
-"co">// since jsonPath specifies what we'd like to find but not necessarily everything leading up to</span>
-         <span class="co">// it, we default to true. </span>
-         <span class=
-"co">// This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,</span>
-         <span class="co">// '..*'            </span>
+"co">/* If there is no previous expression this consume command </span>
+<span class=
+"co">            is at the start of the jsonPath.</span>
+<span class=
+"co">            Since JSONPath specifies what we'd like to find but not </span>
+<span class=
+"co">            necessarily everything leading down to it, when running</span>
+<span class=
+"co">            out of JSONPath to check against we default to true */</span>
          <span class="kw">return</span> always;
       }
 
+      <span class=
+"co">/** return true if the ascent we have contains only the JSON root,</span>
+<span class="co">       *  false otherwise</span>
+<span class="co">       */</span>
       <span class="kw">function</span> <span class=
 "fu">notAtRoot</span>(ascent){
          <span class="kw">return</span> <span class=
@@ -3959,21 +4044,26 @@ Chapter 4+5 40 to 60 pages
       <span class="kw">return</span> <span class=
 "fu">lazyIntersection</span>(
                <span class=
-"co">// If we're already at the root but there are more expressions to satisfy,</span>
-               <span class=
-"co">// can't consume any more. No match.</span>
-               
-               <span class=
-"co">// This check is why none of the other exprs have to be able to handle empty lists;</span>
-               <span class=
-"co">// only consume1 moves onto the next token and it refuses to do so once it reaches</span>
-               <span class=
-"co">// the list item in the list.       </span>
+"co">/* If we're already at the root but there are more </span>
+<span class=
+"co">                  expressions to satisfy, can't consume any more. No match.</span>
+
+<span class=
+"co">                  This check is why none of the other exprs have to be able </span>
+<span class=
+"co">                  to handle empty lists; skip1 is the only evaluator that </span>
+<span class=
+"co">                  moves onto the next token and it refuses to do so once it </span>
+<span class=
+"co">                  reaches the last item in the list. */</span>
                notAtRoot,
                
                <span class=
-"co">// consider the next bit of the ascent by passing only the tail to the previous</span>
-               <span class="co">// expression </span>
+"co">/* We are not at the root of the ascent yet.</span>
+<span class=
+"co">                  Move to the next level of the ascent by handing only </span>
+<span class=
+"co">                  the tail to the previous expression */</span> 
                <span class="fu">compose</span>(previousExpr, tail) 
       );
                                                                                                                
@@ -3981,53 +4071,49 @@ Chapter 4+5 40 to 60 pages
    
    <span class="co">/**</span>
 <span class=
-"co">    * Expression for the .. (double dot) token. Consumes zero or more tokens from the input, the fewest that</span>
+"co">    * Create an evaluator function for the .. (double dot) token. Consumes</span>
 <span class=
-"co">    * are required for the previousExpr to match.</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Function} a function which examines the descents on a path from the root of a json to a node</span>
-<span class=
-"co">    *                     and decides if there is a match or not</span>
+"co">    * zero or more levels of the ascent, the fewest that are required to find</span>
+<span class="co">    * a match when given to previousExpr.</span>
 <span class="co">    */</span>   
    <span class="kw">function</span> <span class=
 "fu">skipMany</span>(previousExpr) {
 
       <span class="kw">if</span>( previousExpr == always ) {
          <span class=
-"co">// If there is no previous expression, this consume command is at the start of the jsonPath.</span>
-         <span class=
-"co">// since jsonPath specifies what we'd like to find but not necessarily everything leading up to</span>
-         <span class="co">// it, we default to true. </span>
-         <span class=
-"co">// This is relevant for example in the jsonPath '*'. This should match the root obejct. Or,</span>
-         <span class="co">// '..*'            </span>
+"co">/* If there is no previous expression this consume command </span>
+<span class=
+"co">            is at the start of the jsonPath.</span>
+<span class=
+"co">            Since JSONPath specifies what we'd like to find but not </span>
+<span class=
+"co">            necessarily everything leading down to it, when running</span>
+<span class=
+"co">            out of JSONPath to check against we default to true */</span>            
          <span class="kw">return</span> always;
       }
           
       <span class="kw">var</span> 
-            <span class=
-"co">// jsonPath .. is equivalent to !.. so if .. reaches the root</span>
-            <span class="co">// the match has suceeded.</span>
+          <span class=
+"co">// In JSONPath .. is equivalent to !.. so if .. reaches the root</span>
+          <span class=
+"co">// the match has succeeded. Ie, we might write ..foo or !..foo</span>
+          <span class=
+"co">// and both should match identically.</span>
           terminalCaseWhenArrivingAtRoot = <span class=
 "fu">rootExpr</span>(),
           terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
           recursiveCase = <span class=
-"fu">skip1</span>(consumeManyPartiallyCompleted),
+"fu">skip1</span>(skipManyInner),
           
           cases = <span class="fu">lazyUnion</span>(
                      terminalCaseWhenArrivingAtRoot
                   ,  terminalCaseWhenPreviousExpressionIsSatisfied
                   ,  recursiveCase
                   );                        
-      <span class="co">/**</span>
-<span class="co">       * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Object|false} either the object that was found, or false if nothing was found</span>
-<span class="co">       */</span>            
+            
       <span class="kw">function</span> <span class=
-"fu">consumeManyPartiallyCompleted</span>(ascent) {
+"fu">skipManyInner</span>(ascent) {
       
          <span class="kw">if</span>( !ascent ) {
             <span class=
@@ -4040,25 +4126,18 @@ Chapter 4+5 40 to 60 pages
 "fu">cases</span>(ascent);
       }
       
-      <span class="kw">return</span> consumeManyPartiallyCompleted;
+      <span class="kw">return</span> skipManyInner;
    }      
    
    <span class="co">/**</span>
 <span class=
-"co">    * Expression for $ - matches only the root element of the json</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Object|false} either the object that was found, or false if nothing was found         </span>
+"co">    * Generate an evaluator for ! - matches only the root element of the json</span>
+<span class=
+"co">    * and ignores any previous expressions since nothing may precede !. </span>
 <span class="co">    */</span>   
    <span class="kw">function</span> <span class=
 "fu">rootExpr</span>() {
-   
-      <span class="co">/**</span>
-<span class="co">       * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Object|false} either the object that was found, or false if nothing was found</span>
-<span class="co">       */</span>   
+      
       <span class="kw">return</span> <span class=
 "kw">function</span>(ascent){
          <span class="kw">return</span> <span class=
@@ -4068,38 +4147,25 @@ Chapter 4+5 40 to 60 pages
          
    <span class="co">/**</span>
 <span class=
-"co">    * Expression for the empty string. As the jsonPath parser generates the path parser, it will eventually</span>
-<span class=
-"co">    * run out of tokens and get to the empty string. So, all generated parsers will be wrapped in this function.</span>
+"co">    * Generate a statement wrapper to sit around the outermost </span>
+<span class="co">    * clause evaluator.</span>
 <span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Function} a function which examines the descents on a path from the root of a json to a node</span>
 <span class=
-"co">    *                     and decides if there is a match or not</span>
+"co">    * Handles the case where the capturing is implicit because the JSONPath</span>
+<span class=
+"co">    * did not contain a '$' by returning the last node.</span>
 <span class="co">    */</span>   
    <span class="kw">function</span> <span class=
 "fu">statementExpr</span>(lastClause) {
-   
-      <span class="co">/**</span>
-<span class="co">       * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Object|false} either the object that was found, or false if nothing was found</span>
-<span class="co">       */</span>   
+      
       <span class="kw">return</span> <span class=
 "kw">function</span>(ascent) {
    
          <span class=
-"co">// kick off the parsing by passing through to the lastExpression</span>
+"co">// kick off the evaluation by passing through to the last clause</span>
          <span class="kw">var</span> exprMatch = <span class=
 "fu">lastClause</span>(ascent);
-                               
-         <span class=
-"co">// Returning exactly true indicates that there has been a match but no node is captured. </span>
-         <span class=
-"co">// By default, the node at the start of the lists gets returned. Just like in css4 selector </span>
-         <span class=
-"co">// spec, if there is no $, the last node in the selector is the one being styled.                      </span>
+                                                     
          <span class="kw">return</span> exprMatch === <span class=
 "kw">true</span> ? <span class=
 "fu">head</span>(ascent) : exprMatch;
@@ -4108,18 +4174,17 @@ Chapter 4+5 40 to 60 pages
                           
    <span class="co">/**</span>
 <span class=
-"co">    * For when a token match has been found. Compiles the parser for that token.</span>
-<span class="co">    * If called with a zero-length list of </span>
-<span class="co">    * </span>
+"co">    * For when a token has been found in the JSONPath input.</span>
 <span class=
-"co">    * When partially completed with an expression function, can be used as the parserGenerator</span>
-<span class=
-"co">    * argument to compileTokenToParserIfMatches. The other possible value is passthroughParserGenerator.</span>
+"co">    * Compiles the parser for that token and returns in combination with the</span>
+<span class="co">    * parser already generated.</span>
 <span class="co">    * </span>
 <span class="co">    * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Function}</span><span class=
-"co"> exprs zero or more expressions that parses this token </span>
+"co"> exprs  a list of the clause evaluator generators for</span>
+<span class=
+"co">    *                          the token that was found</span>
 <span class="co">    * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Function}</span><span class=
@@ -4127,135 +4192,151 @@ Chapter 4+5 40 to 60 pages
 <span class="co">    * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Array}</span><span class=
-"co"> detection the match given by the regex engine when the feature was found</span>
+"co"> detection the match given by the regex engine when </span>
+<span class=
+"co">    *                          the feature was found</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">expressionsReader</span>( exprs, parserGeneratedSoFar, detection ) {
                      
       <span class=
-"co">// note that if exprs is zero-length, fold will pass back </span>
+"co">// if exprs is zero-length foldR will pass back the </span>
       <span class=
-"co">// parserGeneratedSoFar so we don't need to treat this as a special case</span>
-      <span class="kw">return</span> <span class=
-"fu">foldR</span>( <span class=
-"kw">function</span>( parserGeneratedSoFar, expr ){
+"co">// parserGeneratedSoFar as-is so we don't need to treat </span>
+      <span class="co">// this as a special case</span>
       
-         <span class="kw">return</span> <span class=
+      <span class="kw">return</span>   <span class=
+"fu">foldR</span>( 
+                  <span class=
+"kw">function</span>( parserGeneratedSoFar, expr ){
+         
+                     <span class="kw">return</span> <span class=
 "fu">expr</span>(parserGeneratedSoFar, detection);
-                     
-      }, parserGeneratedSoFar, exprs );                     
+                  }, 
+                  parserGeneratedSoFar, 
+                  exprs
+               );                     
 
    }
 
-   <span class=
-"co">/** If jsonPath matches the given regular expression pattern, return a partially completed version of expr</span>
+   <span class="co">/** </span>
 <span class=
-"co">    *  which is ready to be used as a jsonPath parser. </span>
+"co">    *  If jsonPath matches the given detector function, creates a function which</span>
+<span class=
+"co">    *  evaluates against every clause in the clauseEvaluatorGenerators. The</span>
+<span class=
+"co">    *  created function is propagated to the onSuccess function, along with</span>
+<span class=
+"co">    *  the remaining unparsed JSONPath substring.</span>
 <span class="co">    *  </span>
 <span class=
-"co">    *  This function is designed to be partially completed with the pattern and expr, leaving a function</span>
+"co">    *  The intended use is to create a clauseMatcher by filling in</span>
 <span class=
-"co">    *  which can be stored in the tokenExprs array. tokenExpr(pattern, expr) is a shorthand for this</span>
-<span class="co">    *  partial completion.</span>
+"co">    *  the first two arguments, thus providing a function that knows</span>
+<span class=
+"co">    *  some syntax to match and what kind of generator to create if it</span>
+<span class=
+"co">    *  finds it. The parameter list once completed is:</span>
 <span class="co">    *  </span>
-<span class="co">    *  Returns undefined on no match</span>
+<span class=
+"co">    *    (jsonPath, parserGeneratedSoFar, onSuccess)</span>
 <span class="co">    *  </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class=
-"co"> detector a function which can examine a jsonPath and returns an object describing the match</span>
 <span class=
-"co">    *                   if there is a match for our particular feature at the start of the jsonPath.</span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function</span><span class="co">[]} exprs</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{String}</span><span class="co"> jsonPath</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class="co"> parserGeneratedSoFar</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function</span><span class=
-"co">(Function, String)} onSuccess a function to pass the generated parser to if one can be made,</span>
+"co">    *  onSuccess may be compileJsonPathToFunction, to recursively continue </span>
 <span class=
-"co">    *    also passes the remaining string from jsonPath that is still to parse</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@return</span><span class="co"> {*|undefined}</span>
+"co">    *  parsing after finding a match or returnFoundParser to stop here.</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
-"fu">generateClauseReaderIfJsonPathMatchesRegex</span>(detector, exprs, jsonPath, parserGeneratedSoFar, onSuccess) {
+"fu">generateClauseReaderIfTokenFound</span> (
+     
+                        tokenDetector, clauseEvaluatorGenerators,
+                         
+                        jsonPath, parserGeneratedSoFar, onSuccess) {
+                        
       <span class="kw">var</span> detected = <span class=
-"fu">detector</span>(jsonPath);
+"fu">tokenDetector</span>(jsonPath);
 
       <span class="kw">if</span>(detected) {
          <span class="kw">var</span> compiledParser = <span class=
-"fu">expressionsReader</span>(exprs, parserGeneratedSoFar, detected),
+"fu">expressionsReader</span>(
+                                 clauseEvaluatorGenerators, 
+                                 parserGeneratedSoFar, 
+                                 detected
+                              ),
          
-             unparsedJsonPath = <span class=
+             remainingUnparsedJsonPath = <span class=
 "ot">jsonPath</span>.<span class="fu">substr</span>(<span class=
 "fu">len</span>(detected[<span class=
 "dv">0</span>]));                
                                
          <span class="kw">return</span> <span class=
-"fu">onSuccess</span>(unparsedJsonPath, compiledParser);
+"fu">onSuccess</span>(remainingUnparsedJsonPath, compiledParser);
       }         
    }
                  
    <span class="co">/**</span>
 <span class=
-"co">    * Generate a function which parses the pattern in the given regex. If matches, returns a parser</span>
-<span class=
-"co">    * generated from that token that processes the given expr, otherwise returns no value (undefined).</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@returns</span><span class=
-"co"> {Function(Function parserGeneratedSoFar, Function onSucess)}</span>
+"co">    * Partially completes generateClauseReaderIfTokenFound above. </span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
-"fu">clauseMatcher</span>(detector, exprs) {
+"fu">clauseMatcher</span>(tokenDetector, exprs) {
         
-      <span class="kw">return</span> <span class=
-"fu">partialComplete</span>( generateClauseReaderIfJsonPathMatchesRegex, detector, exprs );
+      <span class="kw">return</span>   <span class=
+"fu">partialComplete</span>( 
+                  generateClauseReaderIfTokenFound, 
+                  tokenDetector, 
+                  exprs 
+               );
    }
-                   
-   <span class=
-"co">// A list of functions which test if a string matches the required patter and, if it does, returns</span>
-   <span class=
-"co">// a generated parser for that expression     </span>
+
+   <span class="co">/**</span>
+<span class=
+"co">    * clauseForJsonPath is a function which attempts to match against </span>
+<span class=
+"co">    * several clause matchers in order until one matches. If non match the</span>
+<span class=
+"co">    * jsonPath expression is invalid and an error is thrown.</span>
+<span class="co">    * </span>
+<span class=
+"co">    * The parameter list is the same as a single clauseMatcher:</span>
+<span class="co">    * </span>
+<span class=
+"co">    *    (jsonPath, parserGeneratedSoFar, onSuccess)</span>
+<span class="co">    */</span>     
    <span class="kw">var</span> clauseForJsonPath = <span class=
 "fu">lazyUnion</span>(
 
       <span class=
 "fu">clauseMatcher</span>(pathNodeSyntax   , <span class=
-"fu">list</span>(capture, duckTypeClause, nameClause, skip1 ))        
+"fu">list</span>( capture, 
+                                             duckTypeClause, 
+                                             nameClause, 
+                                             skip1 ))
+                                                     
    ,  <span class=
 "fu">clauseMatcher</span>(doubleDotSyntax  , <span class=
-"fu">list</span>(skipMany))
+"fu">list</span>( skipMany))
        
        <span class=
-"co">// dot is a separator only (like whitespace in other languages) but rather than special case</span>
+"co">// dot is a separator only (like whitespace in other languages) but </span>
        <span class=
-"co">// it, the expressions can be an empty array.</span>
+"co">// rather than make it a special case, use an empty list of </span>
+       <span class=
+"co">// expressions when this token is found</span>
    ,  <span class=
 "fu">clauseMatcher</span>(dotSyntax        , <span class=
 "fu">list</span>() )  
                                                                                       
    ,  <span class=
 "fu">clauseMatcher</span>(bangSyntax       , <span class=
-"fu">list</span>(capture, rootExpr))             
+"fu">list</span>( capture,
+                                             rootExpr))
+                                                          
    ,  <span class=
 "fu">clauseMatcher</span>(emptySyntax      , <span class=
-"fu">list</span>(statementExpr))
+"fu">list</span>( statementExpr))
    
-   ,   <span class=
-"co">// if none of the above worked, we need to fail by throwing an error</span>
-      <span class="kw">function</span> (jsonPath) {
+   ,  <span class="kw">function</span> (jsonPath) {
          <span class="kw">throw</span> <span class=
 "fu">Error</span>(<span class=
 "st">'"'</span> + jsonPath + <span class=
@@ -4266,94 +4347,63 @@ Chapter 4+5 40 to 60 pages
 
    <span class="co">/**</span>
 <span class=
-"co">    * This value is one possible value for the onSuccess argument of compileTokenToParserIfMatches.</span>
-<span class=
-"co">    * When this function is passed, compileTokenToParserIfMatches simply returns the compiledParser that it</span>
-<span class=
-"co">    * made, regardless of if there is any remaining jsonPath to be compiled.</span>
+"co">    * One of two possible values for the onSuccess argument of </span>
+<span class="co">    * generateClauseReaderIfTokenFound.</span>
 <span class="co">    * </span>
 <span class=
-"co">    * The other possible value is compileJsonPathToFunction, which causes it to recursively compile</span>
-<span class="co">    * the rest of the string.</span>
-<span class="co">    * </span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{String}</span><span class=
-"co"> _remainingJsonPath since this function never recurs, anything left over is ignored.</span>
-<span class="co">    * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class="co"> compiledParser</span>
+"co">    * When this function is used, generateClauseReaderIfTokenFound simply </span>
+<span class=
+"co">    * returns the compiledParser that it made, regardless of if there is </span>
+<span class=
+"co">    * any remaining jsonPath to be compiled.</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">returnFoundParser</span>(_remainingJsonPath, compiledParser){ 
       <span class="kw">return</span> compiledParser 
    }     
               
-   <span class="co">/** </span>
+   <span class="co">/**</span>
 <span class=
-"co">    * Recursively compile a jsonPath into a function.</span>
-<span class=
-"co">    * Each recursive call wraps the parser generated by its inner calls.</span>
-<span class=
-"co">    * We parse the jsonPath spec from left to right, generating a parser which parses the found paths from </span>
-<span class=
-"co">    * right to left (or, deepest to shallowest path names).</span>
+"co">    * Recursively compile a JSONPath expression.</span>
 <span class="co">    * </span>
 <span class=
-"co">    *    (String jsonPath, ((String[], Object[]) -&gt; (Object|Boolean))) -&gt; ((String[], Object[]) -&gt; (Object|Boolean))</span>
-<span class="co">    *    </span>
+"co">    * This function serves as one of two possible values for the onSuccess </span>
 <span class=
-"co">    * or, if we consider Expr = ((String[], Object[]) -&gt; (Object|Boolean)) it can be expressed more simply as:</span>
-<span class="co">    * </span>
-<span class="co">    *    (String jsonPath, Expr) -&gt; Expr</span>
-<span class="co">    *    </span>
+"co">    * argument of generateClauseReaderIfTokenFound, meaning continue to</span>
 <span class=
-"co">    * In practice, an Expr is any of the functions from tokenExprs[*].expr after being partially completed by </span>
-<span class="co">    * filling in the first three arguments</span>
-<span class="co">    * </span>
-<span class=
-"co">    * Note that this function's signature matches the onSuccess callback to compileTokenIfMatches, meaning that</span>
-<span class=
-"co">    * compileTokenIfMatches is able to make our recursive call back to here for us.</span>
+"co">    * recursively compile. Otherwise, returnFoundParser is given and</span>
+<span class="co">    * compilation terminates.</span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
-"fu">compileJsonPathToFunction</span>( uncompiledJsonPath, parserGeneratedSoFar ) {
+"fu">compileJsonPathToFunction</span>( uncompiledJsonPath, 
+                                       parserGeneratedSoFar ) {
 
       <span class="co">/**</span>
 <span class=
-"co">       * Called when a matching token is found. </span>
-<span class="co">       * </span>
-<span class="co">       * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class=
-"co"> parser the parser that has just been compiled</span>
-<span class="co">       * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{String}</span><span class=
-"co"> remaining the remaining jsonPath that has not been compiled yet</span>
-<span class="co">       * </span>
+"co">       * On finding a match, if there is remaining text to be compiled</span>
 <span class=
-"co">       * On finding a match, we want to either continue parsing using a recursive call to compileJsonPathToFunction</span>
+"co">       * we want to either continue parsing using a recursive call to </span>
 <span class=
-"co">       * or we want to stop and just return the parser that we've found so far.</span>
-<span class="co">       * </span>
+"co">       * compileJsonPathToFunction. Otherwise, we want to stop and return </span>
 <span class=
-"co">       * We use the jsonPath rather than the remaining to branch on here because it is</span>
-<span class=
-"co">       * valid to recur onto an empty string (there's a tokenExpr for that) but it is not</span>
-<span class="co">       * valid to recur past that point. </span>
+"co">       * the parser that we have found so far.</span>
 <span class="co">       */</span>
-      <span class=
-"kw">var</span> onFind = uncompiledJsonPath? compileJsonPathToFunction : returnFoundParser;
+      <span class="kw">var</span> onFind =      uncompiledJsonPath
+                     ?  compileJsonPathToFunction 
+                     :  returnFoundParser;
                    
-      <span class="kw">return</span> <span class=
-"fu">clauseForJsonPath</span>(uncompiledJsonPath, parserGeneratedSoFar, onFind);                              
+      <span class="kw">return</span>   <span class=
+"fu">clauseForJsonPath</span>( 
+                  uncompiledJsonPath, 
+                  parserGeneratedSoFar, 
+                  onFind
+               );                              
    }
 
-   <span class=
-"co">// all the above is now captured in the closure of this immediately-called function. let's</span>
-   <span class=
-"co">// return the function we wish to expose globally:</span>
+   <span class="co">/**</span>
+<span class=
+"co">    * This is the function that we expose to the rest of the library.</span>
+<span class="co">    */</span>
    <span class="kw">return</span> <span class=
 "kw">function</span>(jsonPath){
         
@@ -4362,12 +4412,15 @@ Chapter 4+5 40 to 60 pages
 "co">// Kick off the recursive parsing of the jsonPath </span>
          <span class="kw">return</span> <span class=
 "fu">compileJsonPathToFunction</span>(jsonPath, always);
+         
       } <span class="kw">catch</span>( e ) {
          <span class="kw">throw</span> <span class=
-"fu">Error</span>(<span class=
-"st">'Could not compile "'</span> + jsonPath + <span class=
+"fu">Error</span>( <span class=
+"st">'Could not compile "'</span> + jsonPath + 
+                      <span class=
 "st">'" because '</span> + <span class="ot">e</span>.<span class=
-"fu">message</span>);
+"fu">message</span>
+         );
       }
    }
 
@@ -4381,70 +4434,72 @@ Chapter 4+5 40 to 60 pages
 <code class="sourceCode javascript"><span class=
 "kw">var</span> jsonPathSyntax = (<span class=
 "kw">function</span>() {
-
-   <span class=
-"co">// The regular expressions all start with ^ because we only want to find matches at the start of the jsonPath</span>
-   <span class=
-"co">// spec that we are given. As we parse, substrings are taken so the string is consumed from left to right, </span>
-   <span class="co">// allowing new token regexes to match.</span>
-   <span class="co">//    For all regular expressions:</span>
-   <span class=
-"co">//       The first subexpression is the $ (if the token is eligible to capture)</span>
-   <span class=
-"co">//       The second subexpression is the name of the expected path node (if the token may have a name)</span>
-
-
-   <span class=
-"co">/** Allows exporting of a regular expression as a generified function interface by encapsulating just the exec</span>
-<span class="co">    *  function</span>
-<span class="co">    *  </span>
-<span class="co">    *  Could also be expressed as:</span>
+ 
+   <span class="kw">var</span>
+   
+   <span class="co">/** </span>
 <span class=
-"co">    *    Function.prototype.bind.bind(RegExp.prototype.exec),</span>
-<span class="co">    *    </span>
+"co">    * Export a regular expression as a simple function by exposing just </span>
 <span class=
-"co">    *  But that's far too confusing! (and not even smaller once minified and gzipped)</span>
-<span class="co">    *  </span>
-<span class="co">    *  </span>@type<span class=
-"co"> {Function}</span>
-<span class="co">    *  </span>
-<span class="co">    *  </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{RegExp}</span><span class=
-"co"> regex the regular expression to export</span>
-<span class="co">    *  </span>
-<span class="co">    *  </span><span class=
-"kw">@returns</span><span class=
-"co"> a function which is equivalent to calling exec on that regular expression</span>
+"co">    * the Regex#exec. This allows regex tests to be used under the same </span>
+<span class=
+"co">    * interface as differently implemented tests, or for a user of the</span>
+<span class=
+"co">    * tests to not concern themselves with their implementation as regular</span>
+<span class="co">    * expressions.</span>
+<span class="co">    * </span>
+<span class=
+"co">    * This could also be expressed point-free as:</span>
+<span class=
+"co">    *   Function.prototype.bind.bind(RegExp.prototype.exec),</span>
+<span class="co">    *   </span>
+<span class=
+"co">    * But that's far too confusing! (and not even smaller once minified </span>
+<span class="co">    * and gzipped)</span>
 <span class="co">    */</span>
-   <span class="kw">var</span> regexDescriptor =   <span class=
+       regexDescriptor = <span class=
 "kw">function</span> <span class=
 "fu">regexDescriptor</span>(regex) {
-                              <span class=
-"kw">return</span> <span class="ot">regex</span>.<span class=
-"ot">exec</span>.<span class="fu">bind</span>(regex);
-                           }, 
-  
-       jsonPathClause =    <span class=
-"fu">varArgs</span>(<span class=
-"kw">function</span>( componentRegexes ) {
-           
-                              <span class=
-"ot">componentRegexes</span>.<span class=
+            <span class="kw">return</span> <span class=
+"ot">regex</span>.<span class="ot">exec</span>.<span class=
+"fu">bind</span>(regex);
+       }
+       
+   <span class="co">/**</span>
+<span class=
+"co">    * Join several regular expressions and express as a function.</span>
+<span class=
+"co">    * This allows the token patterns to reuse component regular expressions</span>
+<span class=
+"co">    * instead of being expressed in full using huge and confusing regular</span>
+<span class="co">    * expressions.</span>
+<span class="co">    */</span>       
+   ,   jsonPathClause = <span class=
+"fu">varArgs</span>(<span class="kw">function</span>( componentRegexes ) {
+
+            <span class=
+"co">// The regular expressions all start with ^ because we </span>
+            <span class=
+"co">// only want to find matches at the start of the </span>
+            <span class=
+"co">// JSONPath fragment we are inspecting           </span>
+            <span class="ot">componentRegexes</span>.<span class=
 "fu">unshift</span>(<span class="ot">/</span><span class=
 "fl">^</span><span class="ot">/</span>);
-                           
-                              <span class=
-"kw">return</span> <span class=
-"fu">regexDescriptor</span>(<span class=
-"fu">RegExp</span>(<span class=
+            
+            <span class="kw">return</span>   <span class=
+"fu">regexDescriptor</span>(
+                        <span class="fu">RegExp</span>(
+                           <span class=
 "ot">componentRegexes</span>.<span class=
 "fu">map</span>(<span class="fu">attr</span>(<span class=
 "st">'source'</span>)).<span class="fu">join</span>(<span class=
-"st">''</span>)));
-                           }),
-
-       possiblyCapturing =           <span class=
+"st">''</span>)
+                        )
+                     );
+       })
+       
+   ,   possiblyCapturing =           <span class=
 "ot">/</span><span class="fl">(\$?)</span><span class="ot">/</span>
    ,   namedNode =                   <span class=
 "ot">/</span><span class="fl">(</span><span class=
@@ -4474,53 +4529,74 @@ Chapter 4+5 40 to 60 pages
 "bn"> ]</span><span class="fl">*?)</span><span class=
 "ot">}</span><span class="fl">)?</span><span class="ot">/</span>
     
-                  
-   ,   jsonPathNamedNodeInObjectNotation     = <span class=
-"fu">jsonPathClause</span>(possiblyCapturing, namedNode, optionalFieldList)
-                                                                                       <span class="co">//   foo or *</span>
+
+       <span class="co">//   foo or *                  </span>
+   ,   jsonPathNamedNodeInObjectNotation   = <span class=
+"fu">jsonPathClause</span>( 
+                                                possiblyCapturing, 
+                                                namedNode, 
+                                                optionalFieldList
+                                             )
+                                             
+       <span class="co">//   ["foo"]   </span>
+   ,   jsonPathNamedNodeInArrayNotation    = <span class=
+"fu">jsonPathClause</span>( 
+                                                possiblyCapturing, 
+                                                nodeInArrayNotation, 
+                                                optionalFieldList
+                                             )  
+
+       <span class="co">//   [2] or [*]       </span>
+   ,   jsonPathNumberedNodeInArrayNotation = <span class=
+"fu">jsonPathClause</span>( 
+                                                possiblyCapturing, 
+                                                numberedNodeInArrayNotation, 
+                                                optionalFieldList
+                                             )
+
+       <span class="co">//   {a b c}      </span>
+   ,   jsonPathPureDuckTyping              = <span class=
+"fu">jsonPathClause</span>( 
+                                                possiblyCapturing, 
+                                                namePlaceholder, 
+                                                fieldList
+                                             )
    
-   ,   jsonPathNamedNodeInArrayNotation      = <span class=
-"fu">jsonPathClause</span>(possiblyCapturing, nodeInArrayNotation, optionalFieldList)
-                                                                                       <span class="co">//   ["foo"]  </span>
-       
-   ,   jsonPathNumberedNodeInArrayNotation   = <span class=
-"fu">jsonPathClause</span>(possiblyCapturing, numberedNodeInArrayNotation, optionalFieldList)
-                                                                                       <span class="co">//   [2] or [*]</span>
-      
-   ,   jsonPathPureDuckTyping                = <span class=
-"fu">jsonPathClause</span>(possiblyCapturing, namePlaceholder, fieldList)
-   
-   ,   jsonPathDoubleDot                     = <span class=
+       <span class="co">//   ..</span>
+   ,   jsonPathDoubleDot                   = <span class=
 "fu">jsonPathClause</span>(<span class="ot">/</span><span class=
-"fl">\.\.</span><span class=
-"ot">/</span>)                  <span class="co">//   ..</span>
+"fl">\.\.</span><span class="ot">/</span>)                  
    
-   ,   jsonPathDot                           = <span class=
+       <span class="co">//   .</span>
+   ,   jsonPathDot                         = <span class=
 "fu">jsonPathClause</span>(<span class="ot">/</span><span class=
-"fl">\.</span><span class=
-"ot">/</span>)                    <span class="co">//   .</span>
+"fl">\.</span><span class="ot">/</span>)                    
    
-   ,   jsonPathBang                          = <span class=
-"fu">jsonPathClause</span>(possiblyCapturing, <span class=
-"ot">/!/</span>)  <span class="co">//   !</span>
+       <span class="co">//   !</span>
+   ,   jsonPathBang                        = <span class=
+"fu">jsonPathClause</span>(
+                                                possiblyCapturing, 
+                                                <span class=
+"ot">/!/</span>
+                                             )  
    
-   ,   emptyString                           = <span class=
+       <span class="co">//   nada!</span>
+   ,   emptyString                         = <span class=
 "fu">jsonPathClause</span>(<span class="ot">/</span><span class=
-"fl">$</span><span class=
-"ot">/</span>)                     <span class=
-"co">//   nada!</span>
+"fl">$</span><span class="ot">/</span>)                     
    
    ;
    
   
    <span class=
-"co">/* we export only a single function. When called, this function injects into a scope the</span>
+"co">/* We export only a single function. When called, this function injects </span>
 <span class=
-"co">      descriptor functions from this scope which we want to make available elsewhere. </span>
+"co">      into another function the descriptors from above.             </span>
 <span class="co">    */</span>
    <span class="kw">return</span> <span class=
 "kw">function</span> (fn){      
-      <span class="kw">return</span> <span class="fu">fn</span>( 
+      <span class="kw">return</span> <span class=
+"fu">fn</span>(      
          <span class="fu">lazyUnion</span>(
             jsonPathNamedNodeInObjectNotation
          ,  jsonPathNamedNodeInArrayNotation
@@ -4541,17 +4617,21 @@ Chapter 4+5 40 to 60 pages
   "header-section-number">7.9</span> lists.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
-<span class="co"> * Like cons in LISP</span>
+<span class="co"> * Like cons in Lisp</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">cons</span>(x, xs) {
    
    <span class=
-"co">// Internally lists are linked 2-element JS arrays. </span>
-   <span class=
-"co">// So that lists are all immutable we Object.freeze in newer Javascript engines.</span>
-   <span class=
-"co">// In older engines freeze should have been polyfilled with the identity function.</span>
+"co">/* Internally lists are linked 2-element Javascript arrays.</span>
+<span class="co">    </span>
+<span class=
+"co">      So that lists are all immutable we Object.freeze in newer </span>
+<span class="co">      Javascript runtimes.</span>
+<span class="co">      </span>
+<span class=
+"co">      In older engines freeze should have been polyfilled as the </span>
+<span class="co">      identity function. */</span>
    <span class="kw">return</span> <span class=
 "ot">Object</span>.<span class="fu">freeze</span>([x,xs]);
 }
@@ -4681,9 +4761,10 @@ Chapter 4+5 40 to 60 pages
 <span class="co"> * Apply a function to every item in a list</span>
 <span class="co"> * </span>
 <span class=
-"co"> * This doesn't make any sense if we're doing pure functional because it doesn't return</span>
+"co"> * This doesn't make any sense if we're doing pure functional because </span>
 <span class=
-"co"> * anything. Hence, this is only really useful for callbacks if fn has side-effects. </span>
+"co"> * it doesn't return anything. Hence, this is only really useful if fn </span>
+<span class="co"> * has side-effects. </span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">each</span>(fn, list) {
@@ -4728,7 +4809,13 @@ Chapter 4+5 40 to 60 pages
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
-"co"> * isn't this the smallest little pub-sub library you've ever seen?</span>
+"co"> * Isn't this the cutest little pub-sub you've ever seen?</span>
+<span class="co"> * </span>
+<span class=
+"co"> * Does not allow unsubscription because is never needed inside Oboe.</span>
+<span class=
+"co"> * Instead, when an Oboe instance is finished the whole of it should be</span>
+<span class="co"> * available for GC'ing.</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class="fu">pubSub</span>(){
 
@@ -4766,19 +4853,17 @@ Chapter 4+5 40 to 60 pages
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
-"co"> * An xhr wrapper that calls a callback whenever some more of the</span>
+"co"> * An wrapper around the browser XmlHttpRequest object that raises an </span>
 <span class=
-"co"> * response is available, without waiting for all of it.</span>
+"co"> * event whenever a new part of the response is available.</span>
 <span class="co"> * </span>
 <span class=
-"co"> * This probably needs more development and testing more than most other parts </span>
-<span class="co"> * of Oboe.</span>
-<span class="co"> *    </span>
+"co"> * In older browsers progressive reading is impossible so all the </span>
 <span class=
-"co"> * Fetch something over ajax, calling back as often as new data is available.</span>
-<span class="co"> * </span>
-<span class="co"> * None of the parameters are optional.</span>
-<span class="co"> * </span>
+"co"> * content is given in a single call. For newer ones several events</span>
+<span class=
+"co"> * should be raised, allowing progressive interpretation of the response.</span>
+<span class="co"> *      </span>
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Function}</span><span class=
@@ -4801,9 +4886,9 @@ Chapter 4+5 40 to 60 pages
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{String|Object}</span><span class=
-"co"> data some content to be sent with the request. Only valid</span>
+"co"> data some content to be sent with the request.</span>
 <span class=
-"co"> *                        if method is POST or PUT.</span>
+"co"> *                        Only valid if method is POST or PUT.</span>
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Object}</span><span class=
@@ -4815,25 +4900,29 @@ Chapter 4+5 40 to 60 pages
    <span class=
 "kw">var</span> numberOfCharsAlreadyGivenToCallback = <span class=
 "dv">0</span>;
-         
+
+   <span class=
+"co">// When an ABORTING message is put on the event bus abort </span>
+   <span class="co">// the ajax request         </span>
    <span class="fu">on</span>( ABORTING, <span class=
 "kw">function</span>(){
+  
       <span class=
-"co">// when an ABORTING message is put on the event bus abort the ajax request</span>
-   
+"co">// if we keep the onreadystatechange while aborting the XHR gives </span>
       <span class=
-"co">// if we keep the state change listener, aborting gives it a callback the same as</span>
-      <span class=
-"co">// a successful request so null it out.</span>
+"co">// a callback like a successful call so first remove this listener</span>
+      <span class="co">// by assigning null:</span>
       <span class="ot">xhr</span>.<span class=
 "fu">onreadystatechange</span> = <span class="kw">null</span>;
+            
       <span class="ot">xhr</span>.<span class="fu">abort</span>();
    });
 
    <span class=
-"co">/** Given a value from the user to send as the request body, return in a form</span>
+"co">/** Given a value from the user to send as the request body, return in</span>
 <span class=
-"co">    *  that is suitable to sending over the wire. Returns either a string, or null.        </span>
+"co">    *  a form that is suitable to sending over the wire. Returns either a </span>
+<span class="co">    *  string, or null.        </span>
 <span class="co">    */</span>
    <span class="kw">function</span> <span class=
 "fu">validatedRequestBody</span>( body ) {
@@ -4860,15 +4949,15 @@ Chapter 4+5 40 to 60 pages
           newText = <span class="ot">textSoFar</span>.<span class=
 "fu">substr</span>(numberOfCharsAlreadyGivenToCallback);
       
-      <span class="co">// give the new text to the callback.</span>
-      <span class=
-"co">// on older browsers, the new text will alwasys be the whole response. </span>
-      <span class=
-"co">// On newer/better ones it'll be just the little bit that we got since last time.</span>
-      <span class=
-"co">// On browsers which send progress events for the last bit of the response, if we</span>
-      <span class=
-"co">// are responding to the laod event it is now empty         </span>
+      
+      <span class="co">/* Raise the event for new text.</span>
+<span class="co">      </span>
+<span class=
+"co">         On older browsers, the new text is the whole response. </span>
+<span class=
+"co">         On newer/better ones, the fragment part that we got since </span>
+<span class="co">         last progress. */</span>
+         
       <span class="kw">if</span>( newText ) {
          <span class="fu">fire</span>( NEW_CONTENT, newText );
       } 
@@ -4877,8 +4966,11 @@ Chapter 4+5 40 to 60 pages
 "fu">len</span>(textSoFar);
    }
    
+   
    <span class="kw">if</span>(<span class=
-"st">'onprogress'</span> <span class="kw">in</span> xhr){
+"st">'onprogress'</span> <span class=
+"kw">in</span> xhr){  <span class=
+"co">// detect browser support for progressive delivery</span>
       <span class="ot">xhr</span>.<span class=
 "fu">onprogress</span> = handleProgress;
    }
@@ -4899,15 +4991,17 @@ Chapter 4+5 40 to 60 pages
          
          <span class="kw">if</span>( sucessful ) {
             <span class=
-"co">// In Chrome 29 (not 28) no onprogress is fired when a response is complete before the</span>
+"co">// In Chrome 29 (not 28) no onprogress is fired when a response</span>
             <span class=
-"co">// onload. We need to always do handleInput in case we get the load but have</span>
+"co">// is complete before the onload. We need to always do handleInput</span>
             <span class=
-"co">// not had a final progress event. This may change in future but let's take the safest</span>
+"co">// in case we get the load but have not had a final progress event.</span>
             <span class=
-"co">// approach and assume we might not have received a progress event for every bit of</span>
+"co">// This looks like a bug and may change in future but let's take</span>
             <span class=
-"co">// data before we get the load event.</span>
+"co">// the safest approach and assume we might not have received a </span>
+            <span class=
+"co">// progress event for each part of the response</span>
             <span class="fu">handleProgress</span>();
             
             <span class="fu">fire</span>( END_OF_CONTENT );
@@ -4936,17 +5030,16 @@ Chapter 4+5 40 to 60 pages
   <h2 id="util.js"><a href="#util.js"><span class=
   "header-section-number">7.12</span> util.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript">
+<code class="sourceCode javascript"><span class="co">/**</span>
+<span class=
+"co"> * This file defines some loosely associated syntactic sugar for </span>
+<span class="co"> * Javascript programming </span>
+<span class="co"> */</span>
+
+
 <span class="co">/**</span>
 <span class=
 "co"> * Returns true if the given candidate is of type T</span>
-<span class="co"> * </span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Function}</span><span class="co"> T</span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{*}</span><span class="co"> maybeSomething</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">isOfType</span>(T, maybeSomething){
@@ -4967,13 +5060,17 @@ Chapter 4+5 40 to 60 pages
     isString = <span class=
 "fu">partialComplete</span>(isOfType, String);
 
+<span class="co">/** </span>
+<span class="co"> * I don't like saying this:</span>
+<span class="co"> * </span>
+<span class="co"> *    foo !=== undefined</span>
+<span class="co"> *    </span>
 <span class=
-"co">/** I don't like saying foo !=== undefined very much because of the double-negative. I find</span>
-<span class="co"> *  defined(foo) easier to read.</span>
-<span class="co"> *  </span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{*}</span><span class="co"> value anything</span>
+"co"> * because of the double-negative. I find this:</span>
+<span class="co"> * </span>
+<span class="co"> *    defined(foo)</span>
+<span class="co"> *    </span>
+<span class="co"> * easier to read.</span>
 <span class="co"> */</span> 
 <span class="kw">function</span> <span class=
 "fu">defined</span>( value ) {
@@ -4987,16 +5084,10 @@ Chapter 4+5 40 to 60 pages
 
 <span class="co">/**</span>
 <span class=
-"co"> * Returns true if object o has a key named like every property in the properties array.</span>
+"co"> * Returns true if object o has a key named like every property in </span>
 <span class=
-"co"> * Will give false if any are missing, or if o is not an object.</span>
-<span class="co"> * </span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{Object}</span><span class="co"> o</span>
-<span class="co"> * </span><span class=
-"kw">@param</span><span class="co"> </span><span class=
-"kw">{String</span><span class="co">[]} fieldList</span>
+"co"> * the properties array. Will give false if any are missing, or if o </span>
+<span class="co"> * is not an object.</span>
 <span class="co"> */</span>
 <span class="kw">function</span> <span class=
 "fu">hasAllProperties</span>(fieldList, o) {
@@ -5015,9 +5106,17 @@ Chapter 4+5 40 to 60 pages
   <h2 id="wire.js"><a href="#wire.js"><span class=
   "header-section-number">7.13</span> wire.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"kw">function</span> <span class=
+<code class="sourceCode javascript"><span class="co">/**</span>
+<span class=
+"co"> * This file sits just behind the API which is used to attain a new</span>
+<span class=
+"co"> * Oboe instance. It creates the new components that are required</span>
+<span class="co"> * and introduces them to each other.</span>
+<span class="co"> */</span>
+
+<span class="kw">function</span> <span class=
 "fu">wire</span> (httpMethodName, url, body, headers){
+
    <span class="kw">var</span> eventBus = <span class=
 "fu">pubSub</span>();
                
@@ -5029,13 +5128,16 @@ Chapter 4+5 40 to 60 pages
                   httpMethodName, url, body, headers );                              
      
    <span class="kw">return</span> <span class=
-"fu">instanceController</span>( <span class=
-"ot">eventBus</span>.<span class="fu">fire</span>, <span class=
-"ot">eventBus</span>.<span class="fu">on</span>, 
-                              <span class=
-"ot">clarinet</span>.<span class="fu">parser</span>(), <span class=
+"fu">instanceController</span>( 
+               <span class="ot">eventBus</span>.<span class=
+"fu">fire</span>, <span class="ot">eventBus</span>.<span class=
+"fu">on</span>, 
+               <span class="ot">clarinet</span>.<span class=
+"fu">parser</span>(), 
+               <span class=
 "fu">incrementalContentBuilder</span>(<span class=
-"ot">eventBus</span>.<span class="fu">fire</span>) );
+"ot">eventBus</span>.<span class="fu">fire</span>) 
+   );
 }</code>
 </pre>
 

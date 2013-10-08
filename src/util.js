@@ -1,9 +1,11 @@
+/**
+ * This file defines some loosely associated syntactic sugar for 
+ * Javascript programming 
+ */
+
 
 /**
  * Returns true if the given candidate is of type T
- * 
- * @param {Function} T
- * @param {*} maybeSomething
  */
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
@@ -16,10 +18,16 @@ var attr = partialComplete(partialComplete, pluck),
     len = attr('length'),    
     isString = partialComplete(isOfType, String);
 
-/** I don't like saying foo !=== undefined very much because of the double-negative. I find
- *  defined(foo) easier to read.
- *  
- * @param {*} value anything
+/** 
+ * I don't like saying this:
+ * 
+ *    foo !=== undefined
+ *    
+ * because of the double-negative. I find this:
+ * 
+ *    defined(foo)
+ *    
+ * easier to read.
  */ 
 function defined( value ) {
    return value !== undefined;
@@ -28,11 +36,9 @@ function defined( value ) {
 function always(){return true}
 
 /**
- * Returns true if object o has a key named like every property in the properties array.
- * Will give false if any are missing, or if o is not an object.
- * 
- * @param {Object} o
- * @param {String[]} fieldList
+ * Returns true if object o has a key named like every property in 
+ * the properties array. Will give false if any are missing, or if o 
+ * is not an object.
  */
 function hasAllProperties(fieldList, o) {
 
