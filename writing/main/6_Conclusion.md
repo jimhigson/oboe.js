@@ -42,7 +42,7 @@ Performance of code styles under various engines
 Complex JSONPath tested against JSON with approx 2,000 nodes, finding
 100 matches. Real http, full stack Oboe.
 
-  Browser                                       Time
+  Platform                                      Time
   ----------------------------------------- --------
   Firefox 24.0.0 (Mac OS X 10.7)               547ms
   Chrome 30.0.1599 (Mac OS X 10.7.5)           237ms
