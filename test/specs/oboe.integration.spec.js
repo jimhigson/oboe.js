@@ -2,26 +2,32 @@
 describe("oboe integration (real http)", function(){
 
    it('gets all expected callbacks by time request finishes',  function() {
+
+      var fullResponse = null;      
+      function whenDoneFn(obj) {                              
+         fullResponse = obj;               
+      }
+      var nodeSpy = jasmine.createSpy('nodeSpy');
        
-      var asserter = givenAnOboeInstance('/testServer/tenSlowNumbers')
-         .andWeAreListeningForNodes('![*]');         
+      oboe('/testServer/tenSlowNumbers')
+         .node('![*]', nodeSpy)
+         .done(whenDoneFn);         
       
-      waitsFor( asserter.toComplete(), 'the request to complete', ASYNC_TEST_TIMEOUT);
+      waitsFor( function(){return !!fullResponse}, 'the request to complete', ASYNC_TEST_TIMEOUT);
 
       runs(function(){
-               
-         asserter.thenTheInstance(
-             matched(0).atPath([0])
-         ,   matched(1).atPath([1])
-         ,   matched(2).atPath([2])
-         ,   matched(3).atPath([3])
-         ,   matched(4).atPath([4])
-         ,   matched(5).atPath([5])
-         ,   matched(6).atPath([6])
-         ,   matched(7).atPath([7])
-         ,   matched(8).atPath([8])
-         ,   matched(9).atPath([9])
-         );        
+ 
+         expect(nodeSpy).toHaveBeenCalledWith(0, [0], [fullResponse, 0]);
+         expect(nodeSpy).toHaveBeenCalledWith(1, [1], [fullResponse, 1]);
+         expect(nodeSpy).toHaveBeenCalledWith(2, [2], [fullResponse, 2]);
+         expect(nodeSpy).toHaveBeenCalledWith(3, [3], [fullResponse, 3]);
+         expect(nodeSpy).toHaveBeenCalledWith(4, [4], [fullResponse, 4]);
+         expect(nodeSpy).toHaveBeenCalledWith(5, [5], [fullResponse, 5]);
+         expect(nodeSpy).toHaveBeenCalledWith(6, [6], [fullResponse, 6]);
+         expect(nodeSpy).toHaveBeenCalledWith(7, [7], [fullResponse, 7]);
+         expect(nodeSpy).toHaveBeenCalledWith(8, [8], [fullResponse, 8]);
+         expect(nodeSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
+
       });
    })
    
