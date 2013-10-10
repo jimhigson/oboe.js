@@ -288,7 +288,8 @@ module.exports = function (grunt) {
    grunt.registerTask('node-build',      [
       'concat:node', 
       'wrap:nodePackage',
-      'copy:nodeDist'
+      'copy:nodeDist',
+      'jasmine_node_oboe'
    ]);   
    
    grunt.registerTask('default',      [

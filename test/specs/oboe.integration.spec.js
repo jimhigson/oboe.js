@@ -1,13 +1,26 @@
 
 describe("oboe integration (real http)", function() {
 
-   var oboe =  typeof window !== "undefined" 
-            ?  (window && window.oboe) 
-            :  require('../../dist/oboe-node.js');
+   var isNode = typeof window === "undefined"
+
+   var oboe =     isNode 
+               ?  require('../../dist/oboe-node.js') 
+               :  (window.oboe)
+               ;
+            
+   var ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
+   
+   function url( path ){
+      if( isNode ) {
+         return 'localhost:4567/' + path;
+      } else {
+         return '/testServer/' + path;
+      }
+   }            
 
    it('gets all expected callbacks by time request finishes', function () {
 
-      oboe('/testServer/tenSlowNumbers')
+      oboe(url('tenSlowNumbers'))
           .node('![*]', callbackSpy)
           .done(whenDoneFn);
 
@@ -33,7 +46,7 @@ describe("oboe integration (real http)", function() {
 
    it('can abort once some data has been found in streamed response', function () {
   
-      var req = oboe('/testServer/tenSlowNumbers')
+      var req = oboe(url('tenSlowNumbers'))
                   .node('![5]', abortCallback);
 
       waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
@@ -57,7 +70,7 @@ describe("oboe integration (real http)", function() {
       // we'll almost certainly read in the whole response as one onprogress it is on localhost
       // and the json is very small 
 
-      var req = oboe('/testServer/static/json/firstTenNaturalNumbers.json')
+      var req = oboe(url('static/json/firstTenNaturalNumbers.json'))
                   .node('![5]', abortCallback);
 
       waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
@@ -76,7 +89,7 @@ describe("oboe integration (real http)", function() {
 
    it('gives full json to callback when request finishes', function () {
 
-      oboe.doGet('/testServer/static/json/firstTenNaturalNumbers.json')
+      oboe.doGet(url('static/json/firstTenNaturalNumbers.json'))
           .done(whenDoneFn);
 
       waitsFor(function () {
@@ -93,7 +106,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          {  url:'/testServer/echoBackHeaders',
+          {  url:url('/echoBackHeaders'),
              headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
           }
 
@@ -119,7 +132,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          '/testServer/static/json/firstTenNaturalNumbers.json'
+          url('/static/json/firstTenNaturalNumbers.json')
       ).on('node', '!.*', function (number) {
              countGotBack++;
           });
@@ -134,7 +147,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          '/testServer/static/json/firstTenNaturalNumbers.json'
+          url('/static/json/firstTenNaturalNumbers.json')
       ).on('path', '!.*', function (number) {
              countGotBack++;
           });
@@ -148,11 +161,11 @@ describe("oboe integration (real http)", function() {
 
       var gotError = false
 
-      oboe('/testServer/doesNotExist'
-      ).fail(function () {
+      oboe(url('doesNotExist'))
+         .fail(function () {
 
-             gotError = true
-          });
+            gotError = true
+         });
 
       waitsFor(function () {
          return gotError
