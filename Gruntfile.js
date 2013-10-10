@@ -84,7 +84,7 @@ module.exports = function (grunt) {
                '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
                     
-               'exports = (function  () {\n' + 
+               'module.exports = (function  () {\n' + 
                   'var clarinet = require("clarinet")'
                   
                               // source code here
