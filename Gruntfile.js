@@ -35,16 +35,16 @@ module.exports = function (grunt) {
    ,  concat: {
          oboe:{         
             src: OBOE_SOURCE_FILES,
-            dest: 'build/oboe.concat.js'
+            dest: 'build/oboe-browser.concat.js'
          }
       }
       
    ,  wrap: {
          browserPackage: {
-            src: 'build/oboe.concat.js',
+            src: 'build/oboe-browser.concat.js',
             dest: '.',
             wrapper: [
-               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src ' +
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
                '(function  (window, Object, Array, Error, undefined ) {' 
@@ -56,7 +56,7 @@ module.exports = function (grunt) {
    ,  uglify: {
          build:{
             files:{
-               'build/oboe.min.js': 'build/oboe.concat.js'
+               'build/oboe-browser.min.js': 'build/oboe-browser.concat.js'
             }
          }
       }
@@ -117,8 +117,8 @@ module.exports = function (grunt) {
    ,  copy: {
          dist: {
             files: [
-               {src: ['build/oboe.min.js'],    dest: 'dist/oboe.min.js'}
-            ,  {src: ['build/oboe.concat.js'], dest: 'dist/oboe.js'    }
+               {src: ['build/oboe-browser.min.js'],    dest: 'dist/oboe-browser.min.js'}
+            ,  {src: ['build/oboe-browser.concat.js'], dest: 'dist/oboe-browser.js'    }
             ]
          }
       }      
@@ -126,10 +126,10 @@ module.exports = function (grunt) {
    ,  exec:{
          // these might not go too well on Windows :-) - get Cygwin.
          reportMinifiedSize:{
-            command: "echo Minified size is `wc -c < dist/oboe.min.js` bytes" 
+            command: "echo Minified size to Browser is `wc -c < dist/oboe-browser.min.js` bytes" 
          },
          reportMinifiedAndGzippedSize:{
-            command: "echo Size after gzip is `gzip --best --stdout dist/oboe.min.js | wc -c` bytes"
+            command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes"
          }
       }
       
