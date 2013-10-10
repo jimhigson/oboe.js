@@ -247,8 +247,8 @@ module.exports = function (grunt) {
    grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
    
       require('jasmine-node').executeSpecsInFolder({
-      
-         "specFolders":["/Users/jimhigson/Sites/progressivejson/test/specs/oboe.integration.spec.js"], 
+            
+         "specFolders":[process.cwd() + '/test/specs/oboe.integration.spec.js'], 
          "isVerbose":false, 
          "showColors":true, 
          "teamcity":false, 
