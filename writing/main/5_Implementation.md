@@ -514,9 +514,8 @@ statementExpr pointing to the last clause](images/placeholder)
 
 [^1]: https://github.com/substack/http-browserify
 
-[^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js
-    I can't claim superior programming ability, this version is shorter
-    because it is not a generic solution
+[^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingXhr.js
+    This version is shorter mostly because it is not a generic solution
 
 [^3]: See
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
