@@ -8,8 +8,8 @@ function wire (httpMethodName, url, body, headers){
 
    var eventBus = pubSub();
                
-   streamingHttp(  eventBus.fire, eventBus.on,
-                  new XMLHttpRequest(), 
+   streamingHttp( eventBus.fire, eventBus.on,
+                  httpTransport(), 
                   httpMethodName, url, body, headers );                              
      
    return instanceController( 

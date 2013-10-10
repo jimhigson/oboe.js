@@ -9,7 +9,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                         
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
@@ -29,7 +29,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                         
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
@@ -58,7 +58,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                       
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/tenSlowNumbers',
@@ -80,7 +80,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                        
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),         
          'POST',
          '/testServer/echoBackBody',
@@ -102,7 +102,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),         
          'PUT',
           '/testServer/echoBackBody',
@@ -125,7 +125,7 @@ describe('streaming xhr integration (real http)', function() {
       it('gives multiple callbacks when loading a streaming resource',  function(queue) {
                               
          streamingHttp(                           
-            eventBus.fire, eventBus.on,
+            fire, on,
             new XMLHttpRequest(),            
             'GET',
 
@@ -145,16 +145,10 @@ describe('streaming xhr integration (real http)', function() {
    }
    
    it('does not call back with zero-length data',  function(queue) {
-         
-      eventBus.on(NEW_CONTENT,
-          function(nextDrip){            
-             expect(nextDrip.length).not.toEqual(0);                                                                                     
-          }
-      );          
-         
+                         
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingHttp(              
-         eventBus.fire, eventBus.on,
+         fire, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
@@ -163,14 +157,23 @@ describe('streaming xhr integration (real http)', function() {
 
       waitForRequestToComplete()
       
-      runs(function(){})   
+      runs(function(){
+      
+         expect(dripsReceived.length).toBeGreaterThan(0);
+      
+         dripsReceived.forEach(function(drip) {            
+            expect(drip.length).not.toEqual(0);                                                                                     
+         });
+      
+      })   
    })              
 
 
    var requestCompleteListener,
        contentReceived,
        numberOfProgressCallbacks,
-       eventBus;
+       dripsReceived,
+       fire, on;
    
    function waitForRequestToComplete(){
       waitsFor(function(){     
@@ -181,9 +184,9 @@ describe('streaming xhr integration (real http)', function() {
    beforeEach(function(){
       contentReceived = '';      
       numberOfProgressCallbacks = 0;
+      dripsReceived = [];
       requestCompleteListener = sinon.stub();
-      eventBus = pubSub();
-      
+            
       this.addMatchers({
          toParseTo:function( expectedObj ){
             
@@ -209,12 +212,20 @@ describe('streaming xhr integration (real http)', function() {
          }
       });
       
-      eventBus.on(NEW_CONTENT, function(nextDrip){
-         numberOfProgressCallbacks ++;
-         contentReceived += nextDrip;                                                                                     
+      on = jasmine.createSpy();
+      
+      fire = jasmine.createSpy().andCallFake(function( eventName, eventContent ){
+      
+         if( eventName == NEW_CONTENT ) {
+            numberOfProgressCallbacks ++;
+            contentReceived += eventContent;
+            dripsReceived.push(eventContent);
+                     
+         } else if( eventName == END_OF_CONTENT ) {
+            requestCompleteListener();
+         }
       });
       
-      eventBus.on(END_OF_CONTENT, requestCompleteListener);
    });
 
 });

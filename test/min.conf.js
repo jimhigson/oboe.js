@@ -13,7 +13,7 @@ module.exports = function(config) {
       ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
-      ,  'dist/oboe.min.js'
+      ,  'dist/oboe-browser.min.js'
       
       ,  'test/specs/oboe.integration.spec.js'
       ,  'test/specs/oboe.performance.spec.js'

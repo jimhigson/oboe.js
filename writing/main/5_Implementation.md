@@ -84,6 +84,10 @@ data behind the logic which acts on them but I feel the departure is
 worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
+Dual-implementation of same interface for streamingHttp might be considered
+polymorphism, but a function not a class and both are never loaded at
+run time.
+
 Largely for the sake of testing Oboe has also embraced dependency
 injection. This means that components do not create the further
 components that they require but rather rely on them being provided by
@@ -514,9 +518,8 @@ statementExpr pointing to the last clause](images/placeholder)
 
 [^1]: https://github.com/substack/http-browserify
 
-[^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js
-    I can't claim superior programming ability, this version is shorter
-    because it is not a generic solution
+[^2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingXhr.js
+    This version is shorter mostly because it is not a generic solution
 
 [^3]: See
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.

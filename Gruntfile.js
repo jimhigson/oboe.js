@@ -1,15 +1,17 @@
 module.exports = function (grunt) {
 
+   var AUTO_START_BROWSERS = ['Chrome', 'Firefox', 'Safari'];
+
    var STREAM_SOURCE_PORT = 4567;
 
    // NB: source files are order sensitive
-   var OBOE_SOURCE_FILES = [
+   var OBOE_BROWSER_SOURCE_FILES = [
       'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
    ,  'src/libs/clarinet.js'               
    ,  'src/clarinetListenerAdaptor.js'
-   ,  'src/streamingHttp.js'
+   ,  'src/streamingHttp-browser.js'
    ,  'src/jsonPathSyntax.js'
    ,  'src/incrementalContentBuilder.js'            
    ,  'src/jsonPath.js'
@@ -19,6 +21,22 @@ module.exports = function (grunt) {
    ,  'src/wire.js'
    ,  'src/browserApi.js'
    ];
+   
+   var OBOE_NODE_SOURCE_FILES = [
+      'src/functional.js'                
+   ,  'src/util.js'                    
+   ,  'src/lists.js'                                   
+   ,  'src/clarinetListenerAdaptor.js'
+   ,  'src/streamingHttp-node.js'
+   ,  'src/jsonPathSyntax.js'
+   ,  'src/incrementalContentBuilder.js'            
+   ,  'src/jsonPath.js'
+   ,  'src/pubSub.js'
+   ,  'src/events.js'
+   ,  'src/instanceController.js'
+   ,  'src/wire.js'
+   ,  'src/browserApi.js'
+   ];   
    
    var FILES_TRIGGERING_KARMA = [
       'src/**/*.js', 
@@ -33,30 +51,54 @@ module.exports = function (grunt) {
    ,  clean: ['dist/*.js', 'build/*.js']
       
    ,  concat: {
-         oboe:{         
-            src: OBOE_SOURCE_FILES,
-            dest: 'build/oboe.concat.js'
-         }
+         browser:{         
+            src: OBOE_BROWSER_SOURCE_FILES,
+            dest: 'build/oboe-browser.concat.js'
+         },
+         node:{         
+            src: OBOE_NODE_SOURCE_FILES,
+            dest: 'build/oboe-node.concat.js'
+         }         
       }
       
    ,  wrap: {
          browserPackage: {
-            src: 'build/oboe.concat.js',
+            src: 'build/oboe-browser.concat.js',
             dest: '.',
             wrapper: [
-               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe.js/tree/master/src ' +
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
-               '(function  (window, Object, Array, Error, undefined ) {' 
-            ,           '})(window, Object, Array, Error);'
+               'window.oboe = (function  (window, Object, Array, Error, undefined ) {\n'
+               
+                              // source code here
+                
+            ,  '\n\n;return oboe;})(window, Object, Array, Error);'
             ]
-         }
-      }      
-            
+         },
+         
+         nodePackage: {
+            src: 'build/oboe-node.concat.js',
+            dest: '.',
+            wrapper: [
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
+                   'for the unconcatenated source\n' +
+                    
+               'module.exports = (function  () {\n' + 
+                  'var clarinet = require("clarinet")'
+                  
+                              // source code here
+                                        
+            ,  '\n\n;return oboe;})();'
+            ]
+         }         
+      }
+      
+                       
    ,  uglify: {
          build:{
             files:{
-               'build/oboe.min.js': 'build/oboe.concat.js'
+               'build/oboe-browser.min.js': 'build/oboe-browser.concat.js'
             }
          }
       }
@@ -86,19 +128,25 @@ module.exports = function (grunt) {
          }
       ,
          'single-dev': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/unit.conf.js'
          }
       ,
          'single-concat': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/concat.conf.js'      
          }  
       ,  
          'single-minified': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/min.conf.js'
          }
+         
+      ,  
+         'single-browser-http': {
+            browsers: AUTO_START_BROWSERS,
+            configFile: 'test/http.conf.js'
+         }         
          
       ,  
          'persist': {
@@ -115,21 +163,26 @@ module.exports = function (grunt) {
       }
       
    ,  copy: {
-         dist: {
+         browserDist: {
             files: [
-               {src: ['build/oboe.min.js'],    dest: 'dist/oboe.min.js'}
-            ,  {src: ['build/oboe.concat.js'], dest: 'dist/oboe.js'    }
+               {src: ['build/oboe-browser.min.js'],    dest: 'dist/oboe-browser.min.js'}
+            ,  {src: ['build/oboe-browser.concat.js'], dest: 'dist/oboe-browser.js'    }
             ]
-         }
+         },
+         nodeDist: {
+            files: [
+               {src: ['build/oboe-node.concat.js'],    dest: 'dist/oboe-node.js'}
+            ]
+         }         
       }      
       
    ,  exec:{
          // these might not go too well on Windows :-) - get Cygwin.
          reportMinifiedSize:{
-            command: "echo Minified size is `wc -c < dist/oboe.min.js` bytes" 
+            command: "echo Minified size to Browser is `wc -c < dist/oboe-browser.min.js` bytes" 
          },
          reportMinifiedAndGzippedSize:{
-            command: "echo Size after gzip is `gzip --best --stdout dist/oboe.min.js | wc -c` bytes"
+            command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes"
          }
       }
       
@@ -146,10 +199,10 @@ module.exports = function (grunt) {
             files: FILES_TRIGGERING_KARMA,
             tasks:[
                'karma:persist:run',
-               'concat:oboe', 
+               'concat:browser', 
                'wrap:browserPackage', 
                'uglify',
-               'copy:dist',               
+               'copy:browserDist',               
                'dist-sizes']
          },
          
@@ -190,7 +243,25 @@ module.exports = function (grunt) {
       streamSource.start(STREAM_SOURCE_PORT, grunt);
       grunt.log.ok('we started it, but does it work?', streamSource);  
    });
+
+   grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
    
+      require('jasmine-node').executeSpecsInFolder({
+            
+         "specFolders":[process.cwd() + '/test/specs/oboe.integration.spec.js'], 
+         "isVerbose":true, 
+         "showColors":true, 
+         "teamcity":false, 
+         "useRequireJs":false, 
+         "regExpSpec":/.spec\.(js)$/, 
+         "junitreport":{"report":false, "savePath":"./reports/", "useDotNotation":true, "consolidate":true}, 
+         "includeStackTrace":true, 
+         "growl":false,
+         onComplete: this.async()
+         
+      });
+   });   
+      
    grunt.registerTask('test-start-server',   [
       'karma:persist'
    ]);
@@ -213,29 +284,29 @@ module.exports = function (grunt) {
       'exec:reportMinifiedSize',
       'exec:reportMinifiedAndGzippedSize'
    ]);
-   
-   // dev-test
-   //
-   // For one-off test runs while developing. Capture browsers first. Allows
-   // to capture IE running in VM which would be tricky to set up starting
-   // automatically though Karma   
-   grunt.registerTask('dev-test',     [
-      'clear',
-      'start-stream-source',         
-      'karma:precaptured-dev'
-   ]);
+      
+   grunt.registerTask('node-build',      [
+      'concat:node', 
+      'wrap:nodePackage',
+      'copy:nodeDist',
+      'jasmine_node_oboe'
+   ]);   
    
    grunt.registerTask('default',      [
       'clear',   
+      'clean',
       'start-stream-source',
       'karma:single-dev', 
-      'concat:oboe', 
+      'karma:single-browser-http',
+      'concat:browser', 
+      'concat:node', 
       'wrap:browserPackage', 
       'uglify',
-      'copy:dist',
+      'copy:browserDist',
       'karma:single-concat',                                         
       'karma:single-minified',
-      'dist-sizes'                                          
+      'node-build',      
+      'dist-sizes'                                                
    ]);
 
 };
