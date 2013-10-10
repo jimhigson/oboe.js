@@ -249,7 +249,7 @@ module.exports = function (grunt) {
       require('jasmine-node').executeSpecsInFolder({
             
          "specFolders":[process.cwd() + '/test/specs/oboe.integration.spec.js'], 
-         "isVerbose":false, 
+         "isVerbose":true, 
          "showColors":true, 
          "teamcity":false, 
          "useRequireJs":false, 

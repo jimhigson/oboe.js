@@ -30,29 +30,36 @@ function streamingHttp(fire, on, http, method, url, data, headers) {
    
       return isString(body)? body: JSON.stringify(body);
    }      
-     
-   url = 'http://' + url;  
-   console.log(url);
-   console.log(JSON.stringify(require('url').parse(url)));  
-     
-   url = require('url').parse(url);
+               
+   url = require('url').parse('http://' + url);
 
    var req = http.request({
       hostname: url.hostname,
       port: url.port,
       path: url.pathname,
-      method: method   
+      method: method,
+      headers: headers
    }, function(res) {
       
-      res.on('data', function (chunk) {
-         console.log('got data', chunk.toString());
-         fire( NEW_CONTENT, chunk.toString() );
-      });
+      var statusCode = res.statusCode,
+          sucessful = String(statusCode)[0] == 2;
+                             
+      if( sucessful ) {          
+            
+         res.on('data', function (chunk) {
+                           
+            fire( NEW_CONTENT, chunk.toString() );
+         });
+         
+         res.on('end', function() {
+                  
+            fire( END_OF_CONTENT );
+         });
+         
+      } else {
       
-      res.on('end', function() {
-         console.log('done!');      
-         fire( END_OF_CONTENT );
-      });
+         fire( ERROR_EVENT );
+      }
    });
    
    on( ABORTING, function(){              

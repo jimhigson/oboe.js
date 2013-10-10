@@ -26,7 +26,7 @@ describe("oboe integration (real http)", function() {
 
       waitsFor(function () {
          return !!fullResponse
-      }, 'the request to complete', ASYNC_TEST_TIMEOUT);
+      }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
 
       runs(function () {
 
@@ -94,7 +94,7 @@ describe("oboe integration (real http)", function() {
 
       waitsFor(function () {
          return !!fullResponse
-      }, 'the request to complete', ASYNC_TEST_TIMEOUT)
+      }, 'the request to give full response', ASYNC_TEST_TIMEOUT)
 
       runs(function () {
          expect(fullResponse).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -123,7 +123,7 @@ describe("oboe integration (real http)", function() {
   
       waitsFor(function () {
          return countGotBack == 2
-      }, 'the request to complete', ASYNC_TEST_TIMEOUT)
+      }, 'all headers to have been detected back here', ASYNC_TEST_TIMEOUT)
    })
 
    it('can listen for nodes via nodejs-style syntax', function () {
@@ -166,7 +166,7 @@ describe("oboe integration (real http)", function() {
          });
 
       waitsFor(function () {
-         return gotError
+         return gotError;
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })
 
