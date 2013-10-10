@@ -3,7 +3,7 @@ module.exports = function (grunt) {
    var STREAM_SOURCE_PORT = 4567;
 
    // NB: source files are order sensitive
-   var OBOE_SOURCE_FILES = [
+   var OBOE_BROWSER_SOURCE_FILES = [
       'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
@@ -20,6 +20,23 @@ module.exports = function (grunt) {
    ,  'src/browserApi.js'
    ];
    
+   var OBOE_NODE_SOURCE_FILES = [
+      'src/functional.js'                
+   ,  'src/util.js'                    
+   ,  'src/lists.js'                    
+   ,  'src/libs/clarinet.js'               
+   ,  'src/clarinetListenerAdaptor.js'
+   ,  'src/streamingHttp.js'
+   ,  'src/jsonPathSyntax.js'
+   ,  'src/incrementalContentBuilder.js'            
+   ,  'src/jsonPath.js'
+   ,  'src/pubSub.js'
+   ,  'src/events.js'
+   ,  'src/instanceController.js'
+   ,  'src/wire.js'
+   ,  'src/browserApi.js'
+   ];   
+   
    var FILES_TRIGGERING_KARMA = [
       'src/**/*.js', 
       'test/specs/*.spec.js', 
@@ -33,8 +50,8 @@ module.exports = function (grunt) {
    ,  clean: ['dist/*.js', 'build/*.js']
       
    ,  concat: {
-         oboe:{         
-            src: OBOE_SOURCE_FILES,
+         browser:{         
+            src: OBOE_BROWSER_SOURCE_FILES,
             dest: 'build/oboe-browser.concat.js'
          }
       }
@@ -146,7 +163,7 @@ module.exports = function (grunt) {
             files: FILES_TRIGGERING_KARMA,
             tasks:[
                'karma:persist:run',
-               'concat:oboe', 
+               'concat:browser', 
                'wrap:browserPackage', 
                'uglify',
                'copy:dist',               
@@ -227,9 +244,10 @@ module.exports = function (grunt) {
    
    grunt.registerTask('default',      [
       'clear',   
+      'clean',
       'start-stream-source',
       'karma:single-dev', 
-      'concat:oboe', 
+      'concat:browser', 
       'wrap:browserPackage', 
       'uglify',
       'copy:dist',
