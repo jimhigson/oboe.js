@@ -1,5 +1,7 @@
 module.exports = function (grunt) {
 
+   var AUTO_START_BROWSERS = ['Chrome', 'Firefox', 'Safari'];
+
    var STREAM_SOURCE_PORT = 4567;
 
    // NB: source files are order sensitive
@@ -108,19 +110,25 @@ module.exports = function (grunt) {
          }
       ,
          'single-dev': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/unit.conf.js'
          }
       ,
          'single-concat': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/concat.conf.js'      
          }  
       ,  
          'single-minified': {
-            browsers: ['Chrome', 'Firefox', 'Safari'],
+            browsers: AUTO_START_BROWSERS,
             configFile: 'test/min.conf.js'
          }
+         
+      ,  
+         'single-browser-http': {
+            browsers: AUTO_START_BROWSERS,
+            configFile: 'test/http.conf.js'
+         }         
          
       ,  
          'persist': {
@@ -252,6 +260,7 @@ module.exports = function (grunt) {
       'clean',
       'start-stream-source',
       'karma:single-dev', 
+      'karma:single-browser-http',
       'concat:browser', 
       'wrap:browserPackage', 
       'uglify',
