@@ -25,8 +25,7 @@ module.exports = function (grunt) {
    var OBOE_NODE_SOURCE_FILES = [
       'src/functional.js'                
    ,  'src/util.js'                    
-   ,  'src/lists.js'                    
-   ,  'src/libs/clarinet.js'               
+   ,  'src/lists.js'                                   
    ,  'src/clarinetListenerAdaptor.js'
    ,  'src/streamingNodeHttp.js'
    ,  'src/jsonPathSyntax.js'
@@ -70,8 +69,11 @@ module.exports = function (grunt) {
                '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
-               'window.oboe = (function  (window, Object, Array, Error, undefined ) {\n' 
-            ,           '\n\n;return oboe;})(window, Object, Array, Error);'
+               'window.oboe = (function  (window, Object, Array, Error, undefined ) {\n'
+               
+                              // source code here
+                
+            ,  '\n\n;return oboe;})(window, Object, Array, Error);'
             ]
          },
          
@@ -81,9 +83,13 @@ module.exports = function (grunt) {
             wrapper: [
                '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
-               // having a local undefined, window, Object etc allows slightly better minification:                    
-               'exports = (function  () {\n' 
-            ,           '\n\n;return oboe;})();'
+                    
+               'exports = (function  () {\n' + 
+                  'var clarinet = require("clarinet")'
+                  
+                              // source code here
+                                        
+            ,  '\n\n;return oboe;})();'
             ]
          }         
       }
