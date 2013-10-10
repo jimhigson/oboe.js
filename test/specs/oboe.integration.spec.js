@@ -1,8 +1,9 @@
 
 describe("oboe integration (real http)", function() {
 
-   var oboe = window.oboe || require('../dist/oboe-node.js');
-
+   var oboe =  typeof window !== "undefined" 
+            ?  (window && window.oboe) 
+            :  require('../../dist/oboe-node.js');
 
    it('gets all expected callbacks by time request finishes', function () {
 

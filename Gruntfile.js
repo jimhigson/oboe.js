@@ -243,7 +243,25 @@ module.exports = function (grunt) {
       streamSource.start(STREAM_SOURCE_PORT, grunt);
       grunt.log.ok('we started it, but does it work?', streamSource);  
    });
+
+   grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
    
+      require('jasmine-node').executeSpecsInFolder({
+      
+         "specFolders":["/Users/jimhigson/Sites/progressivejson/test/specs/oboe.integration.spec.js"], 
+         "isVerbose":false, 
+         "showColors":true, 
+         "teamcity":false, 
+         "useRequireJs":false, 
+         "regExpSpec":/.spec\.(js)$/, 
+         "junitreport":{"report":false, "savePath":"./reports/", "useDotNotation":true, "consolidate":true}, 
+         "includeStackTrace":true, 
+         "growl":false,
+         onComplete: this.async()
+         
+      });
+   });   
+      
    grunt.registerTask('test-start-server',   [
       'karma:persist'
    ]);
