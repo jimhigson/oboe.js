@@ -1,5 +1,5 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
-window.oboe = (function  (window, Object, Array, Error, undefined ) {
+exports = (function  () {
 /**
  * This file declares various pieces of functional programming.
  * 
@@ -2011,4 +2011,4 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
    };
 }   
 
-;return oboe;})(window, Object, Array, Error);
+;return oboe;})();

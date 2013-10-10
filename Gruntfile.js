@@ -70,10 +70,22 @@ module.exports = function (grunt) {
                '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
                    'for the unconcatenated source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
-               'window.oboe = (function  (window, Object, Array, Error, undefined ) {' 
-            ,           ';return oboe;})(window, Object, Array, Error);'
+               'window.oboe = (function  (window, Object, Array, Error, undefined ) {\n' 
+            ,           '\n\n;return oboe;})(window, Object, Array, Error);'
             ]
-         }
+         },
+         
+         nodePackage: {
+            src: 'build/oboe-node.concat.js',
+            dest: '.',
+            wrapper: [
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
+                   'for the unconcatenated source\n' +
+               // having a local undefined, window, Object etc allows slightly better minification:                    
+               'exports = (function  () {\n' 
+            ,           '\n\n;return oboe;})();'
+            ]
+         }         
       }
       
                        
@@ -145,12 +157,17 @@ module.exports = function (grunt) {
       }
       
    ,  copy: {
-         dist: {
+         browserDist: {
             files: [
                {src: ['build/oboe-browser.min.js'],    dest: 'dist/oboe-browser.min.js'}
             ,  {src: ['build/oboe-browser.concat.js'], dest: 'dist/oboe-browser.js'    }
             ]
-         }
+         },
+         nodeDist: {
+            files: [
+               {src: ['build/oboe-node.concat.js'],    dest: 'dist/oboe-node.js'}
+            ]
+         }         
       }      
       
    ,  exec:{
@@ -179,7 +196,7 @@ module.exports = function (grunt) {
                'concat:browser', 
                'wrap:browserPackage', 
                'uglify',
-               'copy:dist',               
+               'copy:browserDist',               
                'dist-sizes']
          },
          
@@ -243,17 +260,12 @@ module.exports = function (grunt) {
       'exec:reportMinifiedSize',
       'exec:reportMinifiedAndGzippedSize'
    ]);
-   
-   // dev-test
-   //
-   // For one-off test runs while developing. Capture browsers first. Allows
-   // to capture IE running in VM which would be tricky to set up starting
-   // automatically though Karma   
-   grunt.registerTask('dev-test',     [
-      'clear',
-      'start-stream-source',         
-      'karma:precaptured-dev'
-   ]);
+      
+   grunt.registerTask('node-build',      [
+      'concat:node', 
+      'wrap:nodePackage',
+      'copy:nodeDist'
+   ]);   
    
    grunt.registerTask('default',      [
       'clear',   
@@ -262,12 +274,14 @@ module.exports = function (grunt) {
       'karma:single-dev', 
       'karma:single-browser-http',
       'concat:browser', 
+      'concat:node', 
       'wrap:browserPackage', 
       'uglify',
-      'copy:dist',
+      'copy:browserDist',
       'karma:single-concat',                                         
       'karma:single-minified',
-      'dist-sizes'                                          
+      'node-build',      
+      'dist-sizes'                                                
    ]);
 
 };
