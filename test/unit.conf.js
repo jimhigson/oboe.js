@@ -18,7 +18,7 @@ module.exports = function(config) {
       ,  'test/libs/*.js'
       ,  'src/libs/clarinet.js'
       ,  'src/clarinetListenerAdaptor.js'
-      ,  'src/streamingXhr.js'
+      ,  'src/streamingHttp-browser.js'
       ,  'src/jsonPathSyntax.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'

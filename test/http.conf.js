@@ -17,7 +17,7 @@ module.exports = function(config) {
       ,  'src/events.js'
       ,  'src/functional.js'                  
       ,  'src/util.js'           
-      ,  'src/streamingXhr.js'      
+      ,  'src/streamingHttp-browser.js'      
       
             
       ,  'test/specs/streamingHttp.integration.spec.js'
