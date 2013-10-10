@@ -1,5 +1,5 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
-(function  (window, Object, Array, Error, undefined ) {/**
+window.oboe = (function  (window, Object, Array, Error, undefined ) {/**
  * This file declares various pieces of functional programming.
  * 
  * This isn't a general purpose functional library, to keep things small it
@@ -1970,11 +1970,11 @@ function wire (httpMethodName, url, body, headers){
 }
 
 // export public API
-window.oboe          = apiMethod('GET');
-window.oboe.doGet    = window.oboe;
-window.oboe.doDelete = apiMethod('DELETE');
-window.oboe.doPost   = apiMethod('POST', true);
-window.oboe.doPut    = apiMethod('PUT', true);
+var oboe = apiMethod('GET');
+oboe.doGet    = oboe;
+oboe.doDelete = apiMethod('DELETE');
+oboe.doPost   = apiMethod('POST', true);
+oboe.doPut    = apiMethod('PUT', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
@@ -2008,4 +2008,4 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          );
       }
    };
-}   })(window, Object, Array, Error);
+}   ;return oboe;})(window, Object, Array, Error);
