@@ -99,12 +99,6 @@ describe("oboe integration (real http)", function() {
 
    it('gives full json to callback when request finishes', function () {
 
-      var fullResponse = null;
-
-      function whenDoneFn(obj) {
-         fullResponse = obj;
-      }
-
       oboe.doGet('/testServer/static/json/firstTenNaturalNumbers.json')
           .done(whenDoneFn);
 
