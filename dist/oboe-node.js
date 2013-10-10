@@ -1,6 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
-var clarinet = require("clarinet")/**
+var clarinet = require("clarinet");
+/**
  * This file declares various pieces of functional programming.
  * 
  * This isn't a general purpose functional library, to keep things small it

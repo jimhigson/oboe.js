@@ -85,7 +85,7 @@ module.exports = function (grunt) {
                    'for the unconcatenated source\n' +
                     
                'module.exports = (function  () {\n' + 
-                  'var clarinet = require("clarinet")'
+                  'var clarinet = require("clarinet");\n'
                   
                               // source code here
                                         
