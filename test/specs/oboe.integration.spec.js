@@ -1,184 +1,208 @@
 
-describe("oboe integration (real http)", function(){
+describe("oboe integration (real http)", function() {
 
-   it('gets all expected callbacks by time request finishes',  function() {
+   var callbackSpy;
+   var fullResponse;
+   function whenDoneFn(obj) {
+      fullResponse = obj;
+   }
 
-      var fullResponse = null;      
-      function whenDoneFn(obj) {                              
-         fullResponse = obj;               
-      }
-      var nodeSpy = jasmine.createSpy('nodeSpy');
-       
+   beforeEach(function () {
+      fullResponse = null;
+      callbackSpy = jasmine.createSpy('callbackSpy');      
+   });
+
+
+   it('gets all expected callbacks by time request finishes', function () {
+
       oboe('/testServer/tenSlowNumbers')
-         .node('![*]', nodeSpy)
-         .done(whenDoneFn);         
-      
-      waitsFor( function(){return !!fullResponse}, 'the request to complete', ASYNC_TEST_TIMEOUT);
+          .node('![*]', callbackSpy)
+          .done(whenDoneFn);
 
-      runs(function(){
- 
-         expect(nodeSpy).toHaveBeenCalledWith(0, [0], [fullResponse, 0]);
-         expect(nodeSpy).toHaveBeenCalledWith(1, [1], [fullResponse, 1]);
-         expect(nodeSpy).toHaveBeenCalledWith(2, [2], [fullResponse, 2]);
-         expect(nodeSpy).toHaveBeenCalledWith(3, [3], [fullResponse, 3]);
-         expect(nodeSpy).toHaveBeenCalledWith(4, [4], [fullResponse, 4]);
-         expect(nodeSpy).toHaveBeenCalledWith(5, [5], [fullResponse, 5]);
-         expect(nodeSpy).toHaveBeenCalledWith(6, [6], [fullResponse, 6]);
-         expect(nodeSpy).toHaveBeenCalledWith(7, [7], [fullResponse, 7]);
-         expect(nodeSpy).toHaveBeenCalledWith(8, [8], [fullResponse, 8]);
-         expect(nodeSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
+      waitsFor(function () {
+         return !!fullResponse
+      }, 'the request to complete', ASYNC_TEST_TIMEOUT);
+
+      runs(function () {
+
+         expect(callbackSpy).toHaveBeenCalledWith(0, [0], [fullResponse, 0]);
+         expect(callbackSpy).toHaveBeenCalledWith(1, [1], [fullResponse, 1]);
+         expect(callbackSpy).toHaveBeenCalledWith(2, [2], [fullResponse, 2]);
+         expect(callbackSpy).toHaveBeenCalledWith(3, [3], [fullResponse, 3]);
+         expect(callbackSpy).toHaveBeenCalledWith(4, [4], [fullResponse, 4]);
+         expect(callbackSpy).toHaveBeenCalledWith(5, [5], [fullResponse, 5]);
+         expect(callbackSpy).toHaveBeenCalledWith(6, [6], [fullResponse, 6]);
+         expect(callbackSpy).toHaveBeenCalledWith(7, [7], [fullResponse, 7]);
+         expect(callbackSpy).toHaveBeenCalledWith(8, [8], [fullResponse, 8]);
+         expect(callbackSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
 
       });
    })
-   
-   it('can abort once some data has been found in streamed response',  function() {
-       
-      var aborted = false; 
-       
+
+   it('can abort once some data has been found in streamed response', function () {
+
+      var aborted = false;
+
       var asserter = givenAnOboeInstance('/testServer/tenSlowNumbers')
-         .andWeAreListeningForNodes('![5]', function(){
+          .andWeAreListeningForNodes('![5]', function () {
              asserter.andWeAbortTheRequest();
              aborted = true;
-          });         
-      
-      waitsFor( function(){return aborted}, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
-      
+          });
+
+      waitsFor(function () {
+         return aborted
+      }, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+
       // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
       // rest of the data now and the test would fail:
-      waitsFor( someSecondsToPass(3), ASYNC_TEST_TIMEOUT);      
+      waitsFor(someSecondsToPass(3), ASYNC_TEST_TIMEOUT);
 
-      runs( function(){
+      runs(function () {
          asserter.thenTheInstance(
-            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
-            // not the whole ten.
-            hasRootJson([0,1,2,3,4,5])
+             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+             // not the whole ten.
+             hasRootJson([0, 1, 2, 3, 4, 5])
          );
       });
    })
-   
-   it('can abort once some data has been found in not very streamed response',  function() {
-       
+
+   it('can abort once some data has been found in not very streamed response', function () {
+
       // like above but we're getting a static file not the streamed numbers. This means
       // we'll almost certainly read in the whole response as one onprogress it is on localhost
       // and the json is very small 
 
-      var aborted = false; 
-       
+      var aborted = false;
+
       var asserter = givenAnOboeInstance('/testServer/static/json/firstTenNaturalNumbers.json')
-         .andWeAreListeningForNodes('![5]', function(){
+          .andWeAreListeningForNodes('![5]', function () {
              asserter.andWeAbortTheRequest();
              aborted = true;
-          });         
-      
-      waitsFor( function(){return aborted}, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
-      
+          });
+
+      waitsFor(function () {
+         return aborted
+      }, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+
       // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
       // rest of the data now and the test would fail:
-      waitsFor( someSecondsToPass(1), ASYNC_TEST_TIMEOUT);      
+      waitsFor(someSecondsToPass(1), ASYNC_TEST_TIMEOUT);
 
-      runs( function(){
+      runs(function () {
          asserter.thenTheInstance(
-            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
-            // not the whole ten.
-            hasRootJson([0,1,2,3,4,5])
+             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+             // not the whole ten.
+             hasRootJson([0, 1, 2, 3, 4, 5])
          );
       });
-   })      
-   
-   it('gives full json to callback when request finishes',  function() {
-                  
+   })
+
+   it('gives full json to callback when request finishes', function () {
+
       var fullResponse = null;
-      function whenDoneFn(obj) {                              
-         fullResponse = obj;               
-      }                  
-                           
-      oboe.doGet( '/testServer/static/json/firstTenNaturalNumbers.json')
-         .done(whenDoneFn);   
-      
-      waitsFor( function(){ return !!fullResponse }, 'the request to complete', ASYNC_TEST_TIMEOUT )
-      
-      runs( function(){
-         expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9])
-      });      
+
+      function whenDoneFn(obj) {
+         fullResponse = obj;
+      }
+
+      oboe.doGet('/testServer/static/json/firstTenNaturalNumbers.json')
+          .done(whenDoneFn);
+
+      waitsFor(function () {
+         return !!fullResponse
+      }, 'the request to complete', ASYNC_TEST_TIMEOUT)
+
+      runs(function () {
+         expect(fullResponse).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+      });
    })
-   
-   it('gives header to server side',  function() {
 
-      var countGotBack = 0;
-
-      oboe(                      
-         {  url: '/testServer/echoBackHeaders',
-            headers: {'x-snarfu':'SNARF', 'x-foo':'BAR'}
-         }
-
-      ).node( 'x-snarfu', function( headerValue ){
-       
-         expect( headerValue ).toBe( 'SNARF' )
-         countGotBack++;
-         
-      }).node( 'x-foo', function( headerValue ){
-       
-         expect( headerValue ).toBe( 'BAR' )
-         countGotBack++;
-      })         
-      
-      waitsFor( function(){ return countGotBack == 2 }, 'the request to complete', ASYNC_TEST_TIMEOUT )            
-   })
-      
-   it('can listen for nodes via nodejs-style syntax',  function() {
+   it('gives header to server side', function () {
 
       var countGotBack = 0;
 
       oboe(
-         '/testServer/static/json/firstTenNaturalNumbers.json'
-      ).on('node', '!.*', function( number ){
-         countGotBack++;          
-      });         
-      
-      waitsFor( function(){ return countGotBack == 10 }, 'ten callbacks', ASYNC_TEST_TIMEOUT )            
+          {  url:'/testServer/echoBackHeaders',
+             headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
+          }
+
+      ).node('x-snarfu',
+          function (headerValue) {
+
+             expect(headerValue).toBe('SNARF')
+             countGotBack++;
+
+          }).node('x-foo', function (headerValue) {
+
+             expect(headerValue).toBe('BAR')
+             countGotBack++;
+          })
+
+      waitsFor(function () {
+         return countGotBack == 2
+      }, 'the request to complete', ASYNC_TEST_TIMEOUT)
    })
-   
-   it('can listen for paths via nodejs-style syntax',  function() {
+
+   it('can listen for nodes via nodejs-style syntax', function () {
 
       var countGotBack = 0;
 
       oboe(
-         '/testServer/static/json/firstTenNaturalNumbers.json'
-      ).on('path', '!.*', function( number ){
-         countGotBack++;          
-      });         
-      
-      waitsFor( function(){ return countGotBack == 10 }, 'ten callbacks', ASYNC_TEST_TIMEOUT )            
-   })      
-   
-   it('fires error on 404',  function() {
+          '/testServer/static/json/firstTenNaturalNumbers.json'
+      ).on('node', '!.*', function (number) {
+             countGotBack++;
+          });
+
+      waitsFor(function () {
+         return countGotBack == 10
+      }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
+   })
+
+   it('can listen for paths via nodejs-style syntax', function () {
+
+      var countGotBack = 0;
+
+      oboe(
+          '/testServer/static/json/firstTenNaturalNumbers.json'
+      ).on('path', '!.*', function (number) {
+             countGotBack++;
+          });
+
+      waitsFor(function () {
+         return countGotBack == 10
+      }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
+   })
+
+   it('fires error on 404', function () {
 
       var gotError = false
 
       oboe('/testServer/doesNotExist'
-      ).fail(function(){
-      
-         gotError = true
-      });
-      
-      waitsFor( function(){ return gotError }, 'the request to fail', ASYNC_TEST_TIMEOUT )            
-   })   
-      
+      ).fail(function () {
+
+             gotError = true
+          });
+
+      waitsFor(function () {
+         return gotError
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+   })
+
    function someSecondsToPass(waitSecs) {
-      
-      function now(){
+
+      function now() {
          // IE8 doesn't have Date.now() 
          return new Date().getTime();
       }
-      
+
       var waitStart = now(),
           waitMs = waitSecs * 1000;
-      
-      return function(){
-         return now() > (waitStart + waitMs); 
+
+      return function () {
+         return now() > (waitStart + waitMs);
       }
    }
-     
+
 });  
 
 
