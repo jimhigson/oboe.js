@@ -84,6 +84,10 @@ data behind the logic which acts on them but I feel the departure is
 worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
+Dual-implementation of same interface for streamingHttp might be considered
+polymorphism, but a function not a class and both are never loaded at
+run time.
+
 Largely for the sake of testing Oboe has also embraced dependency
 injection. This means that components do not create the further
 components that they require but rather rely on them being provided by
