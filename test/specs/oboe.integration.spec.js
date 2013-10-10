@@ -106,22 +106,21 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          {  url:url('/echoBackHeaders'),
+          {  url:url('echoBackHeaders'),
              headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
-          }
+          } 
+  
+      ).node('x-snarfu', function (headerValue) {
 
-      ).node('x-snarfu',
-          function (headerValue) {
+         expect(headerValue).toBe('SNARF')
+         countGotBack++;      
+      
+      }).node('x-foo', function (headerValue) {
 
-             expect(headerValue).toBe('SNARF')
-             countGotBack++;
-
-          }).node('x-foo', function (headerValue) {
-
-             expect(headerValue).toBe('BAR')
-             countGotBack++;
-          })
-
+         expect(headerValue).toBe('BAR')
+         countGotBack++;
+      }) 
+  
       waitsFor(function () {
          return countGotBack == 2
       }, 'the request to complete', ASYNC_TEST_TIMEOUT)
@@ -131,26 +130,25 @@ describe("oboe integration (real http)", function() {
 
       var countGotBack = 0;
 
-      oboe(
-          url('/static/json/firstTenNaturalNumbers.json')
-      ).on('node', '!.*', function (number) {
-             countGotBack++;
-          });
+      oboe(url('static/json/firstTenNaturalNumbers.json'))
+         .on('node', '!.*', function (number) {
+            countGotBack++;
+         });
 
       waitsFor(function () {
          return countGotBack == 10
       }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
    })
 
-   it('can listen for paths via nodejs-style syntax', function () {
+   it('can listen for paths via noeejs-style syntax', function () {
 
       var countGotBack = 0;
 
-      oboe(
-          url('/static/json/firstTenNaturalNumbers.json')
-      ).on('path', '!.*', function (number) {
-             countGotBack++;
-          });
+      oboe(url('static/json/firstTenNaturalNumbers.json'))
+      
+         .on('path', '!.*', function (number) { 
+            countGotBack++;
+         });
 
       waitsFor(function () {
          return countGotBack == 10
