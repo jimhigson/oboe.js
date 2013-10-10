@@ -1,14 +1,15 @@
 Conclusion
 ==========
 
-Benchmarking vs non-progressive http
+Benchmarking vs non-progressive REST
 ------------------------------------
 
 Doing things faster vs doing things earlier. "Hurry up and wait"
 approach to optimisation.
 
-Interesting article from Clarinet:
-http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+Interesting article from Clarinet: All this says is that Clarinet is
+already known to be slower than JSON.parse http://writings.nunojob
+.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
 
 In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
@@ -27,6 +28,12 @@ Consider:
 ### Suitability for databases
 
 Databases offer data one row at a time, not as a big lump.
+
+Ease of use vs SAX
+------------------
+
+Programmer Ergonomics vs non-progressive REST
+---------------------------------------------
 
 Status as a micro-lib
 ---------------------

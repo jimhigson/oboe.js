@@ -331,13 +331,17 @@ by Clarinet.
 API design
 ----------
 
+*API allows body to be given as Object and converts into JSON because
+it is anticipated that REST services which emmit JSON will also accept
+it*
+
 In designing the API developer ergonomics are the top priority. This is
 especially pertinent given that the library does nothing that can't be
 done with existing tools such as JSON SAX parsers but that those tools
 are not used because they require too much effort to form a part of most
 developers' everyday toolkit.
 
-Expose single global.
+*Expose single global.*
 
 To pursue good ergonomics, I will study successful libraries and, where
 appropriate, copy their APIs. We may assume that the existing libraries
