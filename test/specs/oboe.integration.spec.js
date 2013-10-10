@@ -1,17 +1,6 @@
 
 describe("oboe integration (real http)", function() {
 
-   var callbackSpy;
-   var fullResponse;
-   function whenDoneFn(obj) {
-      fullResponse = obj;
-   }
-
-   beforeEach(function () {
-      fullResponse = null;
-      callbackSpy = jasmine.createSpy('callbackSpy');      
-   });
-
 
    it('gets all expected callbacks by time request finishes', function () {
 
@@ -40,29 +29,22 @@ describe("oboe integration (real http)", function() {
    })
 
    it('can abort once some data has been found in streamed response', function () {
+  
+      var req = oboe('/testServer/tenSlowNumbers')
+                  .node('![5]', abortCallback);
 
-      var aborted = false;
-
-      var asserter = givenAnOboeInstance('/testServer/tenSlowNumbers')
-          .andWeAreListeningForNodes('![5]', function () {
-             asserter.andWeAbortTheRequest();
-             aborted = true;
-          });
-
-      waitsFor(function () {
-         return aborted
-      }, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+      waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
 
       // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
       // rest of the data now and the test would fail:
-      waitsFor(someSecondsToPass(3), ASYNC_TEST_TIMEOUT);
+      waitsFor(someSecondsToPass(2), ASYNC_TEST_TIMEOUT);
 
       runs(function () {
-         asserter.thenTheInstance(
-             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
-             // not the whole ten.
-             hasRootJson([0, 1, 2, 3, 4, 5])
-         );
+         // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+         // not the whole ten.      
+      
+         expect(req.root()).toEqual([0, 1, 2, 3, 4, 5]);
+      
       });
    })
 
@@ -72,28 +54,20 @@ describe("oboe integration (real http)", function() {
       // we'll almost certainly read in the whole response as one onprogress it is on localhost
       // and the json is very small 
 
-      var aborted = false;
+      var req = oboe('/testServer/static/json/firstTenNaturalNumbers.json')
+                  .node('![5]', abortCallback);
 
-      var asserter = givenAnOboeInstance('/testServer/static/json/firstTenNaturalNumbers.json')
-          .andWeAreListeningForNodes('![5]', function () {
-             asserter.andWeAbortTheRequest();
-             aborted = true;
-          });
-
-      waitsFor(function () {
-         return aborted
-      }, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
+      waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
 
       // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
       // rest of the data now and the test would fail:
-      waitsFor(someSecondsToPass(1), ASYNC_TEST_TIMEOUT);
+      waitsFor(someSecondsToPass(2), ASYNC_TEST_TIMEOUT);
 
       runs(function () {
-         asserter.thenTheInstance(
-             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
-             // not the whole ten.
-             hasRootJson([0, 1, 2, 3, 4, 5])
-         );
+         // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+         // not the whole ten.      
+      
+         expect(req.root()).toEqual([0, 1, 2, 3, 4, 5]);      
       });
    })
 
@@ -196,6 +170,29 @@ describe("oboe integration (real http)", function() {
          return now() > (waitStart + waitMs);
       }
    }
+   
+   var callbackSpy,
+       fullResponse,
+       aborted;
+   
+   function abortCallback() {
+      this.abort();
+      aborted = true;
+   }   
+   
+   function theRequestToBeAborted() {
+      return aborted
+   }   
+      
+   function whenDoneFn(obj) {
+      fullResponse = obj;
+   }
+
+   beforeEach(function () {
+      aborted = false;
+      fullResponse = null;
+      callbackSpy = jasmine.createSpy('callbackSpy');      
+   });   
 
 });  
 
