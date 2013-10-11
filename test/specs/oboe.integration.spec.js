@@ -171,8 +171,8 @@ describe("oboe integration (real http)", function() {
       .node('c', function(){ order.push(7) }) 
       .done(function(){      order.push(8) })
       
-      waitsFor(function(){ 
-         return order.length == 8 }, 'all 8 callbacks');
+      waitsFor(function(){ return order.length == 8 }, 
+         'all 8 callbacks', ASYNC_TEST_TIMEOUT);
       
       runs(function(){
          expect(order).toEqual([1,2,3,4,5,6,7,8]);
