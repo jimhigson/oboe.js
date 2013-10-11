@@ -294,9 +294,13 @@ module.exports = function (grunt) {
    ]);   
    
    grunt.registerTask('default',      [
+   
+      // init
       'clear',   
       'clean',
       'start-stream-source',
+      
+      // browser tasks
       'karma:single-dev', 
       'karma:single-browser-http',
       'concat:browser', 
@@ -313,6 +317,7 @@ module.exports = function (grunt) {
       'copy:nodeDist',
       'jasmine_node_oboe',
       
+      // how big are we?
       'dist-sizes'                                                            
    ]);
 
