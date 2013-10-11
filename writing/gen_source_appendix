@@ -14,6 +14,8 @@ FIRST=1
 
 cd ../writing
 
+rm $APPENDIX_MARKDOWN_DIR/* 
+
 for JS_FILE_NAME in $SRC_FILES; do
    MD_FILE=$APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
    
