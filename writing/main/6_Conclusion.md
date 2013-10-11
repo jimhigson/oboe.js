@@ -68,9 +68,19 @@ are tested.
 Although Clarinet is known to be slower than JSON.parse, in practice
 this didn't show in the results.
 
+Does not save memory over DOM parsing since the same DOM tree is built.
+May slightly increase memory usage by utilising memory earlier that
+would otherwise be dept dormant until the whole transmission is received
+but worst case more often a concern than mean.
+
 Doing things faster vs doing things earlier. "Hurry up and wait"
 approach to optimisation. Already know Clarinet is slower than browser's
 inbuilt parsing mechanism although not by a significant amount [^3]
+
+Parse time for large files spread out over a long time. Reaction to
+parsed content spread out over a long time, for example de-marshalling
+to domain objects. For UX may be preferable to have many small delays
+rather than one large one.
 
 Comparative Programmer Ergonomics
 ---------------------------------
@@ -135,14 +145,15 @@ discourage adoption.
 potential future work
 ---------------------
 
-implementation keeps 'unreachable' listeners difficult
+There is nothing about Oboe which precludes working with other tree-shaped
+markup formats. If there is demand, An XML/XPATH version seems like an obvious
+expansion.
+
+
+
+Implementation keeps 'unreachable' listeners difficult
 decidability/proof type problem to get completely right but could cover
 most of the easy cases
-
-Parse time for large files spread out over a long time. Reaction to
-parsed content spread out over a long time, for example de-marshalling
-to domain objects. For UX may be preferable to have many small delays
-rather than one large one.
 
 Doesn't support all of jsonpath. Not a strict subset of the language.
 
@@ -172,11 +183,6 @@ jsonPath that couldn't match anything. Invalid syntax is picked up.
 Could be confusing for user. Better to fail.
 
 ### Invalid JSONPath expressions
-
-Does not save memory over DOM parsing since the same DOM tree is built.
-May slightly increase memory usage by utilising memory earlier that
-would otherwise be dept dormant until the whole transmission is received
-but worst case more often a concern than mean.
 
 Implementation in a purely functional language with lazy evaluation:
 could it mean that only the necessary parts are computed? Could I have
