@@ -182,7 +182,7 @@ module.exports = function (grunt) {
             command: "echo Minified size to Browser is `wc -c < dist/oboe-browser.min.js` bytes" 
          },
          reportMinifiedAndGzippedSize:{
-            command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes (max 5120)"
+            command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes - max 5120"
          }
       }
       
