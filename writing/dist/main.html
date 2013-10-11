@@ -2234,6 +2234,10 @@ Chapter 4+5 40 to 60 pages
   greater certainty it allows over the correct functioning of the
   program.</p>
 
+  <p>Dual-implementation of same interface for streamingHttp might
+  be considered polymorphism, but a function not a class and both
+  are never loaded at run time.</p>
+
   <p>Largely for the sake of testing Oboe has also embraced
   dependency injection. This means that components do not create
   the further components that they require but rather rely on them
@@ -2767,17 +2771,257 @@ Chapter 4+5 40 to 60 pages
   <h1 id="conclusion"><a href="#conclusion"><span class=
   "header-section-number">6</span> Conclusion</a></h1>
 
-  <h2 id="benchmarking-vs-non-progressive-http"><a href=
-  "#benchmarking-vs-non-progressive-http"><span class=
+  <h2 id="benchmarking-vs-non-progressive-rest"><a href=
+  "#benchmarking-vs-non-progressive-rest"><span class=
   "header-section-number">6.1</span> Benchmarking vs
-  non-progressive http</a></h2>
+  non-progressive REST</a></h2>
+
+  <p>I feel it is important to experimentally answer the question,
+  <em>is this actually any faster?</em>. To do this I have created
+  a small benchmarking suite that runs under Node.js. I chose Node
+  because it at its code is a very basic platform which I feel it
+  gives a more repeatable environment than modern browsers which at
+  during the tests could be performing any number of background
+  tasks. These tests may be seen in the <code>benchmark</code>
+  folder of the project. Node also has the advantage in measuring
+  the memory of a running process is not swamped by the memory
+  taken up by the browser itself.</p>
+
+  <p>One of the proposed advantages of progressive REST is an
+  improved user experience because of earlier, more progressive
+  interface rendering and a perceptual improvement in speed. I am
+  not focusing on this area for benchmarking because it would be
+  much more difficult to measure, involving human participants.
+  While I can't provide numbers on the perceptual improvements, I
+  have created sites using Oboe and the improvement in
+  responsiveness over slower networks is large enough to be
+  obvious.</p>
+
+  <p>The benchmark mimics a relational database-backed REST
+  service. Relational databases serve data to a cursor one tuple at
+  a time. The simulated service writes out twenty tuples as JSON
+  objects, one every two milliseconds. To simulate network
+  slowness, Apple's <em>Network Line Conditioner</em> was used. I
+  chose the named presets "3G, Average Case" and "Cable modem" to
+  represent poor and good networks respectively.<sup><a href=
+  "#fn13" class="footnoteRef" id="fnref13" name=
+  "fnref13">13</a></sup> Each test involves two node processes, one
+  acting as the client and one as the server, with data transfer
+  between them via normal http.</p>
+
+  <p>Memory was measured using Node's built in memory reporting
+  tool at various points and the maximum figure returned on each
+  run was taken:<sup><a href="#fn14" class="footnoteRef" id=
+  "fnref14" name="fnref14">14</a></sup></p>
+
+  <h3 id="aggregating-services"><a href=
+  "#aggregating-services"><span class=
+  "header-section-number">6.1.1</span> Aggregating
+  services</a></h3>
+
+  <p>Each object in the returned JSON contains a URL to a further
+  resource. Each further resource is fetched and parsed. The
+  aggregation is complete when we have them all.</p>
+
+  <table>
+    <thead>
+      <tr class="header">
+        <th align="left">Strategy</th>
+
+        <th align="left">Network conditions</th>
+
+        <th align="left">Total time</th>
+
+        <th align="left">Max. Memory</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="odd">
+        <td align="left">Oboe.js</td>
+
+        <td align="left">Poor</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">Oboe.js</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="odd">
+        <td align="left">JSON.parse</td>
+
+        <td align="left">Poor</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">JSON.parse</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="odd">
+        <td align="left">Clarinet (SAX)</td>
+
+        <td align="left">Poor</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">Clarinet (SAX)</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="simple-download"><a href="#simple-download"><span class=
+  "header-section-number">6.1.2</span> Simple download</a></h3>
+
+  <p>This is a much simpler test which involved downloading just
+  one resource. To reduce the size of the data only good network
+  conditions are tested.</p>
+
+  <table>
+    <thead>
+      <tr class="header">
+        <th align="left">Strategy</th>
+
+        <th align="left">Network conditions</th>
+
+        <th align="left">Total time</th>
+
+        <th align="left">Max. Memory</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="odd">
+        <td align="left">Oboe.js</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">JSON.parse</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+
+      <tr class="odd">
+        <td align="left">Clarinet (SAX)</td>
+
+        <td align="left">Good</td>
+
+        <td align="left">?</td>
+
+        <td align="left">?</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="commentary-on-the-results"><a href=
+  "#commentary-on-the-results"><span class=
+  "header-section-number">6.1.3</span> Commentary on the
+  results</a></h3>
+
+  <p>Although Clarinet is known to be slower than JSON.parse, in
+  practice this didn't show in the results.</p>
+
+  <p>Does not save memory over DOM parsing since the same DOM tree
+  is built. May slightly increase memory usage by utilising memory
+  earlier that would otherwise be dept dormant until the whole
+  transmission is received but worst case more often a concern than
+  mean.</p>
 
   <p>Doing things faster vs doing things earlier. "Hurry up and
-  wait" approach to optimisation.</p>
+  wait" approach to optimisation. Already know Clarinet is slower
+  than browser's inbuilt parsing mechanism although not by a
+  significant amount<sup><a href="#fn15" class="footnoteRef" id=
+  "fnref15" name="fnref15">15</a></sup></p>
 
-  <p>Interesting article from Clarinet: <a href=
-  "http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">
-  http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a></p>
+  <p>Parse time for large files spread out over a long time.
+  Reaction to parsed content spread out over a long time, for
+  example de-marshalling to domain objects. For UX may be
+  preferable to have many small delays rather than one large
+  one.</p>
+
+  <h2 id="comparative-programmer-ergonomics"><a href=
+  "#comparative-programmer-ergonomics"><span class=
+  "header-section-number">6.2</span> Comparative Programmer
+  Ergonomics</a></h2>
+
+  <table>
+    <thead>
+      <tr class="header">
+        <th align="left">Strategy</th>
+
+        <th align="left">Lines of Code Required</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="odd">
+        <td align="left">Oboe.js</td>
+
+        <td align="left">not many</td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">JSON.parse</td>
+
+        <td align="left">bit more</td>
+      </tr>
+
+      <tr class="odd">
+        <td align="left">Clarinet (SAX)</td>
+
+        <td align="left">lots</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="vs-non-progressive-rest"><a href=
+  "#vs-non-progressive-rest"><span class=
+  "header-section-number">6.2.1</span> vs non-progressive
+  REST</a></h3>
+
+  <p>Consider difficulty in upgrades.</p>
+
+  <h3 id="vs-clarinet"><a href="#vs-clarinet"><span class=
+  "header-section-number">6.2.2</span> vs Clarinet</a></h3>
 
   <p>In terms of syntax: compare to SAX (clarinet) for getting the
   same job done. Draw examples from github project README. Or from
@@ -2790,36 +3034,8 @@ Chapter 4+5 40 to 60 pages
 
     <li>Ease of reading the program / clarity of code</li>
 
-    <li>Resources consumed</li>
-
-    <li>Performance (time) taken</li>
-
-    <li>about the same. Can react equally quickly to io in
-    progress, both largely io bound.</li>
-
-    <li>Is earlier really faster?</li>
+    <li>Ease of use vs SAX</li>
   </ul>
-
-  <h3 id="suitability-for-databases"><a href=
-  "#suitability-for-databases"><span class=
-  "header-section-number">6.1.1</span> Suitability for
-  databases</a></h3>
-
-  <p>Databases offer data one row at a time, not as a big lump.</p>
-
-  <h2 id="status-as-a-micro-lib"><a href=
-  "#status-as-a-micro-lib"><span class=
-  "header-section-number">6.2</span> Status as a micro-lib</a></h2>
-
-  <div class="figure">
-    <img src="images/placeholder.png" alt=
-    "A pie chart showing the sizes of the various parts of the codebase">
-
-    <p class="caption">A pie chart showing the sizes of the various
-    parts of the codebase</p>
-  </div>
-
-  <p>Comment on the size of the libraray</p>
 
   <h2 id="performance-of-code-styles-under-various-engines">
   <a href="#performance-of-code-styles-under-various-engines"><span class="header-section-number">
@@ -2832,7 +3048,7 @@ Chapter 4+5 40 to 60 pages
   <table>
     <thead>
       <tr class="header">
-        <th align="left">Browser</th>
+        <th align="left">Platform</th>
 
         <th align="right">Time</th>
       </tr>
@@ -2840,15 +3056,15 @@ Chapter 4+5 40 to 60 pages
 
     <tbody>
       <tr class="odd">
-        <td align="left">Firefox 24.0.0 (Mac OS X 10.7)</td>
+        <td align="left">Chrome 30.0.1599 (Mac OS X 10.7.5)</td>
 
-        <td align="right">547ms</td>
+        <td align="right">202ms</td>
       </tr>
 
       <tr class="even">
-        <td align="left">Chrome 30.0.1599 (Mac OS X 10.7.5)</td>
+        <td align="left">Safari 6.0.5 (Mac OS X 10.7.5)</td>
 
-        <td align="right">237ms</td>
+        <td align="right">231ms</td>
       </tr>
 
       <tr class="odd">
@@ -2859,15 +3075,21 @@ Chapter 4+5 40 to 60 pages
       </tr>
 
       <tr class="even">
-        <td align="left">Safari 6.0.5 (Mac OS X 10.7.5)</td>
+        <td align="left">IE 10.0.0 (Windows 8)</td>
 
-        <td align="right">231ms</td>
+        <td align="right">480ms</td>
       </tr>
 
       <tr class="odd">
+        <td align="left">Firefox 24.0.0 (Mac OS X 10.7)</td>
+
+        <td align="right">547ms</td>
+      </tr>
+
+      <tr class="even">
         <td align="left">IE 8.0.0 (Windows XP)</td>
 
-        <td align="right">3048ms</td>
+        <td align="right">3,048ms</td>
       </tr>
     </tbody>
   </table>
@@ -2884,165 +3106,82 @@ Chapter 4+5 40 to 60 pages
   an idealised CPU rather than an abstract machine capable of
   executing on an actual CPU.</p>
 
+  <h2 id="status-as-a-micro-library"><a href=
+  "#status-as-a-micro-library"><span class=
+  "header-section-number">6.4</span> Status as a
+  micro-library</a></h2>
+
+  <p>Built versions of Oboe as delivered reside in the project's
+  <code>dist</code> folder. The file
+  <code>oboe-browser.min.js</code> is the minified version which
+  should be sent to browsers gzipped. After gzip is applied this
+  file comes to 4966 bytes; close to but comfortably under the 5120
+  limit. At roughly the size as a very small image, the size of
+  Oboe should not discourage adoption.</p>
+
   <h2 id="potential-future-work"><a href=
   "#potential-future-work"><span class=
-  "header-section-number">6.4</span> potential future work</a></h2>
+  "header-section-number">6.5</span> potential future work</a></h2>
 
-  <p>implementation keeps 'unreachable' listeners difficult
-  decidability/proof type problem to get completely right but could
-  cover most of the easy cases</p>
+  <p>There is nothing about Oboe which precludes working with other
+  tree-shaped format. If there is demand, An XML/XPATH version
+  seems like an obvious expansion.</p>
 
-  <p>Parse time for large files spread out over a long time.
-  Reaction to parsed content spread out over a long time, for
-  example de-marshalling to domain objects. For UX may be
-  preferable to have many small delays rather than one large
-  one.</p>
+  <h1 id="fullness"><a href="#fullness"><span class=
+  "header-section-number">7</span> Fullness</a></h1>
 
-  <p>Doesn't support all of jsonpath. Not a strict subset of the
-  language.</p>
+  <p>Oboe stores all items that are parsed from the JSON it
+  receives, resulting in a memory use which is as high as a DOM
+  parser. These are kept in order to be able to provide a match to
+  any possible JSONPath expression. However, in most cases memory
+  would be saved if the parsed content were only stored so far as
+  is needed to provide matches against the JSONPath expressions
+  which have actually been registered. For typical use cases I
+  expect this would allow the non-storage of large branches.
+  Likewise, the current implementation takes a rather brute force
+  approach when examining node for pattern matches: check every
+  registered JSONPath expression against every node and path that
+  are found in the JSON. For many expressions we are able to know
+  there is no possibility of matching a JSON tree, either because
+  we have already matched or because the the current node's
+  ancestors already mandate failure. A more sophisticated programme
+  might disregard provably unsatisfiable handlers for the duration
+  of a subtree. Either of these changes would involve some rather
+  difficult programming and because matching is fast enough I think
+  brute force is the best approach for the time being.</p>
 
-  <h3 id="mutability"><a href="#mutability"><span class=
-  "header-section-number">6.4.1</span> Mutability</a></h3>
+  <p>During JSONPath matching much of the computation is repeated.
+  For example, matching the expression <code>b.*</code> against
+  many children of a common parent will repeat the same test,
+  checking if the parent's name is 'b', for each child node.
+  Because the JSONPath matching is stateless, recursive and
+  side-effect free there is a potential to cut out repeated
+  computation by using a functional cache. This would reduce the
+  overall amount of computation needed for JSONPath expressions
+  with common substrings to their left side or nodes with a common
+  ancestry. Current Javascript implementations make it difficult to
+  manage a functional cache, or caches in general, from inside the
+  language itself because there is no way to occupy only the unused
+  memory. Weak references are currently only experimentally
+  supported<sup><a href="#fn16" class="footnoteRef" id="fnref16"
+  name="fnref16">16</a></sup> but should they become common they
+  would be ideal to allow the runtime to manage memory used as a
+  non-essential cache.</p>
 
-  <p>Rest client as a library is passing mutable objects to the
-  caller. too inefficient to re-create a new map/array every time
-  an item is not as efficient in immutability as list head-tail
-  type storage</p>
-
-  <p>An immutability wrapper might be possible with defineProperty.
-  Can't casually overwrite via assignment but still possible to do
-  defineProperty again.</p>
-
-  <p>Would benefit from a stateless language where everything is
-  stateless at all times to avoid having to program
-  defensively.</p>
-
-  <h3 id="xml"><a href="#xml"><span class=
-  "header-section-number">6.4.2</span> XML</a></h3>
-
-  <p>Same pattern could be extended to XML. Or any tree-based
-  format. Text is easier but no reason why not binary
-  applications.</p>
-
-  <h3 id="jsonpath"><a href="#jsonpath"><span class=
-  "header-section-number">6.4.3</span> JSONPath</a></h3>
-
-  <p>Invalid jsonpaths made from otherwise valid clauses (for
-  example two roots) perhaps could fail early, at compile time.
-  Instead, get a jsonPath that couldn't match anything. Invalid
-  syntax is picked up. Could be confusing for user. Better to
-  fail.</p>
-
-  <h3 id="invalid-jsonpath-expressions"><a href=
-  "#invalid-jsonpath-expressions"><span class=
-  "header-section-number">6.4.4</span> Invalid JSONPath
-  expressions</a></h3>
-
-  <p>Does not save memory over DOM parsing since the same DOM tree
-  is built. May slightly increase memory usage by utilising memory
-  earlier that would otherwise be dept dormant until the whole
-  transmission is received but worst case more often a concern than
-  mean.</p>
-
-  <p>Implementation in a purely functional language with lazy
-  evaluation: could it mean that only the necessary parts are
-  computed? Could I have implemented the same in javascript?</p>
-
-  <p>Would be nice to:</p>
-
-  <ul>
-    <li>discard patterns that can't match any further parts of the
-    tree</li>
-
-    <li>discard branches of the tree that can't match any
-    patterns</li>
-
-    <li>just over the parsing of branches of the tree that provably
-    can't match any of the patterns</li>
-  </ul>
-
-  <h3 id="not-particularly-useful-reading-from-local-files.">
-  <a href=
-  "#not-particularly-useful-reading-from-local-files."><span class=
-  "header-section-number">6.4.5</span> Not particularly useful
-  reading from local files.</a></h3>
+  <p>The nodes which Oboe hands to callbacks are mutable meaning
+  that potentially the correct workings of the library could be
+  broken if the containing application carelessly alters them.
+  Newer implementations of Javascript allows a whole object to be
+  made immutable, or just certain properties via an immutability
+  decorator and the <code>defineProperty</code> method. This would
+  probably be an improvement.</p>
 
   <h1 id="appendix"><a href="#appendix"><span class=
-  "header-section-number">7</span> Appendix</a></h1>
-
-  <h2 id="browserapi.js"><a href="#browserapi.js"><span class=
-  "header-section-number">7.1</span> browserApi.js</a></h2>
-  <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class=
-"co">// export public API</span>
-<span class="ot">window</span>.<span class=
-"fu">oboe</span>          = <span class=
-"fu">apiMethod</span>(<span class="st">'GET'</span>);
-<span class="ot">window</span>.<span class=
-"ot">oboe</span>.<span class="fu">doGet</span>    = <span class=
-"ot">window</span>.<span class="fu">oboe</span>;
-<span class="ot">window</span>.<span class=
-"ot">oboe</span>.<span class="fu">doDelete</span> = <span class=
-"fu">apiMethod</span>(<span class="st">'DELETE'</span>);
-<span class="ot">window</span>.<span class=
-"ot">oboe</span>.<span class="fu">doPost</span>   = <span class=
-"fu">apiMethod</span>(<span class="st">'POST'</span>, <span class=
-"kw">true</span>);
-<span class="ot">window</span>.<span class=
-"ot">oboe</span>.<span class="fu">doPut</span>    = <span class=
-"fu">apiMethod</span>(<span class="st">'PUT'</span>, <span class=
-"kw">true</span>);
-
-<span class="kw">function</span> <span class=
-"fu">apiMethod</span>(httpMethodName, mayHaveRequestBody) {
-               
-   <span class="kw">return</span> <span class=
-"kw">function</span>(firstArg){
-           
-      <span class="kw">if</span> (<span class=
-"fu">isString</span>(firstArg)) {
-      
-         <span class=
-"co">// parameters specified as arguments</span>
-         <span class="co">//</span>
-         <span class=
-"co">//  if (mayHaveContext == true) method signature is:</span>
-         <span class="co">//     .doMethod( url, content )</span>
-         <span class="co">//</span>
-         <span class="co">//  else it is:</span>
-         <span class=
-"co">//     .doMethod( url )            </span>
-         <span class="co">//                                </span>
-         <span class="kw">return</span> <span class=
-"fu">wire</span>(
-                  httpMethodName,
-                  firstArg,                                  <span class="co">// url</span>
-                  mayHaveRequestBody &amp;&amp; arguments[<span class="dv">1</span>]         <span class="co">// body</span>
-         );
-      } <span class="kw">else</span> {
-      
-         <span class="co">// method signature is:</span>
-         <span class=
-"co">//    .doMethod({url:u, body:b, complete:c, headers:{...}})</span>
-         
-         <span class="kw">return</span> <span class=
-"fu">wire</span>(   
-                  httpMethodName,
-                  <span class="ot">firstArg</span>.<span class=
-"fu">url</span>,
-                  <span class="ot">firstArg</span>.<span class=
-"fu">body</span>,
-                  <span class="ot">firstArg</span>.<span class=
-"fu">headers</span> 
-         );
-      }
-   };
-}   </code>
-</pre>
+  "header-section-number">8</span> Appendix</a></h1>
 
   <h2 id="clarinetlisteneradaptor.js"><a href=
   "#clarinetlisteneradaptor.js"><span class=
-  "header-section-number">7.2</span>
+  "header-section-number">8.1</span>
   clarinetListenerAdaptor.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript">
@@ -3084,7 +3223,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="events.js"><a href="#events.js"><span class=
-  "header-section-number">7.3</span> events.js</a></h2>
+  "header-section-number">8.2</span> events.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -3112,7 +3251,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="functional.js"><a href="#functional.js"><span class=
-  "header-section-number">7.4</span> functional.js</a></h2>
+  "header-section-number">8.3</span> functional.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -3342,7 +3481,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="incrementalcontentbuilder.js"><a href=
   "#incrementalcontentbuilder.js"><span class=
-  "header-section-number">7.5</span>
+  "header-section-number">8.4</span>
   incrementalContentBuilder.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/** </span>
@@ -3637,7 +3776,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="instancecontroller.js"><a href=
   "#instancecontroller.js"><span class=
-  "header-section-number">7.6</span> instanceController.js</a></h2>
+  "header-section-number">8.5</span> instanceController.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -3874,7 +4013,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="jsonpath.js"><a href="#jsonpath.js"><span class=
-  "header-section-number">7.7</span> jsonPath.js</a></h2>
+  "header-section-number">8.6</span> jsonPath.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -4428,7 +4567,7 @@ Chapter 4+5 40 to 60 pages
 
   <h2 id="jsonpathsyntax.js"><a href=
   "#jsonpathsyntax.js"><span class=
-  "header-section-number">7.8</span> jsonPathSyntax.js</a></h2>
+  "header-section-number">8.7</span> jsonPathSyntax.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class=
 "kw">var</span> jsonPathSyntax = (<span class=
@@ -4613,7 +4752,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="lists.js"><a href="#lists.js"><span class=
-  "header-section-number">7.9</span> lists.js</a></h2>
+  "header-section-number">8.8</span> lists.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * Like cons in Lisp</span>
@@ -4771,7 +4910,7 @@ Chapter 4+5 40 to 60 pages
    <span class="kw">if</span>( list ){  
       <span class="fu">fn</span>(<span class=
 "fu">head</span>(list));
-      <span class="fu">all</span>(fn, <span class=
+      <span class="fu">each</span>(fn, <span class=
 "fu">tail</span>(list));
    }
 }
@@ -4804,7 +4943,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="pubsub.js"><a href="#pubsub.js"><span class=
-  "header-section-number">7.10</span> pubSub.js</a></h2>
+  "header-section-number">8.9</span> pubSub.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -4846,13 +4985,88 @@ Chapter 4+5 40 to 60 pages
 }</code>
 </pre>
 
-  <h2 id="streaminghttp.js"><a href=
-  "#streaminghttp.js"><span class="header-section-number">7.11</span>
-  streamingHttp.js</a></h2>
+  <h2 id="publicapi.js"><a href="#publicapi.js"><span class=
+  "header-section-number">8.10</span> publicApi.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class="co">/**</span>
+<code class="sourceCode javascript"><span class=
+"co">// export public API</span>
+<span class="kw">var</span> oboe = <span class=
+"fu">apiMethod</span>(<span class="st">'GET'</span>);
+<span class="ot">oboe</span>.<span class=
+"fu">doGet</span>    = oboe;
+<span class="ot">oboe</span>.<span class=
+"fu">doDelete</span> = <span class=
+"fu">apiMethod</span>(<span class="st">'DELETE'</span>);
+<span class="ot">oboe</span>.<span class=
+"fu">doPost</span>   = <span class=
+"fu">apiMethod</span>(<span class="st">'POST'</span>, <span class=
+"kw">true</span>);
+<span class="ot">oboe</span>.<span class=
+"fu">doPut</span>    = <span class=
+"fu">apiMethod</span>(<span class="st">'PUT'</span>, <span class=
+"kw">true</span>);
+
+<span class="kw">function</span> <span class=
+"fu">apiMethod</span>(httpMethodName, mayHaveRequestBody) {
+               
+   <span class="kw">return</span> <span class=
+"kw">function</span>(firstArg){
+           
+      <span class="kw">if</span> (<span class=
+"fu">isString</span>(firstArg)) {
+      
+         <span class=
+"co">// parameters specified as arguments</span>
+         <span class="co">//</span>
+         <span class=
+"co">//  if (mayHaveContext == true) method signature is:</span>
+         <span class="co">//     .doMethod( url, content )</span>
+         <span class="co">//</span>
+         <span class="co">//  else it is:</span>
+         <span class=
+"co">//     .doMethod( url )            </span>
+         <span class="co">//                                </span>
+         <span class="kw">return</span> <span class=
+"fu">wire</span>(
+                  httpMethodName,
+                  firstArg,                                  <span class="co">// url</span>
+                  mayHaveRequestBody &amp;&amp; arguments[<span class="dv">1</span>]         <span class="co">// body</span>
+         );
+      } <span class="kw">else</span> {
+      
+         <span class="co">// method signature is:</span>
+         <span class=
+"co">//    .doMethod({url:u, body:b, complete:c, headers:{...}})</span>
+         
+         <span class="kw">return</span> <span class=
+"fu">wire</span>(   
+                  httpMethodName,
+                  <span class="ot">firstArg</span>.<span class=
+"fu">url</span>,
+                  <span class="ot">firstArg</span>.<span class=
+"fu">body</span>,
+                  <span class="ot">firstArg</span>.<span class=
+"fu">headers</span> 
+         );
+      }
+   };
+}   </code>
+</pre>
+
+  <h2 id="streaminghttp-browser.js"><a href=
+  "#streaminghttp-browser.js"><span class=
+  "header-section-number">8.11</span>
+  streamingHttp-browser.js</a></h2>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"kw">function</span> <span class="fu">httpTransport</span>(){
+   <span class="kw">return</span> <span class=
+"kw">new</span> <span class="fu">XMLHttpRequest</span>();
+}
+
+<span class="co">/**</span>
 <span class=
-"co"> * An wrapper around the browser XmlHttpRequest object that raises an </span>
+"co"> * A wrapper around the browser XmlHttpRequest object that raises an </span>
 <span class=
 "co"> * event whenever a new part of the response is available.</span>
 <span class="co"> * </span>
@@ -4874,14 +5088,19 @@ Chapter 4+5 40 to 60 pages
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{XMLHttpRequest}</span><span class=
-"co"> xhr the xhr to use as the transport</span>
+"co"> xhr the xhr to use as the transport. Under normal</span>
+<span class=
+"co"> *          operation, will have been created using httpTransport() above</span>
+<span class=
+"co"> *          but for tests a stub can be provided instead.</span>
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{String}</span><span class=
 "co"> method one of 'GET' 'POST' 'PUT' 'DELETE'</span>
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
-"kw">{String}</span><span class="co"> url</span>
+"kw">{String}</span><span class=
+"co"> url the url to make a request to</span>
 <span class="co"> * </span><span class=
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{String|Object}</span><span class=
@@ -4892,7 +5111,7 @@ Chapter 4+5 40 to 60 pages
 "kw">@param</span><span class="co"> </span><span class=
 "kw">{Object}</span><span class=
 "co"> [headers] the http request headers to send                       </span>
-<span class="co"> */</span>
+<span class="co"> */</span>  
 <span class="kw">function</span> <span class=
 "fu">streamingHttp</span>(fire, on, xhr, method, url, data, headers) {
         
@@ -5006,28 +5225,181 @@ Chapter 4+5 40 to 60 pages
             <span class="fu">fire</span>( END_OF_CONTENT );
          } <span class="kw">else</span> {
          
-            <span class="fu">fire</span>( ERROR_EVENT );
+            <span class="fu">fire</span>( ERROR_EVENT, <span class=
+"ot">xhr</span>.<span class="fu">status</span> );
          }
       }
    };
 
-   <span class="ot">xhr</span>.<span class=
+   <span class="kw">try</span>{
+   
+      <span class="ot">xhr</span>.<span class=
 "fu">open</span>(method, url, <span class="kw">true</span>);
    
-   <span class="kw">for</span>( <span class=
+      <span class="kw">for</span>( <span class=
 "kw">var</span> headerName <span class="kw">in</span> headers ){
-      <span class="ot">xhr</span>.<span class=
+         <span class="ot">xhr</span>.<span class=
 "fu">setRequestHeader</span>(headerName, headers[headerName]);
-   }
-   
-   <span class="ot">xhr</span>.<span class=
+      }
+      
+      <span class="ot">xhr</span>.<span class=
 "fu">send</span>(<span class=
 "fu">validatedRequestBody</span>(data));
+      
+   } <span class="kw">catch</span>( e ) {
+      <span class=
+"co">// To keep a consistent interface with Node, we can't fire an event here.</span>
+      <span class=
+"co">// Node's streaming http adaptor receives the error as an asynchronous</span>
+      <span class=
+"co">// event rather than as an exception. If we fired now, the Oboe user</span>
+      <span class=
+"co">// has had no chance to add a .fail listener so there is no way</span>
+      <span class=
+"co">// the event could be useful. For both these reasons defer the</span>
+      <span class="co">// firing to the next JS frame.  </span>
+      <span class="ot">window</span>.<span class=
+"fu">setTimeout</span>(<span class=
+"fu">partialComplete</span>(fire, ERROR_EVENT, e), <span class=
+"dv">0</span>);
+   }            
+}</code>
+</pre>
+
+  <h2 id="streaminghttp-node.js"><a href=
+  "#streaminghttp-node.js"><span class=
+  "header-section-number">8.12</span>
+  streamingHttp-node.js</a></h2>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"kw">function</span> <span class="fu">httpTransport</span>(){
+   <span class="kw">return</span> <span class=
+"fu">require</span>(<span class="st">'http'</span>);
+}
+
+<span class="co">/**</span>
+<span class=
+"co"> * A wrapper around the browser XmlHttpRequest object that raises an </span>
+<span class=
+"co"> * event whenever a new part of the response is available.</span>
+<span class="co"> * </span>
+<span class=
+"co"> * In older browsers progressive reading is impossible so all the </span>
+<span class=
+"co"> * content is given in a single call. For newer ones several events</span>
+<span class=
+"co"> * should be raised, allowing progressive interpretation of the response.</span>
+<span class="co"> *      </span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{Function}</span><span class=
+"co"> fire a function to pass events to when something happens</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{Function}</span><span class=
+"co"> on a function to use to subscribe to events</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{XMLHttpRequest}</span><span class=
+"co"> http the http implementation to use as the transport. Under normal</span>
+<span class=
+"co"> *          operation, will have been created using httpTransport() above</span>
+<span class="co"> *          and therefore be Node's http</span>
+<span class=
+"co"> *          but for tests a stub may be provided instead.</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{String}</span><span class=
+"co"> method one of 'GET' 'POST' 'PUT' 'DELETE'</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{String}</span><span class=
+"co"> url the url to make a request to</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{String|Object}</span><span class=
+"co"> data some content to be sent with the request.</span>
+<span class=
+"co"> *                        Only valid if method is POST or PUT.</span>
+<span class="co"> * </span><span class=
+"kw">@param</span><span class="co"> </span><span class=
+"kw">{Object}</span><span class=
+"co"> [headers] the http request headers to send                       </span>
+<span class="co"> */</span>  
+<span class="kw">function</span> <span class=
+"fu">streamingHttp</span>(fire, on, http, method, url, data, headers) {
+                        
+   url = <span class="fu">require</span>(<span class=
+"st">'url'</span>).<span class="fu">parse</span>(<span class=
+"st">'http://'</span> + url);
+
+   <span class="kw">var</span> req = <span class=
+"ot">http</span>.<span class="fu">request</span>({
+      <span class="dt">hostname</span>: <span class=
+"ot">url</span>.<span class="fu">hostname</span>,
+      <span class="dt">port</span>: <span class=
+"ot">url</span>.<span class="fu">port</span>,
+      <span class="dt">path</span>: <span class=
+"ot">url</span>.<span class="fu">pathname</span>,
+      <span class="dt">method</span>: method,
+      <span class="dt">headers</span>: headers
+   }, <span class="kw">function</span>(res) {
+      
+      <span class="kw">var</span> statusCode = <span class=
+"ot">res</span>.<span class="fu">statusCode</span>,
+          sucessful = <span class=
+"fu">String</span>(statusCode)[<span class=
+"dv">0</span>] == <span class="dv">2</span>;
+                             
+      <span class="kw">if</span>( sucessful ) {          
+            
+         <span class="ot">res</span>.<span class=
+"fu">on</span>(<span class="st">'data'</span>, <span class=
+"kw">function</span> (chunk) {
+                           
+            <span class="fu">fire</span>( NEW_CONTENT, <span class=
+"ot">chunk</span>.<span class="fu">toString</span>() );
+         });
+         
+         <span class="ot">res</span>.<span class=
+"fu">on</span>(<span class="st">'end'</span>, <span class=
+"kw">function</span>() {
+                  
+            <span class="fu">fire</span>( END_OF_CONTENT );
+         });
+         
+      } <span class="kw">else</span> {
+      
+         <span class="fu">fire</span>( ERROR_EVENT, statusCode );
+      }
+   });
+   
+   <span class="ot">req</span>.<span class=
+"fu">on</span>(<span class="st">'error'</span>, <span class=
+"kw">function</span>(e) {
+      <span class="fu">fire</span>( ERROR_EVENT, e );
+   });
+   
+   <span class="fu">on</span>( ABORTING, <span class=
+"kw">function</span>(){              
+      <span class="ot">req</span>.<span class="fu">abort</span>();
+   });
+      
+   <span class="kw">if</span>( data ) {
+      <span class="kw">var</span> body = <span class=
+"fu">isString</span>(data)? data: <span class=
+"ot">JSON</span>.<span class="fu">stringify</span>(data);
+      <span class="ot">req</span>.<span class=
+"fu">write</span>(body);
+   }
+   
+   <span class="ot">req</span>.<span class="fu">end</span>();
+
 }</code>
 </pre>
 
   <h2 id="util.js"><a href="#util.js"><span class=
-  "header-section-number">7.12</span> util.js</a></h2>
+  "header-section-number">8.13</span> util.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -5103,7 +5475,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h2 id="wire.js"><a href="#wire.js"><span class=
-  "header-section-number">7.13</span> wire.js</a></h2>
+  "header-section-number">8.14</span> wire.js</a></h2>
   <pre class="sourceCode javascript">
 <code class="sourceCode javascript"><span class="co">/**</span>
 <span class=
@@ -5119,11 +5491,10 @@ Chapter 4+5 40 to 60 pages
    <span class="kw">var</span> eventBus = <span class=
 "fu">pubSub</span>();
                
-   <span class="fu">streamingHttp</span>(  <span class=
+   <span class="fu">streamingHttp</span>( <span class=
 "ot">eventBus</span>.<span class="fu">fire</span>, <span class=
 "ot">eventBus</span>.<span class="fu">on</span>,
-                  <span class="kw">new</span> <span class=
-"fu">XMLHttpRequest</span>(), 
+                  <span class="fu">httpTransport</span>(), 
                   httpMethodName, url, body, headers );                              
      
    <span class="kw">return</span> <span class=
@@ -5141,7 +5512,7 @@ Chapter 4+5 40 to 60 pages
 </pre>
 
   <h1 id="bibliography"><a href="#bibliography"><span class=
-  "header-section-number">8</span> Bibliography</a></h1>
+  "header-section-number">9</span> Bibliography</a></h1>
 
   <p>Ahuvia, Yogev. 2013. &acirc;&euro;&oelig;Design Patterns:
   Infinite Scrolling: Let&acirc;&euro;&trade;s Get To The Bottom Of
@@ -5253,63 +5624,52 @@ Chapter 4+5 40 to 60 pages
     <ol>
       <li id="fn1">
         <p><a href=
-        "https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js">
-        Https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js</a>
-        I can't claim superior programming ability, this version is
-        shorter because it is not a generic solution.<a href=
-        "#fnref1">&acirc;&dagger;&copy;</a></p>
+        "http://nodejs.org/api/process.html">Http://nodejs.org/api/process.html</a>#process_process_memoryusage.<a href="#fnref1">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn2">
         <p><a href=
-        "https://github.com/substack/http-browserify">Https://github.com/substack/http-browserify</a>.<a href="#fnref2">&acirc;&dagger;&copy;</a></p>
+        "http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">
+        Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref2">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn3">
         <p><a href=
-        "https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js">
-        Https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js</a>
-        I can't claim superior programming ability, this version is
-        shorter because it is not a generic solution.<a href=
-        "#fnref3">&acirc;&dagger;&copy;</a></p>
+        "http://nodejs.org/api/process.html">Http://nodejs.org/api/process.html</a>#process_process_memoryusage.<a href="#fnref3">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn4">
         <p><a href=
-        "https://github.com/substack/http-browserify">Https://github.com/substack/http-browserify</a>.<a href="#fnref4">&acirc;&dagger;&copy;</a></p>
+        "http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">
+        Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref4">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn5">
         <p><a href=
-        "https://github.com/substack/http-browserify">Https://github.com/substack/http-browserify</a>.<a href="#fnref5">&acirc;&dagger;&copy;</a></p>
+        "http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">
+        Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref5">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn6">
         <p><a href=
-        "https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js">
-        Https://github.com/jimhigson/oboe.js/blob/master/src/streamingHttp.js</a>
-        I can't claim superior programming ability, this version is
-        shorter because it is not a generic solution.<a href=
-        "#fnref6">&acirc;&dagger;&copy;</a></p>
+        "http://nodejs.org/api/process.html">Http://nodejs.org/api/process.html</a>#process_process_memoryusage.<a href="#fnref6">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn7">
-        <p>See <a href=
-        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/Object/freeze">
-        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze</a>.
-        Although older engines don't provide any ability to create
-        immutable objects at run-time, we can be fairly certain
-        that the code does not mutate these objects or the tests
-        would fail when run in environments which are able to
-        enforce this.<a href=
-        "#fnref7">&acirc;&dagger;&copy;</a></p>
+        <p><a href=
+        "http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">
+        Http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a>.<a href="#fnref7">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn8">
-        <p>JSONPath compiler from the first commit can be found at
-        line 159 here: <a href=
-        "https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js">
-        https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js</a>#L159.<a href="#fnref8">&acirc;&dagger;&copy;</a></p>
+        <p>At time of writing, Firefox is the only engine
+        supporting WeakHashMap by default. In Chome it is
+        implemented but not available to Javascript unless
+        explicitly enabled by a browser flag. <a href=
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/WeakMap">
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a>
+        retrieved 11th October 2013.<a href=
+        "#fnref8">&acirc;&dagger;&copy;</a></p>
       </li>
 
       <li id="fn9">
@@ -5337,6 +5697,34 @@ Chapter 4+5 40 to 60 pages
         <p><a href=
         "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions">
         Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref12">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn13">
+        <p><a href=
+        "http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">
+        Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref13">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn14">
+        <p><a href=
+        "http://nodejs.org/api/process.html">Http://nodejs.org/api/process.html</a>#process_process_memoryusage.<a href="#fnref14">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn15">
+        <p><a href=
+        "http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">
+        Http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a>.<a href="#fnref15">&acirc;&dagger;&copy;</a></p>
+      </li>
+
+      <li id="fn16">
+        <p>At time of writing, Firefox is the only engine
+        supporting WeakHashMap by default. In Chome it is
+        implemented but not available to Javascript unless
+        explicitly enabled by a browser flag. <a href=
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/WeakMap">
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a>
+        retrieved 11th October 2013.<a href=
+        "#fnref16">&acirc;&dagger;&copy;</a></p>
       </li>
     </ol>
   </div>
