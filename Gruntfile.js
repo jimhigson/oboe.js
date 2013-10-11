@@ -286,6 +286,7 @@ module.exports = function (grunt) {
    ]);
       
    grunt.registerTask('node-build',      [
+      'start-stream-source',   
       'concat:node', 
       'wrap:nodePackage',
       'copy:nodeDist',
@@ -306,7 +307,13 @@ module.exports = function (grunt) {
       'karma:single-concat',                                         
       'karma:single-minified',
       'node-build',      
-      'dist-sizes'                                                
+
+      'concat:node', 
+      'wrap:nodePackage',
+      'copy:nodeDist',
+      'jasmine_node_oboe',
+      
+      'dist-sizes'                                                            
    ]);
 
 };
