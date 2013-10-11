@@ -305,9 +305,9 @@ module.exports = function (grunt) {
       'uglify',
       'copy:browserDist',
       'karma:single-concat',                                         
-      'karma:single-minified',
-      'node-build',      
+      'karma:single-minified',     
 
+      // now node:
       'concat:node', 
       'wrap:nodePackage',
       'copy:nodeDist',
