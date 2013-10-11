@@ -161,10 +161,11 @@ resulting in a memory use which is as high as a DOM parser. These are
 kept in order to be able to provide a match to any possible JSONPath
 expression. However, in most cases memory would be saved if the parsed
 content were only stored so far as is needed to provide matches against
-the JSONPath expressions which have actually been registered. Likewise,
-the current implementation of testing for matches is rather brute force
-in nature: it tests every registered JSONPath expression against every
-node and path that are found in the JSON. For many expressions we are
+the JSONPath expressions which have actually been registered. For typical
+use cases I expect this would allow the non-storage of large branches.
+Likewise, the current implementation takes a rather brute force approach
+when examining node for pattern matches: check every registered JSONPath 
+expression against every node and path that are found in the JSON. For many expressions we are
 able to know there is no possibility of matching a JSON tree, either
 because we have already matched or because the the current node's
 ancestors already mandate failure. A more sophisticated programme might
@@ -184,38 +185,19 @@ Weak hash-maps will be available in near future. Good for this.
 
 ### Mutability
 
-Rest client as a library is passing mutable objects to the caller. too
-inefficient to re-create a new map/array every time an item is not as
-efficient in immutability as list head-tail type storage
+The nodes which Oboe hands to callbacks are mutable meaning that potentially
+the correct workings of the library could be broken if the containing application
+carelessly alters them. Newer implementations of Javascript allows a whole object 
+to be made immutable, or just certain properties via an immutability decorator and 
+the `defineProperty` method. This would probably be an improvement.
 
-An immutability wrapper might be possible with defineProperty. Can't
-casually overwrite via assignment but still possible to do
-defineProperty again.
-
-Would benefit from a stateless language where everything is stateless at
-all times to avoid having to program defensively.
-
-### JSONPath
+### Invalid JSONPath expressions
 
 Invalid jsonpaths made from otherwise valid clauses (for example two
 roots) perhaps could fail early, at compile time. Instead, get a
 jsonPath that couldn't match anything. Invalid syntax is picked up.
 Could be confusing for user. Better to fail.
 
-### Invalid JSONPath expressions
-
-Implementation in a purely functional language with lazy evaluation:
-could it mean that only the necessary parts are computed? Could I have
-implemented the same in javascript?
-
-Would be nice to:
-
--   discard patterns that can't match any further parts of the tree
--   discard branches of the tree that can't match any patterns
--   just over the parsing of branches of the tree that provably can't
-    match any of the patterns
-
-### Not particularly useful reading from local files.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
