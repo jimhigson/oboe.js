@@ -172,7 +172,7 @@ describe("oboe integration (real http)", function() {
       .done(function(){      order.push(8) })
       
       waitsFor(function(){ 
-      return order.length == 8 }, 'all 8 callbacks');
+         return order.length == 8 }, 'all 8 callbacks');
       
       runs(function(){
          expect(order).toEqual([1,2,3,4,5,6,7,8]);
