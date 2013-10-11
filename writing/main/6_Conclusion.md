@@ -173,18 +173,18 @@ time being.
 
 During JSONPath matching much of the computation is repeated. For
 example, matching the expression `b.*` against many children of a common
-parent will perform the exact same test of checking if the parent's name
-is 'b' for each child node. Because the JSONPath matching is stateless
-and side-effect free there is a potential to cut out repeated
-computation by using a functional cache. Current common Javascript
-implementations make it difficult to manage a functional cache from
-inside the language itself, or caches in general, because there is no
-way to occupy only the unused memory and a policy for periodically
-removing items would itself maintain a reference to the cache, meaning
-that it could not be garbage collected. Weak references are currently
-only experimentally supported but should they become common they would
-be ideal to allow the runtime to manage memory used as a non-essential
-cache. [^4]
+parent will repeat the same test, checking if the parent's name is 'b',
+for each child node. Because the JSONPath matching is stateless,
+recursive and side-effect free there is a potential to cut out repeated
+computation by using a functional cache. This would reduce the overall
+amount of computation needed for JSONPath expressions with common
+substrings to their left side or nodes with a common ancestry. Current
+Javascript implementations make it difficult to manage a functional
+cache, or caches in general, from inside the language itself because
+there is no way to occupy only the unused memory. Weak references are
+currently only experimentally supported[^4] but should they become
+common they would be ideal to allow the runtime to manage memory used as
+a non-essential cache.
 
 The nodes which Oboe hands to callbacks are mutable meaning that
 potentially the correct workings of the library could be broken if the
@@ -199,5 +199,8 @@ method. This would probably be an improvement.
 
 [^3]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
 
-[^4]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
+[^4]: At time of writing, Firefox is the only engine supporting
+    WeakHashMap by default. In Chome it is implemented but not available
+    to Javascript unless explicitly enabled by a browser flag.
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
     retrieved 11th October 2013
