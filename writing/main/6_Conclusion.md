@@ -152,10 +152,6 @@ an obvious expansion.
 Fullness
 ========
 
-Doesn't support all of jsonpath. Not a strict subset of the language.
-
-### Potential to improve efficiency
-
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
 kept in order to be able to provide a match to any possible JSONPath
@@ -180,11 +176,15 @@ example, matching the expression `b.*` against many children of a common
 parent will perform the exact same test of checking if the parent's name
 is 'b' for each child node. Because the JSONPath matching is stateless
 and side-effect free there is a potential to cut out repeated
-computation by using a functional cache.
-
-Weak hash-maps will be available in near future. Good for this.
-
-### Mutability
+computation by using a functional cache. Current common Javascript
+implementations make it difficult to manage a functional cache from
+inside the language itself, or caches in general, because there is no
+way to occupy only the unused memory and a policy for periodically
+removing items would itself maintain a reference to the cache, meaning
+that it could not be garbage collected. Weak references are currently
+only experimentally supported but should they become common they would
+be ideal to allow the runtime to manage memory used as a non-essential
+cache. [^4]
 
 The nodes which Oboe hands to callbacks are mutable meaning that
 potentially the correct workings of the library could be broken if the
@@ -193,15 +193,11 @@ Javascript allows a whole object to be made immutable, or just certain
 properties via an immutability decorator and the `defineProperty`
 method. This would probably be an improvement.
 
-### Invalid JSONPath expressions
-
-Invalid jsonpaths made from otherwise valid clauses (for example two
-roots) perhaps could fail early, at compile time. Instead, get a
-jsonPath that couldn't match anything. Invalid syntax is picked up.
-Could be confusing for user. Better to fail.
-
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
 [^2]: http://nodejs.org/api/process.html\#process\_process\_memoryusage
 
 [^3]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+
+[^4]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
+    retrieved 11th October 2013
