@@ -110,29 +110,42 @@ Consider:
 Performance of code styles under various engines
 ------------------------------------------------
 
-Complex JSONPath tested against JSON with approx 2,000 nodes, finding
-100 matches. Real http, full stack Oboe.
+Is the library fast enough?
 
-  Platform                                       Time
-  ----------------------------------------- ---------
-  Node.js v0.10.1
-  Chrome 30.0.1599 (Mac OS X 10.7.5)            202ms
-  Safari 6.0.5 (Mac OS X 10.7.5)                231ms
-  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)       431ms
-  IE 10.0.0 (Windows 8)                         480ms
-  Firefox 24.0.0 (Mac OS X 10.7)                547ms
-  IE 8.0.0 (Windows XP)                       3,048ms
+The file `test/specs/oboe.performance.spec.js` contains a simple
+benchmark. This test registeres a very complex JSONPath expression which
+intentionally uses all of the language and fetches a JSON file
+containing 100 objects, each with 8 String properties against .
+Correspondingly the expression is evaluated just over 800 times and 100
+matches are found. Although real http is used, it is kept within the
+localhost. The results below are averaged from ten runs. The tests were
+performed by a mid-range Macbook Air except for Chrome Mobile which was
+tested on an iPhone 5. Internet Explorer tests were performed inside a
+virtual machine.
 
-For example with only mono-morphic callsites and without a functional
-style. Once either of those programming techniques is taken up
-performance drops rapidly
-[http://rfrn.org/\~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-9571 ms vs 504 ms. When used in a functional style, not 'near-native' in
-the sense that not close to the performance gained by compiling a well
-designed functional language to natively executable code. Depends on
-style coded in, comparison to native somewhat takes C as the description
-of the operation of an idealised CPU rather than an abstract machine
-capable of executing on an actual CPU.
+  Platform                                  Total Time   Throughput (nodes per ms)
+  ----------------------------------------- -----------  ---------------------------
+  Node.js v0.10.1                           172ms        4.67
+  Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
+  Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
+  IE 10.0.0 (Windows 8)                     349ms        2.30
+  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)   431ms        1.86
+  Firefox 24.0.0 (Mac OS X 10.7)            547ms        1.47
+  IE 8.0.0 (Windows XP)                     3,048ms      0.26
+
+We can see that Firefox is much slower than other modern
+browsers. This is probably explicable by the SpiderMonkey just-in-time
+compiler used by Firefix being poor at optimising functional Javascript 
+[@functionalSpiderMonkey]. Because the JSON nodes are not of a common type
+the callsites are also not mono-morphic which Firefox also optimises badly 
+[@functionalSpiderMonkey]. When the test was repeated using a simpler JSONPath
+expression Firefox performed only slightly worse than the other browsers
+indicating that the functional pattern matching is the bottleneck.
+
+Of these results I find only the very low performance on old versions of Internet
+Explorer concerning, almost certainly slowing down the user experience more than 
+it speeds it up. It might be reasonable to conclude that for complex use cases 
+Oboe is currently not unsuited to legacy platforms.
 
 Status as a micro-library
 -------------------------
