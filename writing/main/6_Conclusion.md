@@ -4,12 +4,38 @@ Conclusion
 Benchmarking vs non-progressive REST
 ------------------------------------
 
-Doing things faster vs doing things earlier. "Hurry up and wait"
-approach to optimisation.
+I feel it is important to experimentally answer the question, *is this actually any faster?*.
+To do this I have created a benchmarking suite that runs under Node
+because I feel this gives a more repeatable environment than the browser. 
+One of the major advantages of progressive REST is an improved user experience
+because of earlier, more progressive interface rendering and a perceptual improvement
+in speed. I am not focusing on this area for benchmarking because it would be
+much more difficult to measure, involving human participants. While I can't
+provide numbers on the perceptual improvements, I have created sites using
+Oboe and the difference is obvious.  
+
+Consider:
+
+-   Resources (mem) consumed
+-   Is earlier really faster?
 
 Interesting article from Clarinet: All this says is that Clarinet is
-already known to be slower than JSON.parse http://writings.nunojob
-.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+already known to be slower than JSON.parse
+
+Doing things faster vs doing things earlier. "Hurry up and wait"
+approach to optimisation. Already know Clarinet is slower than browser's
+inbuilt parsing mechanism although not by a significant amount [^1]
+
+### Suitability for databases
+
+Databases offer data one row at a time, not as a big lump.
+
+Comparative Programmer Ergonomics
+---------------------------------
+
+### vs non-progressive REST
+
+### vs Clarinet
 
 In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
@@ -19,21 +45,7 @@ Consider:
 
 -   Difficulty to program
 -   Ease of reading the program / clarity of code
--   Resources consumed
--   Performance (time) taken
--   about the same. Can react equally quickly to io in progress, both
-    largely io bound.
--   Is earlier really faster?
-
-### Suitability for databases
-
-Databases offer data one row at a time, not as a big lump.
-
-Ease of use vs SAX
-------------------
-
-Programmer Ergonomics vs non-progressive REST
----------------------------------------------
+-   Ease of use vs SAX
 
 Status as a micro-lib
 ---------------------
@@ -42,6 +54,9 @@ Status as a micro-lib
 codebase](images/placeholder.png)
 
 Comment on the size of the libraray
+
+Most of the size comes from Clarinet.js inclusion. Comment on making a
+smaller version. c'net is \~30% pre-minification, \~60% post.
 
 Performance of code styles under various engines
 ------------------------------------------------
@@ -126,3 +141,5 @@ Would be nice to:
     match any of the patterns
 
 ### Not particularly useful reading from local files.
+
+[^1]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
