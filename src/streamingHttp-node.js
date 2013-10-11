@@ -58,8 +58,12 @@ function streamingHttp(fire, on, http, method, url, data, headers) {
          
       } else {
       
-         fire( ERROR_EVENT );
+         fire( ERROR_EVENT, statusCode );
       }
+   });
+   
+   req.on('error', function(e) {
+      fire( ERROR_EVENT, e );
    });
    
    on( ABORTING, function(){              

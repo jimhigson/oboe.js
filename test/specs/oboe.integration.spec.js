@@ -194,6 +194,21 @@ describe("oboe integration (real http)", function() {
          return gotError;
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('fires error on unreachable url', function () {
+
+      var gotError = false
+
+      oboe('examples.bomz:754196/fooz/barz')
+         .fail(function () {
+
+            gotError = true
+         });
+
+      waitsFor(function () {
+         return gotError;
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+   })   
 
    function someSecondsToPass(waitSecs) {
 

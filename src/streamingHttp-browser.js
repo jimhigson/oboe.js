@@ -95,16 +95,28 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             fire( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT );
+            fire( ERROR_EVENT, xhr.status );
          }
       }
    };
 
-   xhr.open(method, url, true);
+   try{
    
-   for( var headerName in headers ){
-      xhr.setRequestHeader(headerName, headers[headerName]);
-   }
+      xhr.open(method, url, true);
    
-   xhr.send(validatedRequestBody(data));
+      for( var headerName in headers ){
+         xhr.setRequestHeader(headerName, headers[headerName]);
+      }
+      
+      xhr.send(validatedRequestBody(data));
+      
+   } catch( e ) {
+      // To keep a consistent interface with Node, we can't fire an event here.
+      // Node's streaming http adaptor receives the error as an asynchronous
+      // event rather than as an exception. If we fired now, the Oboe user
+      // has had no chance to add a .fail listener so there is no way
+      // the event could be useful. For both these reasons defer the
+      // firing to the next JS frame.  
+      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+   }            
 }

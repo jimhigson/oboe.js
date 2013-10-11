@@ -1051,18 +1051,24 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             fire( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT );
+            fire( ERROR_EVENT, xhr.status );
          }
       }
    };
 
-   xhr.open(method, url, true);
+   try{
    
-   for( var headerName in headers ){
-      xhr.setRequestHeader(headerName, headers[headerName]);
-   }
+      xhr.open(method, url, true);
    
-   xhr.send(validatedRequestBody(data));
+      for( var headerName in headers ){
+         xhr.setRequestHeader(headerName, headers[headerName]);
+      }
+      
+      xhr.send(validatedRequestBody(data));
+      
+   } catch( e ) {
+      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+   }            
 }
 
 var jsonPathSyntax = (function() {
@@ -1771,7 +1777,7 @@ function pubSub(){
       }, 
     
       fire:function ( eventId, event ) {
-                              
+               
          each(
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
