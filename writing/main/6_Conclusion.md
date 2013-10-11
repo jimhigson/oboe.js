@@ -161,18 +161,19 @@ resulting in a memory use which is as high as a DOM parser. These are
 kept in order to be able to provide a match to any possible JSONPath
 expression. However, in most cases memory would be saved if the parsed
 content were only stored so far as is needed to provide matches against
-the JSONPath expressions which have actually been registered. For typical
-use cases I expect this would allow the non-storage of large branches.
-Likewise, the current implementation takes a rather brute force approach
-when examining node for pattern matches: check every registered JSONPath 
-expression against every node and path that are found in the JSON. For many expressions we are
-able to know there is no possibility of matching a JSON tree, either
-because we have already matched or because the the current node's
-ancestors already mandate failure. A more sophisticated programme might
-disregard provably unsatisfiable handlers for the duration of a subtree.
-Either of these changes would involve some rather difficult programming
-and because matching is fast enough I think brute force is the best
-approach for the time being.
+the JSONPath expressions which have actually been registered. For
+typical use cases I expect this would allow the non-storage of large
+branches. Likewise, the current implementation takes a rather brute
+force approach when examining node for pattern matches: check every
+registered JSONPath expression against every node and path that are
+found in the JSON. For many expressions we are able to know there is no
+possibility of matching a JSON tree, either because we have already
+matched or because the the current node's ancestors already mandate
+failure. A more sophisticated programme might disregard provably
+unsatisfiable handlers for the duration of a subtree. Either of these
+changes would involve some rather difficult programming and because
+matching is fast enough I think brute force is the best approach for the
+time being.
 
 During JSONPath matching much of the computation is repeated. For
 example, matching the expression `b.*` against many children of a common
@@ -185,11 +186,12 @@ Weak hash-maps will be available in near future. Good for this.
 
 ### Mutability
 
-The nodes which Oboe hands to callbacks are mutable meaning that potentially
-the correct workings of the library could be broken if the containing application
-carelessly alters them. Newer implementations of Javascript allows a whole object 
-to be made immutable, or just certain properties via an immutability decorator and 
-the `defineProperty` method. This would probably be an improvement.
+The nodes which Oboe hands to callbacks are mutable meaning that
+potentially the correct workings of the library could be broken if the
+containing application carelessly alters them. Newer implementations of
+Javascript allows a whole object to be made immutable, or just certain
+properties via an immutability decorator and the `defineProperty`
+method. This would probably be an improvement.
 
 ### Invalid JSONPath expressions
 
@@ -197,7 +199,6 @@ Invalid jsonpaths made from otherwise valid clauses (for example two
 roots) perhaps could fail early, at compile time. Instead, get a
 jsonPath that couldn't match anything. Invalid syntax is picked up.
 Could be confusing for user. Better to fail.
-
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
