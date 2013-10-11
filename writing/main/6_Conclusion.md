@@ -4,36 +4,86 @@ Conclusion
 Benchmarking vs non-progressive REST
 ------------------------------------
 
-I feel it is important to experimentally answer the question, *is this actually any faster?*.
-To do this I have created a benchmarking suite that runs under Node
-because I feel this gives a more repeatable environment than the browser. 
-One of the major advantages of progressive REST is an improved user experience
-because of earlier, more progressive interface rendering and a perceptual improvement
-in speed. I am not focusing on this area for benchmarking because it would be
-much more difficult to measure, involving human participants. While I can't
-provide numbers on the perceptual improvements, I have created sites using
-Oboe and the difference is obvious.  
+I feel it is important to experimentally answer the question, *is this
+actually any faster?*. To do this I have created a small benchmarking
+suite that runs under Node.js. I chose Node because it at its code is a
+very basic platform which I feel it gives a more repeatable environment
+than modern browsers which at during the tests could be performing any
+number of background tasks. These tests may be seen in the `benchmark`
+folder of the project. Node also has the advantage in measuring the
+memory of a running process is not swamped by the memory taken up by the
+browser itself.
 
-Consider:
+One of the proposed advantages of progressive REST is an improved user
+experience because of earlier, more progressive interface rendering and
+a perceptual improvement in speed. I am not focusing on this area for
+benchmarking because it would be much more difficult to measure,
+involving human participants. While I can't provide numbers on the
+perceptual improvements, I have created sites using Oboe and the
+improvement in responsiveness over slower networks is large enough to be
+obvious.
 
--   Resources (mem) consumed
--   Is earlier really faster?
+The benchmark mimics a relational database-backed REST service.
+Relational databases serve data to a cursor one tuple at a time. The
+simulated service writes out twenty tuples as JSON objects, one every
+two milliseconds. To simulate network slowness, Apple's *Network Line
+Conditioner* was used. I chose the named presets "3G, Average Case" and
+"Cable modem" to represent poor and good networks respectively [^1].
+Each test involves two node processes, one acting as the client and one
+as the server, with data transfer between them via normal http.
 
-Interesting article from Clarinet: All this says is that Clarinet is
-already known to be slower than JSON.parse
+Memory was measured using Node's built in memory reporting tool at
+various points and the maximum figure returned on each run was taken:
+[^2]
+
+### Aggregating services
+
+Each object in the returned JSON contains a URL to a further resource.
+Each further resource is fetched and parsed. The aggregation is complete
+when we have them all.
+
+  Strategy         Network conditions   Total time   Max. Memory
+  ---------------- -------------------- ------------ -------------
+  Oboe.js          Poor                 ?            ?
+  Oboe.js          Good                 ?            ?
+  JSON.parse       Poor                 ?            ?
+  JSON.parse       Good                 ?            ?
+  Clarinet (SAX)   Poor                 ?            ?
+  Clarinet (SAX)   Good                 ?            ?
+
+### Simple download
+
+This is a much simpler test which involved downloading just one
+resource. To reduce the size of the data only good network conditions
+are tested.
+
+  Strategy         Network conditions   Total time   Max. Memory
+  ---------------- -------------------- ------------ -------------
+  Oboe.js          Good                 ?            ?
+  JSON.parse       Good                 ?            ?
+  Clarinet (SAX)   Good                 ?            ?
+
+### Commentary on the results
+
+Although Clarinet is known to be slower than JSON.parse, in practice
+this didn't show in the results.
 
 Doing things faster vs doing things earlier. "Hurry up and wait"
 approach to optimisation. Already know Clarinet is slower than browser's
-inbuilt parsing mechanism although not by a significant amount [^1]
-
-### Suitability for databases
-
-Databases offer data one row at a time, not as a big lump.
+inbuilt parsing mechanism although not by a significant amount [^3]
 
 Comparative Programmer Ergonomics
 ---------------------------------
 
+  Strategy         Lines of Code Required
+  ---------------- ------------------------
+  Oboe.js          not many
+  JSON.parse       bit more
+  Clarinet (SAX)   lots
+
 ### vs non-progressive REST
+
+Consider difficulty in upgrades.
 
 ### vs Clarinet
 
@@ -142,4 +192,8 @@ Would be nice to:
 
 ### Not particularly useful reading from local files.
 
-[^1]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+[^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
+
+[^2]: http://nodejs.org/api/process.html\#process\_process\_memoryusage
+
+[^3]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
