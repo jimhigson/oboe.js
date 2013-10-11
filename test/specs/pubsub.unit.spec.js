@@ -39,16 +39,55 @@ describe('pub sub', function(){
    
       var events = pubSub(),
           listenerA = jasmine.createSpy('listenerA'),
-          listenerB = jasmine.createSpy('listenerB');
+          listenerA2 = jasmine.createSpy('listenerA2');
       
       events.on('eventA', listenerA);
-      events.on('eventA', listenerB);
+      events.on('eventA', listenerA2);
       
       events.fire('eventA');
       
       expect(listenerA).toHaveBeenCalled();
-      expect(listenerB).toHaveBeenCalled();           
+      expect(listenerA2).toHaveBeenCalled();           
    });
+   
+   it('should allow many listeners to be registered for an event', function(){
+   
+      var events = pubSub(),
+          listenerA = jasmine.createSpy('listenerA'),
+          listenerB = jasmine.createSpy('listenerB');
+      
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+      
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+      
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+      events.on('popularEventA', listenerA);
+      
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+      events.on('popularEventB', listenerB);
+                       
+      events.fire('popularEventB');
+      events.fire('popularEventA');
+      events.fire('popularEventB');
+      events.fire('popularEventA');
+      
+      expect(listenerA.calls.length).toBe(18);
+      expect(listenerB.calls.length).toBe(18);           
+   });   
    
    it('should have a chainable on function', function(){
    

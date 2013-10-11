@@ -333,7 +333,7 @@ function each(fn, list) {
 
    if( list ){  
       fn(head(list));
-      all(fn, tail(list));
+      each(fn, tail(list));
    }
 }
 
@@ -1163,7 +1163,7 @@ function pubSub(){
       }, 
     
       fire:function ( eventId, event ) {
-               
+                              
          each(
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]

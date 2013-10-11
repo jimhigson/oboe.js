@@ -111,6 +111,21 @@ describe("Lists", function(){
       expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
    });
    
+   it('may apply a function with side effects to each item of a list', function(){
+   
+      var callback = jasmine.createSpy();
+    
+      each( callback, list('a','b','c','d','e','f','g') );
+      
+      expect(callback).toHaveBeenCalledWith('a');
+      expect(callback).toHaveBeenCalledWith('b');
+      expect(callback).toHaveBeenCalledWith('c');
+      expect(callback).toHaveBeenCalledWith('d');
+      expect(callback).toHaveBeenCalledWith('e');
+      expect(callback).toHaveBeenCalledWith('f');
+      expect(callback).toHaveBeenCalledWith('g');   
+   });
+   
    beforeEach(function(){
       this.addMatchers({
          toBeFrozen: function(){

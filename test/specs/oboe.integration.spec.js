@@ -140,7 +140,7 @@ describe("oboe integration (real http)", function() {
       }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
    })
 
-   it('can listen for paths via noeejs-style syntax', function () {
+   it('can listen for paths via noedjs-style syntax', function () {
 
       var countGotBack = 0;
 
@@ -154,6 +154,31 @@ describe("oboe integration (real http)", function() {
          return countGotBack == 10
       }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('gets all callbacks and they are in correct order', function () {
+      var order = [];
+   
+      oboe.doPost({
+         url: url('echoBackBody')
+      ,  body: {a:'A', b:'B', c:'C'}
+      })
+      .path('!', function(){ order.push(1) })      
+      .path('a', function(){ order.push(2) })
+      .node('a', function(){ order.push(3) })      
+      .path('b', function(){ order.push(4) })
+      .node('b', function(){ order.push(5) })      
+      .path('c', function(){ order.push(6) })
+      .node('c', function(){ order.push(7) }) 
+      .done(function(){      order.push(8) })
+      
+      waitsFor(function(){ 
+      return order.length == 8 }, 'all 8 callbacks');
+      
+      runs(function(){
+         expect(order).toEqual([1,2,3,4,5,6,7,8]);
+      });   
+      
+   });   
 
    it('fires error on 404', function () {
 

@@ -123,7 +123,7 @@ function each(fn, list) {
 
    if( list ){  
       fn(head(list));
-      all(fn, tail(list));
+      each(fn, tail(list));
    }
 }
 
