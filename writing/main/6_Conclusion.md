@@ -113,13 +113,15 @@ Performance of code styles under various engines
 Complex JSONPath tested against JSON with approx 2,000 nodes, finding
 100 matches. Real http, full stack Oboe.
 
-  Platform                                      Time
-  ----------------------------------------- --------
-  Firefox 24.0.0 (Mac OS X 10.7)               547ms
-  Chrome 30.0.1599 (Mac OS X 10.7.5)           237ms
-  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)      431ms
-  Safari 6.0.5 (Mac OS X 10.7.5)               231ms
-  IE 8.0.0 (Windows XP)                       3048ms
+  Platform                                       Time
+  ----------------------------------------- ---------
+  Node.js v0.10.1
+  Chrome 30.0.1599 (Mac OS X 10.7.5)            202ms
+  Safari 6.0.5 (Mac OS X 10.7.5)                231ms
+  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)       431ms
+  IE 10.0.0 (Windows 8)                         480ms
+  Firefox 24.0.0 (Mac OS X 10.7)                547ms
+  IE 8.0.0 (Windows XP)                       3,048ms
 
 For example with only mono-morphic callsites and without a functional
 style. Once either of those programming techniques is taken up
