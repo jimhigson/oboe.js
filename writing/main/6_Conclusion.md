@@ -145,17 +145,42 @@ discourage adoption.
 potential future work
 ---------------------
 
-There is nothing about Oboe which precludes working with other tree-shaped
-markup formats. If there is demand, An XML/XPATH version seems like an obvious
-expansion.
+There is nothing about Oboe which precludes working with other
+tree-shaped format. If there is demand, An XML/XPATH version seems like
+an obvious expansion.
 
-
-
-Implementation keeps 'unreachable' listeners difficult
-decidability/proof type problem to get completely right but could cover
-most of the easy cases
+Fullness
+========
 
 Doesn't support all of jsonpath. Not a strict subset of the language.
+
+### Potential to improve efficiency
+
+Oboe stores all items that are parsed from the JSON it receives,
+resulting in a memory use which is as high as a DOM parser. These are
+kept in order to be able to provide a match to any possible JSONPath
+expression. However, in most cases memory would be saved if the parsed
+content were only stored so far as is needed to provide matches against
+the JSONPath expressions which have actually been registered. Likewise,
+the current implementation of testing for matches is rather brute force
+in nature: it tests every registered JSONPath expression against every
+node and path that are found in the JSON. For many expressions we are
+able to know there is no possibility of matching a JSON tree, either
+because we have already matched or because the the current node's
+ancestors already mandate failure. A more sophisticated programme might
+disregard provably unsatisfiable handlers for the duration of a subtree.
+Either of these changes would involve some rather difficult programming
+and because matching is fast enough I think brute force is the best
+approach for the time being.
+
+During JSONPath matching much of the computation is repeated. For
+example, matching the expression `b.*` against many children of a common
+parent will perform the exact same test of checking if the parent's name
+is 'b' for each child node. Because the JSONPath matching is stateless
+and side-effect free there is a potential to cut out repeated
+computation by using a functional cache.
+
+Weak hash-maps will be available in near future. Good for this.
 
 ### Mutability
 
@@ -169,11 +194,6 @@ defineProperty again.
 
 Would benefit from a stateless language where everything is stateless at
 all times to avoid having to program defensively.
-
-### XML
-
-Same pattern could be extended to XML. Or any tree-based format. Text is
-easier but no reason why not binary applications.
 
 ### JSONPath
 
