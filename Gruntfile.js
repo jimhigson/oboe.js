@@ -248,12 +248,12 @@ module.exports = function (grunt) {
    
       require('jasmine-node').executeSpecsInFolder({
             
-         "specFolders":[process.cwd() + '/test/specs/oboe.integration.spec.js'], 
+         "specFolders":[process.cwd() + '/test/specs/'], 
          "isVerbose":true, 
          "showColors":true, 
          "teamcity":false, 
          "useRequireJs":false, 
-         "regExpSpec":/.spec\.(js)$/, 
+         "regExpSpec":/oboe\.(?:integration|performance)\.spec\.(js)$/, 
          "junitreport":{"report":false, "savePath":"./reports/", "useDotNotation":true, "consolidate":true}, 
          "includeStackTrace":true, 
          "growl":false,

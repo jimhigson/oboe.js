@@ -206,8 +206,10 @@ describe("oboe integration (real http)", function() {
          });
 
       waitsFor(function () {
-         return gotError;
-      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+            return gotError;
+         }, 'the request to fail', 
+         30*1000 // need to allow time for DNS failure
+      )
    })   
 
    function someSecondsToPass(waitSecs) {
