@@ -97,17 +97,6 @@ Consider:
 -   Ease of reading the program / clarity of code
 -   Ease of use vs SAX
 
-Status as a micro-lib
----------------------
-
-![A pie chart showing the sizes of the various parts of the
-codebase](images/placeholder.png)
-
-Comment on the size of the libraray
-
-Most of the size comes from Clarinet.js inclusion. Comment on making a
-smaller version. c'net is \~30% pre-minification, \~60% post.
-
 Performance of code styles under various engines
 ------------------------------------------------
 
@@ -132,6 +121,16 @@ designed functional language to natively executable code. Depends on
 style coded in, comparison to native somewhat takes C as the description
 of the operation of an idealised CPU rather than an abstract machine
 capable of executing on an actual CPU.
+
+Status as a micro-library
+-------------------------
+
+Built versions of Oboe as delivered reside in the project's `dist`
+folder. The file `oboe-browser.min.js` is the minified version which
+should be sent to browsers gzipped. After gzip is applied this file
+comes to 4966 bytes; close to but comfortably under the 5120 limit. At
+roughly the size as a very small image, the size of Oboe should not
+discourage adoption.
 
 potential future work
 ---------------------
