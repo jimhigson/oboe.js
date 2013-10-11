@@ -23,14 +23,7 @@ function httpTransport(){
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(fire, on, http, method, url, data, headers) {
-         
-   function validatedRequestBody( body ) {
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }      
-               
+                        
    url = require('url').parse('http://' + url);
 
    var req = http.request({
@@ -69,11 +62,10 @@ function streamingHttp(fire, on, http, method, url, data, headers) {
    on( ABORTING, function(){              
       req.abort();
    });
-   
-   var body = validatedRequestBody(data);
-   
-   if( body ) {
-      req.write(validatedRequestBody(data));
+      
+   if( data ) {
+      var body = isString(data)? data: JSON.stringify(data);
+      req.write(body);
    }
    
    req.end();
