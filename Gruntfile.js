@@ -19,7 +19,7 @@ module.exports = function (grunt) {
    ,  'src/events.js'
    ,  'src/instanceController.js'
    ,  'src/wire.js'
-   ,  'src/browserApi.js'
+   ,  'src/publicApi.js'
    ];
    
    var OBOE_NODE_SOURCE_FILES = [
@@ -35,7 +35,7 @@ module.exports = function (grunt) {
    ,  'src/events.js'
    ,  'src/instanceController.js'
    ,  'src/wire.js'
-   ,  'src/browserApi.js'
+   ,  'src/publicApi.js'
    ];   
    
    var FILES_TRIGGERING_KARMA = [

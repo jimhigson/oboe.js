@@ -26,7 +26,7 @@ module.exports = function(config) {
       ,  'src/events.js'  
       ,  'src/instanceController.js'
       ,  'src/wire.js'
-      ,  'src/browserApi.js'
+      ,  'src/publicApi.js'
         
       ,  'test/specs/*.unit.spec.js'
       ,  'test/specs/*.component.spec.js'
