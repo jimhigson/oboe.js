@@ -1,5 +1,76 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 window.oboe = (function  (window, Object, Array, Error, undefined ) {
+/** 
+ * Partially complete a function.
+ * 
+ * Eg: 
+ *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );
+ *    
+ *    add3(4) // gives 7
+ */
+var partialComplete = varArgs(function( fn, boundArgs ) {
+
+      return varArgs(function( callArgs ) {
+               
+         return fn.apply(this, boundArgs.concat(callArgs));
+      }); 
+   }),
+
+
+/**
+ * Compose zero or more functions:
+ * 
+ *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))
+ * 
+ * The last (inner-most) function may take more than one parameter:
+ * 
+ *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
+ */
+   compose = varArgs(function(fns) {
+
+      var fnsList = arrayAsList(fns);
+   
+      function next(params, curFn) {  
+         return [apply(params, curFn)];   
+      }
+      
+      return varArgs(function(startParams){
+        
+         return foldR(next, startParams, fnsList)[0];
+      });
+   }),
+
+/**
+ * Call a list of functions with the same args until one returns a 
+ * truthy result. Similar to the || operator.
+ * 
+ * So:
+ *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
+ *      
+ * Is equivalent to: 
+ *      apply([p1, p2 ... pn], f1) || 
+ *      apply([p1, p2 ... pn], f2) || 
+ *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  
+ *  
+ * @returns the first return value that is given that is truthy.
+ */
+   lazyUnion = varArgs(function(fns) {
+
+      return varArgs(function(params){
+   
+         var maybeValue;
+   
+         for (var i = 0; i < len(fns); i++) {
+   
+            maybeValue = apply(params, fns[i]);
+   
+            if( maybeValue ) {
+               return maybeValue;
+            }
+         }
+      });
+   });   
+
 /**
  * This file declares various pieces of functional programming.
  * 
@@ -61,44 +132,6 @@ function varArgs(fn){
    }       
 }
 
-/** 
- * Partially complete a function.
- * 
- * Eg: 
- *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );
- *    
- *    add3(4) // gives 7
- */
-var partialComplete = varArgs(function( fn, boundArgs ) {
-
-      return varArgs(function( callArgs ) {
-               
-         return fn.apply(this, boundArgs.concat(callArgs));
-      }); 
-   }),
-
-/**
- * Compose zero or more functions:
- * 
- *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))
- * 
- * The last (inner-most) function may take more than one parameter:
- * 
- *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
- */
-   compose = varArgs(function(fns) {
-
-      var fnsList = arrayAsList(fns);
-   
-      function next(params, curFn) {  
-         return [apply(params, curFn)];   
-      }
-      
-      return varArgs(function(startParams){
-        
-         return foldR(next, startParams, fnsList)[0];
-      });
-   });
 
 /**
  * Swap the order of parameters to a binary function
@@ -111,36 +144,6 @@ function flip(fn){
    }
 }
 
-/**
- * Call a list of functions with the same args until one returns a 
- * truthy result. Similar to the || operator.
- * 
- * So:
- *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )
- *      
- * Is equivalent to: 
- *      apply([p1, p2 ... pn], f1) || 
- *      apply([p1, p2 ... pn], f2) || 
- *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  
- *  
- * @returns the first return value that is given that is truthy.
- */
-var lazyUnion = varArgs(function(fns) {
-
-   return varArgs(function(params){
-
-      var maybeValue;
-
-      for (var i = 0; i < len(fns); i++) {
-
-         maybeValue = apply(params, fns[i]);
-
-         if( maybeValue ) {
-            return maybeValue;
-         }
-      }
-   });
-});
 
 /**
  * Create a function which is the intersection of two other functions.
