@@ -26,7 +26,7 @@ obvious.
 The benchmark mimics a relational database-backed REST service.
 Relational databases serve data to a cursor one tuple at a time. The
 simulated service writes out twenty tuples as JSON objects, one every
-two milliseconds. To simulate network slowness, Apple's *Network Line
+ten milliseconds. To simulate network slowness, Apple's *Network Line
 Conditioner* was used. I chose the named presets "3G, Average Case" and
 "Cable modem" to represent poor and good networks respectively [^1].
 Each test involves two node processes, one acting as the client and one
@@ -42,20 +42,25 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy         Network conditions   Total time   Max. Memory
-  ---------------- -------------------- ------------ -------------
-  Oboe.js          Poor                 ?            ?
-  Oboe.js          Good                 ?            ?
-  JSON.parse       Poor                 ?            ?
-  JSON.parse       Good                 ?            ?
-  Clarinet (SAX)   Poor                 ?            ?
-  Clarinet (SAX)   Good                 ?            ?
+  Strategy         Network conditions     Total time (ms)   Max. Memory (Mb)
+  ---------------- -------------------- ----------------- ------------------
+  Oboe.js          Good                               804                6.2
+  Oboe.js          Poor                             1,526                6.2
+  JSON.parse       Good                             1,064                9,0
+  JSON.parse       Poor                             2,609                8.9
+  Clarinet (SAX)   Good                               781                5.5
+  Clarinet (SAX)   Poor                             1,510                5.5
+
+Sample may be too small for memory differences to apply. Clarinet shows
+some improvements but to really shine requires very large files.
 
 ### Simple download
 
 This is a much simpler test which involved downloading just one
 resource. To reduce the size of the data only good network conditions
 are tested.
+
+*What is the point of this?* Wont all be exactly the same?
 
   Strategy         Network conditions   Total time   Max. Memory
   ---------------- -------------------- ------------ -------------
@@ -85,21 +90,60 @@ rather than one large one.
 Comparative Programmer Ergonomics
 ---------------------------------
 
-  Strategy         Lines of Code Required
+In each case have laid out in the most natural way for the strategy.
+
+~~~~ {.javascript}
+oboe(DB_URL).node('{id url}.url', function(url){
+        
+   oboe(url).node('name', function(name){
+                   
+      console.log(name);               
+   });      
+});
+~~~~
+
+  Strategy           Lines of Code Required
   ---------------- ------------------------
-  Oboe.js          not many
-  JSON.parse       bit more
-  Clarinet (SAX)   lots
+  Oboe.js                                 3
+  JSON.parse                              5
+  Clarinet (SAX)                         30
 
 ### vs non-progressive REST
 
-Consider difficulty in upgrades.
+~~~~ {.javascript}
+getJson(DB_URL, function(err, records) {
+    
+   records.data.forEach( function( record ){
+    
+      var url = record.url;
+      
+      getJson(url, function(err, record) {
+      
+         console.log(record.name);
+      });
+   });
+});
+~~~~
+
+Considering effort required given minor changes in format. Very tightly
+coupled `records.data`, `record.url`, explicit looping, `record.name`
+whereas the Oboe version requires no programmatic descending into the
+output.
 
 ### vs Clarinet
 
 In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
 Clarinet's examples.
+
+Nobody could look at this source and see
+
+Although much of this extra code is plumbing to set up the parsing,
+nobody could deny that the ordering and layout of this code makes it
+difficult to follow. Must give generic names such as 'key' or 'value'
+for manual checking rather than being handed exactly what we need and
+able to receive it under a semantic name relating to its purpose rather
+than its representation in the markup.
 
 Consider:
 
@@ -110,7 +154,9 @@ Consider:
 Performance of code styles under various engines
 ------------------------------------------------
 
-Is the library fast enough?
+*Is the library fast enough?*
+
+Haven't put application against a profiler yet.
 
 The file `test/specs/oboe.performance.spec.js` contains a simple
 benchmark. This test registeres a very complex JSONPath expression which
@@ -118,13 +164,17 @@ intentionally uses all of the language and fetches a JSON file
 containing 100 objects, each with 8 String properties against .
 Correspondingly the expression is evaluated just over 800 times and 100
 matches are found. Although real http is used, it is kept within the
-localhost. The results below are averaged from ten runs. The tests were
-performed by a mid-range Macbook Air except for Chrome Mobile which was
-tested on an iPhone 5. Internet Explorer tests were performed inside a
+localhost. The results below are averaged from ten runs. The tests
+executed on a Macbook Air, except for Chrome Mobile which was tested on
+an iPhone 5. Tests requiring Microsoft Windows were performed inside a
 virtual machine.
 
+Curl is a simple download to stdout from the shell and is included as a
+control run to provide a baseline.
+
   Platform                                  Total Time   Throughput (nodes per ms)
-  ----------------------------------------- -----------  ---------------------------
+  ----------------------------------------- ------------ ---------------------------
+  Curl (control)                            60ms         *n/a*
   Node.js v0.10.1                           172ms        4.67
   Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
   Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
@@ -133,19 +183,42 @@ virtual machine.
   Firefox 24.0.0 (Mac OS X 10.7)            547ms        1.47
   IE 8.0.0 (Windows XP)                     3,048ms      0.26
 
-We can see that Firefox is much slower than other modern
-browsers. This is probably explicable by the SpiderMonkey just-in-time
-compiler used by Firefix being poor at optimising functional Javascript 
-[@functionalSpiderMonkey]. Because the JSON nodes are not of a common type
-the callsites are also not mono-morphic which Firefox also optimises badly 
-[@functionalSpiderMonkey]. When the test was repeated using a simpler JSONPath
-expression Firefox performed only slightly worse than the other browsers
-indicating that the functional pattern matching is the bottleneck.
+We can see that Firefox is much slower than other modern browsers
+despite its SpiderMonkey Javascript engine being normally quite fast.
+This is probably explicable in part by SpiderMonkey's just-in-time
+compiler being poor at optimising functional Javascript
+[@functionalSpiderMonkey]. Because the JSON nodes are not of a common
+type the related callsites are not monomorphic which Firefox also
+optimises poorly [@functionalSpiderMonkey]. When the test was repeated
+using a simpler JSONPath expression Firefox showed by far the largest
+improvement indicating that on this platform the functional pattern
+matching is the bottleneck.
 
-Of these results I find only the very low performance on old versions of Internet
-Explorer concerning, almost certainly slowing down the user experience more than 
-it speeds it up. It might be reasonable to conclude that for complex use cases 
-Oboe is currently not unsuited to legacy platforms.
+Of these results I find only the very low performance on old versions of
+Internet Explorer concerning, almost certainly degrading user experience
+more than it is improved. It might be reasonable to conclude that for
+complex use cases Oboe is currently not unsuited to legacy platforms.
+Since this platform cannot progressively interpret an XHR response, if
+performance on legacy platforms becomes a serious concern one option
+might be to create a non-progressive library with the same API which
+could be selectively delivered to those platforms in place of the main
+version.
+
+Nonetheless, in its current form Oboe may slow down the total time when
+working over the very fastest connections.
+
+For an imperative language coded in a functional style the compiler may
+not optimise as effectively as if a functional language was used. This
+is especially the case under a highly dynamic language in which
+everything, even the built-in constructs are mutable. I think Javascript
+was a good choice of language given it is already well adopted and
+allows the targeting of server and client side with only minimal effort,
+giving a very large number of applications with the potential to adopt
+Oboe. However, there are obvious inefficiencies such as the the descent
+and ancestor arrays which are always created to be handed to application
+callbacks but that I anticipate will be predominantly ignored. The
+design of Oboe is very amicable to implementation under a functional
+language and it would be interesting to see the results.
 
 Status as a micro-library
 -------------------------
@@ -158,14 +231,11 @@ roughly the size as a very small image, the size of Oboe should not
 discourage adoption.
 
 potential future work
----------------------
+=====================
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
 an obvious expansion.
-
-Fullness
-========
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
@@ -197,9 +267,8 @@ substrings to their left side or nodes with a common ancestry. Current
 Javascript implementations make it difficult to manage a functional
 cache, or caches in general, from inside the language itself because
 there is no way to occupy only the unused memory. Weak references are
-currently only experimentally supported[^4] but should they become
-common they would be ideal to allow the runtime to manage memory used as
-a non-essential cache.
+proposed in ECMAScript 6 but currently only experimentally
+supported[^4]. For future development they would be ideal.
 
 The nodes which Oboe hands to callbacks are mutable meaning that
 potentially the correct workings of the library could be broken if the
@@ -207,6 +276,9 @@ containing application carelessly alters them. Newer implementations of
 Javascript allows a whole object to be made immutable, or just certain
 properties via an immutability decorator and the `defineProperty`
 method. This would probably be an improvement.
+
+Under Node, accept any Stream. Untie from http. Would allow reading of
+files on disc, or from any network protocol.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
