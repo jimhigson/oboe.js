@@ -2800,7 +2800,7 @@ Chapter 4+5 40 to 60 pages
   <p>The benchmark mimics a relational database-backed REST
   service. Relational databases serve data to a cursor one tuple at
   a time. The simulated service writes out twenty tuples as JSON
-  objects, one every two milliseconds. To simulate network
+  objects, one every ten milliseconds. To simulate network
   slowness, Apple's <em>Network Line Conditioner</em> was used. I
   chose the named presets "3G, Average Case" and "Cable modem" to
   represent poor and good networks respectively.<sup><a href=
@@ -2830,9 +2830,9 @@ Chapter 4+5 40 to 60 pages
 
         <th align="left">Network conditions</th>
 
-        <th align="left">Total time</th>
+        <th align="right">Total time (ms)</th>
 
-        <th align="left">Max. Memory</th>
+        <th align="right">Max. Memory (Mb)</th>
       </tr>
     </thead>
 
@@ -2840,64 +2840,68 @@ Chapter 4+5 40 to 60 pages
       <tr class="odd">
         <td align="left">Oboe.js</td>
 
-        <td align="left">Poor</td>
+        <td align="left">Good</td>
 
-        <td align="left">?</td>
+        <td align="right">804</td>
 
-        <td align="left">?</td>
+        <td align="right">6.2</td>
       </tr>
 
       <tr class="even">
         <td align="left">Oboe.js</td>
 
-        <td align="left">Good</td>
+        <td align="left">Poor</td>
 
-        <td align="left">?</td>
+        <td align="right">1,526</td>
 
-        <td align="left">?</td>
+        <td align="right">6.2</td>
       </tr>
 
       <tr class="odd">
         <td align="left">JSON.parse</td>
 
-        <td align="left">Poor</td>
+        <td align="left">Good</td>
 
-        <td align="left">?</td>
+        <td align="right">1,064</td>
 
-        <td align="left">?</td>
+        <td align="right">9,0</td>
       </tr>
 
       <tr class="even">
         <td align="left">JSON.parse</td>
 
-        <td align="left">Good</td>
+        <td align="left">Poor</td>
 
-        <td align="left">?</td>
+        <td align="right">2,609</td>
 
-        <td align="left">?</td>
+        <td align="right">8.9</td>
       </tr>
 
       <tr class="odd">
         <td align="left">Clarinet (SAX)</td>
 
-        <td align="left">Poor</td>
+        <td align="left">Good</td>
 
-        <td align="left">?</td>
+        <td align="right">781</td>
 
-        <td align="left">?</td>
+        <td align="right">5.5</td>
       </tr>
 
       <tr class="even">
         <td align="left">Clarinet (SAX)</td>
 
-        <td align="left">Good</td>
+        <td align="left">Poor</td>
 
-        <td align="left">?</td>
+        <td align="right">1,510</td>
 
-        <td align="left">?</td>
+        <td align="right">5.5</td>
       </tr>
     </tbody>
   </table>
+
+  <p>Sample may be too small for memory differences to apply.
+  Clarinet shows some improvements but to really shine requires
+  very large files.</p>
 
   <h3 id="simple-download"><a href="#simple-download"><span class=
   "header-section-number">6.1.2</span> Simple download</a></h3>
@@ -2905,6 +2909,9 @@ Chapter 4+5 40 to 60 pages
   <p>This is a much simpler test which involved downloading just
   one resource. To reduce the size of the data only good network
   conditions are tested.</p>
+
+  <p><em>What is the point of this?</em> Wont all be exactly the
+  same?</p>
 
   <table>
     <thead>
@@ -2983,12 +2990,29 @@ Chapter 4+5 40 to 60 pages
   "header-section-number">6.2</span> Comparative Programmer
   Ergonomics</a></h2>
 
+  <p>In each case have laid out in the most natural way for the
+  strategy.</p>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">oboe</span>(DB_URL).<span class="fu">node</span>(<span class=
+"st">'{id url}.url'</span>, <span class="kw">function</span>(url){
+        
+   <span class="fu">oboe</span>(url).<span class=
+"fu">node</span>(<span class="st">'name'</span>, <span class=
+"kw">function</span>(name){
+                   
+      <span class="ot">console</span>.<span class=
+"fu">log</span>(name);               
+   });      
+});</code>
+</pre>
+
   <table>
     <thead>
       <tr class="header">
         <th align="left">Strategy</th>
 
-        <th align="left">Lines of Code Required</th>
+        <th align="right">Lines of Code Required</th>
       </tr>
     </thead>
 
@@ -2996,19 +3020,19 @@ Chapter 4+5 40 to 60 pages
       <tr class="odd">
         <td align="left">Oboe.js</td>
 
-        <td align="left">not many</td>
+        <td align="right">3</td>
       </tr>
 
       <tr class="even">
         <td align="left">JSON.parse</td>
 
-        <td align="left">bit more</td>
+        <td align="right">5</td>
       </tr>
 
       <tr class="odd">
         <td align="left">Clarinet (SAX)</td>
 
-        <td align="left">lots</td>
+        <td align="right">30</td>
       </tr>
     </tbody>
   </table>
@@ -3017,8 +3041,34 @@ Chapter 4+5 40 to 60 pages
   "#vs-non-progressive-rest"><span class=
   "header-section-number">6.2.1</span> vs non-progressive
   REST</a></h3>
+  <pre class="sourceCode javascript">
+<code class="sourceCode javascript"><span class=
+"fu">getJson</span>(DB_URL, <span class=
+"kw">function</span>(err, records) {
+    
+   <span class="ot">records</span>.<span class=
+"ot">data</span>.<span class="fu">forEach</span>( <span class=
+"kw">function</span>( record ){
+    
+      <span class="kw">var</span> url = <span class=
+"ot">record</span>.<span class="fu">url</span>;
+      
+      <span class="fu">getJson</span>(url, <span class=
+"kw">function</span>(err, record) {
+      
+         <span class="ot">console</span>.<span class=
+"fu">log</span>(<span class="ot">record</span>.<span class=
+"fu">name</span>);
+      });
+   });
+});</code>
+</pre>
 
-  <p>Consider difficulty in upgrades.</p>
+  <p>Considering effort required given minor changes in format.
+  Very tightly coupled <code>records.data</code>,
+  <code>record.url</code>, explicit looping,
+  <code>record.name</code> whereas the Oboe version requires no
+  programmatic descending into the output.</p>
 
   <h3 id="vs-clarinet"><a href="#vs-clarinet"><span class=
   "header-section-number">6.2.2</span> vs Clarinet</a></h3>
@@ -3026,6 +3076,16 @@ Chapter 4+5 40 to 60 pages
   <p>In terms of syntax: compare to SAX (clarinet) for getting the
   same job done. Draw examples from github project README. Or from
   reimplementing Clarinet's examples.</p>
+
+  <p>Nobody could look at this source and see</p>
+
+  <p>Although much of this extra code is plumbing to set up the
+  parsing, nobody could deny that the ordering and layout of this
+  code makes it difficult to follow. Must give generic names such
+  as 'key' or 'value' for manual checking rather than being handed
+  exactly what we need and able to receive it under a semantic name
+  relating to its purpose rather than its representation in the
+  markup.</p>
 
   <p>Consider:</p>
 
@@ -3042,69 +3102,144 @@ Chapter 4+5 40 to 60 pages
   6.3</span> Performance of code styles under various
   engines</a></h2>
 
-  <p>Complex JSONPath tested against JSON with approx 2,000 nodes,
-  finding 100 matches. Real http, full stack Oboe.</p>
+  <p><em>Is the library fast enough?</em></p>
+
+  <p>Haven't put application against a profiler yet.</p>
+
+  <p>The file <code>test/specs/oboe.performance.spec.js</code>
+  contains a simple benchmark. This test registeres a very complex
+  JSONPath expression which intentionally uses all of the language
+  and fetches a JSON file containing 100 objects, each with 8
+  String properties against . Correspondingly the expression is
+  evaluated just over 800 times and 100 matches are found. Although
+  real http is used, it is kept within the localhost. The results
+  below are averaged from ten runs. The tests executed on a Macbook
+  Air, except for Chrome Mobile which was tested on an iPhone 5.
+  Tests requiring Microsoft Windows were performed inside a virtual
+  machine.</p>
+
+  <p>Curl is a simple download to stdout from the shell and is
+  included as a control run to provide a baseline.</p>
 
   <table>
     <thead>
       <tr class="header">
         <th align="left">Platform</th>
 
-        <th align="right">Time</th>
+        <th align="left">Total Time</th>
+
+        <th align="left">Throughput (nodes per ms)</th>
       </tr>
     </thead>
 
     <tbody>
       <tr class="odd">
+        <td align="left">Curl (control)</td>
+
+        <td align="left">60ms</td>
+
+        <td align="left"><em>n/a</em></td>
+      </tr>
+
+      <tr class="even">
+        <td align="left">Node.js v0.10.1</td>
+
+        <td align="left">172ms</td>
+
+        <td align="left">4.67</td>
+      </tr>
+
+      <tr class="odd">
         <td align="left">Chrome 30.0.1599 (Mac OS X 10.7.5)</td>
 
-        <td align="right">202ms</td>
+        <td align="left">202ms</td>
+
+        <td align="left">3.98</td>
       </tr>
 
       <tr class="even">
         <td align="left">Safari 6.0.5 (Mac OS X 10.7.5)</td>
 
-        <td align="right">231ms</td>
+        <td align="left">231ms</td>
+
+        <td align="left">3.48</td>
       </tr>
 
       <tr class="odd">
-        <td align="left">Chrome Mobile iOS 30.0.1599 (iOS
-        7.0.2)</td>
+        <td align="left">IE 10.0.0 (Windows 8)</td>
 
-        <td align="right">431ms</td>
+        <td align="left">349ms</td>
+
+        <td align="left">2.30</td>
       </tr>
 
       <tr class="even">
-        <td align="left">IE 10.0.0 (Windows 8)</td>
+        <td align="left">Chrome Mobile iOS 30.0.1599 (iOS
+        7.0.2)</td>
 
-        <td align="right">480ms</td>
+        <td align="left">431ms</td>
+
+        <td align="left">1.86</td>
       </tr>
 
       <tr class="odd">
         <td align="left">Firefox 24.0.0 (Mac OS X 10.7)</td>
 
-        <td align="right">547ms</td>
+        <td align="left">547ms</td>
+
+        <td align="left">1.47</td>
       </tr>
 
       <tr class="even">
         <td align="left">IE 8.0.0 (Windows XP)</td>
 
-        <td align="right">3,048ms</td>
+        <td align="left">3,048ms</td>
+
+        <td align="left">0.26</td>
       </tr>
     </tbody>
   </table>
 
-  <p>For example with only mono-morphic callsites and without a
-  functional style. Once either of those programming techniques is
-  taken up performance drops rapidly [<a href=
-  "http://rfrn.org/">http://rfrn.org/</a>~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html]
-  9571 ms vs 504 ms. When used in a functional style, not
-  'near-native' in the sense that not close to the performance
-  gained by compiling a well designed functional language to
-  natively executable code. Depends on style coded in, comparison
-  to native somewhat takes C as the description of the operation of
-  an idealised CPU rather than an abstract machine capable of
-  executing on an actual CPU.</p>
+  <p>We can see that Firefox is much slower than other modern
+  browsers despite its SpiderMonkey Javascript engine being
+  normally quite fast. This is probably explicable in part by
+  SpiderMonkey's just-in-time compiler being poor at optimising
+  functional Javascript <span class="citation">(Guo 2013)</span>.
+  Because the JSON nodes are not of a common type the related
+  callsites are not monomorphic which Firefox also optimises poorly
+  <span class="citation">(Guo 2013)</span>. When the test was
+  repeated using a simpler JSONPath expression Firefox showed by
+  far the largest improvement indicating that on this platform the
+  functional pattern matching is the bottleneck.</p>
+
+  <p>Of these results I find only the very low performance on old
+  versions of Internet Explorer concerning, almost certainly
+  degrading user experience more than it is improved. It might be
+  reasonable to conclude that for complex use cases Oboe is
+  currently not unsuited to legacy platforms. Since this platform
+  cannot progressively interpret an XHR response, if performance on
+  legacy platforms becomes a serious concern one option might be to
+  create a non-progressive library with the same API which could be
+  selectively delivered to those platforms in place of the main
+  version.</p>
+
+  <p>Nonetheless, in its current form Oboe may slow down the total
+  time when working over the very fastest connections.</p>
+
+  <p>For an imperative language coded in a functional style the
+  compiler may not optimise as effectively as if a functional
+  language was used. This is especially the case under a highly
+  dynamic language in which everything, even the built-in
+  constructs are mutable. I think Javascript was a good choice of
+  language given it is already well adopted and allows the
+  targeting of server and client side with only minimal effort,
+  giving a very large number of applications with the potential to
+  adopt Oboe. However, there are obvious inefficiencies such as the
+  the descent and ancestor arrays which are always created to be
+  handed to application callbacks but that I anticipate will be
+  predominantly ignored. The design of Oboe is very amicable to
+  implementation under a functional language and it would be
+  interesting to see the results.</p>
 
   <h2 id="status-as-a-micro-library"><a href=
   "#status-as-a-micro-library"><span class=
@@ -3119,16 +3254,13 @@ Chapter 4+5 40 to 60 pages
   limit. At roughly the size as a very small image, the size of
   Oboe should not discourage adoption.</p>
 
-  <h2 id="potential-future-work"><a href=
+  <h1 id="potential-future-work"><a href=
   "#potential-future-work"><span class=
-  "header-section-number">6.5</span> potential future work</a></h2>
+  "header-section-number">7</span> potential future work</a></h1>
 
   <p>There is nothing about Oboe which precludes working with other
   tree-shaped format. If there is demand, An XML/XPATH version
   seems like an obvious expansion.</p>
-
-  <h1 id="fullness"><a href="#fullness"><span class=
-  "header-section-number">7</span> Fullness</a></h1>
 
   <p>Oboe stores all items that are parsed from the JSON it
   receives, resulting in a memory use which is as high as a DOM
@@ -3162,11 +3294,10 @@ Chapter 4+5 40 to 60 pages
   ancestry. Current Javascript implementations make it difficult to
   manage a functional cache, or caches in general, from inside the
   language itself because there is no way to occupy only the unused
-  memory. Weak references are currently only experimentally
-  supported<sup><a href="#fn16" class="footnoteRef" id="fnref16"
-  name="fnref16">16</a></sup> but should they become common they
-  would be ideal to allow the runtime to manage memory used as a
-  non-essential cache.</p>
+  memory. Weak references are proposed in ECMAScript 6 but
+  currently only experimentally supported<sup><a href="#fn16"
+  class="footnoteRef" id="fnref16" name="fnref16">16</a></sup>. For
+  future development they would be ideal.</p>
 
   <p>The nodes which Oboe hands to callbacks are mutable meaning
   that potentially the correct workings of the library could be
@@ -3175,6 +3306,9 @@ Chapter 4+5 40 to 60 pages
   made immutable, or just certain properties via an immutability
   decorator and the <code>defineProperty</code> method. This would
   probably be an improvement.</p>
+
+  <p>Under Node, accept any Stream. Untie from http. Would allow
+  reading of files on disc, or from any network protocol.</p>
 
   <h1 id="appendix"><a href="#appendix"><span class=
   "header-section-number">8</span> Appendix</a></h1>
@@ -3253,7 +3387,106 @@ Chapter 4+5 40 to 60 pages
   <h2 id="functional.js"><a href="#functional.js"><span class=
   "header-section-number">8.3</span> functional.js</a></h2>
   <pre class="sourceCode javascript">
-<code class="sourceCode javascript"><span class="co">/**</span>
+<code class="sourceCode javascript"><span class="co">/** </span>
+<span class="co"> * Partially complete a function.</span>
+<span class="co"> * </span>
+<span class="co"> * Eg: </span>
+<span class=
+"co"> *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );</span>
+<span class="co"> *    </span>
+<span class="co"> *    add3(4) // gives 7</span>
+<span class="co"> */</span>
+<span class="kw">var</span> partialComplete = <span class=
+"fu">varArgs</span>(<span class=
+"kw">function</span>( fn, boundArgs ) {
+
+      <span class="kw">return</span> <span class=
+"fu">varArgs</span>(<span class="kw">function</span>( callArgs ) {
+               
+         <span class="kw">return</span> <span class=
+"ot">fn</span>.<span class="fu">apply</span>(<span class=
+"kw">this</span>, <span class="ot">boundArgs</span>.<span class=
+"fu">concat</span>(callArgs));
+      }); 
+   }),
+
+
+<span class="co">/**</span>
+<span class="co"> * Compose zero or more functions:</span>
+<span class="co"> * </span>
+<span class=
+"co"> *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))</span>
+<span class="co"> * </span>
+<span class=
+"co"> * The last (inner-most) function may take more than one parameter:</span>
+<span class="co"> * </span>
+<span class=
+"co"> *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))</span>
+<span class="co"> */</span>
+   compose = <span class="fu">varArgs</span>(<span class=
+"kw">function</span>(fns) {
+
+      <span class="kw">var</span> fnsList = <span class=
+"fu">arrayAsList</span>(fns);
+   
+      <span class="kw">function</span> <span class=
+"fu">next</span>(params, curFn) {  
+         <span class="kw">return</span> [<span class=
+"fu">apply</span>(params, curFn)];   
+      }
+      
+      <span class="kw">return</span> <span class=
+"fu">varArgs</span>(<span class="kw">function</span>(startParams){
+        
+         <span class="kw">return</span> <span class=
+"fu">foldR</span>(next, startParams, fnsList)[<span class=
+"dv">0</span>];
+      });
+   }),
+
+<span class="co">/**</span>
+<span class=
+"co"> * Call a list of functions with the same args until one returns a </span>
+<span class=
+"co"> * truthy result. Similar to the || operator.</span>
+<span class="co"> * </span>
+<span class="co"> * So:</span>
+<span class=
+"co"> *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )</span>
+<span class="co"> *      </span>
+<span class="co"> * Is equivalent to: </span>
+<span class="co"> *      apply([p1, p2 ... pn], f1) || </span>
+<span class="co"> *      apply([p1, p2 ... pn], f2) || </span>
+<span class=
+"co"> *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  </span>
+<span class="co"> *  </span>
+<span class="co"> * </span><span class=
+"kw">@returns</span><span class=
+"co"> the first return value that is given that is truthy.</span>
+<span class="co"> */</span>
+   lazyUnion = <span class="fu">varArgs</span>(<span class=
+"kw">function</span>(fns) {
+
+      <span class="kw">return</span> <span class=
+"fu">varArgs</span>(<span class="kw">function</span>(params){
+   
+         <span class="kw">var</span> maybeValue;
+   
+         <span class="kw">for</span> (<span class=
+"kw">var</span> i = <span class="dv">0</span>; i &lt; <span class=
+"fu">len</span>(fns); i++) {
+   
+            maybeValue = <span class=
+"fu">apply</span>(params, fns[i]);
+   
+            <span class="kw">if</span>( maybeValue ) {
+               <span class="kw">return</span> maybeValue;
+            }
+         }
+      });
+   });   
+
+<span class="co">/**</span>
 <span class=
 "co"> * This file declares various pieces of functional programming.</span>
 <span class="co"> * </span>
@@ -3343,61 +3576,6 @@ Chapter 4+5 40 to 60 pages
    }       
 }
 
-<span class="co">/** </span>
-<span class="co"> * Partially complete a function.</span>
-<span class="co"> * </span>
-<span class="co"> * Eg: </span>
-<span class=
-"co"> *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );</span>
-<span class="co"> *    </span>
-<span class="co"> *    add3(4) // gives 7</span>
-<span class="co"> */</span>
-<span class="kw">var</span> partialComplete = <span class=
-"fu">varArgs</span>(<span class=
-"kw">function</span>( fn, boundArgs ) {
-
-      <span class="kw">return</span> <span class=
-"fu">varArgs</span>(<span class="kw">function</span>( callArgs ) {
-               
-         <span class="kw">return</span> <span class=
-"ot">fn</span>.<span class="fu">apply</span>(<span class=
-"kw">this</span>, <span class="ot">boundArgs</span>.<span class=
-"fu">concat</span>(callArgs));
-      }); 
-   }),
-
-<span class="co">/**</span>
-<span class="co"> * Compose zero or more functions:</span>
-<span class="co"> * </span>
-<span class=
-"co"> *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))</span>
-<span class="co"> * </span>
-<span class=
-"co"> * The last (inner-most) function may take more than one parameter:</span>
-<span class="co"> * </span>
-<span class=
-"co"> *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))</span>
-<span class="co"> */</span>
-   compose = <span class="fu">varArgs</span>(<span class=
-"kw">function</span>(fns) {
-
-      <span class="kw">var</span> fnsList = <span class=
-"fu">arrayAsList</span>(fns);
-   
-      <span class="kw">function</span> <span class=
-"fu">next</span>(params, curFn) {  
-         <span class="kw">return</span> [<span class=
-"fu">apply</span>(params, curFn)];   
-      }
-      
-      <span class="kw">return</span> <span class=
-"fu">varArgs</span>(<span class="kw">function</span>(startParams){
-        
-         <span class="kw">return</span> <span class=
-"fu">foldR</span>(next, startParams, fnsList)[<span class=
-"dv">0</span>];
-      });
-   });
 
 <span class="co">/**</span>
 <span class=
@@ -3414,47 +3592,6 @@ Chapter 4+5 40 to 60 pages
    }
 }
 
-<span class="co">/**</span>
-<span class=
-"co"> * Call a list of functions with the same args until one returns a </span>
-<span class=
-"co"> * truthy result. Similar to the || operator.</span>
-<span class="co"> * </span>
-<span class="co"> * So:</span>
-<span class=
-"co"> *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )</span>
-<span class="co"> *      </span>
-<span class="co"> * Is equivalent to: </span>
-<span class="co"> *      apply([p1, p2 ... pn], f1) || </span>
-<span class="co"> *      apply([p1, p2 ... pn], f2) || </span>
-<span class=
-"co"> *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  </span>
-<span class="co"> *  </span>
-<span class="co"> * </span><span class=
-"kw">@returns</span><span class=
-"co"> the first return value that is given that is truthy.</span>
-<span class="co"> */</span>
-<span class="kw">var</span> lazyUnion = <span class=
-"fu">varArgs</span>(<span class="kw">function</span>(fns) {
-
-   <span class="kw">return</span> <span class=
-"fu">varArgs</span>(<span class="kw">function</span>(params){
-
-      <span class="kw">var</span> maybeValue;
-
-      <span class="kw">for</span> (<span class=
-"kw">var</span> i = <span class="dv">0</span>; i &lt; <span class=
-"fu">len</span>(fns); i++) {
-
-         maybeValue = <span class=
-"fu">apply</span>(params, fns[i]);
-
-         <span class="kw">if</span>( maybeValue ) {
-            <span class="kw">return</span> maybeValue;
-         }
-      }
-   });
-});
 
 <span class="co">/**</span>
 <span class=
@@ -5329,18 +5466,25 @@ Chapter 4+5 40 to 60 pages
 <span class="kw">function</span> <span class=
 "fu">streamingHttp</span>(fire, on, http, method, url, data, headers) {
                         
-   url = <span class="fu">require</span>(<span class=
-"st">'url'</span>).<span class="fu">parse</span>(<span class=
-"st">'http://'</span> + url);
+   <span class="kw">if</span>( !<span class=
+"ot">url</span>.<span class="fu">match</span>(<span class=
+"ot">/http:</span><span class="fl">\/\/</span><span class=
+"ot">/</span>) ) {
+      url = <span class="st">'http://'</span> + url;
+   }                           
+                        
+   <span class="kw">var</span> parsedUrl = <span class=
+"fu">require</span>(<span class="st">'url'</span>).<span class=
+"fu">parse</span>(url);
 
    <span class="kw">var</span> req = <span class=
 "ot">http</span>.<span class="fu">request</span>({
       <span class="dt">hostname</span>: <span class=
-"ot">url</span>.<span class="fu">hostname</span>,
+"ot">parsedUrl</span>.<span class="fu">hostname</span>,
       <span class="dt">port</span>: <span class=
-"ot">url</span>.<span class="fu">port</span>,
+"ot">parsedUrl</span>.<span class="fu">port</span>,
       <span class="dt">path</span>: <span class=
-"ot">url</span>.<span class="fu">pathname</span>,
+"ot">parsedUrl</span>.<span class="fu">pathname</span>,
       <span class="dt">method</span>: method,
       <span class="dt">headers</span>: headers
    }, <span class="kw">function</span>(res) {
