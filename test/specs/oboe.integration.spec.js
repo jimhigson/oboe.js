@@ -44,7 +44,7 @@ describe("oboe integration (real http)", function() {
       });
    })
    
-   it('can make nested requests', function () {
+   it('can make nested requests from arrays', function () {
 
       oboe(url('tenSlowNumbers'))
          .node('![*]', function(outerNumber){
@@ -63,7 +63,26 @@ describe("oboe integration (real http)", function() {
          '100 callbacks', 
          30 * 1000 // makes a lot of requests so give it a while to complete
       );
-   })   
+   })
+   
+
+   it('continues to parse after a callback throws an exception', function () {
+
+      oboe(url('static/json/tenRecords.json'))
+         .node('{id name}', function(){
+                           
+            callbackSpy()
+            throw new Error('uh oh!');
+         })
+         .done(whenDoneFn);
+
+      waitsFor(
+         function () {
+            return !!(callbackSpy.calls.length == 10);
+         },
+         '100 callbacks'
+      );
+   })      
 
    it('can abort once some data has been found in streamed response', function () {
   
@@ -229,7 +248,7 @@ describe("oboe integration (real http)", function() {
       waitsFor(function () {
             return gotError;
          }, 'the request to fail', 
-         30*1000 // need to allow time for DNS failure
+         30*1000 // need to allow time for failure
       )
    })   
 
