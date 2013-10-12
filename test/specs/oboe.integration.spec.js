@@ -43,6 +43,27 @@ describe("oboe integration (real http)", function() {
 
       });
    })
+   
+   it('can make nested requests', function () {
+
+      oboe(url('tenSlowNumbers'))
+         .node('![*]', function(outerNumber){
+         
+            oboe(url('tenSlowNumbers'))
+               .node('![*]', function(innerNumber){               
+                  callbackSpy();
+               });            
+         })
+         .done(whenDoneFn);
+
+      waitsFor(
+         function () {
+            return !!(callbackSpy.calls.length == 100);
+         },
+         '100 callbacks', 
+         30 * 1000 // makes a lot of requests so give it a while to complete
+      );
+   })   
 
    it('can abort once some data has been found in streamed response', function () {
   
