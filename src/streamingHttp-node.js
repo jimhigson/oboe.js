@@ -24,12 +24,16 @@ function httpTransport(){
  */  
 function streamingHttp(fire, on, http, method, url, data, headers) {
                         
-   url = require('url').parse('http://' + url);
+   if( !url.match(/http:\/\//) ) {
+      url = 'http://' + url;
+   }                           
+                        
+   var parsedUrl = require('url').parse(url);
 
    var req = http.request({
-      hostname: url.hostname,
-      port: url.port,
-      path: url.pathname,
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port,
+      path: parsedUrl.pathname,
       method: method,
       headers: headers
    }, function(res) {

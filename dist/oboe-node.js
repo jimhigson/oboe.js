@@ -407,8 +407,7 @@ function httpTransport(){
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(fire, on, http, method, url, data, headers) {
-              
-   // add protocol if not already given. Only http supported for now.                        
+                        
    if( !url.match(/http:\/\//) ) {
       url = 'http://' + url;
    }                           
