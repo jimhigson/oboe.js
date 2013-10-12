@@ -41,7 +41,8 @@
     "node-simple-router": "~0.4.7",
     "grunt-concurrent": "~0.3.1",
     "color": "~0.4.4",
-    "jasmine-node": "~1.11.0"
+    "jasmine-node": "~1.11.0",
+    "get-json": "0.0.1"
   },
   "dependencies": {
     "clarinet": "~0.7.2"
