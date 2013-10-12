@@ -5,6 +5,9 @@
 
 var PORT = 4444;
 
+var TIME_BETWEEN_RECORDS = 15;
+var NUMBER_OF_RECORDS = 40;
+
 function sendJsonHeaders(res) {
    var JSON_MIME_TYPE = "application/octet-stream";
    res.setHeader("Content-Type", JSON_MIME_TYPE);
@@ -12,9 +15,6 @@ function sendJsonHeaders(res) {
 }
 
 function serveItemList(_req, res) {
-
-   var NUMBER_INTERVAL = 10;
-   var NUMBER_OF_RECORDS = 20;
 
    console.log('slow number server: send simulated database data');
 
@@ -26,7 +26,7 @@ function serveItemList(_req, res) {
 
       res.write(JSON.stringify({
          "id": i,
-         "url": "localhost:4444/item/" + i         
+         "url": "http://localhost:4444/item/" + i         
       }));
       
       if (i == NUMBER_OF_RECORDS) {
@@ -39,11 +39,10 @@ function serveItemList(_req, res) {
       } else {
          res.write(',');
       }
-           
       
       i++;  
 
-   }, NUMBER_INTERVAL);
+   }, TIME_BETWEEN_RECORDS);
 }
 
 function serveItem(req, res){
@@ -52,22 +51,24 @@ function serveItem(req, res){
    
    console.log('will output fake record with id', id);     
 
-   // the items served are all the same except for the id field.
-   // this is realistic looking but randomly generated object fro
-   // <project>/test/json/oneHundredrecords.json   
-   res.end(JSON.stringify({
-      "id" : id,
-      "url": "localhost:4444/item/" + id,      
-      "guid": "046447ee-da78-478c-b518-b612111942a5",
-      "picture": "http://placehold.it/32x32",
-      "age": 37,
-      "name": "Humanoid robot number " + id,
-      "company": "Robotomic",
-      "phone": "806-587-2379",
-      "email": "payton@robotomic.com"
-   }));
-   
-   console.log('output fake record');
+   setTimeout(function(){
+      // the items served are all the same except for the id field.
+      // this is realistic looking but randomly generated object fro
+      // <project>/test/json/oneHundredrecords.json   
+      res.end(JSON.stringify({
+         "id" : id,
+         "url": "http://localhost:4444/item/" + id,      
+         "guid": "046447ee-da78-478c-b518-b612111942a5",
+         "picture": "http://placehold.it/32x32",
+         "age": 37,
+         "name": "Humanoid robot number " + id,
+         "company": "Robotomic",
+         "phone": "806-587-2379",
+         "email": "payton@robotomic.com"
+      }));
+            
+   }, TIME_BETWEEN_RECORDS);
+
 }
 
 function routing() {

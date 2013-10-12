@@ -1,65 +1,114 @@
 
+/* call this script from the command line with first argument either
+    oboe, jsonParse, or clarinet.
+    
+   This script won't time the events, I'm using `time` on the command line
+   to keep things simple.
+ */
+
 require('color');
 
-var DB_URL = 'localhost:4444/db';  
+var DB_URL = 'http://localhost:4444/db';  
 
-function oboeReqInner(record) {
-
-   var oboe = require('../dist/oboe-node.js');
-
-   var url = record.url;
-                       
-   console.log('will make inner request to', url);
-              
-   // we have a record. Now get the item linked to:
-   
-   try {
-   
-      oboe(url).node('name', function(name){
-      
-         console.log(name);
-         //this.abort();                           
-      }).fail(function(e){
-      
-         console.log('error making request', url, e);            
-      });
-      
-   } catch(e){
-      console.log('!--- unpected error', e);
-   }
-      
-}
 
 function aggregateWithOboe() {
 
    var oboe = require('../dist/oboe-node.js');
-
-/*   oboe('localhost:4444/item/2')
-      .node('name', function(name){
-         console.log(name)
-      })
-      .fail(function(e){
-         console.log('there was an error', e);
-      });
-
-   return;*/
-
-   console.log('making request to ', DB_URL);
    
-   oboe(DB_URL)
-      .node('{id url}', oboeReqInner)
-      .fail(function(){
-         console.log('error in db request', e);
-      });
-                 
-   console.log('made request');      
+   oboe(DB_URL).node('{id url}.url', function(url){
+           
+      oboe(url).node('name', function(name){
+                      
+         console.log(name);
+         console.log( process.memoryUsage().heapUsed );         
+      });      
+   });                 
 }
 
 function aggregateWithJsonParse() {
+
+   var getJson = require('get-json');
+
+   getJson(DB_URL, function(err, records) {
+       
+      records.data.forEach( function( record ){
+       
+         var url = record.url;
+         
+         getJson(url, function(err, record) {
+            console.log(record.name);
+            console.log( process.memoryUsage().heapUsed );
+         });
+      });
+
+   });   
+
 }
 
+
 function aggregateWithClarinet() {
-   var clarinet = require('clarinet');
+
+   var clarinet = require('clarinet');   
+   var http = require('http');
+   var outerClarinetStream = clarinet.createStream();
+   var outerKey;
+   
+   var outerRequest = http.request(DB_URL, function(res) {
+                              
+      res.pipe(outerClarinetStream);
+   });
+   
+   outerClarinetStream = clarinet.createStream();
+      
+   outerRequest.end();
+      
+   outerClarinetStream.on('openobject', function( keyName ){      
+      if( keyName ) {
+         outerKey = keyName;      
+      }
+   });
+   
+   outerClarinetStream.on('key', function(keyName){
+      outerKey = keyName;
+   });
+   
+   outerClarinetStream.on('value', function(value){
+      if( outerKey == 'url' ) {
+         innerRequest(value)
+      }
+   });      
+   
+   
+   function innerRequest(url) {
+      
+      var innerRequest = http.request(url, function(res) {
+                                 
+         res.pipe(innerClarinetStream);
+      });
+      
+      var innerClarinetStream = clarinet.createStream();
+      
+      innerRequest.end();            
+      
+      var innerKey;
+      
+      innerClarinetStream.on('openobject', function( keyName ){      
+         if( keyName ) {
+            innerKey = keyName;      
+         }
+      });
+      
+      innerClarinetStream.on('key', function(keyName){
+         innerKey = keyName;
+      });
+      
+      innerClarinetStream.on('value', function(value){
+         if( innerKey == 'name' ) {
+            console.log( value )
+            console.log( process.memoryUsage().heapUsed );            
+         }
+      });            
+   }
 }
 
 var strategies = {
