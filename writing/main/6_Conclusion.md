@@ -76,7 +76,7 @@ Comparative Programmer Ergonomics
 ---------------------------------
 
 For each of the benchmarks above the code was laid out in the most natural
-way for the strategy under test. 
+way for the strategy under test.  
 
   Strategy            Code Required (lines)    Code required (chars)
   ---------------- ------------------------  -----------------------
@@ -96,9 +96,9 @@ oboe(DB_URL).node('{id url}.url', function(url){
 });
 ~~~~
 
-Non-progressive parsing was slightly longer, mostly because of an
-explicit `forEach` loop, an if statement and programmatically descending to 
-examine the results:
+Non-progressive parsing was slightly longer, requiring in addition 
+a loop, an if statement, and programmatically selecting specific parts 
+of the results:
 
 ~~~~ {.javascript}
 // JSON.parse 
@@ -118,12 +118,18 @@ getJson(DB_URL, function(err, records) {
 });
 ~~~~
 
-Considering effort required given minor changes in format. Very tightly
-coupled `records.data`, `record.url`, explicit looping, `record.name`
-whereas the Oboe version requires no programmatic descending into the
-output.
+The JSON.parse version is very closely coupled with the format that it is
+handling. We can see this in the fragments `records.data`, `record.url`, 
+`record.name` which expects to find sub-trees at very specific locations 
+in the JSON. The code might be said to contain a description of the format
+that it is for. Conversely, the Oboe version describes the format only so
+far as is needed to identify the parts that it is interested in; the remainder
+of the format could change and the code would continue to work. As well as
+being simpler to program against than the previous simplest mode, I believe
+this demonstrates a greater tolerance to change formats.
 
-### vs Clarinet
+
+See appendex (??) for the Clarinet version.
 
 In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
