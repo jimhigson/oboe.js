@@ -6,7 +6,11 @@
 
 FILE_LIST=$(find main -name "*.md" | sort)
 
-for f in $FILE_LIST; do 
-   cat $f
+for f in $FILE_LIST; do
+   # need to make footnote names unique by prepending the file they come from:
+    
+   filename=$(basename $f .md)
+   cat $f | sed -E "s/\[\^([0-9])\]/[^$filename\1]/g" 
+   
    echo; echo
 done
