@@ -222,7 +222,7 @@ roughly the size as a very small image, the size of Oboe should not
 discourage adoption.
 
 potential future work
-=====================
+---------------------
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
