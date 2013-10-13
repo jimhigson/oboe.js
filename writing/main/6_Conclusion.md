@@ -145,9 +145,9 @@ JSON.parse both allow names to be given by the meaning of the token.
 Performance of code styles under various engines
 ------------------------------------------------
 
-The 15% overhead of Oboe vs Clarinet suggests Oboe might be computationally
-expensive. With very fast networks the extra computation might outweigh a more 
-efficient i/o strategy.
+The 15% overhead of Oboe vs Clarinet suggests Oboe might be
+computationally expensive. With very fast networks the extra computation
+might outweigh a more efficient i/o strategy.
 
 The file `test/specs/oboe.performance.spec.js` contains a simple
 benchmark. This test registeres a very complex JSONPath expression which
@@ -226,7 +226,10 @@ potential future work
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
-an obvious expansion.
+an obvious expansion. Currently Oboe only operates on http traffic.
+While this restriction is reasonable in a Browser context, under Node it
+is unnecessarily limiting and should be lifted by allowing arbitrary
+streams to be read.
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
@@ -267,9 +270,6 @@ containing application carelessly alters them. Newer implementations of
 Javascript allows a whole object to be made immutable, or just certain
 properties via an immutability decorator and the `defineProperty`
 method. This would probably be an improvement.
-
-Under Node, accept any Stream. Untie from http. Would allow reading of
-files on disc, or from any network protocol.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
