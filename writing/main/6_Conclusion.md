@@ -42,14 +42,14 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy         Network conditions     Total time (ms)   Max. Memory (Mb)
-  ---------------- -------------------- ----------------- ------------------
-  Oboe.js          Good                               804                6.2
-  Oboe.js          Poor                             1,526                6.2
-  JSON.parse       Good                             1,064                9,0
-  JSON.parse       Poor                             2,609                8.9
-  Clarinet (SAX)   Good                               781                5.5
-  Clarinet (SAX)   Poor                             1,510                5.5
+  Strategy         Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
+  ---------------- --------- ------------------- ----------------- ------------------
+  Oboe.js          Good                       40               804                6.2
+  Oboe.js          Poor                       60             1,526                6.2
+  JSON.parse       Good                      984             1,064                9,0
+  JSON.parse       Poor                     2550             2,609                8.9
+  Clarinet (SAX)   Good                       34               781                5.5
+  Clarinet (SAX)   Poor                       58             1,510                5.5
 
 Sample may be too small for memory differences to apply. Clarinet shows
 some improvements but to really shine requires very large files.
