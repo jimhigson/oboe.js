@@ -32,9 +32,8 @@ Conditioner* was used. I chose the named presets "3G, Average Case" and
 Each test involves two node processes, one acting as the client and one
 as the server, with data transfer between them via normal http.
 
-Memory was measured using Node's built in memory reporting tool at
-various points and the maximum figure returned on each run was taken:
-[^2]
+Memory was measured using Node's built in memory reporting tool, 
+`process.memoryusage()` and the maximum figure returned on each run was taken
 
 ### Aggregating services
 
@@ -42,55 +41,50 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy         Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
-  ---------------- --------- ------------------- ----------------- ------------------
-  Oboe.js          Good                       40               804                6.2
-  Oboe.js          Poor                       60             1,526                6.2
-  JSON.parse       Good                      984             1,064                9,0
-  JSON.parse       Poor                     2550             2,609                8.9
-  Clarinet (SAX)   Good                       34               781                5.5
-  Clarinet (SAX)   Poor                       58             1,510                5.5
+  Strategy            Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
+  ----------------    --------- ------------------- ----------------- ------------------
+  Oboe.js             Good                       40               804                6.2
+  Oboe.js             Poor                       60             1,526                6.2
+  JSON.parse (DOM)    Good                      984             1,064                9,0
+  JSON.parse (DOM)    Poor                     2550             2,609                8.9
+  Clarinet (SAX)      Good                       34               781                5.5
+  Clarinet (SAX)      Poor                       52             1,510                5.5
 
-Sample may be too small for memory differences to apply. Clarinet shows
-some improvements but to really shine requires very large files.
+Vs Json.parse shows a dramatic improvement over first output of about 96% and 
+a smaller but significant improvement of about 40% in time required to complete the
+task. Oboe's performance in terms of time is about 15% slower than Clarinet; 
+since Oboe is built on Clarinet it could not be faster but I had hoped for these
+results to be closer.   
 
-### Simple download
+As expected, in this simulation of real-world usage, the extra computation  
+compared to JSON.parse which is needed by Oboe's more involved algorithms or Clarinet's
+less efficient parsing [^3] have been dwarfed by better i/o management. Reacting 
+earlier using slower handlers has been shown to be faster overall than reacting 
+later with quicker ones. I believe that this vindicates a focus on efficient
+management of i/o over faster algorithms. I believe that much programming takes a 
+"Hurry up and wait" approach by concentrating overly on optimal computation 
+rather than optimal i/o management. 
 
-This is a much simpler test which involved downloading just one
-resource. To reduce the size of the data only good network conditions
-are tested.
-
-*What is the point of this?* Wont all be exactly the same?
-
-  Strategy         Network conditions   Total time   Max. Memory
-  ---------------- -------------------- ------------ -------------
-  Oboe.js          Good                 ?            ?
-  JSON.parse       Good                 ?            ?
-  Clarinet (SAX)   Good                 ?            ?
-
-### Commentary on the results
-
-Although Clarinet is known to be slower than JSON.parse, in practice
-this didn't show in the results.
-
-Does not save memory over DOM parsing since the same DOM tree is built.
-May slightly increase memory usage by utilising memory earlier that
-would otherwise be dept dormant until the whole transmission is received
-but worst case more often a concern than mean.
-
-Doing things faster vs doing things earlier. "Hurry up and wait"
-approach to optimisation. Already know Clarinet is slower than browser's
-inbuilt parsing mechanism although not by a significant amount [^3]
-
-Parse time for large files spread out over a long time. Reaction to
-parsed content spread out over a long time, for example de-marshalling
-to domain objects. For UX may be preferable to have many small delays
-rather than one large one.
+There is an unexpected improvement vs JSON.parse in terms of memory usage. It is
+not clear why this would be but it may be attributable to the json fetching library
+used to simplify the JSON.parse tests having a large dependency tree. As expected,
+Clarinet shows the largest improvements in terms of memory usage. For very large
+JSON I would expect Clarinet's memory usage to remain roughly constant whilst the
+two approaches rise linearly with the size of the resource.
 
 Comparative Programmer Ergonomics
 ---------------------------------
 
-In each case have laid out in the most natural way for the strategy.
+For each of the benchmarks above the code was laid out in the most natural
+way for the strategy under test. 
+
+  Strategy            Code Required (lines)    Code required (chars)
+  ---------------- ------------------------  -----------------------
+  Oboe.js                                 3                       64
+  JSON.parse                              5                      102
+  Clarinet (SAX)                         30                    lots!
+
+Oboe was the shortest:
 
 ~~~~ {.javascript}
 oboe(DB_URL).node('{id url}.url', function(url){
@@ -102,25 +96,24 @@ oboe(DB_URL).node('{id url}.url', function(url){
 });
 ~~~~
 
-  Strategy           Lines of Code Required
-  ---------------- ------------------------
-  Oboe.js                                 3
-  JSON.parse                              5
-  Clarinet (SAX)                         30
-
-### vs non-progressive REST
+Non-progressive parsing was slightly longer, mostly because of an
+explicit `forEach` loop, an if statement and programmatically descending to 
+examine the results:
 
 ~~~~ {.javascript}
+// JSON.parse 
+
 getJson(DB_URL, function(err, records) {
     
    records.data.forEach( function( record ){
     
-      var url = record.url;
+      if( record.url ) {
       
-      getJson(url, function(err, record) {
-      
-         console.log(record.name);
-      });
+         getJson(record.url, function(err, record) {
+         
+            console.log(record.name);
+         });
+      }
    });
 });
 ~~~~
@@ -136,7 +129,8 @@ In terms of syntax: compare to SAX (clarinet) for getting the same job
 done. Draw examples from github project README. Or from reimplementing
 Clarinet's examples.
 
-Nobody could look at this source and see
+Nobody could look at this source and really understand what is being done
+without thinking about it for a long time.
 
 Although much of this extra code is plumbing to set up the parsing,
 nobody could deny that the ordering and layout of this code makes it
@@ -154,7 +148,7 @@ Consider:
 Performance of code styles under various engines
 ------------------------------------------------
 
-*Is the library fast enough?*
+Although Overall faster 
 
 Haven't put application against a profiler yet.
 
@@ -281,8 +275,6 @@ Under Node, accept any Stream. Untie from http. Would allow reading of
 files on disc, or from any network protocol.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
-
-[^2]: http://nodejs.org/api/process.html\#process\_process\_memoryusage
 
 [^3]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
 
