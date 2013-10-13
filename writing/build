@@ -16,9 +16,12 @@ echo made proposal pdf
 
 echo made main html
 
-cp images/*.png dist/images # TODO: step down from print-quality images!
+cp images/*.png dist/images
 
-echo copied png images for dist html
+# step down print-res images to a more sensible size for html files:
+sips -Z 512 dist/images/*.png
+
+echo copied and scaled down png images for dist html
 
 ./all_main | pandoc -f markdown+autolink_bare_uris --smart --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate --output=dist/main.pdf
 
