@@ -12,7 +12,7 @@ pandoc proposal.md -o dist/proposal.pdf
 
 echo made proposal pdf
 
-./all_main | pandoc -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --output=dist/main.html
+./all_main | pandoc -s -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --output=dist/main.html
 
 echo made main html
 

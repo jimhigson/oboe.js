@@ -1,3 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Jim Higson" />
+  <title>Oboe.js: An approach to i/o for rest clients which is neither batch nor stream; nor SAX nor DOM</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Oboe.js: An approach to i/o for rest clients which is neither batch nor stream; nor SAX nor DOM</h1>
+<h2 class="author">Jim Higson</h2>
+<h3 class="date">2013</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#abstract"><span class="toc-section-number">1</span> Abstract</a></li>
+<li><a href="#introduction"><span class="toc-section-number">2</span> Introduction</a><ul>
+<li><a href="#rest-aggregation-could-be-faster"><span class="toc-section-number">2.1</span> REST aggregation could be faster</a></li>
+<li><a href="#stepping-outside-the-big-small-tradeoff"><span class="toc-section-number">2.2</span> Stepping outside the big-small tradeoff</a></li>
+<li><a href="#staying-fast-on-a-fallible-network"><span class="toc-section-number">2.3</span> Staying fast on a fallible network</a></li>
+<li><a href="#agile-methodologies-frequent-deployments-and-compatibility-today-with-versions-tomorrow"><span class="toc-section-number">2.4</span> Agile methodologies, frequent deployments, and compatibility today with versions tomorrow</a></li>
+<li><a href="#deliverables"><span class="toc-section-number">2.5</span> Deliverables</a></li>
+<li><a href="#criteria-for-success"><span class="toc-section-number">2.6</span> Criteria for success</a></li>
+</ul></li>
+<li><a href="#background"><span class="toc-section-number">3</span> Background</a><ul>
+<li><a href="#the-web-as-an-application-platform"><span class="toc-section-number">3.1</span> The web as an application platform</a></li>
+<li><a href="#node.js"><span class="toc-section-number">3.2</span> Node.js</a></li>
+<li><a href="#streams-in-node"><span class="toc-section-number">3.3</span> Streams in Node</a></li>
+<li><a href="#web-browsers-hosting-rest-clients"><span class="toc-section-number">3.4</span> Web browsers hosting REST clients</a></li>
+<li><a href="#browser-streaming-frameworks"><span class="toc-section-number">3.5</span> Browser streaming frameworks</a></li>
+<li><a href="#json-and-xml"><span class="toc-section-number">3.6</span> Json and XML</a></li>
+<li><a href="#parsing-sax-and-dom"><span class="toc-section-number">3.7</span> Parsing: SAX and Dom</a></li>
+<li><a href="#common-patterns-when-connecting-to-rest-services"><span class="toc-section-number">3.8</span> Common patterns when connecting to REST services</a></li>
+<li><a href="#jsonpath-and-xpath"><span class="toc-section-number">3.9</span> JsonPath and XPath</a></li>
+<li><a href="#testing"><span class="toc-section-number">3.10</span> Testing</a></li>
+</ul></li>
+<li><a href="#design-and-reflection"><span class="toc-section-number">4</span> Design and Reflection:</a><ul>
+<li><a href="#jsonpath-and-types"><span class="toc-section-number">4.1</span> JSONPath and types</a></li>
+<li><a href="#jsonpath-improving-stability-over-upgrades"><span class="toc-section-number">4.2</span> JSONPath improving stability over upgrades</a></li>
+<li><a href="#importing-css4-selector-capturing-to-oboe-jsonpath"><span class="toc-section-number">4.3</span> Importing CSS4 selector capturing to Oboe JSONPath</a></li>
+<li><a href="#parsing-the-json-response"><span class="toc-section-number">4.4</span> Parsing the JSON Response</a></li>
+<li><a href="#api-design"><span class="toc-section-number">4.5</span> API design</a></li>
+<li><a href="#earlier-callbacks-when-paths-are-matched"><span class="toc-section-number">4.6</span> Earlier callbacks when paths are matched</a></li>
+<li><a href="#oboe.js-as-a-micro-library"><span class="toc-section-number">4.7</span> Oboe.js as a Micro-Library</a></li>
+<li><a href="#handling-transport-failures"><span class="toc-section-number">4.8</span> Handling transport failures</a></li>
+<li><a href="#fallback-support-on-less-capable-platforms"><span class="toc-section-number">4.9</span> Fallback support on less-capable platforms</a></li>
+</ul></li>
+<li><a href="#implementation"><span class="toc-section-number">5</span> Implementation</a><ul>
+<li><a href="#components-of-the-project"><span class="toc-section-number">5.1</span> Components of the project</a></li>
+<li><a href="#automated-testing"><span class="toc-section-number">5.2</span> Automated testing</a></li>
+<li><a href="#running-the-tests"><span class="toc-section-number">5.3</span> Running the tests</a></li>
+<li><a href="#packaging-as-a-single-distributable-file"><span class="toc-section-number">5.4</span> Packaging as a single, distributable file</a></li>
+<li><a href="#styles-of-programming"><span class="toc-section-number">5.5</span> Styles of Programming</a></li>
+<li><a href="#incrementally-building-up-the-content"><span class="toc-section-number">5.6</span> Incrementally building up the content</a></li>
+<li><a href="#oboe-jsonpath-implementation"><span class="toc-section-number">5.7</span> Oboe JSONPath Implementation</a></li>
+</ul></li>
+<li><a href="#conclusion"><span class="toc-section-number">6</span> Conclusion</a><ul>
+<li><a href="#benchmarking-vs-non-progressive-rest"><span class="toc-section-number">6.1</span> Benchmarking vs non-progressive REST</a><ul>
+<li><a href="#aggregating-services"><span class="toc-section-number">6.1.1</span> Aggregating services</a></li>
+</ul></li>
+<li><a href="#comparative-programmer-ergonomics"><span class="toc-section-number">6.2</span> Comparative Programmer Ergonomics</a></li>
+<li><a href="#performance-of-code-styles-under-various-engines"><span class="toc-section-number">6.3</span> Performance of code styles under various engines</a></li>
+<li><a href="#status-as-a-micro-library"><span class="toc-section-number">6.4</span> Status as a micro-library</a></li>
+<li><a href="#potential-future-work"><span class="toc-section-number">6.5</span> potential future work</a></li>
+</ul></li>
+<li><a href="#appendix"><span class="toc-section-number">7</span> Appendix</a><ul>
+<li><a href="#clarinetlisteneradaptor.js"><span class="toc-section-number">7.1</span> clarinetListenerAdaptor.js</a></li>
+<li><a href="#events.js"><span class="toc-section-number">7.2</span> events.js</a></li>
+<li><a href="#functional.js"><span class="toc-section-number">7.3</span> functional.js</a></li>
+<li><a href="#incrementalcontentbuilder.js"><span class="toc-section-number">7.4</span> incrementalContentBuilder.js</a></li>
+<li><a href="#instancecontroller.js"><span class="toc-section-number">7.5</span> instanceController.js</a></li>
+<li><a href="#jsonpath.js"><span class="toc-section-number">7.6</span> jsonPath.js</a></li>
+<li><a href="#jsonpathsyntax.js"><span class="toc-section-number">7.7</span> jsonPathSyntax.js</a></li>
+<li><a href="#lists.js"><span class="toc-section-number">7.8</span> lists.js</a></li>
+<li><a href="#pubsub.js"><span class="toc-section-number">7.9</span> pubSub.js</a></li>
+<li><a href="#publicapi.js"><span class="toc-section-number">7.10</span> publicApi.js</a></li>
+<li><a href="#streaminghttp-browser.js"><span class="toc-section-number">7.11</span> streamingHttp-browser.js</a></li>
+<li><a href="#streaminghttp-node.js"><span class="toc-section-number">7.12</span> streamingHttp-node.js</a></li>
+<li><a href="#util.js"><span class="toc-section-number">7.13</span> util.js</a></li>
+<li><a href="#wire.js"><span class="toc-section-number">7.14</span> wire.js</a></li>
+</ul></li>
+<li><a href="#bibliography"><span class="toc-section-number">8</span> Bibliography</a></li>
+</ul>
+</div>
 <h1 id="abstract"><a href="#abstract"><span class="header-section-number">1</span> Abstract</a></h1>
 <p>A Javascript REST client library targeting both Node.js and web browsers that incorporates http streaming, pattern matching, and progressive JSON parsing, with the aim of improving performance, fault tolerance, and encouraging a greater degree of loose coupling between programs. Loose coupling is particularly considered in light of the application of Agile methodologies to SOA, providing a framework in which it is acceptable to partially restructure the JSON format in which a resource is expressed whilst maintaining compatibility with dependent systems.</p>
 <p>A critique is made of current practice under which resources are entirely retrieved before items of interest are extracted programmatically. An alternative model is presented allowing the specification of items of interest using a declarative syntax similar to JSONPath. The identified items are then provided incrementally while the resource is still downloading.</p>
@@ -2361,3 +2467,5 @@ Chapter 4+5 40 to 60 pages
 <li id="fn15"><p>At time of writing, Firefox is the only engine supporting WeakHashMap by default. In Chome it is implemented but not available to Javascript unless explicitly enabled by a browser flag. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a> retrieved 11th October 2013.<a href="#fnref15">↩</a></p></li>
 </ol>
 </div>
+</body>
+</html>
