@@ -1,17 +1,3 @@
-/* based on https://gist.github.com/ryangray/1882525 */
-
-body {
-   /* buttondown's pages are a bit wide. Set max width: */
-   max-width: 40em;
-   margin-left: 10%;
-}
-
-p {
-   text-align: justify;
-}
-.footnotes p {
-   text-align: left;
-}
 
 /*
     Buttondown
