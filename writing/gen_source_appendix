@@ -34,13 +34,11 @@ function copyToMd {
 
 SOURCE_APPENDIX_MARKDOWN_DIR=main/7b_Appendix_oboe_source
 
-SRC_FILES=$(ls ../src/*.js | sort) 
-
 rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md
 
 FIRST=1
 
-for JS_FILE in $SRC_FILES; do
+for JS_FILE in $(ls ../src/*.js | sort); do
 
    JS_FILE_NAME=$(basename $JS_FILE)
    
