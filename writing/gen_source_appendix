@@ -3,18 +3,7 @@
 # This script generates the markdown versions of the Javascript source so that
 # Pandoc can later turn them into a PDF.
 
-cd ../src
-
-SOURCE_APPENDIX_MARKDOWN_DIR=main/7b_Appendix_oboe_source
-
-SRC_FILES=$(ls *.js | sort) 
-
-FIRST=1
-
-cd ../writing
-
-rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md 
-
+ 
 function copyToMd {
    source=$1
    destination=$2
@@ -41,6 +30,17 @@ function copyToMd {
    echo >> $destination         
 }
 
+cd ../src
+
+SOURCE_APPENDIX_MARKDOWN_DIR=main/7b_Appendix_oboe_source
+
+SRC_FILES=$(ls *.js | sort) 
+
+cd ../writing
+
+rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md
+
+FIRST=1
 
 for JS_FILE_NAME in $SRC_FILES; do
    MD_FILE=$SOURCE_APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
