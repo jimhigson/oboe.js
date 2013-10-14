@@ -143,44 +143,46 @@ the request made and the time taken to first update the interface.
 Staying fast on a fallible network
 ----------------------------------
 
-The reliability of networks that REST operates over varies widely.
-Considering the worst case we see mobile networks in marginal signal
-over which it is common for ongoing downloads to be abruptly
-disconnected. Existing http clients handle this kind of unexpected
-termination poorly. Consider the everyday situation of somebody using a
-smartphone browser to check their email. The use of Webmail necessitates
-that the communication in made via REST rather than a mail specific
-protocol such as IMAP. Mobile data coverage is less than network
-operators claim [@BBC3g] so while travelling the signal can be expected
-to be lost and reestablished many times. Whilst not strictly forbidding
-their inspection, the web developer's standard AJAX toolkit are
-structured in such a way as to encourage the developer to consider
-partially successful messages as wholly unsuccessful. For example, the
-popular AJAX library jQuery automatically parses complete JSON or XML
-responses before handing back to the application. But on failure there
-is no attempt to parse or deliver the partial response. To programmers
-who know where to look the partial responses are retrievable as raw text
-but handling them is a special case, bringing-your-own-parser affair.
-Because of this difficulty I can only find examples of partial messages
-being dropped without inspection. In practice this means that for the
-user checking her email, even if 90% of her inbox had been retrieved she
-will be shown nothing. When the network is available again the
-application will have to download from scratch, including the 90% which
-it already fetched. I see much potential for improvement here.
+REST operates over networks whose reliability varies widely. On
+unreliable networks connections are abruptly dropped and in my opinion
+existing http clients handle unexpected terminations suboptimally.
+Consider the everyday situation of a person using a smartphone browser
+to check their email. Mobile data coverage is often weak outside of
+major cities [@opensignal] so while travelling the signal will be lost
+and reestablished many times. The web developer's standard AJAX toolkit
+is structured in a way that encourages early terminated connections to
+be considered as wholly unsuccessful rather than as partially
+successful. For example, the popular AJAX library jQuery automatically
+parses JSON or XML responses before passing back to the application but
+given an early disconnection there is no attempt to hand over the
+partial response. To the programmer who knows where to look the partial
+responses are extractable as raw text but handling them involves writing
+a special case and is difficult because standard parsers are not
+amenable to incomplete markup. Because of this difficulty I can only
+find examples of partial messages being dropped without inspection. For
+the user checking her email, even if 90% of her inbox had been retrieved
+before her phone signal was lost, the web application will behave as if
+it received none and show her nothing. Later, when the network is
+available again the inbox will be downloaded from scratch, including the
+90% which previously delivered. I see much potential for improvement
+here.
 
-Not every message, incomplete, is useful. Whilst of course a generic
-REST client cannot understand the semantics of specific messages fully
-enough to decide if a partially downloaded message is useful, I propose
-it would be an improvement if the content from incomplete responses
-could be handled using much the same programming as for complete
-responses. This follows naturally from a conceptualisation of the http
+I propose moving away from this polarised view of
+successful/unsuccessful requests to one in which identifiable parts of a
+message are recognised as interesting in themselves, regardless of what
+follows, and these parts are handed back to the application as streaming
+occurs. This follows naturally from a conceptualisation of the http
 response as a progressive stream of many small parts; as each part
 arrives it should be possible to use it without knowing if the next will
-be delivered successfully. This style of programming encourages thinking
-in terms of optimistic locking. Upon each partial delivery there is an
-implicit assumption that it may be acted on straight away and the next
-will also be successful. In cases where this assumption fails the
-application should be notified so that some rollback may be performed.
+be delivered successfully. Should an early disconnection occur, the
+content delivered up to that point will have already been handled so no
+special case is required to salvage it. In most cases the only recovery
+necessary will be to make a new request for just the part that was
+missed. This approach is not incompatible with a problem domain where
+the usefulness of an earlier part is dependent on the correct delivery
+of the whole providing optimistic locking is used. In this case earlier
+parts may be used immediately but their effect rolled back should a
+notification of failure be received.
 
 Agile methodologies, frequent deployments, and compatibility today with versions tomorrow
 -----------------------------------------------------------------------------------------
