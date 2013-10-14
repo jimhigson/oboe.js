@@ -30,9 +30,9 @@ function copyToMd {
    echo >> $destination         
 }
 
-cd ../src
-
 SOURCE_APPENDIX_MARKDOWN_DIR=main/7b_Appendix_oboe_source
+
+cd ../src
 
 SRC_FILES=$(ls *.js | sort) 
 
