@@ -187,46 +187,49 @@ notification of failure be received.
 Agile methodologies, frequent deployments, and compatibility today with versions tomorrow
 -----------------------------------------------------------------------------------------
 
-In most respects SOA architecture fits well with the fast release cycle
-that Agile methodologies encourage. Because in SOA we may consider that
-all data is local rather than global and that the components are loosely
-coupled and autonomous, frequent releases of any particular sub-system
-shouldn't pose a problem to the correct operation of the whole.
-Following emergent design it should be possible for the format of
-resources to be realised slowly and iteratively as a greater
-understanding of the problem is achieved. Unfortunately in practice the
-ability to change is hampered by tools which encourage programming
-against rigidly specified formats. Working in enterprise I have often
-seen the release of dozens of components cancelled because of a single
-unit that failed to meet acceptance criteria. By allowing a tight
-coupling that depends on exact versions of formats, the perfect
-environment is created for contagion whereby the updating of any single
-unit may only be done as part of the updating of the whole.
+In most respects a SOA architecture fits well with the fast release
+cycle encouraged by Agile methodologies. Because in SOA we may consider
+that all data is local rather than global and that the components are
+loosely coupled and autonomous, frequent releases of any particular
+sub-system shouldn't pose a problem to the correct operation of the
+whole. In allowing a design to emerge organically it should be possible
+for the structure of resource formats to be realised slowly and
+iteratively while a greater understanding of the problem is gained.
+Unfortunately in practice the ability to change is hampered by tools
+which encourage programming against rigidly specified formats. If a
+program is allowed to be tightly coupled to a data format it will resist
+changes in the programs which produce data to that format. Working in
+enterprise I have often seen the release of dozens of components
+cancelled because of a single unit that failed to meet acceptance
+criteria. By insisting on exact data formats, subsystems become tightly
+coupled and the perfect environment is created for contagion whereby the
+updating of any single unit may only be done as part of the updating of
+the whole.
 
 An effective response to this problem would be to integrate into a REST
-client library the ability to use a response whilst being only loosely
-coupled to the *shape* of the overall message.
+clients the ability to use a response whilst being only loosely coupled
+to the *shape* of the message.
 
 Deliverables
 ------------
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest work which can we said to realise my thesis. Amongst
-commentators on start-up companies this is known as a *zoom-in pivot*
-and the work it produces should be the *Minimum Viable Product* or MVP
-[@lean p. 106-110], the guiding principle being that it is preferable to
-produce a little well than more badly. By focusing tightly I cannot not
-deliver a full stack so I am forced to implement only solutions which
-interoperate with existing deployments. This is advantageous; to
-somebody looking to improve their system small additions are easier to
-action than wholesale change.
+smallest work which can we said to realise my thesis, the guiding
+principle being that it is preferable to produce a little well than more
+badly. Amongst commentators on start-up companies this is known as a
+*zoom-in pivot* [@lean p172] and the work it produces should be the
+*Minimum Viable Product* or MVP [@lean p106-110]. With a focus on
+quality I could not deliver a full stack so I am obliged to implement
+only solutions which interoperate with existing deployments. This is
+advantageous; to somebody looking to improve their system small
+enhancements are more inviting than wholesale change.
 
 To reify the vision above, a streaming client is the MVP. Because all
 network transmissions may be viewed though a streaming lens an
 explicitly streaming server is not required. Additionally, whilst http
 servers capable of streaming are quite common even if they are not
 always programmed as such, I have been unable to find any example of a
-streaming-capable REST client.
+streaming-receptive REST client.
 
 Criteria for success
 --------------------
@@ -242,10 +245,10 @@ a algorithms will be de-emphasised unless especially egregious. The
 measuring of speed will include a consideration of performance
 degradation due to connections which are terminated early.
 
-Additionally, I shall be looking at common ways in which the semantics
-of a message are expanded as a system's design emerges and commenting on
-the value of loose coupling in avoiding disruption given unanticipated
-format changes.
+Additionally, I shall be considering how the semantics of a message are
+expanded as a system's design emerges and commenting on the value of
+loose coupling between data formats and the programs which act on them
+in avoiding disruption given unanticipated format changes.
 
 [^1]: for quite an obviously visible example of progressive SVG loading,
     try loading this SVG using a recent version of Google Chrome:
