@@ -400,6 +400,8 @@ approaches are particularly satisfactory.
 Json and XML
 ------------
 
+*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
+
 Although AJAX started as a means to transfer XML, today JSON "The
 fat-free alternative to XML[@jsonorg]" is the more popular serialisation
 format. The goals of XML were to simplify SGML to the point that a
