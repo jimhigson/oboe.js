@@ -33,6 +33,16 @@
          ]
       }
    },
+   
+   {
+      "id":"rubylang",
+      "title":"The Power and Philosophy of Ruby",
+      "author":[                   
+         { "given": "Matsumoto", "family":"Yukihiro"}
+      ],
+      "url":"http://www.rubyist.net/~matz/slides/oscon2003/index.html",
+      "issued": { "date-parts":[ [2003] ] }              
+   },
 
    {
       "id":"encycCompSci",
