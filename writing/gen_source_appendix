@@ -44,7 +44,27 @@ for JS_FILE in $(ls ../src/*.js | sort); do
    
    MD_FILE=$SOURCE_APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
    
-   echo "will package source for appendix $MD_FILE"
+   echo "will package $JS_FILE for appendix as $MD_FILE"
+
+   copyToMd $JS_FILE $MD_FILE $FIRST  
+   
+   FIRST=0    
+done
+
+
+SOURCE_APPENDIX_MARKDOWN_DIR=main/7c_Appendix_benchmarks
+
+rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md
+
+FIRST=1
+
+for JS_FILE in $(ls ../benchmarking/*.js | sort); do
+
+   JS_FILE_NAME=$(basename $JS_FILE)
+   
+   MD_FILE=$SOURCE_APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
+   
+   echo "will package $JS_FILE for appendix as $MD_FILE"
 
    copyToMd $JS_FILE $MD_FILE $FIRST  
    
