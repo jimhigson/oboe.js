@@ -82,18 +82,19 @@ unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
 Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} comparatively
 illustrate how a progressive client may, without adjustments to the
 server, be used to produce an aggregated resource sooner. This results
-in a moderate improvement in the time taken to show the complete aggregation
-but a dramatic improvement in the time to show the first content. The
-ability to present the first content as early as possible is a desirable
-trait for system usability because it allows the user to start reading
-earlier and a progressively rendered display in itself increases the human
-perception of speed [@perceptionFaxSpeed]. Note also how the cadence of
-requests is more steady in Figure \ref{rest_timeline_2} with four
-connections opened at roughly equal intervals rather than a single
-request followed by a rapid burst of three. Both clients and servers
-routinely limit the number of simultaneous connections per peer so
-avoiding bursts of requests is further to our advantage. [Appendix
-i](#appendix_http_limits) lists some actual limits.
+in a moderate improvement in the time taken to show the complete
+aggregation but a dramatic improvement in the time to show the first
+content. The ability to present the first content as early as possible
+is a desirable trait for system usability because it allows the user to
+start reading earlier and a progressively rendered display in itself
+increases the human perception of speed [@perceptionFaxSpeed]. Note also
+how the cadence of requests is more steady in Figure
+\ref{rest_timeline_2} with four connections opened at roughly equal
+intervals rather than a single request followed by a rapid burst of
+three. Both clients and servers routinely limit the number of
+simultaneous connections per peer so avoiding bursts of requests is
+further to our advantage. [Appendix i](#appendix_http_limits) lists some
+actual limits.
 
 Nodes in an n-tier architecture defy categorisation as 'client' or
 'server' in a way which is appropriate from all frames of reference. A
@@ -112,37 +113,32 @@ overall delivery remains faster.
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where a domain model contains a series of data, of which ranges are made
-available via REST, I have often seen a trade-off with regards to how
-much of the series each call should request. Answering this question is
-usually a compromise between competing concerns in which it is not
-simultaneously possible to addresses all concerns satisfactorily. A good
-example might be a Twitter's pages listing a series of tweets where the
-interface designers adopted a currently trending pattern
-[@infinitescroll], Infinite Scrolling. Starting from an initial page
-showing some finite number of tweets, upon scrolling to the bottom the
-next batch is automatically requested. The new batch is fetched in a
-json format and, once loaded, presented as html and added to the bottom
-of the page. Applied repeatedly this allows the user to scroll
-indefinitely, albeit punctuated by slightly jolting pauses while new
-content is loaded. To frame the big-small tradeoff we might consider the
-extreme choices. Firstly, requesting just one tweet per http request. By
-requesting the smallest possible content individual calls would complete
-very quickly and the pauses would be short. Taking the extreme small end
-the page stutters, pausing momentarily but frequently. Taking the
-opposite extreme, by requesting some huge number of tweets we see long
-periods of smooth scrolling partitioned by long waits.
+Where a domain model contains data in a series with continuous ranges
+requestable via REST, I have often noticed a tradeoff in the client's
+design with regards to how much should be requested in each call.
+Because at any time it shows only a small window into a much larger
+model, the social networking site Twitter might be a good example. The
+Twitter interface designers adopted a popular interface pattern,
+Infinite Scrolling [@infinitescroll]. Starting from an initial page
+showing some finite number of tweets, once the user scrolls and reaches
+the end of the list the next batch is automatically requested. When
+loaded, this new batch is converted to HTML and added to the bottom of
+the page. Applied repeatedly the illusion of an infinitely long page in
+maintained, albeit punctuated with pauses whenever new content is
+loaded. For the programmers working on this presentation layer there is
+a tradeoff between sporadically requesting many tweets, yielding long,
+infrequent delays and frequently requesting a little, giving an
+interface which stutters momentarily but often.
 
-I propose that my thesis may be applied used to stand down from this
-compromise by delivering pauses which are both infrequent and short. In
-the Twitter example, once we have thinking about http progressively this
-may be achieved quite simply by issuing large requests but instead of
-deferring all rendering until the request completes, render individual
-tweets incrementally as they are progressively parsed out of the ongoing
-response.
-
-Integrate: twitter: page could update at bottom and top with same
-transport perhaps.
+I propose that progressive loading could render this tradeoff
+unnecessary by simultaneously delivering the best of both strategies. In
+the Twitter example this could be achieved by making large requests but
+instead of deferring all rendering until the request completes, add the
+individual tweets to the page as they are incrementally parsed out of
+the ongoing response. With a streaming transport, the time taken to
+receive the first tweet should not vary depending on the total number
+that are also being sent so there is no relationship between the size of
+the request made and the time taken to first update the interface.
 
 Staying fast on a fallible network
 ----------------------------------
