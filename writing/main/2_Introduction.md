@@ -1,64 +1,64 @@
 Introduction
 ============
 
-This dissertation does not focus on implementing software for any
-particular problem domain. Rather, its purpose is to encourage the REST
-paradigm to be viewed through a novel lens. In application this may be
-used to deliver tangible benefits to many common REST use cases.
-Although I express my thesis through programming, the contribution I
-hope to deliver is felt more strongly as a shift in how we *think* about
-http than it is a change in the underlying technology.
+This purpose of this dissertation is to encourage the REST paradigm to
+be viewed through a novel lens which in application this may be used to
+deliver tangible benefits to many common REST use cases. Although I
+express my thesis through programming, the contribution I hope to make
+is felt more strongly as a modification in how we *think* about http
+than as the delivery of new software.
 
 In the interest of developer ergonomics, REST clients have tended to
 style the calling of remote resources similar to the call style of the
 host programming language. Depending on the language, one of two schemas
-are followed: a synchronous style in which the http call is an
-expression which evaluates to the resource that was fetched; or
-asynchronous or monadic in which some logic is specified which may be
-applied to the response once it is complete. This tendency to cast REST
-calls using terms from the language feels quite natural; we may call a
-remote service without having to make any adjustment for the fact that
-it is remote. However, we should remember that this construct is not the
-only possible mapping. Importing some moderate Whorfianism
-[@whorf56][@sapir58] from linguistics, we might venture to say that the
-programming languages we use encourage us to think in the terms that
-they easily support. Also UML! For any multi-packet message sent via a network
-some parts will arrive before others, at least approximately in-order,
-but whilst coding a C-inspired language whose return statements yield
-single, discrete values it comfortable to conceptualise the REST
-response as a discrete event. Perhaps better suited to representing a
-progressively returned value would have been the relatively unsupported
-Generator routine [@encycCompSci].
+are followed: a synchronous style in which a some invocation halts
+execution for the duration of the request before evaluating to the
+fetched resource; or asynchronous in which the logic is specified to be
+applied to a response once it is available. Languages encourage our
+thinking to follow the terms that they easily support[@whorf56]. While
+there is some overlap, languages which promote concurrency though
+threading consider blocking in a single thread to be acceptable and will
+generally prefer the former mode whereas languages with first class
+functions are naturally conversant in callbacks and will prefer the
+latter. We should remember in programming that languages limit the
+patterns that we readily see [@rubylang] and that better mappings may be
+possible. This observation extends to graphical notations such as UML
+whose constructs strongly reflect the programming languages of the day.
+For any multi-packet message sent via a network some parts will arrive
+before others, at least approximately in-order, but viewed from inside a
+language whose statements invariably yield single, discrete values it
+comfortable to conceptualise the REST response as a discrete event. UML
+sequence diagrams contain the syntax for instantaneously delivered
+return values, with no corresponding notation for a resource whose data
+is progressively revealed.
 
-In most practical cases where software is being used to perform a task
-there is no reasonable distinction between being earlier and being
-quicker. Therefore, if our interest is to create fast software we should
-be using data at the first possible opportunity. Examining data *while*
-it streams rather than hold unexamined until the message ends.
+In most practical cases where we wish to be fast in performing a task
+there is no reasonable distinction between acting *earlier* and being
+*quicker*. To create efficient software we should be using data at the
+first possible opportunity: examining content *while it streams* rather
+than holding it unexamined until it is wholly available.
 
-The coining of the term REST represented a shift in how we think about
-http, away from the transfer of hypertext documents to that of arbitrary
-data [@rest pp. 407–416]. It introduced no fundamentally new methods.
-Likewise, no genuinely new computer science techniques need be invented
-to realise my thesis. As a minimum, the implementation requires an http
-client which exposes the response whilst it is in progress and a parser
-which can start making sense of a response before it sees all of it. I
-also could not claim this thesis to be an entirely novel composition of
-such parts. Few ideas are genuinely new and it is often wiser to mine
-for solved problems then to solve again afresh. The intense competition
-of Web browsers to be as fast as possible has already found this
-solution. Load any graphics rich with images -- essentially an
-aggregation of hypertext and images -- the HTML is parsed incrementally
-while it is downloading and the images are requested as soon as
-individual \<img\> tags are encountered. The browser's implementation
-involves a highly optimised parser created for a single task, that of
-displaying web pages. The new contribution of this dissertation is to
-provide a generic analog applicable to any problem domain.
+While the coining of the term REST represented a shift in how we think
+about http, away from the transfer of hypertext documents to that of
+arbitrary data [@rest pp. 407–416], it introduced no fundamentally new
+methods. Similarly building on previous ideas, no new computing
+techniques need be invented to realise my thesis. As a minimum it
+requires an http client which reveals the response whilst it is in
+progress and a parser which can begin to interpret that response before
+it sees all of it. Nor is it novel to use these preexisting parts in
+composition. Every current web browser already implements such a schema;
+load any complex webpage -- essentially an aggregation of hypertext and
+other resources -- the HTML will be parsed and displayed incrementally
+while it is downloading and resources such as images are requested in
+parallel as soon as they are referenced. The images may themselves be
+presented incrementally in the case of progressive JPEGs or SVGs[^1].
+This incremental display is achieved through highly optimised software
+created for a single task, that of displaying web pages. The new
+contribution of this dissertation is to provide a generic analog
+applicable to any problem domain.
 
-Also progressive SVGs. [^2]
-
-REST aggregation could be faster
---------------------------------
+How REST aggregation could be faster
+------------------------------------
 
 ![**Aggregation of lower-level resources exposed via REST.** The client
 fetches a listing of an author's publications and then the first three
@@ -146,8 +146,8 @@ deferring all rendering until the request completes, render individual
 tweets incrementally as they are progressively parsed out of the ongoing
 response.
 
-Integrate: twitter: page could update at bottom and top with same transport
-perhaps.
+Integrate: twitter: page could update at bottom and top with same
+transport perhaps.
 
 Staying fast on a fallible network
 ----------------------------------
@@ -221,7 +221,7 @@ To avoid feature creep I am paring down the software deliverables to the
 smallest work which can we said to realise my thesis. Amongst
 commentators on start-up companies this is known as a *zoom-in pivot*
 and the work it produces should be the *Minimum Viable Product* or MVP
-[@lean p. ??], the guiding principle being that it is preferable to
+[@lean p. 106-110], the guiding principle being that it is preferable to
 produce a little well than more badly. By focusing tightly I cannot not
 deliver a full stack so I am forced to implement only solutions which
 interoperate with existing deployments. This is advantageous; to
@@ -254,7 +254,7 @@ of a message are expanded as a system's design emerges and commenting on
 the value of loose coupling in avoiding disruption given unanticipated
 format changes.
 
-[^2]: for quite an obviously visible example of progressive SVG loading,
+[^1]: for quite an obviously visible example of progressive SVG loading,
     try loading this SVG using a recent version of Google Chrome:
     <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg>
     For the perfectionist SVG artist, not just the final image should be
