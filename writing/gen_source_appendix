@@ -13,33 +13,41 @@ FIRST=1
 
 cd ../writing
 
-rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.md 
+rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md 
+
+function copyToMd {
+   source=$1
+   destination=$2
+   ommitpagebreak=$3
+   
+   touch $destination
+   
+   echo > $destination  
+   
+   if [ $ommitpagebreak -ne 1 ]
+   then
+      echo "\pagebreak" >> $destination      
+   fi
+          
+   echo >> $destination         
+   echo $source >> $destination
+   echo "---" >> $destination
+   echo >> $destination    
+   
+   echo "~~~~ {.javascript}" >> $destination
+   cat ../src/$source >> $destination
+   echo >> $destination
+   echo "~~~~" >> $destination
+   echo >> $destination         
+}
+
 
 for JS_FILE_NAME in $SRC_FILES; do
    MD_FILE=$SOURCE_APPENDIX_MARKDOWN_DIR/$JS_FILE_NAME.md
    
    echo "will package source for appendix $MD_FILE"
 
-   touch $MD_FILE
-   
-   echo > $MD_FILE  
-   
-   if [ $FIRST -ne 1 ]
-   then
-      echo "\pagebreak" >> $MD_FILE      
-   fi
+   copyToMd $JS_FILE_NAME $MD_FILE $FIRST  
    
    FIRST=0    
-       
-   echo >> $MD_FILE         
-   echo $JS_FILE_NAME >> $MD_FILE
-   echo "---" >> $MD_FILE
-   echo >> $MD_FILE    
-   
-   echo "~~~~ {.javascript}" >> $MD_FILE
-   cat ../src/$JS_FILE_NAME >> $MD_FILE
-   echo >> $MD_FILE
-   echo "~~~~" >> $MD_FILE
-   echo >> $MD_FILE                 
-     
 done
