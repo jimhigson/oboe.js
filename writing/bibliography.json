@@ -96,12 +96,17 @@
    },
 
    {
-      "id":"BBC3g",
-      "title":"3G mobile data network crowd-sourcing survey",
-      "publisher":"BBC News",
+      "id":"opensignal",
+      "title":"OpenSignal",
+      "author":[
+         {
+            "family":"Gill",
+            "given":"Brendan"
+         }
+      ],      
       "issued":{
          "date-parts":[
-            [2011]
+            [2013]
          ]
       },
       "type":"webpage"

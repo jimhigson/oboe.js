@@ -14,41 +14,58 @@ middle tier \label{architecture}](images/architecture.png)
 The web as an application platform
 ----------------------------------
 
-Application design, particularly regarding the presentation layer, has
-charted an undulating path pulled by competing strategies of thick and
-thin clients. Having been taken up as the platform for all but the most
-specialised applications, the web continues in this fashion by resisting
-easy categorisation as either mode. Today it is agreed that program
-architecture should separate presentation from operational logic but
-there is no firm consensus on where each concern should be exercised.
-While for some sites Javascript is requisite to view any content, there
-are also actions in the opposite direction. For example in 2012 twitter
-moved much of their rendering back to the server-side reducing load
-times to one fifth of their previous design, commenting "The future is
-coming and it looks just like the past" [@newTwitter]. This model
-generated server-side short pages that load quick and are ready to be
-displayed but also sent the Javascript which would allow the display to
-be updated without another full server load. One weakness of this model
-is that the same presentational logic requires two expressions.
+Application design has historically charted an undulating path pulled by
+competing approaches of thick and thin clients. Having evolved from a
+document viewing system to an application platform for all but the most
+specialised tasks, the web perpetuates this narrative by resisting
+categorisation as either mode.
 
--   cs/ss not the most meaningful split
--   REST glues the layers together regardless
+While the trend is generally for more client scripting and for some
+sites Javascript is now requisite, there are also counter-trends. In
+2012 twitter reduced load times to one fifth of their previous design by
+moving much of their rendering back to the server-side, commenting that
+"The future is coming and it looks just like the past" [@newTwitter].
+Under this architecture short, fast-loading pages are generated on the
+server-side but Javascript is also provides progressively enhancement.
+Although it does not generate the page anew, the Javascript must know
+how to create most of the interface elements so one weakness of this
+architecture is that much of the presentation layer logic must be
+expressed twice.
 
-Like most interactive programming, client-side scripts usually suffer
-greater delays waiting for io than because javascript execution times
-present a bottleneck. Because Javascript is used for user interfaces,
-frame-rates are important. Single threaded so js holds up rendering.
-Important to return control to the browser quickly. However, once
-execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation is without practical benefit. Hence,
-writing extremely optimised Javascript, especially focusing on
-micro-optimisations that hurt code readability is a futile endeavour.
+Despite client devices taking on responsibilities which would previously
+have been performed on a server, there is a limit to how much of the
+stack may safely be offloaded in this direction. The client-side
+ultimately falls under the control of the user so no important business
+decisions should be taken here. A banking site should not allow loan
+approval to take place in the browser because for the knowledgeable user
+any decision would be possible. Separated from data stores by the public
+internet, the client is also a poor place to perform data aggregation or
+examine large data sets. For non-trivial applications these restrictions
+encourage a middle tier to execute business logic and produce aggregate
+data.
 
-> The user does something, then the app responds visually with immediacy
-> at 30 frames per second or more, and completes a task in a few hundred
-> milliseconds. As long as an app meets this user goal, it doesn’t
-> matter how big an abstraction layer it has to go through to get to
-> silicon. [@fivemyths]
+While REST may not be the only communications technology employed by an
+application architecture, for this project we should examine where the
+REST clients fit into the picture. REST is used to pull data from
+middleware for the sake of presentation regardless of where the
+presentation resides. Likewise, rather than connect to databases
+directly, for portability middlewares often communicate with a thin REST
+layer which wraps data stores. This suggests three uses:
+
+-   From web browser to middleware
+-   From server-side presentation layer to middleware
+-   From middleware to one or more nodes in a data tier
+
+Fortunately, each of these contexts require a similar performance
+profile. The node is essentially acting as a router dealing with small
+messages containing only the information they requested rather than
+dealing with a whole model. As a part of an interactive system low
+latency is important whereas throughput can be increased relatively
+cheaply by adding more hardware. As demand for the system increases the
+total work required grows but the complexity of any one of these tasks
+does remains constant. Although serving any particular request might be
+done in series, the workload as a whole at these tiers consists of many
+independent tasks and as such is embarrassingly parallelisable.
 
 Node.js
 -------
@@ -177,7 +194,25 @@ the API.
 Web browsers hosting REST clients
 ---------------------------------
 
-Http is essentially a thinly-wrapped text response around some usually
+*Client side deals with user input interactively whereas the server as a
+batch of data. Like most interactive programming, client-side scripts
+usually suffer greater delays waiting for io than because javascript
+execution times present a bottleneck. Because Javascript is used for
+user interfaces, frame-rates are important. Single threaded so js holds
+up rendering. Important to return control to the browser quickly.
+However, once execution of each js frame of execution is no more than
+the monitor refresh rate, further optimisation is without practical
+benefit. Hence, writing extremely optimised Javascript, especially
+focusing on micro-optimisations that hurt code readability is a futile
+endeavour.*
+
+> The user does something, then the app responds visually with immediacy
+> at 30 frames per second or more, and completes a task in a few hundred
+> milliseconds. As long as an app meets this user goal, it doesn’t
+> matter how big an abstraction layer it has to go through to get to
+> silicon. [@fivemyths]
+
+*Http is essentially a thinly-wrapped text response around some usually
 text-based (but sometimes binary) data. It may give the length of the
 content as a header, but is not obliged to. It supports an explicitly
 chunked mode, but even the non-chunked mode may be considered as a
@@ -185,7 +220,7 @@ stream. For example, a program generating web pages on the server side
 might choose to use chunking so that the browser is better able to
 choose when to re-render during the progressive display of a page
 [@perceptionHttpChunkedSpeed] but this is optional and without these
-hints progressive rendering will still take place.
+hints progressive rendering will still take place.*
 
 The requesting of http from Javascript, commonly termed AJAX, was so
 significant a technique in establishing the modern web application

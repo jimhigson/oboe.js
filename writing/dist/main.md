@@ -293,7 +293,7 @@ in avoiding disruption given unanticipated format changes.
 Background
 ==========
 
-![**Labelling nodes in an n-tier architecture** Regardless of where a
+![**Labelling nodes in an n-tier architecture**. Regardless of where a
 node is located, REST may be used as the means of communication. By
 focusing on REST clients, nodes in the middleware and presentation layer
 fall in our scope. Although network topology is often split about client
@@ -301,57 +301,75 @@ and server side, for our purposes categorisation as tiers is a more
 meaningful distinction. According to this split the client-side
 presentation layer and server-side presentation layer serve the same
 purpose, generating mark-up based on aggregated data created in the
-middle tier](images/architecture.png)
+middle tier \label{architecture}](images/architecture.png)
 
 The web as an application platform
 ----------------------------------
 
-Application design, particularly regarding the presentation layer, has
-charted an undulating path pulled by competing strategies of thick and
-thin clients. Having been taken up as the platform for all but the most
-specialised applications, the web continues in this fashion by resisting
-easy categorisation as either mode. Today it is agreed that program
-architecture should separate presentation from operational logic but
-there is no firm consensus on where each concern should be exercised.
-While it feels that Javascript is becoming requisite to even display a
-page, there are also actions in the opposite direction, for example in
-2012 twitter moved much of their rendering back to the server-side
-reducing load times to one fifth of their previous design, commenting
+Application design has historically charted an undulating path pulled by
+competing approaches of thick and thin clients. Having evolved from a
+document viewing system to an application platform for all but the most
+specialised tasks, the web perpetuates this narrative by resisting
+categorisation as either mode.
+
+While the trend is generally for more client scripting and for some
+sites Javascript is now requisite, there are also counter-trends. In
+2012 twitter reduced load times to one fifth of their previous design by
+moving much of their rendering back to the server-side, commenting that
 "The future is coming and it looks just like the past" [@newTwitter].
-This model generated server-side short pages that load quick and are
-ready to be displayed but also sent the Javascript which would allow the
-display to be updated without another full server load. One weakness of
-this model is that the same presentational logic requires two
-expressions.
+Under this architecture short, fast-loading pages are generated on the
+server-side but Javascript is also provides progressively enhancement.
+Although it does not generate the page anew, the Javascript must know
+how to create most of the interface elements so one weakness of this
+architecture is that much of the presentation layer logic must be
+expressed twice.
 
-Like most interactive programming, client-side scripts usually suffer
-greater delays waiting for io than because javascript execution times
-present a bottleneck. Because Javascript is used for user interfaces,
-frame-rates are important. Single threaded so js holds up rendering.
-Important to return control to the browser quickly. However, once
-execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation is without practical benefit. Hence,
-writing extremely optimised Javascript, especially focusing on
-micro-optimisations that hurt code readability is a bit silly.
+Despite client devices taking on responsibilities which would previously
+have been performed on a server, there is a limit to how much of the
+stack may safely be offloaded in this direction. The client-side
+ultimately falls under the control of the user so no important business
+decisions should be taken here. A banking site should not allow loan
+approval to take place in the browser because for the knowledgeable user
+any decision would be possible. Separated from data stores by the public
+internet, the client is also a poor place to perform data aggregation or
+examine large data sets. For non-trivial applications these restrictions
+encourage a middle tier to execute business logic and produce aggregate
+data.
 
-> The user does something, then the app responds visually with immediacy
-> at 30 frames per second or more, and completes a task in a few hundred
-> milliseconds. As long as an app meets this user goal, it doesn’t
-> matter how big an abstraction layer it has to go through to get to
-> silicon. [@fivemyths]
+While REST may not be the only communications technology employed by an
+application architecture, for this project we should examine where the
+REST clients fit into the picture. REST is used to pull data from
+middleware for the sake of presentation regardless of where the
+presentation resides. Likewise, rather than connect to databases
+directly, for portability middlewares often communicate with a thin REST
+layer which wraps data stores. This suggests three uses:
+
+-   From web browser to middleware
+-   From server-side presentation layer to middleware
+-   From middleware to one or more nodes in a data tier
+
+Fortunately, each of these contexts require a similar performance
+profile. The node is essentially acting as a router dealing with small
+messages containing only the information they requested rather than
+dealing with a whole model. As a part of an interactive system low
+latency is important whereas throughput can be increased relatively
+cheaply by adding more hardware. As demand for the system increases the
+total work required grows but the complexity of any one of these tasks
+does remains constant. Although serving any particular request might be
+done in series, the workload as a whole at these tiers consists of many
+independent tasks and as such is embarrassingly parallelisable.
 
 Node.js
 -------
 
-Include? Node not just for servers. CLI tools etc.
+architecture shown in figure \ref{architecture}
 
-Include? Compare to Erlang. Waiter model. Node restaurant much more
-efficient use of expensive resources.
-
-Include? No 'task' class or type, tasks are nothing more than functions,
-possibly having some values implicitly wrapped up in their closure.
-
-Include? Easy to distribute software (npm etc)
+-   Node not just for servers. CLI tools etc.
+-   Compare to Erlang. Waiter model. Node restaurant much more efficient
+    use of expensive resources.
+-   No 'task' class or type, tasks are nothing more than functions,
+    possibly having some values implicitly wrapped up in their closure.
+-   Easy to distribute software (npm etc)
 
 It is difficult to say to what degree Node's use of Javascript is a
 distraction from the system's principled design aims and to what degree
@@ -408,43 +426,36 @@ programmer. Closures require no new syntax, the implicit storage of this
 data feels so natural and inevitable that looking at the typical program
 it is often not obvious that the responsibility exists at all.
 
+Consider the below example. Rather than blocking, this code relies on
+non-blocking io and schedules three tasks, each of which are very short
+and exit quickly allowing this node instance to continue with other
+tasks in between. However sophisticated and performant this style of
+programming, to the developer it is barely more difficult than if a
+blocking io model were followed.
+
 ~~~~ {.javascript}
+function printResource(url) {
 
-// Rather than blocking, this function relies on non-blocking io and
-// schedules three tasks, each of which exit quickly, allowing this
-// node instance to continue with other tasks in between. 
-// However sophisticated and performant this style of programming, 
-// to the developer it is barely more difficult than if a blocking io
-// model were followed. 
-
-function makeRequest( host, path ) {
-
-   var options = { host: host, path: path };
-   
-   http.get(options, function(response){
+   http.get(url, function(response){
       
-      // This function will be called when the response starts. The callback
-      // having started listening to the response object will quickly exit
-      // as Node tasks are want to do. Because of closures we are able to
-      // access the path variable declared in a containing scope, even after
-      // the containing scope has exited.      
+      // This function will be called when the response starts.
+      // It does some logging, adds a listener and quickly exits.
+      
+      // Because it is captured inside a closure we are able to reference 
+      // the url parameter even now the scope that declared it has finished.            
       console.log("The response has started for " + path);
    
-      response.on('data', function(chunk) {
-      
+      response.on('data', function(chunk) {      
          // This function is called each time some data is received from the 
-         // http request
-         
-         console.log('Got some response ' + chunk);
-       
+         // http request                  
+         console.log('Got some response ' + chunk);       
       });
    }).on("error", function(e){
-   
+      
       console.log("Got error: " + e.message);
-   });
-   
+   });      
    console.log("Request has been made");
-}
+}   
 ~~~~
 
 Streams in Node
@@ -475,7 +486,25 @@ the API.
 Web browsers hosting REST clients
 ---------------------------------
 
-Http is essentially a thinly-wrapped text response around some usually
+*Client side deals with user input interactively whereas the server as a
+batch of data. Like most interactive programming, client-side scripts
+usually suffer greater delays waiting for io than because javascript
+execution times present a bottleneck. Because Javascript is used for
+user interfaces, frame-rates are important. Single threaded so js holds
+up rendering. Important to return control to the browser quickly.
+However, once execution of each js frame of execution is no more than
+the monitor refresh rate, further optimisation is without practical
+benefit. Hence, writing extremely optimised Javascript, especially
+focusing on micro-optimisations that hurt code readability is a futile
+endeavour.*
+
+> The user does something, then the app responds visually with immediacy
+> at 30 frames per second or more, and completes a task in a few hundred
+> milliseconds. As long as an app meets this user goal, it doesn’t
+> matter how big an abstraction layer it has to go through to get to
+> silicon. [@fivemyths]
+
+*Http is essentially a thinly-wrapped text response around some usually
 text-based (but sometimes binary) data. It may give the length of the
 content as a header, but is not obliged to. It supports an explicitly
 chunked mode, but even the non-chunked mode may be considered as a
@@ -483,7 +512,7 @@ stream. For example, a program generating web pages on the server side
 might choose to use chunking so that the browser is better able to
 choose when to re-render during the progressive display of a page
 [@perceptionHttpChunkedSpeed] but this is optional and without these
-hints progressive rendering will still take place.
+hints progressive rendering will still take place.*
 
 The requesting of http from Javascript, commonly termed AJAX, was so
 significant a technique in establishing the modern web application
@@ -628,9 +657,8 @@ programmer debugging an application the assortment of transports only
 enhances the black-box mentality with regards to the underlying
 transports.
 
-<!---
 *some or all of the below could move to A&R, it is wondering into
-analysis* --->
+analysis*
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
@@ -2557,7 +2585,7 @@ Appendix i: Limits to number of simultaneous connections under various http clie
   http Client     connection limit per
                   server
   --------------- ---------------------
-  Firefox         6 
+  Firefox         6
 
   Internet        4
   Explorer        
