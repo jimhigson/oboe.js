@@ -12,9 +12,11 @@ pandoc proposal.md -o dist/proposal.pdf
 
 echo made proposal pdf
 
-./all_main > dist/main.md 
+./all_main > dist/main.md
 
-./all_main | pandoc -s -c buttondown.css -f markdown+autolink_bare_uris --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --output=dist/main.html
+echo made main md 
+
+./all_main | pandoc -s -c buttondown.css -f markdown+autolink_bare_uris --toc --section-divs --default-image-extension=png --number-sections --bibliography=bibliography.json --output=dist/main.html
 
 echo made main html
 
@@ -25,8 +27,12 @@ sips -Z 512 dist/images/*.png
 
 echo copied and scaled down png images for dist html
 
-echo making main pdf...
+./all_main | pandoc -f markdown+autolink_bare_uris --smart --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate --to latex --output=dist/main.tex
 
+echo made main tex
+
+echo making main pdf...
+ 
 ./all_main | pandoc -f markdown+autolink_bare_uris --smart --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=mainOboeTemplate --output=dist/main.pdf
 
 echo ...done
