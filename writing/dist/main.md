@@ -6,15 +6,16 @@
 Abstract
 ========
 
-A Javascript REST client library targeting both Node.js and web
-browsers that incorporates http streaming, pattern matching, and
-progressive JSON parsing, with the aim of improving performance, fault
-tolerance, and encouraging a greater degree of loose coupling between
-programs. Loose coupling is particularly considered in light of the
-application of Agile methodologies to SOA, providing a framework in
-which it is acceptable to partially restructure the JSON format in which
-a resource is expressed whilst maintaining compatibility with dependent
-systems.
+A new design for http client libraries incorporating http streaming,
+pattern matching, and incremental parsing, with the aim of improving
+performance, fault tolerance, and encouraging a greater degree of loose
+coupling between programs. A Javascript client capable of progressively
+parsing JSON resources is presented targeting both Node.js and web
+browsers. Loose coupling is particularly considered in light of the
+application of Agile methodologies to REST and SOA, providing a
+framework in which it is acceptable to partially restructure the JSON
+format in which a resource is expressed whilst maintaining compatibility
+with dependent systems.
 
 A critique is made of current practice under which resources are
 entirely retrieved before items of interest are extracted
@@ -25,245 +26,241 @@ resource is still downloading.
 
 In addition to a consideration of performance in absolute terms, the
 usability implications of an incremental model are also evaluated with
-regards to differences in user perception of performance.
+regards to developer ergonomics and end user perception of performance.
 
 
 Introduction
 ============
 
-This dissertation does not focus on implementing software for any
-particular problem domain. Rather, its purpose is to encourage the REST
-paradigm to be viewed through a novel lens. In application this may be
-used to deliver tangible benefits to many common REST use cases.
-Although I express my thesis through programming, the contribution I
-hope to deliver is felt more strongly as a shift in how we *think* about
-http than it is a change in the underlying technology.
+This purpose of this dissertation is to encourage the REST paradigm to
+be viewed through a novel lens which in application this may be used to
+deliver tangible benefits to many common REST use cases. Although I
+express my thesis through programming, the contribution I hope to make
+is felt more strongly as a modification in how we *think* about http
+than as the delivery of new software.
 
 In the interest of developer ergonomics, REST clients have tended to
 style the calling of remote resources similar to the call style of the
 host programming language. Depending on the language, one of two schemas
-are followed: a synchronous style in which the http call is an
-expression which evaluates to the resource that was fetched; or
-asynchronous or monadic in which some logic is specified which may be
-applied to the response once it is complete. This tendency to cast REST
-calls using terms from the language feels quite natural; we may call a
-remote service without having to make any adjustment for the fact that
-it is remote. However, we should remember that this construct is not the
-only possible mapping. Importing some moderate Whorfianism
-[@whorf56][@sapir58] from linguistics, we might venture to say that the
-programming languages we use encourage us to think in the terms that
-they easily support. Also UML! For any multi-packet message sent via a network
-some parts will arrive before others, at least approximately in-order,
-but whilst coding a C-inspired language whose return statements yield
-single, discrete values it comfortable to conceptualise the REST
-response as a discrete event. Perhaps better suited to representing a
-progressively returned value would have been the relatively unsupported
-Generator routine [@encycCompSci].
+are followed: a synchronous style in which a some invocation halts
+execution for the duration of the request before evaluating to the
+fetched resource; or asynchronous in which the logic is specified to be
+applied to a response once it is available. Languages encourage our
+thinking to follow the terms that they easily support[@whorf56]. While
+there is some overlap, languages which promote concurrency though
+threading consider blocking in a single thread to be acceptable and will
+generally prefer the former mode whereas languages with first class
+functions are naturally conversant in callbacks and will prefer the
+latter. We should remember in programming that languages limit the
+patterns that we readily see [@rubylang] and that better mappings may be
+possible. This observation extends to graphical notations such as UML
+whose constructs strongly reflect the programming languages of the day.
+For any multi-packet message sent via a network some parts will arrive
+before others, at least approximately in-order, but viewed from inside a
+language whose statements invariably yield single, discrete values it
+comfortable to conceptualise the REST response as a discrete event. UML
+sequence diagrams contain the syntax for instantaneously delivered
+return values, with no corresponding notation for a resource whose data
+is progressively revealed.
 
-In most practical cases where software is being used to perform a task
-there is no reasonable distinction between being earlier and being
-quicker. Therefore, if our interest is to create fast software we should
-be using data at the first possible opportunity. Examining data *while*
-it streams rather than hold unexamined until the message ends.
+In most practical cases where we wish to be fast in performing a task
+there is no reasonable distinction between acting *earlier* and being
+*quicker*. To create efficient software we should be using data at the
+first possible opportunity: examining content *while it streams* rather
+than holding it unexamined until it is wholly available.
 
-The coining of the term REST represented a shift in how we think about
-http, away from the transfer of hypertext documents to that of arbitrary
-data [@rest pp. 407–416]. It introduced no fundamentally new methods.
-Likewise, no genuinely new computer science techniques need be invented
-to realise my thesis. As a minimum, the implementation requires an http
-client which exposes the response whilst it is in progress and a parser
-which can start making sense of a response before it sees all of it. I
-also could not claim this thesis to be an entirely novel composition of
-such parts. Few ideas are genuinely new and it is often wiser to mine
-for solved problems then to solve again afresh. The intense competition
-of Web browsers to be as fast as possible has already found this
-solution. Load any graphics rich with images -- essentially an
-aggregation of hypertext and images -- the HTML is parsed incrementally
-while it is downloading and the images are requested as soon as
-individual \<img\> tags are encountered. The browser's implementation
-involves a highly optimised parser created for a single task, that of
-displaying web pages. The new contribution of this dissertation is to
-provide a generic analog applicable to any problem domain.
+While the coining of the term REST represented a shift in how we think
+about http, away from the transfer of hypertext documents to that of
+arbitrary data [@rest pp. 407–416], it introduced no fundamentally new
+methods. Similarly building on previous ideas, no new computing
+techniques need be invented to realise my thesis. As a minimum it
+requires an http client which reveals the response whilst it is in
+progress and a parser which can begin to interpret that response before
+it sees all of it. Nor is it novel to use these preexisting parts in
+composition. Every current web browser already implements such a schema;
+load any complex webpage -- essentially an aggregation of hypertext and
+other resources -- the HTML will be parsed and displayed incrementally
+while it is downloading and resources such as images are requested in
+parallel as soon as they are referenced. The images may themselves be
+presented incrementally in the case of progressive JPEGs or SVGs[^2_Introduction1].
+This incremental display is achieved through highly optimised software
+created for a single task, that of displaying web pages. The new
+contribution of this dissertation is to provide a generic analog
+applicable to any problem domain.
 
-Also progressive SVGs. [^2_Introduction2]
+How REST aggregation could be faster
+------------------------------------
 
-REST aggregation could be faster
---------------------------------
+![**Sequence diagram showing the aggregation of low-level REST
+resources.** A client fetches an author's publication list and then
+their first three articles. This sequence represents the most commonly
+used technique in which the client does not react to the response until
+it is complete. In this example the second wave of requests cannot be
+made until the original response is complete, at which time they are
+issued in quick succession.
+\label{rest_timeline_1}](images/rest_timeline_1.png)
 
-![**Aggregation of lower-level resources exposed via REST.** The client
-fetches a listing of an author's publications and then the first three
-articles. The sequence represents the most commonly used technique in
-which the client does not react to the response until it is complete. In
-this example the second wave of requests cannot be made until the
-original response is complete, at which time they are issued in quick
-succession. \label{rest_timeline_1}](images/rest_timeline_1.png)
+![**Revised aggregation sequence for a client capable of progressively
+interpreting the resources.** Because arrows in UML sequence diagrams
+draw returned values as a one-off happening rather than a continuous
+process, I have introduced a lighter arrow notation representing
+fragments of an incremental response. Each request for an individual
+publication is made as soon as the its URL can be extracted from the
+publications list and once all required data has been read from the
+original response it is aborted rather than continue to download
+unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
 
-![**Revised sequence of aggregation performed by a client capable of
-progressively interpreting the fetched resource.** Because UML sequence
-diagrams arrows draw the concept of a returned value as a one-off event
-rather than a continuous process, I have introduced the notation of
-lighter arrows illustrating fragments of an ongoing response. Each
-individual publication request is made at the earliest possible time, as
-soon as the its URL can be extracted from the publications list. Once
-the required data has been read from the original resource it is aborted
-rather than continue to download unnecessary data. This results in a
-moderate reduction in wait time to see all three articles but a dramatic
-reduction in waiting before the first content is presented. Note also
-how the cadence of requests is more even with four connections opened at
-roughly equal intervals rather than a single request followed by a rapid
-burst of three. Clients frequently limit the number of simultaneous
-connections per domain so avoiding bursts of requests is further to our
-advantage. \label{rest_timeline_2}](images/rest_timeline_2.png)
+Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} comparatively
+illustrate how a progressive client may, without adjustments to the
+server, be used to produce an aggregated resource sooner. This results
+in a moderate improvement in the time taken to show the complete
+aggregation but a dramatic improvement in the time to show the first
+content. The ability to present the first content as early as possible
+is a desirable trait for system usability because it allows the user to
+start reading earlier and a progressively rendered display in itself
+increases the human perception of speed [@perceptionFaxSpeed]. Note also
+how the cadence of requests is more steady in Figure
+\ref{rest_timeline_2} with four connections opened at roughly equal
+intervals rather than a single request followed by a rapid burst of
+three. Both clients and servers routinely limit the number of
+simultaneous connections per peer so avoiding bursts of requests is
+further to our advantage. [Appendix i](#appendix_http_limits) lists some
+actual limits.
 
-<!--- 
-connections per peer limited:
-http://stackoverflow.com/questions/5751515/official-references-for-default-values-of-concurrent-http-1-1-connections-per-se 
---->
-
-Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} illustrate how a
-progressive REST client may without adjustments to the server be used to
-aggregate REST resources faster. The greatest improvement is in how
-early the first piece of data is able to be used. This is advantageous:
-firstly, progressive display in itself raises the human perception of
-performance [@perceptionFaxSpeed]; secondly, a user wanting to scan from
-top to bottom may start reading the first article while waiting for the
-later ones to arrive; thirdly, on seeing the first content the user may
-notice that they have requested the wrong aggregation, allowing them to
-backtrack earlier.
-
-Although the label "client software" in the figures above hints at
-software running directly on a user's own device this is not necessarily
-the case, for example the client may in fact be an server-side
-aggregation layer. Nodes in an n-tier architecture commonly defy
-categorisation as 'client' or 'server' in a way which is appropriate
-from all frames of reference. Rather, nodes may be thought of as a
-client from the layer below and as a server from the layer above. A
-further example would be a server-side webpage generator maintaining a
-perceptual performance improvement by progressively writing out html
-using http chunked encoding. [@perceptionHttpChunkedSpeed]. The
-demonstrated advantages hold regardless of where in the stack the
-'client' is located.
+Nodes in an n-tier architecture defy categorisation as 'client' or
+'server' in a way which is appropriate from all frames of reference. A
+node might be labeled as the 'server' from the layer below and 'client'
+from the layer above. Although the "client software" labels in the
+figures above hint at something running directly on a user's own device,
+the same benefits apply if this layer is running remotely. If this layer
+were generating a web page on the server-side to be displayed by the
+client's browser, the perceptual speed improvements apply because of
+http chunked encoding [@perceptionHttpChunkedSpeed]. If this layer were
+a remote aggregation service, starting to write out the aggregated
+response early provides much the same benefits so long as the client is
+also able to interpret it progressively and, even if it were not, the
+overall delivery remains faster.
 
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where a domain model contains a series of data, of which ranges are made
-available via REST, I have often seen a trade-off with regards to how
-much of the series each call should request. Answering this question is
-usually a compromise between competing concerns in which it is not
-simultaneously possible to addresses all concerns satisfactorily. A good
-example might be a Twitter's pages listing a series of tweets where the
-interface designers adopted a currently trending pattern
-[@infinitescroll], Infinite Scrolling. Starting from an initial page
-showing some finite number of tweets, upon scrolling to the bottom the
-next batch is automatically requested. The new batch is fetched in a
-json format and, once loaded, presented as html and added to the bottom
-of the page. Applied repeatedly this allows the user to scroll
-indefinitely, albeit punctuated by slightly jolting pauses while new
-content is loaded. To frame the big-small tradeoff we might consider the
-extreme choices. Firstly, requesting just one tweet per http request. By
-requesting the smallest possible content individual calls would complete
-very quickly and the pauses would be short. Taking the extreme small end
-the page stutters, pausing momentarily but frequently. Taking the
-opposite extreme, by requesting some huge number of tweets we see long
-periods of smooth scrolling partitioned by long waits.
+Where a domain model contains data in a series with continuous ranges
+requestable via REST, I have often noticed a tradeoff in the client's
+design with regards to how much should be requested in each call.
+Because at any time it shows only a small window into a much larger
+model, the social networking site Twitter might be a good example. The
+Twitter interface designers adopted a popular interface pattern,
+Infinite Scrolling [@infinitescroll]. Starting from an initial page
+showing some finite number of tweets, once the user scrolls and reaches
+the end of the list the next batch is automatically requested. When
+loaded, this new batch is converted to HTML and added to the bottom of
+the page. Applied repeatedly the illusion of an infinitely long page in
+maintained, albeit punctuated with pauses whenever new content is
+loaded. For the programmers working on this presentation layer there is
+a tradeoff between sporadically requesting many tweets, yielding long,
+infrequent delays and frequently requesting a little, giving an
+interface which stutters momentarily but often.
 
-I propose that my thesis may be applied used to stand down from this
-compromise by delivering pauses which are both infrequent and short. In
-the Twitter example, once we have thinking about http progressively this
-may be achieved quite simply by issuing large requests but instead of
-deferring all rendering until the request completes, render individual
-tweets incrementally as they are progressively parsed out of the ongoing
-response.
-
-Integrate: twitter: page could update at bottom and top with same transport
-perhaps.
+I propose that progressive loading could render this tradeoff
+unnecessary by simultaneously delivering the best of both strategies. In
+the Twitter example this could be achieved by making large requests but
+instead of deferring all rendering until the request completes, add the
+individual tweets to the page as they are incrementally parsed out of
+the ongoing response. With a streaming transport, the time taken to
+receive the first tweet should not vary depending on the total number
+that are also being sent so there is no relationship between the size of
+the request made and the time taken to first update the interface.
 
 Staying fast on a fallible network
 ----------------------------------
 
-The reliability of networks that REST operates over varies widely.
-Considering the worst case we see mobile networks in marginal signal
-over which it is common for ongoing downloads to be abruptly
-disconnected. Existing http clients handle this kind of unexpected
-termination poorly. Consider the everyday situation of somebody using a
-smartphone browser to check their email. The use of Webmail necessitates
-that the communication in made via REST rather than a mail specific
-protocol such as IMAP. Mobile data coverage is less than network
-operators claim [@BBC3g] so while travelling the signal can be expected
-to be lost and reestablished many times. Whilst not strictly forbidding
-their inspection, the web developer's standard AJAX toolkit are
-structured in such a way as to encourage the developer to consider
-partially successful messages as wholly unsuccessful. For example, the
-popular AJAX library jQuery automatically parses complete JSON or XML
-responses before handing back to the application. But on failure there
-is no attempt to parse or deliver the partial response. To programmers
-who know where to look the partial responses are retrievable as raw text
-but handling them is a special case, bringing-your-own-parser affair.
-Because of this difficulty I can only find examples of partial messages
-being dropped without inspection. In practice this means that for the
-user checking her email, even if 90% of her inbox had been retrieved she
-will be shown nothing. When the network is available again the
-application will have to download from scratch, including the 90% which
-it already fetched. I see much potential for improvement here.
+REST operates over networks whose reliability varies widely. On
+unreliable networks connections are abruptly dropped and in my opinion
+existing http clients handle unexpected terminations suboptimally.
+Consider the everyday situation of a person using a smartphone browser
+to check their email. Mobile data coverage is often weak outside of
+major cities [@opensignal] so while travelling the signal will be lost
+and reestablished many times. The web developer's standard AJAX toolkit
+is structured in a way that encourages early terminated connections to
+be considered as wholly unsuccessful rather than as partially
+successful. For example, the popular AJAX library jQuery automatically
+parses JSON or XML responses before passing back to the application but
+given an early disconnection there is no attempt to hand over the
+partial response. To the programmer who knows where to look the partial
+responses are extractable as raw text but handling them involves writing
+a special case and is difficult because standard parsers are not
+amenable to incomplete markup. Because of this difficulty I can only
+find examples of partial messages being dropped without inspection. For
+the user checking her email, even if 90% of her inbox had been retrieved
+before her phone signal was lost, the web application will behave as if
+it received none and show her nothing. Later, when the network is
+available again the inbox will be downloaded from scratch, including the
+90% which previously delivered. I see much potential for improvement
+here.
 
-Not every message, incomplete, is useful. Whilst of course a generic
-REST client cannot understand the semantics of specific messages fully
-enough to decide if a partially downloaded message is useful, I propose
-it would be an improvement if the content from incomplete responses
-could be handled using much the same programming as for complete
-responses. This follows naturally from a conceptualisation of the http
+I propose moving away from this polarised view of
+successful/unsuccessful requests to one in which identifiable parts of a
+message are recognised as interesting in themselves, regardless of what
+follows, and these parts are handed back to the application as streaming
+occurs. This follows naturally from a conceptualisation of the http
 response as a progressive stream of many small parts; as each part
 arrives it should be possible to use it without knowing if the next will
-be delivered successfully. This style of programming encourages thinking
-in terms of optimistic locking. Upon each partial delivery there is an
-implicit assumption that it may be acted on straight away and the next
-will also be successful. In cases where this assumption fails the
-application should be notified so that some rollback may be performed.
+be delivered successfully. Should an early disconnection occur, the
+content delivered up to that point will have already been handled so no
+special case is required to salvage it. In most cases the only recovery
+necessary will be to make a new request for just the part that was
+missed. This approach is not incompatible with a problem domain where
+the usefulness of an earlier part is dependent on the correct delivery
+of the whole providing optimistic locking is used. In this case earlier
+parts may be used immediately but their effect rolled back should a
+notification of failure be received.
 
 Agile methodologies, frequent deployments, and compatibility today with versions tomorrow
 -----------------------------------------------------------------------------------------
 
-In most respects SOA architecture fits well with the fast release cycle
-that Agile methodologies encourage. Because in SOA we may consider that
-all data is local rather than global and that the components are loosely
-coupled and autonomous, frequent releases of any particular sub-system
-shouldn't pose a problem to the correct operation of the whole.
-Following emergent design it should be possible for the format of
-resources to be realised slowly and iteratively as a greater
-understanding of the problem is achieved. Unfortunately in practice the
-ability to change is hampered by tools which encourage programming
-against rigidly specified formats. Working in enterprise I have often
-seen the release of dozens of components cancelled because of a single
-unit that failed to meet acceptance criteria. By allowing a tight
-coupling that depends on exact versions of formats, the perfect
-environment is created for contagion whereby the updating of any single
-unit may only be done as part of the updating of the whole.
+In most respects a SOA architecture fits well with the fast release
+cycle encouraged by Agile methodologies. Because in SOA we may consider
+that all data is local rather than global and that the components are
+loosely coupled and autonomous, frequent releases of any particular
+sub-system shouldn't pose a problem to the correct operation of the
+whole. In allowing a design to emerge organically it should be possible
+for the structure of resource formats to be realised slowly and
+iteratively while a greater understanding of the problem is gained.
+Unfortunately in practice the ability to change is hampered by tools
+which encourage programming against rigidly specified formats. If a
+program is allowed to be tightly coupled to a data format it will resist
+changes in the programs which produce data to that format. Working in
+enterprise I have often seen the release of dozens of components
+cancelled because of a single unit that failed to meet acceptance
+criteria. By insisting on exact data formats, subsystems become tightly
+coupled and the perfect environment is created for contagion whereby the
+updating of any single unit may only be done as part of the updating of
+the whole.
 
 An effective response to this problem would be to integrate into a REST
-client library the ability to use a response whilst being only loosely
-coupled to the *shape* of the overall message.
+clients the ability to use a response whilst being only loosely coupled
+to the *shape* of the message.
 
 Deliverables
 ------------
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest work which can we said to realise my thesis. Amongst
-commentators on start-up companies this is known as a *zoom-in pivot*
-and the work it produces should be the *Minimum Viable Product* or MVP
-[@lean p. ??], the guiding principle being that it is preferable to
-produce a little well than more badly. By focusing tightly I cannot not
-deliver a full stack so I am forced to implement only solutions which
-interoperate with existing deployments. This is advantageous; to
-somebody looking to improve their system small additions are easier to
-action than wholesale change.
+smallest work which can we said to realise my thesis, the guiding
+principle being that it is preferable to produce a little well than more
+badly. Amongst commentators on start-up companies this is known as a
+*zoom-in pivot* [@lean p172] and the work it produces should be the
+*Minimum Viable Product* or MVP [@lean p106-110]. With a focus on
+quality I could not deliver a full stack so I am obliged to implement
+only solutions which interoperate with existing deployments. This is
+advantageous; to somebody looking to improve their system small
+enhancements are more inviting than wholesale change.
 
 To reify the vision above, a streaming client is the MVP. Because all
 network transmissions may be viewed though a streaming lens an
 explicitly streaming server is not required. Additionally, whilst http
 servers capable of streaming are quite common even if they are not
 always programmed as such, I have been unable to find any example of a
-streaming-capable REST client.
+streaming-receptive REST client.
 
 Criteria for success
 --------------------
@@ -279,12 +276,12 @@ a algorithms will be de-emphasised unless especially egregious. The
 measuring of speed will include a consideration of performance
 degradation due to connections which are terminated early.
 
-Additionally, I shall be looking at common ways in which the semantics
-of a message are expanded as a system's design emerges and commenting on
-the value of loose coupling in avoiding disruption given unanticipated
-format changes.
+Additionally, I shall be considering how the semantics of a message are
+expanded as a system's design emerges and commenting on the value of
+loose coupling between data formats and the programs which act on them
+in avoiding disruption given unanticipated format changes.
 
-[^2_Introduction2]: for quite an obviously visible example of progressive SVG loading,
+[^2_Introduction1]: for quite an obviously visible example of progressive SVG loading,
     try loading this SVG using a recent version of Google Chrome:
     <http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg>
     For the perfectionist SVG artist, not just the final image should be
@@ -296,13 +293,13 @@ format changes.
 Background
 ==========
 
-The web as an application platform
-----------------------------------
-
 ![*A webapp running with a front end generated partially on server and
 partially on client side.* Ie, front-end client-side, front-end
 server-side, presentation layer a more meaningful distinction
-than](images/placeholder.png)
+than](images/architecture.png)
+
+The web as an application platform
+----------------------------------
 
 Application design, particularly regarding the presentation layer, has
 charted an undulating path pulled by competing patterns of thick and
@@ -694,6 +691,8 @@ approaches are particularly satisfactory.
 
 Json and XML
 ------------
+
+*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
 
 Although AJAX started as a means to transfer XML, today JSON "The
 fat-free alternative to XML[@jsonorg]" is the more popular serialisation
@@ -2331,8 +2330,6 @@ Memory was measured using Node's built in memory reporting tool,
 `process.memoryusage()` and the maximum figure returned on each run was
 taken
 
-### Aggregating services
-
 Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
@@ -2577,10 +2574,33 @@ method. This would probably be an improvement.
     retrieved 11th October 2013
 
 
+Appendix i: Limits to number of simultaneous connections under various http clients {#appendix_http_limits}
+===================================================================================
+
+  -------------------------------------
+  http Client     connection limit per
+                  server
+  --------------- ---------------------
+  Firefox         6 
+
+  Internet        4
+  Explorer        
+
+  Chrome /        32 sockets per proxy
+  Chromium        6 sockets per
+                  destination host 256
+                  sockets per process
+  -------------------------------------
+
+https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+
+http://msdn.microsoft.com/de-de/magazine/ee330731.aspx\#http11\_max\_con
+
+http://dev.chromium.org/developers/design-documents/network-stack\#TOC-Connection-Management
 
 
-Appendix
-========
+Appendix ii: Oboe.js source code listing
+========================================
 
 
 
@@ -4264,6 +4284,254 @@ function wire (httpMethodName, url, body, headers){
                incrementalContentBuilder(eventBus.fire) 
    );
 }
+
+~~~~
+
+
+
+Appendix iii: Benchmarking
+==========================
+
+
+
+
+benchmarkClient.js
+---
+
+~~~~ {.javascript}
+
+/* call this script from the command line with first argument either
+    oboe, jsonParse, or clarinet.
+    
+   This script won't time the events, I'm using `time` on the command line
+   to keep things simple.
+ */
+
+require('color');
+
+var DB_URL = 'http://localhost:4444/db';  
+
+
+function aggregateWithOboe() {
+
+   var oboe = require('../dist/oboe-node.js');
+   
+   oboe(DB_URL).node('{id url}.url', function(url){
+           
+      oboe(url).node('name', function(name){
+                      
+         console.log(name);
+         this.abort();
+         console.log( process.memoryUsage().heapUsed );         
+      });      
+   });                 
+}
+
+function aggregateWithJsonParse() {
+
+   var getJson = require('get-json');
+
+   getJson(DB_URL, function(err, records) {
+       
+      records.data.forEach( function( record ){
+       
+         var url = record.url;
+         
+         getJson(url, function(err, record) {
+            console.log(record.name);
+            console.log( process.memoryUsage().heapUsed );
+         });
+      });
+
+   });   
+
+}
+
+
+function aggregateWithClarinet() {
+
+   var clarinet = require('clarinet');   
+   var http = require('http');
+   var outerClarinetStream = clarinet.createStream();
+   var outerKey;
+   
+   var outerRequest = http.request(DB_URL, function(res) {
+                              
+      res.pipe(outerClarinetStream);
+   });
+   
+   outerClarinetStream = clarinet.createStream();
+      
+   outerRequest.end();
+      
+   outerClarinetStream.on('openobject', function( keyName ){      
+      if( keyName ) {
+         outerKey = keyName;      
+      }
+   });
+   
+   outerClarinetStream.on('key', function(keyName){
+      outerKey = keyName;
+   });
+   
+   outerClarinetStream.on('value', function(value){
+      if( outerKey == 'url' ) {
+         innerRequest(value)
+      }
+   });      
+   
+   
+   function innerRequest(url) {
+      
+      var innerRequest = http.request(url, function(res) {
+                                 
+         res.pipe(innerClarinetStream);
+      });
+      
+      var innerClarinetStream = clarinet.createStream();
+      
+      innerRequest.end();            
+      
+      var innerKey;
+      
+      innerClarinetStream.on('openobject', function( keyName ){      
+         if( keyName ) {
+            innerKey = keyName;      
+         }
+      });
+      
+      innerClarinetStream.on('key', function(keyName){
+         innerKey = keyName;
+      });
+      
+      innerClarinetStream.on('value', function(value){
+         if( innerKey == 'name' ) {
+            console.log( value )
+            console.log( process.memoryUsage().heapUsed );            
+         }
+      });            
+   }
+}
+
+var strategies = {
+   oboe:       aggregateWithOboe,
+   jsonParse:  aggregateWithJsonParse,
+   clarinet:   aggregateWithClarinet
+}
+
+var strategyName = process.argv[2];
+
+// use any of the above three strategies depending on a command line argument:
+console.log('benchmarking strategy', strategyName);
+
+strategies[strategyName]();
+
+
+~~~~
+
+
+
+
+\pagebreak
+
+benchmarkServer.js
+---
+
+~~~~ {.javascript}
+/**   
+ */
+
+"use strict";
+
+var PORT = 4444;
+
+var TIME_BETWEEN_RECORDS = 15;
+// 80 records but only every other one has a URL:
+var NUMBER_OF_RECORDS = 80;
+
+function sendJsonHeaders(res) {
+   var JSON_MIME_TYPE = "application/octet-stream";
+   res.setHeader("Content-Type", JSON_MIME_TYPE);
+   res.writeHead(200);
+}
+
+function serveItemList(_req, res) {
+
+   console.log('slow number server: send simulated database data');
+
+   res.write('{"data": [');
+
+   var i = 0;
+
+   var inervalId = setInterval(function () {
+
+      if( i % 2 == 0 ) {
+
+         res.write(JSON.stringify({
+            "id": i,
+            "url": "http://localhost:4444/item/" + i         
+         }));
+      } else {
+         res.write(JSON.stringify({
+            "id": i         
+         }));      
+      }
+      
+      if (i == NUMBER_OF_RECORDS) {
+
+         res.end(']}');
+         
+         clearInterval(inervalId);
+         
+         console.log('db server: finished writing to stream');
+      } else {
+         res.write(',');
+      }
+      
+      i++;  
+
+   }, TIME_BETWEEN_RECORDS);
+}
+
+function serveItem(req, res){
+
+   var id = req.params.id;
+   
+   console.log('will output fake record with id', id);     
+
+   setTimeout(function(){
+      // the items served are all the same except for the id field.
+      // this is realistic looking but randomly generated object fro
+      // <project>/test/json/oneHundredrecords.json   
+      res.end(JSON.stringify({
+         "id" : id,
+         "url": "http://localhost:4444/item/" + id,      
+         "guid": "046447ee-da78-478c-b518-b612111942a5",
+         "picture": "http://placehold.it/32x32",
+         "age": 37,
+         "name": "Humanoid robot number " + id,
+         "company": "Robotomic",
+         "phone": "806-587-2379",
+         "email": "payton@robotomic.com"
+      }));
+            
+   }, TIME_BETWEEN_RECORDS);
+
+}
+
+function routing() {
+   var Router = require('node-simple-router'),
+       router = Router();
+
+   router.get( '/db',         serveItemList);
+   router.get( '/item/:id',   serveItem);
+   
+   return router;
+}
+      
+var server = require('http').createServer(routing()).listen(PORT);
+
+console.log('Benchmark server started on port', String(PORT));
 
 ~~~~
 

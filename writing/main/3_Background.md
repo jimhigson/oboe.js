@@ -1,13 +1,13 @@
 Background
 ==========
 
-The web as an application platform
-----------------------------------
-
 ![*A webapp running with a front end generated partially on server and
 partially on client side.* Ie, front-end client-side, front-end
 server-side, presentation layer a more meaningful distinction
-than](images/placeholder.png)
+than](images/architecture.png)
+
+The web as an application platform
+----------------------------------
 
 Application design, particularly regarding the presentation layer, has
 charted an undulating path pulled by competing patterns of thick and
