@@ -53,7 +53,7 @@ micro-optimisations that hurt code readability is a futile endeavour.
 Node.js
 -------
 
-architecture showin in figure \ref{architecture}
+architecture shown in figure \ref{architecture}
 
 Include? Node not just for servers. CLI tools etc.
 
@@ -333,9 +333,8 @@ programmer debugging an application the assortment of transports only
 enhances the black-box mentality with regards to the underlying
 transports.
 
-<!---
 *some or all of the below could move to A&R, it is wondering into
-analysis* --->
+analysis*
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
