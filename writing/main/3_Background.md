@@ -1,45 +1,24 @@
 Background
 ==========
 
-![*A webapp running with a front end generated partially on server and
-partially on client side.* Ie, front-end client-side, front-end
-server-side, presentation layer a more meaningful distinction
-than](images/architecture.png)
+![**Labelling nodes in an n-tier architecture** Regardless of where a
+node is located, REST may be used as the means of communication. By
+focusing on REST clients, nodes in the middleware and presentation layer
+fall in our scope. Although network topology is often split about client
+and server side, for our purposes categorisation as tiers is a more
+meaningful distinction. According to this split the client-side
+presentation layer and server-side presentation layer serve the same
+purpose, generating mark-up based on aggregated data created in the
+middle tier](images/architecture.png)
 
 The web as an application platform
 ----------------------------------
 
 Application design, particularly regarding the presentation layer, has
-charted an undulating path pulled by competing patterns of thick and
-thin clients. Having been taken up as the platform today for all but the
+charted an undulating path pulled by competing strategies of thick and
+thin clients. Having been taken up as the platform for all but the
 most specialised applications, the web continues in this fashion by
-resisting easy categorisation as either mode. Although born on the
-network, at inception the web wasn't particularly graphical and didn't
-tread in the steps of networked graphical technologies such as X11 in
-which every presentation decision was made on a remote server [^1] --
-instead of sending fine-grained graphical instructions, a much more
-compact document mark-up format was used. At the same time, the
-markup-format was unlike like Gopher by being not totally semantic
-meaning that presentation layer concerns were kept partially resident on
-the server. At this time, whereas CGI was being used to serve documents
-with changeable content, it was not until 1996 with *ViaWeb* (later to
-become Yahoo Stores) that a user could be given pages comparable in
-function to the GUI interface of a desktop application. [@otherRoad -
-get page number, in old dis]. The interface of these early web
-applications comprised of pages dynamically generated on the server
-side, but handled statically on the client side so far as the browser
-was not able to be scripted to manipulate the page in any way.
-
-The modern, client-scripted web bears a striking resemblance to NeWS.
-Rather than send many individual drawings, the server could send
-parametrised instructions to show the client *how* some item of
-presentation is drawn. Having received the program, the only
-communications required are the parameters. This mixed-model provides no
-lesser degree of server-side control but by using client-side rendering
-a much faster experience was possible than would otherwise be possible
-over low-speed networks [@news].
-
-Today it is agreed that program architecture should separate
+resisting easy categorisation as either mode. Today it is agreed that program architecture should separate
 presentation from operational logic but there is no firm consensus on
 where each concern should be exercised. While it feels that Javascript
 is becoming requisite to even display a page, there are also actions in
@@ -58,7 +37,7 @@ present a bottleneck. Because Javascript is used for user interfaces,
 frame-rates are important. Single threaded so js holds up rendering.
 Important to return control to the browser quickly. However, once
 execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation brings zero benefit. Hence, writing
+refresh rate, further optimisation is without practical benefit. Hence, writing
 extremely optimised Javascript, especially focusing on
 micro-optimisations that hurt code readability is a bit silly.
 
@@ -73,11 +52,11 @@ Node.js
 
 Include? Node not just for servers. CLI tools etc.
 
-Include? Compare to Erlang. Waiter model. Node restaurant much more efficient use
-of expensive resources.
+Include? Compare to Erlang. Waiter model. Node restaurant much more
+efficient use of expensive resources.
 
-Include? No 'task' class or type, tasks are nothing more than functions, possibly
-having some values implicitly wrapped up in their closure.
+Include? No 'task' class or type, tasks are nothing more than functions,
+possibly having some values implicitly wrapped up in their closure.
 
 Include? Easy to distribute software (npm etc)
 
