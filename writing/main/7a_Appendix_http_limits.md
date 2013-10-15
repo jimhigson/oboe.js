@@ -1,11 +1,11 @@
-Appendix i: Limits to number of simultaneous connections under various http clients
+Appendix i: Limits to number of simultaneous connections under various http clients {#appendix_http_limits}
 ===================================================================================
 
   -------------------------------------
   http Client     connection limit per
                   server
   --------------- ---------------------
-  Firefox         6 
+  Firefox         6
 
   Internet        4
   Explorer        
