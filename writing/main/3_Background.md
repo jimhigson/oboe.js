@@ -55,15 +55,12 @@ Node.js
 
 architecture shown in figure \ref{architecture}
 
-Include? Node not just for servers. CLI tools etc.
-
-Include? Compare to Erlang. Waiter model. Node restaurant much more
-efficient use of expensive resources.
-
-Include? No 'task' class or type, tasks are nothing more than functions,
-possibly having some values implicitly wrapped up in their closure.
-
-Include? Easy to distribute software (npm etc)
+-   Node not just for servers. CLI tools etc.
+-   Compare to Erlang. Waiter model. Node restaurant much more efficient
+    use of expensive resources.
+-   No 'task' class or type, tasks are nothing more than functions,
+    possibly having some values implicitly wrapped up in their closure.
+-   Easy to distribute software (npm etc)
 
 It is difficult to say to what degree Node's use of Javascript is a
 distraction from the system's principled design aims and to what degree
@@ -136,7 +133,7 @@ function printResource(url) {
       // It does some logging, adds a listener and quickly exits.
       
       // Because it is captured inside a closure we are able to reference 
-      // the url variable even after the scope that declared it has finished.            
+      // the url parameter even now the scope that declared it has finished.            
       console.log("The response has started for " + path);
    
       response.on('data', function(chunk) {      
