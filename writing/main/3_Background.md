@@ -116,14 +116,14 @@ programmer. Closures require no new syntax, the implicit storage of this
 data feels so natural and inevitable that looking at the typical program
 it is often not obvious that the responsibility exists at all.
 
+Consider the below example. Rather than blocking, this code relies on
+non-blocking io and schedules three tasks, each of which are very short
+and exit quickly allowing this node instance to continue with other
+tasks in between. However sophisticated and performant this style of
+programming, to the developer it is barely more difficult than if a
+blocking io model were followed.
+
 ~~~~ {.javascript}
-// Rather than blocking, this code relies on non-blocking io and
-// schedules three tasks, each of which are very short and exit quickly
-// allowing this node instance to continue with other tasks in between. 
-// However sophisticated and performant this style of programming, 
-// to the developer it is barely more difficult than if a blocking io
-// model were followed. 
-      
 http.get('http://example.com/', function(response){
    
    // This function will be called when the response starts. The callback
