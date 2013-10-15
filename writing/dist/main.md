@@ -293,56 +293,36 @@ in avoiding disruption given unanticipated format changes.
 Background
 ==========
 
-![*A webapp running with a front end generated partially on server and
-partially on client side.* Ie, front-end client-side, front-end
-server-side, presentation layer a more meaningful distinction
-than](images/architecture.png)
+![**Labelling nodes in an n-tier architecture** Regardless of where a
+node is located, REST may be used as the means of communication. By
+focusing on REST clients, nodes in the middleware and presentation layer
+fall in our scope. Although network topology is often split about client
+and server side, for our purposes categorisation as tiers is a more
+meaningful distinction. According to this split the client-side
+presentation layer and server-side presentation layer serve the same
+purpose, generating mark-up based on aggregated data created in the
+middle tier](images/architecture.png)
 
 The web as an application platform
 ----------------------------------
 
 Application design, particularly regarding the presentation layer, has
-charted an undulating path pulled by competing patterns of thick and
-thin clients. Having been taken up as the platform today for all but the
-most specialised applications, the web continues in this fashion by
-resisting easy categorisation as either mode. Although born on the
-network, at inception the web wasn't particularly graphical and didn't
-tread in the steps of networked graphical technologies such as X11 in
-which every presentation decision was made on a remote server [^3_Background1] --
-instead of sending fine-grained graphical instructions, a much more
-compact document mark-up format was used. At the same time, the
-markup-format was unlike like Gopher by being not totally semantic
-meaning that presentation layer concerns were kept partially resident on
-the server. At this time, whereas CGI was being used to serve documents
-with changeable content, it was not until 1996 with *ViaWeb* (later to
-become Yahoo Stores) that a user could be given pages comparable in
-function to the GUI interface of a desktop application. [@otherRoad -
-get page number, in old dis]. The interface of these early web
-applications comprised of pages dynamically generated on the server
-side, but handled statically on the client side so far as the browser
-was not able to be scripted to manipulate the page in any way.
-
-The modern, client-scripted web bears a striking resemblance to NeWS.
-Rather than send many individual drawings, the server could send
-parametrised instructions to show the client *how* some item of
-presentation is drawn. Having received the program, the only
-communications required are the parameters. This mixed-model provides no
-lesser degree of server-side control but by using client-side rendering
-a much faster experience was possible than would otherwise be possible
-over low-speed networks [@news].
-
-Today it is agreed that program architecture should separate
-presentation from operational logic but there is no firm consensus on
-where each concern should be exercised. While it feels that Javascript
-is becoming requisite to even display a page, there are also actions in
-the opposite direction, for example in 2012 twitter moved much of their
-rendering back to the server-side reducing load times to one fifth of
-their previous design, commenting "The future is coming and it looks
-just like the past" [@newTwitter]. This model generated server-side
-short pages that load quick and are ready to be displayed but also sent
-the Javascript which would allow the display to be updated without
-another full server load. One weakness of this model is that the same
-presentational logic requires two expressions.
+charted an undulating path pulled by competing strategies of thick and
+thin clients. Having been taken up as the platform for all but the most
+specialised applications, the web continues in this fashion by resisting
+easy categorisation as either mode. Today it is agreed that program
+architecture should separate presentation from operational logic but
+there is no firm consensus on where each concern should be exercised.
+While it feels that Javascript is becoming requisite to even display a
+page, there are also actions in the opposite direction, for example in
+2012 twitter moved much of their rendering back to the server-side
+reducing load times to one fifth of their previous design, commenting
+"The future is coming and it looks just like the past" [@newTwitter].
+This model generated server-side short pages that load quick and are
+ready to be displayed but also sent the Javascript which would allow the
+display to be updated without another full server load. One weakness of
+this model is that the same presentational logic requires two
+expressions.
 
 Like most interactive programming, client-side scripts usually suffer
 greater delays waiting for io than because javascript execution times
@@ -350,8 +330,8 @@ present a bottleneck. Because Javascript is used for user interfaces,
 frame-rates are important. Single threaded so js holds up rendering.
 Important to return control to the browser quickly. However, once
 execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation brings zero benefit. Hence, writing
-extremely optimised Javascript, especially focusing on
+refresh rate, further optimisation is without practical benefit. Hence,
+writing extremely optimised Javascript, especially focusing on
 micro-optimisations that hurt code readability is a bit silly.
 
 > The user does something, then the app responds visually with immediacy
@@ -365,11 +345,11 @@ Node.js
 
 Include? Node not just for servers. CLI tools etc.
 
-Include? Compare to Erlang. Waiter model. Node restaurant much more efficient use
-of expensive resources.
+Include? Compare to Erlang. Waiter model. Node restaurant much more
+efficient use of expensive resources.
 
-Include? No 'task' class or type, tasks are nothing more than functions, possibly
-having some values implicitly wrapped up in their closure.
+Include? No 'task' class or type, tasks are nothing more than functions,
+possibly having some values implicitly wrapped up in their closure.
 
 Include? Easy to distribute software (npm etc)
 
@@ -546,7 +526,7 @@ structure to de-serialise to. If this seems like a small advantage,
 contrast with the plethora of confusing and incompatible representations
 of JSON output presented by the various Java JSON parsers; JSON's Object
 better resembles Java's Map than Object and the confusion between JSON
-null, Java null, and Jackson's NullNode[^3_Background2] is a common cause of errors.
+null, Java null, and Jackson's NullNode[^3_Background1] is a common cause of errors.
 Endowed with certainty regarding deserialisation, JSON parsers could be
 safely integrated directly into AJAX libraries. This provided a call
 style while working with remote resources so streamlined as to require
@@ -1096,11 +1076,7 @@ JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
 
-[^3_Background1]: rather confusingly, X11 would call the *server* the *client* but I
-    use terms here by their more cannonical meaning such that the client
-    is the machine the user is actually interacting with
-
-[^3_Background2]: See
+[^3_Background1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
 
 

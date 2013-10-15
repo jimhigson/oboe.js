@@ -384,59 +384,36 @@ in avoiding disruption given unanticipated format changes.
 \begin{figure}[htbp]
 \centering
 \includegraphics{images/architecture.png}
-\caption{\emph{A webapp running with a front end generated partially on
-server and partially on client side.} Ie, front-end client-side,
-front-end server-side, presentation layer a more meaningful distinction
-than}
+\caption{\textbf{Labelling nodes in an n-tier architecture} Regardless
+of where a node is located, REST may be used as the means of
+communication. By focusing on REST clients, nodes in the middleware and
+presentation layer fall in our scope. Although network topology is often
+split about client and server side, for our purposes categorisation as
+tiers is a more meaningful distinction. According to this split the
+client-side presentation layer and server-side presentation layer serve
+the same purpose, generating mark-up based on aggregated data created in
+the middle tier}
 \end{figure}
 
 \subsection{The web as an application platform}
 
 Application design, particularly regarding the presentation layer, has
-charted an undulating path pulled by competing patterns of thick and
-thin clients. Having been taken up as the platform today for all but the
-most specialised applications, the web continues in this fashion by
-resisting easy categorisation as either mode. Although born on the
-network, at inception the web wasn't particularly graphical and didn't
-tread in the steps of networked graphical technologies such as X11 in
-which every presentation decision was made on a remote server\footnote{Rather
-  confusingly, X11 would call the \emph{server} the \emph{client} but I
-  use terms here by their more cannonical meaning such that the client
-  is the machine the user is actually interacting with.} -- instead of
-sending fine-grained graphical instructions, a much more compact
-document mark-up format was used. At the same time, the markup-format
-was unlike like Gopher by being not totally semantic meaning that
-presentation layer concerns were kept partially resident on the server.
-At this time, whereas CGI was being used to serve documents with
-changeable content, it was not until 1996 with \emph{ViaWeb} (later to
-become Yahoo Stores) that a user could be given pages comparable in
-function to the GUI interface of a desktop application. (Graham 2004 -
-get page number, in old dis). The interface of these early web
-applications comprised of pages dynamically generated on the server
-side, but handled statically on the client side so far as the browser
-was not able to be scripted to manipulate the page in any way.
-
-The modern, client-scripted web bears a striking resemblance to NeWS.
-Rather than send many individual drawings, the server could send
-parametrised instructions to show the client \emph{how} some item of
-presentation is drawn. Having received the program, the only
-communications required are the parameters. This mixed-model provides no
-lesser degree of server-side control but by using client-side rendering
-a much faster experience was possible than would otherwise be possible
-over low-speed networks (Hopkins 1994).
-
-Today it is agreed that program architecture should separate
-presentation from operational logic but there is no firm consensus on
-where each concern should be exercised. While it feels that Javascript
-is becoming requisite to even display a page, there are also actions in
-the opposite direction, for example in 2012 twitter moved much of their
-rendering back to the server-side reducing load times to one fifth of
-their previous design, commenting ``The future is coming and it looks
-just like the past'' (Lea 2012). This model generated server-side short
-pages that load quick and are ready to be displayed but also sent the
-Javascript which would allow the display to be updated without another
-full server load. One weakness of this model is that the same
-presentational logic requires two expressions.
+charted an undulating path pulled by competing strategies of thick and
+thin clients. Having been taken up as the platform for all but the most
+specialised applications, the web continues in this fashion by resisting
+easy categorisation as either mode. Today it is agreed that program
+architecture should separate presentation from operational logic but
+there is no firm consensus on where each concern should be exercised.
+While it feels that Javascript is becoming requisite to even display a
+page, there are also actions in the opposite direction, for example in
+2012 twitter moved much of their rendering back to the server-side
+reducing load times to one fifth of their previous design, commenting
+``The future is coming and it looks just like the past'' (Lea 2012).
+This model generated server-side short pages that load quick and are
+ready to be displayed but also sent the Javascript which would allow the
+display to be updated without another full server load. One weakness of
+this model is that the same presentational logic requires two
+expressions.
 
 Like most interactive programming, client-side scripts usually suffer
 greater delays waiting for io than because javascript execution times
@@ -444,8 +421,8 @@ present a bottleneck. Because Javascript is used for user interfaces,
 frame-rates are important. Single threaded so js holds up rendering.
 Important to return control to the browser quickly. However, once
 execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation brings zero benefit. Hence, writing
-extremely optimised Javascript, especially focusing on
+refresh rate, further optimisation is without practical benefit. Hence,
+writing extremely optimised Javascript, especially focusing on
 micro-optimisations that hurt code readability is a bit silly.
 
 \begin{quote}
@@ -4713,14 +4690,9 @@ Geelhoed, Erik, Peter Toft, Suzanne Roberts, and Patrick Hyland. 1995.
 
 Gill, Brendan. 2013. ``OpenSignal.''
 
-Graham, Paul. 2004. \emph{The Other Road Ahead}. O'Reilly and
-Associates.
-
 Guo, shu-yu. 2013. ``Two Reasons Functional Style Is Slow in
 SpiderMonkey.''
 \url{http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html}.
-
-Hopkins, Don. 1994. \emph{The X-Windows Disaster}. Hungry Minds.
 
 Lea, Tom. 2012. ``Improving performance on twitter.com.''
 \url{{[}https://blog.twitter.com/2012/improving-performance-twittercom{]}}.
