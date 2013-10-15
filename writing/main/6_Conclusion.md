@@ -36,8 +36,6 @@ Memory was measured using Node's built in memory reporting tool,
 `process.memoryusage()` and the maximum figure returned on each run was
 taken
 
-### Aggregating services
-
 Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
