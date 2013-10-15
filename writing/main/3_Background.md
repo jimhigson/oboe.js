@@ -16,20 +16,21 @@ The web as an application platform
 
 Application design, particularly regarding the presentation layer, has
 charted an undulating path pulled by competing strategies of thick and
-thin clients. Having been taken up as the platform for all but the
-most specialised applications, the web continues in this fashion by
-resisting easy categorisation as either mode. Today it is agreed that program architecture should separate
-presentation from operational logic but there is no firm consensus on
-where each concern should be exercised. While it feels that Javascript
-is becoming requisite to even display a page, there are also actions in
-the opposite direction, for example in 2012 twitter moved much of their
-rendering back to the server-side reducing load times to one fifth of
-their previous design, commenting "The future is coming and it looks
-just like the past" [@newTwitter]. This model generated server-side
-short pages that load quick and are ready to be displayed but also sent
-the Javascript which would allow the display to be updated without
-another full server load. One weakness of this model is that the same
-presentational logic requires two expressions.
+thin clients. Having been taken up as the platform for all but the most
+specialised applications, the web continues in this fashion by resisting
+easy categorisation as either mode. Today it is agreed that program
+architecture should separate presentation from operational logic but
+there is no firm consensus on where each concern should be exercised.
+While it feels that Javascript is becoming requisite to even display a
+page, there are also actions in the opposite direction, for example in
+2012 twitter moved much of their rendering back to the server-side
+reducing load times to one fifth of their previous design, commenting
+"The future is coming and it looks just like the past" [@newTwitter].
+This model generated server-side short pages that load quick and are
+ready to be displayed but also sent the Javascript which would allow the
+display to be updated without another full server load. One weakness of
+this model is that the same presentational logic requires two
+expressions.
 
 Like most interactive programming, client-side scripts usually suffer
 greater delays waiting for io than because javascript execution times
@@ -37,8 +38,8 @@ present a bottleneck. Because Javascript is used for user interfaces,
 frame-rates are important. Single threaded so js holds up rendering.
 Important to return control to the browser quickly. However, once
 execution of each js frame of execution is no more than the monitor
-refresh rate, further optimisation is without practical benefit. Hence, writing
-extremely optimised Javascript, especially focusing on
+refresh rate, further optimisation is without practical benefit. Hence,
+writing extremely optimised Javascript, especially focusing on
 micro-optimisations that hurt code readability is a bit silly.
 
 > The user does something, then the app responds visually with immediacy
@@ -233,7 +234,7 @@ structure to de-serialise to. If this seems like a small advantage,
 contrast with the plethora of confusing and incompatible representations
 of JSON output presented by the various Java JSON parsers; JSON's Object
 better resembles Java's Map than Object and the confusion between JSON
-null, Java null, and Jackson's NullNode[^2] is a common cause of errors.
+null, Java null, and Jackson's NullNode[^1] is a common cause of errors.
 Endowed with certainty regarding deserialisation, JSON parsers could be
 safely integrated directly into AJAX libraries. This provided a call
 style while working with remote resources so streamlined as to require
@@ -783,9 +784,5 @@ JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
 
-[^1]: rather confusingly, X11 would call the *server* the *client* but I
-    use terms here by their more cannonical meaning such that the client
-    is the machine the user is actually interacting with
-
-[^2]: See
+[^1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
