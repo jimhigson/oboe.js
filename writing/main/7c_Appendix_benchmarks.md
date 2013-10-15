@@ -1,2 +1,2 @@
-Appendix iii: Benchmarking source
-=================================
+Appendix iii: Benchmarking
+==========================
