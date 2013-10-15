@@ -263,16 +263,15 @@ the language itself from inside the language itself. With a functional
 approach, assembly from very small pieces gives a similar level of
 expressivity as writing the logic out as source code.
 
-JS language 
+JS language
 -----------
 
 Javascript: not the greatest for 'final' elegant presentation of
 programming. Does allow 'messy' first drafts which can be refactored
-into beautiful code. An awareness of beautiful languages lets us
-know the right direction to go in. An ugly language lets us find
-something easy to write that works to get us started. Allows a very
-sketchy program to be written, little more than a programming
-scratchpad.
+into beautiful code. An awareness of beautiful languages lets us know
+the right direction to go in. An ugly language lets us find something
+easy to write that works to get us started. Allows a very sketchy
+program to be written, little more than a programming scratchpad.
 
 Without strict typing, hard to know if program is correct without
 running it. In theory (decidability) and in practice (often find errors
@@ -316,8 +315,37 @@ Built into Dojo Followers on Github Being posted in forums (hopefully
 also listed on blogs) No homepage as of yet other than the Github page
 
 Http blargh
-----------
+-----------
 
 Aborting http request may not stop processing on the server. Why this is
 perhaps desirable - transactions, leaving resources in a half-complete
 state.
+
+From top of 3. background -- some good stuff here perhaps
+---------------------------------------------------------
+
+Although born on the network, at inception the web wasn't particularly
+graphical and didn't tread in the steps of networked graphical
+technologies such as X11 in which every presentation decision was made
+on a remote server [\^1] -- instead of sending fine-grained graphical
+instructions, a much more compact document mark-up format was used. At
+the same time, the markup-format was unlike like Gopher by being not
+totally semantic meaning that presentation layer concerns were kept
+partially resident on the server. At this time, whereas CGI was being
+used to serve documents with changeable content, it was not until 1996
+with *ViaWeb* (later to become Yahoo Stores) that a user could be given
+pages comparable in function to the GUI interface of a desktop
+application. [@otherRoad - get page number, in old dis]. The interface
+of these early web applications comprised of pages dynamically generated
+on the server side, but handled statically on the client side so far as
+the browser was not able to be scripted to manipulate the page in any
+way.
+
+The modern, client-scripted web bears a striking resemblance to NeWS.
+Rather than send many individual drawings, the server could send
+parametrised instructions to show the client *how* some item of
+presentation is drawn. Having received the program, the only
+communications required are the parameters. This mixed-model provides no
+lesser degree of server-side control but by using client-side rendering
+a much faster experience was possible than would otherwise be possible
+over low-speed networks [@news].
