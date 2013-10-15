@@ -644,7 +644,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.3586011"
-     inkscape:cx="426.85121"
+     inkscape:cx="307.75401"
      inkscape:cy="530.17168"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -913,7 +913,7 @@
          y="627.36218"
          x="297.36523"
          sodipodi:role="line"
-         id="tspan7956">middle tier</tspan></text>
+         id="tspan7956">middleware</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text7958"
@@ -924,7 +924,7 @@
          y="627.36218"
          x="235"
          sodipodi:role="line"
-         id="tspan7960">back end/data</tspan></text>
+         id="tspan7960">data tier</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text7968"
