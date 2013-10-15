@@ -1,7 +1,7 @@
 Background
 ==========
 
-![**Labelling nodes in an n-tier architecture** Regardless of where a
+![**Labelling nodes in an n-tier architecture**. Regardless of where a
 node is located, REST may be used as the means of communication. By
 focusing on REST clients, nodes in the middleware and presentation layer
 fall in our scope. Although network topology is often split about client
@@ -9,7 +9,7 @@ and server side, for our purposes categorisation as tiers is a more
 meaningful distinction. According to this split the client-side
 presentation layer and server-side presentation layer serve the same
 purpose, generating mark-up based on aggregated data created in the
-middle tier](images/architecture.png)
+middle tier \label{architecture}](images/architecture.png)
 
 The web as an application platform
 ----------------------------------
@@ -21,16 +21,18 @@ specialised applications, the web continues in this fashion by resisting
 easy categorisation as either mode. Today it is agreed that program
 architecture should separate presentation from operational logic but
 there is no firm consensus on where each concern should be exercised.
-While it feels that Javascript is becoming requisite to even display a
-page, there are also actions in the opposite direction, for example in
-2012 twitter moved much of their rendering back to the server-side
-reducing load times to one fifth of their previous design, commenting
-"The future is coming and it looks just like the past" [@newTwitter].
-This model generated server-side short pages that load quick and are
-ready to be displayed but also sent the Javascript which would allow the
-display to be updated without another full server load. One weakness of
-this model is that the same presentational logic requires two
-expressions.
+While for some sites Javascript is requisite to view any content, there
+are also actions in the opposite direction. For example in 2012 twitter
+moved much of their rendering back to the server-side reducing load
+times to one fifth of their previous design, commenting "The future is
+coming and it looks just like the past" [@newTwitter]. This model
+generated server-side short pages that load quick and are ready to be
+displayed but also sent the Javascript which would allow the display to
+be updated without another full server load. One weakness of this model
+is that the same presentational logic requires two expressions.
+
+-   cs/ss not the most meaningful split
+-   REST glues the layers together regardless
 
 Like most interactive programming, client-side scripts usually suffer
 greater delays waiting for io than because javascript execution times
@@ -40,7 +42,7 @@ Important to return control to the browser quickly. However, once
 execution of each js frame of execution is no more than the monitor
 refresh rate, further optimisation is without practical benefit. Hence,
 writing extremely optimised Javascript, especially focusing on
-micro-optimisations that hurt code readability is a bit silly.
+micro-optimisations that hurt code readability is a futile endeavour.
 
 > The user does something, then the app responds visually with immediacy
 > at 30 frames per second or more, and completes a task in a few hundred
@@ -50,6 +52,8 @@ micro-optimisations that hurt code readability is a bit silly.
 
 Node.js
 -------
+
+architecture showin in figure \ref{architecture}
 
 Include? Node not just for servers. CLI tools etc.
 
@@ -124,27 +128,28 @@ programming, to the developer it is barely more difficult than if a
 blocking io model were followed.
 
 ~~~~ {.javascript}
-http.get('http://example.com/', function(response){
-   
-   // This function will be called when the response starts. The callback
-   // having started listening to the response object will quickly exit
-   // as Node tasks are want to do. Because of closures we are able to
-   // access the path variable declared in a containing scope, even after
-   // the containing scope has exited.      
-   console.log("The response has started for " + path);
+function printResource(url) {
 
-   response.on('data', function(chunk) {
+   http.get(url, function(response){
+      
+      // This function will be called when the response starts.
+      // It does some logging, adds a listener and quickly exits.
+      
+      // Because it is captured inside a closure we are able to reference 
+      // the url variable even after the scope that declared it has finished.            
+      console.log("The response has started for " + path);
    
-      // This function is called each time some data is received from the 
-      // http request         
-      console.log('Got some response ' + chunk);       
-   });
-}).on("error", function(e){
-   
-   console.log("Got error: " + e.message);
-});      
-console.log("Request has been made");
-
+      response.on('data', function(chunk) {      
+         // This function is called each time some data is received from the 
+         // http request                  
+         console.log('Got some response ' + chunk);       
+      });
+   }).on("error", function(e){
+      
+      console.log("Got error: " + e.message);
+   });      
+   console.log("Request has been made");
+}   
 ~~~~
 
 Streams in Node
