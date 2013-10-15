@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="115.8125"
+   height="188.6875"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45+devel+devel"
+   sodipodi:docname="database-outline.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0"
+   inkscape:export-filename="I:\Documents and Settings\Eric\Bureau\database.png"
+   inkscape:export-xdpi="51.25"
+   inkscape:export-ydpi="51.25">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.206709"
+     inkscape:cx="21.324202"
+     inkscape:cy="60.065903"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     gridtolerance="10"
+     inkscape:snap-global="false"
+     inkscape:window-width="1270"
+     inkscape:window-height="954"
+     inkscape:window-x="1"
+     inkscape:window-y="1"
+     inkscape:object-nodes="false"
+     inkscape:snap-intersection-grid-guide="false">
+    <inkscape:grid
+       type="axonomgrid"
+       id="grid2388"
+       units="mm"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-116.8134,-634.58466)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 174.71965,639.58466 C 145.52246,639.58466 121.8134,652.92792 121.8134,669.36591 L 121.8134,788.49091 C 121.8134,804.9289 145.52247,818.27216 174.71965,818.27216 C 203.91684,818.27215 227.6259,804.92892 227.6259,788.49091 L 227.6259,669.36591 L 227.59465,669.36591 C 227.59465,652.92792 203.91684,639.58466 174.71965,639.58466 z"
+       id="rect3196" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.93746947999999990;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path2527"
+       sodipodi:cx="184.11563"
+       sodipodi:cy="698.03149"
+       sodipodi:rx="30.68594"
+       sodipodi:ry="17.716536"
+       d="M 214.80157,698.03149 A 30.68594,17.716536 0 1 1 153.42969,698.03149 A 30.68594,17.716536 0 1 1 214.80157,698.03149 z"
+       transform="matrix(1.6638767,0,0,1.6225174,-131.61326,-463.20234)" />
+  </g>
+</svg>
