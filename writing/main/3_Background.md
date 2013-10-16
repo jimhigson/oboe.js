@@ -165,9 +165,6 @@ function printResourceToConsole(url) {
 }   
 ~~~~
 
-Streams in Node
----------------
-
 > Streams in node are one of the rare occasions when doing something the
 > fast way is actually easier. SO USE THEM. not since bash has streaming
 > been introduced into a high level language as nicely as it is in
