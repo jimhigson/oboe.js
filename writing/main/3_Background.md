@@ -224,8 +224,10 @@ Once applications were built using Javascript abstractions over
 underlying browser differences, they could be written purposefully and
 comprehensibly express more complex ideas.
 
-JSON being a subset of Javascript, web developers barely noticed their
-privileged position whereby the serialisation of their data format
+JSON, itself a subset of Javascript, emerged as the main format for REST
+end points when requested via AJAX. 
+Javascript programmers occupied a
+privileged position whereby their serialisation format
 mapped exactly onto the basic types of their programming language. As
 such there was never any confusion as to which exact object structure to
 de-serialise to. If this seems like a small advantage, contrast with the
