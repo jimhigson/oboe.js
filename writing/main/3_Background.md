@@ -255,9 +255,9 @@ Streaming XHRs
 
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
-lowest common denominator of the available browser abilities. While
-simple, the call style above was developed while the most popular browser
-gave no means of access to partial responses so inevitably draws a
+lowest common denominator of the available browser abilities. At the time
+that the call style above was developed the most popular browser
+gave no means of access to partial responses. Inevitably, it draws a
 conceptualisation of the response as a one-time event with no
 accommodation offered for progressively delivered data.
 
