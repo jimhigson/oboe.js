@@ -233,18 +233,17 @@ to. Should this advantage seem insubstantial, contrast with the plethora of
 confusing and incompatible representations of JSON given by
 the various Java parsers: JSON's Object better resembles Java's Map interface
 than Java Objects and the confusion between JSON null, Java null, and
-Jackson's NullNode[^1] is a common cause of errors. Endowed with
-certainty regarding deserialisation, JSON parsers could be safely
-integrated directly into AJAX libraries. This provided a call style
-while working with remote resources so streamlined as to require hardly
-any additional effort.
+Jackson's NullNode[^1] is a common cause of errors. Emboldened by
+certainty regarding deserialisation, AJAX libraries directly integrated 
+JSON parsers, providing a call style for working with remote resources 
+so streamlined as to require hardly any additional effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
 
    // The parsing of the people json into a javascript object
-   // feels so natural that it is easy to forget while looking 
-   // at the code that it happens at all. 
+   // feels so natural that it is easy to forget from looking 
+   // at the code that parsing happens at all. 
    
    alert('the first person is called ' + people[0].name);
 });
