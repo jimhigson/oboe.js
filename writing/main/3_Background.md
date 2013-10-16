@@ -224,15 +224,16 @@ Once applications were built using Javascript abstractions over
 underlying browser differences, they could be written purposefully and
 comprehensibly express more complex ideas.
 
-JSON, itself a subset of Javascript, emerged as the main format output by REST
-end points when requesting via AJAX. Javascript programmers occupy a
-privileged position whereby their serialisation format maps exactly
-onto the inbuilt types of their programming language. As such there is
-never any confusion regarding which object structure to de-serialise to.
-Should this advantage seem insubstantial, contrast with the plethora of
-confusing and incompatible representations of JSON that are output by the various
-Java parsers: JSON's Object better resembles Java's Map interface than
-Java Objects, creating linguistic difficulties, and the confusion between JSON null, Java null, and
+JSON, itself a subset of Javascript, emerged as the main format output
+by REST end points when requesting via AJAX. Javascript programmers
+occupy a privileged position whereby their serialisation format maps
+exactly onto the inbuilt types of their programming language. As such
+there is never any confusion regarding which object structure to
+de-serialise to. Should this advantage seem insubstantial, contrast with
+the plethora of confusing and incompatible representations of JSON that
+are output by the various Java parsers: JSON's Object better resembles
+Java's Map interface than Java Objects, creating linguistic
+difficulties, and the confusion between JSON null, Java null, and
 Jackson's NullNode[^1] is a common cause of errors. Emboldened by
 certainty regarding deserialisation, AJAX libraries directly integrated
 JSON parsers, providing a call style for working with remote resources
