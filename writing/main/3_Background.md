@@ -286,24 +286,6 @@ considerations is implemented as a specific-purpose mechanism internal
 to the browser which is not exported to Javascript and as such is not
 possible to repurpose.
 
-*Client side deals with user input interactively whereas the server as a
-batch of data. Like most interactive programming, client-side scripts
-usually suffer greater delays waiting for io than because javascript
-execution times present a bottleneck. Because Javascript is used for
-user interfaces, frame-rates are important. Single threaded so js holds
-up rendering. Important to return control to the browser quickly.
-However, once execution of each js frame of execution is no more than
-the monitor refresh rate, further optimisation is without practical
-benefit. Hence, writing extremely optimised Javascript, especially
-focusing on micro-optimisations that hurt code readability is a futile
-endeavour.*
-
-> The user does something, then the app responds visually with immediacy
-> at 30 frames per second or more, and completes a task in a few hundred
-> milliseconds. As long as an app meets this user goal, it doesn’t
-> matter how big an abstraction layer it has to go through to get to
-> silicon. [@fivemyths]
-
 Streaming to the browser
 ------------------------
 

@@ -396,3 +396,24 @@ might choose to use chunking so that the browser is better able to
 choose when to re-render during the progressive display of a page
 [@perceptionHttpChunkedSpeed] but this is optional and without these
 hints progressive rendering will still take place.*
+
+js speed vs i/o speed
+---------------------
+
+*Client side deals with user input interactively whereas the server as a
+batch of data. Like most interactive programming, client-side scripts
+usually suffer greater delays waiting for io than because javascript
+execution times present a bottleneck. Because Javascript is used for
+user interfaces, frame-rates are important. Single threaded so js holds
+up rendering. Important to return control to the browser quickly.
+However, once execution of each js frame of execution is no more than
+the monitor refresh rate, further optimisation is without practical
+benefit. Hence, writing extremely optimised Javascript, especially
+focusing on micro-optimisations that hurt code readability is a futile
+endeavour.*
+
+> The user does something, then the app responds visually with immediacy
+> at 30 frames per second or more, and completes a task in a few hundred
+> milliseconds. As long as an app meets this user goal, it doesn’t
+> matter how big an abstraction layer it has to go through to get to
+> silicon. [@fivemyths]
