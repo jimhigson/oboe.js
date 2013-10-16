@@ -255,8 +255,8 @@ Streaming XHRs
 
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
-lowest common denominator of the available browser abilities. At the time
-that the call style above was developed the most popular browser
+lowest common denominator of the available browser abilities. At the
+time that the call style above was developed the most popular browser
 gave no means of access to partial responses. Inevitably, it draws a
 conceptualisation of the response as a one-time event with no
 accommodation offered for progressively delivered data.
@@ -270,11 +270,11 @@ Given streaming ambitions, of greatest interest is the progress event:
 
 Currently only legacy browsers do not support this event.
 
-The historic lack of streaming allowed by XHR stands incongruously with the
-browser as a platform which has long used streaming to precipitate almost every
-other remote resource. Progressive image formats, html, svg, video and
-Javascript itself (script interpretation starts before the script is fully
-loaded) are all examples of this.
+The historic lack of streaming allowed by XHR stands incongruously with
+the browser as a platform which has long used streaming to precipitate
+almost every other remote resource. Progressive image formats, html,
+svg, video and Javascript itself (script interpretation starts before
+the script is fully loaded) are all examples of this.
 
 Browser streaming frameworks
 ----------------------------
