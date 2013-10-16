@@ -174,13 +174,12 @@ function printResourceToConsole(url) {
 
 In Node i/o is performed through a unified streaming interface
 regardless of the source. The streams follow a publisher-subscriber
-pattern fitting comfortably with the wider event-driven model. 
-Although the abstraction provided by streams is quite a thin layer on
-top of the host system's socket, it forms a powerful and
-intuitive interface. For many tasks it is preferable to program in a
-'plumbing' style by joining one stream's output to another's input.
-In the example below a resource from the internet is written to
-the local filesystem.
+pattern fitting comfortably with the wider event-driven model. Although
+the abstraction provided by streams is quite a thin layer on top of the
+host system's socket, it forms a powerful and intuitive interface. For
+many tasks it is preferable to program in a 'plumbing' style by joining
+one stream's output to another's input. In the example below a resource
+from the internet is written to the local filesystem.
 
 ~~~~ {.javascript}
 http.get(url)
@@ -189,66 +188,35 @@ http.get(url)
    });
 ~~~~
 
-Current state of web browsers acting as REST clients 
-----------------------------------------------------
+State of web browsers as REST client hosts
+------------------------------------------
 
-*Client side deals with user input interactively whereas the server as a
-batch of data. Like most interactive programming, client-side scripts
-usually suffer greater delays waiting for io than because javascript
-execution times present a bottleneck. Because Javascript is used for
-user interfaces, frame-rates are important. Single threaded so js holds
-up rendering. Important to return control to the browser quickly.
-However, once execution of each js frame of execution is no more than
-the monitor refresh rate, further optimisation is without practical
-benefit. Hence, writing extremely optimised Javascript, especially
-focusing on micro-optimisations that hurt code readability is a futile
-endeavour.*
-
-> The user does something, then the app responds visually with immediacy
-> at 30 frames per second or more, and completes a task in a few hundred
-> milliseconds. As long as an app meets this user goal, it doesn’t
-> matter how big an abstraction layer it has to go through to get to
-> silicon. [@fivemyths]
-
-*Http is essentially a thinly-wrapped text response around some usually
-text-based (but sometimes binary) data. It may give the length of the
-content as a header, but is not obliged to. It supports an explicitly
-chunked mode, but even the non-chunked mode may be considered as a
-stream. For example, a program generating web pages on the server side
-might choose to use chunking so that the browser is better able to
-choose when to re-render during the progressive display of a page
-[@perceptionHttpChunkedSpeed] but this is optional and without these
-hints progressive rendering will still take place.*
-
-The requesting of http from Javascript, commonly termed AJAX, was so
-significant a technique in establishing the modern web application
-architecture that it is often taken as being a synonym for
-Javascript-heavy web pages. Although an acronym for Asynchronous
-Javascript and XML, for data services designed with delivery to
-client-side web applications in mind JSON is almost exclusively
-preferred to XML and the term is used without regard for the data format
-of the response (the unpronounceable *AJAJ* never took off). During the
-'browser war' years adding non-standard features was a common form of
-competition between authors; following this pattern Internet Explorer
-originally made AJAX possible by exposing Microsoft's Active X *Xml Http
-Request*, or XHR, object to Javascript programmers. This was widely
-copied as functional equivalents were added to all major browsers and
-the technique was eventually formalised by the W3C[@xhrWorkingDraft].
-What followed was a period of stagnation for web browsers. HTML4 reached
-W3C Recommendation status in 2001 but having subsequently found several
-evolutionary dead ends such as XHTML, the developer community would see
+Making http requests from Javascript, commonly termed AJAX, was so
+significant in establishing the modern web architecture that it 
+is sometimes used synonymously with Javascript-rich
+web applications. Although AJAX is an acronym for **A**synchronous
+**J**avascript (**a**nd) **X**ML, this reflects the early millennial 
+enthusiasm for XML as the one true data format and in practice any
+textual format may be transferred. Today JSON is generally preferred,
+especially for delivery to client-side web applications. During the
+'browser war' years web browsers competed by adding non-standard features;
+Internet Explorer made AJAX possible in 2000 by exposing Microsoft's Active X *Xml Http
+Request* (XHR) class to the Javascript sandbox. This was widely
+copied and near equivalents were added to all major browsers. In 2006
+the interface was eventually formalised by the W3C [@xhrWorkingDraft].
+XHR's slow progresss to standardisation reflected a period of general stagnation 
+for web standards.
+HTML4 reached Recommendation status in 2001 but having subsequently found several
+evolutionary dead ends such as XHTML, there would be
 no major updates until HTML5 started to gather pace some ten years
-later. In this context the web continued to rapidly mature as an
-application platform and AJAX programming inevitably overtook the
-original XHR specification, browser vendors again adding their own
-proprietary extensions to compensate.
+later.
 
+Despite a reputation for being poorly standardised, as a language
+Javascript is very consistently implemented. More accurately we would say that
+the libraries exposed to Javascript by the browsers lack compatibility.
 Given this backdrop of non-standard extensions and lagging
 standardisation, abstraction layers predictably rose in popularity.
-Despite a reputation Javascript being poorly standardised, as a language
-it is very consistently implemented. More accurately we should say that
-the libraries provided by the environment lack compatibility. Given an
-abstraction layer to gloss over considerable differences cross-browser
+Equipped with an abstraction layer to gloss over considerable differences cross-browser
 webapp developers found little difficulty in targeting multiple
 platforms. The various abstraction competed on developer ergonomics with
 the popular jQuery and Prototype.js promoting themselves respectively as
@@ -314,8 +282,26 @@ considerations is implemented as a specific-purpose mechanism internal
 to the browser which is not exported to Javascript and as such is not
 possible to repurpose.
 
-Browser streaming frameworks
-----------------------------
+*Client side deals with user input interactively whereas the server as a
+batch of data. Like most interactive programming, client-side scripts
+usually suffer greater delays waiting for io than because javascript
+execution times present a bottleneck. Because Javascript is used for
+user interfaces, frame-rates are important. Single threaded so js holds
+up rendering. Important to return control to the browser quickly.
+However, once execution of each js frame of execution is no more than
+the monitor refresh rate, further optimisation is without practical
+benefit. Hence, writing extremely optimised Javascript, especially
+focusing on micro-optimisations that hurt code readability is a futile
+endeavour.*
+
+> The user does something, then the app responds visually with immediacy
+> at 30 frames per second or more, and completes a task in a few hundred
+> milliseconds. As long as an app meets this user goal, it doesn’t
+> matter how big an abstraction layer it has to go through to get to
+> silicon. [@fivemyths]
+
+Streaming to the browser
+------------------------
 
 As the web's remit spread to include more applications which would
 previously have been native apps, to be truly 'live' many applications
