@@ -359,6 +359,46 @@ does remains constant. Although serving any particular request might be
 done in series, the workload as a whole at these tiers consists of many
 independent tasks and as such is embarrassingly parallelisable.
 
+Json and XML data transfer formats
+----------------------------------
+
+*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
+
+Although AJAX started as a means to transfer XML, today JSON "The
+fat-free alternative to XML[@jsonorg]" is the more popular serialisation
+format. The goals of XML were to simplify SGML to the point that a
+graduate student would be able to implement a parser in a week [@javaxml
+p ???]. For the student tackling JSON a few hours with a parser
+generator should surfice, being expressable in 15 CFGs. Indeed, because
+JSON is a strict subset of Javascript, in many cases the Javascript
+programmer requires no parser at all. Unimpeeded by SGML's roots as a
+document format, JSON provides a much more direct analogue to the
+metamodel of a canonical modern programming language with entities such
+as *string*, *number*, *object* and *array*. By closely mirroring a
+programmer's metamodel, visualising a mapping between a domain model and
+it's serialised objects becomes trivial.
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+~~~~
+
+This close resemblance to the model of the programming in some cases
+causes fast-changing formats.
+
+Like XML attributes, as a serialised text format, JSON objects have an
+order but are almost always parsed to and from orderless maps meaning
+that the order of the keys/value pairings as seen in the stream usually
+follows no defined order. No rule in the format would forbid
+representing of an ordered map in an ordered way but most tools on
+receiving such a message would ignore the ordering.
+
+(MINE SOA assignment). Also the diagram.
+
 Node.js
 -------
 
@@ -480,8 +520,8 @@ http.get(url)
    });
 ~~~~
 
-State of web browsers as REST client hosts
-------------------------------------------
+Browser XML Http Request (XHR)
+------------------------------
 
 Making http requests from Javascript, commonly termed AJAX, was so
 significant in establishing the modern web architecture that it is
@@ -503,28 +543,29 @@ as XHTML, there would be no major updates until HTML5 started to gather
 pace some ten years later.
 
 Despite a reputation for being poorly standardised, as a language
-Javascript is very consistently implemented. More accurately we would
-say that the libraries exposed to Javascript by the browsers lack
-compatibility. Given this backdrop of vendor extensions and lagging
-standardisation, abstraction layers predictably rose in popularity.
-Various abstractions competed primarily on developer ergonomics with the
-popular jQuery and Prototype.js libraries promoting themselves as *"do
-more, write less"* and *"elegant APIs around the clumsy interfaces of
-Ajax"* respectively. Written for an unadorned browser, Javascript
-applications read as a maze of platform-detection and special cases.
-Once applications were built using Javascript abstractions over
-underlying browser differences, they could be written purposefully and
-comprehensibly express more complex ideas.
+Javascript enjoys consistent implementation. More accurately we would
+say that browser APIs exposed to Javascript lack compatibility. Given
+this backdrop of vendor extensions and lagging standardisation,
+abstraction layers predictably rose in popularity. Various abstractions
+competed primarily on developer ergonomics with the popular jQuery and
+Prototype.js libraries promoting themselves as *"do more, write less"*
+and *"elegant APIs around the clumsy interfaces of Ajax"*. Written
+against the unadorned browser, Javascript applications read as a maze of
+platform-detection and special cases. Once applications were built using
+Javascript abstractions over the underlying browser differences, they
+could be written purposefully and were able to express more complex
+ideas without becoming incomprehensible.
 
-JSON, itself a subset of Javascript, emerged as the main format for REST
-end points when requested via AJAX. Javascript programmers occupied a
-privileged position whereby their serialisation format mapped exactly
-onto the inbuilt types of the programming language. As such there was
-never any confusion regarding which object structure to de-serialise to.
-Should this advantage seem insubstantial, contrast with the plethora of
-confusing and incompatible representations of JSON given by the various
-Java parsers: JSON's Object better resembles Java's Map interface than
-Java Objects and the confusion between JSON null, Java null, and
+JSON, itself a subset of Javascript, emerged as the main format output
+by REST end points when requesting via AJAX. Javascript programmers
+occupy a privileged position whereby their serialisation format maps
+exactly onto the inbuilt types of their programming language. As such
+there is never any confusion regarding which object structure to
+de-serialise to. Should this advantage seem insubstantial, contrast with
+the plethora of confusing and incompatible representations of JSON that
+are output by the various Java parsers: JSON's Object better resembles
+Java's Map interface than Java Objects, creating linguistic
+difficulties, and the confusion between JSON null, Java null, and
 Jackson's NullNode[^3_Background1] is a common cause of errors. Emboldened by
 certainty regarding deserialisation, AJAX libraries directly integrated
 JSON parsers, providing a call style for working with remote resources
@@ -541,195 +582,84 @@ jQuery.ajax('http://example.com/people.json', function( people ) {
 });
 ~~~~
 
-Whilst simple, the above call style is built on the assumption that a
-response is a one-time event and no accommodation is made for a
-continuously delivered response. Meanwhile, the XHR2 standardisation
-process had started and was busy observing and specifying proprietary
-extensions to the original XHR1. Given an interest in streaming, the
-most interesting of these is the progress event:
+XHRs and streaming
+------------------
+
+Browser abstraction layers brought an improvement in expressivity to web
+application programming but were ultimately limited to supporting the
+lowest common denominator of the available browser abilities. At the
+time that the call style above was developed the most popular browser
+gave no means of access to partial responses. Inevitably, it draws a
+conceptualisation of the response as a one-time event with no
+accommodation offered for progressively delivered data.
+
+The followup standard, XHR2 is now at Working Draft stage. Given
+ambitions to build a streaming REST client, of greatest interest is the
+progress event:
 
 > While the download is progressing, queue a task to fire a progress
 > event named progress about every 50ms or for every byte received,
 > whichever is least frequent. [@xhr2progress]
 
-Prior to this addition there had been no mechanism, at least so far as
-the published specs to an XHR instance in a streaming fashion. However,
-while all major browsers currently support progress events in their most
-recently versions, the installed userbase of supporting browsers is
-unlikely to grow fast enough that this technique may be relied upon
-without a fallback for several years.
+Presently this event is supported by all but legacy browsers.
 
-In fact, this is exactly how web browsers are implemented. However, this
-progressive use of http is hardwired into the browser engines rather
-than exposing an API suitable for general use and as such is treated as
-something of a special case specific to web browsers and has not so far
-seen a more general application. I wish to argue that a general
-application of this technique is viable and offers a worthwhile
-improvement over current common methods.
+The historic lack of streaming allowed by XHR stands incongruously with
+the browser as a platform which has long used streaming to precipitate
+almost every other remote resource. Progressive image formats, html,
+svg, video and Javascript itself (script interpretation starts before
+the script is fully loaded) are all examples of this.
 
-While until recently browsers have provided no mechanism to stream into
-AJAX, almost every other instance of downloading has taken advantage of
-streaming and progressive interpretation. This includes image formats,
-as the progressive PNG and JPEG; markup as progressive display of html
-and svg; video; and Javascript itself -- script interpretation starts
-before the script is wholly fetched. Each of these progressive
-considerations is implemented as a specific-purpose mechanism internal
-to the browser which is not exported to Javascript and as such is not
-possible to repurpose.
+Browser streaming frameworks
+----------------------------
 
-*Client side deals with user input interactively whereas the server as a
-batch of data. Like most interactive programming, client-side scripts
-usually suffer greater delays waiting for io than because javascript
-execution times present a bottleneck. Because Javascript is used for
-user interfaces, frame-rates are important. Single threaded so js holds
-up rendering. Important to return control to the browser quickly.
-However, once execution of each js frame of execution is no more than
-the monitor refresh rate, further optimisation is without practical
-benefit. Hence, writing extremely optimised Javascript, especially
-focusing on micro-optimisations that hurt code readability is a futile
-endeavour.*
+The web's remit is increasingly widening to encompass scenarios which
+would have previously been the domain of native applications. In order
+to use live data many current webapps employ frameworks which push soft
+real-time events to the client side. In comparison to the XHR2 progress
+event, this form of streaming has a different but overlapping purpose.
+Whereas XHR2 enables downloads to be viewed as short-lived streams but
+does not otherwise disrupt the sequence of http's request-response
+model, streaming frameworks facilitate an entirely different sequence,
+that of perpetual data. Consider a webmail interface; initially the
+user's inbox is downloaded via REST and a streaming download might be
+used to speed its display. Regardless of if the response is interpreted
+progressively, this inbox download is a standard REST call and shares
+little in common with the push events which follow to provide instant
+notification as new messages arrive.
 
-> The user does something, then the app responds visually with immediacy
-> at 30 frames per second or more, and completes a task in a few hundred
-> milliseconds. As long as an app meets this user goal, it doesn’t
-> matter how big an abstraction layer it has to go through to get to
-> silicon. [@fivemyths]
+**Push tables** sidestep the browser's absent data streaming abilities
+by leaning on a resource that it can stream: progressive html. From the
+client a page containing a table is hidden in an off-screen iframe. This
+table is served from a a page that never completes, fed by a connection
+that never closes. When the server wishes to push a message to the
+client it writes a new row in this table which is then noticed by
+Javascript monitoring the iframe on the client. More recently,
+**Websockets** is a new standard that builds a standardised streaming
+transport on top of http's chunked mode. Websockets requires browser
+implementation and cannot be retrofitted to older browsers through
+Javascript. Websockets are a promising technology but for the time being
+patchy support means it cannot be used without a suitable fallback.
 
-Streaming to the browser
-------------------------
-
-As the web's remit spread to include more applications which would
-previously have been native apps, to be truly 'live' many applications
-found the need to be able to receive real-time push events. Dozens of
-streaming transports have been developed sidestepping the browser's
-apparent limitations.
-
-The earliest and most basic attempt was to poll by making many requests,
-I won't consider this approach other than to say it came with all the
-usually associated downsides. Despite the inadequacy of this approach,
-from here the improved technique of *long polling* was invented. A
-client makes a request to the server side. Once the connection is open
-the server waits, writing nothing until a push is required. To push the
-server writes the message and closes the http connection; since the http
-response is now complete the content may be handled by the Javascript
-client which then immediately makes a new request, reiterating the cycle
-of wait and response. This approach works well where messages are
-infrequently pushed but where the frequency is high the limitation of
-one http transmission per connections requires imposes a high overhead.
-
-Observing that while browsers lack progressive ajax, progressive html
-rendering is available, *push tables* achieve progressive data transfer
-by serialising streaming data to a HTML format. Most commonly messages
-are written to a table, one row per message. On the client side this
-table is hidden in an off-screen frame and the Javascript streaming
-client watches the table and reacts whenever a new row is found. In many
-ways an improvement over long-polling, this approach nevertheless
-suffers from an unnatural data format. Whilst html is a textual format
-so provides a degree of human-readability, html was not designed with
-the goal of an elegent or compact transfer of asynchronous data.
-Contrasted with a SOA ideal of *'plumbing on the outside'*, peeking
-inside the system is difficult whilst bloated and confusing formats are
-tasked with conveying meaning.
-
-Both long polling and push tables are better throught of as a means to
-circumvent restrictions than indigene technology. A purose-built stack,
-*Websockets* is poised to take over, building a standardised duplex
-transport and API on top of http's chunked mode. While the newest
-browsers support websockets, most of the wild use base does not. Nor do
-older browsers provide a fine-grained enough interface into http in
-order to allow a Javascript implementation. In practice, real-world
-streaming libraries such as socket.io [CITE] are capable of several
-streaming techniques and can select the best for a given context. To the
-programmer debugging an application the assortment of transports only
-enhances the black-box mentality with regards to the underlying
-transports.
-
-*some or all of the below could move to A&R, it is wondering into
-analysis*
-
-Whilst there is some overlap, each of the approaches above addresses a
-problem only tangentially related to this project's aims. Firstly,
-requiring a server that can write to an esoteric format feels quite
-anti-REST, especially given that the server is sending in a format which
-requires a specific, known, specialised client rather than a generic
-tool. In REST I have always valued how prominently the plumbing of a
-system is visible, so that to sample a resource all that is required is
-to type a URL and be presented with it in a human-comprehensible format.
-
-Secondly, as adaptations to the context in which they were created,
-these frameworks realise a view of network usage in which downloading
-and streaming are dichotomously split, whereas I aim to realise a schema
-without dichotomy in which *streaming is adapted as the most effective
-means of downloading*. In existing common practice a wholly distinct
-mechanism is provided vs for data which is ongoing vs data which is
-finite. For example, the display of real-time stock data might start by
-AJAXing in historical and then separately use a websocket to maintain
-up-to-the-second updates. This requires the server to support two
-distinct modes. However, I see no reason why a single transport could
-not be used for both. Such a server might start answering a request by
-write historic events from a database, then switch to writing out live
-data in the same format in response to messages from a MOM. By closing
-the dichotomy we would have the advantage that a single implementation
-is able to handle all cases.
-
-It shouldn't be a surprise that a dichotomous implementation of
-streaming, where a streaming transport is used only for live events is
-incompatible with http caching. If an event is streamed when it is new,
-but then when it is old made available for download, http caching
-between the two requests is impossible. However, where a single mode is
-used for both live and historic events the transport is wholly
-compatible with http caching.
-
-If we take streaming as a technique to achieve efficient downloading,
-not only for the transfer of forever-ongoing data, none of these
-approaches are particularly satisfactory.
-
-Json and XML
-------------
-
-*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
-
-Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the more popular serialisation
-format. The goals of XML were to simplify SGML to the point that a
-graduate student would be able to implement a parser in a week [@javaxml
-p ???]. For the student tackling JSON a few hours with a parser
-generator should surfice, being expressable in 15 CFGs. Indeed, because
-JSON is a strict subset of Javascript, in many cases the Javascript
-programmer requires no parser at all. Unimpeeded by SGML's roots as a
-document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language with entities such
-as *string*, *number*, *object* and *array*. By closely mirroring a
-programmer's metamodel, visualising a mapping between a domain model and
-it's serialised objects becomes trivial.
-
-~~~~ {.javascript}
-{
-   people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-   ]
-}
-~~~~
-
-This close resemblance to the model of the programming in some cases
-causes fast-changing formats.
-
-Like XML attributes, as a serialised text format, JSON objects have an
-order but are almost always parsed to and from orderless maps meaning
-that the order of the keys/value pairings as seen in the stream usually
-follows no defined order. No rule in the format would forbid
-representing of an ordered map in an ordered way but most tools on
-receiving such a message would ignore the ordering.
-
-(MINE SOA assignment). Also the diagram.
+These frameworks do not interoperate at all with REST. Because the
+resources they serve never complete they may not be read by a standard
+REST client. Unlike REST they also are not amenable to standard http
+mechanics such as caching. A server which writes to an esoteric format
+requiring a specific, known, specialised client also feels quite
+anti-REST, especially when we consider that the format design reflects
+the nature of the transport more so than the resource. This form of
+streaming is not, however, entirely alien to a SOA mindset. The data
+formats, while not designed primarily for human readability are
+nontheless text based and a person may take a peek inside the system's
+plumbing simply by observing the traffic at a particular URL. In the
+case of push-tables, an actual table of the event's properties may be
+viewed from a browser as the messages are streamed.
 
 Parsing: SAX and Dom
 --------------------
 
-In the XML world two standard parser models exist, SAX and DOM, with DOM
-far the more popular. DOM performs a parse as a single evaluation, on
-the request of the programmer, returning an object model representing
+In the XML domain two standard parser models exist, SAX and DOM, with
+DOM far the more popular. DOM performs a parse as a single evaluation,
+on the request of the programmer, returning an object model representing
 the whole of the document. At this level of abstraction the details of
 the markup are only distant concern. Conversely, SAX parsers are
 probably better considered as tokenisers, providing a very low-level
@@ -838,8 +768,8 @@ generally event handlers will cover multiple unrelated concerns and each
 concern will span multiple event handlers. This lends to programming in
 which separate concerns are not separately expressed in the code.
 
-Common patterns when connecting to REST services
-------------------------------------------------
+Common patterns for connecting to REST services
+-----------------------------------------------
 
 Marshaling provides two-way mapping between a domain model and a
 serialisation as JSON or XML, either completely automatically or based
@@ -1095,11 +1025,6 @@ attention of the Grunt community.
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
 
 
-<!---
-Chapter 4+5 40 to 60 pages
-
-@333w/p, 13,000 to 19,000
---->
 
 Design and Reflection:
 ======================
@@ -1175,7 +1100,7 @@ JSONPath and types
 Given its use to identify interesting parts of a document, not all of
 the published JSONPath spec is useful. Parts of a document will be
 considered interesting because of their type, position, or both. This
-contrasts with filter-type queries such as 'books costing less than X'.
+contrasts with 'search' style queries such as 'books costing less than X'.
 Examining REST responses it is likely we will not be explicitly
 searching through a full model but rather selecting from a resource
 subset that the programmer requested, assembled on their behalf using
@@ -1383,8 +1308,8 @@ why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-Importing CSS4 selector capturing to Oboe JSONPath
---------------------------------------------------
+Importing CSS4's explicit capturing to Oboe's JSONPath
+------------------------------------------------------
 
 Sometimes when downloading a collection of items it is less useful to be
 given each element individually than being kept up to date as the
@@ -1636,7 +1561,7 @@ delivered in 5k or less, 5120 bytes. Micro-libraries also tend to follow
 the ethos that it is better for a developer to gather together several
 tiny libraries than one that uses a one-size-fits-all approach, perhaps
 echoing the unix command line tradition of small programs which each do
-do exactly one thing. Javascript Micro-libraries are listed at [^4_Application_and_Reflection1],
+do exactly one thing. Javascript Micro-libraries are listed at [^4_Design_and_Reflection1],
 which includes this project. Oboe.js feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
 somewhat arbitrary, for the sake of adoption smaller is better and
@@ -1645,6 +1570,50 @@ challenge. As well as being a small library, in the spirit of a
 micro-library a project should impose as few restrictions as possible on
 its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
+
+Choice of streaming data transport
+------------------------
+
+Considering longpoll, push-tables and websockets...
+
+I find that it is not necessary to take this dichotomous view of streaming.
+
+Whilst there is some overlap, each of the approaches above addresses a
+problem only tangentially related to this project's aims. Firstly,
+
+
+In REST I have always valued how prominently the plumbing of a
+system is visible, so that to sample a resource all that is required is
+to type a URL and be presented with it in a human-comprehensible format.
+
+Secondly, as adaptations to the context in which they were created,
+these frameworks realise a view of network usage in which downloading
+and streaming are dichotomously split, whereas I aim to realise a schema
+without dichotomy in which *streaming is adapted as the most effective
+means of downloading*. In existing common practice a wholly distinct
+mechanism is provided vs for data which is ongoing vs data which is
+finite. For example, the display of real-time stock data might start by
+AJAXing in historical and then separately use a websocket to maintain
+up-to-the-second updates. This requires the server to support two
+distinct modes. However, I see no reason why a single transport could
+not be used for both. Such a server might start answering a request by
+write historic events from a database, then switch to writing out live
+data in the same format in response to messages from a MOM. By closing
+the dichotomy we would have the advantage that a single implementation
+is able to handle all cases.
+
+It shouldn't be a surprise that a dichotomous implementation of
+streaming, where a streaming transport is used only for live events is
+incompatible with http caching. If an event is streamed when it is new,
+but then when it is old made available for download, http caching
+between the two requests is impossible. However, where a single mode is
+used for both live and historic events the transport is wholly
+compatible with http caching.
+
+If we take streaming as a technique to achieve efficient downloading,
+not only for the transfer of forever-ongoing data, none of these
+approaches are particularly satisfactory.
+
 
 Handling transport failures
 ---------------------------
@@ -1732,7 +1701,7 @@ than emulate the browser API so will require platform-specific
 programming inside the library. This abstraction will be hidden from the
 library user so will not require any special programming on their part.
 
-[^4_Application_and_Reflection1]: http://microjs.com/
+[^4_Design_and_Reflection1]: http://microjs.com/
 
 
 Implementation
