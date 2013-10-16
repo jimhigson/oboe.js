@@ -301,14 +301,15 @@ gave no means of access to partial responses. Inevitably, it draws a
 conceptualisation of the response as a one-time event with no
 accommodation offered for progressively delivered data.
 
-Currently, the XHR2 standardisation process is at Working Draft stage.
-Given streaming ambitions, of greatest interest is the progress event:
+The followup standard, XHR2 is now at Working Draft stage. Given
+ambitions to build a streaming REST client, of greatest interest is the
+progress event:
 
 > While the download is progressing, queue a task to fire a progress
 > event named progress about every 50ms or for every byte received,
 > whichever is least frequent. [@xhr2progress]
 
-Currently only legacy browsers do not support this event.
+Presently this event is supported by all but legacy browsers.
 
 The historic lack of streaming allowed by XHR stands incongruously with
 the browser as a platform which has long used streaming to precipitate
@@ -319,98 +320,54 @@ the script is fully loaded) are all examples of this.
 Browser streaming frameworks
 ----------------------------
 
-As the web's remit spread to include more applications which would
-previously have been native apps, to be truly 'live' many applications
-found the need to be able to receive soft realtime push events. 
-Streaming transports have been developed sidestepping the browser's
-apparent limitations.
+The web's remit is increasingly widening to encompass scenarios which
+would have previously been the domain of native applications. In order
+to use live data many current webapps employ frameworks which push soft
+real-time events to the client side. In comparison to the XHR2 progress
+event, this form of streaming has a different but overlapping purpose.
+Whereas XHR2 enables downloads to be viewed as short-lived streams but
+does not otherwise disrupt the sequence of http's request-response
+model, streaming frameworks facilitate an entirely different sequence,
+that of perpetual data. Consider a webmail interface; initially the
+user's inbox is downloaded via REST and a streaming download might be
+used to speed its display. Regardless of if the response is interpreted
+progressively, this inbox download is a standard REST call and shares
+little in common with the push events which follow to provide instant
+notification as new messages arrive.
 
-The earliest and most basic attempt was to poll by making many requests,
-I won't consider this approach other than to say it came with all the
-usually associated downsides. Despite the inadequacy of this approach,
-from here the improved technique of *long polling* was invented. A
-client makes a request to the server side. Once the connection is open
-the server waits, writing nothing until a push is required. To push the
-server writes the message and closes the http connection; since the http
-response is now complete the content may be handled by the Javascript
-client which then immediately makes a new request, reiterating the cycle
-of wait and response. This approach works well where messages are
-infrequently pushed but where the frequency is high the limitation of
-one http transmission per connections requires imposes a high overhead.
+**Push tables** sidestep the browser's absent data streaming abilities
+by leaning on a resource that it can stream: progressive html. From the
+client a page containing a table is hidden in an off-screen iframe. This
+table is served from a a page that never completes, fed by a connection
+that never closes. When the server wishes to push a message to the
+client it writes a new row in this table which is then noticed by
+Javascript monitoring the iframe on the client. More recently,
+**Websockets** is a new standard that builds a standardised streaming
+transport on top of http's chunked mode. Websockets requires browser
+implementation and cannot be retrofitted to older browsers through
+Javascript. Websockets are a promising technology but for the time being
+patchy support means it cannot be used without a suitable fallback.
 
-Observing that while browsers lack progressive ajax, progressive html
-rendering is available, *push tables* achieve progressive data transfer
-by serialising streaming data to a HTML format. Most commonly messages
-are written to a table, one row per message. On the client side this
-table is hidden in an off-screen frame and the Javascript streaming
-client watches the table and reacts whenever a new row is found. In many
-ways an improvement over long-polling, this approach nevertheless
-suffers from an unnatural data format. Whilst html is a textual format
-so provides a degree of human-readability, html was not designed with
-the goal of an elegant or compact transfer of asynchronous data.
-Contrasted with a SOA ideal of *'plumbing on the outside'*, peeking
-inside the system is difficult whilst bloated and confusing formats are
-tasked with conveying meaning.
-
-Both long polling and push tables are better thought of as a means to
-circumvent restrictions than indigene technology. A purose-built stack,
-*Websockets* is poised to take over, building a standardised duplex
-transport and API on top of http's chunked mode. While the newest
-browsers support websockets, most of the wild use base does not. Nor do
-older browsers provide a fine-grained enough interface into http in
-order to allow a Javascript implementation. In practice, real-world
-streaming libraries such as socket.io [CITE] are capable of several
-streaming techniques and can select the best for a given context. To the
-programmer debugging an application the assortment of transports only
-enhances the black-box mentality with regards to the underlying
-transports.
-
-Json and XML
-------------
-
-*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
-
-Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the more popular serialisation
-format. The goals of XML were to simplify SGML to the point that a
-graduate student would be able to implement a parser in a week [@javaxml
-p ???]. For the student tackling JSON a few hours with a parser
-generator should surfice, being expressable in 15 CFGs. Indeed, because
-JSON is a strict subset of Javascript, in many cases the Javascript
-programmer requires no parser at all. Unimpeeded by SGML's roots as a
-document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language with entities such
-as *string*, *number*, *object* and *array*. By closely mirroring a
-programmer's metamodel, visualising a mapping between a domain model and
-it's serialised objects becomes trivial.
-
-~~~~ {.javascript}
-{
-   people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-   ]
-}
-~~~~
-
-This close resemblance to the model of the programming in some cases
-causes fast-changing formats.
-
-Like XML attributes, as a serialised text format, JSON objects have an
-order but are almost always parsed to and from orderless maps meaning
-that the order of the keys/value pairings as seen in the stream usually
-follows no defined order. No rule in the format would forbid
-representing of an ordered map in an ordered way but most tools on
-receiving such a message would ignore the ordering.
-
-(MINE SOA assignment). Also the diagram.
+These frameworks do not interoperate at all with REST. Because the
+resources they serve never complete they may not be read by a standard
+REST client. Unlike REST they also are not amenable to standard http
+mechanics such as caching. A server which writes to an esoteric format
+requiring a specific, known, specialised client also feels quite
+anti-REST, especially when we consider that the format design reflects
+the nature of the transport more so than the resource. This form of
+streaming is not, however, entirely alien to a SOA mindset. The data
+formats, while not designed primarily for human readability are
+nontheless text based and a person may take a peek inside the system's
+plumbing simply by observing the traffic at a particular URL. In the
+case of push-tables, an actual table of the event's properties may be
+viewed from a browser as the messages are streamed.
 
 Parsing: SAX and Dom
 --------------------
 
-In the XML world two standard parser models exist, SAX and DOM, with DOM
-far the more popular. DOM performs a parse as a single evaluation, on
-the request of the programmer, returning an object model representing
+In the XML domain two standard parser models exist, SAX and DOM, with
+DOM far the more popular. DOM performs a parse as a single evaluation,
+on the request of the programmer, returning an object model representing
 the whole of the document. At this level of abstraction the details of
 the markup are only distant concern. Conversely, SAX parsers are
 probably better considered as tokenisers, providing a very low-level
