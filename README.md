@@ -1,12 +1,13 @@
-**Oboe.js**'s goal is to make web applications faster by wrapping https's request-response model
-in a progressive interface.
+**Oboe.js**'s makes web applications faster by wrapping https's request-response model
+with a progressively streamed interface.
 It glues a transport that sits 
 **somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
 DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any external dependencies and 
 doesn't care which other libraries you need it to speak to.
 
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
-Or even if it never completes.
+Or even if it never completes. It is well tested in the browser and has alpha-level
+support for Node.js.
 
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
