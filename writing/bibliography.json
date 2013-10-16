@@ -377,8 +377,19 @@
       "url":"http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html",
       "issued": { "date-parts":[ [2013] ] },
       "type":"webpage"                  
+   },
+   
+   {
+      "id":"nodeStream",
+      "title":"Streaming XHR",
+      "author":[         
+         { "family": "Ogden", "given":"Max"}
+      ],
+      "url":"http://maxogden.com/a-proposal-for-streaming-xhr.html",
+      "issued": { "date-parts":[ [2012] ] },
+      "type":"webpage"                  
    }
-
+   
 ]
 
 

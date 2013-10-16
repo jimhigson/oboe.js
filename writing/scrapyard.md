@@ -365,3 +365,21 @@ architecture is well suited to any application domain where low-latency
 responses to i/o is more of a concern than heavyweight computation. Web
 applications fit well into this niche but they are far from the only
 domain that does so.
+
+Being single-threaded, Node realises concurrency by setting up i/o
+libraries in such a way that programming is strongly encouraged to be
+decomposed into many quickly completed tasks.
+
+Node streams
+------------
+
+> Streams in node are one of the rare occasions when doing something the
+> fast way is actually easier. SO USE THEM. not since bash has streaming
+> been introduced into a high level language as nicely as it is in
+> node." [high level node style guide](https://gist.github.com/2401787)
+
+Bash streams a powerful abstraction easily programmed for linear
+streaming. Node more powerful, allows a powerful streaming abstraction
+which is no more complex to program than a javascript webapp front end.
+Essentially a lower-level (and therefore more powerful) interface to
+streaming such as unix sockets or tcp connections.

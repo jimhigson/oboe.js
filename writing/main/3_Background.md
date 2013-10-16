@@ -104,35 +104,37 @@ Node builds on a model of event-based, asynchronous i/o that was
 established by Javascript execution in web browsers. Although Javascript
 in a browser may be performing multiple tasks simultaneously, for
 example requesting several resources from the server side, it does so
-from within a single-threaded virtual machine. Node similarly facilitates
-concurrency by managing an event loop of queued tasks and providing
-exclusively non-blocking i/o. Unlike Erlang, Node does not swap tasks
-out preemptively, it always waits for tasks to complete before moving
-onto the next. This means that each task must complete quickly to avoid
-holding up others. *Prima facie* this might seem like an onerous
-requirement to put on the programmer but in practice with only
-non-blocking i/o each task naturally exits quickly without any special
-effort. Accidental non-terminating loops or heavy number-crunching
-aside, with no reason for a task to wait it is difficult to write a node
-program where the tasks do not complete quickly.
+from within a single-threaded virtual machine. Node similarly
+facilitates concurrency by managing an event loop of queued tasks and
+providing exclusively non-blocking i/o. Unlike Erlang, Node does not
+swap tasks out preemptively, it always waits for tasks to complete
+before moving onto the next. This means that each task must complete
+quickly to avoid holding up others. *Prima facie* this might seem like
+an onerous requirement to put on the programmer but in practice with
+only non-blocking i/o each task naturally exits quickly without any
+special effort. Accidental non-terminating loops or heavy
+number-crunching aside, with no reason for a task to wait it is
+difficult to write a node program where the tasks do not complete
+quickly.
 
 Each task in node is simply a Javascript function. Node is able to swap
 its single Javascript thread between these tasks efficiently while
 providing the programmer with an intuitive interface because of
-closures. Utilising closures, the responsibility of maintaining state between
-issuing an asynchronous call and receiving the callback is removed from
-the programmer by folding it invisibly into the language. This implicit
-data store requires no syntax and feels so natural and inevitable that
-it is often not obvious that the responsibility exists at all.
+closures. Utilising closures, the responsibility of maintaining state
+between issuing an asynchronous call and receiving the callback is
+removed from the programmer by folding it invisibly into the language.
+This implicit data store requires no syntax and feels so natural and
+inevitable that it is often not obvious that the responsibility exists
+at all.
 
 Consider the example below. The code schedules three tasks, each of
 which are very short and exit quickly allowing Node to finely interlace
-them between other concurrent concerns. The `on` method is used to attach
-functions as listeners to streams. However sophisticated and performant
-this style of programming, to the developer it is hardly more difficult
-an expression than if a blocking io model were followed. It is certainly
-easier to get right than synchronising mutable objects for sharing
-between threads.
+them between other concurrent concerns. The `on` method is used to
+attach functions as listeners to streams. However sophisticated and
+performant this style of programming, to the developer it is hardly more
+difficult an expression than if a blocking io model were followed. It is
+certainly easier to get right than synchronising mutable objects for
+sharing between threads.
 
 ~~~~ {.javascript}
 function printResourceToConsole(url) {
@@ -165,30 +167,30 @@ function printResourceToConsole(url) {
 }   
 ~~~~
 
-> Streams in node are one of the rare occasions when doing something the
-> fast way is actually easier. SO USE THEM. not since bash has streaming
-> been introduced into a high level language as nicely as it is in
-> node." [high level node style guide](https://gist.github.com/2401787)
-
-Bash streams a powerful abstraction easily programmed for linear
-streaming. Node more powerful, allows a powerful streaming abstraction
-which is no more complex to program than a javascript webapp front end.
-Essentially a lower-level (and therefore more powerful) interface to
-streaming such as unix sockets or tcp connections.
-
-> Node Stream API, which is the core I/O abstraction in Node.js (which
+> "Node Stream API, which is the core I/O abstraction in Node.js (which
 > is a tool for I/O) is essentially an abstract in/out interface that
 > can handle any protocol/stream that also happens to be written in
-> JavaScript. [http://maxogden.com/a-proposal-for-streaming-xhr.html]
+> JavaScript." [@nodeStream]
 
-Streams in node are a variant of the observer pattern and fit into a
-wider Node event model. Streams emit 'readable' events when they have
-some data to be read and 'end' events when they are finished. Apart from
-error handling, so far as reading is concerned, that is the extent of
-the API.
+In Node i/o is performed through a unified streaming interface
+regardless of the source. The streams follow a publisher-subscriber
+pattern fitting comfortably with the wider event-driven model. 
+Although the abstraction provided by streams is quite a thin layer on
+top of the host system's socket, it forms a powerful and
+intuitive interface. For many tasks it is preferable to program in a
+'plumbing' style by joining one stream's output to another's input.
+In the example below a resource from the internet is written to
+the local filesystem.
 
-Web browsers hosting REST clients
----------------------------------
+~~~~ {.javascript}
+http.get(url)
+   .on('response', function(response){
+      response.pipe(fs.createWriteStream(pathToFile));
+   });
+~~~~
+
+Current state of web browsers acting as REST clients 
+----------------------------------------------------
 
 *Client side deals with user input interactively whereas the server as a
 batch of data. Like most interactive programming, client-side scripts
