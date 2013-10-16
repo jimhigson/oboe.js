@@ -213,19 +213,18 @@ pace some ten years later.
 Despite a reputation for being poorly standardised, as a language
 Javascript is very consistently implemented. More accurately we would
 say that the libraries exposed to Javascript by the browsers lack
-compatibility. Given this backdrop of vendor extensions and
-lagging standardisation, abstraction layers predictably rose in
-popularity. Various abstractions
-competed primarily on developer ergonomics with the popular jQuery and
-Prototype.js libraries promoting themselves as *"do more, write
-less"* and *"elegant APIs around the clumsy interfaces of Ajax"* respectively.
-Written for an unadorned browser, Javascript applications read as a maze of 
-platform-detection and special cases. Once applications were built using Javascript
-abstractions over underlying browser differences, they could be written purposefully 
-and comprehensibly express more complex ideas.
+compatibility. Given this backdrop of vendor extensions and lagging
+standardisation, abstraction layers predictably rose in popularity.
+Various abstractions competed primarily on developer ergonomics with the
+popular jQuery and Prototype.js libraries promoting themselves as *"do
+more, write less"* and *"elegant APIs around the clumsy interfaces of
+Ajax"* respectively. Written for an unadorned browser, Javascript
+applications read as a maze of platform-detection and special cases.
+Once applications were built using Javascript abstractions over
+underlying browser differences, they could be written purposefully and
+comprehensibly express more complex ideas.
 
-JSON
-being a subset of Javascript, web developers barely noticed their
+JSON being a subset of Javascript, web developers barely noticed their
 privileged position whereby the serialisation of their data format
 mapped exactly onto the basic types of their programming language. As
 such there was never any confusion as to which exact object structure to
