@@ -383,3 +383,16 @@ streaming. Node more powerful, allows a powerful streaming abstraction
 which is no more complex to program than a javascript webapp front end.
 Essentially a lower-level (and therefore more powerful) interface to
 streaming such as unix sockets or tcp connections.
+
+http
+----
+
+*Http is essentially a thinly-wrapped text response around some usually
+text-based (but sometimes binary) data. It may give the length of the
+content as a header, but is not obliged to. It supports an explicitly
+chunked mode, but even the non-chunked mode may be considered as a
+stream. For example, a program generating web pages on the server side
+might choose to use chunking so that the browser is better able to
+choose when to re-render during the progressive display of a page
+[@perceptionHttpChunkedSpeed] but this is optional and without these
+hints progressive rendering will still take place.*
