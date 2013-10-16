@@ -544,6 +544,49 @@ micro-library a project should impose as few restrictions as possible on
 its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
 
+Choice of data transport
+------------------------
+
+Considering longpoll, push-tables and websockets...
+
+Whilst there is some overlap, each of the approaches above addresses a
+problem only tangentially related to this project's aims. Firstly,
+requiring a server that can write to an esoteric format feels quite
+anti-REST, especially given that the server is sending in a format which
+requires a specific, known, specialised client rather than a generic
+tool. In REST I have always valued how prominently the plumbing of a
+system is visible, so that to sample a resource all that is required is
+to type a URL and be presented with it in a human-comprehensible format.
+
+Secondly, as adaptations to the context in which they were created,
+these frameworks realise a view of network usage in which downloading
+and streaming are dichotomously split, whereas I aim to realise a schema
+without dichotomy in which *streaming is adapted as the most effective
+means of downloading*. In existing common practice a wholly distinct
+mechanism is provided vs for data which is ongoing vs data which is
+finite. For example, the display of real-time stock data might start by
+AJAXing in historical and then separately use a websocket to maintain
+up-to-the-second updates. This requires the server to support two
+distinct modes. However, I see no reason why a single transport could
+not be used for both. Such a server might start answering a request by
+write historic events from a database, then switch to writing out live
+data in the same format in response to messages from a MOM. By closing
+the dichotomy we would have the advantage that a single implementation
+is able to handle all cases.
+
+It shouldn't be a surprise that a dichotomous implementation of
+streaming, where a streaming transport is used only for live events is
+incompatible with http caching. If an event is streamed when it is new,
+but then when it is old made available for download, http caching
+between the two requests is impossible. However, where a single mode is
+used for both live and historic events the transport is wholly
+compatible with http caching.
+
+If we take streaming as a technique to achieve efficient downloading,
+not only for the transfer of forever-ongoing data, none of these
+approaches are particularly satisfactory.
+
+
 Handling transport failures
 ---------------------------
 
