@@ -70,45 +70,37 @@ independent tasks and as such is embarrassingly parallelisable.
 Node.js
 -------
 
-architecture shown in figure \ref{architecture}
-
--   Node not just for servers. CLI tools etc.
 -   Compare to Erlang. Waiter model. Node restaurant much more efficient
     use of expensive resources.
 -   No 'task' class or type, tasks are nothing more than functions,
     possibly having some values implicitly wrapped up in their closure.
--   Easy to distribute software (npm etc)
+      
+Node.js is a general purpose tool for executing Javascript outside of a
+browser. I has the aim of low-latency i/o and is used predominantly
+for server applications and command line tools. It is difficult to judge
+to what degree Javascript is a distraction from Node's principled design
+and to what degree the language defines the platform.
 
-It is difficult to say to what degree Node's use of Javascript is a
-distraction from the system's principled design aims and to what degree
-it defines the technology. Paradoxically, both may be so. Javascript has
-proven itself very effective as the language to meet Node's design goals
-but this suitability is not based on Javascript's association with web
-browsers, although it is certainly beneficial: for the first time it is
-possible to program presentation logic once which is capable of running
-on either client or server. Being already familiar with Javascript, web
-programmers were the first to take up Node.js first but the project
-mission statement makes no reference to the web; Node's architecture is
-well suited to any application domain where low-latency responses to i/o
-is more of a concern than heavyweight computation. Web applications fit
-well into this niche but they are far from the only domain that does so.
-
-In most imperative languages attempts at concurrency have focused on
-threaded execution, whereas Node is by design single-threaded. Threads
-are an effective means to speed up parallel computation but not well
-suited to concurrently running tasks which are mostly i/o dependent.
-Used for io, threads consume considerable resources while spending most
-of their lives waiting, occasionally punctuated with short bursts of
-activity. Programming Java safely with threads which share access to
+In most imperative languages the thread is the basic unit of concurrency.
+whereas Node is single-threaded by design. Threads
+are an effective means to share parallel computation over multiple cores but are 
+less well suited to scheduling concurrent tasks which are mostly i/o dependent.
+Programming threads safely with shared access to
 mutable objects requires great care and experience, otherwise the
-programmer is liable to create race conditions. If we consider for
-example a Java thread-based http aggregator; each 'requester' thread
-waits for seconds and then processes for milliseconds. The ratio of
-waiting to processing is so high that any gains achieved through actual
-concurrent execution of the active phase is pyrrhic. Following Node's
-lead, even traditionally thread-based environments such as Java are
-starting to embrace asynchronous, single-threaded servers with projects
-such as Netty.
+programmer is liable to create race conditions.
+Considering for example a Java http aggregator; because we
+wish to fetch in parallel each http request is assigned to a thread.  
+These 'requester' tasks are computationally simple: make a request, wait
+for a complete response, and then participate in a Barrier to wait for 
+the others.
+Each thread consumes considerable resources but during its multi-second
+lifespan requires only a fraction of a millisecond on
+the CPU. It is unlikely any two requests return at exactly the same moment
+so usually the threads will process in series rather than parallel anyway.
+Even if they do, the actual CPU time required in making an http request is so short 
+that any concurrent processing is a pyrrhic victory.
+
+![*Single-threaded vs multi-threaded scheduling for a http aggregator*](images/placeholder.png)
 
 Node manages concurrency by managing an event loop of queued tasks and
 expects each task never to block. Non-blocking calls are used for all io
@@ -133,6 +125,11 @@ asynchronous call and receiving the callback is removed from the
 programmer. Closures require no new syntax, the implicit storage of this
 data feels so natural and inevitable that looking at the typical program
 it is often not obvious that the responsibility exists at all.
+
+Following Node's
+lead, even traditionally thread-based environments such as Java are
+starting to embrace asynchronous, single-threaded servers with projects
+such as Netty.
 
 Consider the below example. Rather than blocking, this code relies on
 non-blocking io and schedules three tasks, each of which are very short

@@ -349,3 +349,19 @@ communications required are the parameters. This mixed-model provides no
 lesser degree of server-side control but by using client-side rendering
 a much faster experience was possible than would otherwise be possible
 over low-speed networks [@news].
+
+Web developers agree that program
+architecture should separate presentation from operational logic but
+there is no firm consensus on where each concern should be exercised.
+
+Javascript has proven very effective as the language to meet
+Node's design goals but this suitability is not based on Javascript's
+association with web browsers, although it is certainly beneficial: for
+the first time it is possible to program presentation logic once which
+is capable of running on either client or server. Being already familiar
+with Javascript, web programmers were the first to take up Node.js first
+but the project mission statement makes no reference to the web; Node's
+architecture is well suited to any application domain where low-latency
+responses to i/o is more of a concern than heavyweight computation. Web
+applications fit well into this niche but they are far from the only
+domain that does so.
