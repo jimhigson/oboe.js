@@ -281,8 +281,8 @@ Browser streaming frameworks
 
 As the web's remit spread to include more applications which would
 previously have been native apps, to be truly 'live' many applications
-found the need to be able to receive real-time push events. Dozens of
-streaming transports have been developed sidestepping the browser's
+found the need to be able to receive soft realtime push events. 
+Streaming transports have been developed sidestepping the browser's
 apparent limitations.
 
 The earliest and most basic attempt was to poll by making many requests,
