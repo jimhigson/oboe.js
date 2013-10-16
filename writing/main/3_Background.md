@@ -192,44 +192,44 @@ State of web browsers as REST client hosts
 ------------------------------------------
 
 Making http requests from Javascript, commonly termed AJAX, was so
-significant in establishing the modern web architecture that it 
-is sometimes used synonymously with Javascript-rich
-web applications. Although AJAX is an acronym for **A**synchronous
-**J**avascript (**a**nd) **X**ML, this reflects the early millennial 
-enthusiasm for XML as the one true data format and in practice any
-textual format may be transferred. Today JSON is generally preferred,
-especially for delivery to client-side web applications. During the
-'browser war' years web browsers competed by adding non-standard features;
-Internet Explorer made AJAX possible in 2000 by exposing Microsoft's Active X *Xml Http
-Request* (XHR) class to the Javascript sandbox. This was widely
-copied and near equivalents were added to all major browsers. In 2006
-the interface was eventually formalised by the W3C [@xhrWorkingDraft].
-XHR's slow progresss to standardisation reflected a period of general stagnation 
-for web standards.
-HTML4 reached Recommendation status in 2001 but having subsequently found several
-evolutionary dead ends such as XHTML, there would be
-no major updates until HTML5 started to gather pace some ten years
-later.
+significant in establishing the modern web architecture that it is
+sometimes used synonymously with Javascript-rich web applications.
+Although AJAX is an acronym for **A**synchronous **J**avascript
+(**a**nd) **X**ML, this reflects the early millennial enthusiasm for XML
+as the one true data format and in practice any textual format may be
+transferred. Today JSON is generally preferred, especially for delivery
+to client-side web applications. During the 'browser war' years web
+browsers competed by adding non-standard features; Internet Explorer
+made AJAX possible in 2000 by exposing Microsoft's Active X *Xml Http
+Request* (XHR) class to the Javascript sandbox. This was widely copied
+and near equivalents were added to all major browsers. In 2006 the
+interface was eventually formalised by the W3C [@xhrWorkingDraft]. XHR's
+slow progresss to standardisation reflected a period of general
+stagnation for web standards. HTML4 reached Recommendation status in
+2001 but having subsequently found several evolutionary dead ends such
+as XHTML, there would be no major updates until HTML5 started to gather
+pace some ten years later.
 
 Despite a reputation for being poorly standardised, as a language
-Javascript is very consistently implemented. More accurately we would say that
-the libraries exposed to Javascript by the browsers lack compatibility.
-Given this backdrop of non-standard extensions and lagging
-standardisation, abstraction layers predictably rose in popularity.
-Equipped with an abstraction layer to gloss over considerable differences cross-browser
-webapp developers found little difficulty in targeting multiple
-platforms. The various abstraction competed on developer ergonomics with
-the popular jQuery and Prototype.js promoting themselves respectively as
-*"do more, write less"* and *"elegant APIs around the clumsy interfaces
-of Ajax"*. JSON being a subset of Javascript, web developers barely
-noticed their privileged position whereby the serialisation of their
-data format mapped exactly onto the basic types of their programming
-language. As such there was never any confusion as to which exact object
-structure to de-serialise to. If this seems like a small advantage,
-contrast with the plethora of confusing and incompatible representations
-of JSON output presented by the various Java JSON parsers; JSON's Object
-better resembles Java's Map than Object and the confusion between JSON
-null, Java null, and Jackson's NullNode[^1] is a common cause of errors.
+Javascript is very consistently implemented. More accurately we would
+say that the libraries exposed to Javascript by the browsers lack
+compatibility. Given this backdrop of non-standard extensions and
+lagging standardisation, abstraction layers predictably rose in
+popularity. Equipped with an abstraction layer to gloss over
+considerable differences cross-browser webapp developers found little
+difficulty in targeting multiple platforms. The various abstraction
+competed on developer ergonomics with the popular jQuery and
+Prototype.js promoting themselves respectively as *"do more, write
+less"* and *"elegant APIs around the clumsy interfaces of Ajax"*. JSON
+being a subset of Javascript, web developers barely noticed their
+privileged position whereby the serialisation of their data format
+mapped exactly onto the basic types of their programming language. As
+such there was never any confusion as to which exact object structure to
+de-serialise to. If this seems like a small advantage, contrast with the
+plethora of confusing and incompatible representations of JSON output
+presented by the various Java JSON parsers; JSON's Object better
+resembles Java's Map than Object and the confusion between JSON null,
+Java null, and Jackson's NullNode[^1] is a common cause of errors.
 Endowed with certainty regarding deserialisation, JSON parsers could be
 safely integrated directly into AJAX libraries. This provided a call
 style while working with remote resources so streamlined as to require
