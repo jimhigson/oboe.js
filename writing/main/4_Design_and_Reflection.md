@@ -281,8 +281,8 @@ why JSONPath-like syntax allows upgrading message semantics without
 causing problems [SOA] how to guarantee non-breakages? could publish
 'supported queries' that are guaranteed to work
 
-Importing CSS4 selector capturing to Oboe JSONPath
---------------------------------------------------
+Importing CSS4's explicit capturing to Oboe's JSONPath
+------------------------------------------------------
 
 Sometimes when downloading a collection of items it is less useful to be
 given each element individually than being kept up to date as the
@@ -544,10 +544,12 @@ micro-library a project should impose as few restrictions as possible on
 its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
 
-Choice of data transport
+Choice of streaming data transport
 ------------------------
 
 Considering longpoll, push-tables and websockets...
+
+I find that it is not necessary to take this dichotomous view of streaming.
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
