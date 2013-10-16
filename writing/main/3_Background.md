@@ -89,15 +89,15 @@ dependent. Programming threads safely with shared access to mutable
 objects requires great care and experience, otherwise the programmer is
 liable to create race conditions. Considering for example a Java http
 aggregator; because we wish to fetch in parallel each http request is
-assigned to a thread.\
-These 'requester' tasks are computationally simple: make a request, wait
-for a complete response, and then participate in a Barrier to wait for
-the others. Each thread consumes considerable resources but during its
-multi-second lifespan requires only a fraction of a millisecond on the
-CPU. It is unlikely any two requests return at exactly the same moment
-so usually the threads will process in series rather than parallel
-anyway. Even if they do, the actual CPU time required in making an http
-request is so short that any concurrent processing is a pyrrhic victory.
+assigned to a thread. These 'requester' tasks are computationally
+simple: make a request, wait for a complete response, and then
+participate in a Barrier to wait for the others. Each thread consumes
+considerable resources but during its multi-second lifespan requires
+only a fraction of a millisecond on the CPU. It is unlikely any two
+requests return at exactly the same moment so usually the threads will
+process in series rather than parallel anyway. Even if they do, the
+actual CPU time required in making an http request is so short that any
+concurrent processing is a pyrrhic victory.
 
 ![*Single-threaded vs multi-threaded scheduling for a http
 aggregator*](images/placeholder.png)
