@@ -250,44 +250,34 @@ jQuery.ajax('http://example.com/people.json', function( people ) {
 });
 ~~~~
 
-Whilst simple, the above call style is built on the assumption that a
-response is a one-time event and no accommodation is made for a
-continuously delivered response. Meanwhile, the XHR2 standardisation
-process had started and was busy observing and specifying proprietary
-extensions to the original XHR1. Given an interest in streaming, the
-most interesting of these is the progress event:
+Streaming XHRs
+--------------
+
+Browser abstraction layers brought an improvement in expressivity to web
+application programming but were ultimately limited to supporting the
+lowest common denominator of the available browser abilities. While
+simple, the call style above was developed while the most popular browser
+gave no means of access to partial responses so inevitably draws a
+conceptualisation of the response as a one-time event with no
+accommodation offered for progressively delivered data.
+
+Currently, the XHR2 standardisation process is at Working Draft stage.
+Given streaming ambitions, of greatest interest is the progress event:
 
 > While the download is progressing, queue a task to fire a progress
 > event named progress about every 50ms or for every byte received,
 > whichever is least frequent. [@xhr2progress]
 
-Prior to this addition there had been no mechanism, at least so far as
-the published specs to an XHR instance in a streaming fashion. However,
-while all major browsers currently support progress events in their most
-recently versions, the installed userbase of supporting browsers is
-unlikely to grow fast enough that this technique may be relied upon
-without a fallback for several years.
+Currently only legacy browsers do not support this event.
 
-In fact, this is exactly how web browsers are implemented. However, this
-progressive use of http is hardwired into the browser engines rather
-than exposing an API suitable for general use and as such is treated as
-something of a special case specific to web browsers and has not so far
-seen a more general application. I wish to argue that a general
-application of this technique is viable and offers a worthwhile
-improvement over current common methods.
+The historic lack of streaming allowed by XHR stands incongruously with the
+browser as a platform which has long used streaming to precipitate almost every
+other remote resource. Progressive image formats, html, svg, video and
+Javascript itself (script interpretation starts before the script is fully
+loaded) are all examples of this.
 
-While until recently browsers have provided no mechanism to stream into
-AJAX, almost every other instance of downloading has taken advantage of
-streaming and progressive interpretation. This includes image formats,
-as the progressive PNG and JPEG; markup as progressive display of html
-and svg; video; and Javascript itself -- script interpretation starts
-before the script is wholly fetched. Each of these progressive
-considerations is implemented as a specific-purpose mechanism internal
-to the browser which is not exported to Javascript and as such is not
-possible to repurpose.
-
-Streaming to the browser
-------------------------
+Browser streaming frameworks
+----------------------------
 
 As the web's remit spread to include more applications which would
 previously have been native apps, to be truly 'live' many applications
