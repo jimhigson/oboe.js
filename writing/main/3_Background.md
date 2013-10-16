@@ -307,12 +307,12 @@ client watches the table and reacts whenever a new row is found. In many
 ways an improvement over long-polling, this approach nevertheless
 suffers from an unnatural data format. Whilst html is a textual format
 so provides a degree of human-readability, html was not designed with
-the goal of an elegent or compact transfer of asynchronous data.
+the goal of an elegant or compact transfer of asynchronous data.
 Contrasted with a SOA ideal of *'plumbing on the outside'*, peeking
 inside the system is difficult whilst bloated and confusing formats are
 tasked with conveying meaning.
 
-Both long polling and push tables are better throught of as a means to
+Both long polling and push tables are better thought of as a means to
 circumvent restrictions than indigene technology. A purose-built stack,
 *Websockets* is poised to take over, building a standardised duplex
 transport and API on top of http's chunked mode. While the newest
