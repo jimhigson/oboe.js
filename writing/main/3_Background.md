@@ -227,8 +227,8 @@ comprehensibly express more complex ideas.
 JSON, itself a subset of Javascript, emerged as the main format for REST
 end points when requested via AJAX. Javascript programmers occupied a
 privileged position whereby their serialisation format mapped exactly
-onto the basic types of their programming language. As such there was
-never any confusion as to which exact object structure to de-serialise
+onto the inbuilt types of the programming language. As such there was
+never any confusion regarding which object structure to de-serialise
 to. If this seems like a small advantage, contrast with the plethora of
 confusing and incompatible representations of JSON output presented by
 the various Java JSON parsers; JSON's Object better resembles Java's Map
