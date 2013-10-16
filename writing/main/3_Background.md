@@ -70,11 +70,6 @@ independent tasks and as such is embarrassingly parallelisable.
 Node.js
 -------
 
--   Compare to Erlang. Waiter model. Node restaurant much more efficient
-    use of expensive resources.
--   No 'task' class or type, tasks are nothing more than functions,
-    possibly having some values implicitly wrapped up in their closure.
-
 Node.js is a general purpose tool for executing Javascript outside of a
 browser. I has the aim of low-latency i/o and is used predominantly for
 server applications and command line tools. It is difficult to judge to
@@ -82,83 +77,91 @@ what degree Javascript is a distraction from Node's principled design
 and to what degree the language defines the platform.
 
 In most imperative languages the thread is the basic unit of
-concurrency. whereas Node is single-threaded by design. Threads are an
-effective means to share parallel computation over multiple cores but
-are less well suited to scheduling concurrent tasks which are mostly i/o
-dependent. Programming threads safely with shared access to mutable
-objects requires great care and experience, otherwise the programmer is
-liable to create race conditions. Considering for example a Java http
-aggregator; because we wish to fetch in parallel each http request is
-assigned to a thread. These 'requester' tasks are computationally
-simple: make a request, wait for a complete response, and then
-participate in a Barrier to wait for the others. Each thread consumes
-considerable resources but during its multi-second lifespan requires
-only a fraction of a millisecond on the CPU. It is unlikely any two
-requests return at exactly the same moment so usually the threads will
-process in series rather than parallel anyway. Even if they do, the
-actual CPU time required in making an http request is so short that any
-concurrent processing is a pyrrhic victory.
+concurrency. whereas Node presents the programmer with a single-threaded
+abstraction. Threads are an effective means to share parallel
+computation over multiple cores but are less well suited to scheduling
+concurrent tasks which are mostly i/o dependent. Programming threads
+safely with shared access to mutable objects requires great care and
+experience, otherwise the programmer is liable to create race
+conditions. Considering for example a Java http aggregator; because we
+wish to fetch in parallel each http request is assigned to a thread.
+These 'requester' tasks are computationally simple: make a request, wait
+for a complete response, and then participate in a Barrier to wait for
+the others. Each thread consumes considerable resources but during its
+multi-second lifespan requires only a fraction of a millisecond on the
+CPU. It is unlikely any two requests return at exactly the same moment
+so usually the threads will process in series rather than parallel
+anyway. Even if they do, the actual CPU time required in making an http
+request is so short that any concurrent processing is a pyrrhic victory.
+Following Node's lead, traditionally thread-based environments are
+beginning to embrace asynchronous, single-threaded servers. The Netty
+project can be though of as roughly the Java equivalent of Node.
 
 ![*Single-threaded vs multi-threaded scheduling for a http
 aggregator*](images/placeholder.png)
 
-Node manages concurrency by managing an event loop of queued tasks and
-expects each task never to block. Non-blocking calls are used for all io
-and are callback based. Unlike Erlang, Node does not swap tasks out
-preemptively, it always waits for tasks to complete. This means that
-each task must complete quickly; while this might at first seem like an
-onerous requirement to put on the programmer, in practice the
-asynchronous nature of the toolkit makes following this requirement more
-natural than not. Indeed, other than accidental non-terminating loops or
-heavy number-crunching, the lack of any blocking io whatsoever makes it
-rather difficult to write a node program whose tasks do not exit
-quickly. This programming model of callback-based, asynchronous,
-non-blocking io with an event loop is already the model followed inside
-web browsers, which although multi-threaded in some regards, present a
-single-threaded virtual machine in terms of Javascript execution.
+Node builds on a model of event-based, asynchronous i/o that was
+established by Javascript execution in web browsers. Although Javascript
+in a browser may be performing multiple tasks simultaneously, for
+example requesting several resources from the server side, it does so
+from within a single-threaded virtual machine. Node similarly facilitates
+concurrency by managing an event loop of queued tasks and providing
+exclusively non-blocking i/o. Unlike Erlang, Node does not swap tasks
+out preemptively, it always waits for tasks to complete before moving
+onto the next. This means that each task must complete quickly to avoid
+holding up others. *Prima facie* this might seem like an onerous
+requirement to put on the programmer but in practice with only
+non-blocking i/o each task naturally exits quickly without any special
+effort. Accidental non-terminating loops or heavy number-crunching
+aside, with no reason for a task to wait it is difficult to write a node
+program where the tasks do not complete quickly.
 
-A programmer working with Node's single-thread is able to switch
-contexts quickly to achieve a very efficient kind of concurrency because
-of Javascript's support for closures. Because of closures, under Node
-the responsibility to explicitly store state between making an
-asynchronous call and receiving the callback is removed from the
-programmer. Closures require no new syntax, the implicit storage of this
-data feels so natural and inevitable that looking at the typical program
+Each task in node is simply a Javascript function. Node is able to swap
+its single Javascript thread between these tasks efficiently while
+providing the programmer with an intuitive interface because of
+closures. Utilising closures, the responsibility of maintaining state between
+issuing an asynchronous call and receiving the callback is removed from
+the programmer by folding it invisibly into the language. This implicit
+data store requires no syntax and feels so natural and inevitable that
 it is often not obvious that the responsibility exists at all.
 
-Following Node's lead, even traditionally thread-based environments such
-as Java are starting to embrace asynchronous, single-threaded servers
-with projects such as Netty.
-
-Consider the below example. Rather than blocking, this code relies on
-non-blocking io and schedules three tasks, each of which are very short
-and exit quickly allowing this node instance to continue with other
-tasks in between. However sophisticated and performant this style of
-programming, to the developer it is barely more difficult than if a
-blocking io model were followed.
+Consider the example below. The code schedules three tasks, each of
+which are very short and exit quickly allowing Node to finely interlace
+them between other concurrent concerns. The `on` method is used to attach
+functions as listeners to streams. However sophisticated and performant
+this style of programming, to the developer it is hardly more difficult
+an expression than if a blocking io model were followed. It is certainly
+easier to get right than synchronising mutable objects for sharing
+between threads.
 
 ~~~~ {.javascript}
-function printResource(url) {
+function printResourceToConsole(url) {
 
-   http.get(url, function(response){
+   http.get(url)
+      .on('response', function(response){
       
-      // This function will be called when the response starts.
-      // It does some logging, adds a listener and quickly exits.
+         // This function will be called when the response starts.
+         // It logs to the console, adds a listener and quickly exits.
+         
+         // Because it is captured by a closure we are able to reference 
+         // the url parameter after the scope that declared it has finished.            
+         console.log("The response has started for " + path);
       
-      // Because it is captured inside a closure we are able to reference 
-      // the url parameter even now the scope that declared it has finished.            
-      console.log("The response has started for " + path);
-   
-      response.on('data', function(chunk) {      
-         // This function is called each time some data is received from the 
-         // http request                  
-         console.log('Got some response ' + chunk);       
-      });
-   }).on("error", function(e){
-      
-      console.log("Got error: " + e.message);
-   });      
-   console.log("Request has been made");
+         response.on('data', function(chunk) {      
+            // This function is called each time some data is received from the 
+            // http request. In this example we write the response to the console
+            // and quickly exit.
+            console.log('Got some response ' + chunk);
+                   
+         }).on('end', function(){
+            console.log('The response is complete');
+         })
+         
+      }).on("error", function(e){
+         
+         console.log("There was an error: " + e.message);
+      });      
+   console.log("The request has been made");
 }   
 ~~~~
 
