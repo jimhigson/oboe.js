@@ -1,8 +1,3 @@
-<!---
-Chapter 4+5 40 to 60 pages
-
-@333w/p, 13,000 to 19,000
---->
 
 Design and Reflection:
 ======================
@@ -78,7 +73,7 @@ JSONPath and types
 Given its use to identify interesting parts of a document, not all of
 the published JSONPath spec is useful. Parts of a document will be
 considered interesting because of their type, position, or both. This
-contrasts with filter-type queries such as 'books costing less than X'.
+contrasts with 'search' style queries such as 'books costing less than X'.
 Examining REST responses it is likely we will not be explicitly
 searching through a full model but rather selecting from a resource
 subset that the programmer requested, assembled on their behalf using
