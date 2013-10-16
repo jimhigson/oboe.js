@@ -67,6 +67,46 @@ does remains constant. Although serving any particular request might be
 done in series, the workload as a whole at these tiers consists of many
 independent tasks and as such is embarrassingly parallelisable.
 
+Json and XML data transfer formats
+----------------------------------
+
+*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
+
+Although AJAX started as a means to transfer XML, today JSON "The
+fat-free alternative to XML[@jsonorg]" is the more popular serialisation
+format. The goals of XML were to simplify SGML to the point that a
+graduate student would be able to implement a parser in a week [@javaxml
+p ???]. For the student tackling JSON a few hours with a parser
+generator should surfice, being expressable in 15 CFGs. Indeed, because
+JSON is a strict subset of Javascript, in many cases the Javascript
+programmer requires no parser at all. Unimpeeded by SGML's roots as a
+document format, JSON provides a much more direct analogue to the
+metamodel of a canonical modern programming language with entities such
+as *string*, *number*, *object* and *array*. By closely mirroring a
+programmer's metamodel, visualising a mapping between a domain model and
+it's serialised objects becomes trivial.
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+~~~~
+
+This close resemblance to the model of the programming in some cases
+causes fast-changing formats.
+
+Like XML attributes, as a serialised text format, JSON objects have an
+order but are almost always parsed to and from orderless maps meaning
+that the order of the keys/value pairings as seen in the stream usually
+follows no defined order. No rule in the format would forbid
+representing of an ordered map in an ordered way but most tools on
+receiving such a message would ignore the ordering.
+
+(MINE SOA assignment). Also the diagram.
+
 Node.js
 -------
 
@@ -188,8 +228,8 @@ http.get(url)
    });
 ~~~~
 
-State of web browsers as REST client hosts
-------------------------------------------
+Browser XML Http Request (XHR)
+------------------------------
 
 Making http requests from Javascript, commonly termed AJAX, was so
 significant in establishing the modern web architecture that it is
@@ -250,8 +290,8 @@ jQuery.ajax('http://example.com/people.json', function( people ) {
 });
 ~~~~
 
-Streaming XHRs
---------------
+XHRs and streaming
+------------------
 
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
@@ -479,8 +519,8 @@ generally event handlers will cover multiple unrelated concerns and each
 concern will span multiple event handlers. This lends to programming in
 which separate concerns are not separately expressed in the code.
 
-Common patterns when connecting to REST services
-------------------------------------------------
+Common patterns for connecting to REST services
+-----------------------------------------------
 
 Marshaling provides two-way mapping between a domain model and a
 serialisation as JSON or XML, either completely automatically or based
