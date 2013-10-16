@@ -229,10 +229,10 @@ end points when requested via AJAX. Javascript programmers occupied a
 privileged position whereby their serialisation format mapped exactly
 onto the inbuilt types of the programming language. As such there was
 never any confusion regarding which object structure to de-serialise
-to. If this seems like a small advantage, contrast with the plethora of
-confusing and incompatible representations of JSON output presented by
-the various Java JSON parsers; JSON's Object better resembles Java's Map
-than Object and the confusion between JSON null, Java null, and
+to. Should this advantage seem insubstantial, contrast with the plethora of
+confusing and incompatible representations of JSON given by
+the various Java parsers: JSON's Object better resembles Java's Map interface
+than Java Objects and the confusion between JSON null, Java null, and
 Jackson's NullNode[^1] is a common cause of errors. Endowed with
 certainty regarding deserialisation, JSON parsers could be safely
 integrated directly into AJAX libraries. This provided a call style
