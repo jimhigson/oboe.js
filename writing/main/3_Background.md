@@ -74,33 +74,33 @@ Node.js
     use of expensive resources.
 -   No 'task' class or type, tasks are nothing more than functions,
     possibly having some values implicitly wrapped up in their closure.
-      
+
 Node.js is a general purpose tool for executing Javascript outside of a
-browser. I has the aim of low-latency i/o and is used predominantly
-for server applications and command line tools. It is difficult to judge
-to what degree Javascript is a distraction from Node's principled design
+browser. I has the aim of low-latency i/o and is used predominantly for
+server applications and command line tools. It is difficult to judge to
+what degree Javascript is a distraction from Node's principled design
 and to what degree the language defines the platform.
 
-In most imperative languages the thread is the basic unit of concurrency.
-whereas Node is single-threaded by design. Threads
-are an effective means to share parallel computation over multiple cores but are 
-less well suited to scheduling concurrent tasks which are mostly i/o dependent.
-Programming threads safely with shared access to
-mutable objects requires great care and experience, otherwise the
-programmer is liable to create race conditions.
-Considering for example a Java http aggregator; because we
-wish to fetch in parallel each http request is assigned to a thread.  
+In most imperative languages the thread is the basic unit of
+concurrency. whereas Node is single-threaded by design. Threads are an
+effective means to share parallel computation over multiple cores but
+are less well suited to scheduling concurrent tasks which are mostly i/o
+dependent. Programming threads safely with shared access to mutable
+objects requires great care and experience, otherwise the programmer is
+liable to create race conditions. Considering for example a Java http
+aggregator; because we wish to fetch in parallel each http request is
+assigned to a thread.\
 These 'requester' tasks are computationally simple: make a request, wait
-for a complete response, and then participate in a Barrier to wait for 
-the others.
-Each thread consumes considerable resources but during its multi-second
-lifespan requires only a fraction of a millisecond on
-the CPU. It is unlikely any two requests return at exactly the same moment
-so usually the threads will process in series rather than parallel anyway.
-Even if they do, the actual CPU time required in making an http request is so short 
-that any concurrent processing is a pyrrhic victory.
+for a complete response, and then participate in a Barrier to wait for
+the others. Each thread consumes considerable resources but during its
+multi-second lifespan requires only a fraction of a millisecond on the
+CPU. It is unlikely any two requests return at exactly the same moment
+so usually the threads will process in series rather than parallel
+anyway. Even if they do, the actual CPU time required in making an http
+request is so short that any concurrent processing is a pyrrhic victory.
 
-![*Single-threaded vs multi-threaded scheduling for a http aggregator*](images/placeholder.png)
+![*Single-threaded vs multi-threaded scheduling for a http
+aggregator*](images/placeholder.png)
 
 Node manages concurrency by managing an event loop of queued tasks and
 expects each task never to block. Non-blocking calls are used for all io
@@ -126,10 +126,9 @@ programmer. Closures require no new syntax, the implicit storage of this
 data feels so natural and inevitable that looking at the typical program
 it is often not obvious that the responsibility exists at all.
 
-Following Node's
-lead, even traditionally thread-based environments such as Java are
-starting to embrace asynchronous, single-threaded servers with projects
-such as Netty.
+Following Node's lead, even traditionally thread-based environments such
+as Java are starting to embrace asynchronous, single-threaded servers
+with projects such as Netty.
 
 Consider the below example. Rather than blocking, this code relies on
 non-blocking io and schedules three tasks, each of which are very short
