@@ -225,20 +225,19 @@ underlying browser differences, they could be written purposefully and
 comprehensibly express more complex ideas.
 
 JSON, itself a subset of Javascript, emerged as the main format for REST
-end points when requested via AJAX. 
-Javascript programmers occupied a
-privileged position whereby their serialisation format
-mapped exactly onto the basic types of their programming language. As
-such there was never any confusion as to which exact object structure to
-de-serialise to. If this seems like a small advantage, contrast with the
-plethora of confusing and incompatible representations of JSON output
-presented by the various Java JSON parsers; JSON's Object better
-resembles Java's Map than Object and the confusion between JSON null,
-Java null, and Jackson's NullNode[^1] is a common cause of errors.
-Endowed with certainty regarding deserialisation, JSON parsers could be
-safely integrated directly into AJAX libraries. This provided a call
-style while working with remote resources so streamlined as to require
-hardly any additional effort.
+end points when requested via AJAX. Javascript programmers occupied a
+privileged position whereby their serialisation format mapped exactly
+onto the basic types of their programming language. As such there was
+never any confusion as to which exact object structure to de-serialise
+to. If this seems like a small advantage, contrast with the plethora of
+confusing and incompatible representations of JSON output presented by
+the various Java JSON parsers; JSON's Object better resembles Java's Map
+than Object and the confusion between JSON null, Java null, and
+Jackson's NullNode[^1] is a common cause of errors. Endowed with
+certainty regarding deserialisation, JSON parsers could be safely
+integrated directly into AJAX libraries. This provided a call style
+while working with remote resources so streamlined as to require hardly
+any additional effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
