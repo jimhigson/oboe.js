@@ -218,28 +218,30 @@ objects that it may be used directly without any further transformation.
    people: [
       {name: 'John', town:'Oxford'},
       {name: 'Jack', town:'Bristol'}
+      {town:'Cambridge', name: 'Walter'}
    ]
 }
 ~~~~
 
-Expressed as text, an ordered list of characters, nodes in a JSON or XML
-format are inevitably encountered according to their serialisation order
-but both are used to serialise to and from orderless constructs. There
+Both JSON and XML are used to serialise to and from orderless constructs
+but but while serialised to text, an ordered list of characters, the nodes 
+are inevitably encountered according to some serialisation order. There
 is no rule forbidding serialisation to JSON or XML attributes in an
 order-significant way but in general the order is considered to not be
 significant in the serialised format's model. In the example above, the
-people objects would probably have been written out based on either a
+people objects would probably have been written out to represent either a
 class with two public properties or a hash map. On receiving this data
-the text would be demarshalled back into similar structures and that the
+the text would be demarshalled into similar structures and that the
 data found an ordered expression during transport would be quickly
 forgotten. However, when viewing a document through a streaming and
-interpreting incomplete documents this detail cannot be ignored as a
-concern relating only to the transfer because will be encountering the
-nodes in an order. Because the serialisation will contain items which
-are written out by indeterminate order it will be important to ensure
+interpreting documents while still incomplete this detail cannot be ignored as a
+concern relating only to the accidents of transfer. If nodes were interpreted
+based on their first field in the example above Walter would find a
+different handling than the other two. Because the serialisation will contain items which
+are written to follow an indeterminate order it will be important to ensure
 that, despite the streaming, the REST client does not encourage
 programming in a way that depends on the order that these fields are
-received in.
+received.
 
 Browser XML Http Request (XHR)
 ------------------------------
