@@ -217,9 +217,9 @@ any further transformation.
 ~~~~ {.javascript}
 {
    people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-      {town:'Cambridge', name: 'Walter'}
+      {firstName: 'John', town:'Oxford'},
+      {firstName: 'Jack', town:'Bristol'}
+      {town:'Cambridge', firstName: 'Walter'}
    ]
 }
 ~~~~
@@ -256,7 +256,7 @@ is required. In more strongly typed OO languages such as Java or C\#,
 JSON's relatively freeform, classless objects are less convenient. For
 the example JSON from [the previous section](#jsonxml2) to be smoothly
 consumed, instantiating instances of a domain model Person class with
-methods such as `getName()` and `getTown()` would be preferable,
+methods such as `getFirstName()` and `getTown()` would be preferable,
 representing the remote resource's objects no differently than if they
 had originated locally. Automatic marshaling generalises this process by
 providing a two-way mapping between the domain model and its
@@ -277,59 +277,50 @@ The degree of marshaling that is used generally changes only the types
 of the entities that the REST client library hands over to the
 application developer without affecting the overall structure of the
 message. Regardless of the exact types given, having received the
-response model the developer will usually start by identifying the
-interesting parts from it by drilling down into the structures using
-assessor operators from the programming language itself.
+response model the developer will usually start by addressing the
+pertinent parts of the response by drilling down into the structures
+using assessor operators from the programming language itself.
 
 ~~~~ {.java}
-// An example programmatic approach to a domain model interrogation 
-// under Java; upon receiving a list of people, each person's name
-// is added to a database. The methods used to drill down to the
-// pertinent components of the response are all getters: getPeople, 
-// getGivenName, and getSurname. 
+// Java example - programmatic approach to domain model interrogation 
+
+// The methods used to drill down to desired components 
+// are all getters: getPeople, getFirstName, and getTown.
+ 
 void handleResponse( RestResponse response ) {
 
    for( Person p : response.getPeople() ) {
-      addNameToDb( p.getGivenName(), p.getSurname() );
+      addPersonToDb( p.getFirstName(), p.getTown() );
    }   
 }
 ~~~~
 
 ~~~~ {.javascript}
-// Although in this Javascript example the objects passed to the handler 
-// remain in the form given by the JSON parser, containing no domain-specific
-// getters, the programming follows the same basic process.
+// equivalent Javascript - the programming follows the same basic
+// process. This time using Javascript's dot operator.
+
 function handleResponse( response ){
 
    response.people.forEach( function( person ){
-      addNameToDb( p.givenName, p.surname );
+      addPersonToDb( p.firstName, p.town );
    });
 }
 ~~~~
 
-Because it is applied directly to the metamodel of the language[\^ It
-could be argued that getters aren't a part of the metamodel of Java
-itself, but they form such a common pattern that it is a part ], this
-extraction has become such a natural component of a workflow that it
-maye be used while thinking of it as wholly unremarkable. In the
-examples above we are interacting with the model in the way that the
-language makes the most easy to conceptualise. However se should
-consider that, however subtly embedded, the technique is an invented
-construct and only one of the possible formulations which might have
-been drawn.
+One weakness I can identify in this means of drilling down is that the
+code making the inspections is quite tightly coupled to the thing that
+it is inspecting. Taking the above example, if the resource being
+fetched were later refactored such that the firstName concept were
+replaced with a structured name formed as a firstname-surname pair, the
+code addressing the structure would also have to change.
 
-One weakness of this inspection model is that, once much code is written
-to interrogate models in this way, the interface of the model becomes
-increasingly expensive to change as the code making the inspections
-becomes more tightly coupled with the thing that it is inspecting.
-Taking the above example, if the model were later refactored such that
-the concepts of firstName and surName were pulled from the Person class
-into an extracted Name class, because the inspection relies on a
-sequence of calls made directly into domain objects, the code making the
-query would also have to change. Whilst following the object oriented
-principle of encapsulation of data, such that the caller does not have
-to concern themselves with the data structures hidden behind the getter,
-there is no such abstraction for when the structure itself changes.
+Whilst following the object oriented principle of encapsulation of data,
+such that the caller does not have to concern themselves with the data
+structures hidden behind the getter, the internal implementation may be
+changed without disruptions to the rest of the code base, no similar
+abstraction is provided for when the structure of the composition of the
+model objects is revised.
+
 Given an Agile environment where the shape of data is refactored
 regularly, this would be a problem when programming against any kind of
 resource; for example, if change of objects formats propagates knock-on
@@ -342,8 +333,6 @@ refactoring occurs. The coupling is all the more acute where the format
 of the item being inspected is defined by an independently maintained
 service.
 
-*contagion problem*
-
 Extraneous changes dilute the changelog, making it less easily defined
 by code changes which are intrinsically linked to the actual change in
 the logic being expressed by the program, and therefore to the thinking
@@ -351,6 +340,9 @@ behind the change and the reason for the change.
 
 The JsonPath and XPath selector languages
 -----------------------------------------
+
+The problem of drilling down to the interesting parts of a
+message without tightly coupling to the format.
 
 Both the above difficulty in identifying the interesting parts of a
 message whilst using a streaming parser and the problem with tight
@@ -369,8 +361,8 @@ demarshaler's end. Consider the following XML:
 ~~~~ {.xml}
 <people>
    <person>
-      <givenName>...</givenName>   
-      <familyName>Bond</familyName>
+      <firstName>...</firstName>   
+      <town>Bond</town>
    </person>
 </people>
 ~~~~
@@ -461,6 +453,9 @@ One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
+
+More applicable to JSON because doesn't have to distinguish between text
+children and attributes.
 
 Browser XML Http Request (XHR)
 ------------------------------
