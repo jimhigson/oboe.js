@@ -188,7 +188,7 @@ http.get(url)
    });
 ~~~~
 
-Json and XML data transfer formats
+Json and XML data transfer formats {#jsonxml}
 ----------------------------------
 
 Both XML and JSON are text based, tree shaped data formats with human
@@ -247,43 +247,44 @@ depends on the order that these fields are received.
 Common patterns for connecting to REST services
 -----------------------------------------------
 
-For REST resources received by languages such as Javascript 
-or Clojure with a loosely-typed representation of objects as
-generic key-value pairs, the output from the parser resembles 
-the language's built-in types closely enough that it is acceptable 
-to use it directly.  
+For languages such as Javascript or Clojure with a loosely-typed
+representation of objects as generic key-value pairs, when a
+JSON REST resource is received, the output from the parser resembles the normal object
+types closely enough that it is acceptable to use it directly throughout
+the program. For XML this is not the case and some marshaling is required.
+In more
+strongly typed OO languages such as Java or C\#, JSON's relatively freeform,
+classless objects are less convenient. For the example
+JSON from [the previous section](#jsonxml2) to be smoothly consumed,
+instantiating instances of a domain model Person class with methods
+such as `getName()` and `getTown()` would be preferable, 
+representing the remote resource's objects no differently than if they
+had originated locally. 
+Automatic marshaling 
+generalises this process by providing a two-way mapping between the domain model
+and its serialisation, either completely automatically or based on a
+declarative specification. It is
+common in strongly typed languages for the REST client to automatically
+demarshal as part of receiving a fetched rest response. From the programmer's vantage it is as
+if the domain objects themselves had been fetched. Adding an additional layer,
+another common design pattern intended to give a degree of isolation
+between remote resources and the local domain model is to demarshal
+automatically only so far as *Data Transfer Objects* (DTOs). DTOs are
+instances of classes which implement no logic other than storage, and
+from these DTOs the domain model objects may be programmatically
+instantiated. DTOs are more necessary when using XML. For reading JSON
+resources we might say that the JSON objects *are* the DTOs.
 
-Marshaling provides two-way mapping between a domain model and its
-serialisation, either completely automatically or based
-on a declarative specification. To handle a fetched rest response it is
-common to automatically demarshal it so that can application may make
-use of the response from inside its own model, no differently from
-if the remote resource's objects had originated locally.
-From the programmer's vantage it is as if the domain objects themselves 
-had been fetched.
-Another common design pattern, intended to give a degree of isolation
-between concerns, is to demarshal automatically only so far as Data
-Transfer Objects (DTOs), instances of classes which implement no logic
-other than storage, and from these DTOs programmatically instantiate the
-domain model objects.
-
-
-![*Degrees of automatic marshaling*. From marshaling directly to domain
-objects, DTOs, using parser output as a DTO, or using objects directly.
-Distinguish work done by library vs application programmer's
-domain](images/placeholder.png)
-
-Ultimately the degree of marshaling that is used changes only the level
-of abstraction of the resource that the REST client library hands over
-to the application developer. Regardless of the exact form of the
-response model, the developer will usually programmatically extract one
-or more parts from it via calls in the programming language itself. For
-example, on receiving a resource de-marshaled to domain objects, a Java
-developer will inspect it by calling a series of getters in order to
-narrow down to the interesting parts. This is not to say that the whole
-of the message might not in some way be interesting, only that by using
-it certain parts will need to be identified as distinct areas of
-concern.
+The degree of marshaling that is used changes only the level of
+abstraction of the resource that the REST client library hands over to
+the application developer. Regardless of the exact form of the response
+model, the developer will usually programmatically extract one or more
+parts from it via calls in the programming language itself. For example,
+on receiving a resource de-marshaled to domain objects, a Java developer
+will inspect it by calling a series of getters in order to narrow down
+to the interesting parts. This is not to say that the whole of the
+message might not in some way be interesting, only that by using it
+certain parts will need to be identified as distinct areas of concern.
 
 ~~~~ {.java}
 // An example programmatic approach to a domain model interrogation 
@@ -302,8 +303,7 @@ void handleResponse( RestResponse response ) {
 ~~~~ {.javascript}
 // Although in this Javascript example the objects passed to the handler 
 // remain in the form given by the JSON parser, containing no domain-specific
-// getters, the programming represents a different expression of the same 
-// basic process.
+// getters, the programming follows the same basic process.
 function handleResponse( response ){
 
    response.people.forEach( function( person ){
@@ -590,9 +590,9 @@ programming required to interpret it also increases, mandating more
 state be stored and an increased number of cases be covered per event
 handler.
 
-While SAX addresses many of the problems raised in this dissertation,
-I find the unfriendly developer ergonomics pose too high a barrier to
-its adoption for all but fringe uses.
+While SAX addresses many of the problems raised in this dissertation, I
+find the unfriendly developer ergonomics pose too high a barrier to its
+adoption for all but fringe uses.
 
 The JsonPath and XPath selector languages
 -----------------------------------------
