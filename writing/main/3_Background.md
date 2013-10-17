@@ -67,46 +67,6 @@ does remains constant. Although serving any particular request might be
 done in series, the workload as a whole at these tiers consists of many
 independent tasks and as such is embarrassingly parallelisable.
 
-Json and XML data transfer formats
-----------------------------------
-
-*later mention JSON 'nodes'/'paths' a lot. Good place to intro here*
-
-Although AJAX started as a means to transfer XML, today JSON "The
-fat-free alternative to XML[@jsonorg]" is the more popular serialisation
-format. The goals of XML were to simplify SGML to the point that a
-graduate student would be able to implement a parser in a week [@javaxml
-p ???]. For the student tackling JSON a few hours with a parser
-generator should surfice, being expressable in 15 CFGs. Indeed, because
-JSON is a strict subset of Javascript, in many cases the Javascript
-programmer requires no parser at all. Unimpeeded by SGML's roots as a
-document format, JSON provides a much more direct analogue to the
-metamodel of a canonical modern programming language with entities such
-as *string*, *number*, *object* and *array*. By closely mirroring a
-programmer's metamodel, visualising a mapping between a domain model and
-it's serialised objects becomes trivial.
-
-~~~~ {.javascript}
-{
-   people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-   ]
-}
-~~~~
-
-This close resemblance to the model of the programming in some cases
-causes fast-changing formats.
-
-Like XML attributes, as a serialised text format, JSON objects have an
-order but are almost always parsed to and from orderless maps meaning
-that the order of the keys/value pairings as seen in the stream usually
-follows no defined order. No rule in the format would forbid
-representing of an ordered map in an ordered way but most tools on
-receiving such a message would ignore the ordering.
-
-(MINE SOA assignment). Also the diagram.
-
 Node.js
 -------
 
@@ -228,6 +188,59 @@ http.get(url)
    });
 ~~~~
 
+Json and XML data transfer formats
+----------------------------------
+
+Both XML and JSON are text based, tree shaped data formats with
+human and machine readability. One of the design goals of XML was to
+simplify SGML to the point that a graduate student could implement a
+full parser in a week [@javatools p287]. Continuing this arc of simpler
+data formats, JSON "The fat-free alternative to XML[@jsonorg]"
+isolates Javascript's syntax for literal values into a stand-alone
+serialisation language. For the graduate tackling JSON parsing the task
+is simpler still, being expressible as fifteen context free grammars.
+
+Whereas XML's design can be traced to document formats, JSON's lineage
+is in a programming language. From these roots isn't surprising that
+JSON maps more directly to the metamodel that most programmers think in.
+XML parsers produce Elements, Text, Attributes, ProcessingInstruction
+which require extra translation before they are convenient to use inside
+a programming language. Because JSON already closely resembles how a
+programmer would construct a runtime model of their data, fewer steps
+are required before using the deserialised form in a given programming language.
+The JSON nodes: *strings*, *numbers*, *objects* and *arrays* will in
+many cases map directly onto their language types and, for loosely typed
+languages at least, the parser output bears enough similarity to domain model
+objects that it may be used directly without any further transformation.
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+   ]
+}
+~~~~
+
+Expressed as text, an ordered list of characters, nodes in a JSON or XML
+format are inevitably encountered according to their serialisation order
+but both are used to serialise to and from orderless constructs. There
+is no rule forbidding serialisation to JSON or XML attributes in an
+order-significant way but in general the order is considered to not be
+significant in the serialised format's model. In the example above, the
+people objects would probably have been written out based on either a
+class with two public properties or a hash map. On receiving this data
+the text would be demarshalled back into similar structures and that the
+data found an ordered expression during transport would be quickly
+forgotten. However, when viewing a document through a streaming and
+interpreting incomplete documents this detail cannot be ignored as a
+concern relating only to the transfer because will be encountering the
+nodes in an order. Because the serialisation will contain items which
+are written out by indeterminate order it will be important to ensure
+that, despite the streaming, the REST client does not encourage
+programming in a way that depends on the order that these fields are
+received in.
+
 Browser XML Http Request (XHR)
 ------------------------------
 
@@ -264,20 +277,20 @@ Javascript abstractions over the underlying browser differences, they
 could be written purposefully and were able to express more complex
 ideas without becoming incomprehensible.
 
-JSON, itself a subset of Javascript, emerged as the main format output
-by REST end points when requesting via AJAX. Javascript programmers
-occupy a privileged position whereby their serialisation format maps
-exactly onto the inbuilt types of their programming language. As such
-there is never any confusion regarding which object structure to
-de-serialise to. Should this advantage seem insubstantial, contrast with
-the plethora of confusing and incompatible representations of JSON that
-are output by the various Java parsers: JSON's Object better resembles
-Java's Map interface than Java Objects, creating linguistic
-difficulties, and the confusion between JSON null, Java null, and
-Jackson's NullNode[^1] is a common cause of errors. Emboldened by
-certainty regarding deserialisation, AJAX libraries directly integrated
-JSON parsers, providing a call style for working with remote resources
-so streamlined as to require hardly any additional effort.
+JSON is today the main format output by REST end points when requesting
+via AJAX. Javascript programmers occupy a privileged position whereby
+their serialisation format maps exactly onto the inbuilt types of their
+programming language. As such there is never any confusion regarding
+which object structure to de-serialise to. Should this advantage seem
+insubstantial, contrast with the plethora of confusing and incompatible
+representations of JSON that are output by the various Java parsers:
+JSON's Object better resembles Java's Map interface than Java Objects,
+creating linguistic difficulties, and the confusion between JSON null,
+Java null, and Jackson's NullNode[^1] is a common cause of errors.
+Emboldened by certainty regarding deserialisation, AJAX libraries
+directly integrated JSON parsers, providing a call style for working
+with remote resources so streamlined as to require hardly any additional
+effort.
 
 ~~~~ {.javascript}
 jQuery.ajax('http://example.com/people.json', function( people ) {
