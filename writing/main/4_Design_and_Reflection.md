@@ -553,10 +553,9 @@ I find that it is not necessary to take this dichotomous view of streaming.
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
-requiring a server that can write to an esoteric format feels quite
-anti-REST, especially given that the server is sending in a format which
-requires a specific, known, specialised client rather than a generic
-tool. In REST I have always valued how prominently the plumbing of a
+
+
+In REST I have always valued how prominently the plumbing of a
 system is visible, so that to sample a resource all that is required is
 to type a URL and be presented with it in a human-comprehensible format.
 
