@@ -264,7 +264,7 @@ Automatic marshaling
 generalises this process by providing a two-way mapping between the domain model
 and its serialisation, either completely automatically or based on a
 declarative specification. It is
-common in strongly typed languages for the REST client to automatically
+common in strongly typed languages for REST client libraries to automatically
 demarshal as part of receiving a fetched rest response. From the programmer's vantage it is as
 if the domain objects themselves had been fetched. Adding an additional layer,
 another common design pattern intended to give a degree of isolation
@@ -275,16 +275,14 @@ from these DTOs the domain model objects may be programmatically
 instantiated. DTOs are more necessary when using XML. For reading JSON
 resources we might say that the JSON objects *are* the DTOs.
 
-The degree of marshaling that is used changes only the level of
-abstraction of the resource that the REST client library hands over to
-the application developer. Regardless of the exact form of the response
-model, the developer will usually programmatically extract one or more
-parts from it via calls in the programming language itself. For example,
-on receiving a resource de-marshaled to domain objects, a Java developer
-will inspect it by calling a series of getters in order to narrow down
-to the interesting parts. This is not to say that the whole of the
-message might not in some way be interesting, only that by using it
-certain parts will need to be identified as distinct areas of concern.
+The degree of marshaling that is used generally changes only the types of
+the entities that the REST client library hands over to the application
+developer without affecting the overall structure of the message.
+Regardless of the exact types given,
+having received the response model the developer will usually start by 
+identifying the interesting parts from it by drilling down into
+the structures using assessor operators from the programming language
+itself.
 
 ~~~~ {.java}
 // An example programmatic approach to a domain model interrogation 
