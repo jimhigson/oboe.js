@@ -381,15 +381,15 @@ viewed from a browser as the messages are streamed.
 Parsing: SAX and Dom
 --------------------
 
-In the XML domain two standard parser models exist, SAX and DOM, with
-DOM far the more popular. DOM performs a parse as a single evaluation,
-on the request of the programmer, returning an object model representing
-the whole of the document. At this level of abstraction the details of
-the markup are only distant concern. Conversely, SAX parsers are
+In the XML domain two standard parser types exist, SAX and DOM, with
+DOM by far the more popular. DOM performs a parse  
+as a single evaluation, returning an object model representing
+the whole of the document. Conversely, SAX parsers are
 probably better considered as tokenisers, providing a very low-level
-event driven interface in line with the Observer pattern to notify the
-programmer of syntax as it is seen. Each element's opening and closing
-tag is noted
+event driven interface following the Observer pattern that notifys the
+programmer of syntax as it is seen. At DOM's level of abstraction the markup
+syntax is a distant concern whereas for SAX each element's opening and 
+closing tag is noted so the developer is forced to keep it in mind. 
 
 This presents poor developer ergonomics by requiring that the programmer
 implement the recording of state with regard to the nodes that they have
