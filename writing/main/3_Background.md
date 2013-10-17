@@ -381,74 +381,55 @@ viewed from a browser as the messages are streamed.
 Parsing: SAX and Dom
 --------------------
 
-In the XML domain two standard parser types exist, SAX and DOM, with DOM
-by far the more popular. DOM performs a parse as a single evaluation,
-returning an object model representing the whole of the document.
-Conversely, SAX parsers are probably better considered as tokenisers,
-providing a very low-level event driven interface following the Observer
-pattern that notifies the programmer of syntax as it is seen. At DOM's
-level of abstraction the markup syntax is a distant concern whereas for
-SAX each element's opening and closing tag is noted so the developer is
-forced to keep it in mind.
+From the XML world two standard parser types exist, SAX and DOM, with
+DOM by far the more popular. Although the terms originate in XML, both
+styles of parsers are also available for JSON. DOM performs a parse as a
+single evaluation and returns a single object model representing the
+whole of the document. Conversely, SAX parsers are probably better
+considered as tokenisers, providing a very low-level event driven
+interface following the Observer pattern that notifies the programmer of
+each token separately as it is found. From DOM's level of abstraction
+the markup syntax is a distant concern whereas for SAX each element's
+opening and closing tag is noted so the developer may not put the data's
+serialisation aside. SAX has the advantages that it may read a document
+progressively and has lower memory requirements because it does not
+store the parsed tree. Correspondingly, it it popular for embedded
+systems on limited hardware which need to handle documents larger than
+the available RAM.
 
-This presents poor developer ergonomics by requiring that the programmer
-implement the recording of state with regard to the nodes that they have
-seen. For programmers using SAX, a conversion to their domain objects is
-usually implemented imperatively. This programming tends to be difficult
-to read and programmed once per usage rather than assembled as the
-combination of reusable parts. For this reason SAX is usually reserved
-for fringe cases where messages are very large or memory unusually
-scarce.
-
-DOM isn't just a parser, it is also a cross-language defined interface
-for manipulating the XML in real time, for example to change the
-contents of a web page in order to provide some interactivity. In JSON
-world, DOM-style parser not referring to the DOM spec, or what browser
-makers would mean. Rather, borrowing from the XML world to mean a parser
-which requires the whole file to be loaded.
-
-Suppose we want to extract the name of the first person. Given a DOM
-parser this is very easy:
+Suppose we have some json representing people and want to extract the
+name of the first person. Given a DOM parser this may be written quite
+succinctly:
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString ) {
 
-   // Extracting an interesting part from JSON-serialised data is
-   // relatively easy given a DOM-style parser. Unfortunately this
-   // forbids any kind of progressive consideration of the data.
-   // All recent browsers provide a JSON parser as standard. 
+   // All recent browsers provide JSON.parse as standard. 
 
    var document = JSON.parse( myJsonString );
    return document.people[0].name; // that was easy!
 }
 ~~~~
 
-Contrast with the programming below which uses the clarinet JSON SAX
-parser. To prove that I'm not exaggerating the case, see published
-usages at [Clarinet demos].
-
-\pagebreak
+To contrast, the equivalent below uses SAX, expressed in the most
+natural way for the technology. [^2]
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
 
-   // The equivalent logic, expressed in the most natural way
-   // fora s JSON SAX parser is longer and much more 
-   // difficult to read. The developer pays a high price for 
-   // progressive parsing. 
 
    var clarinet = clarinet.parser(),
    
-       // with a SAX parser it is the developer's responsibility 
+       // With a SAX parser it is the developer's responsibility 
        // to track where in the document the cursor currently is,
-       // requiring several variables to maintain.        
+       // Several variables are used to maintain this state.        
        inPeopleArray = false,   
        inPersonObject = false,
        inNameAttribute = false,
        found = false;
    
    clarinet.onopenarray = function(){
-      // for brevity we'll cheat by assuming there is only one
+      // For brevity we'll cheat by assuming there is only one
       // array in the document. In practice this would be overly
       // brittle.
       
@@ -483,14 +464,25 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
 }
 ~~~~
 
-As we can see above, SAX's low-level semantics require a lengthy
-expression and for the programmer to maintain state regarding the
-position in the document -- usually recording the ancestors seen on the
-descent from the root to the current node -- in order to identify the
-interesting parts. This order of the code is also quite unintuitive;
-generally event handlers will cover multiple unrelated concerns and each
-concern will span multiple event handlers. This lends to programming in
-which separate concerns are not separately expressed in the code.
+The developer pays a high price for progressive parsing, the SAX version
+is considerably longer and more difficult to read. SAX's low-level
+semantics require a lengthy expression and push the responsibility of
+maintaining state regarding the current position in the document and the
+nodes that have previously been seen onto the programmer. This
+maintenance of state tends to programmed once per usage rather than
+assembled as the composition of reusable parts. I find the order of the
+code under SAX quite unintuitive; event handlers cover multiple
+unrelated cases and each concern spans multiple handlers. This lends to
+a style of programming in which separate concerns do not find separate
+expression in the code. It is also notable that, unlike DOM, as the
+depth of the document being interpreted increases, the length of the
+programming required to interpret it also increases, mandating more
+state be stored and an increased number of cases be covered per event
+handler.
+
+While SAX addresses many of the problems raised in this dissertation,
+I find the unfriendly developer ergonomics pose too high a barrier to
+its adoption for all but fringe uses.
 
 Common patterns for connecting to REST services
 -----------------------------------------------
@@ -747,3 +739,6 @@ attention of the Grunt community.
 
 [^1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
+
+[^2]: For an example closer to the real world see
+    https://github.com/dscape/clarinet/blob/master/samples/twitter.js
