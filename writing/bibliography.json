@@ -388,6 +388,17 @@
       "url":"http://maxogden.com/a-proposal-for-streaming-xhr.html",
       "issued": { "date-parts":[ [2012] ] },
       "type":"webpage"                  
+   },
+   
+   {
+      "id":"javatools",
+      "title":"Java Tools: Using XML, EJB, CORBA, Servlets and SOAP",
+      "author":[     
+         { "family": "Eberhart", "given":"Andreas"},
+         { "family": "Fischer", "given":"Stefan"}
+      ],
+      "issued": { "date-parts":[ [2002] ] },
+      "type":"book"                  
    }
    
 ]
