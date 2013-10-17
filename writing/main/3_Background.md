@@ -349,6 +349,119 @@ by code changes which are intrinsically linked to the actual change in
 the logic being expressed by the program, and therefore to the thinking
 behind the change and the reason for the change.
 
+The JsonPath and XPath selector languages
+-----------------------------------------
+
+Both the above difficulty in identifying the interesting parts of a
+message whilst using a streaming parser and the problem with tight
+coupling of programmatic drilling down to REST formats leads me to
+search for areas where this problem has already been solved.
+
+In the domain of markup languages there are associated query languages
+such as XPATH whose coupling is loose enough that their expressions may
+continue to function after the exact shape of a message is refactored.
+While observing this is nothing more radical than using the query
+languages in more-or-less they were intended, their employment is not
+the most natural coming from a programming context in which the
+application developer's responsibilities usually start where the
+demarshaler's end. Consider the following XML:
+
+~~~~ {.xml}
+<people>
+   <person>
+      <givenName>...</givenName>   
+      <familyName>Bond</familyName>
+   </person>
+</people>
+~~~~
+
+The XPath //person[0]//surname//text() would continue to identify the
+correct part of the resource without being updated after the xml
+analogue of the above Java Name refactor:
+
+~~~~ {.xml}
+<people>
+   <person>
+      <name>
+         <givenName>...</givenName>
+         <familyName>Bond</familyName>
+      </name>
+   </person>
+</people>
+~~~~
+
+Luckily in JSON there exists already an attempt at an equivalent named
+Jsonpath. JsonPath closely resembles the javascript code which would
+select the same nodes. Not a real spec.
+
+~~~~ {.javascript}
+
+// an in-memory person with a multi-line address:
+let person = {
+   name: {givenName:'', familyName:''},
+   address: [
+      "line1",
+      "line2",
+      "line3"
+   ]
+}
+
+
+// in javascript we can get line two of the address as such:
+let address = person.address[2]
+
+// the equivalent jsonpath expression is identical:
+let jsonPath = "person.address[2]"
+
+// although jsonpath also allows ancestor relationships which are not
+// expressible quite so neatly as basic Javascript:
+let jsonPath2 = "person..given"
+~~~~
+
+Xpath is able to express identifiers which often survive refactoring
+because XML represents a tree, hence we can consider relationships
+between entities to be that of contains/contained in (also siblings?).
+In application of XML, in the languages that we build on top of XML, it
+is very natural to consider all elements to belong to their ancestors.
+Examples are myriad, for example consider a word count in a book written
+in DOCBook format - it should be calculable without knowing if the book
+is split into chapters or not since this is a concept internal to the
+organisation of the book itself nd not something that a querier is
+likely to find interesting - if this must be considered the structure
+acts as barrier to information rather than enabling the information's
+delivery. Therefore, in many cases the exact location of a piece of
+information is not as important as a more general location of x being in
+some way under y.
+
+This may not always hold. A slightly contrived example might be if we
+were representing a model of partial knowledge:
+
+~~~~ {.xml}
+<people>
+   <person>
+      <name>
+         <isNot><surname>Bond</surname></isNot>
+      </name>
+   </person>
+</people>
+~~~~
+
+The typical use pattern of XPath or JSONPath is to search for nodes once
+the whole serialisation has been parsed into a DOM-style model. JSONPath
+implementation only allows for search-type usage:
+https://code.google.com/p/jsonpath/To examine a whole document for the
+list of nodes that match a jsonpath expression the whole of the tree is
+required. But to evaluate if a single node matches an expression, only
+the *path of the descent from the root to that node* is required -- the
+same state as a programmer usually maintains whilst employing a SAX
+parser. This is possible because JSONPath does not have a way to express
+the relationship with sibling nodes, only ancestors and decedents.
+
+One limitation of the JSONPath language is that it is not possible to
+construct an 'containing' expression. CSS4 allows this in a way that is
+likely to become familiar to web developers over the next five years or
+so.
+
 Browser XML Http Request (XHR)
 ------------------------------
 
@@ -588,119 +701,6 @@ handler.
 While SAX addresses many of the problems raised in this dissertation, I
 find the unfriendly developer ergonomics pose too high a barrier to its
 adoption for all but fringe uses.
-
-The JsonPath and XPath selector languages
------------------------------------------
-
-Both the above difficulty in identifying the interesting parts of a
-message whilst using a streaming parser and the problem with tight
-coupling of programmatic drilling down to REST formats leads me to
-search for areas where this problem has already been solved.
-
-In the domain of markup languages there are associated query languages
-such as XPATH whose coupling is loose enough that their expressions may
-continue to function after the exact shape of a message is refactored.
-While observing this is nothing more radical than using the query
-languages in more-or-less they were intended, their employment is not
-the most natural coming from a programming context in which the
-application developer's responsibilities usually start where the
-demarshaler's end. Consider the following XML:
-
-~~~~ {.xml}
-<people>
-   <person>
-      <givenName>...</givenName>   
-      <familyName>Bond</familyName>
-   </person>
-</people>
-~~~~
-
-The XPath //person[0]//surname//text() would continue to identify the
-correct part of the resource without being updated after the xml
-analogue of the above Java Name refactor:
-
-~~~~ {.xml}
-<people>
-   <person>
-      <name>
-         <givenName>...</givenName>
-         <familyName>Bond</familyName>
-      </name>
-   </person>
-</people>
-~~~~
-
-Luckily in JSON there exists already an attempt at an equivalent named
-Jsonpath. JsonPath closely resembles the javascript code which would
-select the same nodes. Not a real spec.
-
-~~~~ {.javascript}
-
-// an in-memory person with a multi-line address:
-let person = {
-   name: {givenName:'', familyName:''},
-   address: [
-      "line1",
-      "line2",
-      "line3"
-   ]
-}
-
-
-// in javascript we can get line two of the address as such:
-let address = person.address[2]
-
-// the equivalent jsonpath expression is identical:
-let jsonPath = "person.address[2]"
-
-// although jsonpath also allows ancestor relationships which are not
-// expressible quite so neatly as basic Javascript:
-let jsonPath2 = "person..given"
-~~~~
-
-Xpath is able to express identifiers which often survive refactoring
-because XML represents a tree, hence we can consider relationships
-between entities to be that of contains/contained in (also siblings?).
-In application of XML, in the languages that we build on top of XML, it
-is very natural to consider all elements to belong to their ancestors.
-Examples are myriad, for example consider a word count in a book written
-in DOCBook format - it should be calculable without knowing if the book
-is split into chapters or not since this is a concept internal to the
-organisation of the book itself nd not something that a querier is
-likely to find interesting - if this must be considered the structure
-acts as barrier to information rather than enabling the information's
-delivery. Therefore, in many cases the exact location of a piece of
-information is not as important as a more general location of x being in
-some way under y.
-
-This may not always hold. A slightly contrived example might be if we
-were representing a model of partial knowledge:
-
-~~~~ {.xml}
-<people>
-   <person>
-      <name>
-         <isNot><surname>Bond</surname></isNot>
-      </name>
-   </person>
-</people>
-~~~~
-
-The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. JSONPath
-implementation only allows for search-type usage:
-https://code.google.com/p/jsonpath/To examine a whole document for the
-list of nodes that match a jsonpath expression the whole of the tree is
-required. But to evaluate if a single node matches an expression, only
-the *path of the descent from the root to that node* is required -- the
-same state as a programmer usually maintains whilst employing a SAX
-parser. This is possible because JSONPath does not have a way to express
-the relationship with sibling nodes, only ancestors and decedents.
-
-One limitation of the JSONPath language is that it is not possible to
-construct an 'containing' expression. CSS4 allows this in a way that is
-likely to become familiar to web developers over the next five years or
-so.
 
 Testing
 -------
