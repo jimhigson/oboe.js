@@ -191,14 +191,14 @@ http.get(url)
 Json and XML data transfer formats
 ----------------------------------
 
-Both XML and JSON are text based, tree shaped data formats with
-human and machine readability. One of the design goals of XML was to
-simplify SGML to the point that a graduate student could implement a
-full parser in a week [@javatools p287]. Continuing this arc of simpler
-data formats, JSON "The fat-free alternative to XML[@jsonorg]"
-isolates Javascript's syntax for literal values into a stand-alone
-serialisation language. For the graduate tackling JSON parsing the task
-is simpler still, being expressible as fifteen context free grammars.
+Both XML and JSON are text based, tree shaped data formats with human
+and machine readability. One of the design goals of XML was to simplify
+SGML to the point that a graduate student could implement a full parser
+in a week [@javatools p287]. Continuing this arc of simpler data
+formats, JSON "The fat-free alternative to XML[@jsonorg]" isolates
+Javascript's syntax for literal values into a stand-alone serialisation
+language. For the graduate tackling JSON parsing the task is simpler
+still, being expressible as fifteen context free grammars.
 
 Whereas XML's design can be traced to document formats, JSON's lineage
 is in a programming language. From these roots isn't surprising that
@@ -207,11 +207,12 @@ XML parsers produce Elements, Text, Attributes, ProcessingInstruction
 which require extra translation before they are convenient to use inside
 a programming language. Because JSON already closely resembles how a
 programmer would construct a runtime model of their data, fewer steps
-are required before using the deserialised form in a given programming language.
-The JSON nodes: *strings*, *numbers*, *objects* and *arrays* will in
-many cases map directly onto their language types and, for loosely typed
-languages at least, the parser output bears enough similarity to domain model
-objects that it may be used directly without any further transformation.
+are required before using the deserialised form in a given programming
+language. The JSON nodes: *strings*, *numbers*, *objects* and *arrays*
+will in many cases map directly onto their language types and, for
+loosely typed languages at least, the parser output bears enough
+similarity to domain model objects that it may be used directly without
+any further transformation.
 
 ~~~~ {.javascript}
 {
@@ -224,24 +225,24 @@ objects that it may be used directly without any further transformation.
 ~~~~
 
 Both JSON and XML are used to serialise to and from orderless constructs
-but but while serialised to text, an ordered list of characters, the nodes 
-are inevitably encountered according to some serialisation order. There
-is no rule forbidding serialisation to JSON or XML attributes in an
-order-significant way but in general the order is considered to not be
-significant in the serialised format's model. In the example above, the
-people objects would probably have been written out to represent either a
-class with two public properties or a hash map. On receiving this data
-the text would be demarshalled into similar structures and that the
-data found an ordered expression during transport would be quickly
-forgotten. However, when viewing a document through a streaming and
-interpreting documents while still incomplete this detail cannot be ignored as a
-concern relating only to the accidents of transfer. If nodes were interpreted
-based on their first field in the example above Walter would find a
-different handling than the other two. Because the serialisation will contain items which
-are written to follow an indeterminate order it will be important to ensure
-that, despite the streaming, the REST client does not encourage
-programming in a way that depends on the order that these fields are
-received.
+but but while serialised to text, an ordered list of characters, the
+nodes are inevitably encountered according to some serialisation order.
+There is no rule forbidding serialisation to JSON or XML attributes in
+an order-significant way but in general the order is considered to not
+be significant in the serialised format's model. In the example above,
+the people objects would probably have been written out to represent
+either a class with two public properties or a hash map. On receiving
+this data the text would be demarshalled into similar structures and
+that the data found an ordered expression during transport would be
+quickly forgotten. However, when viewing a document through a streaming
+and interpreting documents while still incomplete this detail cannot be
+ignored as a concern relating only to the accidents of transfer. If
+nodes were interpreted based on their first field in the example above
+Walter would find a different handling than the other two. Because the
+serialisation will contain items which are written to follow an
+indeterminate order it will be important to ensure that, despite the
+streaming, the REST client does not encourage programming in a way that
+depends on the order that these fields are received.
 
 Browser XML Http Request (XHR)
 ------------------------------
