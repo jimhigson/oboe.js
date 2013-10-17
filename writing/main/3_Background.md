@@ -585,8 +585,8 @@ by code changes which are intrinsically linked to the actual change in
 the logic being expressed by the program, and therefore to the thinking
 behind the change and the reason for the change.
 
-JsonPath and XPath
-------------------
+The JsonPath and XPath selector languages
+-----------------------------------------
 
 Both the above difficulty in identifying the interesting parts of a
 message whilst using a streaming parser and the problem with tight
