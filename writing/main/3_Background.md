@@ -217,9 +217,9 @@ any further transformation.
 ~~~~ {.javascript}
 {
    people: [
-      {firstName: 'John', town:'Oxford'},
-      {firstName: 'Jack', town:'Bristol'}
-      {town:'Cambridge', firstName: 'Walter'}
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+      {town:'Cambridge', name: 'Walter'}
    ]
 }
 ~~~~
@@ -256,7 +256,7 @@ is required. In more strongly typed OO languages such as Java or C\#,
 JSON's relatively freeform, classless objects are less convenient. For
 the example JSON from [the previous section](#jsonxml2) to be smoothly
 consumed, instantiating instances of a domain model Person class with
-methods such as `getFirstName()` and `getTown()` would be preferable,
+methods such as `getName()` and `getTown()` would be preferable,
 representing the remote resource's objects no differently than if they
 had originated locally. Automatic marshaling generalises this process by
 providing a two-way mapping between the domain model and its
@@ -285,12 +285,12 @@ using assessor operators from the programming language itself.
 // Java example - programmatic approach to domain model interrogation 
 
 // The methods used to drill down to desired components 
-// are all getters: getPeople, getFirstName, and getTown.
+// are all getters: getPeople, getName, and getTown.
  
 void handleResponse( RestResponse response ) {
 
    for( Person p : response.getPeople() ) {
-      addPersonToDb( p.getFirstName(), p.getTown() );
+      addPersonToDb( p.getName(), p.getTown() );
    }   
 }
 ~~~~
@@ -302,41 +302,47 @@ void handleResponse( RestResponse response ) {
 function handleResponse( response ){
 
    response.people.forEach( function( person ){
-      addPersonToDb( p.firstName, p.town );
+      addPersonToDb( p.name, p.town );
    });
 }
 ~~~~
 
-One weakness I can identify in this means of drilling down is that the
-code making the inspections is quite tightly coupled to the thing that
-it is inspecting. Taking the above example, if the resource being
-fetched were later refactored such that the firstName concept were
-replaced with a structured name formed as a firstname-surname pair, the
-code addressing the structure would also have to change.
+\newpage
 
-Whilst following the object oriented principle of encapsulation of data,
-such that the caller does not have to concern themselves with the data
-structures hidden behind the getter, the internal implementation may be
-changed without disruptions to the rest of the code base, no similar
-abstraction is provided for when the structure of the composition of the
-model objects is revised.
+One weakness in this means of drilling down is that the
+code making the inspection is quite tightly coupled to the precise 
+structure of the thing that it is inspecting.
+Taking the above example, if the resource being
+fetched were later refactored such that the town concept were
+refactored into a fuller address with a town-county-country tuple, the
+code addressing the structure would also have to change just to continue
+to do the same thing.
 
-Given an Agile environment where the shape of data is refactored
-regularly, this would be a problem when programming against any kind of
-resource; for example, if change of objects formats propagates knock-on
-changes where ever the object is used it is very difficult to commit
-small diffs to the VCS which make incremental changes to a tightly
-focused area of the system. A method of programming which truly embraced
-extreme programming would allow constant change without disparate,
-barely related parts having to be modified in parallel when structural
-refactoring occurs. The coupling is all the more acute where the format
-of the item being inspected is defined by an independently maintained
-service.
+In *the Red Queen's race* it took "all the running 
+you can do, to keep in the same place". Ideally as a programmer I'd like
+to expend effort to make my code to do
+something new, or to perform something that it already did better, not so
+that it can stay still.
 
-Extraneous changes dilute the changelog, making it less easily defined
-by code changes which are intrinsically linked to the actual change in
-the logic being expressed by the program, and therefore to the thinking
-behind the change and the reason for the change.
+Following an object oriented encapsulation of data,
+such that a caller does not have to concern themselves with the data
+structures behind an interface, the internal implementation may be
+changed without disruptions to the rest of the code base. However 
+when the structure of the inter-object composition is revised,
+isolation from the changes is less often recognised as a desirable
+trait. A method of programming which truly embraced
+extreme programming would allow structural refactoring to occur without disparate,
+parts having to be modified in parallel.
+
+Although this kind of drill-down programming is commonly practiced
+and not generally recognised as a code smell, requiring knock-on changes 
+when an unrelated system is refactored seems to me as undesirable
+here as it would be anywhere else.
+  
+Extraneous changes dilute a VCS changelog, making it less easily to later follow
+a narrative of code changes which are linked to the progress of a program, 
+and therefore harder to later understand the thinking behind the change 
+and the reason for the change.
 
 The JsonPath and XPath selector languages
 -----------------------------------------
@@ -359,9 +365,10 @@ application developer's responsibilities usually start where the
 demarshaler's end. Consider the following XML:
 
 ~~~~ {.xml}
+<!-- as JSON perhaps? -->
 <people>
    <person>
-      <firstName>...</firstName>   
+      <name>...</name>   
       <town>Bond</town>
    </person>
 </people>
