@@ -307,45 +307,40 @@ function handleResponse( response ){
 }
 ~~~~
 
-One weakness in this means of drilling down is that the
-code making the inspection is quite tightly coupled to the precise 
-structure of the thing that it is inspecting.
-Taking the above example, if the resource being
-fetched were later refactored such that the town concept were
+One weakness in this means of drilling down is that the code making the
+inspection is quite tightly coupled to the precise structure of the
+thing that it is inspecting. Taking the above example, if the resource
+being fetched were later refactored such that the town concept were
 refactored into a fuller address with a town-county-country tuple, the
 code addressing the structure would also have to change just to continue
-to do the same thing.
-Although this kind of drill-down programming is commonly practiced
-and not generally recognised as a code smell, requiring knock-on changes 
-when an unrelated system is refactored seems to me as undesirable
-here as it would be anywhere else.
+to do the same thing. Although this kind of drill-down programming is
+commonly practiced and not generally recognised as a code smell,
+requiring knock-on changes when an unrelated system is refactored seems
+to me as undesirable here as it would be anywhere else.
 
-In *the Red Queen's race* it took "all the running 
-you can do, to keep in the same place". Ideally as a programmer I'd like
-to expend effort to make my code to do
-something new, or to perform something that it already did better, not so
-that it can stay still.
-Following an object oriented encapsulation of data,
-such that a caller does not have to concern themselves with the data
-structures behind an interface, the internal implementation may be
-changed without disruptions to the rest of the code base. However 
-when the structure of the inter-object composition is revised,
-isolation from the changes is less often recognised as a desirable
-trait. A method of programming which truly embraced
-extreme programming would allow structural refactoring to occur without disparate,
-parts having to be modified in parallel.
+In *the Red Queen's race* it took "all the running you can do, to keep
+in the same place". Ideally as a programmer I'd like to expend effort to
+make my code to do something new, or to perform something that it
+already did better, not so that it can stay still. Following an object
+oriented encapsulation of data, such that a caller does not have to
+concern themselves with the data structures behind an interface, the
+internal implementation may be changed without disruptions to the rest
+of the code base. However when the structure of the inter-object
+composition is revised, isolation from the changes is less often
+recognised as a desirable trait. A method of programming which truly
+embraced extreme programming would allow structural refactoring to occur
+without disparate, parts having to be modified in parallel.
 
-Extraneous changes also dilute a VCS changelog, making it less easily to later follow
-a narrative of code changes which are intrinsic to the changes in
-logic expressed by the program, 
-and therefore harder to later understand the thinking behind the change 
-and the reason for the change.
+Extraneous changes also dilute a VCS changelog, making it less easily to
+later follow a narrative of code changes which are intrinsic to the
+changes in logic expressed by the program, and therefore harder to later
+understand the thinking behind the change and the reason for the change.
 
 The JsonPath and XPath selector languages
 -----------------------------------------
 
-The problem of drilling down to the interesting parts of a
-message without tightly coupling to the format.
+The problem of drilling down to the interesting parts of a message
+without tightly coupling to the format.
 
 Both the above difficulty in identifying the interesting parts of a
 message whilst using a streaming parser and the problem with tight
