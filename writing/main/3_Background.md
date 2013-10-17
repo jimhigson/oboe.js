@@ -244,6 +244,116 @@ indeterminate order it will be important to ensure that, despite the
 streaming, the REST client does not encourage programming in a way that
 depends on the order that these fields are received.
 
+Common patterns for connecting to REST services
+-----------------------------------------------
+
+Marshaling provides two-way mapping between a domain model and its
+serialisation, either completely automatically or based
+on a declarative specification. To handle a fetched rest response it is
+common to automatically demarshal it so that can application may make
+use of the response from inside its own model, no differently from
+if the remote resource's objects had originated locally.
+From the programmer's vantage it is as if the domain objects themselves 
+had been fetched.
+Another common design pattern, intended to give a degree of isolation
+between concerns, is to demarshal automatically only so far as Data
+Transfer Objects (DTOs), instances of classes which implement no logic
+other than storage, and from these DTOs programmatically instantiate the
+domain model objects. Going one step further, for JSON resources sent to
+loosely-typed languages with a native representation of objects as
+generic key-value pairs such as Javascript or Clojure, the marshaling
+step is often skipped: the output from the parser so closely resembles
+the language's built-in types that it is simplest to use it directly.
+Depending on the programming style adopted we might say that the JSON
+parser's output *is* the DTO and create domain model objects based on
+it, or that no further instantiation is necessary.
+
+![*Degrees of automatic marshaling*. From marshaling directly to domain
+objects, DTOs, using parser output as a DTO, or using objects directly.
+Distinguish work done by library vs application programmer's
+domain](images/placeholder.png)
+
+Ultimately the degree of marshaling that is used changes only the level
+of abstraction of the resource that the REST client library hands over
+to the application developer. Regardless of the exact form of the
+response model, the developer will usually programmatically extract one
+or more parts from it via calls in the programming language itself. For
+example, on receiving a resource de-marshaled to domain objects, a Java
+developer will inspect it by calling a series of getters in order to
+narrow down to the interesting parts. This is not to say that the whole
+of the message might not in some way be interesting, only that by using
+it certain parts will need to be identified as distinct areas of
+concern.
+
+~~~~ {.java}
+// An example programmatic approach to a domain model interrogation 
+// under Java; upon receiving a list of people, each person's name
+// is added to a database. The methods used to drill down to the
+// pertinent components of the response are all getters: getPeople, 
+// getGivenName, and getSurname. 
+void handleResponse( RestResponse response ) {
+
+   for( Person p : response.getPeople() ) {
+      addNameToDb( p.getGivenName(), p.getSurname() );
+   }   
+}
+~~~~
+
+~~~~ {.javascript}
+// Although in this Javascript example the objects passed to the handler 
+// remain in the form given by the JSON parser, containing no domain-specific
+// getters, the programming represents a different expression of the same 
+// basic process.
+function handleResponse( response ){
+
+   response.people.forEach( function( person ){
+      addNameToDb( p.givenName, p.surname );
+   });
+}
+~~~~
+
+Because it is applied directly to the metamodel of the language[\^ It
+could be argued that getters aren't a part of the metamodel of Java
+itself, but they form such a common pattern that it is a part ], this
+extraction has become such a natural component of a workflow that it
+maye be used while thinking of it as wholly unremarkable. In the
+examples above we are interacting with the model in the way that the
+language makes the most easy to conceptualise. However se should
+consider that, however subtly embedded, the technique is an invented
+construct and only one of the possible formulations which might have
+been drawn.
+
+One weakness of this inspection model is that, once much code is written
+to interrogate models in this way, the interface of the model becomes
+increasingly expensive to change as the code making the inspections
+becomes more tightly coupled with the thing that it is inspecting.
+Taking the above example, if the model were later refactored such that
+the concepts of firstName and surName were pulled from the Person class
+into an extracted Name class, because the inspection relies on a
+sequence of calls made directly into domain objects, the code making the
+query would also have to change. Whilst following the object oriented
+principle of encapsulation of data, such that the caller does not have
+to concern themselves with the data structures hidden behind the getter,
+there is no such abstraction for when the structure itself changes.
+Given an Agile environment where the shape of data is refactored
+regularly, this would be a problem when programming against any kind of
+resource; for example, if change of objects formats propagates knock-on
+changes where ever the object is used it is very difficult to commit
+small diffs to the VCS which make incremental changes to a tightly
+focused area of the system. A method of programming which truly embraced
+extreme programming would allow constant change without disparate,
+barely related parts having to be modified in parallel when structural
+refactoring occurs. The coupling is all the more acute where the format
+of the item being inspected is defined by an independently maintained
+service.
+
+*contagion problem*
+
+Extraneous changes dilute the changelog, making it less easily defined
+by code changes which are intrinsically linked to the actual change in
+the logic being expressed by the program, and therefore to the thinking
+behind the change and the reason for the change.
+
 Browser XML Http Request (XHR)
 ------------------------------
 
@@ -483,116 +593,6 @@ handler.
 While SAX addresses many of the problems raised in this dissertation,
 I find the unfriendly developer ergonomics pose too high a barrier to
 its adoption for all but fringe uses.
-
-Common patterns for connecting to REST services
------------------------------------------------
-
-Marshaling provides two-way mapping between a domain model and its
-serialisation, either completely automatically or based
-on a declarative specification. To handle a fetched rest response it is
-common to automatically demarshal it so that can application may make
-use of the response from inside its own model, no differently from
-if the remote resource's objects had originated locally.
-From the programmer's vantage it is as if the domain objects themselves 
-had been fetched.
-Another common design pattern, intended to give a degree of isolation
-between concerns, is to demarshal automatically only so far as Data
-Transfer Objects (DTOs), instances of classes which implement no logic
-other than storage, and from these DTOs programmatically instantiate the
-domain model objects. Going one step further, for JSON resources sent to
-loosely-typed languages with a native representation of objects as
-generic key-value pairs such as Javascript or Clojure, the marshaling
-step is often skipped: the output from the parser so closely resembles
-the language's built-in types that it is simplest to use it directly.
-Depending on the programming style adopted we might say that the JSON
-parser's output *is* the DTO and create domain model objects based on
-it, or that no further instantiation is necessary.
-
-![*Degrees of automatic marshaling*. From marshaling directly to domain
-objects, DTOs, using parser output as a DTO, or using objects directly.
-Distinguish work done by library vs application programmer's
-domain](images/placeholder.png)
-
-Ultimately the degree of marshaling that is used changes only the level
-of abstraction of the resource that the REST client library hands over
-to the application developer. Regardless of the exact form of the
-response model, the developer will usually programmatically extract one
-or more parts from it via calls in the programming language itself. For
-example, on receiving a resource de-marshaled to domain objects, a Java
-developer will inspect it by calling a series of getters in order to
-narrow down to the interesting parts. This is not to say that the whole
-of the message might not in some way be interesting, only that by using
-it certain parts will need to be identified as distinct areas of
-concern.
-
-~~~~ {.java}
-// An example programmatic approach to a domain model interrogation 
-// under Java; upon receiving a list of people, each person's name
-// is added to a database. The methods used to drill down to the
-// pertinent components of the response are all getters: getPeople, 
-// getGivenName, and getSurname. 
-void handleResponse( RestResponse response ) {
-
-   for( Person p : response.getPeople() ) {
-      addNameToDb( p.getGivenName(), p.getSurname() );
-   }   
-}
-~~~~
-
-~~~~ {.javascript}
-// Although in this Javascript example the objects passed to the handler 
-// remain in the form given by the JSON parser, containing no domain-specific
-// getters, the programming represents a different expression of the same 
-// basic process.
-function handleResponse( response ){
-
-   response.people.forEach( function( person ){
-      addNameToDb( p.givenName, p.surname );
-   });
-}
-~~~~
-
-Because it is applied directly to the metamodel of the language[\^ It
-could be argued that getters aren't a part of the metamodel of Java
-itself, but they form such a common pattern that it is a part ], this
-extraction has become such a natural component of a workflow that it
-maye be used while thinking of it as wholly unremarkable. In the
-examples above we are interacting with the model in the way that the
-language makes the most easy to conceptualise. However se should
-consider that, however subtly embedded, the technique is an invented
-construct and only one of the possible formulations which might have
-been drawn.
-
-One weakness of this inspection model is that, once much code is written
-to interrogate models in this way, the interface of the model becomes
-increasingly expensive to change as the code making the inspections
-becomes more tightly coupled with the thing that it is inspecting.
-Taking the above example, if the model were later refactored such that
-the concepts of firstName and surName were pulled from the Person class
-into an extracted Name class, because the inspection relies on a
-sequence of calls made directly into domain objects, the code making the
-query would also have to change. Whilst following the object oriented
-principle of encapsulation of data, such that the caller does not have
-to concern themselves with the data structures hidden behind the getter,
-there is no such abstraction for when the structure itself changes.
-Given an Agile environment where the shape of data is refactored
-regularly, this would be a problem when programming against any kind of
-resource; for example, if change of objects formats propagates knock-on
-changes where ever the object is used it is very difficult to commit
-small diffs to the VCS which make incremental changes to a tightly
-focused area of the system. A method of programming which truly embraced
-extreme programming would allow constant change without disparate,
-barely related parts having to be modified in parallel when structural
-refactoring occurs. The coupling is all the more acute where the format
-of the item being inspected is defined by an independently maintained
-service.
-
-*contagion problem*
-
-Extraneous changes dilute the changelog, making it less easily defined
-by code changes which are intrinsically linked to the actual change in
-the logic being expressed by the program, and therefore to the thinking
-behind the change and the reason for the change.
 
 The JsonPath and XPath selector languages
 -----------------------------------------
