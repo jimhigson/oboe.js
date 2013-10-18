@@ -336,8 +336,8 @@ later follow a narrative of code changes which are intrinsic to the
 changes in logic expressed by the program, and therefore harder to later
 understand the thinking behind the change and the reason for the change.
 
-The JsonPath and XPath selector languages
------------------------------------------
+JsonPath and XPath selector languages
+-------------------------------------
 
 The problem of drilling down to the interesting parts of a message
 without tightly coupling to the format.
