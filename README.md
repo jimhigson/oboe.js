@@ -7,7 +7,7 @@ doesn't care which other libraries you need it to speak to.
 
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
 Or even if it never completes. It is well tested in the browser and has alpha-level
-support for Node.js.
+support for Node.js [npm package](https://npmjs.org/package/oboe).
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
