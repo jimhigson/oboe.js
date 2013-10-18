@@ -283,18 +283,7 @@ oboe('/myapp/things.json')
       // here we'll be called back with baz and bax but not Boz.
       
    });
-```  
-
-Like css4 stylesheets, this can also be used to express a 'containing' operator.
-
-``` js
-oboe('/myapp/things.json')
-   .node('people.$*.email', function( personWithAnEmailAddress ){
-      
-      // here we'll be called back with baz and bax but not Boz.
-      
-   });
-``` 
+```
 
 ## Using Oboe with d3.js
 
