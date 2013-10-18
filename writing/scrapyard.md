@@ -451,3 +451,18 @@ is required -- the same state as a programmer usually maintains whilst
 employing a SAX parser. This is possible because JSONPath does not have
 a way to express the relationship with sibling nodes, only ancestors and
 decedents.
+
+Xpath is able to express identifiers which often survive refactoring
+because XML represents a tree, hence we can consider relationships
+between entities to be that of contains/contained in (also siblings?).
+In application of XML, in the languages that we build on top of XML, it
+is very natural to consider all elements to belong to their ancestors.
+Examples are myriad, for example consider a word count in a book written
+in DOCBook format - it should be calculable without knowing if the book
+is split into chapters or not since this is a concept internal to the
+organisation of the book itself nd not something that a querier is
+likely to find interesting - if this must be considered the structure
+acts as barrier to information rather than enabling the information's
+delivery. Therefore, in many cases the exact location of a piece of
+information is not as important as a more general location of x being in
+some way under y.

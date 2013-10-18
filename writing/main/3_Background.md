@@ -452,23 +452,30 @@ Likewise, the text inside `<name>` might be `John` or `\n         John`.
 Inherited from JSON's programming language ancestry, whitespace between
 tokens is never significant.
 
-Xpath is able to express identifiers which often survive refactoring
-because XML represents a tree, hence we can consider relationships
-between entities to be that of contains/contained in (also siblings?).
-In application of XML, in the languages that we build on top of XML, it
-is very natural to consider all elements to belong to their ancestors.
-Examples are myriad, for example consider a word count in a book written
-in DOCBook format - it should be calculable without knowing if the book
-is split into chapters or not since this is a concept internal to the
-organisation of the book itself nd not something that a querier is
-likely to find interesting - if this must be considered the structure
-acts as barrier to information rather than enabling the information's
-delivery. Therefore, in many cases the exact location of a piece of
-information is not as important as a more general location of x being in
-some way under y.
+Of course, not evey refactor yields a new format which a an unmodified 
+may continue to track.
+To our favour is the trend for ancestor relationships to generally denote the 
+same relationship between concepts regardless of the number of intermediate 
+generations. In the example above `town` transitioned from
+child to grandchild of `person` without disturbing the denoted
+'lives in' relationship.
+By necessity we should limit ourselves to a reasonable ability to track changes
+with regards to a different representation of the same data
+rather than a change in the information that the format represents.
+
+Testing needed. However, the ability to easily write a client
+compatible with a present and known future version removes the need to exactly
+synchronise one system's update with another's.
+
+Correctly selecting parts often requires
+correctly imposing a reified type concept on the various sub-trees of the document.
+If we allow ourselves to assume that every node with a name represents a person we 
+are liable to write brittle selectors. However, a sound type imposition will
+sometimes be simple, an object with an isbn property is almost certainly a
+book.
 
 This may not always hold. A slightly contrived example might be if we
-were representing a model of partial knowledge:
+expanded a model to contain partial knowledge:
 
 ~~~~ {.xml}
 <people>
