@@ -388,7 +388,10 @@ continue to select correctly after a refactor to the JSON below:
       {  name: 'Jack',
          address:{town:'Bristol', county:'Bristol', country:'uk'}
       }
-      {  address:{town:'Cambridge', county:'Cambridgeshire', country:'uk'},
+      {  address:{
+            town:'Cambridge', county:'Cambridgeshire', 
+            country:'uk'
+         },
          name: 'Walter'
       }
    ]
@@ -438,12 +441,16 @@ JSONPath, it is much less likely because, each nodes only having one,
 unambiguous set of children, the JSON metamodel does not offer the
 format author a selection from equivalent but incompatible alternatives.
 
-XML also suffers ambiguity regarding whitespace characters between tags.
-Strictly this is a part of the document but in traversal practice many
-engines discard it as insignificant. For example, in the XML above the
+XML also invites ambiguity regarding whitespace characters between tags,
+reflecting XML's dual purposes of document markup and data; whitespace
+is generally meaningful for documents but ignorable for data. Strictly
+whitespace text nodes are part of the document but in practice many tree
+walkers discard them as insignificant. In the XML example above the
 `<person>` element may be enumerated as the first or second child of
 `<people>` depending on whether the whitespace before it is considered.
 Likewise, the text inside `<name>` might be `John` or `\n         John`.
+Inherited from JSON's programming language ancestry, whitespace between
+tokens is never significant.
 
 Xpath is able to express identifiers which often survive refactoring
 because XML represents a tree, hence we can consider relationships
@@ -467,26 +474,16 @@ were representing a model of partial knowledge:
 <people>
    <person>
       <name>
-         <isNot><surname>Bond</surname></isNot>
+         <isNot>Bob</isNot>
       </name>
    </person>
 </people>
 ~~~~
 
-The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. JSONPath
-implementation only allows for search-type usage:
-To examine a whole document for the
-list of nodes that match a JSONPath expression the whole of the tree is
-required. But to evaluate if a single node matches an expression, only
-the *path of the descent from the root to that node* is required -- the
-same state as a programmer usually maintains whilst employing a SAX
-parser. This is possible because JSONPath does not have a way to express
-the relationship with sibling nodes, only ancestors and decedents.
-
 Create own language variant for these purposes. Such a language would
 require a reflection on how higher-level types are distinguished in
-JSON.
+JSON. JSONPath does not have a way to express the relationship with
+sibling nodes, only ancestors and decedents.
 
 One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
