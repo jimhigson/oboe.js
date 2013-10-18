@@ -1,4 +1,4 @@
-**Oboe.js**'s makes web applications faster by wrapping https's request-response model
+**Oboe.js** makes web applications faster by wrapping https's request-response model
 with a progressively streamed interface.
 It glues a transport that sits 
 **somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
@@ -283,18 +283,7 @@ oboe('/myapp/things.json')
       // here we'll be called back with baz and bax but not Boz.
       
    });
-```  
-
-Like css4 stylesheets, this can also be used to express a 'containing' operator.
-
-``` js
-oboe('/myapp/things.json')
-   .node('people.$*.email', function( personWithAnEmailAddress ){
-      
-      // here we'll be called back with baz and bax but not Boz.
-      
-   });
-``` 
+```
 
 ## Using Oboe with d3.js
 
