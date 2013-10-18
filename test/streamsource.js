@@ -11,7 +11,8 @@ require('color');
 function startServer( port, grunt ) {
 
    "use strict";
-   
+
+   var JSON_MIME_TYPE = "application/octet-stream";   
    var verboseLog = grunt? grunt.verbose.ok : console.log,
        errorLog = grunt? grunt.log.error : console.error;
 
@@ -86,10 +87,70 @@ function startServer( port, grunt ) {
    }
    
    function sendJsonHeaders(res) {
-      var JSON_MIME_TYPE = "application/octet-stream";
+
       res.setHeader("Content-Type", JSON_MIME_TYPE);
       res.writeHead(200);
    }
+   
+   function twoHundredItems(_req, res) {
+   
+      var TIME_BETWEEN_RECORDS = 40;
+      // 80 records but only every other one has a URL:
+      var NUMBER_OF_RECORDS = 200;
+      
+      res.write('{"data": [');
+   
+      var i = 0;
+   
+      var inervalId = setInterval(function () {
+   
+            res.write(JSON.stringify({
+               "id": i,
+               "url": "http://localhost:4444/item/" + i,
+               // let's get some entropy in here for gzip:
+               "number1": Math.random(),  
+               "number2": Math.random(),  
+               "number3": Math.random(),  
+               "number4": Math.random()  
+            }));
+         
+         if (i == NUMBER_OF_RECORDS) {
+   
+            res.end(']}');
+            
+            clearInterval(inervalId);
+            
+            console.log('db server: finished writing to stream');
+         } else {
+            res.write(',');
+         }
+         
+         i++;  
+   
+      }, TIME_BETWEEN_RECORDS);
+   }   
+   
+   function replyWithTenSlowNumbersGzipped(req, serverResponse){
+   
+      // request out non-gzipped stream and re-serve gzipped
+      require('http').get({  
+                        host: 'localhost',
+                        path: '/twoHundredItems',
+                        port: port })
+      .on('response', function(clientResponse){
+      
+         var zlib = require('zlib');
+                        
+         //res.writeHead(200, { 'content-encoding': 'gzip' });
+         
+         serverResponse.setHeader("content-type", JSON_MIME_TYPE);
+         serverResponse.setHeader("content-encoding", 'gzip');
+         serverResponse.writeHead(200);      
+         
+         clientResponse.pipe(zlib.createGzip()).pipe(serverResponse);
+         
+       });
+   }   
    
    function routing() {
       var Router = require('node-simple-router'),
@@ -101,7 +162,9 @@ function startServer( port, grunt ) {
       router.get(    '/echoBackHeaders',           echoBackHeaders);
       router.get(    '/static/json/:name.json',    replyWithStaticJson);
       router.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
-      
+      router.get(    '/twoHundredItems',           twoHundredItems);
+      router.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
+
       return router;
    }
          
