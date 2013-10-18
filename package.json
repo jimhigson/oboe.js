@@ -2,9 +2,14 @@
   "name": "Oboe.js",
   "version": "1.2.0",
   "description": "Oboe.js ajaxes in json, giving you the objects that you care about without waiting for the whole request to finish",
-  "main": "index.js",
+  "main": "./dist/oboe-node.js",
   "scripts": {
-    "test": "./runTests.sh"
+    "test": "node ./node_modules/grunt-cli/bin/grunt default",
+    "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
+    "test-run": "node ./node_modules/grunt-cli/bin/grunt test-run",
+    "test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
+    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
+    "node-build": "node ./node_modules/grunt-cli/bin/grunt node-build"
   },
   "repository": "https://github.com/jimhigson/oboe.js.git",
   "keywords": [
@@ -42,7 +47,8 @@
     "grunt-concurrent": "~0.3.1",
     "color": "~0.4.4",
     "jasmine-node": "~1.11.0",
-    "get-json": "0.0.1"
+    "get-json": "0.0.1",
+    "grunt-cli": "~0.1.9"
   },
   "dependencies": {
     "clarinet": "~0.7.2"
