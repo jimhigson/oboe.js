@@ -417,3 +417,37 @@ endeavour.*
 > milliseconds. As long as an app meets this user goal, it doesn’t
 > matter how big an abstraction layer it has to go through to get to
 > silicon. [@fivemyths]
+
+Drilling down in code
+---------------------
+
+this
+extraction has become such a natural component of a workflow that it
+maye be used while thinking of it as wholly unremarkable. In the
+examples above we are interacting with the model in the way that the
+language makes the most easy to conceptualise. However se should
+consider that, however subtly embedded, the technique is an invented
+construct and only one of the possible formulations which might have
+been drawn.
+
+selector languages
+------------------
+
+their employment is not
+the most natural coming from a programming context in which the
+application developer's responsibilities usually start where the
+demarshaller's end
+
+using (json|xml)path with sax
+-----------------------------
+
+The typical use pattern of XPath or JSONPath is to search for nodes once
+the whole serialisation has been parsed into a DOM-style model. JSONPath
+implementation only allows for search-type usage: To examine a whole
+document for the list of nodes that match a JSONPath expression the
+whole of the tree is required. But to evaluate if a single node matches
+an expression, only the *path of the descent from the root to that node*
+is required -- the same state as a programmer usually maintains whilst
+employing a SAX parser. This is possible because JSONPath does not have
+a way to express the relationship with sibling nodes, only ancestors and
+decedents.
