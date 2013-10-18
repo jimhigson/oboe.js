@@ -333,7 +333,7 @@ without disparate, parts having to be modified in parallel.
 
 Extraneous changes also dilute a VCS changelog, making it less easily to
 later follow a narrative of code changes which are intrinsic to the
-changes in logic expressed by the program, and therefore harder to later
+difference in logic expressed by the program, and therefore harder to later
 understand the thinking behind the change and the reason for the change.
 
 JsonPath and XPath selector languages
