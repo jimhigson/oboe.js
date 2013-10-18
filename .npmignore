@@ -1,0 +1,11 @@
+libpeerconnection.log
+*.idea
+*.iml
+*.tidy
+*.backup
+.DS_Store
+writing
+src
+examples
+build
+benchmarking
