@@ -321,8 +321,8 @@ to me as undesirable here as it would be anywhere else.
 In *the Red Queen's race* it took "all the running you can do, to keep
 in the same place". Ideally as a programmer I'd like to expend effort to
 make my code to do something new, or to perform something that it
-already did better, not so that it can stay still. Following an object
-oriented encapsulation of data, such that a caller does not have to
+already did better, not so that it keeps the same. Following an object
+oriented encapsulation of data such that a caller does not have to
 concern themselves with the data structures behind an interface, the
 internal implementation may be changed without disruptions to the rest
 of the code base. However when the structure of the inter-object
