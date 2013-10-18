@@ -89,21 +89,6 @@ oboe('/myapp/things.json')
    });
 ```
 
-## Detecting strings, numbers
-
-Want to detect strings or numbers instead of objects? Oboe doesn't care about the 
-types in the json so the syntax is the same:
-
-``` js
-   oboeInstance.node({
-      'name': function( name ){
-         // do something with the name
-      },
-      'friends.*.name':function( friendsName ){
-         // etc etc
-      });
-```
-
 ## Duck typing
 
 Sometimes it is more useful to say *what you are trying to find* than *where you'd like to find it*. In these cases,
@@ -111,12 +96,28 @@ Sometimes it is more useful to say *what you are trying to find* than *where you
  
 
 ``` js
-   oboeInstance.node('{name colour}', function( foodObject ) {   
+oboe('/myapp/things.json')
+   .node('{name colour}', function( foodObject ) {   
       // I'll get called for every object found that 
       // has both a name and a colour   
    };
-```   
+```
 
+## Detecting strings, numbers
+
+Want to detect strings or numbers instead of objects? Oboe doesn't care about the 
+types in the json so the syntax is the same:
+
+``` js
+oboe('/myapp/socialgraph.json')
+   .node({
+      'name': function( name ){
+         // do something with the name
+      },
+      'friends.*.name':function( friendsName ){
+         // etc etc
+      });
+```  
 
 ## Reacting before we get the whole object
 
