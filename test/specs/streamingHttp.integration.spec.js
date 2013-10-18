@@ -142,6 +142,28 @@ describe('streaming xhr integration (real http)', function() {
             expect(numberOfProgressCallbacks).toBeGreaterThan(3);
          });      
       })
+      
+      /*
+      This is fine in Firefox but breaks in Chrome:
+         https://code.google.com/p/chromium/issues/detail?id=309092
+         
+      it('gives multiple callbacks when loading a gzipped streaming resource',  function(queue) {
+                              
+         streamingHttp(                           
+            fire, on,
+            new XMLHttpRequest(),            
+            'GET',
+ 
+            '/testServer/gzippedTwoHundredItems',
+             null // this is a get: no data to send         
+         );                     
+         
+         waitForRequestToComplete();      
+   
+         runs(function(){
+            expect(numberOfProgressCallbacks).toBeGreaterThan(1);
+         });      
+      })*/      
    }
    
    it('does not call back with zero-length data',  function(queue) {

@@ -44,6 +44,35 @@ describe("oboe integration (real http)", function() {
       });
    })
    
+   /*
+   Currently failing in Chrome
+      https://code.google.com/p/chromium/issues/detail?id=309092
+   it('can fetch gzipped content', function () {
+
+      oboe(url('gzippedTenSlowNumbers'))
+          .node('![*]', callbackSpy)
+          .done(whenDoneFn);
+
+      waitsFor(function () {
+         return !!fullResponse
+      }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+      runs(function () {
+
+         expect(callbackSpy).toHaveBeenCalledWith(0, [0], [fullResponse, 0]);
+         expect(callbackSpy).toHaveBeenCalledWith(1, [1], [fullResponse, 1]);
+         expect(callbackSpy).toHaveBeenCalledWith(2, [2], [fullResponse, 2]);
+         expect(callbackSpy).toHaveBeenCalledWith(3, [3], [fullResponse, 3]);
+         expect(callbackSpy).toHaveBeenCalledWith(4, [4], [fullResponse, 4]);
+         expect(callbackSpy).toHaveBeenCalledWith(5, [5], [fullResponse, 5]);
+         expect(callbackSpy).toHaveBeenCalledWith(6, [6], [fullResponse, 6]);
+         expect(callbackSpy).toHaveBeenCalledWith(7, [7], [fullResponse, 7]);
+         expect(callbackSpy).toHaveBeenCalledWith(8, [8], [fullResponse, 8]);
+         expect(callbackSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
+
+      });
+   })*/   
+   
    it('can make nested requests from arrays', function () {
 
       oboe(url('tenSlowNumbers'))
