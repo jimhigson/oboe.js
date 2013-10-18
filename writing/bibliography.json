@@ -399,7 +399,18 @@
       ],
       "issued": { "date-parts":[ [2002] ] },
       "type":"book"                  
-   }
+   },
+   
+   {
+      "id":"jsonpath",
+      "title":"JSONPath - XPath for JSON",
+      "author":[         
+         { "family": "Goessner", "given":"Stefan"}
+      ],
+      "url":"http://goessner.net/articles/JsonPath/",
+      "issued": { "date-parts":[ [2007] ] },
+      "type":"webpage"                  
+   }   
    
 ]
 
