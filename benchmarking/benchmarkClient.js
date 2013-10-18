@@ -20,6 +20,7 @@ function aggregateWithOboe() {
       oboe(url).node('name', function(name){
                       
          console.log(name);
+         this.abort();
          console.log( process.memoryUsage().heapUsed );         
       });      
    });                 

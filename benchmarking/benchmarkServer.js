@@ -6,7 +6,8 @@
 var PORT = 4444;
 
 var TIME_BETWEEN_RECORDS = 15;
-var NUMBER_OF_RECORDS = 40;
+// 80 records but only every other one has a URL:
+var NUMBER_OF_RECORDS = 80;
 
 function sendJsonHeaders(res) {
    var JSON_MIME_TYPE = "application/octet-stream";
@@ -16,7 +17,7 @@ function sendJsonHeaders(res) {
 
 function serveItemList(_req, res) {
 
-   console.log('slow number server: send simulated database data');
+   console.log('slow fake db server: send simulated database data');
 
    res.write('{"data": [');
 
@@ -24,10 +25,17 @@ function serveItemList(_req, res) {
 
    var inervalId = setInterval(function () {
 
-      res.write(JSON.stringify({
-         "id": i,
-         "url": "http://localhost:4444/item/" + i         
-      }));
+      if( i % 2 == 0 ) {
+
+         res.write(JSON.stringify({
+            "id": i,
+            "url": "http://localhost:4444/item/" + i         
+         }));
+      } else {
+         res.write(JSON.stringify({
+            "id": i         
+         }));      
+      }
       
       if (i == NUMBER_OF_RECORDS) {
 
