@@ -1,4 +1,4 @@
-**Oboe.js**'s makes web applications faster by wrapping https's request-response model
+**Oboe.js** makes web applications faster by wrapping https's request-response model
 with a progressively streamed interface.
 It glues a transport that sits 
 **somewhere between streaming and downloading** onto to a **JSON parser that sits somewhere between SAX and
