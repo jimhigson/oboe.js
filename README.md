@@ -512,9 +512,12 @@ output asynchronously as soon as it is ready instead of waiting before everythin
 Browsers with Full support are:
 
 * Recent Chrome
-* Recent Firefoxes
+* Recent Firefox
 * Internet Explorer 10
 * Recent Safaris
+
+Chrome's XHR [doesn't fire progress events for gzipped content](https://code.google.com/p/chromium/issues/detail?id=309092).
+It'll work but if the content is gzipped the AJAX call works like a non-streaming one.
 
 Browsers with partial support:
 
