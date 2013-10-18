@@ -525,8 +525,6 @@ Browsers with partial support:
  
 Unfortunately, IE before version 10 
 [doesn't provide any convenient way to read an http request while it is in progress](http://blogs.msdn.com/b/ieinternals/archive/2010/04/06/comet-streaming-in-internet-explorer-with-xmlhttprequest-and-xdomainrequest.aspx).
-While streaming is possible to work into older Internet Explorers, it requires the server-side to write
-out script tags which goes against Oboe's ethos of very simple streaming from standard REST services.
 
 The good news is that in older versions of IE Oboe gracefully degrades,
 it'll just fall back to waiting for the whole response to return, then fire all the events together.
