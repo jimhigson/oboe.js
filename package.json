@@ -12,7 +12,10 @@
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
     "node-build": "node ./node_modules/grunt-cli/bin/grunt node-build"
   },
-  "repository": "https://github.com/jimhigson/oboe.js.git",
+  "repository": {
+      "type":"git",
+      "url": "https://github.com/jimhigson/oboe.js.git"
+  },
   "keywords": [
     "json",
     "parser",
@@ -25,6 +28,7 @@
     "async",
     "browser"
   ],
+  "homepage":"https://github.com/jimhigson/oboe.js",
   "author": "Jim Higson",
   "license": "BSD",
   "readmeFilename": "README.md",
