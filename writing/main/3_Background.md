@@ -333,81 +333,114 @@ without disparate, parts having to be modified in parallel.
 
 Extraneous changes also dilute a VCS changelog, making it less easily to
 later follow a narrative of code changes which are intrinsic to the
-difference in logic expressed by the program, and therefore harder to later
-understand the thinking behind the change and the reason for the change.
+difference in logic expressed by the program, and therefore harder to
+later understand the thinking behind the change and the reason for the
+change.
 
 JsonPath and XPath selector languages
 -------------------------------------
 
-The problem of drilling down to the interesting parts of a message
-without tightly coupling to the format.
+The problem of drilling down to pertinent fragments of a message without
+tightly coupling to the format could be somewhat solved if instead of
+programmatically descending step-by-step, a language were used which
+allows the right amount of specificity regarding which parts to select.
+For markup languages there are associated query languages whose coupling
+is loose enough that not every node that is descended through must be
+specified. The best known is XPATH but there is also JSONPath, a JSON
+equivalent [@jsonpath].
 
-Both the above difficulty in identifying the interesting parts of a
-message whilst using a streaming parser and the problem with tight
-coupling of programmatic drilling down to REST formats leads me to
-search for areas where this problem has already been solved.
-
-In the domain of markup languages there are associated query languages
-such as XPATH whose coupling is loose enough that their expressions may
-continue to function after the exact shape of a message is refactored.
-While observing this is nothing more radical than using the query
-languages in more-or-less they were intended, their employment is not
-the most natural coming from a programming context in which the
-application developer's responsibilities usually start where the
-demarshaler's end. Consider the following XML:
-
-~~~~ {.xml}
-<!-- as JSON perhaps? -->
-<people>
-   <person>
-      <name>...</name>   
-      <town>Bond</town>
-   </person>
-</people>
-~~~~
-
-The XPath //person[0]//surname//text() would continue to identify the
-correct part of the resource without being updated after the xml
-analogue of the above Java Name refactor:
-
-~~~~ {.xml}
-<people>
-   <person>
-      <name>
-         <givenName>...</givenName>
-         <familyName>Bond</familyName>
-      </name>
-   </person>
-</people>
-~~~~
-
-Luckily in JSON there exists already an attempt at an equivalent named
-Jsonpath. JsonPath closely resembles the javascript code which would
-select the same nodes. Not a real spec.
+As far as possible the JSONPath language follows the javascript to
+descend into the same sub-tree.
 
 ~~~~ {.javascript}
+// in Javascript we can get the town of the second person as:
+let town = subject.people[2].town
 
-// an in-memory person with a multi-line address:
-let person = {
-   name: {givenName:'', familyName:''},
-   address: [
-      "line1",
-      "line2",
-      "line3"
+// the equivalent JSONPath expression is identical:
+let townSelector = "people[2].town"
+
+// We would be wise not to write overly-specific selectors.
+// JSONPath also provides an ancestor relationship not found in Javascript:
+let betterTownSelector = "people[2]..town"
+~~~~
+
+Consider the resource below:
+
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+      {town:'Cambridge', name: 'Walter'}
    ]
 }
-
-
-// in javascript we can get line two of the address as such:
-let address = person.address[2]
-
-// the equivalent jsonpath expression is identical:
-let jsonPath = "person.address[2]"
-
-// although jsonpath also allows ancestor relationships which are not
-// expressible quite so neatly as basic Javascript:
-let jsonPath2 = "person..given"
 ~~~~
+
+The JSONPath `people.\*..town` against the above JSON format would
+continue to select correctly after a refactor to the JSON below:
+
+~~~~ {.javascript}
+{
+   people: [
+      {  name: 'John', 
+         address:{town:'Oxford', county:'Oxon', country:'uk'}
+      },
+      {  name: 'Jack',
+         address:{town:'Bristol', county:'Bristol', country:'uk'}
+      }
+      {  address:{town:'Cambridge', county:'Cambridgeshire', country:'uk'},
+         name: 'Walter'
+      }
+   ]
+}
+~~~~
+
+Maintaining compatibility with unanticipated format revisions through
+selector languages is easier with JSON than XML. The XML metamodel
+contains overlapping representations of equivalent entities which a
+refactored format is liable to switch between. Each XML element has two
+distinct lists of child nodes, attribute children and node list
+children; from one perspective attributes are child nodes of their
+parent element but they can alternatively be considered as data stored
+in the element. Because of this classification ambiguity an XML document
+doesn't form a single, correct n-way tree. Because of the difference in
+expressivity between attributes which may only be strings and child
+nodes which allow recursive structure, this is a common refactor when a
+more detailed mapping is required and a scalar value is upgraded to be
+compound. XPath selectors written in the most natural way do not track
+this change.
+
+~~~~ {.xml}
+<people>
+   <person name="John" town="Oxford"></person>
+</people>
+~~~~
+
+The XPath `\/\/person@town` matches the XML above but because of the
+refactor from attribute to child element fails to match the revised
+version below.
+
+~~~~ {.xml}
+<people>
+   <person>
+      <name>John</name>
+      <address>
+         <town>Oxford</town> <county>Oxon</county>
+      </address>
+   </person>
+</people>
+~~~~
+
+XML also suffers ambiguities regarding whitespace between tags. Strictly
+this is a part of the document but in practice many engines discard it
+as insignificant. For example, in the XML above the `<person>` element
+may be enumerated as the first or second child of `<people>` depending
+on whether the whitespace before it is considered.
+
+While it remains possible to create untrackable format changes in JSON,
+it is much less likely because, each nodes only having one, unambiguous
+child list, the JSON format does not promote the use of equivalent but
+incompatible alternatives.
 
 Xpath is able to express identifiers which often survive refactoring
 because XML represents a tree, hence we can consider relationships
@@ -448,13 +481,12 @@ same state as a programmer usually maintains whilst employing a SAX
 parser. This is possible because JSONPath does not have a way to express
 the relationship with sibling nodes, only ancestors and decedents.
 
+Create own language variant for these purposes
+
 One limitation of the JSONPath language is that it is not possible to
 construct an 'containing' expression. CSS4 allows this in a way that is
 likely to become familiar to web developers over the next five years or
 so.
-
-More applicable to JSON because doesn't have to distinguish between text
-children and attributes.
 
 Browser XML Http Request (XHR)
 ------------------------------
