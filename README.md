@@ -227,9 +227,9 @@ given instead to the callback.
 
 // the json from the server side looks like this:
 {people: [
-   {name:'Baz', age:34, email: 'baz@example.com'}
-   {name:'Boz', age:24}
-   {name:'Bax', age:98, email: 'bax@example.com'}}
+   {'name':'Baz', 'age':34, 'email': 'baz@example.com'}
+   {'name':'Boz', 'age':24}
+   {'name':'Bax', 'age':98, 'email': 'bax@example.com'}}
 ]}
 
 // we are using Angular and have a controller:
