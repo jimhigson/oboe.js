@@ -9,8 +9,6 @@ Oboe makes it really easy to start using json from a response before the ajax re
 Or even if it never completes. It is well tested in the browser and has alpha-level
 support for Node.js.
 
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
-
 - [Examples](#examples)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
 	- [Hanging up the AJAX when we get what we need](#hanging-up-the-ajax-when-we-get-what-we-need)
