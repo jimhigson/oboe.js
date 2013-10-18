@@ -70,7 +70,7 @@ oboe('/myapp/things.json')
 
 ## Hanging up the AJAX when we get what we need
 
-We can example on the example above. Since we only care about the foods object and 
+We can improve on the example above. Since we only care about the foods object and 
 not the non-foods we can hang up as soon as we have the foods, reducing our precious 
 download footprint.
 
@@ -119,7 +119,7 @@ oboe('/myapp/socialgraph.json')
 
 ## Reacting before we get the whole object
 
-As well as ```.node```, you can use ```.path``` to be notified when the path is first found, even though we don't yet 
+As well as `.node`, you can use `.path` to be notified when the path is first found, even though we don't yet 
 know what will be found there. We might want to eagerly create elements before we have all the content to get them on the 
 page as soon as possible.
 
@@ -220,7 +220,7 @@ repeatedly whenever a new element is concatenated onto it.
 Oboe supports css4-style selectors and gives them much the same meaning as in the 
 [proposed css level 4 selector spec](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject).
 
-If a term is prefixed with a dollor, instead of the element that matched, an element further up the parsed object tree will be
+If a term is prefixed with a dollar sign, instead of the element that matched, an element further up the parsed object tree will be
 given instead to the callback. 
 
 ``` js
@@ -327,7 +327,7 @@ oboe('people.json')
 
 # API
 
-Oboe exposes a single global at ```window.oboe```. You can start a new AJAX request by 
+Oboe exposes a single global at `window.oboe`. You can start a new AJAX request by 
 calling one of these methods:
 
 ```js
@@ -346,7 +346,7 @@ calling one of these methods:
    })         
 ```   
 
-```doneCallback``` is passed the entire json when the response is complete.
+`doneCallback` is passed the entire json when the response is complete.
 Usually it is better to read the json in small parts than waiting for it to completely 
 download but this is there for if you need to know when the request is done.
 
@@ -356,7 +356,7 @@ The returned instance exposes a few chainable methods:
    .node(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```.node()``` registers our interest in nodes in the JSON which match the given ```pattern```.
+`.node()` registers our interest in nodes in the JSON which match the given `pattern`.
 Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
 When the pattern is matched the callback is given the matching node and a path describing where it was found.
    
@@ -364,10 +364,10 @@ When the pattern is matched the callback is given the matching node and a path d
    .path(String pattern, Function callback(thingFound, String[] path, context))
 ```
 
-```.path)``` is the same as ```.node()``` except the callback is fired when the *path* matches, not when we have the
-thing. For the same pattern this will always fire before ```.node()``` and might be used to get things ready for that call.
+`.path()` is the same as `.node()` except the callback is fired when the *path* matches, not when we have the
+thing. For the same pattern this will always fire before `.node()` and might be used to get things ready for that call.
 
-Alternatively, several patterns may be registered at once with either ```.path``` or ```.node```:
+Alternatively, several patterns may be registered at once with either `.path` or `.node`:
 
 ```js
    .node({
@@ -378,10 +378,10 @@ Alternatively, several patterns may be registered at once with either ```.path``
    .path({
       pattern : callback,
       pattern : callback
-   });   
+   });
 ``` 
 
-```abort()``` Stops the http call at any time. This is useful if you want to read a json response only as
+`abort()` Stops the http call at any time. This is useful if you want to read a json response only as
 far as is necessary. Everything stops. You are guaranteed not to get any further .path() or .node() 
 callbacks, even if the underlying xhr already has additional content buffered.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
@@ -418,7 +418,7 @@ Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/j
 
 The pattern engine supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (```$```) symbol.
+using the dollar (`$`) symbol.
 
 There are also **[some example patterns](#more-example-patterns)** below. 
 
