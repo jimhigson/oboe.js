@@ -376,7 +376,7 @@ Consider the resource below:
 }
 ~~~~
 
-The JSONPath `people.\*..town` against the above JSON format would
+The JSONPath `people.*..town` against the above JSON format would
 continue to select correctly after a refactor to the JSON below:
 
 ~~~~ {.javascript}
