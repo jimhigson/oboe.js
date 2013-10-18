@@ -1,4 +1,4 @@
-% Oboe.js: An approach to i/o for rest clients which is neither batch nor stream; nor SAX nor DOM 
+% Oboe.js: An approach to I/O for REST clients which is neither batch nor stream; nor SAX nor DOM 
 % Jim Higson
 % 2013
 
@@ -613,8 +613,8 @@ to me as undesirable here as it would be anywhere else.
 In *the Red Queen's race* it took "all the running you can do, to keep
 in the same place". Ideally as a programmer I'd like to expend effort to
 make my code to do something new, or to perform something that it
-already did better, not so that it can stay still. Following an object
-oriented encapsulation of data, such that a caller does not have to
+already did better, not so that it keeps the same. Following an object
+oriented encapsulation of data such that a caller does not have to
 concern themselves with the data structures behind an interface, the
 internal implementation may be changed without disruptions to the rest
 of the code base. However when the structure of the inter-object
@@ -625,128 +625,161 @@ without disparate, parts having to be modified in parallel.
 
 Extraneous changes also dilute a VCS changelog, making it less easily to
 later follow a narrative of code changes which are intrinsic to the
-changes in logic expressed by the program, and therefore harder to later
-understand the thinking behind the change and the reason for the change.
+difference in logic expressed by the program, and therefore harder to
+later understand the thinking behind the change and the reason for the
+change.
 
-The JsonPath and XPath selector languages
------------------------------------------
+JsonPath and XPath selector languages
+-------------------------------------
 
-The problem of drilling down to the interesting parts of a message
-without tightly coupling to the format.
+The problem of drilling down to pertinent fragments of a message without
+tightly coupling to the format could be somewhat solved if instead of
+programmatically descending step-by-step, a language were used which
+allows the right amount of specificity regarding which parts to select.
+For markup languages there are associated query languages whose coupling
+is loose enough that not every node that is descended through must be
+specified. The best known is XPATH but there is also JSONPath, a JSON
+equivalent [@jsonpath].
 
-Both the above difficulty in identifying the interesting parts of a
-message whilst using a streaming parser and the problem with tight
-coupling of programmatic drilling down to REST formats leads me to
-search for areas where this problem has already been solved.
-
-In the domain of markup languages there are associated query languages
-such as XPATH whose coupling is loose enough that their expressions may
-continue to function after the exact shape of a message is refactored.
-While observing this is nothing more radical than using the query
-languages in more-or-less they were intended, their employment is not
-the most natural coming from a programming context in which the
-application developer's responsibilities usually start where the
-demarshaler's end. Consider the following XML:
-
-~~~~ {.xml}
-<!-- as JSON perhaps? -->
-<people>
-   <person>
-      <name>...</name>   
-      <town>Bond</town>
-   </person>
-</people>
-~~~~
-
-The XPath //person[0]//surname//text() would continue to identify the
-correct part of the resource without being updated after the xml
-analogue of the above Java Name refactor:
-
-~~~~ {.xml}
-<people>
-   <person>
-      <name>
-         <givenName>...</givenName>
-         <familyName>Bond</familyName>
-      </name>
-   </person>
-</people>
-~~~~
-
-Luckily in JSON there exists already an attempt at an equivalent named
-Jsonpath. JsonPath closely resembles the javascript code which would
-select the same nodes. Not a real spec.
+As far as possible the JSONPath language follows the javascript to
+descend into the same sub-tree.
 
 ~~~~ {.javascript}
+// in Javascript we can get the town of the second person as:
+let town = subject.people[2].town
 
-// an in-memory person with a multi-line address:
-let person = {
-   name: {givenName:'', familyName:''},
-   address: [
-      "line1",
-      "line2",
-      "line3"
-   ]
-}
+// the equivalent JSONPath expression is identical:
+let townSelector = "people[2].town"
 
-
-// in javascript we can get line two of the address as such:
-let address = person.address[2]
-
-// the equivalent jsonpath expression is identical:
-let jsonPath = "person.address[2]"
-
-// although jsonpath also allows ancestor relationships which are not
-// expressible quite so neatly as basic Javascript:
-let jsonPath2 = "person..given"
+// We would be wise not to write overly-specific selectors.
+// JSONPath also provides an ancestor relationship not found in Javascript:
+let betterTownSelector = "people[2]..town"
 ~~~~
 
-Xpath is able to express identifiers which often survive refactoring
-because XML represents a tree, hence we can consider relationships
-between entities to be that of contains/contained in (also siblings?).
-In application of XML, in the languages that we build on top of XML, it
-is very natural to consider all elements to belong to their ancestors.
-Examples are myriad, for example consider a word count in a book written
-in DOCBook format - it should be calculable without knowing if the book
-is split into chapters or not since this is a concept internal to the
-organisation of the book itself nd not something that a querier is
-likely to find interesting - if this must be considered the structure
-acts as barrier to information rather than enabling the information's
-delivery. Therefore, in many cases the exact location of a piece of
-information is not as important as a more general location of x being in
-some way under y.
+Consider the resource below:
 
-This may not always hold. A slightly contrived example might be if we
-were representing a model of partial knowledge:
+~~~~ {.javascript}
+{
+   people: [
+      {name: 'John', town:'Oxford'},
+      {name: 'Jack', town:'Bristol'}
+      {town:'Cambridge', name: 'Walter'}
+   ]
+}
+~~~~
+
+The JSONPath `people.\*..town` against the above JSON format would
+continue to select correctly after a refactor to the JSON below:
+
+~~~~ {.javascript}
+{
+   people: [
+      {  name: 'John', 
+         address:{town:'Oxford', county:'Oxon', country:'uk'}
+      },
+      {  name: 'Jack',
+         address:{town:'Bristol', county:'Bristol', country:'uk'}
+      }
+      {  address:{
+            town:'Cambridge', county:'Cambridgeshire', 
+            country:'uk'
+         },
+         name: 'Walter'
+      }
+   ]
+}
+~~~~
+
+Maintaining compatibility with unanticipated format revisions through
+selector languages is easier with JSON than XML. The XML metamodel
+contains overlapping representations of equivalent entities which a
+refactored format is liable to switch between. Each XML element has two
+distinct lists of child nodes, attribute children and node list
+children; from one perspective attributes are child nodes of their
+parent element but they can alternatively be considered as data stored
+in the element. Because of this classification ambiguity an XML document
+doesn't form a single, correct n-way tree. Because of the difference in
+expressivity between attributes which may only be strings and child
+nodes which allow recursive structure, this is a common refactor when a
+more detailed mapping is required and a scalar value is upgraded to be
+compound. XPath selectors written in the most natural way do not track
+this change.
+
+~~~~ {.xml}
+<people>
+   <person name="John" town="Oxford"></person>
+</people>
+~~~~
+
+The XPath `//person@town` matches the XML above but because of the
+refactor from attribute to child element fails to match the revised
+version below.
 
 ~~~~ {.xml}
 <people>
    <person>
       <name>
-         <isNot><surname>Bond</surname></isNot>
+         John
       </name>
+      <address>
+         <town>Oxford</town> <county>Oxon</county>
+      </address>
    </person>
 </people>
 ~~~~
 
-The typical use pattern of XPath or JSONPath is to search for nodes once
-the whole serialisation has been parsed into a DOM-style model. JSONPath
-implementation only allows for search-type usage:
-https://code.google.com/p/jsonpath/To examine a whole document for the
-list of nodes that match a jsonpath expression the whole of the tree is
-required. But to evaluate if a single node matches an expression, only
-the *path of the descent from the root to that node* is required -- the
-same state as a programmer usually maintains whilst employing a SAX
-parser. This is possible because JSONPath does not have a way to express
-the relationship with sibling nodes, only ancestors and decedents.
+While it is possible to create format changes that are untrackable by
+JSONPath, it is much less likely because, each nodes only having one,
+unambiguous set of children, the JSON metamodel does not offer the
+format author a selection from equivalent but incompatible alternatives.
 
-One limitation of the JSONPath language is that it is not possible to
-construct an 'containing' expression. CSS4 allows this in a way that is
-likely to become familiar to web developers over the next five years or
-so.
+XML also invites ambiguity regarding whitespace characters between tags,
+reflecting XML's dual purposes of document markup and data; whitespace
+is generally meaningful for documents but ignorable for data. Strictly
+whitespace text nodes are part of the document but in practice many tree
+walkers discard them as insignificant. In the XML example above the
+`<person>` element may be enumerated as the first or second child of
+`<people>` depending on whether the whitespace before it is considered.
+Likewise, the text inside `<name>` might be `John` or `\n         John`.
+Inherited from JSON's programming language ancestry, whitespace between
+tokens is never significant.
 
-More applicable to JSON because doesn't have to distinguish between text
-children and attributes.
+Of course, not evey refactor yields a new format which a an unmodified 
+may continue to track.
+To our favour is the trend for ancestor relationships to generally denote the 
+same relationship between concepts regardless of the number of intermediate 
+generations. In the example above `town` transitioned from
+child to grandchild of `person` without disturbing the denoted
+'lives in' relationship.
+By necessity we should limit ourselves to a reasonable ability to track changes
+with regards to a different representation of the same data
+rather than a change in the information that the format represents.
+
+Doesn't mean can continue to rely on compatibility with other systems without
+any work. Integration testing needed.
+However, the ability to easily write a client
+compatible with a present and known future version removes the need to exactly
+synchronise one system's update with another's.
+
+Correctly selecting parts often requires
+correctly imposing a reified type concept on the various sub-trees of the document.
+If we allow ourselves to assume that every node with a name represents a person we 
+are liable to write brittle selectors. However, a sound type imposition will
+sometimes be simple, an object with an isbn property is almost certainly a
+book.
+
+This may not always hold. A slightly contrived example might be if we
+expanded a model to contain fuzzy knowledge:
+
+~~~~ {.xml}
+<people>
+   <person>
+      <name>
+         <isProbably>Bob</isProbably>
+      </name>
+   </person>
+</people>
+~~~~
 
 Browser XML Http Request (XHR)
 ------------------------------
@@ -2255,6 +2288,8 @@ statementExpr pointing to the last clause](images/placeholder)
 
 Conclusion
 ==========
+
+https://github.com/substack/node-trumpet
 
 Benchmarking vs non-progressive REST
 ------------------------------------

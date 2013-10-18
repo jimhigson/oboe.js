@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="author" content="Jim Higson" />
-  <title>Oboe.js: An approach to i/o for rest clients which is neither batch nor stream; nor SAX nor DOM</title>
+  <title>Oboe.js: An approach to I/O for REST clients which is neither batch nor stream; nor SAX nor DOM</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
@@ -30,7 +30,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </head>
 <body>
 <div id="header">
-<h1 class="title">Oboe.js: An approach to i/o for rest clients which is neither batch nor stream; nor SAX nor DOM</h1>
+<h1 class="title">Oboe.js: An approach to I/O for REST clients which is neither batch nor stream; nor SAX nor DOM</h1>
 <h2 class="author">Jim Higson</h2>
 <h3 class="date">2013</h3>
 </div>
@@ -50,7 +50,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#node.js"><span class="toc-section-number">3.2</span> Node.js</a></li>
 <li><a href="#jsonxml"><span class="toc-section-number">3.3</span> Json and XML data transfer formats</a></li>
 <li><a href="#common-patterns-for-connecting-to-rest-services"><span class="toc-section-number">3.4</span> Common patterns for connecting to REST services</a></li>
-<li><a href="#the-jsonpath-and-xpath-selector-languages"><span class="toc-section-number">3.5</span> The JsonPath and XPath selector languages</a></li>
+<li><a href="#jsonpath-and-xpath-selector-languages"><span class="toc-section-number">3.5</span> JsonPath and XPath selector languages</a></li>
 <li><a href="#browser-xml-http-request-xhr"><span class="toc-section-number">3.6</span> Browser XML Http Request (XHR)</a></li>
 <li><a href="#xhrs-and-streaming"><span class="toc-section-number">3.7</span> XHRs and streaming</a></li>
 <li><a href="#browser-streaming-frameworks"><span class="toc-section-number">3.8</span> Browser streaming frameworks</a></li>
@@ -261,64 +261,75 @@ code > span.er { color: #ff0000; font-weight: bold; }
    });
 }</code></pre>
 <p>One weakness in this means of drilling down is that the code making the inspection is quite tightly coupled to the precise structure of the thing that it is inspecting. Taking the above example, if the resource being fetched were later refactored such that the town concept were refactored into a fuller address with a town-county-country tuple, the code addressing the structure would also have to change just to continue to do the same thing. Although this kind of drill-down programming is commonly practiced and not generally recognised as a code smell, requiring knock-on changes when an unrelated system is refactored seems to me as undesirable here as it would be anywhere else.</p>
-<p>In <em>the Red Queen's race</em> it took &quot;all the running you can do, to keep in the same place&quot;. Ideally as a programmer I'd like to expend effort to make my code to do something new, or to perform something that it already did better, not so that it can stay still. Following an object oriented encapsulation of data, such that a caller does not have to concern themselves with the data structures behind an interface, the internal implementation may be changed without disruptions to the rest of the code base. However when the structure of the inter-object composition is revised, isolation from the changes is less often recognised as a desirable trait. A method of programming which truly embraced extreme programming would allow structural refactoring to occur without disparate, parts having to be modified in parallel.</p>
-<p>Extraneous changes also dilute a VCS changelog, making it less easily to later follow a narrative of code changes which are intrinsic to the changes in logic expressed by the program, and therefore harder to later understand the thinking behind the change and the reason for the change.</p>
+<p>In <em>the Red Queen's race</em> it took &quot;all the running you can do, to keep in the same place&quot;. Ideally as a programmer I'd like to expend effort to make my code to do something new, or to perform something that it already did better, not so that it keeps the same. Following an object oriented encapsulation of data such that a caller does not have to concern themselves with the data structures behind an interface, the internal implementation may be changed without disruptions to the rest of the code base. However when the structure of the inter-object composition is revised, isolation from the changes is less often recognised as a desirable trait. A method of programming which truly embraced extreme programming would allow structural refactoring to occur without disparate, parts having to be modified in parallel.</p>
+<p>Extraneous changes also dilute a VCS changelog, making it less easily to later follow a narrative of code changes which are intrinsic to the difference in logic expressed by the program, and therefore harder to later understand the thinking behind the change and the reason for the change.</p>
 </div>
-<div id="the-jsonpath-and-xpath-selector-languages" class="section level2">
-<h2><a href="#the-jsonpath-and-xpath-selector-languages"><span class="header-section-number">3.5</span> The JsonPath and XPath selector languages</a></h2>
-<p>The problem of drilling down to the interesting parts of a message without tightly coupling to the format.</p>
-<p>Both the above difficulty in identifying the interesting parts of a message whilst using a streaming parser and the problem with tight coupling of programmatic drilling down to REST formats leads me to search for areas where this problem has already been solved.</p>
-<p>In the domain of markup languages there are associated query languages such as XPATH whose coupling is loose enough that their expressions may continue to function after the exact shape of a message is refactored. While observing this is nothing more radical than using the query languages in more-or-less they were intended, their employment is not the most natural coming from a programming context in which the application developer's responsibilities usually start where the demarshaler's end. Consider the following XML:</p>
-<pre class="sourceCode xml"><code class="sourceCode xml"><span class="co">&lt;!-- as JSON perhaps? --&gt;</span>
-<span class="kw">&lt;people&gt;</span>
-   <span class="kw">&lt;person&gt;</span>
-      <span class="kw">&lt;name&gt;</span>...<span class="kw">&lt;/name&gt;</span>   
-      <span class="kw">&lt;town&gt;</span>Bond<span class="kw">&lt;/town&gt;</span>
-   <span class="kw">&lt;/person&gt;</span>
-<span class="kw">&lt;/people&gt;</span></code></pre>
-<p>The XPath //person[0]//surname//text() would continue to identify the correct part of the resource without being updated after the xml analogue of the above Java Name refactor:</p>
-<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
-   <span class="kw">&lt;person&gt;</span>
-      <span class="kw">&lt;name&gt;</span>
-         <span class="kw">&lt;givenName&gt;</span>...<span class="kw">&lt;/givenName&gt;</span>
-         <span class="kw">&lt;familyName&gt;</span>Bond<span class="kw">&lt;/familyName&gt;</span>
-      <span class="kw">&lt;/name&gt;</span>
-   <span class="kw">&lt;/person&gt;</span>
-<span class="kw">&lt;/people&gt;</span></code></pre>
-<p>Luckily in JSON there exists already an attempt at an equivalent named Jsonpath. JsonPath closely resembles the javascript code which would select the same nodes. Not a real spec.</p>
-<pre class="sourceCode javascript"><code class="sourceCode javascript">
-<span class="co">// an in-memory person with a multi-line address:</span>
-<span class="kw">let</span> person = {
-   <span class="dt">name</span>: {<span class="dt">givenName</span>:<span class="st">&#39;&#39;</span>, <span class="dt">familyName</span>:<span class="st">&#39;&#39;</span>},
-   <span class="dt">address</span>: [
-      <span class="st">&quot;line1&quot;</span>,
-      <span class="st">&quot;line2&quot;</span>,
-      <span class="st">&quot;line3&quot;</span>
+<div id="jsonpath-and-xpath-selector-languages" class="section level2">
+<h2><a href="#jsonpath-and-xpath-selector-languages"><span class="header-section-number">3.5</span> JsonPath and XPath selector languages</a></h2>
+<p>The problem of drilling down to pertinent fragments of a message without tightly coupling to the format could be somewhat solved if instead of programmatically descending step-by-step, a language were used which allows the right amount of specificity regarding which parts to select. For markup languages there are associated query languages whose coupling is loose enough that not every node that is descended through must be specified. The best known is XPATH but there is also JSONPath, a JSON equivalent <span class="citation">(Goessner 2007)</span>.</p>
+<p>As far as possible the JSONPath language follows the javascript to descend into the same sub-tree.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// in Javascript we can get the town of the second person as:</span>
+<span class="kw">let</span> town = <span class="ot">subject</span>.<span class="fu">people</span>[<span class="dv">2</span>].<span class="fu">town</span>
+
+<span class="co">// the equivalent JSONPath expression is identical:</span>
+<span class="kw">let</span> townSelector = <span class="st">&quot;people[2].town&quot;</span>
+
+<span class="co">// We would be wise not to write overly-specific selectors.</span>
+<span class="co">// JSONPath also provides an ancestor relationship not found in Javascript:</span>
+<span class="kw">let</span> betterTownSelector = <span class="st">&quot;people[2]..town&quot;</span></code></pre>
+<p>Consider the resource below:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">{
+   <span class="dt">people</span>: [
+      {<span class="dt">name</span>: <span class="st">&#39;John&#39;</span>, <span class="dt">town</span>:<span class="st">&#39;Oxford&#39;</span>},
+      {<span class="dt">name</span>: <span class="st">&#39;Jack&#39;</span>, <span class="dt">town</span>:<span class="st">&#39;Bristol&#39;</span>}
+      {<span class="dt">town</span>:<span class="st">&#39;Cambridge&#39;</span>, <span class="dt">name</span>: <span class="st">&#39;Walter&#39;</span>}
    ]
-}
-
-
-<span class="co">// in javascript we can get line two of the address as such:</span>
-<span class="kw">let</span> address = <span class="ot">person</span>.<span class="fu">address</span>[<span class="dv">2</span>]
-
-<span class="co">// the equivalent jsonpath expression is identical:</span>
-<span class="kw">let</span> jsonPath = <span class="st">&quot;person.address[2]&quot;</span>
-
-<span class="co">// although jsonpath also allows ancestor relationships which are not</span>
-<span class="co">// expressible quite so neatly as basic Javascript:</span>
-<span class="kw">let</span> jsonPath2 = <span class="st">&quot;person..given&quot;</span></code></pre>
-<p>Xpath is able to express identifiers which often survive refactoring because XML represents a tree, hence we can consider relationships between entities to be that of contains/contained in (also siblings?). In application of XML, in the languages that we build on top of XML, it is very natural to consider all elements to belong to their ancestors. Examples are myriad, for example consider a word count in a book written in DOCBook format - it should be calculable without knowing if the book is split into chapters or not since this is a concept internal to the organisation of the book itself nd not something that a querier is likely to find interesting - if this must be considered the structure acts as barrier to information rather than enabling the information's delivery. Therefore, in many cases the exact location of a piece of information is not as important as a more general location of x being in some way under y.</p>
-<p>This may not always hold. A slightly contrived example might be if we were representing a model of partial knowledge:</p>
+}</code></pre>
+<p>The JSONPath <code>people.\*..town</code> against the above JSON format would continue to select correctly after a refactor to the JSON below:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">{
+   <span class="dt">people</span>: [
+      {  <span class="dt">name</span>: <span class="st">&#39;John&#39;</span>, 
+         <span class="dt">address</span>:{<span class="dt">town</span>:<span class="st">&#39;Oxford&#39;</span>, <span class="dt">county</span>:<span class="st">&#39;Oxon&#39;</span>, <span class="dt">country</span>:<span class="st">&#39;uk&#39;</span>}
+      },
+      {  <span class="dt">name</span>: <span class="st">&#39;Jack&#39;</span>,
+         <span class="dt">address</span>:{<span class="dt">town</span>:<span class="st">&#39;Bristol&#39;</span>, <span class="dt">county</span>:<span class="st">&#39;Bristol&#39;</span>, <span class="dt">country</span>:<span class="st">&#39;uk&#39;</span>}
+      }
+      {  <span class="dt">address</span>:{
+            <span class="dt">town</span>:<span class="st">&#39;Cambridge&#39;</span>, <span class="dt">county</span>:<span class="st">&#39;Cambridgeshire&#39;</span>, 
+            <span class="dt">country</span>:<span class="st">&#39;uk&#39;</span>
+         },
+         <span class="dt">name</span>: <span class="st">&#39;Walter&#39;</span>
+      }
+   ]
+}</code></pre>
+<p>Maintaining compatibility with unanticipated format revisions through selector languages is easier with JSON than XML. The XML metamodel contains overlapping representations of equivalent entities which a refactored format is liable to switch between. Each XML element has two distinct lists of child nodes, attribute children and node list children; from one perspective attributes are child nodes of their parent element but they can alternatively be considered as data stored in the element. Because of this classification ambiguity an XML document doesn't form a single, correct n-way tree. Because of the difference in expressivity between attributes which may only be strings and child nodes which allow recursive structure, this is a common refactor when a more detailed mapping is required and a scalar value is upgraded to be compound. XPath selectors written in the most natural way do not track this change.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
+   <span class="kw">&lt;person</span><span class="ot"> name=</span><span class="st">&quot;John&quot;</span><span class="ot"> town=</span><span class="st">&quot;Oxford&quot;</span><span class="kw">&gt;&lt;/person&gt;</span>
+<span class="kw">&lt;/people&gt;</span></code></pre>
+<p>The XPath <code>//person@town</code> matches the XML above but because of the refactor from attribute to child element fails to match the revised version below.</p>
 <pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
    <span class="kw">&lt;person&gt;</span>
       <span class="kw">&lt;name&gt;</span>
-         <span class="kw">&lt;isNot&gt;&lt;surname&gt;</span>Bond<span class="kw">&lt;/surname&gt;&lt;/isNot&gt;</span>
+         John
+      <span class="kw">&lt;/name&gt;</span>
+      <span class="kw">&lt;address&gt;</span>
+         <span class="kw">&lt;town&gt;</span>Oxford<span class="kw">&lt;/town&gt;</span> <span class="kw">&lt;county&gt;</span>Oxon<span class="kw">&lt;/county&gt;</span>
+      <span class="kw">&lt;/address&gt;</span>
+   <span class="kw">&lt;/person&gt;</span>
+<span class="kw">&lt;/people&gt;</span></code></pre>
+<p>While it is possible to create format changes that are untrackable by JSONPath, it is much less likely because, each nodes only having one, unambiguous set of children, the JSON metamodel does not offer the format author a selection from equivalent but incompatible alternatives.</p>
+<p>XML also invites ambiguity regarding whitespace characters between tags, reflecting XML's dual purposes of document markup and data; whitespace is generally meaningful for documents but ignorable for data. Strictly whitespace text nodes are part of the document but in practice many tree walkers discard them as insignificant. In the XML example above the <code>&lt;person&gt;</code> element may be enumerated as the first or second child of <code>&lt;people&gt;</code> depending on whether the whitespace before it is considered. Likewise, the text inside <code>&lt;name&gt;</code> might be <code>John</code> or <code>\n         John</code>. Inherited from JSON's programming language ancestry, whitespace between tokens is never significant.</p>
+<p>Of course, not evey refactor yields a new format which a an unmodified may continue to track. To our favour is the trend for ancestor relationships to generally denote the same relationship between concepts regardless of the number of intermediate generations. In the example above <code>town</code> transitioned from child to grandchild of <code>person</code> without disturbing the denoted 'lives in' relationship. By necessity we should limit ourselves to a reasonable ability to track changes with regards to a different representation of the same data rather than a change in the information that the format represents.</p>
+<p>Doesn't mean can continue to rely on compatibility with other systems without any work. Integration testing needed. However, the ability to easily write a client compatible with a present and known future version removes the need to exactly synchronise one system's update with another's.</p>
+<p>Correctly selecting parts often requires correctly imposing a reified type concept on the various sub-trees of the document. If we allow ourselves to assume that every node with a name represents a person we are liable to write brittle selectors. However, a sound type imposition will sometimes be simple, an object with an isbn property is almost certainly a book.</p>
+<p>This may not always hold. A slightly contrived example might be if we expanded a model to contain fuzzy knowledge:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
+   <span class="kw">&lt;person&gt;</span>
+      <span class="kw">&lt;name&gt;</span>
+         <span class="kw">&lt;isProbably&gt;</span>Bob<span class="kw">&lt;/isProbably&gt;</span>
       <span class="kw">&lt;/name&gt;</span>
    <span class="kw">&lt;/person&gt;</span>
 <span class="kw">&lt;/people&gt;</span></code></pre>
-<p>The typical use pattern of XPath or JSONPath is to search for nodes once the whole serialisation has been parsed into a DOM-style model. JSONPath implementation only allows for search-type usage: <a href="https://code.google.com/p/jsonpath/To">https://code.google.com/p/jsonpath/To</a> examine a whole document for the list of nodes that match a jsonpath expression the whole of the tree is required. But to evaluate if a single node matches an expression, only the <em>path of the descent from the root to that node</em> is required -- the same state as a programmer usually maintains whilst employing a SAX parser. This is possible because JSONPath does not have a way to express the relationship with sibling nodes, only ancestors and decedents.</p>
-<p>One limitation of the JSONPath language is that it is not possible to construct an 'containing' expression. CSS4 allows this in a way that is likely to become familiar to web developers over the next five years or so.</p>
-<p>More applicable to JSON because doesn't have to distinguish between text children and attributes.</p>
 </div>
 <div id="browser-xml-http-request-xhr" class="section level2">
 <h2><a href="#browser-xml-http-request-xhr"><span class="header-section-number">3.6</span> Browser XML Http Request (XHR)</a></h2>
@@ -735,6 +746,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="conclusion" class="section level1">
 <h1><a href="#conclusion"><span class="header-section-number">6</span> Conclusion</a></h1>
+<p><a href="https://github.com/substack/node-trumpet">https://github.com/substack/node-trumpet</a></p>
 <div id="benchmarking-vs-non-progressive-rest" class="section level2">
 <h2><a href="#benchmarking-vs-non-progressive-rest"><span class="header-section-number">6.1</span> Benchmarking vs non-progressive REST</a></h2>
 <p>I feel it is important to experimentally answer the question, <em>is this actually any faster?</em>. To do this I have created a small benchmarking suite that runs under Node.js. I chose Node because it at its code is a very basic platform which I feel it gives a more repeatable environment than modern browsers which at during the tests could be performing any number of background tasks. These tests may be seen in the <code>benchmark</code> folder of the project. Node also has the advantage in measuring the memory of a running process is not swamped by the memory taken up by the browser itself.</p>
@@ -2788,6 +2800,7 @@ strategies[strategyName]();
 <p>Fielding, R. T. 2000. “Principled design of the modern Web architecture.”</p>
 <p>Geelhoed, Erik, Peter Toft, Suzanne Roberts, and Patrick Hyland. 1995. “To influence Time Perception.” Hewlett Packard Labs. <a href="http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm" title="http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm">http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm</a>.</p>
 <p>Gill, Brendan. 2013. “OpenSignal.”</p>
+<p>Goessner, Stefan. 2007. “JSONPath - XPath for JSON.” <a href="http://goessner.net/articles/JsonPath/" title="http://goessner.net/articles/JsonPath/">http://goessner.net/articles/JsonPath/</a>.</p>
 <p>Guo, shu-yu. 2013. “Two Reasons Functional Style Is Slow in SpiderMonkey.” <a href="http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html" title="http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html">http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html</a>.</p>
 <p>Lea, Tom. 2012. “Improving performance on twitter.com.” <a href="[https://blog.twitter.com/2012/improving-performance-twittercom]" title="[https://blog.twitter.com/2012/improving-performance-twittercom]">[https://blog.twitter.com/2012/improving-performance-twittercom]</a>.</p>
 <p>Martin, Robert “Uncle Bob.” 2008. <em>Clean Code: A Handbook of Agile Software Craftsmanship</em>.</p>
