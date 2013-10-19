@@ -6,8 +6,8 @@ DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't
 doesn't care which other libraries you need it to speak to.
 
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
-Or even if it never completes. It is well tested in the browser and has alpha-level
-support for Node.js [npm package](https://npmjs.org/package/oboe).
+Or even if it never completes. It is well tested in the browser and has beta-level
+support for Node.js ([npm package](https://npmjs.org/package/oboe)).
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
@@ -196,8 +196,6 @@ oboe('/myapp/things.json')
    });   
 ```
 
-
-
 ## The path passback
 
 The callback is also given the path to the node that it found in the json. It is sometimes preferable to
@@ -235,6 +233,23 @@ oboe('http://mysocialsite.example.com/homepage.json')
    });
 
 ```
+
+## Reading from any stream (Node.js only)
+
+Instead of passing a url, give any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable)
+To load from a local file you'd do this:
+
+``` js
+oboe( fs.createReadStream( 'secretPlans' ) )
+   .node('!.schemes.*', function(scheme){
+      console.log(scheme);
+   });
+   .node('!.plottings.*', function(deviousPlot){
+      console.log(deviousPlot);   
+   });   
+```
+
+(normally, local files should be fast enough that JSON.parse is just as good) 
 
 ## Css4 style patterns
 
@@ -346,6 +361,7 @@ calling one of these methods:
 
 ```js
    oboe( String url ) // makes a GET request
+   oboe( ReadableStream source ) // node only
    
    oboe.doGet(    String url )
    oboe.doPut(    String url, String|Object body )

@@ -17,6 +17,54 @@ describe("oboe integration (real http)", function() {
          return '/testServer/' + path;
       }
    }            
+   
+   isNode && describe('running under node', function(){
+
+      var http = require('http'),
+          fs = require('fs');
+   
+      it('can read from a stream that is passed in', function() {
+      
+         http.request( 'http://localhost:4567/tenSlowNumbers' )
+            .on('response', function( res ) {
+                      
+               oboe(res)
+               .node('![*]', callbackSpy)
+               .done(whenDoneFn);
+            
+            }).on('error', function(e) {
+   
+               console.log(e);
+            }).end();
+         
+            
+         waitsFor(function () {
+            return !!fullResponse
+         }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+   
+         runs(function () {
+  
+            expect( callbackSpy.calls.length ).toBe(10);   
+         });      
+      })
+      
+      it('can read from a local file', function() {
+            
+         oboe(fs.createReadStream( 'test/json/firstTenNaturalNumbers.json' ))
+            .node('![*]', callbackSpy)
+            .done(whenDoneFn);            
+                     
+         waitsFor(function () {
+            return !!fullResponse
+         }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+   
+         runs(function () {
+  
+            expect( callbackSpy.calls.length ).toBe(10);   
+         });      
+      })      
+   
+   });   
 
    it('gets all expected callbacks by time request finishes', function () {
 

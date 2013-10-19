@@ -1976,13 +1976,13 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, url, body, headers){
+function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
    streamingHttp( eventBus.fire, eventBus.on,
                   httpTransport(), 
-                  httpMethodName, url, body, headers );                              
+                  httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
                eventBus.fire, eventBus.on, 
@@ -2000,10 +2000,21 @@ oboe.doPut    = apiMethod('PUT', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
-   return function(firstArg){
-           
-      if (isString(firstArg)) {
-      
+   return function(firstArg) {
+
+      if (firstArg.url) {
+
+         // method signature is:
+         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
+
+         return wire(
+             httpMethodName,
+             firstArg.url,
+             firstArg.body,
+             firstArg.headers
+         );
+      } else {
+
          // parameters specified as arguments
          //
          //  if (mayHaveContext == true) method signature is:
@@ -2013,20 +2024,9 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          //     .doMethod( url )            
          //                                
          return wire(
-                  httpMethodName,
-                  firstArg,                                  // url
-                  mayHaveRequestBody && arguments[1]         // body
-         );
-      } else {
-      
-         // method signature is:
-         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
-         
-         return wire(   
-                  httpMethodName,
-                  firstArg.url,
-                  firstArg.body,
-                  firstArg.headers 
+             httpMethodName,
+             firstArg, // url
+             mayHaveRequestBody && arguments[1]         // body
          );
       }
    };

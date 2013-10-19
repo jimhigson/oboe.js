@@ -4,13 +4,13 @@
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, url, body, headers){
+function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
    streamingHttp( eventBus.fire, eventBus.on,
                   httpTransport(), 
-                  httpMethodName, url, body, headers );                              
+                  httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
                eventBus.fire, eventBus.on, 

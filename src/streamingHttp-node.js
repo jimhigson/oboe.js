@@ -17,65 +17,77 @@ function httpTransport(){
  *          and therefore be Node's http
  *          but for tests a stub may be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
- * @param {String} url the url to make a request to
+ * @param {String} contentSource the url to make a request to, or a stream to read from
  * @param {String|Object} data some content to be sent with the request.
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, http, method, url, data, headers) {
+function streamingHttp(fire, on, http, method, contentSource, data, headers) {
 
-   function readFromStream(res) {
-            
-      var statusCode = res.statusCode,
-          sucessful = String(statusCode)[0] == 2;
-                             
-      if( sucessful ) {          
-            
-         res.on('data', function (chunk) {
+   function readFromStream(readableStream) {
+         
+      // use stream in flowing mode   
+      readableStream.on('data', function (chunk) {
+                                             
+         fire( NEW_CONTENT, chunk.toString() );
+      });
+      
+      readableStream.on('end', function() {
+               
+         fire( END_OF_CONTENT );
+      });
+   }
+   
+   function fetchUrl( url ) {
+      if( !contentSource.match(/http:\/\//) ) {
+         contentSource = 'http://' + contentSource;
+      }                           
                            
-            fire( NEW_CONTENT, chunk.toString() );
-         });
-         
-         res.on('end', function() {
-                  
-            fire( END_OF_CONTENT );
-         });
-         
-      } else {
+      var parsedUrl = require('url').parse(contentSource); 
+   
+      var req = http.request({
+         hostname: parsedUrl.hostname,
+         port: parsedUrl.port, 
+         path: parsedUrl.pathname,
+         method: method,
+         headers: headers 
+      });
       
-         fire( ERROR_EVENT, statusCode );
+      req.on('response', function(res){
+         var statusCode = res.statusCode,
+             sucessful = String(statusCode)[0] == 2;
+                                
+         if( sucessful ) {          
+               
+            readFromStream(res)
+            
+         } else {
+         
+            fire( ERROR_EVENT, statusCode );
+         }      
+      });
+      
+      req.on('error', function(e) {
+         fire( ERROR_EVENT, e );
+      });
+      
+      on( ABORTING, function(){              
+         req.abort();
+      });
+         
+      if( data ) {
+         var body = isString(data)? data: JSON.stringify(data);
+         req.write(body);
       }
-   }
-
-   if( !url.match(/http:\/\//) ) {
-      url = 'http://' + url;
-   }                           
-                        
-   var parsedUrl = require('url').parse(url); 
-
-   var req = http.request({
-      hostname: parsedUrl.hostname,
-      port: parsedUrl.port, 
-      path: parsedUrl.pathname,
-      method: method,
-      headers: headers 
-   });
-   
-   req.on('response', readFromStream);
-   
-   req.on('error', function(e) {
-      fire( ERROR_EVENT, e );
-   });
-   
-   on( ABORTING, function(){              
-      req.abort();
-   });
       
-   if( data ) {
-      var body = isString(data)? data: JSON.stringify(data);
-      req.write(body);
+      req.end();         
    }
    
-   req.end();
+   if( isString(contentSource) ) {
+      fetchUrl(contentSource);
+   } else {
+      // contentsource is a stream
+      readFromStream(contentSource);   
+   }
 
 }
