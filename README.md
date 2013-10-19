@@ -9,7 +9,7 @@ Oboe makes it really easy to start using json from a response before the ajax re
 Or even if it never completes.
 
 Support for Node.js isn't well tested at the moment but seems fine.
-In Node any stream can be read [not just http](reading-from-any-stream-nodejs-only).
+In Node any stream can be read [not just http](#reading-from-any-stream-nodejs-only).
 [npm package here](https://npmjs.org/package/oboe).
 
 - [Use cases](#use-cases)
@@ -23,7 +23,7 @@ In Node any stream can be read [not just http](reading-from-any-stream-nodejs-on
 	- [The path passback](#the-path-passback)
 	- [Css4 style patterns](#css4-style-patterns)
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
-	- [Reading from any stream (Node.js only)](reading-from-any-stream-nodejs-only)
+	- [Reading from any stream (Node.js only)](#reading-from-any-stream-nodejs-only)
 	- [Error handling](#error-handling)
 - [API](#api)
 	- [Pattern matching](#pattern-matching)
