@@ -436,12 +436,6 @@ version below.
 </people>
 ~~~~
 
-While it is possible to for a service to change in a way which is untrackable 
-using JSONPath, it is more difficult than with XPATH. Because each nodes only 
-having one, unambiguous set of children, the JSON metamodel does not present a
-format author with a selection from logical equivalents that are modeled
-incompatibly.
-
 XML also invites ambiguity regarding whitespace characters between tags,
 reflecting XML's dual purposes of document markup and data; whitespace
 is generally meaningful for documents but ignorable for data. Strictly
@@ -453,18 +447,17 @@ Likewise, the text inside `<name>` might be `John` or
 `(newline)(tab)(tab)John`. Inherited from JSON's programming language
 ancestry, whitespace between tokens is never significant.
 
+While it is possible to for a service to change in a way which is untrackable 
+using JSONPath, it is more difficult than with XPATH. Because each nodes only 
+has one, unambiguous set of children, the JSON metamodel does not present a
+format author with a selection from logical equivalents that are addressed
+incompatibly. In JSON if a scalar value is changed to a compound one only
+the node itself change, the path to the node is unaffected. 
+
 Of course, not evey service refactor yields a new format which an
 unmodified client will be able to track.
-
-By necessity we should limit ourselves to a reasonable ability to track
-changes with regards to a different representation of the same data
-rather than a change in the information that the format represents.
-
-Doesn't mean can continue to rely on compatibility with other systems
-without any work. Integration testing needed. However, the ability to
-easily write a client compatible with a present and known future version
-removes the need to exactly synchronise one system's update with
-another's.
+By necessity a resource reader should limit their ambitions to tracking
+ontology additions which do not change the meaning of the existing concepts.
 
 In our favour is the trend for ancestor relationships to generally
 denote the same relationship between concepts regardless of the number
@@ -472,15 +465,9 @@ of intermediate generations. In the example above `town` transitioned
 from child to grandchild of `person` without disturbing the denoted
 'lives in' relationship.
 
-Correctly selecting parts often requires correctly imposing a reified
-type concept on the various sub-trees of the document. If we allow
-ourselves to assume that every node with a name represents a person we
-are liable to write brittle selectors. However, a sound type imposition
-will sometimes be simple, an object with an isbn property is almost
-certainly a book.
-
 This may not always hold. A slightly contrived example might be if we
-expanded a model to contain fuzzy knowledge:
+expanded a model to contain fuzzy knowledge. Clearly the ancestor relationship
+between the person and the name has been changed:
 
 ~~~~ {.xml}
 <people>
@@ -491,6 +478,19 @@ expanded a model to contain fuzzy knowledge:
    </person>
 </people>
 ~~~~
+
+Doesn't mean can continue to rely on compatibility with other systems
+without any work. Integration testing needed. However, the ability to
+easily write a client compatible with a present and known future version
+removes the need to exactly synchronise one system's update with
+another's.
+
+Correctly selecting parts often requires correctly imposing a reified
+type concept on the various sub-trees of the document. If we allow
+ourselves to assume that every node with a name represents a person we
+are liable to write brittle selectors. However, a sound type imposition
+will sometimes be simple, an object with an isbn property is almost
+certainly a book.
 
 Browser XML Http Request (XHR)
 ------------------------------
