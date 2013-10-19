@@ -32,6 +32,9 @@ regards to developer ergonomics and end user perception of performance.
 Introduction
 ============
 
+https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index
+http://dry.ly/full-streams-ahead
+
 This purpose of this dissertation is to encourage the REST paradigm to
 be viewed through a novel lens which in application this may be used to
 deliver tangible benefits to many common REST use cases. Although I
@@ -668,7 +671,7 @@ Consider the resource below:
 }
 ~~~~
 
-The JSONPath `people.\*..town` against the above JSON format would
+The JSONPath `people.*..town` against the above JSON format would
 continue to select correctly after a refactor to the JSON below:
 
 ~~~~ {.javascript}
@@ -728,48 +731,36 @@ version below.
 </people>
 ~~~~
 
-While it is possible to create format changes that are untrackable by
-JSONPath, it is much less likely because, each nodes only having one,
-unambiguous set of children, the JSON metamodel does not offer the
-format author a selection from equivalent but incompatible alternatives.
+Reflecting its dual purpose for marking up for documents or data, XML
+also invites ambiguous interpretation of the whitespace between tags.
+Whitespace is usually meaningful for documents but ignorable for data.
+Strictly, whitespace text nodes are a part of the document but in
+practice many tree walkers discard them as insignificant. In the XML
+above the `<person>` element may be enumerated as either the first or
+second child of `<people>` depending on whether the whitespace before it
+is considered. Likewise, the text inside `<name>` might be `'John'` or
+`'(newline)(tab)(tab)John'`. Inherited from JSON's programming language
+ancestry, the space between tokens is never significant.
 
-XML also invites ambiguity regarding whitespace characters between tags,
-reflecting XML's dual purposes of document markup and data; whitespace
-is generally meaningful for documents but ignorable for data. Strictly
-whitespace text nodes are part of the document but in practice many tree
-walkers discard them as insignificant. In the XML example above the
-`<person>` element may be enumerated as the first or second child of
-`<people>` depending on whether the whitespace before it is considered.
-Likewise, the text inside `<name>` might be `John` or `\n         John`.
-Inherited from JSON's programming language ancestry, whitespace between
-tokens is never significant.
+Programming against a changing service is always going to be a moving
+target, but it is easier to miss with XPATH than with JSON. In JSON each
+nodes has only one, unambiguous set of children so the metamodel does
+not present the format author with a selection from logical equivalents
+that are addressed through different mechanisms. If a scalar value is
+updated to a compound only the node itself changes, the addressing of
+the node is unaffected.
 
-Of course, not evey refactor yields a new format which a an unmodified 
-may continue to track.
-To our favour is the trend for ancestor relationships to generally denote the 
-same relationship between concepts regardless of the number of intermediate 
-generations. In the example above `town` transitioned from
-child to grandchild of `person` without disturbing the denoted
-'lives in' relationship.
-By necessity we should limit ourselves to a reasonable ability to track changes
-with regards to a different representation of the same data
-rather than a change in the information that the format represents.
-
-Doesn't mean can continue to rely on compatibility with other systems without
-any work. Integration testing needed.
-However, the ability to easily write a client
-compatible with a present and known future version removes the need to exactly
-synchronise one system's update with another's.
-
-Correctly selecting parts often requires
-correctly imposing a reified type concept on the various sub-trees of the document.
-If we allow ourselves to assume that every node with a name represents a person we 
-are liable to write brittle selectors. However, a sound type imposition will
-sometimes be simple, an object with an isbn property is almost certainly a
-book.
-
-This may not always hold. A slightly contrived example might be if we
-expanded a model to contain fuzzy knowledge:
+Generally in descriptive hierarchical data there is a trend for
+ancestorship to denote the same relationship between concepts regardless
+of the number of intermediate generations. In the example above, `town`
+transitioned from child to grandchild of `person` without disturbing the
+implicit 'lives in' relationship. In JSONPath the `..` operator provides
+matching through zero or more generations, unperturbed when extra levels
+are added. Of course, this trend will not hold for every conceivable way
+of building message semantics because it is possible that an
+intermediate node on the path from ancestor to descendant will change
+the nature of the expressed relationship. A slightly contrived example
+might be if we expanded our model to contain fuzzy knowledge:
 
 ~~~~ {.xml}
 <people>
@@ -780,6 +771,17 @@ expanded a model to contain fuzzy knowledge:
    </person>
 </people>
 ~~~~
+
+Considering the general case, it will not be possible to track all
+possible service refactors safely. By necessity a resource consumer
+should limit their ambitions to tracking ontology additions which do not
+change the meaning of the existing concepts. In practice integration
+testing against the beta version of a service will be necessary to be
+pre-warned of upcoming, incompatible changes. If an incompatibility is
+found the ability to then create an expression which is compatible with
+with a present and known future version remains a valuable tool because
+it decouples service consumer and provider update schedules, removing
+the need for the client to march perfectly in sync with the service.
 
 Browser XML Http Request (XHR)
 ------------------------------
@@ -1020,37 +1022,6 @@ handler.
 While SAX addresses many of the problems raised in this dissertation, I
 find the unfriendly developer ergonomics pose too high a barrier to its
 adoption for all but fringe uses.
-
-Testing
--------
-
-![Relationship between the main players in the JS testing landscape.
-JSTD, Karma, Jasmine, NodeUnit, jasmine-node,
-Browsers](images/placeholder.png)
-
-By the commonjs spec, test directory should be called 'test'
-(http://wiki.commonjs.org/wiki/Packages/1.0\#Package\_Directory\_Layout)
-doesn't matter for my project since not using commonjs, but might as
-well stick to the convention.
-
-How TDD helps How can fit into methodology
-
--   JSTD
--   NodeUnit
--   Karma
--   Jasmine
-
-Initially started with jstestdriver but found it difficult. Karma
-started because engineers working on the Angular project in Google were
-"struggling a lot with jstd": http://www.youtube.com/watch?v=MVw8N3hTfCI
-- jstd is a google project Even Jstd's authors seems to be disowning it
-slightly. Describe what was once its main mode of operation as now being
-for stress testing of jstd itself only. Problems: browsers become
-unresponsive. Generally unreliable, has to be restarted frequently.
-
-JSTD, as a Java program, is difficult to start via Grunt. Also an issue
-that Grunt post-dates Karma by enough that JSTD doesn't have the
-attention of the Grunt community.
 
 [^3_Background1]: See
     <http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html>
@@ -4453,7 +4424,7 @@ function sendJsonHeaders(res) {
 
 function serveItemList(_req, res) {
 
-   console.log('slow number server: send simulated database data');
+   console.log('slow fake db server: send simulated database data');
 
    res.write('{"data": [');
 

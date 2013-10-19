@@ -55,7 +55,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#xhrs-and-streaming"><span class="toc-section-number">3.7</span> XHRs and streaming</a></li>
 <li><a href="#browser-streaming-frameworks"><span class="toc-section-number">3.8</span> Browser streaming frameworks</a></li>
 <li><a href="#parsing-sax-and-dom"><span class="toc-section-number">3.9</span> Parsing: SAX and Dom</a></li>
-<li><a href="#testing"><span class="toc-section-number">3.10</span> Testing</a></li>
 </ul></li>
 <li><a href="#design-and-reflection"><span class="toc-section-number">4</span> Design and Reflection:</a><ul>
 <li><a href="#jsonpath-and-types"><span class="toc-section-number">4.1</span> JSONPath and types</a></li>
@@ -117,6 +116,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="introduction" class="section level1">
 <h1><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
+<p><a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index">https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index</a> <a href="http://dry.ly/full-streams-ahead">http://dry.ly/full-streams-ahead</a></p>
 <p>This purpose of this dissertation is to encourage the REST paradigm to be viewed through a novel lens which in application this may be used to deliver tangible benefits to many common REST use cases. Although I express my thesis through programming, the contribution I hope to make is felt more strongly as a modification in how we <em>think</em> about http than as the delivery of new software.</p>
 <p>In the interest of developer ergonomics, REST clients have tended to style the calling of remote resources similar to the call style of the host programming language. Depending on the language, one of two schemas are followed: a synchronous style in which a some invocation halts execution for the duration of the request before evaluating to the fetched resource; or asynchronous in which the logic is specified to be applied to a response once it is available. Languages encourage our thinking to follow the terms that they easily support<span class="citation">(Whorf 1956)</span>. While there is some overlap, languages which promote concurrency though threading consider blocking in a single thread to be acceptable and will generally prefer the former mode whereas languages with first class functions are naturally conversant in callbacks and will prefer the latter. We should remember in programming that languages limit the patterns that we readily see <span class="citation">(Yukihiro 2003)</span> and that better mappings may be possible. This observation extends to graphical notations such as UML whose constructs strongly reflect the programming languages of the day. For any multi-packet message sent via a network some parts will arrive before others, at least approximately in-order, but viewed from inside a language whose statements invariably yield single, discrete values it comfortable to conceptualise the REST response as a discrete event. UML sequence diagrams contain the syntax for instantaneously delivered return values, with no corresponding notation for a resource whose data is progressively revealed.</p>
 <p>In most practical cases where we wish to be fast in performing a task there is no reasonable distinction between acting <em>earlier</em> and being <em>quicker</em>. To create efficient software we should be using data at the first possible opportunity: examining content <em>while it streams</em> rather than holding it unexamined until it is wholly available.</p>
@@ -285,7 +285,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       {<span class="dt">town</span>:<span class="st">&#39;Cambridge&#39;</span>, <span class="dt">name</span>: <span class="st">&#39;Walter&#39;</span>}
    ]
 }</code></pre>
-<p>The JSONPath <code>people.\*..town</code> against the above JSON format would continue to select correctly after a refactor to the JSON below:</p>
+<p>The JSONPath <code>people.*..town</code> against the above JSON format would continue to select correctly after a refactor to the JSON below:</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">{
    <span class="dt">people</span>: [
       {  <span class="dt">name</span>: <span class="st">&#39;John&#39;</span>, 
@@ -317,12 +317,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="kw">&lt;/address&gt;</span>
    <span class="kw">&lt;/person&gt;</span>
 <span class="kw">&lt;/people&gt;</span></code></pre>
-<p>While it is possible to create format changes that are untrackable by JSONPath, it is much less likely because, each nodes only having one, unambiguous set of children, the JSON metamodel does not offer the format author a selection from equivalent but incompatible alternatives.</p>
-<p>XML also invites ambiguity regarding whitespace characters between tags, reflecting XML's dual purposes of document markup and data; whitespace is generally meaningful for documents but ignorable for data. Strictly whitespace text nodes are part of the document but in practice many tree walkers discard them as insignificant. In the XML example above the <code>&lt;person&gt;</code> element may be enumerated as the first or second child of <code>&lt;people&gt;</code> depending on whether the whitespace before it is considered. Likewise, the text inside <code>&lt;name&gt;</code> might be <code>John</code> or <code>\n         John</code>. Inherited from JSON's programming language ancestry, whitespace between tokens is never significant.</p>
-<p>Of course, not evey refactor yields a new format which a an unmodified may continue to track. To our favour is the trend for ancestor relationships to generally denote the same relationship between concepts regardless of the number of intermediate generations. In the example above <code>town</code> transitioned from child to grandchild of <code>person</code> without disturbing the denoted 'lives in' relationship. By necessity we should limit ourselves to a reasonable ability to track changes with regards to a different representation of the same data rather than a change in the information that the format represents.</p>
-<p>Doesn't mean can continue to rely on compatibility with other systems without any work. Integration testing needed. However, the ability to easily write a client compatible with a present and known future version removes the need to exactly synchronise one system's update with another's.</p>
-<p>Correctly selecting parts often requires correctly imposing a reified type concept on the various sub-trees of the document. If we allow ourselves to assume that every node with a name represents a person we are liable to write brittle selectors. However, a sound type imposition will sometimes be simple, an object with an isbn property is almost certainly a book.</p>
-<p>This may not always hold. A slightly contrived example might be if we expanded a model to contain fuzzy knowledge:</p>
+<p>Reflecting its dual purpose for marking up for documents or data, XML also invites ambiguous interpretation of the whitespace between tags. Whitespace is usually meaningful for documents but ignorable for data. Strictly, whitespace text nodes are a part of the document but in practice many tree walkers discard them as insignificant. In the XML above the <code>&lt;person&gt;</code> element may be enumerated as either the first or second child of <code>&lt;people&gt;</code> depending on whether the whitespace before it is considered. Likewise, the text inside <code>&lt;name&gt;</code> might be <code>'John'</code> or <code>'(newline)(tab)(tab)John'</code>. Inherited from JSON's programming language ancestry, the space between tokens is never significant.</p>
+<p>Programming against a changing service is always going to be a moving target, but it is easier to miss with XPATH than with JSON. In JSON each nodes has only one, unambiguous set of children so the metamodel does not present the format author with a selection from logical equivalents that are addressed through different mechanisms. If a scalar value is updated to a compound only the node itself changes, the addressing of the node is unaffected.</p>
+<p>Generally in descriptive hierarchical data there is a trend for ancestorship to denote the same relationship between concepts regardless of the number of intermediate generations. In the example above, <code>town</code> transitioned from child to grandchild of <code>person</code> without disturbing the implicit 'lives in' relationship. In JSONPath the <code>..</code> operator provides matching through zero or more generations, unperturbed when extra levels are added. Of course, this trend will not hold for every conceivable way of building message semantics because it is possible that an intermediate node on the path from ancestor to descendant will change the nature of the expressed relationship. A slightly contrived example might be if we expanded our model to contain fuzzy knowledge:</p>
 <pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;people&gt;</span>
    <span class="kw">&lt;person&gt;</span>
       <span class="kw">&lt;name&gt;</span>
@@ -330,6 +327,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="kw">&lt;/name&gt;</span>
    <span class="kw">&lt;/person&gt;</span>
 <span class="kw">&lt;/people&gt;</span></code></pre>
+<p>Considering the general case, it will not be possible to track all possible service refactors safely. By necessity a resource consumer should limit their ambitions to tracking ontology additions which do not change the meaning of the existing concepts. In practice integration testing against the beta version of a service will be necessary to be pre-warned of upcoming, incompatible changes. If an incompatibility is found the ability to then create an expression which is compatible with with a present and known future version remains a valuable tool because it decouples service consumer and provider update schedules, removing the need for the client to march perfectly in sync with the service.</p>
 </div>
 <div id="browser-xml-http-request-xhr" class="section level2">
 <h2><a href="#browser-xml-http-request-xhr"><span class="header-section-number">3.6</span> Browser XML Http Request (XHR)</a></h2>
@@ -422,22 +420,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p>The developer pays a high price for progressive parsing, the SAX version is considerably longer and more difficult to read. SAX's low-level semantics require a lengthy expression and push the responsibility of maintaining state regarding the current position in the document and the nodes that have previously been seen onto the programmer. This maintenance of state tends to programmed once per usage rather than assembled as the composition of reusable parts. I find the order of the code under SAX quite unintuitive; event handlers cover multiple unrelated cases and each concern spans multiple handlers. This lends to a style of programming in which separate concerns do not find separate expression in the code. It is also notable that, unlike DOM, as the depth of the document being interpreted increases, the length of the programming required to interpret it also increases, mandating more state be stored and an increased number of cases be covered per event handler.</p>
 <p>While SAX addresses many of the problems raised in this dissertation, I find the unfriendly developer ergonomics pose too high a barrier to its adoption for all but fringe uses.</p>
-</div>
-<div id="testing" class="section level2">
-<h2><a href="#testing"><span class="header-section-number">3.10</span> Testing</a></h2>
-<div class="figure">
-<img src="images/placeholder.png" alt="Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers" /><p class="caption">Relationship between the main players in the JS testing landscape. JSTD, Karma, Jasmine, NodeUnit, jasmine-node, Browsers</p>
-</div>
-<p>By the commonjs spec, test directory should be called 'test' (<a href="http://wiki.commonjs.org/wiki/Packages/1.0">http://wiki.commonjs.org/wiki/Packages/1.0</a>#Package_Directory_Layout) doesn't matter for my project since not using commonjs, but might as well stick to the convention.</p>
-<p>How TDD helps How can fit into methodology</p>
-<ul>
-<li>JSTD</li>
-<li>NodeUnit</li>
-<li>Karma</li>
-<li>Jasmine</li>
-</ul>
-<p>Initially started with jstestdriver but found it difficult. Karma started because engineers working on the Angular project in Google were &quot;struggling a lot with jstd&quot;: <a href="http://www.youtube.com/watch?v=MVw8N3hTfCI">http://www.youtube.com/watch?v=MVw8N3hTfCI</a> - jstd is a google project Even Jstd's authors seems to be disowning it slightly. Describe what was once its main mode of operation as now being for stress testing of jstd itself only. Problems: browsers become unresponsive. Generally unreliable, has to be restarted frequently.</p>
-<p>JSTD, as a Java program, is difficult to start via Grunt. Also an issue that Grunt post-dates Karma by enough that JSTD doesn't have the attention of the Grunt community.</p>
 </div>
 </div>
 <div id="design-and-reflection" class="section level1">
@@ -2713,7 +2695,7 @@ strategies[strategyName]();
 
 <span class="kw">function</span> <span class="fu">serveItemList</span>(_req, res) {
 
-   <span class="ot">console</span>.<span class="fu">log</span>(<span class="st">&#39;slow number server: send simulated database data&#39;</span>);
+   <span class="ot">console</span>.<span class="fu">log</span>(<span class="st">&#39;slow fake db server: send simulated database data&#39;</span>);
 
    <span class="ot">res</span>.<span class="fu">write</span>(<span class="st">&#39;{&quot;data&quot;: [&#39;</span>);
 
