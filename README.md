@@ -106,7 +106,7 @@ oboe('/myapp/things.json')
    
          alert('go ahead and eat some ' + foodObject.name);
       },
-      'foods':, function(){
+      'foods': function(){
          this.abort();
       }
    });
