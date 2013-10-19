@@ -328,7 +328,11 @@ oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    });
    .node('!.plottings.*', function(deviousPlot){
       console.log('Hmmm! ' + deviousPlot);   
+   })
+   .done(function(){
+      console.log("*twiddles mustache*");
    });   
+      
 ```
 
 (normally, local files should be fast enough that JSON.parse is just as good)
