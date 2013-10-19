@@ -318,7 +318,7 @@ oboe('/data/things.json')
 
 ## Reading from any stream (Node.js only)
 
-Instead of passing a url, give any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable)
+Instead of giving a url, you can pass any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable).
 To load from a local file you'd do this:
 
 ``` js
