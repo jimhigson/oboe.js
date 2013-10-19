@@ -466,3 +466,44 @@ acts as barrier to information rather than enabling the information's
 delivery. Therefore, in many cases the exact location of a piece of
 information is not as important as a more general location of x being in
 some way under y.
+
+Create own language variant for these purposes. Such a language would
+require a reflection on how higher-level types are distinguished in
+JSON. JSONPath does not have a way to express the relationship with
+sibling nodes, only ancestors and decedents.
+
+One limitation of the JSONPath language is that it is not possible to
+construct an 'containing' expression. CSS4 allows this in a way that is
+likely to become familiar to web developers over the next five years or
+so.
+
+Testing
+-------
+
+![Relationship between the main players in the JS testing landscape.
+JSTD, Karma, Jasmine, NodeUnit, jasmine-node,
+Browsers](images/placeholder.png)
+
+By the commonjs spec, test directory should be called 'test'
+(http://wiki.commonjs.org/wiki/Packages/1.0\#Package\_Directory\_Layout)
+doesn't matter for my project since not using commonjs, but might as
+well stick to the convention.
+
+How TDD helps How can fit into methodology
+
+-   JSTD
+-   NodeUnit
+-   Karma
+-   Jasmine
+
+Initially started with jstestdriver but found it difficult. Karma
+started because engineers working on the Angular project in Google were
+"struggling a lot with jstd": http://www.youtube.com/watch?v=MVw8N3hTfCI
+- jstd is a google project Even Jstd's authors seems to be disowning it
+slightly. Describe what was once its main mode of operation as now being
+for stress testing of jstd itself only. Problems: browsers become
+unresponsive. Generally unreliable, has to be restarted frequently.
+
+JSTD, as a Java program, is difficult to start via Grunt. Also an issue
+that Grunt post-dates Karma by enough that JSTD doesn't have the
+attention of the Grunt community.
