@@ -66,7 +66,7 @@ a neat way to route different parts of a json response to different parts of his
 Say we have a resource called things.json that we need to fetch over AJAX:
 ``` js
 {
-   foods: [
+   "foods": [
       {'name':'aubergine',    'colour':'purple'},
       {'name':'apple',        'colour':'red'},
       {'name':'nuts',         'colour':'brown'}
