@@ -10,7 +10,7 @@ Or even if it never completes.
 
 Support for Node.js isn't well tested at the moment but seems fine.
 In Node any stream can be read [not just http](reading-from-any-stream-nodejs-only).
-([npm package](https://npmjs.org/package/oboe)).
+[npm package here](https://npmjs.org/package/oboe).
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
