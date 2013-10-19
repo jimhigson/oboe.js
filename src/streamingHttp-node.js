@@ -23,21 +23,9 @@ function httpTransport(){
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(fire, on, http, method, url, data, headers) {
-                        
-   if( !url.match(/http:\/\//) ) {
-      url = 'http://' + url;
-   }                           
-                        
-   var parsedUrl = require('url').parse(url);
 
-   var req = http.request({
-      hostname: parsedUrl.hostname,
-      port: parsedUrl.port,
-      path: parsedUrl.pathname,
-      method: method,
-      headers: headers
-   }, function(res) {
-      
+   function readFromStream(res) {
+            
       var statusCode = res.statusCode,
           sucessful = String(statusCode)[0] == 2;
                              
@@ -57,7 +45,23 @@ function streamingHttp(fire, on, http, method, url, data, headers) {
       
          fire( ERROR_EVENT, statusCode );
       }
+   }
+
+   if( !url.match(/http:\/\//) ) {
+      url = 'http://' + url;
+   }                           
+                        
+   var parsedUrl = require('url').parse(url); 
+
+   var req = http.request({
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port, 
+      path: parsedUrl.pathname,
+      method: method,
+      headers: headers 
    });
+   
+   req.on('response', readFromStream);
    
    req.on('error', function(e) {
       fire( ERROR_EVENT, e );
