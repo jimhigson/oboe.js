@@ -6,8 +6,11 @@ DOM**. It is small enough to be a [micro-library](http://microjs.com/#), doesn't
 doesn't care which other libraries you need it to speak to.
 
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
-Or even if it never completes. It is well tested in the browser and has beta-level
-support for Node.js ([npm package](https://npmjs.org/package/oboe)).
+Or even if it never completes.
+
+Support for Node.js isn't well tested at the moment but seems fine.
+In Node any stream can be read [not just http](reading-from-any-stream-nodejs-only).
+([npm package](https://npmjs.org/package/oboe)).
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
@@ -20,6 +23,7 @@ support for Node.js ([npm package](https://npmjs.org/package/oboe)).
 	- [The path passback](#the-path-passback)
 	- [Css4 style patterns](#css4-style-patterns)
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
+	- [Reading from any stream (Node.js only)](reading-from-any-stream-nodejs-only)
 	- [Error handling](#error-handling)
 - [API](#api)
 	- [Pattern matching](#pattern-matching)
@@ -234,23 +238,6 @@ oboe('http://mysocialsite.example.com/homepage.json')
 
 ```
 
-## Reading from any stream (Node.js only)
-
-Instead of passing a url, give any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable)
-To load from a local file you'd do this:
-
-``` js
-oboe( fs.createReadStream( 'secretPlans' ) )
-   .node('!.schemes.*', function(scheme){
-      console.log(scheme);
-   });
-   .node('!.plottings.*', function(deviousPlot){
-      console.log(deviousPlot);   
-   });   
-```
-
-(normally, local files should be fast enough that JSON.parse is just as good) 
-
 ## Css4 style patterns
 
 Sometimes when downloading an array of items it isn't very useful to be given each element individually. 
@@ -328,6 +315,23 @@ oboe('/data/things.json')
    });
 
 ```
+
+## Reading from any stream (Node.js only)
+
+Instead of passing a url, give any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable)
+To load from a local file you'd do this:
+
+``` js
+oboe( fs.createReadStream( 'secretPlans' ) )
+   .node('!.schemes.*', function(scheme){
+      console.log(scheme);
+   });
+   .node('!.plottings.*', function(deviousPlot){
+      console.log(deviousPlot);   
+   });   
+```
+
+(normally, local files should be fast enough that JSON.parse is just as good)
 
 ## Error handling
 
@@ -481,10 +485,10 @@ It is nice to just have one, simple service for everything.
 
 # Status
 
-Just hitting v1.2, the API has been changing a lot recently but should be settling down now.
+The API has been changing a lot recently but should be settling down now.
 Patches and suggestions most welcome.
 
-The project is designed in for easy testability and has [about 250 cases](/test/specs).
+Codebase designed in for easy testability and has [about 250 cases](/test/specs).
 
 BSD licenced. But if you use it drop me a note!
        
