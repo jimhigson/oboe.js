@@ -436,10 +436,11 @@ version below.
 </people>
 ~~~~
 
-While it is possible to create format changes that are untrackable by
-JSONPath, it is much less likely because, each nodes only having one,
-unambiguous set of children, the JSON metamodel does not offer the
-format author a selection from equivalent but incompatible alternatives.
+While it is possible to for a service to change in a way which is untrackable 
+using JSONPath, it is more difficult than with XPATH. Because each nodes only 
+having one, unambiguous set of children, the JSON metamodel does not present a
+format author with a selection from logical equivalents that are modeled
+incompatibly.
 
 XML also invites ambiguity regarding whitespace characters between tags,
 reflecting XML's dual purposes of document markup and data; whitespace
@@ -448,54 +449,48 @@ whitespace text nodes are part of the document but in practice many tree
 walkers discard them as insignificant. In the XML example above the
 `<person>` element may be enumerated as the first or second child of
 `<people>` depending on whether the whitespace before it is considered.
-Likewise, the text inside `<name>` might be `John` or `\n         John`.
-Inherited from JSON's programming language ancestry, whitespace between
-tokens is never significant.
+Likewise, the text inside `<name>` might be `John` or
+`(newline)(tab)(tab)John`. Inherited from JSON's programming language
+ancestry, whitespace between tokens is never significant.
 
-Of course, not evey refactor yields a new format which a an unmodified 
-may continue to track.
-To our favour is the trend for ancestor relationships to generally denote the 
-same relationship between concepts regardless of the number of intermediate 
-generations. In the example above `town` transitioned from
-child to grandchild of `person` without disturbing the denoted
-'lives in' relationship.
-By necessity we should limit ourselves to a reasonable ability to track changes
-with regards to a different representation of the same data
+Of course, not evey service refactor yields a new format which an
+unmodified client will be able to track.
+
+By necessity we should limit ourselves to a reasonable ability to track
+changes with regards to a different representation of the same data
 rather than a change in the information that the format represents.
 
-Testing needed. However, the ability to easily write a client
-compatible with a present and known future version removes the need to exactly
-synchronise one system's update with another's.
+Doesn't mean can continue to rely on compatibility with other systems
+without any work. Integration testing needed. However, the ability to
+easily write a client compatible with a present and known future version
+removes the need to exactly synchronise one system's update with
+another's.
 
-Correctly selecting parts often requires
-correctly imposing a reified type concept on the various sub-trees of the document.
-If we allow ourselves to assume that every node with a name represents a person we 
-are liable to write brittle selectors. However, a sound type imposition will
-sometimes be simple, an object with an isbn property is almost certainly a
-book.
+In our favour is the trend for ancestor relationships to generally
+denote the same relationship between concepts regardless of the number
+of intermediate generations. In the example above `town` transitioned
+from child to grandchild of `person` without disturbing the denoted
+'lives in' relationship.
+
+Correctly selecting parts often requires correctly imposing a reified
+type concept on the various sub-trees of the document. If we allow
+ourselves to assume that every node with a name represents a person we
+are liable to write brittle selectors. However, a sound type imposition
+will sometimes be simple, an object with an isbn property is almost
+certainly a book.
 
 This may not always hold. A slightly contrived example might be if we
-expanded a model to contain partial knowledge:
+expanded a model to contain fuzzy knowledge:
 
 ~~~~ {.xml}
 <people>
    <person>
       <name>
-         <isNot>Bob</isNot>
+         <isProbably>Bob</isProbably>
       </name>
    </person>
 </people>
 ~~~~
-
-Create own language variant for these purposes. Such a language would
-require a reflection on how higher-level types are distinguished in
-JSON. JSONPath does not have a way to express the relationship with
-sibling nodes, only ancestors and decedents.
-
-One limitation of the JSONPath language is that it is not possible to
-construct an 'containing' expression. CSS4 allows this in a way that is
-likely to become familiar to web developers over the next five years or
-so.
 
 Browser XML Http Request (XHR)
 ------------------------------
