@@ -322,12 +322,12 @@ Instead of giving a url, you can pass any [readable stream](http://nodejs.org/ap
 To load from a local file you'd do this:
 
 ``` js
-oboe( fs.createReadStream( 'secretPlans' ) )
+oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .node('!.schemes.*', function(scheme){
-      console.log(scheme);
+      console.log('Aha! ' + scheme);
    });
    .node('!.plottings.*', function(deviousPlot){
-      console.log(deviousPlot);   
+      console.log('Hmmm! ' + deviousPlot);   
    });   
 ```
 
