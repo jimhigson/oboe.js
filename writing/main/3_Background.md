@@ -436,7 +436,7 @@ version below.
 </people>
 ~~~~
 
-Reflecting its dual purpose as markup for documents and data, XML also
+Reflecting its dual purpose for marking up for documents or data, XML also
 invites ambiguous interpretation of the whitespace between tags.
 Whitespace is usually meaningful for documents but ignorable for data.
 Strictly, whitespace text nodes are a part of the document but in
@@ -445,13 +445,13 @@ above the `<person>` element may be enumerated as either the first or
 second child of `<people>` depending on whether the whitespace before it
 is considered. Likewise, the text inside `<name>` might be `'John'` or
 `'(newline)(tab)(tab)John'`. Inherited from JSON's programming language
-ancestry, whitespace between tokens is never significant.
+ancestry, the space between tokens is never significant.
 
 Programming against a changing service is always going to be a moving
 target, but it is easier to miss with XPATH than with JSON. In JSON each
 nodes has only one, unambiguous set of children so the metamodel does
-not present a format author with a selection from logical equivalents
-that are addressed through different mechanisms. In JSON if a scalar
+not present the format author with a selection from logical equivalents
+that are addressed through different mechanisms. If a scalar
 value is updated to a compound only the node itself changes, the
 addressing of the node is unaffected.
 
@@ -459,12 +459,12 @@ Generally in descriptive hierarchical data there is a trend for
 ancestorship to denote the same relationship between concepts regardless
 of the number of intermediate generations. In the example above, `town`
 transitioned from child to grandchild of `person` without disturbing the
-implicit 'lives in' relationship. The JSONPath `..` provides matching
-through zero or more generations, unperturbed if extra levels are added.
-Of course, this trend will not hold for every possible way of building
+implicit 'lives in' relationship. In JSONPath the `..` operator provides matching
+through zero or more generations, unperturbed when extra levels are added.
+Of course, this trend will not hold for every conceivable way of building
 message semantics because it is possible that an intermediate node on
 the path from ancestor to descendant will change the nature of the
-denoted relationship. A slightly contrived example might be if we
+expressed relationship. A slightly contrived example might be if we
 expanded our model to contain fuzzy knowledge:
 
 ~~~~ {.xml}
@@ -481,12 +481,13 @@ Considering the general case, it will not be possible to track all
 possible service refactors safely. By necessity a resource consumer
 should limit their ambitions to tracking ontology additions which do not
 change the meaning of the existing concepts. In practice integration
-testing against a beta version of the service will be necessary to be
-pre-warned of upcoming incompatible changes. If an incompatibility is
-found, the ability to then create an expression which is compatible with
-with a present and known next future version remains a valuable tool
-because it decoupling their update schedules, removing the need for the
-client to march perfectly in sync with the service.
+testing against the beta version of a service will be necessary to be
+pre-warned of upcoming, incompatible changes. If an incompatibility is
+found the ability to then create an expression which is compatible with
+with a present and known future version remains a valuable tool
+because it decouples service consumer and provider update schedules, 
+removing the need for the client to march perfectly in sync with the 
+service.
 
 Browser XML Http Request (XHR)
 ------------------------------
