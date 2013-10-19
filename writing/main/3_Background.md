@@ -454,20 +454,16 @@ format author with a selection from logical equivalents that are addressed
 incompatibly. In JSON if a scalar value is changed to a compound one only
 the node itself change, the path to the node is unaffected. 
 
-Of course, not evey service refactor yields a new format which an
-unmodified client will be able to track.
-By necessity a resource reader should limit their ambitions to tracking
-ontology additions which do not change the meaning of the existing concepts.
-
-In our favour is the trend for ancestor relationships to generally
-denote the same relationship between concepts regardless of the number
-of intermediate generations. In the example above `town` transitioned
-from child to grandchild of `person` without disturbing the denoted
-'lives in' relationship.
-
-This may not always hold. A slightly contrived example might be if we
-expanded a model to contain fuzzy knowledge. Clearly the ancestor relationship
-between the person and the name has been changed:
+Generally in descriptive hierarchical data there is a trend for ancestorship 
+in the markup to denote the same relationship between concepts regardless 
+of the number of intermediate generations. In the example above, `town` 
+transitioned from child to grandchild of `person` without disturbing the 
+denoted 'lives in' relationship. The JSONPath `..` provides this matching,
+unperturbed when extra levels are added. Of course, this trend will not
+hold for every possible way of building message semantics because it is possible
+that an intermediate node between ancestor and descendant will change the
+nature of the denoted relationship. A slightly contrived example might be if we
+expanded a model to contain fuzzy knowledge:
 
 ~~~~ {.xml}
 <people>
@@ -479,18 +475,16 @@ between the person and the name has been changed:
 </people>
 ~~~~
 
-Doesn't mean can continue to rely on compatibility with other systems
-without any work. Integration testing needed. However, the ability to
-easily write a client compatible with a present and known future version
-removes the need to exactly synchronise one system's update with
-another's.
+By necessity a resource consumer should limit their ambitions to tracking
+ontology additions which do not change the meaning of the existing concepts.
+Considering the general case, it will not be possible to track all possible 
+service refactors safely. In practice integration testing against a beta version
+of the serve will be necessary to be pre-warned of upcoming incompatible changes.
+If an incompatibility is found the ability to then create an expression which is
+compatible with with a present and known next future version remains a valuable
+tactic because it removes the need for the client's updating to exactly 
+synchronise with the service's.
 
-Correctly selecting parts often requires correctly imposing a reified
-type concept on the various sub-trees of the document. If we allow
-ourselves to assume that every node with a name represents a person we
-are liable to write brittle selectors. However, a sound type imposition
-will sometimes be simple, an object with an isbn property is almost
-certainly a book.
 
 Browser XML Http Request (XHR)
 ------------------------------
