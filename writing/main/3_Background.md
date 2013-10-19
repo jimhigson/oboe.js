@@ -436,9 +436,9 @@ version below.
 </people>
 ~~~~
 
-XML also invites ambiguity regarding whitespace characters between tags,
-reflecting XML's dual purposes of document markup and data; whitespace
-is generally meaningful for documents but ignorable for data. Strictly
+XML also invites ambiguity regarding whitespace between tags,
+reflecting its dual purpose as markup for documents and data. Generally 
+whitespace is meaningful for documents but ignorable for data. Strictly
 whitespace text nodes are part of the document but in practice many tree
 walkers discard them as insignificant. In the XML example above the
 `<person>` element may be enumerated as the first or second child of
@@ -448,18 +448,20 @@ Likewise, the text inside `<name>` might be `John` or
 ancestry, whitespace between tokens is never significant.
 
 While it is possible to for a service to change in a way which is untrackable 
-using JSONPath, it is more difficult than with XPATH. Because each nodes only 
-has one, unambiguous set of children, the JSON metamodel does not present a
-format author with a selection from logical equivalents that are addressed
-incompatibly. In JSON if a scalar value is changed to a compound one only
-the node itself change, the path to the node is unaffected. 
+using JSONPath, it is easier to miss the moving target with XPATH.
+In JSON each nodes has only one, unambiguous set of children, so the metamodel 
+does not present the format author with a selection from logical equivalents 
+that are addressed through different mechanisms.
+In JSON if a scalar value is updated to a compound one only
+the node itself changes, the addressing of the node is unaffected. 
 
 Generally in descriptive hierarchical data there is a trend for ancestorship 
-in the markup to denote the same relationship between concepts regardless 
+to denote the same relationship between concepts regardless 
 of the number of intermediate generations. In the example above, `town` 
 transitioned from child to grandchild of `person` without disturbing the 
-denoted 'lives in' relationship. The JSONPath `..` provides this matching,
-unperturbed when extra levels are added. Of course, this trend will not
+implicit 'lives in' relationship. The JSONPath `..` provides matching through
+zero or more generations, unperturbed if extra levels are added.
+Of course, this trend will not
 hold for every possible way of building message semantics because it is possible
 that an intermediate node between ancestor and descendant will change the
 nature of the denoted relationship. A slightly contrived example might be if we
