@@ -206,6 +206,15 @@ module.exports = function (grunt) {
                'dist-sizes']
          },
          
+         // like above but reports the file size. This is good for 
+         // watching while developing to make sure it doesn't get
+         // too big. Doesn't run tests against minified.
+         testNode:{
+            files: FILES_TRIGGERING_KARMA,
+            tasks:[ 
+               'node-run-tests']
+         },         
+         
          restartStreamSourceAndRunTests:{
             // this fails at the moment because start-stream-source
             // fails if run more than once - the port is taken.
@@ -278,19 +287,28 @@ module.exports = function (grunt) {
       'start-stream-source',
       'karma:persist',
       'concurrent:watchDev'       
-   ]);      
+   ]);
+   
+   grunt.registerTask('node-test-auto-run',   [
+      'start-stream-source',
+      'watch:testNode'       
+   ]);         
 
    grunt.registerTask('dist-sizes',   [
       'exec:reportMinifiedSize',
       'exec:reportMinifiedAndGzippedSize'
    ]);
-      
-   grunt.registerTask('node-build',      [
-      'start-stream-source',   
+
+   grunt.registerTask('node-run-tests',      [
       'concat:node', 
       'wrap:nodePackage',
       'copy:nodeDist',
       'jasmine_node_oboe'
+   ]);
+      
+   grunt.registerTask('node-build',      [
+      'start-stream-source',
+      'node-run-tests'
    ]);   
    
    grunt.registerTask('default',      [
