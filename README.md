@@ -529,9 +529,6 @@ Browsers with Full support are:
 * Internet Explorer 10
 * Recent Safaris
 
-Chrome's XHR [doesn't fire progress events for gzipped content](https://code.google.com/p/chromium/issues/detail?id=309092).
-It'll work but if the content is gzipped the AJAX call works like a non-streaming one.
-
 Browsers with partial support:
 
 * Internet explorer 8 and 9, given [appropriate shims for ECMAScript 5](https://github.com/kriskowal/es5-shim/blob/master/es5-sham.js)
