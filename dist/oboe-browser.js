@@ -974,7 +974,7 @@ function httpTransport(){
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          but for tests a stub can be provided instead.
- * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+ * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} url the url to make a request to
  * @param {String|Object} data some content to be sent with the request.
  *                        Only valid if method is POST or PUT.
@@ -1997,6 +1997,7 @@ oboe.doGet    = oboe;
 oboe.doDelete = apiMethod('DELETE');
 oboe.doPost   = apiMethod('POST', true);
 oboe.doPut    = apiMethod('PUT', true);
+oboe.doPatch  = apiMethod('PATCH', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
