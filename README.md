@@ -66,15 +66,15 @@ a neat way to route different parts of a json response to different parts of his
 Say we have a resource called things.json that we need to fetch over AJAX:
 ``` js
 {
-   foods: [
-      {'name':'aubergine',    'colour':'purple'},
-      {'name':'apple',        'colour':'red'},
-      {'name':'nuts',         'colour':'brown'}
+   "foods": [
+      {"name":"aubergine",    "colour":"purple"},
+      {"name":"apple",        "colour":"red"},
+      {"name":"nuts",         "colour":"brown"}
    ],
    "nonFoods": [
-      {'name':'brick',        'colour':'red'},
-      {'name':'poison',       'colour':'pink'},
-      {'name':'broken_glass', 'colour':'green'}
+      {"name":"brick",        "colour":"red"},
+      {"name":"poison",       "colour":"pink"},
+      {"name":"broken_glass", "colour":"green"}
    ]
 }
 ```
@@ -207,17 +207,17 @@ register a wide-matching pattern and use the path parameter to decide what to do
 
 ``` js
 // json from the server side. Each top-level object is for a different module on the page.
-{  'notifications':{
-      'newNotifications': 5,
-      'totalNotifications': 4
+{  "notifications":{
+      "newNotifications": 5,
+      "totalNotifications": 4
    },
-   'messages': [
-      {'from':'Joe', 'subject':'blah blah', 'url':'messages/1'},
-      {'from':'Baz', 'subject':'blah blah blah', 'url':'messages/2'}
+   "messages": [
+      {"from":"Joe", "subject":"blah blah", "url":"messages/1"},
+      {"from":"Baz", "subject":"blah blah blah", "url":"messages/2"}
    ],
-   'photos': {
-      'new': [
-         {'title': 'party', 'url':'/photos/5', 'peopleTagged':['Joe','Baz']}
+   "photos": {
+      "new": [
+         {"title": "party", "url":"/photos/5", "peopleTagged":["Joe","Baz"]}
       ]
    }
    // ... other modules ...
@@ -253,10 +253,10 @@ given instead to the callback.
 ``` js
 
 // the json from the server side looks like this:
-{people: [
-   {'name':'Baz', 'age':34, 'email': 'baz@example.com'}
-   {'name':'Boz', 'age':24}
-   {'name':'Bax', 'age':98, 'email': 'bax@example.com'}}
+{"people": [
+   {"name":"Baz", "age":34, "email": "baz@example.com"}
+   {"name":"Boz", "age":24}
+   {"name":"Bax", "age":98, "email": "bax@example.com"}}
 ]}
 
 // we are using Angular and have a controller:
