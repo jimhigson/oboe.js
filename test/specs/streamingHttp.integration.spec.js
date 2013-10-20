@@ -115,6 +115,28 @@ describe('streaming xhr integration (real http)', function() {
          expect(contentReceived).toParseTo(payload);
       });
      
+   }) 
+
+   it('can make a patch request',  function(queue) {
+   
+      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+   
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingHttp(
+         fire, on,
+         new XMLHttpRequest(),         
+         'PATCH',
+          '/testServer/echoBackBody',
+          payload       
+      );
+      
+      waitForRequestToComplete();            
+
+      runs(function(){
+         expect(contentReceived).toParseTo(payload);
+      });
+     
    })   
           
    // this test is only activated for non-IE browsers and IE 10 or newer.

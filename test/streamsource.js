@@ -159,6 +159,7 @@ function startServer( port, grunt ) {
       router.get(    '/echoBackBody',              function(req, res){ res.end("POST here, don't GET")});
       router.post(   '/echoBackBody',              echoBackBody);
       router.put(    '/echoBackBody',              echoBackBody);
+      router.patch(  '/echoBackBody',              echoBackBody);
       router.get(    '/echoBackHeaders',           echoBackHeaders);
       router.get(    '/static/json/:name.json',    replyWithStaticJson);
       router.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
