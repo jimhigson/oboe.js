@@ -147,7 +147,9 @@ function startServer( port, grunt ) {
          serverResponse.setHeader("content-encoding", 'gzip');
          serverResponse.writeHead(200);      
          
-         clientResponse.pipe(zlib.createGzip()).pipe(serverResponse);
+         clientResponse.pipe(zlib.createGzip({
+            flush: zlib.Z_SYNC_FLUSH
+         })).pipe(serverResponse);
          
        });
    }   
