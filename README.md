@@ -30,6 +30,7 @@ http. [npm package here](https://npmjs.org/package/oboe).
 - [Why I made this](#why-i-made-this)
 - [Status](#status)
 - [More example patterns](#more-example-patterns)
+- [Installing](#installing)
 - [Getting the most from oboe](#getting-the-most-from-oboe)
 - [Browser support](#browser-support)
 	- [Running the tests](#running-the-tests)
@@ -322,6 +323,8 @@ Instead of giving a url, you can pass any [readable stream](http://nodejs.org/ap
 To load from a local file you'd do this:
 
 ``` js
+var oboe = require('oboe');
+
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .node('!.schemes.*', function(scheme){
       console.log('Aha! ' + scheme);
@@ -513,6 +516,20 @@ BSD licenced. But if you use it drop me a note!
 `$person..email` any person in the json stream with an email address  
 `*` every object, string, number etc found in the json stream  
 `!` the root object (fired when the whole response is available, like JSON.parse())  
+
+# Installing
+
+For the client-side, either grab [dist/oboe-browser.js](dist/oboe-browser.js) or use [bower](http://bower.io/) like:
+
+```
+bower install oboe
+```
+
+For Node:
+
+```
+npm install oboe
+```
 
 # Getting the most from oboe
 
