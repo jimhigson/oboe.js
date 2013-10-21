@@ -72,7 +72,10 @@ possible features that I'm reasonably sure will be used for 80% of
 tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
-of books might use branching to further select inside their callback;
+of books might use branching to further select inside their callback.
+I anticipate that the selections will frequently involve types
+so it is useful to examine the nature of type imposition with regards
+to JSON.
 
 Detecting types in JSON
 -----------------------
@@ -121,64 +124,72 @@ because of the parent node's field name.
 
 ~~~~ {.javascript}
 {
-   name: '...'
-,  residence: {
-      address: [
-         '...', '...', '...'
+   "name": ""
+,  "residence": {
+      "address": [
+         "47", "Cloud street", "Dreamytown"
       ]
    }
-,  employer: {
-      name: '...'
-   ,  address :[
-         '...', '...', '...'      
+,  "employer": {
+      "name": "Mega ultra-corp"
+   ,  "address":[
+         "Floor 2", "The Offices", "Alvediston", "Wiltshire"      
       ]
    }   
 }
 ~~~~
 
+This first means of imposing type is simple to express by
+JSONPath. The selector `address` would match all nodes whose parent maps
+to them via an address key.
+
 As a loosely typed language, Javascript gives no protection against
-using collections to store disparate types but by sensible convention
-this is avoided. Likewise in JSON, although type is a loose concept, on
-some level the items in a collection will generally be of the same type.
-This allows tje sister convention seen in the example below, whereby
+lists which store disparate types but by sensible convention
+this is avoided. Likewise in JSON, although type is a loose concept, 
+the items in a collection will generally be of the same type.
+From here follows a sister convention seen in the example below, whereby
 each of a list of items are typed according to the key in the
 grandparent node which maps to the array.
 
 ~~~~ {.javascript}
 {
-   residences: {
-      addresses: [
-         ['Townhouse', 'Underground street', 'Far away town']      
-      ,  ['Beach Hut', 'Secret Island', 'Bahamas']
+   "residences": {
+      "addresses": [
+         ["10", "Downing street", "London"]
+      ,  ["Chequers Court", "Ellesborough, "Buckinghamshire"]      
+      ,  ["Beach Hut", "Secret Island", "Bahamas"]
       ]
    }
 }
 ~~~~
 
-The pluralisation of 'address' to 'addresses' above may be a problem to
-a reader wishing to detect address nodes. I considered introducing an
-'or' syntax for this situation, resembling `address|addresses.*` but
-instead decided this problem, while related to type, is simpler to solve
-outside of the JSONPath language. A programmer may simply use two
-JSONPaths mapping to the same callback function.
+In the above JSON, `addresses.*` would correctly identify the address-type
+nodes. The pluralisation of 'address' to 'addresses' may be a problem to
+a reader wishing to detect by either convention for type and it might be
+interesting in future to investigate a system for understanding English
+pluralisation similar to Ruby on Rails' configuration.
+I also considered introducing unions to JSONPath to cover this situation, resembling `address|addresses.*` 
+but decided that this is simpler to solve
+outside of the JSONPath language if the programmer registers two 
+selection specifications against the same handler function.
 
-In the below example typing is trickier still.
+In the below example paths are not the best way to detect the address type:
 
 ~~~~ {.javascript}
 {
-   name: '...'
-,  residence: {
-      number:'...', street:'...', town:'...' 
+   "name": "..."
+,  "residence": {
+      "number":"...", "street":"...", "town":"..." 
    }
-,  employer:{
-      name: '...'
-   ,  premises:[
-         { number:'...', street:'...', town:'...' }
-      ,  { number:'...', street:'...', town:'...' }
-      ,  { number:'...', street:'...', town:'...' }
+,  "employer":{
+      "name": "..."
+   ,  "premises":[
+         { "number":"...", "street":"...", "town":"..." }
+      ,  { "number":"...", "street":"...", "town":"..." }
+      ,  { "number":"...", "street":"...", "town":"..." }
       ]
-   ,  registeredOffice:{
-         number:'...', street:'...', town:'...'
+   ,  "registeredOffice":{
+         "number":"...", "street":"...", "town":"..."
       }
    }
 }  
@@ -229,9 +240,6 @@ JSONPath improving stability over upgrades
 
 -   Use of `..` over `.`
 -   Keep this short. Might not need diagram if time presses.
-
-![extended json rest service that still works - maybe do a table instead
-\label{enhancingrest}](images/placeholder)
 
 Programming to identify a certain interesting part of a resource today
 should with a high probability still work when applied to future
@@ -356,25 +364,25 @@ callsite than if the meaning depended on the position in a linear
 arguments list and the gaps filled in with nulls.
 
 ~~~~ {.javascript}
-jQuery.ajax({ url:"resources/shortMessage.txt",
-              accepts: "text/plain",
-              headers: { 'X-MY-COOKIE': '123ABC' }
+jQuery.ajax({ "url":"resources/shortMessage.txt",
+              "accepts": "text/plain",
+              "headers": { "X-MY-COOKIE": "123ABC" }
            });
 ~~~~
 
 Taking on this style,
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
-   .node( 'person.name', function(name, path, ancestors) {
+oboe("resources/someJson.json")
+   .node( "person.name", function(name, path, ancestors) {
       console.log("got a name " + name);   
    })
    .done( function( wholeJson ) {
-      console.log('got everything');
+      console.log("got everything");
    })
    .fail( function() {
-      console.log('actually, the download failed. Forget the' + 
-                  ' people I just told you about');
+      console.log("actually, the download failed. Forget the" + 
+                  " people I just told you about");
    });
 ~~~~
 
@@ -384,12 +392,12 @@ patterns in a single call by using the patterns as the keys and the
 callbacks as the values in a key/value mapping:
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
+oboe("resources/someJson.json")
    .node({  
-      'person.name': function(personName, path, ancestors) {
+      "person.name": function(personName, path, ancestors) {
          console.log("let me tell you about " + name);
       },
-      'person.address.town': function(townName, path, ancestors) {
+      "person.address.town": function(townName, path, ancestors) {
          console.log("they live in " + townName);
       }
    });
@@ -405,9 +413,9 @@ Consider this JSON:
    "event": "mens 100m",
    "date": "5 Aug 2012",
    "medalWinners": {
-      "gold":     {"name": 'Bolt',    "time": "9.63s"},
-      "silver":   {"name": 'Blake',   "time": "9.75s"},
-      "bronze":   {"name": 'Gatlin',  "time": "9.79s"}
+      "gold":     {"name": "Bolt",    "time": "9.63s"},
+      "silver":   {"name": "Blake",   "time": "9.75s"},
+      "bronze":   {"name": "Gatlin",  "time": "9.79s"}
    }
 }  
 ~~~~
@@ -440,9 +448,9 @@ argument. Adopting this style, my API design for oboe.js also allows
 events to be added as:
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
-   .on( 'node', 'medalWinners.*', function(person, path, ancestors) {
-      console.log( person.name + ' won the ' + lastOf(path) + ' medal' );
+oboe("resources/someJson.json")
+   .on( "node", "medalWinners.*", function(person, path, ancestors) {
+      console.log( person.name + " won the " + lastOf(path) + " medal" );
    });
 ~~~~
 
@@ -471,17 +479,17 @@ API facilitates this by providing a `path` callback following much the
 same pattern as the `node` callback.
 
 ~~~~ {.javascript}
-oboe('events.json')
-   .path( 'medalWinners', function() {
-      // We don't know the winners yet but we know we have some so let's
+oboe("events.json")
+   .path( "medalWinners", function() {
+      // We don"t know the winners yet but we know we have some so let"s
       // start drawing the table already:    
       interface.showMedalTable();
    })
-   .node( 'medalWinners.*', function(person, path) {    
+   .node( "medalWinners.*", function(person, path) {    
       interface.addPersonToMedalTable(person, lastOf(path));
    })
    .fail( function(){
-      // That didn't work. Revert!
+      // That didn"t work. Revert!
       interface.hideMedalTable();
    });
 ~~~~
