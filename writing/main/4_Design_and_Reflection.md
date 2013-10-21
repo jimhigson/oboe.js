@@ -72,10 +72,9 @@ possible features that I'm reasonably sure will be used for 80% of
 tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
-of books might use branching to further select inside their callback.
-I anticipate that the selections will frequently involve types
-so it is useful to examine the nature of type imposition with regards
-to JSON.
+of books might use branching to further select inside their callback. I
+anticipate that the selections will frequently involve types so it is
+useful to examine the nature of type imposition with regards to JSON.
 
 Detecting types in JSON
 -----------------------
@@ -139,17 +138,17 @@ because of the parent node's field name.
 }
 ~~~~
 
-This first means of imposing type is simple to express by
-JSONPath. The selector `address` would match all nodes whose parent maps
-to them via an address key.
+This first means of imposing type is simple to express by JSONPath. The
+selector `address` would match all nodes whose parent maps to them via
+an address key.
 
 As a loosely typed language, Javascript gives no protection against
-lists which store disparate types but by sensible convention
-this is avoided. Likewise in JSON, although type is a loose concept, 
-the items in a collection will generally be of the same type.
-From here follows a sister convention seen in the example below, whereby
-each of a list of items are typed according to the key in the
-grandparent node which maps to the array.
+lists which store disparate types but by sensible convention this is
+avoided. Likewise in JSON, although type is a loose concept, the items
+in a collection will generally be of the same type. From here follows a
+sister convention seen in the example below, whereby each of a list of
+items are typed according to the key in the grandparent node which maps
+to the array.
 
 ~~~~ {.javascript}
 {
@@ -163,17 +162,19 @@ grandparent node which maps to the array.
 }
 ~~~~
 
-In the above JSON, `addresses.*` would correctly identify the address-type
-nodes. The pluralisation of 'address' to 'addresses' may be a problem to
-a reader wishing to detect by either convention for type and it might be
-interesting in future to investigate a system for understanding English
-pluralisation similar to Ruby on Rails' configuration.
-I also considered introducing unions to JSONPath to cover this situation, resembling `address|addresses.*` 
-but decided that this is simpler to solve
-outside of the JSONPath language if the programmer registers two 
-selection specifications against the same handler function.
+In the above JSON, `addresses.*` would correctly identify the
+address-type nodes. The pluralisation of 'address' to 'addresses' may be
+a problem to a reader wishing to detect by either convention for type
+and it might be interesting in future to investigate a system for
+understanding English pluralisation similar to Ruby on Rails'
+configuration. I also considered introducing unions to JSONPath to cover
+this situation, resembling `address|addresses.*` but decided that this
+is simpler to solve outside of the JSONPath language if the programmer
+registers two selection specifications against the same handler
+function.
 
-In the below example paths are not the best way to detect the address type:
+In the below example paths are not the best way to detect the address
+type:
 
 ~~~~ {.javascript}
 {
@@ -195,13 +196,12 @@ In the below example paths are not the best way to detect the address type:
 }  
 ~~~~
 
-Here the keys of the mappings which hold addresses are named by the 
-relationship between
-the parent and child nodes rather than the type of the child. There are
-two ways we may be able to select objects out as addresses. Firstly,
-because of an ontology which subtypes 'residence', 'premises', and
-'office' as places with addresses. More simply, we may import the idea
-of duck typing from Python programing.
+Here the keys of the mappings which hold addresses are named by the
+relationship between the parent and child nodes rather than the type of
+the child. There are two ways we may be able to select objects out as
+addresses. Firstly, because of an ontology which subtypes 'residence',
+'premises', and 'office' as places with addresses. More simply, we may
+import the idea of duck typing from Python programing.
 
 > In other words, don't check whether it IS-a duck: check whether it
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
