@@ -10,27 +10,27 @@ By observing the flow of data streams through a SAX parser we can say that
 the REST workflow is more efficient if we do not wait until we
 have everything before we start using the parts that we do have.
 However, the SAX model presents poor developer ergonomics because it is
-not usually convenient to think on it's presented level of abstraction:
+not usually convenient to think on the level of abstraction that it presents:
 that of markup tokens. Using SAX, a programmer may only work with a
-convenient abstraction after inferring it through a series of callbacks.
+convenient abstraction after inferring it from a lengthy series of callbacks.
 In terms of ease of use, DOM is generally preferred because it provides
 the resource whole and in a convenient form. My design aims to duplicate
 this convenience and combine it with progressive interpretation by
-removing one restriction; that node which is given is always the
-document root. For hierarchical markup such as XML or JSON, it is
-possible to fully parse a sub-tree without fully knowing the parent
-node; taking responsibility for drill-down away from the programmer we
+removing one restriction; that the node which is given is always the
+document root. For hierarchical markup such as XML or JSON when read in order
+it is possible to fully parse a sub-tree before fully knowing the parent
+node. By taking responsibility for drill-down away from the programmer we
 can identify the interesting parts of the document and deliver them as
 fully-formed entities as soon as they are available.
 
 By my design, identifying the interesting parts of a document before it
 is complete involves turning the established model for drilling-down
-inside-out. By asynchronous I/O the programmer's callback traditionally
-receives the resource and then from inside a callback locates the
-sub-parts that are required. Inverting this process, I propose taking
-the locating logic currently found inside the callback outside of it and
-using it to decide when the callback should be used. The callback will
-receive complete fragments from the response which have been selected
+inside-out. Under asynchronous I/O the programmer's callback traditionally
+receives the whole resource and then, inside the callback locates the
+sub-parts that are interesting. Inverting this process, I propose extracting
+the locating logic currently found inside the callback out and using 
+it to decide when the callback should be used. The callback will
+receive complete fragments from the response once they have been selected
 according to this logic.
 
 I will be implementing using the Javascript language because it has good
