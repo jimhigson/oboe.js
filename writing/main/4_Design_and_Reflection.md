@@ -105,28 +105,19 @@ their own.
 
 ~~~~ {.javascript}
 /*    JSON meanwhile provides no very concrete type concept. This node's
-      type might be 'thing', 'animal', 'human', 'man', 'architect',
-      'artist' or any other of many overlapping impositions depending 
-      on our purpose for examining this data */
+      type might be 'thing', 'animal', 'human', 'male', 'man', 
+      'architect', 'artist' or any other of many overlapping impositions 
+      depending on our reason for examining this data */
 {  "name":"...", "gender":"male", "age":"45" 
    "height":"172cm" "profession":"architect">
 }         
 ~~~~
 
 In the absence of node typing beyond the categorisation as objects,
-arrays and various primitive types, the key immediately mapping to the
-object is often taken as a lose concept of the type of the object. Quite
-fortunately, rather than because of a well considered object design,
-this tends to play well with automatically marshaling of domain objects
-expressed in a Java-style OO language because there is a strong tendency
-for field names -- and by extension, 'get' methods -- to be named after
-the *type* of the field, the name of the type also serving as a rough
-summary of the relationship between two objects. See figure
-\ref{marshallTypeFig} below.
-
-In the below example, we impose the the type 'address' because of the
-parent node's field name. Other than this, these are standard arrays of
-strings:
+arrays and various primitives, the key immediately mapping to an
+object is often taken as a loose marker of its type. In the below example 
+we may impose the the type 'address' prior to examining the contents because 
+of the parent node's field name.
 
 ~~~~ {.javascript}
 {
