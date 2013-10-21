@@ -4,6 +4,7 @@ oboe.doGet    = oboe;
 oboe.doDelete = apiMethod('DELETE');
 oboe.doPost   = apiMethod('POST', true);
 oboe.doPut    = apiMethod('PUT', true);
+oboe.doPatch  = apiMethod('PATCH', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                

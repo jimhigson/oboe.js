@@ -144,6 +144,18 @@ describe("browser api", function(){
             )   
          })
       });
+
+      describe('patch', function(){
+         it('can patch a string', function(){
+            oboe.doPatch('http://example.com/oboez', 'my_data');
+
+            expect(wire).toHaveBeenCalledWith(
+               'PATCH',
+               'http://example.com/oboez',
+               'my_data'
+            )
+         })
+      })
       
    });
       

@@ -373,6 +373,7 @@ calling one of these methods:
    
    oboe.doGet(    String url )
    oboe.doPut(    String url, String|Object body )
+   oboe.doPatch(  String url, String|Object body )
    oboe.doPost(   String url, String|Object body )
    oboe.doDelete( String url )
    
