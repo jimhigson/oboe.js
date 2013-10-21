@@ -337,8 +337,9 @@ difference in logic expressed by the program, and therefore harder to
 later understand the thinking behind the change and the reason for the
 change.
 
-JsonPath and XPath selector languages
+JsonPath and XPath selector languages 
 -------------------------------------
+\label{jsonpathxpath}
 
 The problem of drilling down to pertinent fragments of a message without
 tightly coupling to the format could be somewhat solved if instead of
