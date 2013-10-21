@@ -1,13 +1,13 @@
 Design and Reflection:
 ======================
 
-Using a combination of the techniques covered in the previous chapter, I
-propose that a simple design is possible which allows REST clients to be
-more efficient whilst being convenient to program by combining the best
-traits of programming with SAX and DOM.
+Using a combination of the techniques covered in the previous chapter I
+propose that it is possible to combine the desirable
+properties from SAX and DOM parsers into a REST client library which
+allows streaming but is also being convenient to program.
 
-Observing the flow of data through a SAX parser we can say that using a
-resource from a network is more efficient if we do not wait until we
+By observing the flow of data streams through a SAX parser we can say that 
+the REST workflow is more efficient if we do not wait until we
 have everything before we start using the parts that we do have.
 However, the SAX model presents poor developer ergonomics because it is
 not usually convenient to think on it's presented level of abstraction:
