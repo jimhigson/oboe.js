@@ -82,17 +82,17 @@ However, the XML metamodel provides tagnames; essentially a built-in
 type system for subclassifying the elements. JSON has no similar notion
 of types beyond the basic constructs: array, object, string, number. To
 understand data written in JSON's largely typeless model it is often
-useful if we think in terms of a more complex type system.
-This imposition of type is the responsibility of the observer rather
-than of the observed. The reader of a document is free to choose the
-taxonomy they will use to interpret it and this decision will vary
-depending on the purposes of the reader. The required specificity of taxonomy
-differs by the level of involvement in a field. Whereas 'watch'
-may be a reasonable type for most data consumers, to a horologist it is
-likely to be unsatisfactory without further sub-types. To serve
-disparate purposes, the JSONPath variant provided for node selection will
-have no inbuilt concept of type, the aim is to support programmers in
-creating their own.
+useful if we think in terms of a more complex type system. This
+imposition of type is the responsibility of the observer rather than of
+the observed. The reader of a document is free to choose the taxonomy
+they will use to interpret it and this decision will vary depending on
+the purposes of the reader. The required specificity of taxonomy differs
+by the level of involvement in a field. Whereas 'watch' may be a
+reasonable type for most data consumers, to a horologist it is likely to
+be unsatisfactory without further sub-types. To serve disparate
+purposes, the JSONPath variant provided for node selection will have no
+inbuilt concept of type, the aim is to support programmers in creating
+their own.
 
 *integrate with above or discard, maybe move to compatibility with
 future versions* Relationship between type of a node and its purpose in
