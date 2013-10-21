@@ -36,30 +36,30 @@ according to this logic.
 I will be implementing using the Javascript language because it has good
 support for non-blocking I/O and covers both contexts where this project
 will be most useful: in-browser programming and server programming.
-Focusing on the MVP, I will only be implmenting the parsing of one
+Focusing on the MVP, I will only be implementing the parsing of one
 mark-up language. Although this technique could be applied to any
 text-based, tree-shaped markup, I find that JSON best meets my goals
 because it is widely supported, easy to parse, and is amenable to
 selectors which span multiple format versions.
 
-Whilst JSONPath's existing implementation is only implemented for
-searching over already gathered objects, this kind of searching is just
-one application for the query language. I find that this is a very
-suitable declarative language to use to specify the parts of a response
-that a developer would like to drill-down to given the context of a
-document whose parse is in progress. JSONPath is especially applicable
-because it specifies only 'contained-in/contains' type relationships. On
+JSONPath fits well for selecting the interesting sub-parts of a JSON document 
+on behalf of the library user.
+JSONPath is especially applicable to node selection for this library
+because it specifies only constraints on paths and 'contained-in/contains'
+type relationships. On
 encountering any node in a serialised JSON stream, because of the
-depth-first serialisation order I will always have previously seen its
-ancestors. Hence, having written a suitably flexible JSONPath expression
-compiler such that it does not require a complete document, I will have
-enough information to evaluate any expression against any node at the
-time when it is first identified in the document. Because XML is also
-written depth-first, the same logic would apply to an XPath/XML variant
-of this project.
+top-down serialisation order I will have already seen enough of the prior
+document to know its full path. 
+JSONPath would not be so amenable if it expressed sibling relationships
+because there is no similar guarantee of knowing the other nodes on the same 
+level when any particular node is encountered.
+The existing JSONPath library is implemented as a means to
+search for matches through already gathered objects and this implementation is
+too narrow in applicability to be useful for this context so a
+new implementation of the language is required.  
 
-detecting type with JSONPath
-----------------------------
+Detecting types in JSON
+-----------------------
 
 Parts of a document will be considered interesting because of their
 type, position, or both. Given its use to identify interesting parts of
