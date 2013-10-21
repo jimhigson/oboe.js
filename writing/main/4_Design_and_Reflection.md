@@ -33,13 +33,16 @@ using it to decide when the callback should be used. The callback will
 receive complete fragments from the response which have been selected
 according to this logic.
 
-I will be implementing using the Javascript language because it allows
-me to target both of the main use cases where I think this project will
-be useful: browser programming and server programming, and has good
-support for non-blocking i/o. The model of REST library proposed here is
-not limited to Javascript and could be expressed in any given language.
-Likewise, I have also chosen to focus on JSON although I will also be
-commenting on the parallel applicability of these ideas to XML.
+I will be implementing using the Javascript language because it
+has good support for non-blocking I/O and 
+covers both contexts where this project will
+be most useful: in-browser programming and server programming.
+Focusing on the MVP, I will only be implmenting the parsing of one mark-up
+language.
+Although this technique could be applied to any text-based,
+tree-shaped markup, I find that JSON best meets my goals because it is
+widely supported, easy to parse, and is amenable to selectors which
+span multiple format versions. 
 
 Whilst JSONPath's existing implementation is only implemented for
 searching over already gathered objects, this kind of searching is just
