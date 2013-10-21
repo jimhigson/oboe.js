@@ -174,7 +174,7 @@ registers two selection specifications against the same handler
 function.
 
 In the below example paths are not the best way to detect the address
-type:
+type.
 
 ~~~~ {.javascript}
 {
@@ -196,43 +196,40 @@ type:
 }  
 ~~~~
 
-Here the keys of the mappings which hold addresses are named by the
+Here, the keys which map onto addresses are named by the
 relationship between the parent and child nodes rather than the type of
-the child. There are two ways we may be able to select objects out as
-addresses. Firstly, because of an ontology which subtypes 'residence',
-'premises', and 'office' as places with addresses. More simply, we may
-import the idea of duck typing from Python programing.
+the child. The type classification problem might here be solved by using an ontology with
+'address' subtypes such as 'residence', 'premises', and 'office', but this solution
+feels quite heavyweight for a simple selection language.
+Instead I chose to import the idea of *duck typing* from Python programing, 
+as named in a 2000 usenet discussion:
 
 > In other words, don't check whether it IS-a duck: check whether it
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
-> what subset of duck-like behaviour you need to play your
-> language-games with.
+> what subset of duck-like behaviour you need [@pythonduck]
 
-Discussion of typing in Python language, 2000.
-https://groups.google.com/forum/?hl=en\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ
+A 'duck-definition' of an address type might be any object which has a number,
+street and town. That is to say, we take an individualistic approach by 
+deriving type from the node in itself rather than by examining the situation
+in which it occurs. Because I find this selection technique simple and powerful
+I decided to add it to my JSONPath variant. As discussed in section \ref{jsonpathxpath},
+JSONPath's syntax is designed to
+resemble the equivalent Javascript accessors but Javascript has no syntax for
+a value-free list of object keys, the closest available notation is for object
+literals. I created a duck-type syntax derived from the object literal syntax by omitting the values,
+quotation marks, and commas. For the addresses type above a duck-type expression
+is written as `{number street town}`. Order is not significant so `{a b}` and 
+`{b a}` are equivalent.
 
-A 'duck-definition' of address might be any object which has a number,
-street and town. That is to say, type is individualistically
-communicated by the object itself rather than by examining the
-relationships described by its containing ancestors. JSONPath comes with
-no such expressivity but I find this idea so simple and useful that I
-have decided to create one. The JSONPath language is designed to
-resemble programmatic Javascript access but Javascript has no syntax for
-a list of value-free properties. The closest available is the object
-literal format; my duck-type syntax is a simplification with values and
-commas omitted. In the case of the addresses a duck-type expression
-would be written as `{number street town}`. Generally, when identifying
-items of a type from a document it makes sense if the type expression is
-contravariant so that sub-types are also selected. If we consider that
-we create a sub-duck-type when we add to a list of required fields and
-super-duck-types when we remove them, we have a non-tree shaped type
-space with root type `{}` which matches any object. Therefore, the
-fields specified need not be an exhaustive list of the object's
-properties.
+We can consider that there is a root duck type `{}` which matches any node,
+that we create a sub-duck-type when we add to a list of required fields and a
+super-duck-type when we remove one.
+It is difficult to generalise but when selecting
+items from a document by type I believe it will most often be useful if 
+nodes which are covariant with the given duck-type
+were also be matched. In implementation this means that to satisfy a duck type
+a node must have at least the required fields but may also have any others.
 
-The various means of discerning type which are constructable need not be
-used exclusively. For example, `aaa{bbb ccc}` is a valid construction
-combining duck typing and the relationship with the parent object.
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
