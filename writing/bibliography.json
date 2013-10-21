@@ -410,7 +410,19 @@
       "url":"http://goessner.net/articles/JsonPath/",
       "issued": { "date-parts":[ [2007] ] },
       "type":"webpage"                  
-   }   
+   },
+   
+   {
+      "id":"pythonduck",
+      "title":"Discussion of typing in Python language, 2000.",
+      "author":[         
+         { "family": "Martelli", "given":"Alex"}
+      ],
+      "url":"https://groups.google.com/forum/?hl=en\\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ",
+      "issued": { "date-parts":[ [2000] ] },
+      "type":"webpage"                  
+   }
+      
    
 ]
 
