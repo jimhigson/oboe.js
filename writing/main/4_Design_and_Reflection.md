@@ -58,23 +58,23 @@ and is too narrow in applicability to be useful in our context.
 Detecting types in JSON
 -----------------------
 
-Parts of a document may be considered interesting because of their type,
-position, or some combination of the two.
-
-Given its use to select parts of a REST resource, not all of the
-JSONPath spec is useful. This contrasts with 'search' style queries such
-as 'books costing less than X'. Examining REST responses it is likely we
-will not be explicitly searching through a full model but rather
-selecting from a resource subset that the programmer requested,
-assembled on their behalf using their parameters so we can expect the
-developer to be interested in most of the content. In creating a new
-JSONPath implementation, I have chosen to follow the published spec only
-loosely, thereby avoiding writing unnecessary code. This is especially
-the case, as in the books example above whereby a user of the library
-could easily add the filter in the callback itself. Following the
-principle of writing less, better I feel it is better to deliver only
-the features I am reasonably certain will be well used but keep open the
-ability to add more later should it be required.
+Not all of the JSONPath language is well suited when we consider we are
+selecting specifically inside a REST resource. Given this context it is
+likely that we will not be examining a full model but rather a subset
+that we requested and was assembled on our behalf according to the
+parameters that we supplied. We can expect to be interested in all of
+the content so search-style selections such as 'books costing less than
+X' are less useful than queries which identify nodes because of their
+type and position such as 'all books in the discount set'. In creating a
+new JSONPath implementation I have chosen to follow the existing
+language somewhat loosely, thereby specialising the matching and
+avoiding unnecessary code. It is difficult to anticipate what the
+real-world matching requirements will be but if I deliver now the 20% of
+possible features that I'm reasonably sure will be used 80% of the time,
+for the timebeing any functionality which is not covered may be
+implemented inside the callbacks themselves and later added to the
+selection library. For example, somebody wishing to filter on the price
+of books may write an `if` statement inside their callback;
 
 JSON markup describes only a few basic types. On a certain level this is
 also true for XML -- most nodes are of either type Elements or Text.
