@@ -23,15 +23,15 @@ node; taking responsibility for drill-down away from the programmer we
 can identify the interesting parts of the document and deliver them as
 fully-formed entities as soon as they are available.
 
-By my design, identifying the
-interesting parts of a document before it is complete involves turning the established model
-for drilling-down inside-out. By asynchronous I/O the programmer's callback traditionally
-receives the resource and then inside that callback locates
-the sub-parts that they require. Inverting this process, I propose taking that
-locating logic, currently found inside the callback, outside of it and using it
-to decide when the callback should be used.
-The callback will receive the parts of the
-response which have been selected according to this logic.
+By my design, identifying the interesting parts of a document before it
+is complete involves turning the established model for drilling-down
+inside-out. By asynchronous I/O the programmer's callback traditionally
+receives the resource and then from inside a callback locates the
+sub-parts that are required. Inverting this process, I propose taking
+the locating logic currently found inside the callback outside of it and
+using it to decide when the callback should be used. The callback will
+receive complete fragments from the response which have been selected
+according to this logic.
 
 I will be implementing using the Javascript language because it allows
 me to target both of the main use cases where I think this project will
