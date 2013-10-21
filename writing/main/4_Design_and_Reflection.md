@@ -1,36 +1,36 @@
 Design and Reflection:
 ======================
 
-Using a combination of the techniques covered in the previous chapter I
+Using a combination of techniques from the previous chapter I
 propose that it is possible to combine the desirable properties from SAX
 and DOM parsers into a REST client library which allows streaming but is
-also being convenient to program.
+also convenient to program.
 
 By observing the flow of data streams through a SAX parser we can say
 that the REST workflow is more efficient if we do not wait until we have
 everything before we start using the parts that we do have. However, the
 SAX model presents poor developer ergonomics because it is not usually
 convenient to think on the level of abstraction that it presents: that
-of markup tokens. Using SAX, a programmer may only work with a
+of markup tokens. Using SAX, a programmer may only operate on a
 convenient abstraction after inferring it from a lengthy series of
 callbacks. In terms of ease of use, DOM is generally preferred because
 it provides the resource whole and in a convenient form. My design aims
 to duplicate this convenience and combine it with progressive
-interpretation by removing one restriction; that the node which is given
-is always the document root. For hierarchical markup such as XML or JSON
-when read in order it is possible to fully parse a sub-tree before fully
-knowing the parent node. By taking responsibility for drill-down away
-from the programmer we can identify the interesting parts of the
+interpretation by removing one restriction: that the node which is given
+is always the document root. From a hierarchical markup such as XML or JSON,
+when read in order, the sub-trees are fully known before we fully
+know their parent tree. We may select pertinent parts of a
 document and deliver them as fully-formed entities as soon as they are
-available.
+known, without waiting for the remainder of the document to arrive.
 
 By my design, identifying the interesting parts of a document before it
 is complete involves turning the established model for drilling-down
 inside-out. Under asynchronous I/O the programmer's callback
-traditionally receives the whole resource and then, inside the callback
-locates the sub-parts that are interesting. Inverting this process, I
+traditionally receives the whole resource and then, inside the callback,
+locates the sub-parts that are required for a particular task.
+Inverting this process, I
 propose extracting the locating logic currently found inside the
-callback out and using it to decide when the callback should be used.
+callback and using it to decide when the callback should be used.
 The callback will receive complete fragments from the response once they
 have been selected according to this logic.
 
@@ -40,29 +40,32 @@ will be most useful: in-browser programming and server programming.
 Focusing on the MVP, I will only be implementing the parsing of one
 mark-up language. Although this technique could be applied to any
 text-based, tree-shaped markup, I find that JSON best meets my goals
-because it is widely supported, easy to parse, and is amenable to
-selectors which span multiple format versions.
+because it is widely supported, easy to parse, and because it defines 
+a single n-way tree, is amenable to selectors which span multiple format 
+versions.
 
-JSONPath fits well for selecting the interesting sub-parts of a JSON
-document on behalf of the library user. It is especially applicable to
+JSONPath is especially applicable to
 node selection as a document is read because it specifies only
-constraints on paths and 'contains' relationships. On encountering any
-node in a serialised JSON stream, because of the top-down serialisation
-order I will have already seen enough of the prior document to know its
+constraints on paths and 'contains' relationships. 
+Because of the top-down serialisation
+order, on encountering any
+node in a serialised JSON stream, I will have already seen enough of the prior document to know its
 full path. JSONPath would not be so amenable if it expressed sibling
 relationships because there is no similar guarantee of having seen other
 nodes on the same level when any particular node is encountered. A new
 implementation of the language is required because the existing JSONPath
 library is implemented only as a means to search through already
-gathered objects for matches and this implementation is too narrow in
-applicability to be useful in our context.
+gathered objects and is too narrow in applicability to be useful in our 
+context.
 
 Detecting types in JSON
 -----------------------
 
-Parts of a document will be considered interesting because of their
-type, position, or both. Given its use to identify interesting parts of
-a document, not all of the published JSONPath spec is useful. This
+Parts of a document may be considered interesting because of their
+type, position, or some combination of the two.
+
+Given its use to select parts of
+a REST resource, not all of the JSONPath spec is useful. This
 contrasts with 'search' style queries such as 'books costing less than
 X'. Examining REST responses it is likely we will not be explicitly
 searching through a full model but rather selecting from a resource
