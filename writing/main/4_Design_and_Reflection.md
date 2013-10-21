@@ -195,7 +195,8 @@ In the below example paths are not the best way to detect the address type:
 }  
 ~~~~
 
-The properties holding addresses are named by the relationship between
+Here the keys of the mappings which hold addresses are named by the 
+relationship between
 the parent and child nodes rather than the type of the child. There are
 two ways we may be able to select objects out as addresses. Firstly,
 because of an ontology which subtypes 'residence', 'premises', and
@@ -232,31 +233,6 @@ properties.
 The various means of discerning type which are constructable need not be
 used exclusively. For example, `aaa{bbb ccc}` is a valid construction
 combining duck typing and the relationship with the parent object.
-
-JSONPath improving stability over upgrades
-------------------------------------------
-
-*need to look at this an check doesn't duplicate rest of diss*.
-
--   Use of `..` over `.`
--   Keep this short. Might not need diagram if time presses.
-
-Programming to identify a certain interesting part of a resource today
-should with a high probability still work when applied to future
-releases.
-
-Requires some discipline on behalf of the service provider: Upgrade by
-adding of semantics only most of the time rather than changing existing
-semantics.
-
-Adding of semantics should could include adding new fields to objects
-(which could themselves contain large sub-trees) or a "push-down"
-refactor in which what was a root node is pushed down a level by being
-suspended from a new parent.
-
-why JSONPath-like syntax allows upgrading message semantics without
-causing problems [SOA] how to guarantee non-breakages? could publish
-'supported queries' that are guaranteed to work
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
