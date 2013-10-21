@@ -55,9 +55,6 @@ language is required because the existing JSONPath library is
 implemented only as a means to search through already gathered objects
 and is too narrow in applicability to be useful in our context.
 
-Detecting types in JSON
------------------------
-
 Not all of the JSONPath language is well suited when we consider we are
 selecting specifically inside a REST resource. Given this context it is
 likely that we will not be examining a full model but rather a subset
@@ -71,32 +68,33 @@ language somewhat loosely, thereby specialising the matching and
 avoiding unnecessary code. It is difficult to anticipate what the
 real-world matching requirements will be but if I deliver now the 20% of
 possible features that I'm reasonably sure will be used 80% of the time,
-for the timebeing any functionality which is not covered may be
+for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection library. For example, somebody wishing to filter on the price
-of books may write an `if` statement inside their callback;
+of books use branching to further select inside their callback;
+
+Detecting types in JSON
+-----------------------
 
 JSON markup describes only a few basic types. On a certain level this is
-also true for XML -- most nodes are of either type Elements or Text.
+also true for XML -- most nodes are either of type Element or Text.
 However, the XML metamodel provides tagnames, essentially a built-in
-Element sub-typing mechanism. Floating above this distinction, a reader
-abstracting over the details of the markup may forget that a node is an
-Element instance and describe it as an instance of its tagname, without
-considering that the tagname is a sub-type of Element. JSON comes with
-no such built-in type description language. On top of JSON's largely
-typeless model we often place a concept of type. Drawing parallels with
-the physical world, this imposition of type is the responsibility of the
-observer, rather than of the observed. A document reader has a free
-choice of the taxonomy they will use to impose type on the parts of the
-document, and this decision will vary depending on the purpose of the
-reader. The specificity required of a taxonomy differs by the level of
-involvement in a field, whereas 'watch' may be a reasonable type to most
-data consumers, to a horologist it is unlikely to be satisfactory
-without further sub-types. In the scope of this dissertation, since
-selecting on type is desirable, my JSONPath variant must be able to
-distinguish types at various levels of specificity; whilst my selection
-language will have no inbuilt concept of type, the aim is to support
-programmers in creating their own.
+type system for subclassifying the elements.
+JSON has no similar notion of types beyond the basic constructs:
+array, object, string, number. 
+To understand data written in JSON's largely
+typeless model it is often useful if we think in terms of a more complex type system.  
+This imposition of type is the responsibility of the
+observer rather than of the observed. The reader of a document is free to
+choose the taxonomy they will use to interpret it
+and this decision will vary depending on the purpose of the
+reader. The specificity of taxonomy required differs by the level of
+involvement in a field. Whereas 'watch' may be a reasonable type for most
+data consumers, to a horologist it is likely to be unsatisfactory
+without further sub-types. To serve different purposes the JSONPath variant
+provided for node selection 
+will have no inbuilt concept of type, the aim is to support programmers
+in creating their own.
 
 *integrate with above or discard, maybe move to compatibility with
 future versions* Relationship between type of a node and its purpose in
