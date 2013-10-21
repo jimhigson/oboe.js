@@ -230,9 +230,9 @@ type `{}` which matches any node, that we create a sub-duck-type if we
 add to the list of required fields, and a super-duck-type if we remove
 from it. Because in OOP extended classes may add new fields, this idea
 of the attribute list expanding for a sub-type applies neatly to JSON
-REST resources marshaled from OO languages. In implementation, to
-conform to a duck-type a node must have all of the required fields but
-could also have any others.
+REST resources marshaled from an OO representation. In implementation,
+to conform to a duck-type a node must have all of the required fields
+but could also have any others.
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
