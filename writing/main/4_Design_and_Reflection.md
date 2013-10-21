@@ -196,43 +196,43 @@ type.
 }  
 ~~~~
 
-Here, the keys which map onto addresses are named by the
-relationship between the parent and child nodes rather than the type of
-the child. The type classification problem might here be solved by using an ontology with
-'address' subtypes such as 'residence', 'premises', and 'office', but this solution
-feels quite heavyweight for a simple selection language.
-Instead I chose to import the idea of *duck typing* from Python programing, 
-as named in a 2000 usenet discussion:
+Here, the keys which map onto addresses are named by the relationship
+between the parent and child nodes rather than the type of the child.
+The type classification problem might here be solved by using an
+ontology with 'address' subtypes such as 'residence', 'premises', and
+'office', but this solution feels quite heavyweight for a simple
+selection language. Instead I chose to import the idea of *duck typing*
+from Python programing, as named in a 2000 usenet discussion:
 
 > In other words, don't check whether it IS-a duck: check whether it
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
 > what subset of duck-like behaviour you need [@pythonduck]
 
-A 'duck-definition' of an address type might be any object which has a number,
-street and town. That is to say, we take an individualistic approach by 
-deriving type from the node in itself rather than by examining the situation
-in which it occurs. Because I find this selection technique simple and powerful
-I decided to add it to my JSONPath variant. As discussed in section \ref{jsonpathxpath},
-JSONPath's syntax is designed to
-resemble the equivalent Javascript accessors but Javascript has no syntax for
-a value-free list of object keys, the closest available notation is for object
-literals. I created a duck-type syntax derived from the object literal syntax by omitting the values,
-quotation marks, and commas. For the addresses type above a duck-type expression
-is written as `{number street town}`. Order is not significant so `{a b}` and 
-`{b a}` are equivalent.
+A 'duck-definition' of an address type might be any object which has a
+number, street and town. That is to say, we take an individualistic
+approach by deriving type from the node in itself rather than by
+examining the situation in which it occurs. Because I find this
+selection technique simple and powerful I decided to add it to my
+JSONPath variant. As discussed in section \ref{jsonpathxpath},
+JSONPath's syntax is designed to resemble the equivalent Javascript
+accessors but Javascript has no syntax for a value-free list of object
+keys, the closest available notation is for object literals. I created a
+duck-type syntax derived from the object literal syntax by omitting the
+values, quotation marks, and commas. For the addresses type above a
+duck-type expression is written as `{number street town}`. Order is not
+significant so `{a b}` and `{b a}` are equivalent.
 
-We may consider that there is a root duck type `{}` which matches any node,
-that we create a sub-duck-type when we add to a list of required fields and a
-super-duck-type when we remove one. This idea of the attribute list expanding
-with sub-types should map quite neatly onto  
-a JSON REST resource which was marshaled from an object graph in an OO language with
-classical inheritance.  
-It is difficult to generalise but when selecting
-items from a document by type I believe it will most often be useful if 
-nodes which are covariant with the given duck-type
-were also be matched. Or, in terms of implementation, to satisfy a duck type
-a node must have all of the required fields but could also have any others.
-
+We may consider that there is a root duck type `{}` which matches any
+node, that we create a sub-duck-type when we add to a list of required
+fields and a super-duck-type when we remove one. This idea of the
+attribute list expanding with sub-types should map quite neatly onto\
+a JSON REST resource which was marshaled from an object graph in an OO
+language with classical inheritance.\
+It is difficult to generalise but when selecting items from a document
+by type I believe it will most often be useful if nodes which are
+covariant with the given duck-type were also be matched. Or, in terms of
+implementation, to satisfy a duck type a node must have all of the
+required fields but could also have any others.
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
