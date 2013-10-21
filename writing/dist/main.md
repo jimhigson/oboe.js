@@ -629,8 +629,9 @@ difference in logic expressed by the program, and therefore harder to
 later understand the thinking behind the change and the reason for the
 change.
 
-JsonPath and XPath selector languages
+JsonPath and XPath selector languages 
 -------------------------------------
+\label{jsonpathxpath}
 
 The problem of drilling down to pertinent fragments of a message without
 tightly coupling to the format could be somewhat solved if instead of
@@ -1084,220 +1085,184 @@ language is required because the existing JSONPath library is
 implemented only as a means to search through already gathered objects
 and is too narrow in applicability to be useful in our context.
 
+Not all of the JSONPath language is well suited when we consider we are
+selecting specifically inside a REST resource. Given this context it is
+likely that we will not be examining a full model but rather a subset
+that we requested and was assembled on our behalf according to the
+parameters that we supplied. We can expect to be interested in all of
+the content so search-style selections such as 'books costing less than
+X' are less useful than queries which identify nodes because of their
+type and position such as 'all books in the discount set', or, because
+we know we are examining `/books/discount`, simply 'all books'. In
+creating a new JSONPath implementation I have chosen to follow the
+existing language somewhat loosely, thereby specialising the matching
+and avoiding unnecessary code. It is difficult to anticipate what the
+real-world matching requirements will be but if I deliver now the 20% of
+possible features that I'm reasonably sure will be used for 80% of
+tasks, for the time being any functionality which is not covered may be
+implemented inside the callbacks themselves and later added to the
+selection language. For example, somebody wishing to filter on the price
+of books might use branching to further select inside their callback. I
+anticipate that the selections will frequently involve types so it is
+useful to analyse the nature of type imposition with regards to JSON.
+
 Detecting types in JSON
 -----------------------
 
-Parts of a document may be considered interesting because of their type,
-position, or some combination of the two.
-
-Given its use to select parts of a REST resource, not all of the
-JSONPath spec is useful. This contrasts with 'search' style queries such
-as 'books costing less than X'. Examining REST responses it is likely we
-will not be explicitly searching through a full model but rather
-selecting from a resource subset that the programmer requested,
-assembled on their behalf using their parameters so we can expect the
-developer to be interested in most of the content. In creating a new
-JSONPath implementation, I have chosen to follow the published spec only
-loosely, thereby avoiding writing unnecessary code. This is especially
-the case, as in the books example above whereby a user of the library
-could easily add the filter in the callback itself. Following the
-principle of writing less, better I feel it is better to deliver only
-the features I am reasonably certain will be well used but keep open the
-ability to add more later should it be required.
-
 JSON markup describes only a few basic types. On a certain level this is
-also true for XML -- most nodes are of either type Elements or Text.
-However, the XML metamodel provides tagnames, essentially a built-in
-Element sub-typing mechanism. Floating above this distinction, a reader
-abstracting over the details of the markup may forget that a node is an
-Element instance and describe it as an instance of its tagname, without
-considering that the tagname is a sub-type of Element. JSON comes with
-no such built-in type description language. On top of JSON's largely
-typeless model we often place a concept of type. Drawing parallels with
-the physical world, this imposition of type is the responsibility of the
-observer, rather than of the observed. A document reader has a free
-choice of the taxonomy they will use to impose type on the parts of the
-document, and this decision will vary depending on the purpose of the
-reader. The specificity required of a taxonomy differs by the level of
-involvement in a field, whereas 'watch' may be a reasonable type to most
-data consumers, to a horologist it is unlikely to be satisfactory
-without further sub-types. In the scope of this dissertation, since
-selecting on type is desirable, my JSONPath variant must be able to
-distinguish types at various levels of specificity; whilst my selection
-language will have no inbuilt concept of type, the aim is to support
-programmers in creating their own.
-
-*integrate with above or discard, maybe move to compatibility with
-future versions* Relationship between type of a node and its purpose in
-the document (or, perhaps, the purpose the reader wishes to put it to).
-Purpose is often obvious from a combination of URL and type so can
-disregard the place in the document. This structure may be carefully
-designed but ultimately a looser interpretation of the structure can be
-safer.
+also true for XML -- most nodes are either of type Element or Text.
+However, the XML metamodel provides tagnames; essentially, a built-in
+type system for subclassifying the elements. JSON has no similar notion
+of types beyond the basic constructs: array, object, string, number. To
+understand data written in JSON's largely typeless model it is often
+useful if we think in terms of a more complex type system. This
+imposition of type is the responsibility of the observer rather than of
+the observed. The reader of a document is free to choose the taxonomy
+they will use to interpret it and this decision will vary depending on
+the purposes of the reader. The required specificity of taxonomy differs
+by the level of involvement in a field. Whereas 'watch' may be a
+reasonable type for most data consumers, to a horologist it is likely to
+be unsatisfactory without further sub-types. To serve disparate
+purposes, the JSONPath variant provided for node selection will have no
+inbuilt concept of type, the aim being to support programmers in
+creating their own.
 
 ~~~~ {.xml}
-<!--  XML leaves no doubt as to the labels we give to the types
-      of the nodes. This is a 'person' -->
+<!--  XML leaves no doubt as to the labels we give to an Element's type.
+      Although we might further interpret, this is a 'person' -->
 <person  name='...' gender="male"
          age="45" height="175cm" profession="architect">
 </person>
 ~~~~
 
 ~~~~ {.javascript}
-/*    JSON meanwhile provides no such concrete concept. This node's
-      type might be 'thing', 'animal', 'human', 'man', 'architect',
-      'artist' or any other of many overlapping impositions depending 
-      on what purpose the document it is read for */
+/*    JSON meanwhile provides no built-in type concept. 
+      This node's type might be 'thing', 'animal', 'human', 'male', 'man', 
+      'architect', 'artist' or any other of many overlapping impositions 
+      depending on our reason for examining this data */
 {  "name":"...", "gender":"male", "age":"45" 
-   "height":"175cm" "profession":"architect">
+   "height":"172cm" "profession":"architect">
 }         
 ~~~~
 
-In the absence of node typing beyond the categorisation as objects,
-arrays and various primitive types, the key immediately mapping to the
-object is often taken as a lose concept of the type of the object. Quite
-fortunately, rather than because of a well considered object design,
-this tends to play well with automatically marshaling of domain objects
-expressed in a Java-style OO language because there is a strong tendency
-for field names -- and by extension, 'get' methods -- to be named after
-the *type* of the field, the name of the type also serving as a rough
-summary of the relationship between two objects. See figure
-\ref{marshallTypeFig} below.
-
-In the below example, we impose the the type 'address' because of the
-parent node's field name. Other than this, these are standard arrays of
-strings:
+In the absence of node typing beyond categorisation as objects, arrays
+and various primitives, the key immediately mapping to an object is
+often taken as a loose marker of its type. In the below example we may
+impose the the type 'address' prior to examining the contents because of
+the field name in the parent node.
 
 ~~~~ {.javascript}
 {
-   name: '...'
-,  residence: {
-      address: [
-         '...', '...', '...'
+   "name": ""
+,  "residence": {
+      "address": [
+         "47", "Cloud street", "Dreamytown"
       ]
    }
-,  employer: {
-      name: '...'
-   ,  address :[
-         '...', '...', '...'      
+,  "employer": {
+      "name": "Mega ultra-corp"
+   ,  "address":[
+         "Floor 2", "The Offices", "Alvediston", "Wiltshire"      
       ]
    }   
 }
 ~~~~
 
-Although, being loosely typed, in Javascript there is no protection
-against using arrays to contain disparate object, by sensible convention
-the items will usually be of some common type. Likewise in JSON,
-although type is a loose concept, on some level the elements of an array
-will generally be of the same type. This allows a sister convention seen
-in the below example, whereby each of a list of items are typed
-according to the key in the grandparent node which maps to the array.
+This means of imposing type is simply expressed in JSONPath. The
+selector `address` would match all nodes whose parent maps to them via
+an address key.
+
+As a loosely typed language, Javascript gives no protection against
+lists which store disparate types but by sensible convention this is
+avoided. Likewise, in JSON, although type is a loose concept, the items
+in a collection will generally be of the same type. From here follows a
+sister convention illustrated in the example below, whereby each item
+from an array is typed according to the key in the grandparent node
+which maps to the array.
 
 ~~~~ {.javascript}
 {
-   residences: {
-      addresses: [
-         ['Townhouse', 'Underground street', 'Far away town']      
-      ,  ['Beach Hut', 'Secret Island', 'Bahamas']
+   "residences": {
+      "addresses": [
+         ["10", "Downing street", "London"]
+      ,  ["Chequers Court", "Ellesborough, "Buckinghamshire"]      
+      ,  ["Beach Hut", "Secret Island", "Bahamas"]
       ]
    }
 }
 ~~~~
 
-The pluralisation of 'address' to 'addresses' above may be a problem to
-a reader wishing to detect address nodes. I considered introducing an
-'or' syntax for this situation, resembling `address|addresses.*` but
-instead decided this problem, while related to type, is simpler to solve
-outside of the JSONPath language. A programmer may simply use two
-JSONPaths mapping to the same callback function.
+In the above JSON, `addresses.*` would correctly identify the addresses.
+The pluralisation of field names such as 'address' becoming 'addresses'
+is common when marshaling from OO languages because the JSON keys are
+based on getters whose name typically reflects their cardinality;
+`public Address getAddress()` or `public List<Address> getAddresses()`.
+This may pose a problem in some cases and it would be interesting in
+future to investigate a system such as Ruby on Rails that natively
+understands English pluralisation. I considered introducing unions as an
+easy way to cover this situation, allowing expressions resembling
+`address|addresses.*` but decided that it is simpler if this problem is
+solves outside of the JSONPath language if the programmer registers two
+selection specifications against the same handler function.
 
-In the below example typing is trickier still.
+In the below example types may not be easily inferred from ancestor
+keys.
 
 ~~~~ {.javascript}
 {
-   name: '...'
-,  residence: {
-      number:'...', street:'...', town:'...' 
+   "name": "..."
+,  "residence": {
+      "number":"...", "street":"...", "town":"..." 
    }
-,  employer:{
-      name: '...'
-   ,  premises:[
-         { number:'...', street:'...', town:'...' }
-      ,  { number:'...', street:'...', town:'...' }
-      ,  { number:'...', street:'...', town:'...' }
+,  "employer":{
+      "name": "..."
+   ,  "premises":[
+         { "number":"...", "street":"...", "town":"..." }
+      ,  { "number":"...", "street":"...", "town":"..." }
+      ,  { "number":"...", "street":"...", "town":"..." }
       ]
-   ,  registeredOffice:{
-         number:'...', street:'...', town:'...'
+   ,  "registeredOffice":{
+         "number":"...", "street":"...", "town":"..."
       }
    }
 }  
 ~~~~
 
-The properties holding addresses are named by the relationship between
-the parent and child nodes rather than the type of the child. There are
-two ways we may be able to select objects out as addresses. Firstly,
-because of an ontology which subtypes 'residence', 'premises', and
-'office' as places with addresses. More simply, we may import the idea
-of duck typing from Python programing.
+Here, the keys which map onto addresses are named by the relationship
+between the parent and child nodes rather than by the type of the child.
+The type classification problem could be solved using an ontology with
+'address' subtypes 'residence', 'premises', and 'office' but this
+solution feels quite heavyweight for a simple selection language. I
+chose instead to import the idea of *duck typing* from Python
+programing, as named in a 2000 usenet discussion:
 
 > In other words, don't check whether it IS-a duck: check whether it
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
-> what subset of duck-like behaviour you need to play your
-> language-games with.
+> what subset of duck-like behaviour you need [@pythonduck]
 
-Discussion of typing in Python language, 2000.
-https://groups.google.com/forum/?hl=en\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ
+A 'duck-definition' for the above JSON would be any object which has
+number, street, and town properties. We take an individualistic approach
+by deriving type from the node in itself rather than the situation in
+which it occurs. Because I find this selection technique simple and
+powerful I decided to add it to my JSONPath variant. As discussed in
+section \ref{jsonpathxpath}, JSONPath's syntax is designed to resemble
+the equivalent Javascript accessors, but Javascript has no syntax for a
+value-free list of object keys. The closest available notation is for
+object literals so I created a duck-type syntax derived from this by
+omitting the values, quotation marks, and commas. The address type
+described above would be written as `{number street town}`. Field order
+is insignificant so `{a b}` and `{b a}` are equivalent.
 
-A 'duck-definition' of address might be any object which has a number,
-street and town. That is to say, type is individualistically
-communicated by the object itself rather than by examining the
-relationships described by its containing ancestors. JSONPath comes with
-no such expressivity but I find this idea so simple and useful that I
-have decided to create one. The JSONPath language is designed to
-resemble programmatic Javascript access but Javascript has no syntax for
-a list of value-free properties. The closest available is the object
-literal format; my duck-type syntax is a simplification with values and
-commas omitted. In the case of the addresses a duck-type expression
-would be written as `{number street town}`. Generally, when identifying
-items of a type from a document it makes sense if the type expression is
-contravariant so that sub-types are also selected. If we consider that
-we create a sub-duck-type when we add to a list of required fields and
-super-duck-types when we remove them, we have a non-tree shaped type
-space with root type `{}` which matches any object. Therefore, the
-fields specified need not be an exhaustive list of the object's
-properties.
-
-The various means of discerning type which are constructable need not be
-used exclusively. For example, `aaa{bbb ccc}` is a valid construction
-combining duck typing and the relationship with the parent object.
-
-JSONPath improving stability over upgrades
-------------------------------------------
-
-*need to look at this an check doesn't duplicate rest of diss*.
-
--   Use of `..` over `.`
--   Keep this short. Might not need diagram if time presses.
-
-![extended json rest service that still works - maybe do a table instead
-\label{enhancingrest}](images/placeholder)
-
-Programming to identify a certain interesting part of a resource today
-should with a high probability still work when applied to future
-releases.
-
-Requires some discipline on behalf of the service provider: Upgrade by
-adding of semantics only most of the time rather than changing existing
-semantics.
-
-Adding of semantics should could include adding new fields to objects
-(which could themselves contain large sub-trees) or a "push-down"
-refactor in which what was a root node is pushed down a level by being
-suspended from a new parent.
-
-why JSONPath-like syntax allows upgrading message semantics without
-causing problems [SOA] how to guarantee non-breakages? could publish
-'supported queries' that are guaranteed to work
+It is difficult to generalise but when selecting items from a document I
+believe it will often be useful if nodes which are covariant with the
+given type are also matched. We may consider that there is a root duck
+type `{}` which matches any node, that we create a sub-duck-type if we
+add to the list of required fields, and a super-duck-type if we remove
+from it. Because in OOP extended classes may add new fields, this idea
+of the attribute list expanding for a sub-type applies neatly to JSON
+REST resources marshaled from an OO representation. In implementation,
+to conform to a duck-type a node must have all of the required fields
+but could also have any others.
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
@@ -1405,25 +1370,25 @@ callsite than if the meaning depended on the position in a linear
 arguments list and the gaps filled in with nulls.
 
 ~~~~ {.javascript}
-jQuery.ajax({ url:"resources/shortMessage.txt",
-              accepts: "text/plain",
-              headers: { 'X-MY-COOKIE': '123ABC' }
+jQuery.ajax({ "url":"resources/shortMessage.txt",
+              "accepts": "text/plain",
+              "headers": { "X-MY-COOKIE": "123ABC" }
            });
 ~~~~
 
 Taking on this style,
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
-   .node( 'person.name', function(name, path, ancestors) {
+oboe("resources/someJson.json")
+   .node( "person.name", function(name, path, ancestors) {
       console.log("got a name " + name);   
    })
    .done( function( wholeJson ) {
-      console.log('got everything');
+      console.log("got everything");
    })
    .fail( function() {
-      console.log('actually, the download failed. Forget the' + 
-                  ' people I just told you about');
+      console.log("actually, the download failed. Forget the" + 
+                  " people I just told you about");
    });
 ~~~~
 
@@ -1433,12 +1398,12 @@ patterns in a single call by using the patterns as the keys and the
 callbacks as the values in a key/value mapping:
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
+oboe("resources/someJson.json")
    .node({  
-      'person.name': function(personName, path, ancestors) {
+      "person.name": function(personName, path, ancestors) {
          console.log("let me tell you about " + name);
       },
-      'person.address.town': function(townName, path, ancestors) {
+      "person.address.town": function(townName, path, ancestors) {
          console.log("they live in " + townName);
       }
    });
@@ -1454,9 +1419,9 @@ Consider this JSON:
    "event": "mens 100m",
    "date": "5 Aug 2012",
    "medalWinners": {
-      "gold":     {"name": 'Bolt',    "time": "9.63s"},
-      "silver":   {"name": 'Blake',   "time": "9.75s"},
-      "bronze":   {"name": 'Gatlin',  "time": "9.79s"}
+      "gold":     {"name": "Bolt",    "time": "9.63s"},
+      "silver":   {"name": "Blake",   "time": "9.75s"},
+      "bronze":   {"name": "Gatlin",  "time": "9.79s"}
    }
 }  
 ~~~~
@@ -1489,9 +1454,9 @@ argument. Adopting this style, my API design for oboe.js also allows
 events to be added as:
 
 ~~~~ {.javascript}
-oboe('resources/someJson.json')
-   .on( 'node', 'medalWinners.*', function(person, path, ancestors) {
-      console.log( person.name + ' won the ' + lastOf(path) + ' medal' );
+oboe("resources/someJson.json")
+   .on( "node", "medalWinners.*", function(person, path, ancestors) {
+      console.log( person.name + " won the " + lastOf(path) + " medal" );
    });
 ~~~~
 
@@ -1520,17 +1485,17 @@ API facilitates this by providing a `path` callback following much the
 same pattern as the `node` callback.
 
 ~~~~ {.javascript}
-oboe('events.json')
-   .path( 'medalWinners', function() {
-      // We don't know the winners yet but we know we have some so let's
+oboe("events.json")
+   .path( "medalWinners", function() {
+      // We don"t know the winners yet but we know we have some so let"s
       // start drawing the table already:    
       interface.showMedalTable();
    })
-   .node( 'medalWinners.*', function(person, path) {    
+   .node( "medalWinners.*", function(person, path) {    
       interface.addPersonToMedalTable(person, lastOf(path));
    })
    .fail( function(){
-      // That didn't work. Revert!
+      // That didn"t work. Revert!
       interface.hideMedalTable();
    });
 ~~~~
