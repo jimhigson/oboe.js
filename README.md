@@ -519,7 +519,7 @@ BSD licenced. But if you use it drop me a note!
 
 # Installing
 
-For the client-side, either grab [dist/oboe-browser.js](dist/oboe-browser.js) or use [bower](http://bower.io/) like:
+For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js) or use [bower](http://bower.io/) like:
 
 ```
 bower install oboe
