@@ -136,13 +136,13 @@ because of the parent node's field name.
 }
 ~~~~
 
-As a loosely typed language, Javascript gives no protection
-against using collections to store disparate types but by sensible convention
-this is avoided. Likewise in JSON,
-although type is a loose concept, on some level the items in a collection
-will generally be of the same type. This allows tje sister convention seen
-in the example below, whereby each of a list of items are typed
-according to the key in the grandparent node which maps to the array.
+As a loosely typed language, Javascript gives no protection against
+using collections to store disparate types but by sensible convention
+this is avoided. Likewise in JSON, although type is a loose concept, on
+some level the items in a collection will generally be of the same type.
+This allows tje sister convention seen in the example below, whereby
+each of a list of items are typed according to the key in the
+grandparent node which maps to the array.
 
 ~~~~ {.javascript}
 {
