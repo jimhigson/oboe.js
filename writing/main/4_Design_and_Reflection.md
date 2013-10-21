@@ -63,13 +63,13 @@ parameters that we supplied. We can expect to be interested in all of
 the content so search-style selections such as 'books costing less than
 X' are less useful than queries which identify nodes because of their
 type and position such as 'all books in the discount set', or, because
-we know we are examining `/books/discount`, simply 'all books'. In creating a
-new JSONPath implementation I have chosen to follow the existing
-language somewhat loosely, thereby specialising the matching and
-avoiding unnecessary code. It is difficult to anticipate what the
+we know we are examining `/books/discount`, simply 'all books'. In
+creating a new JSONPath implementation I have chosen to follow the
+existing language somewhat loosely, thereby specialising the matching
+and avoiding unnecessary code. It is difficult to anticipate what the
 real-world matching requirements will be but if I deliver now the 20% of
-possible features that I'm reasonably sure will be used for 80% of tasks,
-for the time being any functionality which is not covered may be
+possible features that I'm reasonably sure will be used for 80% of
+tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
 of books might use branching to further select inside their callback;
@@ -114,10 +114,10 @@ their own.
 ~~~~
 
 In the absence of node typing beyond the categorisation as objects,
-arrays and various primitives, the key immediately mapping to an
-object is often taken as a loose marker of its type. In the below example 
-we may impose the the type 'address' prior to examining the contents because 
-of the parent node's field name.
+arrays and various primitives, the key immediately mapping to an object
+is often taken as a loose marker of its type. In the below example we
+may impose the the type 'address' prior to examining the contents
+because of the parent node's field name.
 
 ~~~~ {.javascript}
 {
