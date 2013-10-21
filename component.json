@@ -11,6 +11,8 @@
     "examples",
     "build",
     "benchmarking",
-    "package.json"
+    "package.json",
+    "Gruntfile.js",
+    "test"
   ]
 }
