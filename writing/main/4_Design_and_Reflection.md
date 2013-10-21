@@ -1,50 +1,45 @@
-
 Design and Reflection:
 ======================
 
-Using a combination of the techniques investigated in the previous
-chapter, I propose that a simple design is possible which makes REST
-clients more efficient whilst being no more difficult to program.
-Although simple, this model fits poorly with established vocabulary,
-requiring a transport that sits *somewhere between 'stream' and
-'download'* and a parsing strategy which *takes elements from SAX and
-DOM* but follows neither model.
+Using a combination of the techniques covered in the previous chapter, I
+propose that a simple design is possible which allows REST clients to be
+more efficient whilst being convenient to program by combining the best
+traits of programming with SAX and DOM.
 
-Implementation in Javascript gives me the widest deployment options,
-covering client-side browser programming, server programming, use in
-command line tools, or any other usage. This context dictates a design
-which is non-blocking, asynchronous and callback based. While influenced
-by the language, the model of REST client proposed here is not limited
-to Javascript or web usage and I intent to comment briefly also on the
-applicability to other platforms. Likewise, I have also chosen to focus
-on JSON although I will also be commenting on the parallel applicability
-of these ideas to XML.
+Observing the flow of data through a SAX parser we can say that using a
+resource from a network is more efficient if we do not wait until we
+have everything before we start using the parts that we do have.
+However, the SAX model presents poor developer ergonomics because it is
+not usually convenient to think on it's presented level of abstraction:
+that of markup tokens. Using SAX, a programmer may only work with a
+convenient abstraction after inferring it through a series of callbacks.
+In terms of ease of use, DOM is generally preferred because it provides
+the resource whole and in a convenient form. My design aims to duplicate
+this convenience and combine it with progressive interpretation by
+removing one restriction; that node which is given is always the
+document root. For hierarchical markup such as XML or JSON, it is
+possible to fully parse a sub-tree without fully knowing the parent
+node; taking responsibility for drill-down away from the programmer we
+can identify the interesting parts of the document and deliver them as
+fully-formed entities as soon as they are available.
 
-From DOM we may observe that as a programmer, using a resource is
-simpler when a parsed entity is passed whole to a single callback,
-rather than the SAX model which requires the programmer to infer the
-entity from a lengthy series of callbacks. From observing SAX parsers or
-progressive HTML rendering, we can say that http is more efficient if we
-no not wait until we have everything before we start using the parts
-that we do have. DOM parsers pass a fully parsed node to registered
-callbacks, whole and ready to use, invariably at the root of the parsed
-document. From the vantage of the library's user, my thesis duplicates
-this convenience but removes one restriction; that the node which is
-passed must be the root. Because the mark-up formats we are dealing with
-are hierarchical and serialised depth-first it is possible to fully
-parse any sub-tree without fully knowing the parent node. From these
-observations we may program a new kind of REST client which is as
-performant as SAX but as easy to program as DOM.
+By my design, identifying the
+interesting parts of a document before it is complete involves turning the established model
+for drilling-down inside-out. By asynchronous I/O the programmer's callback traditionally
+receives the resource and then inside that callback locates
+the sub-parts that they require. Inverting this process, I propose taking that
+locating logic, currently found inside the callback, outside of it and using it
+to decide when the callback should be used.
+The callback will receive the parts of the
+response which have been selected according to this logic.
 
-To follow this progressive-but-complete model, identifying the
-interesting parts of a document involves turning the traditional model
-for drilling down inside-out. Traditionally the programmer's callback
-receives the document then inside that callback drills down to locate
-the parts that they are interested in. Instead I propose taking the
-drilling-down logic out from inside the callback and instead wrap the
-callback in it. This means that the callback receives selected parts of
-the response which the library has already drilled down to on behalf of
-the programmer.
+I will be implementing using the Javascript language because it allows
+me to target both of the main use cases where I think this project will
+be useful: browser programming and server programming, and has good
+support for non-blocking i/o. The model of REST library proposed here is
+not limited to Javascript and could be expressed in any given language.
+Likewise, I have also chosen to focus on JSON although I will also be
+commenting on the parallel applicability of these ideas to XML.
 
 Whilst JSONPath's existing implementation is only implemented for
 searching over already gathered objects, this kind of searching is just
@@ -62,19 +57,14 @@ time when it is first identified in the document. Because XML is also
 written depth-first, the same logic would apply to an XPath/XML variant
 of this project.
 
-The definition of 'interesting' will be generic and accommodating enough
-so as to apply to any data domain and allow any granularity of interest,
-from large object to individual datums. With just a few lines of
-programming
+detecting type with JSONPath
+----------------------------
 
-JSONPath and types
-------------------
-
-Given its use to identify interesting parts of a document, not all of
-the published JSONPath spec is useful. Parts of a document will be
-considered interesting because of their type, position, or both. This
-contrasts with 'search' style queries such as 'books costing less than X'.
-Examining REST responses it is likely we will not be explicitly
+Parts of a document will be considered interesting because of their
+type, position, or both. Given its use to identify interesting parts of
+a document, not all of the published JSONPath spec is useful. This
+contrasts with 'search' style queries such as 'books costing less than
+X'. Examining REST responses it is likely we will not be explicitly
 searching through a full model but rather selecting from a resource
 subset that the programmer requested, assembled on their behalf using
 their parameters so we can expect the developer to be interested in most
@@ -258,8 +248,8 @@ JSONPath improving stability over upgrades
 
 *need to look at this an check doesn't duplicate rest of diss*.
 
-* Use of `..` over `.`
-* Keep this short. Might not need diagram if time presses.  
+-   Use of `..` over `.`
+-   Keep this short. Might not need diagram if time presses.
 
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
@@ -326,9 +316,8 @@ by Clarinet.
 API design
 ----------
 
-*API allows body to be given as Object and converts into JSON because
-it is anticipated that REST services which emmit JSON will also accept
-it*
+*API allows body to be given as Object and converts into JSON because it
+is anticipated that REST services which emmit JSON will also accept it*
 
 In designing the API developer ergonomics are the top priority. This is
 especially pertinent given that the library does nothing that can't be
@@ -545,19 +534,19 @@ its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
 
 Choice of streaming data transport
-------------------------
+----------------------------------
 
 Considering longpoll, push-tables and websockets...
 
-I find that it is not necessary to take this dichotomous view of streaming.
+I find that it is not necessary to take this dichotomous view of
+streaming.
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
 
-
-In REST I have always valued how prominently the plumbing of a
-system is visible, so that to sample a resource all that is required is
-to type a URL and be presented with it in a human-comprehensible format.
+In REST I have always valued how prominently the plumbing of a system is
+visible, so that to sample a resource all that is required is to type a
+URL and be presented with it in a human-comprehensible format.
 
 Secondly, as adaptations to the context in which they were created,
 these frameworks realise a view of network usage in which downloading
@@ -586,7 +575,6 @@ compatible with http caching.
 If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
-
 
 Handling transport failures
 ---------------------------
