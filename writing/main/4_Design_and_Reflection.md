@@ -62,16 +62,17 @@ that we requested and was assembled on our behalf according to the
 parameters that we supplied. We can expect to be interested in all of
 the content so search-style selections such as 'books costing less than
 X' are less useful than queries which identify nodes because of their
-type and position such as 'all books in the discount set'. In creating a
+type and position such as 'all books in the discount set', or, because
+we know we are examining `/books/discount`, simply 'all books'. In creating a
 new JSONPath implementation I have chosen to follow the existing
 language somewhat loosely, thereby specialising the matching and
 avoiding unnecessary code. It is difficult to anticipate what the
 real-world matching requirements will be but if I deliver now the 20% of
-possible features that I'm reasonably sure will be used 80% of the time,
+possible features that I'm reasonably sure will be used for 80% of tasks,
 for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
-selection library. For example, somebody wishing to filter on the price
-of books use branching to further select inside their callback;
+selection language. For example, somebody wishing to filter on the price
+of books might use branching to further select inside their callback;
 
 Detecting types in JSON
 -----------------------
@@ -94,29 +95,21 @@ purposes, the JSONPath variant provided for node selection will have no
 inbuilt concept of type, the aim is to support programmers in creating
 their own.
 
-*integrate with above or discard, maybe move to compatibility with
-future versions* Relationship between type of a node and its purpose in
-the document (or, perhaps, the purpose the reader wishes to put it to).
-Purpose is often obvious from a combination of URL and type so can
-disregard the place in the document. This structure may be carefully
-designed but ultimately a looser interpretation of the structure can be
-safer.
-
 ~~~~ {.xml}
 <!--  XML leaves no doubt as to the labels we give to the types
-      of the nodes. This is a 'person' -->
+      of the nodes. Although we might further divide, This is a 'person' -->
 <person  name='...' gender="male"
          age="45" height="175cm" profession="architect">
 </person>
 ~~~~
 
 ~~~~ {.javascript}
-/*    JSON meanwhile provides no such concrete concept. This node's
+/*    JSON meanwhile provides no very concrete type concept. This node's
       type might be 'thing', 'animal', 'human', 'man', 'architect',
       'artist' or any other of many overlapping impositions depending 
-      on what purpose the document it is read for */
+      on our purpose for examining this data */
 {  "name":"...", "gender":"male", "age":"45" 
-   "height":"175cm" "profession":"architect">
+   "height":"172cm" "profession":"architect">
 }         
 ~~~~
 
