@@ -43,19 +43,19 @@ because it is widely supported, easy to parse, and is amenable to
 selectors which span multiple format versions.
 
 JSONPath fits well for selecting the interesting sub-parts of a JSON
-document on behalf of the library user. JSONPath is especially
-applicable to node selection for this library because it specifies only
-constraints on paths and 'contained-in/contains' type relationships. On
+document on behalf of the library user. It is especially
+applicable to node selection as a document is read because it specifies only
+constraints on paths and 'contains' relationships. On
 encountering any node in a serialised JSON stream, because of the
 top-down serialisation order I will have already seen enough of the
 prior document to know its full path. JSONPath would not be so amenable
 if it expressed sibling relationships because there is no similar
-guarantee of knowing the other nodes on the same level when any
-particular node is encountered. The existing JSONPath library is
-implemented as a means to search for matches through already gathered
-objects and this implementation is too narrow in applicability to be
-useful for this context so a new implementation of the language is
-required.
+guarantee of having seen other nodes on the same level when any
+particular node is encountered.
+A new implementation of the language is required because the existing JSONPath library is
+implemented only as a means to search through already gathered
+objects for matches and this implementation is too narrow in applicability to be
+useful in our context.
 
 Detecting types in JSON
 -----------------------
