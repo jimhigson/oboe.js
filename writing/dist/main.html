@@ -57,7 +57,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#parsing-sax-and-dom"><span class="toc-section-number">3.9</span> Parsing: SAX and Dom</a></li>
 </ul></li>
 <li><a href="#design-and-reflection"><span class="toc-section-number">4</span> Design and Reflection:</a><ul>
-<li><a href="#jsonpath-and-types"><span class="toc-section-number">4.1</span> JSONPath and types</a></li>
+<li><a href="#detecting-types-in-json"><span class="toc-section-number">4.1</span> Detecting types in JSON</a></li>
 <li><a href="#jsonpath-improving-stability-over-upgrades"><span class="toc-section-number">4.2</span> JSONPath improving stability over upgrades</a></li>
 <li><a href="#importing-css4s-explicit-capturing-to-oboes-jsonpath"><span class="toc-section-number">4.3</span> Importing CSS4's explicit capturing to Oboe's JSONPath</a></li>
 <li><a href="#parsing-the-json-response"><span class="toc-section-number">4.4</span> Parsing the JSON Response</a></li>
@@ -116,7 +116,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="introduction" class="section level1">
 <h1><a href="#introduction"><span class="header-section-number">2</span> Introduction</a></h1>
-<p><a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index">https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index</a> <a href="http://dry.ly/full-streams-ahead">http://dry.ly/full-streams-ahead</a></p>
 <p>This purpose of this dissertation is to encourage the REST paradigm to be viewed through a novel lens which in application this may be used to deliver tangible benefits to many common REST use cases. Although I express my thesis through programming, the contribution I hope to make is felt more strongly as a modification in how we <em>think</em> about http than as the delivery of new software.</p>
 <p>In the interest of developer ergonomics, REST clients have tended to style the calling of remote resources similar to the call style of the host programming language. Depending on the language, one of two schemas are followed: a synchronous style in which a some invocation halts execution for the duration of the request before evaluating to the fetched resource; or asynchronous in which the logic is specified to be applied to a response once it is available. Languages encourage our thinking to follow the terms that they easily support<span class="citation">(Whorf 1956)</span>. While there is some overlap, languages which promote concurrency though threading consider blocking in a single thread to be acceptable and will generally prefer the former mode whereas languages with first class functions are naturally conversant in callbacks and will prefer the latter. We should remember in programming that languages limit the patterns that we readily see <span class="citation">(Yukihiro 2003)</span> and that better mappings may be possible. This observation extends to graphical notations such as UML whose constructs strongly reflect the programming languages of the day. For any multi-packet message sent via a network some parts will arrive before others, at least approximately in-order, but viewed from inside a language whose statements invariably yield single, discrete values it comfortable to conceptualise the REST response as a discrete event. UML sequence diagrams contain the syntax for instantaneously delivered return values, with no corresponding notation for a resource whose data is progressively revealed.</p>
 <p>In most practical cases where we wish to be fast in performing a task there is no reasonable distinction between acting <em>earlier</em> and being <em>quicker</em>. To create efficient software we should be using data at the first possible opportunity: examining content <em>while it streams</em> rather than holding it unexamined until it is wholly available.</p>
@@ -424,15 +423,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="design-and-reflection" class="section level1">
 <h1><a href="#design-and-reflection"><span class="header-section-number">4</span> Design and Reflection:</a></h1>
-<p>Using a combination of the techniques investigated in the previous chapter, I propose that a simple design is possible which makes REST clients more efficient whilst being no more difficult to program. Although simple, this model fits poorly with established vocabulary, requiring a transport that sits <em>somewhere between 'stream' and 'download'</em> and a parsing strategy which <em>takes elements from SAX and DOM</em> but follows neither model.</p>
-<p>Implementation in Javascript gives me the widest deployment options, covering client-side browser programming, server programming, use in command line tools, or any other usage. This context dictates a design which is non-blocking, asynchronous and callback based. While influenced by the language, the model of REST client proposed here is not limited to Javascript or web usage and I intent to comment briefly also on the applicability to other platforms. Likewise, I have also chosen to focus on JSON although I will also be commenting on the parallel applicability of these ideas to XML.</p>
-<p>From DOM we may observe that as a programmer, using a resource is simpler when a parsed entity is passed whole to a single callback, rather than the SAX model which requires the programmer to infer the entity from a lengthy series of callbacks. From observing SAX parsers or progressive HTML rendering, we can say that http is more efficient if we no not wait until we have everything before we start using the parts that we do have. DOM parsers pass a fully parsed node to registered callbacks, whole and ready to use, invariably at the root of the parsed document. From the vantage of the library's user, my thesis duplicates this convenience but removes one restriction; that the node which is passed must be the root. Because the mark-up formats we are dealing with are hierarchical and serialised depth-first it is possible to fully parse any sub-tree without fully knowing the parent node. From these observations we may program a new kind of REST client which is as performant as SAX but as easy to program as DOM.</p>
-<p>To follow this progressive-but-complete model, identifying the interesting parts of a document involves turning the traditional model for drilling down inside-out. Traditionally the programmer's callback receives the document then inside that callback drills down to locate the parts that they are interested in. Instead I propose taking the drilling-down logic out from inside the callback and instead wrap the callback in it. This means that the callback receives selected parts of the response which the library has already drilled down to on behalf of the programmer.</p>
-<p>Whilst JSONPath's existing implementation is only implemented for searching over already gathered objects, this kind of searching is just one application for the query language. I find that this is a very suitable declarative language to use to specify the parts of a response that a developer would like to drill-down to given the context of a document whose parse is in progress. JSONPath is especially applicable because it specifies only 'contained-in/contains' type relationships. On encountering any node in a serialised JSON stream, because of the depth-first serialisation order I will always have previously seen its ancestors. Hence, having written a suitably flexible JSONPath expression compiler such that it does not require a complete document, I will have enough information to evaluate any expression against any node at the time when it is first identified in the document. Because XML is also written depth-first, the same logic would apply to an XPath/XML variant of this project.</p>
-<p>The definition of 'interesting' will be generic and accommodating enough so as to apply to any data domain and allow any granularity of interest, from large object to individual datums. With just a few lines of programming</p>
-<div id="jsonpath-and-types" class="section level2">
-<h2><a href="#jsonpath-and-types"><span class="header-section-number">4.1</span> JSONPath and types</a></h2>
-<p>Given its use to identify interesting parts of a document, not all of the published JSONPath spec is useful. Parts of a document will be considered interesting because of their type, position, or both. This contrasts with 'search' style queries such as 'books costing less than X'. Examining REST responses it is likely we will not be explicitly searching through a full model but rather selecting from a resource subset that the programmer requested, assembled on their behalf using their parameters so we can expect the developer to be interested in most of the content. In creating a new JSONPath implementation, I have chosen to follow the published spec only loosely, thereby avoiding writing unnecessary code. This is especially the case, as in the books example above whereby a user of the library could easily add the filter in the callback itself. Following the principle of writing less, better I feel it is better to deliver only the features I am reasonably certain will be well used but keep open the ability to add more later should it be required.</p>
+<p>Using a combination of techniques from the previous chapter I propose that it is possible to combine the desirable properties from SAX and DOM parsers into a REST client library which allows streaming but is also convenient to program.</p>
+<p>By observing the flow of data streams through a SAX parser we can say that the REST workflow is more efficient if we do not wait until we have everything before we start using the parts that we do have. However, the SAX model presents poor developer ergonomics because it is not usually convenient to think on the level of abstraction that it presents: that of markup tokens. Using SAX, a programmer may only operate on a convenient abstraction after inferring it from a lengthy series of callbacks. In terms of ease of use, DOM is generally preferred because it provides the resource whole and in a convenient form. My design aims to duplicate this convenience and combine it with progressive interpretation by removing one restriction: that the node which is given is always the document root. From a hierarchical markup such as XML or JSON, when read in order, the sub-trees are fully known before we fully know their parent tree. We may select pertinent parts of a document and deliver them as fully-formed entities as soon as they are known, without waiting for the remainder of the document to arrive.</p>
+<p>By my design, identifying the interesting parts of a document before it is complete involves turning the established model for drilling-down inside-out. Under asynchronous I/O the programmer's callback traditionally receives the whole resource and then, inside the callback, locates the sub-parts that are required for a particular task. Inverting this process, I propose extracting the locating logic currently found inside the callback and using it to decide when the callback should be used. The callback will receive complete fragments from the response once they have been selected according to this logic.</p>
+<p>I will be implementing using the Javascript language because it has good support for non-blocking I/O and covers both contexts where this project will be most useful: in-browser programming and server programming. Focusing on the MVP, I will only be implementing the parsing of one mark-up language. Although this technique could be applied to any text-based, tree-shaped markup, I find that JSON best meets my goals because it is widely supported, easy to parse, and because it defines a single n-way tree, is amenable to selectors which span multiple format versions.</p>
+<p>JSONPath is especially applicable to node selection as a document is read because it specifies only constraints on paths and 'contains' relationships. Because of the top-down serialisation order, on encountering any node in a serialised JSON stream, I will have already seen enough of the prior document to know its full path. JSONPath would not be so amenable if it expressed sibling relationships because there is no similar guarantee of having seen other nodes on the same level when any particular node is encountered. A new implementation of the language is required because the existing JSONPath library is implemented only as a means to search through already gathered objects and is too narrow in applicability to be useful in our context.</p>
+<div id="detecting-types-in-json" class="section level2">
+<h2><a href="#detecting-types-in-json"><span class="header-section-number">4.1</span> Detecting types in JSON</a></h2>
+<p>Parts of a document may be considered interesting because of their type, position, or some combination of the two.</p>
+<p>Given its use to select parts of a REST resource, not all of the JSONPath spec is useful. This contrasts with 'search' style queries such as 'books costing less than X'. Examining REST responses it is likely we will not be explicitly searching through a full model but rather selecting from a resource subset that the programmer requested, assembled on their behalf using their parameters so we can expect the developer to be interested in most of the content. In creating a new JSONPath implementation, I have chosen to follow the published spec only loosely, thereby avoiding writing unnecessary code. This is especially the case, as in the books example above whereby a user of the library could easily add the filter in the callback itself. Following the principle of writing less, better I feel it is better to deliver only the features I am reasonably certain will be well used but keep open the ability to add more later should it be required.</p>
 <p>JSON markup describes only a few basic types. On a certain level this is also true for XML -- most nodes are of either type Elements or Text. However, the XML metamodel provides tagnames, essentially a built-in Element sub-typing mechanism. Floating above this distinction, a reader abstracting over the details of the markup may forget that a node is an Element instance and describe it as an instance of its tagname, without considering that the tagname is a sub-type of Element. JSON comes with no such built-in type description language. On top of JSON's largely typeless model we often place a concept of type. Drawing parallels with the physical world, this imposition of type is the responsibility of the observer, rather than of the observed. A document reader has a free choice of the taxonomy they will use to impose type on the parts of the document, and this decision will vary depending on the purpose of the reader. The specificity required of a taxonomy differs by the level of involvement in a field, whereas 'watch' may be a reasonable type to most data consumers, to a horologist it is unlikely to be satisfactory without further sub-types. In the scope of this dissertation, since selecting on type is desirable, my JSONPath variant must be able to distinguish types at various levels of specificity; whilst my selection language will have no inbuilt concept of type, the aim is to support programmers in creating their own.</p>
 <p><em>integrate with above or discard, maybe move to compatibility with future versions</em> Relationship between type of a node and its purpose in the document (or, perhaps, the purpose the reader wishes to put it to). Purpose is often obvious from a combination of URL and type so can disregard the place in the document. This structure may be carefully designed but ultimately a looser interpretation of the structure can be safer.</p>
 <pre class="sourceCode xml"><code class="sourceCode xml"><span class="co">&lt;!--  XML leaves no doubt as to the labels we give to the types</span>
@@ -728,7 +727,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="conclusion" class="section level1">
 <h1><a href="#conclusion"><span class="header-section-number">6</span> Conclusion</a></h1>
-<p><a href="https://github.com/substack/node-trumpet">https://github.com/substack/node-trumpet</a></p>
 <div id="benchmarking-vs-non-progressive-rest" class="section level2">
 <h2><a href="#benchmarking-vs-non-progressive-rest"><span class="header-section-number">6.1</span> Benchmarking vs non-progressive REST</a></h2>
 <p>I feel it is important to experimentally answer the question, <em>is this actually any faster?</em>. To do this I have created a small benchmarking suite that runs under Node.js. I chose Node because it at its code is a very basic platform which I feel it gives a more repeatable environment than modern browsers which at during the tests could be performing any number of background tasks. These tests may be seen in the <code>benchmark</code> folder of the project. Node also has the advantage in measuring the memory of a running process is not swamped by the memory taken up by the browser itself.</p>
@@ -2220,13 +2218,25 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="ot">oboe</span>.<span class="fu">doDelete</span> = <span class="fu">apiMethod</span>(<span class="st">&#39;DELETE&#39;</span>);
 <span class="ot">oboe</span>.<span class="fu">doPost</span>   = <span class="fu">apiMethod</span>(<span class="st">&#39;POST&#39;</span>, <span class="kw">true</span>);
 <span class="ot">oboe</span>.<span class="fu">doPut</span>    = <span class="fu">apiMethod</span>(<span class="st">&#39;PUT&#39;</span>, <span class="kw">true</span>);
+<span class="ot">oboe</span>.<span class="fu">doPatch</span>  = <span class="fu">apiMethod</span>(<span class="st">&#39;PATCH&#39;</span>, <span class="kw">true</span>);
 
 <span class="kw">function</span> <span class="fu">apiMethod</span>(httpMethodName, mayHaveRequestBody) {
                
-   <span class="kw">return</span> <span class="kw">function</span>(firstArg){
-           
-      <span class="kw">if</span> (<span class="fu">isString</span>(firstArg)) {
-      
+   <span class="kw">return</span> <span class="kw">function</span>(firstArg) {
+
+      <span class="kw">if</span> (<span class="ot">firstArg</span>.<span class="fu">url</span>) {
+
+         <span class="co">// method signature is:</span>
+         <span class="co">//    .doMethod({url:u, body:b, complete:c, headers:{...}})</span>
+
+         <span class="kw">return</span> <span class="fu">wire</span>(
+             httpMethodName,
+             <span class="ot">firstArg</span>.<span class="fu">url</span>,
+             <span class="ot">firstArg</span>.<span class="fu">body</span>,
+             <span class="ot">firstArg</span>.<span class="fu">headers</span>
+         );
+      } <span class="kw">else</span> {
+
          <span class="co">// parameters specified as arguments</span>
          <span class="co">//</span>
          <span class="co">//  if (mayHaveContext == true) method signature is:</span>
@@ -2236,20 +2246,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
          <span class="co">//     .doMethod( url )            </span>
          <span class="co">//                                </span>
          <span class="kw">return</span> <span class="fu">wire</span>(
-                  httpMethodName,
-                  firstArg,                                  <span class="co">// url</span>
-                  mayHaveRequestBody &amp;&amp; arguments[<span class="dv">1</span>]         <span class="co">// body</span>
-         );
-      } <span class="kw">else</span> {
-      
-         <span class="co">// method signature is:</span>
-         <span class="co">//    .doMethod({url:u, body:b, complete:c, headers:{...}})</span>
-         
-         <span class="kw">return</span> <span class="fu">wire</span>(   
-                  httpMethodName,
-                  <span class="ot">firstArg</span>.<span class="fu">url</span>,
-                  <span class="ot">firstArg</span>.<span class="fu">body</span>,
-                  <span class="ot">firstArg</span>.<span class="fu">headers</span> 
+             httpMethodName,
+             firstArg, <span class="co">// url</span>
+             mayHaveRequestBody &amp;&amp; arguments[<span class="dv">1</span>]         <span class="co">// body</span>
          );
       }
    };
@@ -2275,7 +2274,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{XMLHttpRequest}</span><span class="co"> xhr the xhr to use as the transport. Under normal</span>
 <span class="co"> *          operation, will have been created using httpTransport() above</span>
 <span class="co"> *          but for tests a stub can be provided instead.</span>
-<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> method one of &#39;GET&#39; &#39;POST&#39; &#39;PUT&#39; &#39;DELETE&#39;</span>
+<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> method one of &#39;GET&#39; &#39;POST&#39; &#39;PUT&#39; &#39;PATCH&#39; &#39;DELETE&#39;</span>
 <span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> url the url to make a request to</span>
 <span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String|Object}</span><span class="co"> data some content to be sent with the request.</span>
 <span class="co"> *                        Only valid if method is POST or PUT.</span>
@@ -2402,63 +2401,79 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co"> *          operation, will have been created using httpTransport() above</span>
 <span class="co"> *          and therefore be Node&#39;s http</span>
 <span class="co"> *          but for tests a stub may be provided instead.</span>
-<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> method one of &#39;GET&#39; &#39;POST&#39; &#39;PUT&#39; &#39;DELETE&#39;</span>
-<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> url the url to make a request to</span>
+<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> method one of &#39;GET&#39; &#39;POST&#39; &#39;PUT&#39; &#39;PATCH&#39; &#39;DELETE&#39;</span>
+<span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String}</span><span class="co"> contentSource the url to make a request to, or a stream to read from</span>
 <span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{String|Object}</span><span class="co"> data some content to be sent with the request.</span>
 <span class="co"> *                        Only valid if method is POST or PUT.</span>
 <span class="co"> * </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{Object}</span><span class="co"> [headers] the http request headers to send                       </span>
 <span class="co"> */</span>  
-<span class="kw">function</span> <span class="fu">streamingHttp</span>(fire, on, http, method, url, data, headers) {
-                        
-   <span class="kw">if</span>( !<span class="ot">url</span>.<span class="fu">match</span>(<span class="ot">/http:</span><span class="fl">\/\/</span><span class="ot">/</span>) ) {
-      url = <span class="st">&#39;http://&#39;</span> + url;
-   }                           
-                        
-   <span class="kw">var</span> parsedUrl = <span class="fu">require</span>(<span class="st">&#39;url&#39;</span>).<span class="fu">parse</span>(url);
+<span class="kw">function</span> <span class="fu">streamingHttp</span>(fire, on, http, method, contentSource, data, headers) {
 
-   <span class="kw">var</span> req = <span class="ot">http</span>.<span class="fu">request</span>({
-      <span class="dt">hostname</span>: <span class="ot">parsedUrl</span>.<span class="fu">hostname</span>,
-      <span class="dt">port</span>: <span class="ot">parsedUrl</span>.<span class="fu">port</span>,
-      <span class="dt">path</span>: <span class="ot">parsedUrl</span>.<span class="fu">pathname</span>,
-      <span class="dt">method</span>: method,
-      <span class="dt">headers</span>: headers
-   }, <span class="kw">function</span>(res) {
-      
-      <span class="kw">var</span> statusCode = <span class="ot">res</span>.<span class="fu">statusCode</span>,
-          sucessful = <span class="fu">String</span>(statusCode)[<span class="dv">0</span>] == <span class="dv">2</span>;
-                             
-      <span class="kw">if</span>( sucessful ) {          
-            
-         <span class="ot">res</span>.<span class="fu">on</span>(<span class="st">&#39;data&#39;</span>, <span class="kw">function</span> (chunk) {
-                           
-            <span class="fu">fire</span>( NEW_CONTENT, <span class="ot">chunk</span>.<span class="fu">toString</span>() );
-         });
+   <span class="kw">function</span> <span class="fu">readFromStream</span>(readableStream) {
          
-         <span class="ot">res</span>.<span class="fu">on</span>(<span class="st">&#39;end&#39;</span>, <span class="kw">function</span>() {
-                  
-            <span class="fu">fire</span>( END_OF_CONTENT );
-         });
-         
-      } <span class="kw">else</span> {
+      <span class="co">// use stream in flowing mode   </span>
+      <span class="ot">readableStream</span>.<span class="fu">on</span>(<span class="st">&#39;data&#39;</span>, <span class="kw">function</span> (chunk) {
+                                             
+         <span class="fu">fire</span>( NEW_CONTENT, <span class="ot">chunk</span>.<span class="fu">toString</span>() );
+      });
       
-         <span class="fu">fire</span>( ERROR_EVENT, statusCode );
-      }
-   });
-   
-   <span class="ot">req</span>.<span class="fu">on</span>(<span class="st">&#39;error&#39;</span>, <span class="kw">function</span>(e) {
-      <span class="fu">fire</span>( ERROR_EVENT, e );
-   });
-   
-   <span class="fu">on</span>( ABORTING, <span class="kw">function</span>(){              
-      <span class="ot">req</span>.<span class="fu">abort</span>();
-   });
-      
-   <span class="kw">if</span>( data ) {
-      <span class="kw">var</span> body = <span class="fu">isString</span>(data)? data: <span class="ot">JSON</span>.<span class="fu">stringify</span>(data);
-      <span class="ot">req</span>.<span class="fu">write</span>(body);
+      <span class="ot">readableStream</span>.<span class="fu">on</span>(<span class="st">&#39;end&#39;</span>, <span class="kw">function</span>() {
+               
+         <span class="fu">fire</span>( END_OF_CONTENT );
+      });
    }
    
-   <span class="ot">req</span>.<span class="fu">end</span>();
+   <span class="kw">function</span> <span class="fu">fetchUrl</span>( url ) {
+      <span class="kw">if</span>( !<span class="ot">contentSource</span>.<span class="fu">match</span>(<span class="ot">/http:</span><span class="fl">\/\/</span><span class="ot">/</span>) ) {
+         contentSource = <span class="st">&#39;http://&#39;</span> + contentSource;
+      }                           
+                           
+      <span class="kw">var</span> parsedUrl = <span class="fu">require</span>(<span class="st">&#39;url&#39;</span>).<span class="fu">parse</span>(contentSource); 
+   
+      <span class="kw">var</span> req = <span class="ot">http</span>.<span class="fu">request</span>({
+         <span class="dt">hostname</span>: <span class="ot">parsedUrl</span>.<span class="fu">hostname</span>,
+         <span class="dt">port</span>: <span class="ot">parsedUrl</span>.<span class="fu">port</span>, 
+         <span class="dt">path</span>: <span class="ot">parsedUrl</span>.<span class="fu">pathname</span>,
+         <span class="dt">method</span>: method,
+         <span class="dt">headers</span>: headers 
+      });
+      
+      <span class="ot">req</span>.<span class="fu">on</span>(<span class="st">&#39;response&#39;</span>, <span class="kw">function</span>(res){
+         <span class="kw">var</span> statusCode = <span class="ot">res</span>.<span class="fu">statusCode</span>,
+             sucessful = <span class="fu">String</span>(statusCode)[<span class="dv">0</span>] == <span class="dv">2</span>;
+                                
+         <span class="kw">if</span>( sucessful ) {          
+               
+            <span class="fu">readFromStream</span>(res)
+            
+         } <span class="kw">else</span> {
+         
+            <span class="fu">fire</span>( ERROR_EVENT, statusCode );
+         }      
+      });
+      
+      <span class="ot">req</span>.<span class="fu">on</span>(<span class="st">&#39;error&#39;</span>, <span class="kw">function</span>(e) {
+         <span class="fu">fire</span>( ERROR_EVENT, e );
+      });
+      
+      <span class="fu">on</span>( ABORTING, <span class="kw">function</span>(){              
+         <span class="ot">req</span>.<span class="fu">abort</span>();
+      });
+         
+      <span class="kw">if</span>( data ) {
+         <span class="kw">var</span> body = <span class="fu">isString</span>(data)? data: <span class="ot">JSON</span>.<span class="fu">stringify</span>(data);
+         <span class="ot">req</span>.<span class="fu">write</span>(body);
+      }
+      
+      <span class="ot">req</span>.<span class="fu">end</span>();         
+   }
+   
+   <span class="kw">if</span>( <span class="fu">isString</span>(contentSource) ) {
+      <span class="fu">fetchUrl</span>(contentSource);
+   } <span class="kw">else</span> {
+      <span class="co">// contentsource is a stream</span>
+      <span class="fu">readFromStream</span>(contentSource);   
+   }
 
 }</code></pre>
 <p></p>
@@ -2525,13 +2540,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co"> * and introduces them to each other.</span>
 <span class="co"> */</span>
 
-<span class="kw">function</span> <span class="fu">wire</span> (httpMethodName, url, body, headers){
+<span class="kw">function</span> <span class="fu">wire</span> (httpMethodName, contentSource, body, headers){
 
    <span class="kw">var</span> eventBus = <span class="fu">pubSub</span>();
                
    <span class="fu">streamingHttp</span>( <span class="ot">eventBus</span>.<span class="fu">fire</span>, <span class="ot">eventBus</span>.<span class="fu">on</span>,
                   <span class="fu">httpTransport</span>(), 
-                  httpMethodName, url, body, headers );                              
+                  httpMethodName, contentSource, body, headers );                              
      
    <span class="kw">return</span> <span class="fu">instanceController</span>( 
                <span class="ot">eventBus</span>.<span class="fu">fire</span>, <span class="ot">eventBus</span>.<span class="fu">on</span>, 

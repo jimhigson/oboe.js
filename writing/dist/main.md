@@ -32,9 +32,6 @@ regards to developer ergonomics and end user perception of performance.
 Introduction
 ============
 
-https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index
-http://dry.ly/full-streams-ahead
-
 This purpose of this dissertation is to encourage the REST paradigm to
 be viewed through a novel lens which in application this may be used to
 deliver tangible benefits to many common REST use cases. Although I
@@ -1030,94 +1027,83 @@ adoption for all but fringe uses.
     https://github.com/dscape/clarinet/blob/master/samples/twitter.js
 
 
-
 Design and Reflection:
 ======================
 
-Using a combination of the techniques investigated in the previous
-chapter, I propose that a simple design is possible which makes REST
-clients more efficient whilst being no more difficult to program.
-Although simple, this model fits poorly with established vocabulary,
-requiring a transport that sits *somewhere between 'stream' and
-'download'* and a parsing strategy which *takes elements from SAX and
-DOM* but follows neither model.
+Using a combination of techniques from the previous chapter I propose
+that it is possible to combine the desirable properties from SAX and DOM
+parsers into a REST client library which allows streaming but is also
+convenient to program.
 
-Implementation in Javascript gives me the widest deployment options,
-covering client-side browser programming, server programming, use in
-command line tools, or any other usage. This context dictates a design
-which is non-blocking, asynchronous and callback based. While influenced
-by the language, the model of REST client proposed here is not limited
-to Javascript or web usage and I intent to comment briefly also on the
-applicability to other platforms. Likewise, I have also chosen to focus
-on JSON although I will also be commenting on the parallel applicability
-of these ideas to XML.
+By observing the flow of data streams through a SAX parser we can say
+that the REST workflow is more efficient if we do not wait until we have
+everything before we start using the parts that we do have. However, the
+SAX model presents poor developer ergonomics because it is not usually
+convenient to think on the level of abstraction that it presents: that
+of markup tokens. Using SAX, a programmer may only operate on a
+convenient abstraction after inferring it from a lengthy series of
+callbacks. In terms of ease of use, DOM is generally preferred because
+it provides the resource whole and in a convenient form. My design aims
+to duplicate this convenience and combine it with progressive
+interpretation by removing one restriction: that the node which is given
+is always the document root. From a hierarchical markup such as XML or
+JSON, when read in order, the sub-trees are fully known before we fully
+know their parent tree. We may select pertinent parts of a document and
+deliver them as fully-formed entities as soon as they are known, without
+waiting for the remainder of the document to arrive.
 
-From DOM we may observe that as a programmer, using a resource is
-simpler when a parsed entity is passed whole to a single callback,
-rather than the SAX model which requires the programmer to infer the
-entity from a lengthy series of callbacks. From observing SAX parsers or
-progressive HTML rendering, we can say that http is more efficient if we
-no not wait until we have everything before we start using the parts
-that we do have. DOM parsers pass a fully parsed node to registered
-callbacks, whole and ready to use, invariably at the root of the parsed
-document. From the vantage of the library's user, my thesis duplicates
-this convenience but removes one restriction; that the node which is
-passed must be the root. Because the mark-up formats we are dealing with
-are hierarchical and serialised depth-first it is possible to fully
-parse any sub-tree without fully knowing the parent node. From these
-observations we may program a new kind of REST client which is as
-performant as SAX but as easy to program as DOM.
+By my design, identifying the interesting parts of a document before it
+is complete involves turning the established model for drilling-down
+inside-out. Under asynchronous I/O the programmer's callback
+traditionally receives the whole resource and then, inside the callback,
+locates the sub-parts that are required for a particular task. Inverting
+this process, I propose extracting the locating logic currently found
+inside the callback and using it to decide when the callback should be
+used. The callback will receive complete fragments from the response
+once they have been selected according to this logic.
 
-To follow this progressive-but-complete model, identifying the
-interesting parts of a document involves turning the traditional model
-for drilling down inside-out. Traditionally the programmer's callback
-receives the document then inside that callback drills down to locate
-the parts that they are interested in. Instead I propose taking the
-drilling-down logic out from inside the callback and instead wrap the
-callback in it. This means that the callback receives selected parts of
-the response which the library has already drilled down to on behalf of
-the programmer.
+I will be implementing using the Javascript language because it has good
+support for non-blocking I/O and covers both contexts where this project
+will be most useful: in-browser programming and server programming.
+Focusing on the MVP, I will only be implementing the parsing of one
+mark-up language. Although this technique could be applied to any
+text-based, tree-shaped markup, I find that JSON best meets my goals
+because it is widely supported, easy to parse, and because it defines a
+single n-way tree, is amenable to selectors which span multiple format
+versions.
 
-Whilst JSONPath's existing implementation is only implemented for
-searching over already gathered objects, this kind of searching is just
-one application for the query language. I find that this is a very
-suitable declarative language to use to specify the parts of a response
-that a developer would like to drill-down to given the context of a
-document whose parse is in progress. JSONPath is especially applicable
-because it specifies only 'contained-in/contains' type relationships. On
-encountering any node in a serialised JSON stream, because of the
-depth-first serialisation order I will always have previously seen its
-ancestors. Hence, having written a suitably flexible JSONPath expression
-compiler such that it does not require a complete document, I will have
-enough information to evaluate any expression against any node at the
-time when it is first identified in the document. Because XML is also
-written depth-first, the same logic would apply to an XPath/XML variant
-of this project.
+JSONPath is especially applicable to node selection as a document is
+read because it specifies only constraints on paths and 'contains'
+relationships. Because of the top-down serialisation order, on
+encountering any node in a serialised JSON stream, I will have already
+seen enough of the prior document to know its full path. JSONPath would
+not be so amenable if it expressed sibling relationships because there
+is no similar guarantee of having seen other nodes on the same level
+when any particular node is encountered. A new implementation of the
+language is required because the existing JSONPath library is
+implemented only as a means to search through already gathered objects
+and is too narrow in applicability to be useful in our context.
 
-The definition of 'interesting' will be generic and accommodating enough
-so as to apply to any data domain and allow any granularity of interest,
-from large object to individual datums. With just a few lines of
-programming
+Detecting types in JSON
+-----------------------
 
-JSONPath and types
-------------------
+Parts of a document may be considered interesting because of their type,
+position, or some combination of the two.
 
-Given its use to identify interesting parts of a document, not all of
-the published JSONPath spec is useful. Parts of a document will be
-considered interesting because of their type, position, or both. This
-contrasts with 'search' style queries such as 'books costing less than X'.
-Examining REST responses it is likely we will not be explicitly
-searching through a full model but rather selecting from a resource
-subset that the programmer requested, assembled on their behalf using
-their parameters so we can expect the developer to be interested in most
-of the content. In creating a new JSONPath implementation, I have chosen
-to follow the published spec only loosely, thereby avoiding writing
-unnecessary code. This is especially the case, as in the books example
-above whereby a user of the library could easily add the filter in the
-callback itself. Following the principle of writing less, better I feel
-it is better to deliver only the features I am reasonably certain will
-be well used but keep open the ability to add more later should it be
-required.
+Given its use to select parts of a REST resource, not all of the
+JSONPath spec is useful. This contrasts with 'search' style queries such
+as 'books costing less than X'. Examining REST responses it is likely we
+will not be explicitly searching through a full model but rather
+selecting from a resource subset that the programmer requested,
+assembled on their behalf using their parameters so we can expect the
+developer to be interested in most of the content. In creating a new
+JSONPath implementation, I have chosen to follow the published spec only
+loosely, thereby avoiding writing unnecessary code. This is especially
+the case, as in the books example above whereby a user of the library
+could easily add the filter in the callback itself. Following the
+principle of writing less, better I feel it is better to deliver only
+the features I am reasonably certain will be well used but keep open the
+ability to add more later should it be required.
 
 JSON markup describes only a few basic types. On a certain level this is
 also true for XML -- most nodes are of either type Elements or Text.
@@ -1290,8 +1276,8 @@ JSONPath improving stability over upgrades
 
 *need to look at this an check doesn't duplicate rest of diss*.
 
-* Use of `..` over `.`
-* Keep this short. Might not need diagram if time presses.  
+-   Use of `..` over `.`
+-   Keep this short. Might not need diagram if time presses.
 
 ![extended json rest service that still works - maybe do a table instead
 \label{enhancingrest}](images/placeholder)
@@ -1358,9 +1344,8 @@ by Clarinet.
 API design
 ----------
 
-*API allows body to be given as Object and converts into JSON because
-it is anticipated that REST services which emmit JSON will also accept
-it*
+*API allows body to be given as Object and converts into JSON because it
+is anticipated that REST services which emmit JSON will also accept it*
 
 In designing the API developer ergonomics are the top priority. This is
 especially pertinent given that the library does nothing that can't be
@@ -1577,19 +1562,19 @@ its use and be designed to be completely agnostic as to which other
 libraries or programming styles that it is used with.
 
 Choice of streaming data transport
-------------------------
+----------------------------------
 
 Considering longpoll, push-tables and websockets...
 
-I find that it is not necessary to take this dichotomous view of streaming.
+I find that it is not necessary to take this dichotomous view of
+streaming.
 
 Whilst there is some overlap, each of the approaches above addresses a
 problem only tangentially related to this project's aims. Firstly,
 
-
-In REST I have always valued how prominently the plumbing of a
-system is visible, so that to sample a resource all that is required is
-to type a URL and be presented with it in a human-comprehensible format.
+In REST I have always valued how prominently the plumbing of a system is
+visible, so that to sample a resource all that is required is to type a
+URL and be presented with it in a human-comprehensible format.
 
 Secondly, as adaptations to the context in which they were created,
 these frameworks realise a view of network usage in which downloading
@@ -1618,7 +1603,6 @@ compatible with http caching.
 If we take streaming as a technique to achieve efficient downloading,
 not only for the transfer of forever-ongoing data, none of these
 approaches are particularly satisfactory.
-
 
 Handling transport failures
 ---------------------------
@@ -2259,8 +2243,6 @@ statementExpr pointing to the last clause](images/placeholder)
 
 Conclusion
 ==========
-
-https://github.com/substack/node-trumpet
 
 Benchmarking vs non-progressive REST
 ------------------------------------
@@ -3902,13 +3884,25 @@ oboe.doGet    = oboe;
 oboe.doDelete = apiMethod('DELETE');
 oboe.doPost   = apiMethod('POST', true);
 oboe.doPut    = apiMethod('PUT', true);
+oboe.doPatch  = apiMethod('PATCH', true);
 
 function apiMethod(httpMethodName, mayHaveRequestBody) {
                
-   return function(firstArg){
-           
-      if (isString(firstArg)) {
-      
+   return function(firstArg) {
+
+      if (firstArg.url) {
+
+         // method signature is:
+         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
+
+         return wire(
+             httpMethodName,
+             firstArg.url,
+             firstArg.body,
+             firstArg.headers
+         );
+      } else {
+
          // parameters specified as arguments
          //
          //  if (mayHaveContext == true) method signature is:
@@ -3918,20 +3912,9 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
          //     .doMethod( url )            
          //                                
          return wire(
-                  httpMethodName,
-                  firstArg,                                  // url
-                  mayHaveRequestBody && arguments[1]         // body
-         );
-      } else {
-      
-         // method signature is:
-         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
-         
-         return wire(   
-                  httpMethodName,
-                  firstArg.url,
-                  firstArg.body,
-                  firstArg.headers 
+             httpMethodName,
+             firstArg, // url
+             mayHaveRequestBody && arguments[1]         // body
          );
       }
    };
@@ -3964,7 +3947,7 @@ function httpTransport(){
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          but for tests a stub can be provided instead.
- * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
+ * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} url the url to make a request to
  * @param {String|Object} data some content to be sent with the request.
  *                        Only valid if method is POST or PUT.
@@ -4099,63 +4082,79 @@ function httpTransport(){
  *          operation, will have been created using httpTransport() above
  *          and therefore be Node's http
  *          but for tests a stub may be provided instead.
- * @param {String} method one of 'GET' 'POST' 'PUT' 'DELETE'
- * @param {String} url the url to make a request to
+ * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
+ * @param {String} contentSource the url to make a request to, or a stream to read from
  * @param {String|Object} data some content to be sent with the request.
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, http, method, url, data, headers) {
-                        
-   if( !url.match(/http:\/\//) ) {
-      url = 'http://' + url;
-   }                           
-                        
-   var parsedUrl = require('url').parse(url);
+function streamingHttp(fire, on, http, method, contentSource, data, headers) {
 
-   var req = http.request({
-      hostname: parsedUrl.hostname,
-      port: parsedUrl.port,
-      path: parsedUrl.pathname,
-      method: method,
-      headers: headers
-   }, function(res) {
-      
-      var statusCode = res.statusCode,
-          sucessful = String(statusCode)[0] == 2;
-                             
-      if( sucessful ) {          
-            
-         res.on('data', function (chunk) {
-                           
-            fire( NEW_CONTENT, chunk.toString() );
-         });
+   function readFromStream(readableStream) {
          
-         res.on('end', function() {
-                  
-            fire( END_OF_CONTENT );
-         });
-         
-      } else {
+      // use stream in flowing mode   
+      readableStream.on('data', function (chunk) {
+                                             
+         fire( NEW_CONTENT, chunk.toString() );
+      });
       
-         fire( ERROR_EVENT, statusCode );
-      }
-   });
-   
-   req.on('error', function(e) {
-      fire( ERROR_EVENT, e );
-   });
-   
-   on( ABORTING, function(){              
-      req.abort();
-   });
-      
-   if( data ) {
-      var body = isString(data)? data: JSON.stringify(data);
-      req.write(body);
+      readableStream.on('end', function() {
+               
+         fire( END_OF_CONTENT );
+      });
    }
    
-   req.end();
+   function fetchUrl( url ) {
+      if( !contentSource.match(/http:\/\//) ) {
+         contentSource = 'http://' + contentSource;
+      }                           
+                           
+      var parsedUrl = require('url').parse(contentSource); 
+   
+      var req = http.request({
+         hostname: parsedUrl.hostname,
+         port: parsedUrl.port, 
+         path: parsedUrl.pathname,
+         method: method,
+         headers: headers 
+      });
+      
+      req.on('response', function(res){
+         var statusCode = res.statusCode,
+             sucessful = String(statusCode)[0] == 2;
+                                
+         if( sucessful ) {          
+               
+            readFromStream(res)
+            
+         } else {
+         
+            fire( ERROR_EVENT, statusCode );
+         }      
+      });
+      
+      req.on('error', function(e) {
+         fire( ERROR_EVENT, e );
+      });
+      
+      on( ABORTING, function(){              
+         req.abort();
+      });
+         
+      if( data ) {
+         var body = isString(data)? data: JSON.stringify(data);
+         req.write(body);
+      }
+      
+      req.end();         
+   }
+   
+   if( isString(contentSource) ) {
+      fetchUrl(contentSource);
+   } else {
+      // contentsource is a stream
+      readFromStream(contentSource);   
+   }
 
 }
 
@@ -4237,13 +4236,13 @@ wire.js
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, url, body, headers){
+function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
    streamingHttp( eventBus.fire, eventBus.on,
                   httpTransport(), 
-                  httpMethodName, url, body, headers );                              
+                  httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
                eventBus.fire, eventBus.on, 
