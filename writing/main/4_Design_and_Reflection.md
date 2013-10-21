@@ -74,14 +74,14 @@ implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
 of books might use branching to further select inside their callback. I
 anticipate that the selections will frequently involve types so it is
-useful to examine the nature of type imposition with regards to JSON.
+useful to analyse the nature of type imposition with regards to JSON.
 
 Detecting types in JSON
 -----------------------
 
 JSON markup describes only a few basic types. On a certain level this is
 also true for XML -- most nodes are either of type Element or Text.
-However, the XML metamodel provides tagnames; essentially a built-in
+However, the XML metamodel provides tagnames; essentially, a built-in
 type system for subclassifying the elements. JSON has no similar notion
 of types beyond the basic constructs: array, object, string, number. To
 understand data written in JSON's largely typeless model it is often
@@ -94,20 +94,20 @@ by the level of involvement in a field. Whereas 'watch' may be a
 reasonable type for most data consumers, to a horologist it is likely to
 be unsatisfactory without further sub-types. To serve disparate
 purposes, the JSONPath variant provided for node selection will have no
-inbuilt concept of type, the aim is to support programmers in creating
+inbuilt concept of type, the aim being to support programmers in creating
 their own.
 
 ~~~~ {.xml}
-<!--  XML leaves no doubt as to the labels we give to the types
-      of the nodes. Although we might further divide, This is a 'person' -->
+<!--  XML leaves no doubt as to the labels we give to an Element's type.
+      Although we might further interpret, this is a 'person' -->
 <person  name='...' gender="male"
          age="45" height="175cm" profession="architect">
 </person>
 ~~~~
 
 ~~~~ {.javascript}
-/*    JSON meanwhile provides no very concrete type concept. This node's
-      type might be 'thing', 'animal', 'human', 'male', 'man', 
+/*    JSON meanwhile provides no built-in type concept. 
+      This node's type might be 'thing', 'animal', 'human', 'male', 'man', 
       'architect', 'artist' or any other of many overlapping impositions 
       depending on our reason for examining this data */
 {  "name":"...", "gender":"male", "age":"45" 
@@ -115,11 +115,11 @@ their own.
 }         
 ~~~~
 
-In the absence of node typing beyond the categorisation as objects,
+In the absence of node typing beyond categorisation as objects,
 arrays and various primitives, the key immediately mapping to an object
 is often taken as a loose marker of its type. In the below example we
 may impose the the type 'address' prior to examining the contents
-because of the parent node's field name.
+because of the field name in the parent node.
 
 ~~~~ {.javascript}
 {
@@ -138,16 +138,16 @@ because of the parent node's field name.
 }
 ~~~~
 
-This first means of imposing type is simple to express by JSONPath. The
+This means of imposing type is simply expressed in JSONPath. The
 selector `address` would match all nodes whose parent maps to them via
 an address key.
 
 As a loosely typed language, Javascript gives no protection against
 lists which store disparate types but by sensible convention this is
-avoided. Likewise in JSON, although type is a loose concept, the items
+avoided. Likewise, in JSON, although type is a loose concept, the items
 in a collection will generally be of the same type. From here follows a
-sister convention seen in the example below, whereby each of a list of
-items are typed according to the key in the grandparent node which maps
+sister convention illustrated in the example below, whereby each item from an array
+is typed according to the key in the grandparent node which maps
 to the array.
 
 ~~~~ {.javascript}
@@ -163,18 +163,17 @@ to the array.
 ~~~~
 
 In the above JSON, `addresses.*` would correctly identify the
-address-type nodes. The pluralisation of 'address' to 'addresses' may be
-a problem to a reader wishing to detect by either convention for type
-and it might be interesting in future to investigate a system for
-understanding English pluralisation similar to Ruby on Rails'
-configuration. I also considered introducing unions to JSONPath to cover
-this situation, resembling `address|addresses.*` but decided that this
-is simpler to solve outside of the JSONPath language if the programmer
+address-type nodes. The pluralisation of 'address' to 'addresses' may pose 
+a problem and it would be interesting in future to investigate a system such
+as Ruby on Rails that natively
+understands English pluralisation.
+I considered introducing unions to cover
+this situation, allowing expressions resembling `address|addresses.*` but decided that it is
+simpler to solve this problem outside of the JSONPath language if the programmer
 registers two selection specifications against the same handler
 function.
 
-In the below example paths are not the best way to detect the address
-type.
+In the below example types may not be easily inferred from ancestor keys. 
 
 ~~~~ {.javascript}
 {
@@ -198,8 +197,8 @@ type.
 
 Here, the keys which map onto addresses are named by the relationship
 between the parent and child nodes rather than the type of the child.
-The type classification problem might here be solved by using an
-ontology with 'address' subtypes such as 'residence', 'premises', and
+The type classification problem here might be solved by using an
+ontology with 'address' subtypes 'residence', 'premises', and
 'office', but this solution feels quite heavyweight for a simple
 selection language. Instead I chose to import the idea of *duck typing*
 from Python programing, as named in a 2000 usenet discussion:
@@ -209,30 +208,31 @@ from Python programing, as named in a 2000 usenet discussion:
 > what subset of duck-like behaviour you need [@pythonduck]
 
 A 'duck-definition' of an address type might be any object which has a
-number, street and town. That is to say, we take an individualistic
-approach by deriving type from the node in itself rather than by
+number, street, and town. We take an individualistic
+approach by deriving type from the node in itself rather than by 
 examining the situation in which it occurs. Because I find this
 selection technique simple and powerful I decided to add it to my
 JSONPath variant. As discussed in section \ref{jsonpathxpath},
 JSONPath's syntax is designed to resemble the equivalent Javascript
-accessors but Javascript has no syntax for a value-free list of object
-keys, the closest available notation is for object literals. I created a
-duck-type syntax derived from the object literal syntax by omitting the
-values, quotation marks, and commas. For the addresses type above a
-duck-type expression is written as `{number street town}`. Order is not
+accessors, but Javascript has no syntax for a value-free list of object
+keys. The closest available notation is for object literals so I created a
+duck-type syntax derived from this by omitting the
+values, quotation marks, and commas. For the address type described above, the
+duck-type expression would be written as `{number street town}`. Order is not
 significant so `{a b}` and `{b a}` are equivalent.
 
-We may consider that there is a root duck type `{}` which matches any
-node, that we create a sub-duck-type when we add to a list of required
-fields and a super-duck-type when we remove one. This idea of the
-attribute list expanding with sub-types should map quite neatly onto\
-a JSON REST resource which was marshaled from an object graph in an OO
-language with classical inheritance. It is difficult to generalise but
-when selecting items from a document by type I believe it will most
+It is difficult to generalise but
+when selecting items from a document I believe it will 
 often be useful if nodes which are covariant with the given duck-type
-were also be matched. Or, in terms of implementation, to satisfy a duck
-type a node must have all of the required fields but could also have any
-others.
+are also matched. 
+We may consider that there is a root duck type `{}` which matches any
+node, that we create a sub-duck-type if we add to the list of required
+fields, and a super-duck-type if we remove from it. Because in OOP extended
+classes may add new fields, this idea of the
+attribute list expanding to give a sub-type maps applies neatly
+JSON REST resources marshaled from OO languages.
+In implementation, to conform to a duck-type a node must have all 
+of the required fields but could also have any others.
 
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
