@@ -380,7 +380,7 @@ oboe("resources/people.json")
 ~~~~
 
 Note the `path` and `ancestors` parameters in the examples above. These
-provide additional information regarding the location and the context in
+provide additional information regarding the context in
 which the identified node was found. Consider the following JSON:
 
 ~~~~ {.javascript}
@@ -395,23 +395,33 @@ which the identified node was found. Consider the following JSON:
 }  
 ~~~~
 
-Here we can extract the runners using the pattern `{name time}` or
-`medalWinners.*` but the nodes alone are insufficient because their
+In this JSON we may extract the runners using the pattern `{name time}` or
+`medalWinners.*` but nodes alone are insufficient because their
 location communicates information which is as important as their
 content. The `path` parameter provides the location as an array of
 strings plotting a descent from the JSON root to the found node. For
-example, `['medalWinners', 'gold']`. Similarly, the `ancestors` array is
+example, Bolt has path `['medalWinners', 'gold']`. Similarly, the `ancestors` array is
 a list of the ancestors starting at the immediate parent of the found
 node and ending with the JSON root node. For all but the root node,
-which in any case has no ancestors, the nodes in this list will have
-been only partially parsed. Being untyped, Javascript does not enforce
-that ternary callbacks are given. Unlike the example above, given that
-we have provided a JSONPath selector for the locations we would like to
-receive data from, for most JSON formats the content alone will be
-sufficient. The API design orders the callback parameters so that in
-most common case a unary function may be given.
+which in any case has no ancestors, the nodes in the ancestor list will have
+been only partially parsed.
 
-`http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener`
+~~~~ {.javascript}
+oboe("resources/someJson.json")
+   .node( "medalWinners.*", function(person, path) {
+   
+      console.log( person.name + " won the " + lastOf(path) + " medal "
+         + "with a time of " + person.time );
+   });
+~~~~
+
+Being loosely typed, Javascript would not enforce
+that ternary callbacks are used as selection handlers. 
+Given that before a callback is made the application programmer must have
+provided a JSONPath selector for the locations in the document she is 
+interested in, for most JSON formats the content alone is
+sufficient. The API design orders the callback parameters so that in
+most common cases a unary or binary function can be given.
 
 In node.js the code style is more obviously event-based. Listeners are
 added via a `.on` method with a string event name given as the first
