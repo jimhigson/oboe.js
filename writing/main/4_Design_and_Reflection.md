@@ -290,20 +290,19 @@ programming in a style which is unfamiliar to most programmers. With
 this in mind it is a high priority to design a public API for Oboe which
 is concise, simple and resembles other commonly used tools.
 
-jQuery is by far the most popular library for AJAX today.
-If Oboe's API is made similar to common tools, a lesser
-modification should be required to switch existing projects to
-streaming http. For some common use cases it should be possible to
-create an API with a close enough equivalence to popular tools that it can be used as
-a direct drop-in replacement. Although when used in this way no progressive loading
-would be enacted, when refactoring towards a goal the first step
-is often to create a new expression of the same thing [@cleancode p. 212].
-By giving basic support for
-non-progressive downloading, the door is open for apps to incrementally refactor
-towards a progressive expression. Allowing adoption as a series of small, easily
-manageable steps rather than a single leap is especially helpful
-for teams working under Scrum because all
-work must fit within a fairly short timeframe.
+jQuery is by far the most popular library for AJAX today. If Oboe's API
+is made similar to common tools, a lesser modification should be
+required to switch existing projects to streaming http. For some common
+use cases it should be possible to create an API with a close enough
+equivalence to popular tools that it can be used as a direct drop-in
+replacement. Although when used in this way no progressive loading would
+be enacted, when refactoring towards a goal the first step is often to
+create a new expression of the same thing [@cleancode p. 212]. By giving
+basic support for non-progressive downloading, the door is open for apps
+to incrementally refactor towards a progressive expression. Allowing
+adoption as a series of small, easily manageable steps rather than a
+single leap is especially helpful for teams working under Scrum because
+all work must fit within a fairly short timeframe.
 
 jQuery's basic call style for making an AJAX GET request is as follows:
 
