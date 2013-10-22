@@ -485,14 +485,14 @@ to when they are completed.
 Oboe.js as a Micro-Library
 --------------------------
 
-Http traffic, especially sending entropy-sparse text formats is often
+Http traffic, especially for entropy-sparse text formats such as Javascript is often
 gzipped at point of sending in order to deliver it more quickly, so in
-measuring a download footprint it usually makes more sense to compare
+measuring a library's download footprint it usually makes more sense to compare
 post-gzipping. A Javascript library qualifies as being *micro* if it is
-delivered in 5k or less, 5120 bytes. Micro-libraries also tend to follow
+delivered in 5kb or less, 5120 bytes. Micro-libraries also tend to follow
 the ethos that it is better for a developer to gather together several
-tiny libraries than one that uses a one-size-fits-all approach, perhaps
-echoing the unix command line tradition of small programs which each do
+tiny libraries than find one with a one-size-fits-all approach, perhaps
+echoing the unix command line tradition for small programs which each do
 do exactly one thing. Javascript Micro-libraries are listed at [^1],
 which includes this project. Oboe.js feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
