@@ -237,37 +237,35 @@ but could also have any others.
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
 
-Some popular Javascript frameworks such as d3.js and Angular interface
-more naturally with collections than with individual entities. If we are
-downloading data to use with these libraries it is more useful to be
-notified whenever the collection is expanded than it is to be given each
-element individually.
-
 JSONPath naturally expresses a 'contained in' relationship using the dot
-notation but no provision is made for a 'containing' relationship.
-*Cascading Style Sheets*, CSS, the web's styling language has
-historically shared this restriction but a recent proposal for extended
-selectors, currently at Editor's Draft stage [@css4] introduces an
+notation but no provision is made for the inverse 'containing' relationship.
+*Cascading Style Sheets*, CSS, the web's styling language, has
+historically shared this restriction but a proposal for extended
+selectors which is currently at Editor's Draft stage [@css4] introduces an
 elegant solution. Rather than add an explicit 'containing' relationship,
 the draft observes that previously CSS has always selected the element
 conforming to the right-most of the selector terms, allowing only the
-deepest element mentioned to be styled. This restriction is lifted by
+deepest mentioned element to be styled. This restriction is lifted by
 allowing terms to be prefixed with `$` in order to make them explicitly
-capturing, whereas a selector without an explicit capturing term
-continues to select as before. The CSS selector
+capturing; a selector without an explicit capturing term
+continues to work as before. The CSS selector
 `form.important input.mandatory` selects mandatory inputs inside
 important forms but `$form.important input.mandatory` selects important
-forms with mandatory fields. Explicit capturing will be similarly
-integrated with Oboe's JSONPath, so that `person.$address.town` would
-return an address node when it's town child is read, or `$people.*`
-would return the people array repeatedly whenever a new child is added
-to it.
+forms with mandatory fields. 
 
-Importing the CSS4 dollar into Oboe's JSONPath should will it easier to
-integrate with libraries which treat arrays as their basic unit of
-operation. By duplicating a syntax which the majority of web developers
-will probably become familiar with over the next few years I hope that
-Oboe's learning curve will be a little more gradual.
+The new css4 capturing technique will be adapted for
+Oboe JSONPath. By duplicating a syntax which the majority of web developers
+should become familiar with over the next few years I hope that
+Oboe's learning curve can be made a little more gradual. Taking on this feature,
+the selector `person.$address.town` would
+identify an address node with a town child, or `$people.{name, dob}`
+would provide the people array repeatedly whenever a new person is added
+to it.
+Javascript frameworks such as d3.js and Angular are designed to work with whole models as they change. 
+Consequently, the interface they present converses more fluently with collections than individual entities. 
+If we are downloading data to use with these libraries it is more convenient if we use explicit
+capturing so that we are notified whenever the collection is expanded and can pass it on.
+
 
 Parsing the JSON Response
 -------------------------
@@ -409,11 +407,6 @@ we have provided a JSONPath selector for the locations we would like to
 receive data from, for most JSON formats the content alone will be
 sufficient. The API design orders the callback parameters so that in
 most common case a unary function may be given.
-
-If an even wider context is required, the whole document as it has been
-parsed so far may be accessed using the `.root()` method. Since `.root`
-relates to the oboe instance itself rather than the callback per-say, it
-can be accessed from any code with a reference to the oboe object.
 
 `http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener`
 
