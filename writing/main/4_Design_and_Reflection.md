@@ -384,7 +384,7 @@ which the identified node was found. Consider the following JSON:
 
 ~~~~ {.javascript}
 { 
-   "event": "mens 100m",
+   "event": "Mens' 100m sprint",
    "date": "5 Aug 2012",
    "medalWinners": {
       "gold":     {"name": "Bolt",    "time": "9.63s"},
@@ -394,15 +394,18 @@ which the identified node was found. Consider the following JSON:
 }  
 ~~~~
 
-Here we can extract the runners by the patterns such as `{name time}` or
-`medalWinners.*` but clearly the location of the node in the document is
-interesting as well as the context. The `path` parameter provides this
-information by way of an array of strings plotting the descent from the
-JSON root to the match, for example `['medalWinners', 'gold']`.
+Here we can extract the runners using the pattern `{name time}` or
+`medalWinners.*` but the location of the node in the document 
+gives information which is as important as its content.
+The `path` parameter provides the location
+information as an array of strings plotting a descent from the
+JSON root to the found node. For example, `['medalWinners', 'gold']`.
 Similarly, the `ancestors` array is a list of the ancestors starting at
 the immediate parent of the found node and ending with the JSON root
-node. For all but the root node (which has no ancestors anyway) the
-nodes in this list will be only partially parsed. Being untyped,
+node. For all but the root node, which in any case has no ancestors, the
+nodes in this list will have been only partially parsed.
+
+Being untyped,
 Javascript does not enforce the arity of the callback. Because much of
 the time only the content itself is needed, the API design orders the
 callback parameters to take advantage of the loose typing so that a
