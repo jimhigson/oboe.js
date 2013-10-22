@@ -292,13 +292,13 @@ is concise, simple and resembles other commonly used tools.
 
 To pursue good developer ergonomics I will study successful libraries
 and adapt facets of their APIs. Over time well-liked libraries have
-refined their APIs. If Oboe's API is made similar to common tools\
-only minimal modification should be required to switch existing projects
-to streaming http. For the most common use cases, it should be possible
-to create a library with a close functional equivalence that can be used
-as a direct drop-in replacement. Used in this way, no progressive
-loading would be done but it opens the door for the project taking up
-the library to be refactored towards a progressive model over time. By
+refined their APIs. If Oboe's API is made similar to common tools only
+minimal modification should be required to switch existing projects to
+streaming http. For the most common use cases, it should be possible to
+create a library with a close functional equivalence that can be used as
+a direct drop-in replacement. Used in this way, no progressive loading
+would be done but it opens the door for the project taking up the
+library to be refactored towards a progressive model over time. By
 imitating existing APIs we allow adoption as a series of small, easily
 manageable steps rather than a single leap. This is especially helpful
 for teams wishing to adopt this project working under Scrum because all
