@@ -451,15 +451,15 @@ share a commonb implementation.
 is anticipated that REST services which emmit JSON will also accept it*
 
 Earlier callbacks when paths are found prior to nodes
-----------------------------------------
+-----------------------------------------------------
 
 Following with the project's aim of giving callbacks as early as
 possible, sometimes useful work can be done when a node is known to
 exist but before we have the contents of the node. This means that each
-node found in a JSON document can potentially trigger notifications
-at two points: when it is first addressed and when it is complete. The
-API facilitates this by providing a `path` event following much the
-same pattern as `node`.
+node found in a JSON document can potentially trigger notifications at
+two points: when it is first addressed and when it is complete. The API
+facilitates this by providing a `path` event following much the same
+pattern as `node`.
 
 ~~~~ {.javascript}
 oboe("events.json")
@@ -478,10 +478,9 @@ oboe("events.json")
    });
 ~~~~
 
-Implementing path notifications requires little extra code, requiring JSONPath expressions 
-can be evaluated when items are found 
-in addition to when they are
-completed.
+Implementing path notifications requires little extra code, requiring
+JSONPath expressions can be evaluated when items are found in addition
+to when they are completed.
 
 Oboe.js as a Micro-Library
 --------------------------
