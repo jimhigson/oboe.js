@@ -245,25 +245,26 @@ it is more useful to be notified whenever the
 collection is expanded than it is to be
 given each element individually.
 
-Expressing a 'contained in' relationship comes naturally to JSONPath,
-but no provision is made for a 'containing' relationship. Cascading
-Style Sheets, or CSS, the web's styling language has long shared this
-restriction but a recent proposal, currently at Editor's Draft stage
-[@css4] provides an elegant means to cover this gap. Rather than add an
-explicit 'containing' relationship, the css4 proposal observes that css
-selectors have previously only allowed selection of the right-most of
-the terms given, allowing only the deepest element mentioned to be
-selected. This restriction is removed by allowing terms may be prefixed
-with `$` in order to make them capturing: in the absence of an
-explicitly capturing term the right-most continues to capture. Whereas
-`form.important input.mandatory` selects for styling mandatory inputs
+JSONPath naturally expresses a 'contained in' relationship
+but no provision is made for a 'containing' relationship. *Cascading
+Style Sheets*, CSS, the web's styling language has historically shared this
+restriction but a recent proposal for extended selectors, currently at Editor's Draft stage
+[@css4] addresses this limitation. Rather than add an
+explicit 'containing' relationship, the proposal observes css
+has previously always selected the element conforming to the right-most of
+the selector terms, allowing only the deepest element mentioned to be
+styled. This restriction is lifted by allowing terms to be prefixed
+with `$` in order to make them explicitly capturing. A selector without
+an explicit capturing term continues to select as before. Whereas the CSS selector
+`form.important input.mandatory` selects mandatory inputs
 inside important forms, `$form.important input.mandatory` selects
 important forms with mandatory fields.
 
-Importing the CSS4 dollar into Oboe's JSONPath should make it much
+Importing the CSS4 dollar into Oboe's JSONPath should will it 
 easier to integrate with libraries which treat arrays as their basic
-unit of operation and uses a syntax which the majority of web developers
-are likely to be familiar with over the next few years.
+unit of operation. By duplicating a syntax which the majority of web developers
+will be familiar with over the next few years I
+hope that Oboe's learning curve will be a little more gradual.
 
 Parsing the JSON Response
 -------------------------
