@@ -323,13 +323,9 @@ These names, `done` and `fail`, are generic verbs which are
 used for everything that jQuery provides asynchronously. The methods are chainable
 so that several listeners may be added from one statement.
 
-By method overloading, if the request requires more information than the
-parameter to `jQuery.ajax` may be an object. This pattern of accepting
-function parameters as an object is a common in Javascript for functions
-that take a large number of optional arguments because it makes
-understanding the purpose of each argument easier to understand from the
-callsite than if the meaning depended on the position in a linear
-arguments list and the gaps filled in with nulls.
+By method overloading, the
+parameter to `jQuery.ajax` may be an object which allows more information to be
+given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -338,32 +334,43 @@ jQuery.ajax({ "url":"resources/shortMessage.txt",
            });
 ~~~~
 
-Taking on this style,
+This pattern of listing
+function parameters as an object literal is common in Javascript for functions
+which take a large number of arguments, particularly if some are optional.
+This avoids having to pad unprovided optional arguments in the middle of the
+list with null values and, because the purpose of the values is apparent from
+the callee, also 
+an anti-pattern where a callsite can only be understood after careful attention to the position
+of the arguments. 
+
+Taking on this style and extending to cover events for progressive parsing, we 
+get the following Oboe public API:
 
 ~~~~ {.javascript}
-oboe("resources/someJson.json")
+oboe("resources/people.json")
    .node( "person.name", function(name, path, ancestors) {
-      console.log("got a name " + name);   
+      console.log("There is somebody called " + name);   
    })
    .done( function( wholeJson ) {
-      console.log("got everything");
+      console.log("That is everyone!");
    })
    .fail( function() {
-      console.log("actually, the download failed. Forget the" + 
-                  " people I just told you about");
+      console.log("Actually, the download failed. Please forget " + 
+                  "the people I just told you about");
    });
 ~~~~
 
-Because I foresee several patterns being added for most types of JSON
-documents, a shortcut format is also available for adding multiple
-patterns in a single call by using the patterns as the keys and the
-callbacks as the values in a key/value mapping:
+In jQuery only one `done` handler is usually added to a request because there
+is only one thing to receive. Under oboe there will usually be several separately
+selected areas of interest inside a JSON document so I anticipate that adding 
+multiple handlers will be more common. A shortcut call style is provided for 
+adding several selector/handler pairs at a time:
 
 ~~~~ {.javascript}
-oboe("resources/someJson.json")
+oboe("resources/people.json")
    .node({  
       "person.name": function(personName, path, ancestors) {
-         console.log("let me tell you about " + name);
+         console.log("Let me tell you about " + name + "...");
       },
       "person.address.town": function(townName, path, ancestors) {
          console.log("they live in " + townName);
@@ -371,10 +378,9 @@ oboe("resources/someJson.json")
    });
 ~~~~
 
-Note the path and ancestors parameters in the examples above. Most of
-the time giving the callback the matching content is enough to be able
-to act but it is easy to imagine cases where a wider context matters.
-Consider this JSON:
+Note the `path` and `ancestors` parameters in the examples above. These
+provide additional information regarding the location and the context in 
+which the identified node was found. Consider the following JSON:
 
 ~~~~ {.javascript}
 { 
