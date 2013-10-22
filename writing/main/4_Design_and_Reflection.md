@@ -395,9 +395,10 @@ which the identified node was found. Consider the following JSON:
 ~~~~
 
 Here we can extract the runners using the pattern `{name time}` or
-`medalWinners.*` but the location of the node in the document gives
-information which is as important as its content. The `path` parameter
-provides the location information as an array of strings plotting a
+`medalWinners.*` but the nodes alone are insufficient because their location 
+communicates information which is as important as their content.
+The `path` parameter
+provides the location as an array of strings plotting a
 descent from the JSON root to the found node. For example,
 `['medalWinners', 'gold']`. Similarly, the `ancestors` array is a list
 of the ancestors starting at the immediate parent of the found node and
@@ -410,8 +411,8 @@ Because much of the time only the content itself is needed, the API
 design orders the callback parameters to take advantage of the loose
 typing so that a unary function taking only the content may be given.
 
-For the widest context currently available, the whole document as it has
-been parsed so far may be accessed using the `.root` method. Since
+If an even wider context is required, the whole document as it has
+been parsed so far may be accessed using the `.root()` method. Since
 `.root` relates to the oboe instance itself rather than the callback
 per-say, it can be accessed from any code with a reference to the oboe
 object.
