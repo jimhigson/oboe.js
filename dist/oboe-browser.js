@@ -1,12 +1,20 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
-window.oboe = (function  (window, Object, Array, Error, undefined ) {
+(function  (window, Object, Array, Error, undefined ) {
 /** 
  * Partially complete a function.
  * 
  * Eg: 
- *    var add3 = partialComplete( function add(a,b){return a+b}, [3] );
+ *    var add3 = partialComplete( function add(a,b){return a+b}, 3 );
  *    
  *    add3(4) // gives 7
+ *    
+ *    
+ *    function wrap(left, right, cen){return left + " " + cen + " " + right;}
+ *    
+ *    var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );
+ *    
+ *    pirateGreeting("Guybrush Threepwood"); 
+ *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
 var partialComplete = varArgs(function( fn, boundArgs ) {
 
@@ -2033,4 +2041,4 @@ function apiMethod(httpMethodName, mayHaveRequestBody) {
    };
 }   
 
-;return oboe;})(window, Object, Array, Error);
+;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error);

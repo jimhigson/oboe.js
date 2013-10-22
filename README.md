@@ -525,10 +525,20 @@ For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/j
 bower install oboe
 ```
 
+If AMD is detected Oboe will `define` itself, otherwise it adds itself to
+the global namespace. Either load it with require.js, [almond](https://github.com/jrburke/almond)
+etc or just use it directly.
+
 For Node:
 
 ```
 npm install oboe
+```
+
+Then load as usual:
+
+```
+var oboe = require('oboe');
 ```
 
 # Getting the most from oboe

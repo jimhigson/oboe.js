@@ -7,31 +7,16 @@ module.exports = function(config) {
       basePath : '..',
       
       // list of files / patterns to load in the browser
-      files : [           
+      files : [
          'test/libs/es5-shim.js'        
       ,  'test/libs/es5-sham.js'        
-      ,  'src/functional.js'
-      ,  'src/util.js'
-      ,  'src/lists.js' 
       ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
-      ,  'src/libs/clarinet.js'
-      ,  'src/clarinetListenerAdaptor.js'
-      ,  'src/streamingHttp-browser.js'
-      ,  'src/jsonPathSyntax.js'
-      ,  'src/incrementalContentBuilder.js'
-      ,  'src/jsonPath.js'
-      ,  'src/pubSub.js' 
-      ,  'src/events.js'  
-      ,  'src/instanceController.js'
-      ,  'src/wire.js'
-      ,  'src/publicApi.js'
-        
-      ,  'test/specs/*.unit.spec.js'
-      ,  'test/specs/*.component.spec.js'
+      ,  'test/require/require.js'
+      ,  'dist/oboe-browser.min.js'
       
-      //,'test/specs/streamingXhr.integration.spec.js'
+      ,  'test/specs/amd.integration.spec.js'
       ],
                             
       // level of logging
