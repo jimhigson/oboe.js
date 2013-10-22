@@ -245,20 +245,24 @@ it is more useful to be notified whenever the
 collection is expanded than it is to be
 given each element individually.
 
-JSONPath naturally expresses a 'contained in' relationship
+JSONPath naturally expresses a 'contained in' relationship using the dot
+notation
 but no provision is made for a 'containing' relationship. *Cascading
 Style Sheets*, CSS, the web's styling language has historically shared this
 restriction but a recent proposal for extended selectors, currently at Editor's Draft stage
-[@css4] addresses this limitation. Rather than add an
-explicit 'containing' relationship, the proposal observes css
-has previously always selected the element conforming to the right-most of
+[@css4] introduces an elegant solution. Rather than add an
+explicit 'containing' relationship, the draft observes that previously CSS
+has always selected the element conforming to the right-most of
 the selector terms, allowing only the deepest element mentioned to be
 styled. This restriction is lifted by allowing terms to be prefixed
-with `$` in order to make them explicitly capturing. A selector without
-an explicit capturing term continues to select as before. Whereas the CSS selector
+with `$` in order to make them explicitly capturing, whereas a selector without
+an explicit capturing term continues to select as before. The CSS selector
 `form.important input.mandatory` selects mandatory inputs
-inside important forms, `$form.important input.mandatory` selects
-important forms with mandatory fields.
+inside important forms but `$form.important input.mandatory` selects
+important forms with mandatory fields. Explicit capturing will be similarly 
+integrated with Oboe's JSONPath, so that `person.$address.town` would
+return an address node when it's town child is read, or `$people.*` would
+return the people array repeatedly whenever a new child is added to it.  
 
 Importing the CSS4 dollar into Oboe's JSONPath should will it 
 easier to integrate with libraries which treat arrays as their basic
