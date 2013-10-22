@@ -290,21 +290,22 @@ programming in a style which is unfamiliar to most programmers. With
 this in mind it is a high priority to design a public API for Oboe which
 is concise, simple and resembles other commonly used tools.
 
-To pursue good developer ergonomics I will study successful libraries
-and adapt facets of their APIs. Over time well-liked libraries have
-refined their APIs. If Oboe's API is made similar to common tools only
-minimal modification should be required to switch existing projects to
-streaming http. For the most common use cases, it should be possible to
-create a library with a close functional equivalence that can be used as
-a direct drop-in replacement. Used in this way, no progressive loading
-would be done but it opens the door for the project taking up the
-library to be refactored towards a progressive model over time. By
-imitating existing APIs we allow adoption as a series of small, easily
-manageable steps rather than a single leap. This is especially helpful
-for teams wishing to adopt this project working under Scrum because all
-tasks must be self-contained and fit within a fairly short timeframe.
+jQuery is by far the most popular library for AJAX today.
+If Oboe's API is made similar to common tools, a lesser
+modification should be required to switch existing projects to
+streaming http. For some common use cases it should be possible to
+create an API with a close enough equivalence to popular tools that it can be used as
+a direct drop-in replacement. Although when used in this way no progressive loading
+would be enacted, when refactoring towards a goal the first step
+is often to create a new expression of the same thing [@cleancode p. 212].
+By giving basic support for
+non-progressive downloading, the door is open for apps to incrementally refactor
+towards a progressive expression. Allowing adoption as a series of small, easily
+manageable steps rather than a single leap is especially helpful
+for teams working under Scrum because all
+work must fit within a fairly short timeframe.
 
-jQuery's basic call style for making an AJAX GET request follows:
+jQuery's basic call style for making an AJAX GET request is as follows:
 
 ~~~~ {.javascript}
 jQuery.ajax("resources/shortMessage.txt")
