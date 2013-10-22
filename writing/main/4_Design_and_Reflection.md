@@ -339,8 +339,8 @@ common in Javascript for functions which take a large number of
 arguments, particularly if some are optional. This avoids having to pad
 unprovided optional arguments in the middle of the list with null values
 and, because the purpose of the values is apparent from the callee, also
-an anti-pattern where a callsite can only be understood after careful
-attention to the position of the arguments.
+an anti-pattern where a callsite can only be understood after counting 
+the position of the arguments.
 
 Taking on this style and extending to cover events for progressive
 parsing, we get the following Oboe public API:
