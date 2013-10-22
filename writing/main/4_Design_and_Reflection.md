@@ -267,7 +267,7 @@ return the people array repeatedly whenever a new child is added to it.
 Importing the CSS4 dollar into Oboe's JSONPath should will it 
 easier to integrate with libraries which treat arrays as their basic
 unit of operation. By duplicating a syntax which the majority of web developers
-will be familiar with over the next few years I
+will probably become familiar with over the next few years I
 hope that Oboe's learning curve will be a little more gradual.
 
 Parsing the JSON Response
