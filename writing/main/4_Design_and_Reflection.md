@@ -272,10 +272,11 @@ Oboe's learning curve will be a little more gradual.
 Parsing the JSON Response
 -------------------------
 
-While SAX parsers provide an unfriendly interface to application
-developers, as a starting point for higher-level parsers they work very
-well (in fact, most XML DOM parsers are made in this way). The
-pre-existing project Clarinet is well tested, liberally licenced and
+While SAX parsers provide an unappealing interface to application
+developers, as a starting point to handle low-level parsing in higher-level 
+libraries they work very
+well (most XML DOM parsers are built in this way). The
+pre-existing project Clarinet is well tested, liberally licenced, and
 compact, meeting the goals of this project perfectly. In fact, the name
 of this project, Oboe.js, was chosen in tribute to the value delivered
 by Clarinet.
