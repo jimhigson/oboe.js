@@ -238,34 +238,34 @@ Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
 
 JSONPath naturally expresses a 'contained in' relationship using the dot
-notation but no provision is made for the inverse 'containing' relationship.
-*Cascading Style Sheets*, CSS, the web's styling language, has
-historically shared this restriction but a proposal for extended
-selectors which is currently at Editor's Draft stage [@css4] introduces an
-elegant solution. Rather than add an explicit 'containing' relationship,
-the draft observes that previously CSS has always selected the element
-conforming to the right-most of the selector terms, allowing only the
-deepest mentioned element to be styled. This restriction is lifted by
-allowing terms to be prefixed with `$` in order to make them explicitly
-capturing; a selector without an explicit capturing term
+notation but no provision is made for the inverse 'containing'
+relationship. *Cascading Style Sheets*, CSS, the web's styling language,
+has historically shared this restriction but a proposal for extended
+selectors which is currently at Editor's Draft stage [@css4] introduces
+an elegant solution. Rather than add an explicit 'containing'
+relationship, the draft observes that previously CSS has always selected
+the element conforming to the right-most of the selector terms, allowing
+only the deepest mentioned element to be styled. This restriction is
+lifted by allowing terms to be prefixed with `$` in order to make them
+explicitly capturing; a selector without an explicit capturing term
 continues to work as before. The CSS selector
 `form.important input.mandatory` selects mandatory inputs inside
 important forms but `$form.important input.mandatory` selects important
-forms with mandatory fields. 
+forms with mandatory fields.
 
-The new css4 capturing technique will be adapted for
-Oboe JSONPath. By duplicating a syntax which the majority of web developers
-should become familiar with over the next few years I hope that
-Oboe's learning curve can be made a little more gradual. Taking on this feature,
-the selector `person.$address.town` would
-identify an address node with a town child, or `$people.{name, dob}`
-would provide the people array repeatedly whenever a new person is added
-to it.
-Javascript frameworks such as d3.js and Angular are designed to work with whole models as they change. 
-Consequently, the interface they present converses more fluently with collections than individual entities. 
-If we are downloading data to use with these libraries it is more convenient if we use explicit
-capturing so that we are notified whenever the collection is expanded and can pass it on.
-
+The new css4 capturing technique will be adapted for Oboe JSONPath. By
+duplicating a syntax which the majority of web developers should become
+familiar with over the next few years I hope that Oboe's learning curve
+can be made a little more gradual. Taking on this feature, the selector
+`person.$address.town` would identify an address node with a town child,
+or `$people.{name, dob}` would provide the people array repeatedly
+whenever a new person is added to it. Javascript frameworks such as
+d3.js and Angular are designed to work with whole models as they change.
+Consequently, the interface they present converses more fluently with
+collections than individual entities. If we are downloading data to use
+with these libraries it is more convenient if we use explicit capturing
+so that we are notified whenever the collection is expanded and can pass
+it on.
 
 Parsing the JSON Response
 -------------------------
