@@ -395,21 +395,20 @@ which the identified node was found. Consider the following JSON:
 ~~~~
 
 Here we can extract the runners using the pattern `{name time}` or
-`medalWinners.*` but the location of the node in the document 
-gives information which is as important as its content.
-The `path` parameter provides the location
-information as an array of strings plotting a descent from the
-JSON root to the found node. For example, `['medalWinners', 'gold']`.
-Similarly, the `ancestors` array is a list of the ancestors starting at
-the immediate parent of the found node and ending with the JSON root
-node. For all but the root node, which in any case has no ancestors, the
-nodes in this list will have been only partially parsed.
+`medalWinners.*` but the location of the node in the document gives
+information which is as important as its content. The `path` parameter
+provides the location information as an array of strings plotting a
+descent from the JSON root to the found node. For example,
+`['medalWinners', 'gold']`. Similarly, the `ancestors` array is a list
+of the ancestors starting at the immediate parent of the found node and
+ending with the JSON root node. For all but the root node, which in any
+case has no ancestors, the nodes in this list will have been only
+partially parsed.
 
-Being untyped,
-Javascript does not enforce the arity of the callback. Because much of
-the time only the content itself is needed, the API design orders the
-callback parameters to take advantage of the loose typing so that a
-unary function taking only the content may be given.
+Being untyped, Javascript does not enforce the arity of the callback.
+Because much of the time only the content itself is needed, the API
+design orders the callback parameters to take advantage of the loose
+typing so that a unary function taking only the content may be given.
 
 For the widest context currently available, the whole document as it has
 been parsed so far may be accessed using the `.root` method. Since
