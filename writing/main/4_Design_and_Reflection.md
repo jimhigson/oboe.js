@@ -274,36 +274,35 @@ While SAX parsers provide an unappealing interface to application
 developers, as a starting point to handle low-level parsing in
 higher-level libraries they work very well (most XML DOM parsers are
 built in this way). The pre-existing Clarinet project is well tested,
-liberally licenced, and compact, meeting our needs perfectly.
-The name of this project, Oboe.js, was chosen in tribute to the value 
-delivered by Clarinet.
+liberally licenced, and compact, meeting our needs perfectly. The name
+of this project, Oboe.js, was chosen in tribute to the value delivered
+by Clarinet.
 
 API design
 ----------
 
-Everything that Oboe is designed to do can already be achieved by combining
-a SAX parser with imperatively coded node selection. This has
+Everything that Oboe is designed to do can already be achieved by
+combining a SAX parser with imperatively coded node selection. This has
 not been adopted widely because it requires verbose, difficult
 programming in a style which is unfamiliar to most programmers. With
 this in mind it is a high priority to design a public API for Oboe which
-is concise, simple, and resembles other commonly used tools. If Oboe's API
-is made similar to common tools, a lesser modification should be
+is concise, simple, and resembles other commonly used tools. If Oboe's
+API is made similar to common tools, a lesser modification should be
 required to switch existing projects to streaming http.
 
-For some common
-use cases it should be possible to create an API which is a close enough
-equivalent to popular tools that it can be used as a direct drop-in
-replacement. Although used in this way no progressive loading would
-be enacted, when refactoring towards a goal the first step is often to
-create a new expression of the same logic [@cleancode p. 212]. By giving
-basic support for non-progressive downloading, the door is open for apps
-to incrementally refactor towards a progressive expression. Allowing
-adoption as a series of small, easily manageable steps rather than a
-single leap is especially helpful for teams working under Scrum because
-all work must fit within a fairly short timeframe.
+For some common use cases it should be possible to create an API which
+is a close enough equivalent to popular tools that it can be used as a
+direct drop-in replacement. Although used in this way no progressive
+loading would be enacted, when refactoring towards a goal the first step
+is often to create a new expression of the same logic [@cleancode p.
+212]. By giving basic support for non-progressive downloading, the door
+is open for apps to incrementally refactor towards a progressive
+expression. Allowing adoption as a series of small, easily manageable
+steps rather than a single leap is especially helpful for teams working
+under Scrum because all work must fit within a fairly short timeframe.
 
-jQuery is by far the most popular library for AJAX today. The basic call style 
-for making an AJAX GET request is as follows:
+jQuery is by far the most popular library for AJAX today. The basic call
+style for making an AJAX GET request is as follows:
 
 ~~~~ {.javascript}
 jQuery.ajax("resources/shortMessage.txt")
@@ -315,17 +314,16 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
-While jQuery is callback-based and internally event driven, the public API it exposes
-does not wrap asynchronously retrieved content in event
+While jQuery is callback-based and internally event driven, the public
+API it exposes does not wrap asynchronously retrieved content in event
 objects. Event type is expressed by the name of the method used to add
 the listener. These names, `done` and `fail`, follow generic phrasing
-and are common to every functionality that jQuery provides asynchronously.
-Promoting brevity, the
-methods are chainable so that several listeners may be added from one
-statement.
+and are common to every functionality that jQuery provides
+asynchronously. Promoting brevity, the methods are chainable so that
+several listeners may be added from one statement.
 
-`jQuery.ajax` is overloaded and the parameter may be an object,
-allowing more information to be given:
+`jQuery.ajax` is overloaded and the parameter may be an object, allowing
+more information to be given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -334,13 +332,13 @@ jQuery.ajax({ "url":"resources/shortMessage.txt",
            });
 ~~~~
 
-This pattern of passing arguments as an object literal is
-common in Javascript for functions which take a large number of
-arguments, particularly if some are optional. This avoids having to pad
-unprovided optional arguments in the middle of the list with null values
-and, because the purpose of the values is apparent from the callee, also
-avoids an anti-pattern where a callsite can only be understood after counting
-the position of the arguments.
+This pattern of passing arguments as an object literal is common in
+Javascript for functions which take a large number of arguments,
+particularly if some are optional. This avoids having to pad unprovided
+optional arguments in the middle of the list with null values and,
+because the purpose of the values is apparent from the callee, also
+avoids an anti-pattern where a callsite can only be understood after
+counting the position of the arguments.
 
 Taking on this style while extending it to cover events for progressive
 parsing, we arrive at the following Oboe public API:
@@ -359,13 +357,12 @@ oboe("resources/people.json")
    });
 ~~~~
 
-In jQuery only one `done` handler is usually added to a request; the whole
-content is always given so there is only one thing to receive.
-Under Oboe there will usually be
-several separately selected areas of interest inside a JSON document so
-I anticipate that typically multiple handlers will be added. A
-shortcut style is provided for adding several selector/handler
-pairs at a time:
+In jQuery only one `done` handler is usually added to a request; the
+whole content is always given so there is only one thing to receive.
+Under Oboe there will usually be several separately selected areas of
+interest inside a JSON document so I anticipate that typically multiple
+handlers will be added. A shortcut style is provided for adding several
+selector/handler pairs at a time:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -380,8 +377,8 @@ oboe("resources/people.json")
 ~~~~
 
 Note the `path` and `ancestors` parameters in the examples above. These
-provide additional information regarding the context in
-which the identified node was found. Consider the following JSON:
+provide additional information regarding the context in which the
+identified node was found. Consider the following JSON:
 
 ~~~~ {.javascript}
 { 
@@ -395,16 +392,16 @@ which the identified node was found. Consider the following JSON:
 }  
 ~~~~
 
-In this JSON we may extract the runners using the pattern `{name time}` or
-`medalWinners.*` but nodes alone are insufficient because their
+In this JSON we may extract the runners using the pattern `{name time}`
+or `medalWinners.*` but nodes alone are insufficient because their
 location communicates information which is as important as their
 content. The `path` parameter provides the location as an array of
 strings plotting a descent from the JSON root to the found node. For
-example, Bolt has path `['medalWinners', 'gold']`. Similarly, the `ancestors` array is
-a list of the ancestors starting at the immediate parent of the found
-node and ending with the JSON root node. For all but the root node,
-which in any case has no ancestors, the nodes in the ancestor list will have
-been only partially parsed.
+example, Bolt has path `['medalWinners', 'gold']`. Similarly, the
+`ancestors` array is a list of the ancestors starting at the immediate
+parent of the found node and ending with the JSON root node. For all but
+the root node, which in any case has no ancestors, the nodes in the
+ancestor list will have been only partially parsed.
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
@@ -415,23 +412,24 @@ oboe("resources/someJson.json")
    });
 ~~~~
 
-Being loosely typed, Javascript would not enforce
-that ternary callbacks are used as selection handlers. 
-Given that before a callback is made the application programmer must have
-provided a JSONPath selector for the locations in the document she is 
-interested in, for most JSON formats the content alone is
-sufficient. The API design orders the callback parameters so that in
-most common cases a unary or binary function can be given.
+Being loosely typed, Javascript would not enforce that ternary callbacks
+are used as selection handlers. Given that before a callback is made the
+application programmer must have provided a JSONPath selector for the
+locations in the document she is interested in, for most JSON formats
+the content alone is sufficient. The API design orders the callback
+parameters so that in most common cases a unary or binary function can
+be given.
 
-In node.js the code style is more obviously event-based. Listeners are
-added via a `.on` method with a string event name given as the first
-argument. Adopting this style, my API design for oboe.js also allows
-events to be added as:
+Using Node.js the code style is more obviously event-based. Listeners are
+normally added using an `.on` method and the event name is a string given 
+as the first argument. Adopting this style, my API design for oboe.js also 
+allows events to be added as:
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
-   .on( "node", "medalWinners.*", function(person, path, ancestors) {
-      console.log( person.name + " won the " + lastOf(path) + " medal" );
+   .on( "node", "medalWinners.*", function(person) {
+   
+      console.log( "Well done " + person.name );
    });
 ~~~~
 
