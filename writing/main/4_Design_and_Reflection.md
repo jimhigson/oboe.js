@@ -320,8 +320,8 @@ While callback-based and internally event driven, the public API exposed
 by jQuery\
 does not wrap asynchronously retrieved content in event objects. Event
 type is expressed by the name of the method which adds the listener.
-These names, `done` and `fail`, follow generic phrasing and are common to
-everything that jQuery provides asynchronously. The methods are
+These names, `done` and `fail`, follow generic phrasing and are common
+to everything that jQuery provides asynchronously. The methods are
 chainable so that several listeners may be added from one statement.
 
 By method overloading, the parameter to `jQuery.ajax` may be an object
@@ -339,7 +339,7 @@ common in Javascript for functions which take a large number of
 arguments, particularly if some are optional. This avoids having to pad
 unprovided optional arguments in the middle of the list with null values
 and, because the purpose of the values is apparent from the callee, also
-an anti-pattern where a callsite can only be understood after counting 
+an anti-pattern where a callsite can only be understood after counting
 the position of the arguments.
 
 Taking on this style and extending to cover events for progressive
