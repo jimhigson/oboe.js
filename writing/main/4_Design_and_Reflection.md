@@ -291,11 +291,11 @@ is made similar to common tools, a lesser modification should be
 required to switch existing projects to streaming http.
 
 For some common
-use cases it should be possible to create an API with a close enough
-equivalence to popular tools that it can be used as a direct drop-in
-replacement. Although when used in this way no progressive loading would
+use cases it should be possible to create an API which is a close enough
+equivalent to popular tools that it can be used as a direct drop-in
+replacement. Although used in this way no progressive loading would
 be enacted, when refactoring towards a goal the first step is often to
-create a new expression of the same thing [@cleancode p. 212]. By giving
+create a new expression of the same logic [@cleancode p. 212]. By giving
 basic support for non-progressive downloading, the door is open for apps
 to incrementally refactor towards a progressive expression. Allowing
 adoption as a series of small, easily manageable steps rather than a
@@ -315,16 +315,17 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
-While callback-based and internally event driven, the public API exposed
-by jQuery does not wrap asynchronously retrieved content in event
-objects. Event type is expressed by the name of the method which adds
+While jQuery is callback-based and internally event driven, the public API it exposes
+does not wrap asynchronously retrieved content in event
+objects. Event type is expressed by the name of the method used to add
 the listener. These names, `done` and `fail`, follow generic phrasing
-and are common to everything that jQuery provides asynchronously. The
+and are common to every functionality that jQuery provides asynchronously.
+Promoting brevity, the
 methods are chainable so that several listeners may be added from one
 statement.
 
-By method overloading, the parameter to `jQuery.ajax` may be an object
-which allows more information to be given:
+`jQuery.ajax` is overloaded and the parameter may be an object,
+allowing more information to be given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -333,16 +334,16 @@ jQuery.ajax({ "url":"resources/shortMessage.txt",
            });
 ~~~~
 
-This pattern of listing function parameters as an object literal is
+This pattern of passing arguments as an object literal is
 common in Javascript for functions which take a large number of
 arguments, particularly if some are optional. This avoids having to pad
 unprovided optional arguments in the middle of the list with null values
 and, because the purpose of the values is apparent from the callee, also
-an anti-pattern where a callsite can only be understood after counting
+avoids an anti-pattern where a callsite can only be understood after counting
 the position of the arguments.
 
-Taking on this style and extending to cover events for progressive
-parsing, we get the public API for Oboe:
+Taking on this style while extending it to cover events for progressive
+parsing, we arrive at the following Oboe public API:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -358,11 +359,12 @@ oboe("resources/people.json")
    });
 ~~~~
 
-In jQuery only one `done` handler is usually added to a request because
-there is only one thing to receive. Under oboe there will usually be
+In jQuery only one `done` handler is usually added to a request; the whole
+content is always given so there is only one thing to receive.
+Under Oboe there will usually be
 several separately selected areas of interest inside a JSON document so
-I anticipate that adding multiple handlers will be more common. A
-shortcut call style is provided for adding several selector/handler
+I anticipate that typically multiple handlers will be added. A
+shortcut style is provided for adding several selector/handler
 pairs at a time:
 
 ~~~~ {.javascript}
