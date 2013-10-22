@@ -286,11 +286,11 @@ a SAX parser with imperatively coded node selection. This has
 not been adopted widely because it requires verbose, difficult
 programming in a style which is unfamiliar to most programmers. With
 this in mind it is a high priority to design a public API for Oboe which
-is concise, simple, and resembles other commonly used tools.
-
-jQuery is by far the most popular library for AJAX today. If Oboe's API
+is concise, simple, and resembles other commonly used tools. If Oboe's API
 is made similar to common tools, a lesser modification should be
-required to switch existing projects to streaming http. For some common
+required to switch existing projects to streaming http.
+
+For some common
 use cases it should be possible to create an API with a close enough
 equivalence to popular tools that it can be used as a direct drop-in
 replacement. Although when used in this way no progressive loading would
@@ -302,7 +302,8 @@ adoption as a series of small, easily manageable steps rather than a
 single leap is especially helpful for teams working under Scrum because
 all work must fit within a fairly short timeframe.
 
-jQuery's basic call style for making an AJAX GET request is as follows:
+jQuery is by far the most popular library for AJAX today. The basic call style 
+for making an AJAX GET request is as follows:
 
 ~~~~ {.javascript}
 jQuery.ajax("resources/shortMessage.txt")
