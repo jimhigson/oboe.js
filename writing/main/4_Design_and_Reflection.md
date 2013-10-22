@@ -283,7 +283,7 @@ tribute to the value delivered by Clarinet.
 API design
 ----------
 
-Everything that Oboe.js does could already be done with existing tools by
+Everything that Oboe is designed to do can already be achieved by
 using a SAX parser directly with imperatively coded node selection. This has
 not been widely adopted because it requires verbose, difficult programming
 in a style which is unfamiliar to most programmers.
