@@ -420,10 +420,10 @@ the content alone is sufficient. The API design orders the callback
 parameters so that in most common cases a unary or binary function can
 be given.
 
-Using Node.js the code style is more obviously event-based. Listeners are
-normally added using an `.on` method and the event name is a string given 
-as the first argument. Adopting this style, my API design for oboe.js also 
-allows events to be added as:
+Using Node.js the code style is more obviously event-based. Listeners
+are normally added using an `.on` method and the event name is a string
+given as the first argument. Adopting this style, my API design for
+oboe.js also allows events to be added as:
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
