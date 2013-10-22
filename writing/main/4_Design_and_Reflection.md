@@ -316,16 +316,16 @@ jQuery.ajax("resources/shortMessage.txt")
    });
 ~~~~
 
-While callback-based and internally event driven, the public API exposed by jQuery  
-does not wrap asynchronously retrieved content in event objects.
-Event type is expressed by the name of the method which adds the listener.
-These names, `done` and `fail`, are generic verbs which are 
-used for everything that jQuery provides asynchronously. The methods are chainable
-so that several listeners may be added from one statement.
+While callback-based and internally event driven, the public API exposed
+by jQuery\
+does not wrap asynchronously retrieved content in event objects. Event
+type is expressed by the name of the method which adds the listener.
+These names, `done` and `fail`, are generic verbs which are used for
+everything that jQuery provides asynchronously. The methods are
+chainable so that several listeners may be added from one statement.
 
-By method overloading, the
-parameter to `jQuery.ajax` may be an object which allows more information to be
-given:
+By method overloading, the parameter to `jQuery.ajax` may be an object
+which allows more information to be given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -334,17 +334,16 @@ jQuery.ajax({ "url":"resources/shortMessage.txt",
            });
 ~~~~
 
-This pattern of listing
-function parameters as an object literal is common in Javascript for functions
-which take a large number of arguments, particularly if some are optional.
-This avoids having to pad unprovided optional arguments in the middle of the
-list with null values and, because the purpose of the values is apparent from
-the callee, also 
-an anti-pattern where a callsite can only be understood after careful attention to the position
-of the arguments. 
+This pattern of listing function parameters as an object literal is
+common in Javascript for functions which take a large number of
+arguments, particularly if some are optional. This avoids having to pad
+unprovided optional arguments in the middle of the list with null values
+and, because the purpose of the values is apparent from the callee, also
+an anti-pattern where a callsite can only be understood after careful
+attention to the position of the arguments.
 
-Taking on this style and extending to cover events for progressive parsing, we 
-get the following Oboe public API:
+Taking on this style and extending to cover events for progressive
+parsing, we get the following Oboe public API:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -360,11 +359,12 @@ oboe("resources/people.json")
    });
 ~~~~
 
-In jQuery only one `done` handler is usually added to a request because there
-is only one thing to receive. Under oboe there will usually be several separately
-selected areas of interest inside a JSON document so I anticipate that adding 
-multiple handlers will be more common. A shortcut call style is provided for 
-adding several selector/handler pairs at a time:
+In jQuery only one `done` handler is usually added to a request because
+there is only one thing to receive. Under oboe there will usually be
+several separately selected areas of interest inside a JSON document so
+I anticipate that adding multiple handlers will be more common. A
+shortcut call style is provided for adding several selector/handler
+pairs at a time:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -379,7 +379,7 @@ oboe("resources/people.json")
 ~~~~
 
 Note the `path` and `ancestors` parameters in the examples above. These
-provide additional information regarding the location and the context in 
+provide additional information regarding the location and the context in
 which the identified node was found. Consider the following JSON:
 
 ~~~~ {.javascript}
