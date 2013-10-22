@@ -403,13 +403,12 @@ example, `['medalWinners', 'gold']`. Similarly, the `ancestors` array is
 a list of the ancestors starting at the immediate parent of the found
 node and ending with the JSON root node. For all but the root node,
 which in any case has no ancestors, the nodes in this list will have
-been only partially parsed.
-Being untyped, Javascript does not enforce that ternary callbacks are given.
-Unlike the example above, given that we have provided a JSONPath
-selector for the locations we would like to receive data from, for most JSON formats 
-the content alone will be sufficient. The API
-design orders the callback parameters so that in most common case a unary 
-function may be given.
+been only partially parsed. Being untyped, Javascript does not enforce
+that ternary callbacks are given. Unlike the example above, given that
+we have provided a JSONPath selector for the locations we would like to
+receive data from, for most JSON formats the content alone will be
+sufficient. The API design orders the callback parameters so that in
+most common case a unary function may be given.
 
 If an even wider context is required, the whole document as it has been
 parsed so far may be accessed using the `.root()` method. Since `.root`
