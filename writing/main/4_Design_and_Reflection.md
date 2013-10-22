@@ -395,27 +395,26 @@ which the identified node was found. Consider the following JSON:
 ~~~~
 
 Here we can extract the runners using the pattern `{name time}` or
-`medalWinners.*` but the nodes alone are insufficient because their location 
-communicates information which is as important as their content.
-The `path` parameter
-provides the location as an array of strings plotting a
-descent from the JSON root to the found node. For example,
-`['medalWinners', 'gold']`. Similarly, the `ancestors` array is a list
-of the ancestors starting at the immediate parent of the found node and
-ending with the JSON root node. For all but the root node, which in any
-case has no ancestors, the nodes in this list will have been only
-partially parsed.
+`medalWinners.*` but the nodes alone are insufficient because their
+location communicates information which is as important as their
+content. The `path` parameter provides the location as an array of
+strings plotting a descent from the JSON root to the found node. For
+example, `['medalWinners', 'gold']`. Similarly, the `ancestors` array is
+a list of the ancestors starting at the immediate parent of the found
+node and ending with the JSON root node. For all but the root node,
+which in any case has no ancestors, the nodes in this list will have
+been only partially parsed.
+Being untyped, Javascript does not enforce that ternary callbacks are given.
+Unlike the example above, given that we have provided a JSONPath
+selector for the locations we would like to receive data from, for most JSON formats 
+the content alone will be sufficient. The API
+design orders the callback parameters so that in most common case a unary 
+function may be given.
 
-Being untyped, Javascript does not enforce the arity of the callback.
-Because much of the time only the content itself is needed, the API
-design orders the callback parameters to take advantage of the loose
-typing so that a unary function taking only the content may be given.
-
-If an even wider context is required, the whole document as it has
-been parsed so far may be accessed using the `.root()` method. Since
-`.root` relates to the oboe instance itself rather than the callback
-per-say, it can be accessed from any code with a reference to the oboe
-object.
+If an even wider context is required, the whole document as it has been
+parsed so far may be accessed using the `.root()` method. Since `.root`
+relates to the oboe instance itself rather than the callback per-say, it
+can be accessed from any code with a reference to the oboe object.
 
 `http://nodejs.org/docs/latest/api/events.html#events_emitter_on_event_listener`
 
