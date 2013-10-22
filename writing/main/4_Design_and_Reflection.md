@@ -283,29 +283,26 @@ tribute to the value delivered by Clarinet.
 API design
 ----------
 
-Everything that Oboe is designed to do can already be achieved by
-using a SAX parser directly with imperatively coded node selection. This has
-not been widely adopted because it requires verbose, difficult programming
-in a style which is unfamiliar to most programmers.
-With this in mind it is a high priority to design a public API for Oboe which 
+Everything that Oboe is designed to do can already be achieved by using
+a SAX parser directly with imperatively coded node selection. This has
+not been widely adopted because it requires verbose, difficult
+programming in a style which is unfamiliar to most programmers. With
+this in mind it is a high priority to design a public API for Oboe which
 is concise, simple and resembles other commonly used tools.
 
-To pursue good developer ergonomics I will study successful libraries and adapt
-facets of their APIs. 
-Over time well-liked libraries have refined their APIs.
-If Oboe's API is made similar to common tools  
-only minimal modification should be required to switch
-existing projects to streaming http.
-For the most common use cases, it should be
-possible to create a library with a close functional equivalence that
-can be used as a direct drop-in replacement. Used in this way, no
-progressive loading would be done but it opens the door for the project
-taking up the library to be refactored towards a progressive model over
-time. By imitating existing APIs we allow adoption as a series of small,
-easily manageable steps rather than a single leap. This is especially
-helpful for teams wishing to adopt this project working under Scrum
-because all tasks must be self-contained and fit within a fairly short
-timeframe.
+To pursue good developer ergonomics I will study successful libraries
+and adapt facets of their APIs. Over time well-liked libraries have
+refined their APIs. If Oboe's API is made similar to common tools\
+only minimal modification should be required to switch existing projects
+to streaming http. For the most common use cases, it should be possible
+to create a library with a close functional equivalence that can be used
+as a direct drop-in replacement. Used in this way, no progressive
+loading would be done but it opens the door for the project taking up
+the library to be refactored towards a progressive model over time. By
+imitating existing APIs we allow adoption as a series of small, easily
+manageable steps rather than a single leap. This is especially helpful
+for teams wishing to adopt this project working under Scrum because all
+tasks must be self-contained and fit within a fairly short timeframe.
 
 jQuery's basic call style for making an AJAX GET request follows:
 
