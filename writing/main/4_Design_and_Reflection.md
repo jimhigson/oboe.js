@@ -320,7 +320,7 @@ While callback-based and internally event driven, the public API exposed
 by jQuery\
 does not wrap asynchronously retrieved content in event objects. Event
 type is expressed by the name of the method which adds the listener.
-These names, `done` and `fail`, are generic verbs which are used for
+These names, `done` and `fail`, follow generic phrasing and are common to
 everything that jQuery provides asynchronously. The methods are
 chainable so that several listeners may be added from one statement.
 
@@ -343,7 +343,7 @@ an anti-pattern where a callsite can only be understood after counting
 the position of the arguments.
 
 Taking on this style and extending to cover events for progressive
-parsing, we get the following Oboe public API:
+parsing, we get the public API for Oboe:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
