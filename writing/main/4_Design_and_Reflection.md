@@ -309,24 +309,19 @@ jQuery's basic call style for making an AJAX GET request is as follows:
 ~~~~ {.javascript}
 jQuery.ajax("resources/shortMessage.txt")
    .done(function( text ) {
-      console.log( 'Got the text: ' + text ); 
+      console.log( "Got the text: " + text ); 
    }).
-   .fail(function(data) {
-      console.log( 'the request failed' );      
+   .fail(function() {
+      console.log( "the request failed" );      
    });
 ~~~~
 
-While for simple web applications usage is much as above,\
-In real world usage on more complex apps jQuery.ajax is often injected
-into the scope of the code which wants to use it. Easier stubbing so
-that tests don't have to make actual AJAX calls.
-
-While certainly callback-based, the jQuery is somewhat implicit in being
-event-based. There are no event names separate from the methods which
-add the listeners and there are no event objects, preferring to pass the
-content directly. The names used to add the events (done, fail) are also
-generic, used for all asynchronous requests. The methods are chainable
-which allows several listeners to be added in one statement.
+While callback-based and internally event driven, the public API exposed by jQuery  
+does not wrap asynchronously retrieved content in event objects.
+Event type is expressed by the name of the method which adds the listener.
+These names, `done` and `fail`, are generic verbs which are 
+used for everything that jQuery provides asynchronously. The methods are chainable
+so that several listeners may be added from one statement.
 
 By method overloading, if the request requires more information than the
 parameter to `jQuery.ajax` may be an object. This pattern of accepting
