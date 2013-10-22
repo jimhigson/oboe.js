@@ -290,13 +290,13 @@ in a style which is unfamiliar to most programmers.
 With this in mind it is a high priority to design a public API for Oboe which 
 is concise, simple and resembles other commonly used tools.
 
-To pursue good ergonomics, I will study successful libraries and, where
-appropriate, copy their APIs. We may assume that the existing libraries
-have already over time come to refined solutions to similar problems.
-Working in a style similar to existing libraries also makes the library
-easier to learn. Lastly, if we create a library which functions
-similarly enough to existing tools it should be easy to modify an
-existing project to adopt it. In the most common use cases, it should be
+To pursue good developer ergonomics I will study successful libraries and adapt
+facets of their APIs. 
+Over time well-liked libraries have refined their APIs.
+If Oboe's API is made similar to common tools  
+only minimal modification should be required to switch
+existing projects to streaming http.
+For the most common use cases, it should be
 possible to create a library with a close functional equivalence that
 can be used as a direct drop-in replacement. Used in this way, no
 progressive loading would be done but it opens the door for the project
