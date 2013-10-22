@@ -237,13 +237,13 @@ but could also have any others.
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
 
-Sometimes when downloading a collection of items it is less useful to be
-given each element individually than being kept up to date as the
-collection is expanded. Certain Javascript libraries such as d3.js and
-Angular interface more naturally with arrays of items than individual
-entities. To allow integration with these libraries, on receiving an
-array of items it is useful to be repeatedly passed the same containing
-array whenever a new element is concatenated onto it.
+Some popular Javascript frameworks such as d3.js and
+Angular interface more naturally with collections than with individual
+entities.
+If we are downloading data to use with these libraries 
+it is more useful to be notified whenever the
+collection is expanded than it is to be
+given each element individually.
 
 Expressing a 'contained in' relationship comes naturally to JSONPath,
 but no provision is made for a 'containing' relationship. Cascading
