@@ -283,16 +283,12 @@ tribute to the value delivered by Clarinet.
 API design
 ----------
 
-*API allows body to be given as Object and converts into JSON because it
-is anticipated that REST services which emmit JSON will also accept it*
-
-In designing the API developer ergonomics are the top priority. This is
-especially pertinent given that the library does nothing that can't be
-done with existing tools such as JSON SAX parsers but that those tools
-are not used because they require too much effort to form a part of most
-developers' everyday toolkit.
-
-*Expose single global.*
+Everything that Oboe.js does could already be done with existing tools by
+using a SAX parser directly with imperatively coded node selection. This has
+not been widely adopted because it requires verbose, difficult programming
+in a style which is unfamiliar to most programmers.
+With this in mind it is a high priority to design a public API for Oboe which 
+is concise, simple and resembles other commonly used tools.
 
 To pursue good ergonomics, I will study successful libraries and, where
 appropriate, copy their APIs. We may assume that the existing libraries
@@ -446,6 +442,9 @@ the document, for some callback c, `.done(c)` is a synonym for
 `.node('!', c)` and therefore below a thin interface layer may share an
 implementation. Likewise, `.node` is easily expressible as a partial
 completion of `.on` with `'node'`.
+
+*API allows body to be given as Object and converts into JSON because it
+is anticipated that REST services which emmit JSON will also accept it*
 
 Earlier callbacks when paths are matched
 ----------------------------------------
