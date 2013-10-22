@@ -450,16 +450,16 @@ share a commonb implementation.
 *API allows body to be given as Object and converts into JSON because it
 is anticipated that REST services which emmit JSON will also accept it*
 
-Earlier callbacks when paths are matched
+Earlier callbacks when paths are found prior to nodes
 ----------------------------------------
 
 Following with the project's aim of giving callbacks as early as
 possible, sometimes useful work can be done when a node is known to
 exist but before we have the contents of the node. This means that each
-node found in a JSON document has the potential to trigger notifications
-at two points: when it is first discovered and when it is complete. The
-API facilitates this by providing a `path` callback following much the
-same pattern as the `node` callback.
+node found in a JSON document can potentially trigger notifications
+at two points: when it is first addressed and when it is complete. The
+API facilitates this by providing a `path` event following much the
+same pattern as `node`.
 
 ~~~~ {.javascript}
 oboe("events.json")
