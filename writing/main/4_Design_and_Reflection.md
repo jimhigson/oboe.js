@@ -273,20 +273,20 @@ Parsing the JSON Response
 While SAX parsers provide an unappealing interface to application
 developers, as a starting point to handle low-level parsing in
 higher-level libraries they work very well (most XML DOM parsers are
-built in this way). The pre-existing project Clarinet is well tested,
-liberally licenced, and compact, meeting the goals of this project
-perfectly. In fact, the name of this project, Oboe.js, was chosen in
-tribute to the value delivered by Clarinet.
+built in this way). The pre-existing Clarinet project is well tested,
+liberally licenced, and compact, meeting our needs perfectly.
+The name of this project, Oboe.js, was chosen in tribute to the value 
+delivered by Clarinet.
 
 API design
 ----------
 
-Everything that Oboe is designed to do can already be achieved by using
-a SAX parser directly with imperatively coded node selection. This has
-not been widely adopted because it requires verbose, difficult
+Everything that Oboe is designed to do can already be achieved by combining
+a SAX parser with imperatively coded node selection. This has
+not been adopted widely because it requires verbose, difficult
 programming in a style which is unfamiliar to most programmers. With
 this in mind it is a high priority to design a public API for Oboe which
-is concise, simple and resembles other commonly used tools.
+is concise, simple, and resembles other commonly used tools.
 
 jQuery is by far the most popular library for AJAX today. If Oboe's API
 is made similar to common tools, a lesser modification should be
