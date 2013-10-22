@@ -317,12 +317,12 @@ jQuery.ajax("resources/shortMessage.txt")
 ~~~~
 
 While callback-based and internally event driven, the public API exposed
-by jQuery\
-does not wrap asynchronously retrieved content in event objects. Event
-type is expressed by the name of the method which adds the listener.
-These names, `done` and `fail`, follow generic phrasing and are common
-to everything that jQuery provides asynchronously. The methods are
-chainable so that several listeners may be added from one statement.
+by jQuery does not wrap asynchronously retrieved content in event
+objects. Event type is expressed by the name of the method which adds
+the listener. These names, `done` and `fail`, follow generic phrasing
+and are common to everything that jQuery provides asynchronously. The
+methods are chainable so that several listeners may be added from one
+statement.
 
 By method overloading, the parameter to `jQuery.ajax` may be an object
 which allows more information to be given:
