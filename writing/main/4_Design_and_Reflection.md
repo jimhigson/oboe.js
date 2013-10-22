@@ -466,21 +466,22 @@ oboe("events.json")
    .path( "medalWinners", function() {
       // We don"t know the winners yet but we know we have some so let"s
       // start drawing the table already:    
-      interface.showMedalTable();
+      gui.showMedalTable();
    })
    .node( "medalWinners.*", function(person, path) {    
-      interface.addPersonToMedalTable(person, lastOf(path));
+      let metal = lastOf(path);
+      gui.addPersonToMedalTable(person, metal);
    })
    .fail( function(){
       // That didn"t work. Revert!
-      interface.hideMedalTable();
+      gui.hideMedalTable();
    });
 ~~~~
 
-In implementation providing path notifications is a simple matter of
-allowing the evaluation of the json path expressions when items are
-pushed to the stack of current nodes in addition to when they are
-popped.
+Implementing path notifications requires little extra code, requiring JSONPath expressions 
+can be evaluated when items are found 
+in addition to when they are
+completed.
 
 Oboe.js as a Micro-Library
 --------------------------
