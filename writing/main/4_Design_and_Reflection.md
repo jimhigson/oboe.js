@@ -433,18 +433,20 @@ oboe("resources/someJson.json")
    });
 ~~~~
 
-While allowing both styles uncountably creates an API which is larger
+While allowing both styles creates an API which is larger
 than it needs to be, creating a library which is targeted at both the
-client and server side, I hope this will help adoption by either camp.
-The Two styles are similar enough that a person familiar with one should
-be able to pick up the other without difficulty. In implementation a
-duplicative API should require only a minimal degree of extra coding
-because these parts may be expressed in common and their scope reduced
-using partial completion. Because `'!'` is the JSONPath for the root of
-the document, for some callback c, `.done(c)` is a synonym for
-`.node('!', c)` and therefore below a thin interface layer may share an
-implementation. Likewise, `.node` is easily expressible as a partial
+client and server side is a ballance between self-consistency spanning environments
+and consistency *with* the environment, I hope this will help adoption by either camp.
+The two styles are similar enough that a person familiar with one should
+be able to work with the other without difficulty. Implementating the
+duplicative parts of the API should require only a minimal degree of extra coding
+because they may be expressed in common using 
+partial completion. Because `'!'` is the JSONPath for the root of
+the document, for some callback `c`, `.done(c)` is a equal to
+`.node('!', c)`. Likewise, `.node` is easily expressible as a partial
 completion of `.on` with `'node'`.
+Below a thin interface layer may share a commonb
+implementation. 
 
 *API allows body to be given as Object and converts into JSON because it
 is anticipated that REST services which emmit JSON will also accept it*
