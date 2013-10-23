@@ -24,6 +24,10 @@ function pubSub(){
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
+      },
+      
+      un: function( eventId, handler ) {
+         listeners[eventId] = without(listeners[eventId], handler);
       }           
    };
 }

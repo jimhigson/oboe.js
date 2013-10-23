@@ -102,6 +102,22 @@ function foldR(fn, startValue, list) {
             ;
 }
 
+/**
+ * Return a version of list with the first instance of item removed 
+ * Like
+ *    http://hackage.haskell.org/package/base-4.2.0.1/docs/Data-List.html#v:delete
+ */
+function without(list, item) {
+
+   var candiate = head(list),
+       rest = tail(list);
+   
+   return list 
+            ? (head(list) == item? rest : cons(candiate, without(rest, item))) 
+            : emptyList
+            ;
+}
+
 /** 
  * Returns true if the given function holds for every item in 
  * the list, false otherwise 
