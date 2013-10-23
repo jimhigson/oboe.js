@@ -320,7 +320,11 @@ objects. Event type is expressed by the name of the method used to add
 the listener. These names, `done` and `fail`, follow generic phrasing
 and are common to every functionality that jQuery provides
 asynchronously. Promoting brevity, the methods are chainable so that
-several listeners may be added from one statement.
+several listeners may be added from one statement. Although Javascript
+supports exception throwing, a fail event is used. Exceptions are not
+applicable to non-blocking I/O because at the time of the failure the
+call which provoked the exception will have already been popped from the
+call stack.
 
 `jQuery.ajax` is overloaded and the parameter may be an object, allowing
 more information to be given:
@@ -613,11 +617,3 @@ kept and a URL may be constructed to request just the lost part.
 Alternatively, under optimistic locking, the application developer may
 choose to perform rollback. In either case, responding to errors beyond
 informing the calling application is outside of Oboe's scope.
-
-IO errors in a non-blocking system cannot be handled via exception
-throwing because the call which will later cause an error will no longer
-be on the stack at the time that the error occurs. Error-events will be
-used instead.
-
-With further development Oboe could be used for perpetual streaming but
-at the moment there are not the tools to write out JSON like this.
