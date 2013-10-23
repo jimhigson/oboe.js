@@ -202,8 +202,7 @@ oboe('/myapp/things.json')
 
 ## Deregistering a callback
 
-Calling `this.forget()` from inside a callback is an easy way to deregister
-that listener.
+Calling `this.forget()` from inside a callback deregisters that listener.
 
 ``` js
 oboe('')
