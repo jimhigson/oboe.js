@@ -38,9 +38,7 @@ describe("oboe integration (real http)", function() {
             }).end();
          
             
-         waitsFor(function () {
-            return !!fullResponse
-         }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+         waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
    
          runs(function () {
   
@@ -54,9 +52,7 @@ describe("oboe integration (real http)", function() {
             .node('![*]', callbackSpy)
             .done(whenDoneFn);            
                      
-         waitsFor(function () {
-            return !!fullResponse
-         }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+         waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
    
          runs(function () {
   
@@ -72,9 +68,7 @@ describe("oboe integration (real http)", function() {
           .node('![*]', callbackSpy)
           .done(whenDoneFn);
 
-      waitsFor(function () {
-         return !!fullResponse
-      }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+      waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
 
       runs(function () {
 
@@ -92,35 +86,7 @@ describe("oboe integration (real http)", function() {
       });
    })
    
-   /*
-   Currently failing in Chrome
-      https://code.google.com/p/chromium/issues/detail?id=309092
-   it('can fetch gzipped content', function () {
-
-      oboe(url('gzippedTenSlowNumbers'))
-          .node('![*]', callbackSpy)
-          .done(whenDoneFn);
-
-      waitsFor(function () {
-         return !!fullResponse
-      }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
-
-      runs(function () {
-
-         expect(callbackSpy).toHaveBeenCalledWith(0, [0], [fullResponse, 0]);
-         expect(callbackSpy).toHaveBeenCalledWith(1, [1], [fullResponse, 1]);
-         expect(callbackSpy).toHaveBeenCalledWith(2, [2], [fullResponse, 2]);
-         expect(callbackSpy).toHaveBeenCalledWith(3, [3], [fullResponse, 3]);
-         expect(callbackSpy).toHaveBeenCalledWith(4, [4], [fullResponse, 4]);
-         expect(callbackSpy).toHaveBeenCalledWith(5, [5], [fullResponse, 5]);
-         expect(callbackSpy).toHaveBeenCalledWith(6, [6], [fullResponse, 6]);
-         expect(callbackSpy).toHaveBeenCalledWith(7, [7], [fullResponse, 7]);
-         expect(callbackSpy).toHaveBeenCalledWith(8, [8], [fullResponse, 8]);
-         expect(callbackSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
-
-      });
-   })*/   
-   
+        
    it('can make nested requests from arrays', function () {
 
       oboe(url('tenSlowNumbers'))
@@ -181,6 +147,56 @@ describe("oboe integration (real http)", function() {
       });
    })
 
+   it('can deregister from inside the callback', function () {
+  
+      var nodeCallback = jasmine.createSpy().andCallFake(function(){
+         if( nodeCallback.calls.length == 5 ) {
+            this.forget();
+         }
+      });   
+  
+      oboe(url('tenSlowNumbers'))
+         .node('![*]', nodeCallback)
+         .done(whenDoneFn);
+
+      // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
+      // rest of the data now and the test would fail:
+      waitsFor(doneCalled, ASYNC_TEST_TIMEOUT);
+
+      runs(function () {
+         // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+         // not the whole ten.      
+      
+         expect(nodeCallback.calls.length).toBe(5);
+      
+      });
+   })
+   
+   it('can still gets the whole resource after deregistering the callback', function () {
+  
+      var callback = jasmine.createSpy().andCallFake(function(){
+         if( callback.calls.length == 5 ) {
+            this.forget();
+         }
+      });   
+  
+      oboe(url('tenSlowNumbers'))
+         .node('![*]', callback)
+         .done(whenDoneFn);
+
+      // in case we didn't abort, wait a little longer. If we didn't really abort we'd get the
+      // rest of the data now and the test would fail:
+      waitsFor(doneCalled, ASYNC_TEST_TIMEOUT);
+
+      runs(function () {
+         // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+         // not the whole ten.      
+      
+         expect(fullResponse).toBe([0,1,2,3,4,5,6,7,8,9]);
+      
+      });
+   })   
+
    it('can abort once some data has been found in not very streamed response', function () {
 
       // like above but we're getting a static file not the streamed numbers. This means
@@ -209,9 +225,7 @@ describe("oboe integration (real http)", function() {
       oboe.doGet(url('static/json/firstTenNaturalNumbers.json'))
           .done(whenDoneFn);
 
-      waitsFor(function () {
-         return !!fullResponse
-      }, 'the request to give full response', ASYNC_TEST_TIMEOUT)
+      waitsFor(doneCalled, 'the request to give full response', ASYNC_TEST_TIMEOUT)
 
       runs(function () {
          expect(fullResponse).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -359,6 +373,10 @@ describe("oboe integration (real http)", function() {
       
    function whenDoneFn(obj) {
       fullResponse = obj;
+   }
+   
+   function doneCalled(){
+      return !!fullResponse         
    }
 
    beforeEach(function () {

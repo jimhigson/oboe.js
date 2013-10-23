@@ -323,17 +323,18 @@ function foldR(fn, startValue, list) {
 }
 
 /**
- * Return a version of list with the first instance of item removed 
- * Like
- *    http://hackage.haskell.org/package/base-4.2.0.1/docs/Data-List.html#v:delete
+ * Return a list like the one given but with the first instance equal 
+ * to item removed 
  */
 function without(list, item) {
  
-  return list  ? ( head(list) == item ? tail(list) 
-                                      : cons(head(list), without(tail(list), item))
-                 ) 
-               : emptyList
-               ;
+  return list  
+            ?  ( head(list) == item 
+                     ? tail(list) 
+                     : cons(head(list), without(tail(list), item))
+               ) 
+            : emptyList
+            ;
 }
 
 /** 
@@ -1845,7 +1846,8 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
  */
  
  
-function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
+function instanceController(  fire, on, un, 
+                              clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
 
@@ -1899,7 +1901,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
       // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function hadler( ascent ){ 
+      on( eventId, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
@@ -2022,7 +2024,7 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, 
+               eventBus.fire, eventBus.on, eventBus.un, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.fire) 
    );

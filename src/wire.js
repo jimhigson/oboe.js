@@ -13,7 +13,7 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, 
+               eventBus.fire, eventBus.on, eventBus.un, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.fire) 
    );
