@@ -32,7 +32,6 @@ http.
 - [Why I made this](#why-i-made-this)
 - [Getting the most from oboe](#getting-the-most-from-oboe)
 - [Browser support](#browser-support)
-	- [Running the tests](#running-the-tests)
 
 # Use cases
 
@@ -562,6 +561,3 @@ You don't get streaming but it isn't any worse than if you'd have designed your 
 I'm able to test in IE thanks to 
 [this rather wonderful script](https://github.com/xdissent/ievms).
 
-## Running the tests
-
-Use the Grunt. 
