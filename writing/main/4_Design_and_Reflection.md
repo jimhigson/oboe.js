@@ -485,27 +485,24 @@ to when they are completed.
 Oboe.js as a Micro-Library
 --------------------------
 
-In order to transfer it more quickly, especially for 
-entropy-sparse text formats such as Javascript, http traffic is often
-compressed ala gzip at point of sending, so in
-measuring a library's download footprint it usually makes more sense to compare
-post-gzipping. For the sake of adoption smaller is better. A Javascript library qualifies as being *micro* if it is
-delivered in 5kb or less, 5120 bytes. Micro-libraries also tend to follow
-the ethos that it is better for a developer to gather together several
-tiny libraries than find one with a one-size-fits-all approach, perhaps
-echoing the unix command line tradition for small programs which each do
-do exactly one thing.
-As well as being a small library, in the spirit of a
-micro-library a project should impose as few restrictions as possible on
-its use and be designed to be completely agnostic as to which other
-libraries or programming styles that it is used with. 
-Javascript Micro-libraries are listed at [microjs.com](http://microjs.com),
-which includes this project. 
-Oboe.js feels on the edge of what is
-possible to elegantly do as a micro-library so while the limit is
-somewhat arbitrary,  and
-keeping below this limit whilst writing readable code provides an interesting
-extra challenge.
+In order to transfer it more quickly, especially for entropy-sparse text
+formats such as Javascript, http traffic is often compressed ala gzip at
+point of sending, so in measuring a library's download footprint it
+usually makes more sense to compare post-gzipping. For the sake of
+adoption smaller is better. A Javascript library qualifies as being
+*micro* if it is delivered in 5kb or less, 5120 bytes. Micro-libraries
+also tend to follow the ethos that it is better for a developer to
+gather together several tiny libraries than find one with a
+one-size-fits-all approach, perhaps echoing the unix command line
+tradition for small programs which each do do exactly one thing. As well
+as being a small library, in the spirit of a micro-library a project
+should impose as few restrictions as possible on its use and be designed
+to be completely agnostic as to which other libraries or programming
+styles that it is used with. Javascript Micro-libraries are listed at
+[microjs.com](http://microjs.com), which includes this project. Oboe.js
+feels on the edge of what is possible to elegantly do as a micro-library
+so while the limit is somewhat arbitrary, and keeping below this limit
+whilst writing readable code provides an interesting extra challenge.
 
 Choice of streaming data transport
 ----------------------------------
@@ -635,5 +632,3 @@ difficult to implement. It does, however use its own stream API rather
 than emulate the browser API so will require platform-specific
 programming inside the library. This abstraction will be hidden from the
 library user so will not require any special programming on their part.
-
-[^1]: http://microjs.com/
