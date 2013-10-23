@@ -523,35 +523,47 @@ is historic, be retrieved from a cache which was populated by the stream.
 These frameworks use http as the underlying
 transport but I find they do not follow http's design principles.
 Because of these concerns, in the browser I will only be supporting
-downloading using XHRs.
+downloading using standard XHRs.
 
-Although I am designing Oboe for static resources and not focusing on
-creating a means to receive live events, the development community have
-speculated on the possibility of using Oboe to create a REST-compatible
-bridge that unifies live and static data. For example, consider a
+Although I am designing Oboe for ordinary REST resources and not focusing on
+creating a means to receive live events, it is interesting to
+speculate if Oboe could also be used to create a REST-compatible
+bridge which unifies live and static data. Consider a REST
 service which gives the results per-constituency for a UK general
-election. Requesting a previous year's results, the data is delivered in
+election. Requesting historic results, the data is delivered in
 JSON format much as usual. Requesting the results for the current year
 on the night of the election, an incomplete JSON with the constituencies
 known so far would be immediately sent, followed by the remainder as the
-results are called. Eventually, when all results are known the JSON
-would finally close. A few days later, for somebody wishing to fetch the
-results would use the *same url for the now historic data as was used on
-the night for the live data*. The data that was streamed is not
-incompatible with a http caching and a cache which saw the data when it
-was live would be able to store it in the cache and later serve it as
-historic. Programming using Oboe, an application developer would not
-have to handle live and historic data separately. The same code which
-displayed results as they were announced could be used to later show the
-historic results without any adjustments or branching.
+results are called. When all results are known the JSON
+would finally close, leaving a complete resource. A few days later, 
+somebody wishing to fetch the
+results would use the *same url for the historic data as was used on
+the night for the live data*. This is possible because the URL refers
+to the data that is required, regardless of if it is current or historic. 
+Because it eventually formed a complete http response, the data that was 
+streamed is not incompatible with http caching and 
+a cache which saw the data when it
+was live could store it as usual and later serve it as
+historic. The more sophisticated http intermediate caches recognise
+when a new request has the same url as an already ongoing request and
+serve the response received so far, then continue by giving both inbound requests
+the content as it arrives from the single outbound request.
+This means that the data would be cacheable even while the results are 
+streaming.
+Programming using Oboe, an application developer would not
+have to handle live and historic data as separate cases because the 
+node and path events are the same. Without branching, the
+code which displays results as they were announced is automatically
+able to show historic results.
 
 Taking this idea one step further, Oboe might be used for infinite data
 which intentionally never completes. In principle this is not
 incompatible with http caching although in practice would probably not
-work well with a cache which expects requests to eventually complete.
-This would also require a REST service which knows that it is delivering
-to a streaming client. If a non-streaming REST client were to try to use
-the same service it would try to get 'all' of the data and never
+work well with current caches which expect resources to complete.
+A REST service which serves infinite resources would have to confirm that it is delivering
+to a streaming client, perhaps by the client sending an http request header.
+Otherwise, if a non-streaming REST client were to try to use
+the service it would try to get 'all' of the data and never
 complete its task.
 
 Supporting only XHR as a transport unfortunately means that on legacy
