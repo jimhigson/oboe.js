@@ -545,6 +545,8 @@ live and historic data separately. The same code which displayed results
 as they were announced could be used to later show the historic results without
 any adjustments or branching. 
 
+\ref{xhrsandstreaming}
+
 On browsers without support for XHR2 progress events I will not be
 using streaming workarounds such as push tables because this would 
 create a REST
