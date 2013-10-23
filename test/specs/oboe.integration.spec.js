@@ -192,8 +192,7 @@ describe("oboe integration (real http)", function() {
          // because the request was aborted on index array 5, we got 6 numbers (inc zero)
          // not the whole ten.      
       
-         expect(fullResponse).toBe([0,1,2,3,4,5,6,7,8,9]);
-      
+         expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
       });
    })   
 
