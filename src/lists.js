@@ -103,17 +103,18 @@ function foldR(fn, startValue, list) {
 }
 
 /**
- * Return a version of list with the first instance of item removed 
- * Like
- *    http://hackage.haskell.org/package/base-4.2.0.1/docs/Data-List.html#v:delete
+ * Return a list like the one given but with the first instance equal 
+ * to item removed 
  */
 function without(list, item) {
  
-  return list  ? ( head(list) == item ? tail(list) 
-                                      : cons(head(list), without(tail(list), item))
-                 ) 
-               : emptyList
-               ;
+  return list  
+            ?  ( head(list) == item 
+                     ? tail(list) 
+                     : cons(head(list), without(tail(list), item))
+               ) 
+            : emptyList
+            ;
 }
 
 /** 
