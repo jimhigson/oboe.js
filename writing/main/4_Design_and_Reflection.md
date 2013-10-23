@@ -508,58 +508,57 @@ code provides an interesting extra challenge.
 Choice of streaming data transport
 ----------------------------------
 
-As discussed in section \ref{browserstreamingframeworks}, current 
-streaming techniques built on top of http take a dichotomous by splitting
-traffic up as either stream or download.
-I find that this split is not necessary and streaming may be used as 
-the most effective means of downloading.
+As discussed in section \ref{browserstreamingframeworks}, current
+streaming techniques built on top of http take a dichotomous by
+splitting traffic up as either stream or download. I find that this
+split is not necessary and streaming may be used as the most effective
+means of downloading.
 
-Streaming transports such as websockets are not REST services and are solutions to 
-a problem only tangentially related to this project's.
-Under these frameworks each stream has an address but the data in the stream
-is not addressable. This is similar to the *Service Tranpled REST* STREST 
-anti-pattern [@strest] in which http is viewed as addressing endpoints for services rather than
-addressing the resources themselves.
-If an event which is streamed live cannot and then
-then later made available as historic data, because the data is unaddressable 
-it is also uncacheable. These frameworks use http as the 
-underlying transport but I find they bend http away from its principled design.  
+Streaming transports such as websockets are not REST services and are
+solutions to a problem only tangentially related to this project's.
+Under these frameworks each stream has an address but the data in the
+stream is not addressable. This is similar to the *Service Trampled
+REST* STREST anti-pattern [@strest] in which http is viewed as
+addressing endpoints for services rather than addressing the resources
+themselves. If an event which is streamed live cannot and then then
+later made available as historic data, because the data is unaddressable
+it is also uncacheable. These frameworks use http as the underlying
+transport but I find they bend http away from its principled design.
 
-Although I am designing Oboe for static resources and not focusing on 
-creating a means to receive live events, the development community have speculated
-on the possibility of using Oboe to create a REST-compatible bridge that 
-unifies live and static data.
-For example, consider a service which gives the results per-constituency for a
-UK general election. Requesting a previous year's results, the data is delivered
-in JSON format much as usual. Requesting the results for the current year on
-the night of the election, an incomplete JSON with the constituencies known so 
-far would be immediately sent, followed by the remainder as the results are
-called. Eventually, when all results are known the JSON would finally close.
-A few days later, for somebody wishing to fetch the results would use
-the *same url for the now historic data as was used on the night for the live data*.
-The data that was streamed is not incompatible with a http caching and a cache
-which saw the data when it was live would be able to store it in the cache
-and later serve it as historic.
-Programming using Oboe, an application developer would not have to handle
-live and historic data separately. The same code which displayed results
-as they were announced could be used to later show the historic results without
-any adjustments or branching. 
+Although I am designing Oboe for static resources and not focusing on
+creating a means to receive live events, the development community have
+speculated on the possibility of using Oboe to create a REST-compatible
+bridge that unifies live and static data. For example, consider a
+service which gives the results per-constituency for a UK general
+election. Requesting a previous year's results, the data is delivered in
+JSON format much as usual. Requesting the results for the current year
+on the night of the election, an incomplete JSON with the constituencies
+known so far would be immediately sent, followed by the remainder as the
+results are called. Eventually, when all results are known the JSON
+would finally close. A few days later, for somebody wishing to fetch the
+results would use the *same url for the now historic data as was used on
+the night for the live data*. The data that was streamed is not
+incompatible with a http caching and a cache which saw the data when it
+was live would be able to store it in the cache and later serve it as
+historic. Programming using Oboe, an application developer would not
+have to handle live and historic data separately. The same code which
+displayed results as they were announced could be used to later show the
+historic results without any adjustments or branching.
 
-\ref{xhrsandstreaming}
+section \ref{xhrsandstreaming}
 
-On browsers without support for XHR2 progress events I will not be
-using streaming workarounds such as push tables because this would 
-create a REST
-client which is unable to connect to the majority of REST services.
-The closest equivalent behaviour is to wait until the document
-completes and then send the text through Clarinet as usual. 
-This will provide only a non-streaming interpretation of the resource
-and will give callbacks later than on more capable platforms
-but will fire the same events in the same order as if a streaming
-download were possible. The advantage of Oboe using standard AJAX
-on legacy platforms is that application authors will not have to write
-special cases. While there won't be any streaming advantages, the application
-should continue to function as before.  
+On browsers without support for XHR2 progress events I will not be using
+streaming workarounds such as push tables because this would create a
+REST client which is unable to connect to the majority of REST services.
+The closest equivalent behaviour is to wait until the document completes
+and then send the text through Clarinet as usual. This will provide only
+a non-streaming interpretation of the resource and will give callbacks
+later than on more capable platforms but will fire the same events in
+the same order as if a streaming download were possible. The advantage
+of Oboe using standard AJAX on legacy platforms is that application
+authors will not have to write special cases. While there won't be any
+streaming advantages, the application should continue to function as
+before.
 
 Handling transport failures
 ---------------------------
@@ -570,12 +569,12 @@ without necessarily losing the part that was successfully received.
 Researching error handing, I considered the option of automatically
 resuming failed requests without intervention from the containing
 application. Http 1.1 provides a mechanism for Byte Serving via the
-`Accepts-Ranges` header [@headers] which
-is used to request any contiguous fragment of a resource -- in our case,
-the part that we missed when the download failed. Having examined this
-option I came to the conclusion that it would encourage brittle systems
-because it assumes two requests to the same URL will give byte-wise
-equal responses.
+`Accepts-Ranges` header [@headers] which is used to request any
+contiguous fragment of a resource -- in our case, the part that we
+missed when the download failed. Having examined this option I came to
+the conclusion that it would encourage brittle systems because it
+assumes two requests to the same URL will give byte-wise equal
+responses.
 
 A deeper problem is that Oboe cannot know the correct behaviour when a
 request fails so this is better left to the containing applications.
@@ -592,7 +591,7 @@ throwing because the call which will later cause an error will no longer
 be on the stack at the time that the error occurs. Error-events will be
 used instead.
 
-With further development Oboe could be used for perpetual streaming but 
+With further development Oboe could be used for perpetual streaming but
 at the moment there are not the tools to write out JSON like this.
 
 Fallback support for less capable platforms
