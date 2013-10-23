@@ -557,8 +557,7 @@ without necessarily losing the part that was successfully received.
 Researching error handing, I considered the option of automatically
 resuming failed requests without intervention from the containing
 application. Http 1.1 provides a mechanism for Byte Serving via the
-`Accepts-Ranges` header
-[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5] which
+`Accepts-Ranges` header [@headers] which
 is used to request any contiguous fragment of a resource -- in our case,
 the part that we missed when the download failed. Having examined this
 option I came to the conclusion that it would encourage brittle systems

@@ -421,7 +421,18 @@
       "url":"https://groups.google.com/forum/?hl=en\\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ",
       "issued": { "date-parts":[ [2000] ] },
       "type":"webpage"                  
-   }
+   },
+   
+   {
+      "id":"headers",
+      "title":"Hypertext Transfer Protocol -- HTTP/1.1: Header Field Definitions",
+      "author":[         
+         { "family": "Fielding", "given":"R"}
+      ],
+      "url":"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5",
+      "issued": { "date-parts":[ [1999] ] },
+      "type":"webpage"                  
+   }   
       
    
 ]
