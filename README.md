@@ -500,9 +500,7 @@ Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/j
 
 The pattern engine supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (`$`) symbol.
-
-There are also **[some example patterns](#more-example-patterns)** below. 
+using the dollar (`$`) symbol. See also *[some example patterns](#more-patterns)*. 
 
 # Why I made this
 
