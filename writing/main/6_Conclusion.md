@@ -226,10 +226,7 @@ potential future work
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
-an obvious expansion. Currently Oboe only operates on http traffic.
-While this restriction is reasonable in a Browser context, under Node it
-is unnecessarily limiting and should be lifted by allowing arbitrary
-streams to be read.
+an obvious expansion. Plug-ins for formats.
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are

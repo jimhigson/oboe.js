@@ -10,12 +10,12 @@ Or even if it never completes.
 
 Support for Node.js isn't battle hardened yet but seems fine.
 In Node [any stream can be read](#reading-from-any-stream-nodejs-only), not just
-http. [npm package here](https://npmjs.org/package/oboe).
+http.
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
-	- [Hanging up the AJAX when we get what we need](#hanging-up-the-ajax-when-we-get-what-we-need)
+	- [Hanging up when we have what we need](#hanging-up-when-we-have-what-we-need)
 	- [Detecting strings, numbers](#detecting-strings-numbers)
 	- [Duck typing](#duck-typing)
 	- [Reacting before we get the whole object](#reacting-before-we-get-the-whole-object)
@@ -25,12 +25,11 @@ http. [npm package here](https://npmjs.org/package/oboe).
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
 	- [Reading from any stream (Node.js only)](#reading-from-any-stream-nodejs-only)
 	- [Error handling](#error-handling)
+	- [More patterns](#more-patterns)	
+- [Installing](#installing)	
 - [API](#api)
-	- [Pattern matching](#pattern-matching)
+	- [Pattern matching](#pattern-matching)	
 - [Why I made this](#why-i-made-this)
-- [Status](#status)
-- [More example patterns](#more-example-patterns)
-- [Installing](#installing)
 - [Getting the most from oboe](#getting-the-most-from-oboe)
 - [Browser support](#browser-support)
 	- [Running the tests](#running-the-tests)
@@ -98,7 +97,7 @@ oboe('/myapp/things.json')
    });
 ```
 
-## Hanging up the AJAX when we get what we need
+## Hanging up when we have what we need
 
 We can improve on the example above. Since we only care about the foods object and 
 not the non-foods we can hang up as soon as we have the foods, reducing our precious 
@@ -365,6 +364,47 @@ oboe('people.json')
    })
 ```
 
+## More patterns
+  
+`!.foods.colour` the colours of the foods  
+`person.emails[1]` the first element in the email array for each person
+`{name email}` any object with a name and an email property, regardless of where it is in the document  
+`person.emails[*]` any element in the email array for each person  
+`person.$emails[*]` any element in the email array for each person, but the callback will be
+   passed the array so far rather than the array elements as they are found.  
+`person` all people in the json, nested at any depth  
+`person.friends.*.name` detecting friend names in a social network  
+`person.friends..{name}` detecting friends with names in a social network  
+`person..email` email addresses anywhere as descendent of a person object  
+`person..{email}` any object with an email address relating to a person in the stream  
+`$person..email` any person in the json stream with an email address  
+`*` every object, string, number etc found in the json stream  
+`!` the root object (fired when the whole response is available, like JSON.parse())
+
+# Installing
+
+For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js) or use [bower](http://bower.io/) like:
+
+```
+bower install oboe
+```
+
+If AMD is detected Oboe will `define` itself, otherwise it adds itself to
+the global namespace. Either load it with require.js, [almond](https://github.com/jrburke/almond)
+etc or just use it directly.
+
+For Node:
+
+```
+npm install oboe
+```
+
+Then load as usual:
+
+```
+var oboe = require('oboe');
+```
+
 # API
 
 Oboe exposes a single global at `window.oboe`. You can start a new AJAX request by 
@@ -490,56 +530,6 @@ steams silently in the background.
 Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
 but then we'd have to rewrite the server-side and the legacy charts would have no idea how to connect to the new server.
 It is nice to just have one, simple service for everything.
-
-# Status
-
-The API has been changing a lot recently but should be settling down now.
-Patches and suggestions most welcome.
-
-Codebase designed in for easy testability and has [about 250 cases](/test/specs).
-
-BSD licenced. But if you use it drop me a note!
-       
-# More example patterns
-  
-`!.foods.colour` the colours of the foods  
-`person.emails[1]` the first element in the email array for each person
-`{name email}` any object with a name and an email property, regardless of where it is in the document  
-`person.emails[*]` any element in the email array for each person  
-`person.$emails[*]` any element in the email array for each person, but the callback will be
-   passed the array so far rather than the array elements as they are found.  
-`person` all people in the json, nested at any depth  
-`person.friends.*.name` detecting friend names in a social network  
-`person.friends..{name}` detecting friends with names in a social network  
-`person..email` email addresses anywhere as descendent of a person object  
-`person..{email}` any object with an email address relating to a person in the stream  
-`$person..email` any person in the json stream with an email address  
-`*` every object, string, number etc found in the json stream  
-`!` the root object (fired when the whole response is available, like JSON.parse())  
-
-# Installing
-
-For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js) or use [bower](http://bower.io/) like:
-
-```
-bower install oboe
-```
-
-If AMD is detected Oboe will `define` itself, otherwise it adds itself to
-the global namespace. Either load it with require.js, [almond](https://github.com/jrburke/almond)
-etc or just use it directly.
-
-For Node:
-
-```
-npm install oboe
-```
-
-Then load as usual:
-
-```
-var oboe = require('oboe');
-```
 
 # Getting the most from oboe
 
