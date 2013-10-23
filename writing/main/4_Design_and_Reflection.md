@@ -574,19 +574,19 @@ the callbacks will be fired later than on more capable platforms but
 will have the same content and be in the same order. By reverting to
 non-progressive AJAX on legacy platforms, application authors will not
 have to write special cases and the performance will be no worse than
-with their traditional ajax library such as jQuery. Oboe could not be
-used to receive live data on legacy browsers because no data can be read
-until the request finishes. In the election results example, no
+with their traditional ajax library such as jQuery. On legacy browsers
+Oboe could not be used to receive live data because nothing can be read
+before the request finishes. In the election results example, no
 constituencies would be shown until they had all been called.
 
-Under Node, the standard http library provides a view of the response as
-a standard ReadableStream so is very amenable to a streaming
+Node's standard http library provides a view of the response as
+a standard ReadableStream so there will be no problems programming to a progressive
 interpretation of http. Because in Node all streams provide a common API
-regardless of their source, there is no reason not to allow arbitrary
+regardless of their origin there is no reason not to allow arbitrary
 streams to be read. Although Oboe is intended primarily as a REST
 client, under Node it will be capable of reading data from any
-transport. For example, a local file, an ftp server, cryptography, or
-the process's standard are all implemented using streams.
+source. Oboe might be used to read from a local file, an ftp server, 
+a cryptography source, or the process's standard input.
 
 Handling transport failures
 ---------------------------
