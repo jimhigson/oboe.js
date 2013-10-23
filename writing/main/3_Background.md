@@ -581,6 +581,8 @@ the script is fully loaded) are all examples of this.
 Browser streaming frameworks
 ----------------------------
 
+\label{browserstreamingframeworks}
+
 The web's remit is increasingly widening to encompass scenarios which
 would have previously been the domain of native applications. In order
 to use live data many current webapps employ frameworks which push soft

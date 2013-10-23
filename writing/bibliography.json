@@ -432,7 +432,18 @@
       "url":"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5",
       "issued": { "date-parts":[ [1999] ] },
       "type":"webpage"                  
-   }   
+   },
+   
+   {
+      "id":"strest",
+      "title":"Duncan Cragg on Declarative Architectures: STREST (Service-Trampled REST) Will Break Web 2.0",
+      "author":[         
+         { "family": "Cragg", "given":"Duncan"}
+      ],
+      "url":"http://duncan-cragg.org/blog/post/strest-service-trampled-rest-will-break-web-20/",
+      "issued": { "date-parts":[ [2006] ] },
+      "type":"webpage"                  
+   }
       
    
 ]

@@ -508,27 +508,44 @@ code provides an interesting extra challenge.
 Choice of streaming data transport
 ----------------------------------
 
-As discussed in section \ref{browserstreamingframeworks}, most 
-internet streaming techniques take a dichotomous view which splits
-traffic up as either streaming or downloading.
+As discussed in section \ref{browserstreamingframeworks}, current 
+streaming techniques built on top of http take a dichotomous by splitting
+traffic up as either stream or download.
 I find that this split is not necessary and streaming may be used as 
 the most effective means of downloading.
 
-Frameworks for perceptual streaming solve address 
-problem only tangentially related to this project's aims.
-In REST I have always valued how prominently the plumbing of a system is
-visible, so that to sample a resource all that is required is to type a
-URL and be presented with it in a human-comprehensible format.
+Streaming transports such as websockets are not REST services and are solutions to 
+a problem only tangentially related to this project's.
+Under these frameworks each stream has an address but the data in the stream
+is not addressable. This is similar to the *Service Tranpled REST* STREST 
+anti-pattern [@strest] in which http is viewed as addressing endpoints for services rather than
+addressing the resources themselves.
+If an event which is streamed live cannot and then
+then later made available as historic data, because the data is unaddressable 
+it is also uncacheable. These frameworks use http as the 
+underlying transport but I find they bend http away from its principled design.  
 
-It shouldn't be a surprise that a dichotomous implementation of
-streaming, where a streaming transport is used only for live events is
-incompatible with http caching. If an event is streamed when it is new,
-but then when it is old made available for download, http caching
-between the two requests is impossible. However, where a single mode is
-used for both live and historic events the transport is wholly
-compatible with http caching.
+Although I am designing Oboe for static resources and not focusing on 
+creating a means to receive live events, the development community have speculated
+on the possibility of using Oboe to create a REST-compatible bridge that 
+unifies live and static data.
+For example, consider a service which gives the results per-constituency for a
+UK general election. Requesting a previous year's results, the data is delivered
+in JSON format much as usual. Requesting the results for the current year on
+the night of the election, an incomplete JSON with the constituencies known so 
+far would be immediately sent, followed by the remainder as the results are
+called. Eventually, when all results are known the JSON would finally close.
+A few days later, for somebody wishing to fetch the results would use
+the *same url for the now historic data as was used on the night for the live data*.
+The data that was streamed is not incompatible with a http caching and a cache
+which saw the data when it was live would be able to store it in the cache
+and later serve it as historic.
+Programming using Oboe, an application developer would not have to handle
+live and historic data separately. The same code which displayed results
+as they were announced could be used to later show the historic results without
+any adjustments or branching. 
 
-In legacy browsers without support for XHR2 progress events I will not be
+On browsers without support for XHR2 progress events I will not be
 using streaming workarounds such as push tables because this would 
 create a REST
 client which is unable to connect to the majority of REST services.
@@ -541,16 +558,6 @@ download were possible. The advantage of Oboe using standard AJAX
 on legacy platforms is that application authors will not have to write
 special cases. While there won't be any streaming advantages, the application
 should continue to function as before.  
-
-For example, the display of real-time stock data might start by
-AJAXing in historical and then separately use a websocket to maintain
-up-to-the-second updates. This requires the server to support two
-distinct modes. However, I see no reason why a single transport could
-not be used for both. Such a server might start answering a request by
-write historic events from a database, then switch to writing out live
-data in the same format in response to messages from a MOM. By closing
-the dichotomy we would have the advantage that a single implementation
-is able to handle all cases.
 
 Handling transport failures
 ---------------------------
