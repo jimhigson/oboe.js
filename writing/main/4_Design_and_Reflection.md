@@ -571,20 +571,17 @@ browsers which do not fire the progress events (see section
 \ref{xhrsandstreaming}) a progressive conceptualisation of downloading
 is not possible. I will not be using streaming workarounds such as push
 tables because this would create a client which is unable to connect to
-the majority of REST services. The closest equivalent behaviour is to
-wait until the document completes and then send the text through
-Clarinet as usual. This will provide only a non-streaming interpretation
-of the resource and will give callbacks later than on more capable
-platforms but will fire the same events in the same order as if a
-streaming download were possible. By reverting to non-progressive AJAX
+the majority of REST services. The best compatible behaviour is to
+wait until the document completes and then interpret the whole content
+as if it were streamed. Because nothing is done until the request is
+complete the callbacks will be fired later than on more capable
+platforms but will have the same content and be in the same order.
+By reverting to non-progressive AJAX
 on legacy platforms, application authors will not have to write special
-cases and the performance will be no worse than if a more traditional
-ajax library such as jQuery were used.
-
-Oboe could not be used to receive live data on legacy browsers because
-no data could be used until the request finishes. In the election
-results example, no results could be shown until they had all been
-announced.
+cases and the performance will be no worse than with their traditional
+ajax library such as jQuery. Oboe could not be used to receive live data on 
+legacy browsers because no data can be read until the request finishes. In the election
+results example, no constituencies would be shown until they had all been called. 
 
 Under Node, the standard http library provides a view of the response
 as a standard ReadableStream so is very amenable to a streaming interpretation
