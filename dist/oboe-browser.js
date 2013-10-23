@@ -322,6 +322,20 @@ function foldR(fn, startValue, list) {
             ;
 }
 
+/**
+ * Return a version of list with the first instance of item removed 
+ * Like
+ *    http://hackage.haskell.org/package/base-4.2.0.1/docs/Data-List.html#v:delete
+ */
+function without(list, item) {
+ 
+  return list  ? ( head(list) == item ? tail(list) 
+                                      : cons(head(list), without(tail(list), item))
+                 ) 
+               : emptyList
+               ;
+}
+
 /** 
  * Returns true if the given function holds for every item in 
  * the list, false otherwise 
@@ -1799,6 +1813,10 @@ function pubSub(){
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
+      },
+      
+      un: function( eventId, handler ) {
+         listeners[eventId] = without(listeners[eventId], handler);
       }           
    };
 }
@@ -1881,7 +1899,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
       // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function( ascent ){ 
+      on( eventId, function hadler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
@@ -1901,7 +1919,10 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            notifyCallback(callback, maybeMatchingMapping, ascent);                           
+            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            
+               un(eventId, handler);
+            }
          }
       });   
    }   
@@ -1921,16 +1942,24 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
           // To make a path, strip off the last item which is the special
           // ROOT_PATH token for the 'path' to the root node
           path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)); 
+          ancestors  = listAsArray(map(nodeOf, descent)),
+          keep       = true;
+          
+      oboeApi.forget = function(){
+         keep = false;
+      };           
       
-      try{
-      
+      try{      
          callback( nodeOf(matchingMapping), path, ancestors );   
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
          fire(ERROR_EVENT, e);
-      }          
+      }
+      
+      delete oboeApi.forget;
+      
+      return keep;          
    }
 
    /**

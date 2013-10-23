@@ -49,6 +49,32 @@ describe("Lists", function(){
       
       expect( map(doubleit, naturals) ).toEqual( evens );
    });
+   
+   describe('without', function(){
+   
+      it("can remove from the middle of a list", function() {
+         var naturals = list(1, 2, 3);
+               
+         expect( without(naturals, 2) ).toEqual( list(1, 3) );
+      });
+      
+      it("can remove from the end of a list", function() {
+         var naturals = list(1, 2, 3);
+               
+         expect( without(naturals, 3) ).toEqual( list(1, 2) );
+      });
+      
+      it("can not remove", function() {
+         var naturals = list(1, 2, 3);
+               
+         expect( without(naturals, 4) ).toEqual( list(1, 2, 3) );
+      });
+      
+      it("works with the empty list", function() {
+               
+         expect( without(emptyList, 4) ).toEqual( emptyList );
+      });
+   });
       
    it("can convert non empty list to an array", function(){
       

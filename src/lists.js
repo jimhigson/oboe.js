@@ -108,14 +108,12 @@ function foldR(fn, startValue, list) {
  *    http://hackage.haskell.org/package/base-4.2.0.1/docs/Data-List.html#v:delete
  */
 function without(list, item) {
-
-   var candiate = head(list),
-       rest = tail(list);
-   
-   return list 
-            ? (head(list) == item? rest : cons(candiate, without(rest, item))) 
-            : emptyList
-            ;
+ 
+  return list  ? ( head(list) == item ? tail(list) 
+                                      : cons(head(list), without(tail(list), item))
+                 ) 
+               : emptyList
+               ;
 }
 
 /** 
