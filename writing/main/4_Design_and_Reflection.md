@@ -583,37 +583,23 @@ Oboe could not be used to receive live data because nothing can be read
 before the request finishes. In the election results example, no
 constituencies would be shown until they had all been called.
 
-Node's standard http library provides a view of the response as
-a standard ReadableStream so there will be no problems programming to a progressive
-interpretation of http. Because in Node all streams provide a common API
-regardless of their origin there is no reason not to allow arbitrary
-streams to be read. Although Oboe is intended primarily as a REST
-client, under Node it will be capable of reading data from any
-source. Oboe might be used to read from a local file, an ftp server, 
-a cryptography source, or the process's standard input.
+Node's standard http library provides a view of the response as a
+standard ReadableStream so there will be no problems programming to a
+progressive interpretation of http. Because in Node all streams provide
+a common API regardless of their origin there is no reason not to allow
+arbitrary streams to be read. Although Oboe is intended primarily as a
+REST client, under Node it will be capable of reading data from any
+source. Oboe might be used to read from a local file, an ftp server, a
+cryptography source, or the process's standard input.
 
 Handling transport failures
 ---------------------------
 
-Oboe should allow requests to fail while the response is being received
-without necessarily losing the part that was successfully received.
-
-Researching error handing, I considered the option of automatically
-resuming failed requests without intervention from the containing
-application. Http 1.1 provides a mechanism for Byte Serving via the
-`Accepts-Ranges` header [@headers] which is used to request any
-contiguous fragment of a resource -- in our case, the part that we
-missed when the download failed. Having examined this option I came to
-the conclusion that it would encourage brittle systems because it
-assumes two requests to the same URL will give byte-wise equal
-responses.
-
-A deeper problem is that Oboe cannot know the correct behaviour when a
-request fails so this is better left to the containing applications.
-Generally on request failure, two behaviours may be anticipated. If the
-actions performed in response to data received up to time of failure
-remain valid in the absence of a full transmission, their effects may be
-kept and a URL may be constructed to request just the lost part.
-Alternatively, under optimistic locking, the application developer may
-choose to perform rollback. In either case, responding to errors beyond
-informing the calling application is outside of Oboe's scope.
+Oboe cannot know the correct behaviour when a connection is lost so this
+decision is left to the containing application. Generally on request
+failure one of two behaviours are expected: if the actions performed in
+response to data received up to time of failure remain valid in the
+absence of a full transmission, their effects will be kept and a new
+request made for just the missed part; alternatively, if all the data is
+required for the actions to be valid, taking an optimistic locking
+approach the application would perform rollback.
