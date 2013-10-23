@@ -32,7 +32,6 @@ http.
 - [Why I made this](#why-i-made-this)
 - [Getting the most from oboe](#getting-the-most-from-oboe)
 - [Browser support](#browser-support)
-	- [Running the tests](#running-the-tests)
 
 # Use cases
 
@@ -329,11 +328,12 @@ oboe('/data/things.json')
 
 ## Reading from any stream (Node.js only)
 
-Instead of giving a url, you can pass any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable).
+Instead of giving a url you can pass any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable).
 To load from a local file you'd do this:
 
 ``` js
-var oboe = require('oboe');
+var oboe = require('oboe'),
+    fs = require('fs');
 
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .node('!.schemes.*', function(scheme){
@@ -511,9 +511,7 @@ Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/j
 
 The pattern engine supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
-using the dollar (`$`) symbol.
-
-There are also **[some example patterns](#more-example-patterns)** below. 
+using the dollar (`$`) symbol. See also *[some example patterns](#more-patterns)*. 
 
 # Why I made this
 
@@ -572,6 +570,3 @@ You don't get streaming but it isn't any worse than if you'd have designed your 
 I'm able to test in IE thanks to 
 [this rather wonderful script](https://github.com/xdissent/ievms).
 
-## Running the tests
-
-Use the Grunt. 
