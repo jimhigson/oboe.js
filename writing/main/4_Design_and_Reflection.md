@@ -580,8 +580,8 @@ throwing because the call which will later cause an error will no longer
 be on the stack at the time that the error occurs. Error-events will be
 used instead.
 
-Fallback support on less-capable platforms
-------------------------------------------
+Fallback support for less-capable platforms
+-------------------------------------------
 
 *something about market share and link to figures in an appendix?*
 
