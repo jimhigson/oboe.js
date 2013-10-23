@@ -123,6 +123,30 @@ describe('pub sub', function(){
       expect(listenerB).toHaveBeenCalled();      
    });
    
+   it('allows an event to be removed', function(){
+   
+      var events = pubSub(),
+          listenerA  = jasmine.createSpy('listenerA'),
+          listenerA2 = jasmine.createSpy('listenerA2'),
+          listenerB  = jasmine.createSpy('listenerB');
+      
+      events.on('eventA', listenerA);
+      events.on('eventA', listenerA2);
+      events.on('eventB', listenerB);
+      
+      events.fire('eventA');
+      events.fire('eventB');
+      
+      expect(listenerA.calls.length).toBe(1);      
+      
+      events.un('eventA', listenerA);      
+
+      events.fire('eventA');
+
+      expect(listenerA.calls.length).toBe(1);
+      expect(listenerA2.calls.length).toBe(2);      
+   });   
+   
    it('should handle numberic event codes', function(){
    
       var events = pubSub(),
