@@ -161,10 +161,10 @@ streams} rather than holding it unexamined until it is wholly available.
 
 While the coining of the term REST represented a shift in how we think
 about http, away from the transfer of hypertext documents to that of
-arbitrary data (Fielding 2000, 407--416), it introduced no fundamentally
-new methods. Similarly building on previous ideas, no new computing
-techniques need be invented to realise my thesis. As a minimum it
-requires an http client which reveals the response whilst it is in
+arbitrary data (R. T. Fielding 2000, 407--416), it introduced no
+fundamentally new methods. Similarly building on previous ideas, no new
+computing techniques need be invented to realise my thesis. As a minimum
+it requires an http client which reveals the response whilst it is in
 progress and a parser which can begin to interpret that response before
 it sees all of it. Nor is it novel to use these preexisting parts in
 composition. Every current web browser already implements such a schema;
@@ -976,6 +976,8 @@ as to require hardly any additional effort.
 
 \subsection{XHRs and streaming}
 
+\label{xhrsandstreaming}
+
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
 lowest common denominator of the available browser abilities. At the
@@ -994,15 +996,20 @@ named progress about every 50ms or for every byte received, whichever is
 least frequent. (van Kesteren 2012)
 \end{quote}
 
-Presently this event is supported by all but legacy browsers.
+The historic lack of streaming for data fetched using XHR stands
+incongruously with the browser as a platform in which almost every other
+remote resource is interpreted progressively. Examples include
+progressive image formats, html, svg, video, and Javascript itself
+(script interpretation starts before the script is fully loaded).
 
-The historic lack of streaming allowed by XHR stands incongruously with
-the browser as a platform which has long used streaming to precipitate
-almost every other remote resource. Progressive image formats, html,
-svg, video and Javascript itself (script interpretation starts before
-the script is fully loaded) are all examples of this.
+The progress event is supported by the latest version of all major
+browsers. However, Internet Explorer only added support relatively
+recently with version 10 and there is a significant user base remaining
+on versions 8 and 9.
 
 \subsection{Browser streaming frameworks}
+
+\label{browserstreamingframeworks}
 
 The web's remit is increasingly widening to encompass scenarios which
 would have previously been the domain of native applications. In order
@@ -1409,109 +1416,94 @@ have all of the required fields but could also have any others.
 
 \subsection{Importing CSS4's explicit capturing to Oboe's JSONPath}
 
-Sometimes when downloading a collection of items it is less useful to be
-given each element individually than being kept up to date as the
-collection is expanded. Certain Javascript libraries such as d3.js and
-Angular interface more naturally with arrays of items than individual
-entities. To allow integration with these libraries, on receiving an
-array of items it is useful to be repeatedly passed the same containing
-array whenever a new element is concatenated onto it.
-
-Expressing a `contained in' relationship comes naturally to JSONPath,
-but no provision is made for a `containing' relationship. Cascading
-Style Sheets, or CSS, the web's styling language has long shared this
-restriction but a recent proposal, currently at Editor's Draft stage
-(Etemad and Atkins 2013) provides an elegant means to cover this gap.
-Rather than add an explicit `containing' relationship, the css4 proposal
-observes that css selectors have previously only allowed selection of
-the right-most of the terms given, allowing only the deepest element
-mentioned to be selected. This restriction is removed by allowing terms
-may be prefixed with \texttt{\$} in order to make them capturing: in the
-absence of an explicitly capturing term the right-most continues to
-capture. Whereas \texttt{form.important input.mandatory} selects for
-styling mandatory inputs inside important forms,
+JSONPath naturally expresses a `contained in' relationship using the dot
+notation but no provision is made for the inverse `containing'
+relationship. \emph{Cascading Style Sheets}, CSS, the web's styling
+language, has historically shared this restriction but a proposal for
+extended selectors which is currently at Editor's Draft stage (Etemad
+and Atkins 2013) introduces an elegant solution. Rather than add an
+explicit `containing' relationship, the draft observes that previously
+CSS has always selected the element conforming to the right-most of the
+selector terms, allowing only the deepest mentioned element to be
+styled. This restriction is lifted by allowing terms to be prefixed with
+\texttt{\$} in order to make them explicitly capturing; a selector
+without an explicit capturing term continues to work as before. The CSS
+selector \texttt{form.important input.mandatory} selects mandatory
+inputs inside important forms but
 \texttt{\$form.important input.mandatory} selects important forms with
 mandatory fields.
 
-Importing the CSS4 dollar into Oboe's JSONPath should make it much
-easier to integrate with libraries which treat arrays as their basic
-unit of operation and uses a syntax which the majority of web developers
-are likely to be familiar with over the next few years.
+The new css4 capturing technique will be adapted for Oboe JSONPath. By
+duplicating a syntax which the majority of web developers should become
+familiar with over the next few years I hope that Oboe's learning curve
+can be made a little more gradual. Taking on this feature, the selector
+\texttt{person.\$address.town} would identify an address node with a
+town child, or \texttt{\$people.\{name, dob\}} would provide the people
+array repeatedly whenever a new person is added to it. Javascript
+frameworks such as d3.js and Angular are designed to work with whole
+models as they change. Consequently, the interface they present
+converses more fluently with collections than individual entities. If we
+are downloading data to use with these libraries it is more convenient
+if we use explicit capturing so that we are notified whenever the
+collection is expanded and can pass it on.
 
 \subsection{Parsing the JSON Response}
 
-While SAX parsers provide an unfriendly interface to application
-developers, as a starting point for higher-level parsers they work very
-well (in fact, most XML DOM parsers are made in this way). The
-pre-existing project Clarinet is well tested, liberally licenced and
-compact, meeting the goals of this project perfectly. In fact, the name
+While SAX parsers provide an unappealing interface to application
+developers, as a starting point to handle low-level parsing in
+higher-level libraries they work very well (most XML DOM parsers are
+built in this way). The pre-existing Clarinet project is well tested,
+liberally licenced, and compact, meeting our needs perfectly. The name
 of this project, Oboe.js, was chosen in tribute to the value delivered
 by Clarinet.
 
 \subsection{API design}
 
-\emph{API allows body to be given as Object and converts into JSON
-because it is anticipated that REST services which emmit JSON will also
-accept it}
+Everything that Oboe is designed to do can already be achieved by
+combining a SAX parser with imperatively coded node selection. This has
+not been adopted widely because it requires verbose, difficult
+programming in a style which is unfamiliar to most programmers. With
+this in mind it is a high priority to design a public API for Oboe which
+is concise, simple, and resembles other commonly used tools. If Oboe's
+API is made similar to common tools, a lesser modification should be
+required to switch existing projects to streaming http.
 
-In designing the API developer ergonomics are the top priority. This is
-especially pertinent given that the library does nothing that can't be
-done with existing tools such as JSON SAX parsers but that those tools
-are not used because they require too much effort to form a part of most
-developers' everyday toolkit.
+For some common use cases it should be possible to create an API which
+is a close enough equivalent to popular tools that it can be used as a
+direct drop-in replacement. Although used in this way no progressive
+loading would be enacted, when refactoring towards a goal the first step
+is often to create a new expression of the same logic (Martin 2008,
+212). By giving basic support for non-progressive downloading, the door
+is open for apps to incrementally refactor towards a progressive
+expression. Allowing adoption as a series of small, easily manageable
+steps rather than a single leap is especially helpful for teams working
+under Scrum because all work must fit within a fairly short timeframe.
 
-\emph{Expose single global.}
-
-To pursue good ergonomics, I will study successful libraries and, where
-appropriate, copy their APIs. We may assume that the existing libraries
-have already over time come to refined solutions to similar problems.
-Working in a style similar to existing libraries also makes the library
-easier to learn. Lastly, if we create a library which functions
-similarly enough to existing tools it should be easy to modify an
-existing project to adopt it. In the most common use cases, it should be
-possible to create a library with a close functional equivalence that
-can be used as a direct drop-in replacement. Used in this way, no
-progressive loading would be done but it opens the door for the project
-taking up the library to be refactored towards a progressive model over
-time. By imitating existing APIs we allow adoption as a series of small,
-easily manageable steps rather than a single leap. This is especially
-helpful for teams wishing to adopt this project working under Scrum
-because all tasks must be self-contained and fit within a fairly short
-timeframe.
-
-jQuery's basic call style for making an AJAX GET request follows:
+jQuery is by far the most popular library for AJAX today. The basic call
+style for making an AJAX GET request is as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \OtherTok{jQuery}\NormalTok{.}\FunctionTok{ajax}\NormalTok{(}\StringTok{"resources/shortMessage.txt"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{done}\NormalTok{(}\KeywordTok{function}\NormalTok{( text ) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{'Got the text: '} \NormalTok{+ text ); }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Got the text: "} \NormalTok{+ text ); }
    \NormalTok{\}).}
-   \NormalTok{.}\FunctionTok{fail}\NormalTok{(}\KeywordTok{function}\NormalTok{(data) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{'the request failed'} \NormalTok{);      }
+   \NormalTok{.}\FunctionTok{fail}\NormalTok{(}\KeywordTok{function}\NormalTok{() \{}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"the request failed"} \NormalTok{);      }
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
-While for simple web applications usage is much as above,\\In real world
-usage on more complex apps jQuery.ajax is often injected into the scope
-of the code which wants to use it. Easier stubbing so that tests don't
-have to make actual AJAX calls.
+While jQuery is callback-based and internally event driven, the public
+API it exposes does not wrap asynchronously retrieved content in event
+objects. Event type is expressed by the name of the method used to add
+the listener. These names, \texttt{done} and \texttt{fail}, follow
+generic phrasing and are common to every functionality that jQuery
+provides asynchronously. Promoting brevity, the methods are chainable so
+that several listeners may be added from one statement.
 
-While certainly callback-based, the jQuery is somewhat implicit in being
-event-based. There are no event names separate from the methods which
-add the listeners and there are no event objects, preferring to pass the
-content directly. The names used to add the events (done, fail) are also
-generic, used for all asynchronous requests. The methods are chainable
-which allows several listeners to be added in one statement.
-
-By method overloading, if the request requires more information than the
-parameter to \texttt{jQuery.ajax} may be an object. This pattern of
-accepting function parameters as an object is a common in Javascript for
-functions that take a large number of optional arguments because it
-makes understanding the purpose of each argument easier to understand
-from the callsite than if the meaning depended on the position in a
-linear arguments list and the gaps filled in with nulls.
+\texttt{jQuery.ajax} is overloaded and the parameter may be an object,
+allowing more information to be given:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1522,35 +1514,46 @@ linear arguments list and the gaps filled in with nulls.
 \end{Highlighting}
 \end{Shaded}
 
-Taking on this style,
+This pattern of passing arguments as an object literal is common in
+Javascript for functions which take a large number of arguments,
+particularly if some are optional. This avoids having to pad unprovided
+optional arguments in the middle of the list with null values and,
+because the purpose of the values is apparent from the callee, also
+avoids an anti-pattern where a callsite can only be understood after
+counting the position of the arguments.
+
+Taking on this style while extending it to cover events for progressive
+parsing, we arrive at the following Oboe public API:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
+\FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/people.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"person.name"}\NormalTok{, }\KeywordTok{function}\NormalTok{(name, path, ancestors) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"got a name "} \NormalTok{+ name);   }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"There is somebody called "} \NormalTok{+ name);   }
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{done}\NormalTok{( }\KeywordTok{function}\NormalTok{( wholeJson ) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"got everything"}\NormalTok{);}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"That is everyone!"}\NormalTok{);}
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{fail}\NormalTok{( }\KeywordTok{function}\NormalTok{() \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"actually, the download failed. Forget the"} \NormalTok{+ }
-                  \StringTok{" people I just told you about"}\NormalTok{);}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Actually, the download failed. Please forget "} \NormalTok{+ }
+                  \StringTok{"the people I just told you about"}\NormalTok{);}
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
-Because I foresee several patterns being added for most types of JSON
-documents, a shortcut format is also available for adding multiple
-patterns in a single call by using the patterns as the keys and the
-callbacks as the values in a key/value mapping:
+In jQuery only one \texttt{done} handler is usually added to a request;
+the whole content is always given so there is only one thing to receive.
+Under Oboe there will usually be several separately selected areas of
+interest inside a JSON document so I anticipate that typically multiple
+handlers will be added. A shortcut style is provided for adding several
+selector/handler pairs at a time:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
+\FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/people.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{node}\NormalTok{(\{  }
       \StringTok{"person.name"}\NormalTok{: }\KeywordTok{function}\NormalTok{(personName, path, ancestors) \{}
-         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"let me tell you about "} \NormalTok{+ name);}
+         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Let me tell you about "} \NormalTok{+ name + }\StringTok{"..."}\NormalTok{);}
       \NormalTok{\},}
       \StringTok{"person.address.town"}\NormalTok{: }\KeywordTok{function}\NormalTok{(townName, path, ancestors) \{}
          \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"they live in "} \NormalTok{+ townName);}
@@ -1559,15 +1562,14 @@ callbacks as the values in a key/value mapping:
 \end{Highlighting}
 \end{Shaded}
 
-Note the path and ancestors parameters in the examples above. Most of
-the time giving the callback the matching content is enough to be able
-to act but it is easy to imagine cases where a wider context matters.
-Consider this JSON:
+Note the \texttt{path} and \texttt{ancestors} parameters in the examples
+above. These provide additional information regarding the context in
+which the identified node was found. Consider the following JSON:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{\{ }
-   \StringTok{"event"}\NormalTok{: }\StringTok{"mens 100m"}\NormalTok{,}
+   \StringTok{"event"}\NormalTok{: }\StringTok{"Mens' 100m sprint"}\NormalTok{,}
    \StringTok{"date"}\NormalTok{: }\StringTok{"5 Aug 2012"}\NormalTok{,}
    \StringTok{"medalWinners"}\NormalTok{: \{}
       \StringTok{"gold"}\NormalTok{:     \{}\StringTok{"name"}\NormalTok{: }\StringTok{"Bolt"}\NormalTok{,    }\StringTok{"time"}\NormalTok{: }\StringTok{"9.63s"}\NormalTok{\},}
@@ -1578,66 +1580,80 @@ Consider this JSON:
 \end{Highlighting}
 \end{Shaded}
 
-Here we can extract the runners by the patterns such as
-\texttt{\{name time\}} or \texttt{medalWinners.*} but clearly the
-location of the node in the document is interesting as well as the
-context. The \texttt{path} parameter provides this information by way of
-an array of strings plotting the descent from the JSON root to the
-match, for example \texttt{{[}'medalWinners', 'gold'{]}}. Similarly, the
-\texttt{ancestors} array is a list of the ancestors starting at the
-immediate parent of the found node and ending with the JSON root node.
-For all but the root node (which has no ancestors anyway) the nodes in
-this list will be only partially parsed. Being untyped, Javascript does
-not enforce the arity of the callback. Because much of the time only the
-content itself is needed, the API design orders the callback parameters
-to take advantage of the loose typing so that a unary function taking
-only the content may be given.
-
-For the widest context currently available, the whole document as it has
-been parsed so far may be accessed using the \texttt{.root} method.
-Since \texttt{.root} relates to the oboe instance itself rather than the
-callback per-say, it can be accessed from any code with a reference to
-the oboe object.
-
-\texttt{http://nodejs.org/docs/latest/api/events.html\#events\_emitter\_on\_event\_listener}
-
-In node.js the code style is more obviously event-based. Listeners are
-added via a \texttt{.on} method with a string event name given as the
-first argument. Adopting this style, my API design for oboe.js also
-allows events to be added as:
+In this JSON we may extract the runners using the pattern
+\texttt{\{name time\}} or \texttt{medalWinners.*} but nodes alone are
+insufficient because their location communicates information which is as
+important as their content. The \texttt{path} parameter provides the
+location as an array of strings plotting a descent from the JSON root to
+the found node. For example, Bolt has path
+\texttt{{[}'medalWinners', 'gold'{]}}. Similarly, the \texttt{ancestors}
+array is a list of the ancestors starting at the immediate parent of the
+found node and ending with the JSON root node. For all but the root
+node, which in any case has no ancestors, the nodes in the ancestor list
+will have been only partially parsed.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
-   \NormalTok{.}\FunctionTok{on}\NormalTok{( }\StringTok{"node"}\NormalTok{, }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person, path, ancestors) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{+ }\StringTok{" won the "} \NormalTok{+ }\FunctionTok{lastOf}\NormalTok{(path) + }\StringTok{" medal"} \NormalTok{);}
+   \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person, path) \{}
+   
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{+ }\StringTok{" won the "} \NormalTok{+ }\FunctionTok{lastOf}\NormalTok{(path) + }\StringTok{" medal "}
+         \NormalTok{+ }\StringTok{"with a time of "} \NormalTok{+ }\OtherTok{person}\NormalTok{.}\FunctionTok{time} \NormalTok{);}
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
-While allowing both styles uncountably creates an API which is larger
-than it needs to be, creating a library which is targeted at both the
-client and server side, I hope this will help adoption by either camp.
-The Two styles are similar enough that a person familiar with one should
-be able to pick up the other without difficulty. In implementation a
-duplicative API should require only a minimal degree of extra coding
-because these parts may be expressed in common and their scope reduced
-using partial completion. Because \texttt{'!'} is the JSONPath for the
-root of the document, for some callback c, \texttt{.done(c)} is a
-synonym for \texttt{.node('!', c)} and therefore below a thin interface
-layer may share an implementation. Likewise, \texttt{.node} is easily
-expressible as a partial completion of \texttt{.on} with
-\texttt{'node'}.
+Being loosely typed, Javascript would not enforce that ternary callbacks
+are used as selection handlers. Given that before a callback is made the
+application programmer must have provided a JSONPath selector for the
+locations in the document she is interested in, for most JSON formats
+the content alone is sufficient. The API design orders the callback
+parameters so that in most common cases a unary or binary function can
+be given.
 
-\subsection{Earlier callbacks when paths are matched}
+Using Node.js the code style is more obviously event-based. Listeners
+are normally added using an \texttt{.on} method and the event name is a
+string given as the first argument. Adopting this style, my API design
+for oboe.js also allows events to be added as:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
+   \NormalTok{.}\FunctionTok{on}\NormalTok{( }\StringTok{"node"}\NormalTok{, }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person) \{}
+   
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Well done "} \NormalTok{+ }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{);}
+   \NormalTok{\});}
+\end{Highlighting}
+\end{Shaded}
+
+While allowing both styles creates an API which is larger than it needs
+to be, creating a library which is targeted at both the client and
+server side is a ballance between self-consistency spanning environments
+and consistency \emph{with} the environment, I hope this will help
+adoption by either camp. The two styles are similar enough that a person
+familiar with one should be able to work with the other without
+difficulty. Implementating the duplicative parts of the API should
+require only a minimal degree of extra coding because they may be
+expressed in common using partial completion. Because \texttt{'!'} is
+the JSONPath for the root of the document, for some callback \texttt{c},
+\texttt{.done(c)} is a equal to \texttt{.node('!', c)}. Likewise,
+\texttt{.node} is easily expressible as a partial completion of
+\texttt{.on} with \texttt{'node'}. Below a thin interface layer may
+share a commonb implementation.
+
+\emph{API allows body to be given as Object and converts into JSON
+because it is anticipated that REST services which emmit JSON will also
+accept it}
+
+\subsection{Earlier callbacks when paths are found prior to nodes}
 
 Following with the project's aim of giving callbacks as early as
 possible, sometimes useful work can be done when a node is known to
 exist but before we have the contents of the node. This means that each
-node found in a JSON document has the potential to trigger notifications
-at two points: when it is first discovered and when it is complete. The
-API facilitates this by providing a \texttt{path} callback following
-much the same pattern as the \texttt{node} callback.
+node found in a JSON document can potentially trigger notifications at
+two points: when it is first addressed and when it is complete. The API
+facilitates this by providing a \texttt{path} event following much the
+same pattern as \texttt{node}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1645,85 +1661,111 @@ much the same pattern as the \texttt{node} callback.
    \NormalTok{.}\FunctionTok{path}\NormalTok{( }\StringTok{"medalWinners"}\NormalTok{, }\KeywordTok{function}\NormalTok{() \{}
       \CommentTok{// We don"t know the winners yet but we know we have some so let"s}
       \CommentTok{// start drawing the table already:    }
-      \KeywordTok{interface}\NormalTok{.}\FunctionTok{showMedalTable}\NormalTok{();}
+      \OtherTok{gui}\NormalTok{.}\FunctionTok{showMedalTable}\NormalTok{();}
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person, path) \{    }
-      \KeywordTok{interface}\NormalTok{.}\FunctionTok{addPersonToMedalTable}\NormalTok{(person, }\FunctionTok{lastOf}\NormalTok{(path));}
+      \KeywordTok{let} \NormalTok{metal = }\FunctionTok{lastOf}\NormalTok{(path);}
+      \OtherTok{gui}\NormalTok{.}\FunctionTok{addPersonToMedalTable}\NormalTok{(person, metal);}
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{fail}\NormalTok{( }\KeywordTok{function}\NormalTok{()\{}
       \CommentTok{// That didn"t work. Revert!}
-      \KeywordTok{interface}\NormalTok{.}\FunctionTok{hideMedalTable}\NormalTok{();}
+      \OtherTok{gui}\NormalTok{.}\FunctionTok{hideMedalTable}\NormalTok{();}
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
-In implementation providing path notifications is a simple matter of
-allowing the evaluation of the json path expressions when items are
-pushed to the stack of current nodes in addition to when they are
-popped.
+Implementing path notifications requires little extra code, requiring
+JSONPath expressions can be evaluated when items are found in addition
+to when they are completed.
 
 \subsection{Oboe.js as a Micro-Library}
 
-Http traffic, especially sending entropy-sparse text formats is often
-gzipped at point of sending in order to deliver it more quickly, so in
-measuring a download footprint it usually makes more sense to compare
-post-gzipping. A Javascript library qualifies as being \emph{micro} if
-it is delivered in 5k or less, 5120 bytes. Micro-libraries also tend to
-follow the ethos that it is better for a developer to gather together
-several tiny libraries than one that uses a one-size-fits-all approach,
-perhaps echoing the unix command line tradition of small programs which
-each do do exactly one thing. Javascript Micro-libraries are listed
-at,\footnote{\href{http://microjs.com/}{Http://microjs.com/}.} which
-includes this project. Oboe.js feels on the edge of what is possible to
-elegantly do as a micro-library so while the limit is somewhat
-arbitrary, for the sake of adoption smaller is better and keeping below
-this limit whilst writing readable code is an interesting challenge. As
-well as being a small library, in the spirit of a micro-library a
-project should impose as few restrictions as possible on its use and be
-designed to be completely agnostic as to which other libraries or
-programming styles that it is used with.
+Http traffic is often compressed using gzip so that it transfers more
+quickly, particularly for entropy-sparse text formats such as
+Javascript. Measuring a library's download footprint it usually makes
+more sense to compare post-gzipping. For the sake of adoption smaller is
+better because site creators are sensitive to the download size of their
+sites. Javascript micro-libraries are listed at
+\href{http://microjs.com}{microjs.com}, which includes this project, a
+library qualifies as being \emph{micro} if it is delivered in 5kb or
+less, 5120 bytes. Micro-libraries tend to follow the ethos that it is
+better for an application developer to gather together several tiny
+libraries than find one with a one-size-fits-all approach, perhaps
+echoing the unix command line tradition for small programs which each do
+do exactly one thing. As well as being a small library, in the spirit of
+a micro-library a project should impose as few restrictions as possible
+on its use and be be agnostic as to which other libraries or programming
+styles it will be combined with. Oboe feels on the edge of what is
+possible to elegantly do as a micro-library so while the limit is
+somewhat arbitrary, and keeping below this limit whilst writing readable
+code provides an interesting extra challenge.
 
 \subsection{Choice of streaming data transport}
 
-Considering longpoll, push-tables and websockets\ldots{}
+As discussed in section \ref{browserstreamingframeworks}, current
+streaming techniques built on top of http observe a dichotomous split of
+traffic as either stream or download. I find that this split is not
+necessary and streaming may be used as the most effective means of
+downloading. Streaming services such as websockets and push pages are
+not REST. Under these frameworks each stream has an address but the data
+in the stream is not addressable. This is similar to the \emph{Service
+Trampled REST} STREST anti-pattern (Cragg 2006) in which http is viewed
+as addressing endpoints for services rather than addressing the
+resources themselves. If an event which is streamed live cannot and then
+then later made available as historic data, because the data is
+unaddressable it is also uncacheable. These frameworks use http as the
+underlying transport but I find they bend http away from its principled
+design. Because of these concerns, in the browser I will only be
+supporting downloading using XHRs.
 
-I find that it is not necessary to take this dichotomous view of
-streaming.
+Although I am designing Oboe for static resources and not focusing on
+creating a means to receive live events, the development community have
+speculated on the possibility of using Oboe to create a REST-compatible
+bridge that unifies live and static data. For example, consider a
+service which gives the results per-constituency for a UK general
+election. Requesting a previous year's results, the data is delivered in
+JSON format much as usual. Requesting the results for the current year
+on the night of the election, an incomplete JSON with the constituencies
+known so far would be immediately sent, followed by the remainder as the
+results are called. Eventually, when all results are known the JSON
+would finally close. A few days later, for somebody wishing to fetch the
+results would use the \emph{same url for the now historic data as was
+used on the night for the live data}. The data that was streamed is not
+incompatible with a http caching and a cache which saw the data when it
+was live would be able to store it in the cache and later serve it as
+historic. Programming using Oboe, an application developer would not
+have to handle live and historic data separately. The same code which
+displayed results as they were announced could be used to later show the
+historic results without any adjustments or branching.
 
-Whilst there is some overlap, each of the approaches above addresses a
-problem only tangentially related to this project's aims. Firstly,
+Taking this idea one step further, Oboe might be used for infinite data
+which intentionally never completes. In principle this is not
+incompatible with http caching although in practice would probably not
+work well with a cache which expects requests to eventually complete.
+This would also require a REST service which knows that it is delivering
+to a streaming client. If a non-streaming REST client were to try to use
+the same service it would try to get `all' of the data and never
+complete its task.
 
-In REST I have always valued how prominently the plumbing of a system is
-visible, so that to sample a resource all that is required is to type a
-URL and be presented with it in a human-comprehensible format.
+Supporting only XHR as a transport unfortunately means that on legacy
+browsers which do not fire the progress events (see section
+\ref{xhrsandstreaming}) a progressive conceptualisation of downloading
+is not possible. I will not be using streaming workarounds such as push
+tables because this would create a client which is unable to connect to
+the majority of REST services. The closest equivalent behaviour is to
+wait until the document completes and then send the text through
+Clarinet as usual. This will provide only a non-streaming interpretation
+of the resource and will give callbacks later than on more capable
+platforms but will fire the same events in the same order as if a
+streaming download were possible. By reverting to non-progressive AJAX
+on legacy platforms, application authors will not have to write special
+cases and the performance will be no worse than if a more traditional
+ajax library such as jQuery were used.
 
-Secondly, as adaptations to the context in which they were created,
-these frameworks realise a view of network usage in which downloading
-and streaming are dichotomously split, whereas I aim to realise a schema
-without dichotomy in which \emph{streaming is adapted as the most
-effective means of downloading}. In existing common practice a wholly
-distinct mechanism is provided vs for data which is ongoing vs data
-which is finite. For example, the display of real-time stock data might
-start by AJAXing in historical and then separately use a websocket to
-maintain up-to-the-second updates. This requires the server to support
-two distinct modes. However, I see no reason why a single transport
-could not be used for both. Such a server might start answering a
-request by write historic events from a database, then switch to writing
-out live data in the same format in response to messages from a MOM. By
-closing the dichotomy we would have the advantage that a single
-implementation is able to handle all cases.
-
-It shouldn't be a surprise that a dichotomous implementation of
-streaming, where a streaming transport is used only for live events is
-incompatible with http caching. If an event is streamed when it is new,
-but then when it is old made available for download, http caching
-between the two requests is impossible. However, where a single mode is
-used for both live and historic events the transport is wholly
-compatible with http caching.
-
-If we take streaming as a technique to achieve efficient downloading,
-not only for the transfer of forever-ongoing data, none of these
-approaches are particularly satisfactory.
+Oboe could not be used to receive live data on legacy browsers because
+no data could be used until the request finishes. In the election
+results example, no results could be shown until they had all been
+announced.
 
 \subsection{Handling transport failures}
 
@@ -1733,13 +1775,12 @@ without necessarily losing the part that was successfully received.
 Researching error handing, I considered the option of automatically
 resuming failed requests without intervention from the containing
 application. Http 1.1 provides a mechanism for Byte Serving via the
-\texttt{Accepts-Ranges} header
-{[}\url{http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html}\#sec14.5{]}
-which is used to request any contiguous fragment of a resource -- in our
-case, the part that we missed when the download failed. Having examined
-this option I came to the conclusion that it would encourage brittle
-systems because it assumes two requests to the same URL will give
-byte-wise equal responses.
+\texttt{Accepts-Ranges} header (R. Fielding 1999) which is used to
+request any contiguous fragment of a resource -- in our case, the part
+that we missed when the download failed. Having examined this option I
+came to the conclusion that it would encourage brittle systems because
+it assumes two requests to the same URL will give byte-wise equal
+responses.
 
 A deeper problem is that Oboe cannot know the correct behaviour when a
 request fails so this is better left to the containing applications.
@@ -1756,7 +1797,10 @@ throwing because the call which will later cause an error will no longer
 be on the stack at the time that the error occurs. Error-events will be
 used instead.
 
-\subsection{Fallback support on less-capable platforms}
+With further development Oboe could be used for perpetual streaming but
+at the moment there are not the tools to write out JSON like this.
+
+\subsection{Fallback support for less capable platforms}
 
 \emph{something about market share and link to figures in an appendix?}
 
@@ -2621,6 +2665,8 @@ Oboe should not discourage adoption.
 
 \subsection{potential future work}
 
+\emph{Matching server-side tools}
+
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
 an obvious expansion. Currently Oboe only operates on http traffic.
@@ -2785,9 +2831,17 @@ process
 \CommentTok{ * Partially complete a function.}
 \CommentTok{ * }
 \CommentTok{ * Eg: }
-\CommentTok{ *    var add3 = partialComplete( function add(a,b)\{return a+b\}, [3] );}
+\CommentTok{ *    var add3 = partialComplete( function add(a,b)\{return a+b\}, 3 );}
 \CommentTok{ *    }
 \CommentTok{ *    add3(4) // gives 7}
+\CommentTok{ *    }
+\CommentTok{ *    }
+\CommentTok{ *    function wrap(left, right, cen)\{return left + " " + cen + " " + right;\}}
+\CommentTok{ *    }
+\CommentTok{ *    var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );}
+\CommentTok{ *    }
+\CommentTok{ *    pirateGreeting("Guybrush Threepwood"); }
+\CommentTok{ *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"}
 \CommentTok{ */}
 \KeywordTok{var} \NormalTok{partialComplete = }\FunctionTok{varArgs}\NormalTok{(}\KeywordTok{function}\NormalTok{( fn, boundArgs ) \{}
 
@@ -4635,6 +4689,10 @@ Conway, Mel. 2004. \emph{Humanizing Application Building: An
 Anthropological Perspective}.
 \url{http://melconway.com/Home/pdf/humanize.pdf}.
 
+Cragg, Duncan. 2006. ``Duncan Cragg on Declarative Architectures: STREST
+(Service-Trampled REST) Will Break Web 2.0.''
+\url{http://duncan-cragg.org/blog/post/strest-service-trampled-rest-will-break-web-20/}.
+
 Douglas, Crockford. 2009. ``JSON: The fat-free alternative to XML.''
 \url{http://json.org}.
 
@@ -4643,6 +4701,10 @@ XML, EJB, CORBA, Servlets and SOAP}.
 
 Etemad, Elika J, and Tab Atkins. 2013. ``Selectors Level 4.''
 \url{http://dev.w3.org/csswg/selectors4/}.
+
+Fielding, R. 1999. ``Hypertext Transfer Protocol -{}- HTTP/1.1: Header
+Field Definitions.''
+\url{http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html\#sec14.5}.
 
 Fielding, R. T. 2000. ``Principled design of the modern Web
 architecture.''
