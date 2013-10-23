@@ -509,14 +509,11 @@ Choice of streaming data transport
 ----------------------------------
 
 As discussed in section \ref{browserstreamingframeworks}, current
-streaming techniques built on top of http take a dichotomous by
-splitting traffic up as either stream or download. I find that this
+streaming techniques built on top of http observe a dichotomous 
+split of traffic as either stream or download. I find that this
 split is not necessary and streaming may be used as the most effective
-means of downloading.
-
-Streaming transports such as websockets are not REST services and are
-solutions to a problem only tangentially related to this project's.
-Under these frameworks each stream has an address but the data in the
+means of downloading. Streaming services such as websockets and push 
+pages are not REST. Under these frameworks each stream has an address but the data in the
 stream is not addressable. This is similar to the *Service Trampled
 REST* STREST anti-pattern [@strest] in which http is viewed as
 addressing endpoints for services rather than addressing the resources
@@ -524,6 +521,8 @@ themselves. If an event which is streamed live cannot and then then
 later made available as historic data, because the data is unaddressable
 it is also uncacheable. These frameworks use http as the underlying
 transport but I find they bend http away from its principled design.
+Because of these concerns, in the browser I will only be supporting 
+downloading using XHRs.
 
 Although I am designing Oboe for static resources and not focusing on
 creating a means to receive live events, the development community have
@@ -545,20 +544,32 @@ have to handle live and historic data separately. The same code which
 displayed results as they were announced could be used to later show the
 historic results without any adjustments or branching.
 
-section \ref{xhrsandstreaming}
+Taking this idea one step further, Oboe might be used for infinite data
+which intentionally never completes. In principle this is not incompatible
+with http caching although in practice would probably not work well with
+a cache which expects requests to eventually complete. This would also
+require a REST service which knows that it is delivering to a streaming
+client. If a non-streaming REST client were to try to use the same service
+it would try to get 'all' of the data and never complete its task.  
 
-On browsers without support for XHR2 progress events I will not be using
-streaming workarounds such as push tables because this would create a
-REST client which is unable to connect to the majority of REST services.
+Supporting only XHR as a transport unfortunately means that on legacy
+browsers which do not fire the progress events (see section \ref{xhrsandstreaming})
+a progressive conceptualisation of downloading is not possible.
+I will not be using streaming workarounds such as push tables because this would create a
+client which is unable to connect to the majority of REST services.
 The closest equivalent behaviour is to wait until the document completes
 and then send the text through Clarinet as usual. This will provide only
 a non-streaming interpretation of the resource and will give callbacks
 later than on more capable platforms but will fire the same events in
-the same order as if a streaming download were possible. The advantage
-of Oboe using standard AJAX on legacy platforms is that application
-authors will not have to write special cases. While there won't be any
-streaming advantages, the application should continue to function as
-before.
+the same order as if a streaming download were possible. By
+reverting to non-progressive AJAX on legacy platforms, application
+authors will not have to write special cases and the performance will
+be no worse than if a more traditional ajax library such as jQuery were
+used.
+
+Oboe could not be used to receive live data on legacy
+browsers because no data could be used until the request finishes. In the election
+results example, no results could be shown until they had all been announced.
 
 Handling transport failures
 ---------------------------
