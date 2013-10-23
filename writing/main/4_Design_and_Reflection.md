@@ -508,33 +508,17 @@ code provides an interesting extra challenge.
 Choice of streaming data transport
 ----------------------------------
 
-Considering longpoll, push-tables and websockets...
+As discussed in section \ref{browserstreamingframeworks}, most 
+internet streaming techniques take a dichotomous view which splits
+traffic up as either streaming or downloading.
+I find that this split is not necessary and streaming may be used as 
+the most effective means of downloading.
 
-I find that it is not necessary to take this dichotomous view of
-streaming.
-
-Whilst there is some overlap, each of the approaches above addresses a
-problem only tangentially related to this project's aims. Firstly,
-
+Frameworks for perceptual streaming solve address 
+problem only tangentially related to this project's aims.
 In REST I have always valued how prominently the plumbing of a system is
 visible, so that to sample a resource all that is required is to type a
 URL and be presented with it in a human-comprehensible format.
-
-Secondly, as adaptations to the context in which they were created,
-these frameworks realise a view of network usage in which downloading
-and streaming are dichotomously split, whereas I aim to realise a schema
-without dichotomy in which *streaming is adapted as the most effective
-means of downloading*. In existing common practice a wholly distinct
-mechanism is provided vs for data which is ongoing vs data which is
-finite. For example, the display of real-time stock data might start by
-AJAXing in historical and then separately use a websocket to maintain
-up-to-the-second updates. This requires the server to support two
-distinct modes. However, I see no reason why a single transport could
-not be used for both. Such a server might start answering a request by
-write historic events from a database, then switch to writing out live
-data in the same format in response to messages from a MOM. By closing
-the dichotomy we would have the advantage that a single implementation
-is able to handle all cases.
 
 It shouldn't be a surprise that a dichotomous implementation of
 streaming, where a streaming transport is used only for live events is
@@ -544,9 +528,29 @@ between the two requests is impossible. However, where a single mode is
 used for both live and historic events the transport is wholly
 compatible with http caching.
 
-If we take streaming as a technique to achieve efficient downloading,
-not only for the transfer of forever-ongoing data, none of these
-approaches are particularly satisfactory.
+In legacy browsers without support for XHR2 progress events I will not be
+using streaming workarounds such as push tables because this would 
+create a REST
+client which is unable to connect to the majority of REST services.
+The closest equivalent behaviour is to wait until the document
+completes and then send the text through Clarinet as usual. 
+This will provide only a non-streaming interpretation of the resource
+and will give callbacks later than on more capable platforms
+but will fire the same events in the same order as if a streaming
+download were possible. The advantage of Oboe using standard AJAX
+on legacy platforms is that application authors will not have to write
+special cases. While there won't be any streaming advantages, the application
+should continue to function as before.  
+
+For example, the display of real-time stock data might start by
+AJAXing in historical and then separately use a websocket to maintain
+up-to-the-second updates. This requires the server to support two
+distinct modes. However, I see no reason why a single transport could
+not be used for both. Such a server might start answering a request by
+write historic events from a database, then switch to writing out live
+data in the same format in response to messages from a MOM. By closing
+the dichotomy we would have the advantage that a single implementation
+is able to handle all cases.
 
 Handling transport failures
 ---------------------------
@@ -578,6 +582,9 @@ IO errors in a non-blocking system cannot be handled via exception
 throwing because the call which will later cause an error will no longer
 be on the stack at the time that the error occurs. Error-events will be
 used instead.
+
+With further development Oboe could be used for perpetual streaming but 
+at the moment there are not the tools to write out JSON like this.
 
 Fallback support for less capable platforms
 -------------------------------------------
