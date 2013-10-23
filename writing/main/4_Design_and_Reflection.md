@@ -488,7 +488,7 @@ Oboe.js as a Micro-Library
 Http traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
 Javascript. Measuring a library's download footprint it usually makes
-more sense to compare post-gzipping. For the sake of adoption smaller is
+more sense to compare post-compression. For the sake of adoption smaller is
 better because site creators are sensitive to the download size of their
 sites. Javascript micro-libraries are listed at
 [microjs.com](http://microjs.com), which includes this project, a
@@ -509,18 +509,19 @@ Choice of streaming data transport
 ----------------------------------
 
 As discussed in section \ref{browserstreamingframeworks}, current
-streaming techniques built on top of http observe a dichotomous split of
+streaming techniques that operate over http encourage a dichotomous split of
 traffic as either stream or download. I find that this split is not
-necessary and streaming may be used as the most effective means of
-downloading. Streaming services such as websockets and push pages are
-not REST. Under these frameworks each stream has an address but the data
+necessary and that streaming may be used as the most effective means of
+downloading. Streaming services using push pages or websockets are
+not REST. Under these frameworks a stream has a URL address but the data
 in the stream is not addressable. This is similar to the *Service
 Trampled REST* STREST anti-pattern [@strest] in which http is viewed as
 addressing endpoints for services rather than addressing the resources
-themselves. If an event which is streamed live cannot and then then
-later made available as historic data, because the data is unaddressable
-it is also uncacheable. These frameworks use http as the underlying
-transport but I find they bend http away from its principled design.
+themselves. Because it is unaddressable, the data in the stream is
+also uncacheable: an event which is streamed live cannot later, when it
+is historic, be retrieved from a cache which was populated by the stream.
+These frameworks use http as the underlying
+transport but I find they do not follow http's design principles.
 Because of these concerns, in the browser I will only be supporting
 downloading using XHRs.
 
@@ -572,6 +573,14 @@ Oboe could not be used to receive live data on legacy browsers because
 no data could be used until the request finishes. In the election
 results example, no results could be shown until they had all been
 announced.
+
+Under Node, the standard http library provides a view of the response
+as a standard ReadableStream so is very amenable to a streaming interpretation
+of http. Because in Node all streams provide a common API regardless of their source,
+there is no reason not to allow arbitrary streams to be read. Although Oboe
+is intended primarily as a REST client, under Node it will be capable of reading
+data from any transport. For example, a local file, an ftp server, cryptography,
+or the process's standard are all implemented using streams.
 
 Handling transport failures
 ---------------------------
