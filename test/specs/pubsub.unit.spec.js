@@ -1,6 +1,6 @@
 describe('pub sub', function(){
 
-   it('should be able to subscribe', function(){
+   it('is able to subscribe', function(){
    
       var events = pubSub();
       
@@ -10,7 +10,7 @@ describe('pub sub', function(){
    
    });
    
-   it('should be able to notify a subscribed function without an event object', function(){
+   it('is able to notify a subscribed function without an event object', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
@@ -23,7 +23,7 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalled();
    });
    
-   it('should pass first argument through as the event', function(){
+   it('passes first argument through as the event', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
@@ -35,7 +35,7 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalledWith('a');
    });   
    
-   it('should notify multiple listeners of the same event', function(){
+   it('notifies multiple listeners of the same event', function(){
    
       var events = pubSub(),
           listenerA = jasmine.createSpy('listenerA'),
@@ -50,7 +50,7 @@ describe('pub sub', function(){
       expect(listenerA2).toHaveBeenCalled();           
    });
    
-   it('should allow many listeners to be registered for an event', function(){
+   it('allows many listeners to be registered for an event', function(){
    
       var events = pubSub(),
           listenerA = jasmine.createSpy('listenerA'),
@@ -89,7 +89,7 @@ describe('pub sub', function(){
       expect(listenerB.calls.length).toBe(18);           
    });   
    
-   it('should have a chainable on function', function(){
+   it('has a chainable on function', function(){
    
       var events = pubSub(),
           listenerA = jasmine.createSpy('listenerA'),
@@ -147,7 +147,7 @@ describe('pub sub', function(){
       expect(listenerA2.calls.length).toBe(2);      
    });   
    
-   it('should handle numberic event codes', function(){
+   it('handles numberic event codes', function(){
    
       var events = pubSub(),
           listenerA = jasmine.createSpy('listenerA'),
@@ -167,7 +167,7 @@ describe('pub sub', function(){
       expect(listenerB).toHaveBeenCalled();      
    });   
    
-   it('should not crash if asked to fire an event that has no listeners', function(){
+   it('does not crash if asked to fire an event that has no listeners', function(){
    
       var events = pubSub();
       
