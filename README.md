@@ -200,6 +200,18 @@ oboe('/myapp/things.json')
    });   
 ```
 
+## Deregistering a callback
+
+Calling `this.forget()` from inside a callback is an easy way to deregister
+that listener.
+
+``` js
+oboe('')
+   .node('', function(  ){
+      this.forget();
+   });
+```
+
 ## The path passback
 
 The callback is also given the path to the node that it found in the json. It is sometimes preferable to
