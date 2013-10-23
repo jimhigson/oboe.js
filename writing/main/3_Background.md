@@ -578,7 +578,11 @@ incongruously with the browser as a platform in which almost every other
 remote resource is interpreted progressively. Examples include
 progressive image formats, html, svg, video, and Javascript itself
 (script interpretation starts before the script is fully loaded).
-Presently the progress event is supported by all but legacy browsers.
+
+The progress event is supported by the latest version of all major
+browsers. However, Internet Explorer only added support
+recently with version 10 and there is a significant user base remaining
+on versions 8 and 9.
 
 Browser streaming frameworks
 ----------------------------
