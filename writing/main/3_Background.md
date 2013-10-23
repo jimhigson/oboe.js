@@ -337,8 +337,9 @@ difference in logic expressed by the program, and therefore harder to
 later understand the thinking behind the change and the reason for the
 change.
 
-JsonPath and XPath selector languages 
+JsonPath and XPath selector languages
 -------------------------------------
+
 \label{jsonpathxpath}
 
 The problem of drilling down to pertinent fragments of a message without
@@ -554,6 +555,8 @@ jQuery.ajax('http://example.com/people.json', function( people ) {
 XHRs and streaming
 ------------------
 
+\label{xhrsandstreaming}
+
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
 lowest common denominator of the available browser abilities. At the
@@ -570,13 +573,12 @@ progress event:
 > event named progress about every 50ms or for every byte received,
 > whichever is least frequent. [@xhr2progress]
 
-Presently this event is supported by all but legacy browsers.
-
-The historic lack of streaming allowed by XHR stands incongruously with
-the browser as a platform which has long used streaming to precipitate
-almost every other remote resource. Progressive image formats, html,
-svg, video and Javascript itself (script interpretation starts before
-the script is fully loaded) are all examples of this.
+The historic lack of streaming for data fetched using XHR stands
+incongruously with the browser as a platform in which almost every other
+remote resource is interpreted progressively. Examples include
+progressive image formats, html, svg, video, and Javascript itself
+(script interpretation starts before the script is fully loaded).
+Presently the progress event is supported by all but legacy browsers.
 
 Browser streaming frameworks
 ----------------------------
