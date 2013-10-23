@@ -485,21 +485,21 @@ to when they are completed.
 Oboe.js as a Micro-Library
 --------------------------
 
-Http traffic is often compressed
-using gzip so that it transfers more quickly, particularly for entropy-sparse text formats such as
+Http traffic is often compressed using gzip so that it transfers more
+quickly, particularly for entropy-sparse text formats such as
 Javascript. Measuring a library's download footprint it usually makes
 more sense to compare post-gzipping. For the sake of adoption smaller is
 better because site creators are sensitive to the download size of their
 sites. Javascript micro-libraries are listed at
 [microjs.com](http://microjs.com), which includes this project, a
-library qualifies as being *micro* if it is delivered in 5kb
-or less, 5120 bytes. Micro-libraries tend to follow the ethos that it is
-better for an application developer to gather together several tiny
-libraries than find one with a one-size-fits-all approach, perhaps
-echoing the unix command line tradition for small programs which each do
-do exactly one thing. As well as being a small library, in the spirit of
-a micro-library a project should impose as few restrictions as possible
-on its use and be be agnostic as to which other libraries or programming
+library qualifies as being *micro* if it is delivered in 5kb or less,
+5120 bytes. Micro-libraries tend to follow the ethos that it is better
+for an application developer to gather together several tiny libraries
+than find one with a one-size-fits-all approach, perhaps echoing the
+unix command line tradition for small programs which each do do exactly
+one thing. As well as being a small library, in the spirit of a
+micro-library a project should impose as few restrictions as possible on
+its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
 somewhat arbitrary, and keeping below this limit whilst writing readable
