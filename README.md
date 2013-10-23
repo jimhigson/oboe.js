@@ -15,7 +15,7 @@ http.
 - [Use cases](#use-cases)
 - [Examples](#examples)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
-	- [Hanging up the AJAX when we get what we need](#hanging-up-the-ajax-when-we-get-what-we-need)
+	- [Hanging up when we have what we need](#hanging-up-when-we-have-what-we-need)
 	- [Detecting strings, numbers](#detecting-strings-numbers)
 	- [Duck typing](#duck-typing)
 	- [Reacting before we get the whole object](#reacting-before-we-get-the-whole-object)
@@ -97,7 +97,7 @@ oboe('/myapp/things.json')
    });
 ```
 
-## Hanging up the AJAX when we get what we need
+## Hanging up when we have what we need
 
 We can improve on the example above. Since we only care about the foods object and 
 not the non-foods we can hang up as soon as we have the foods, reducing our precious 
