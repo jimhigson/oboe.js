@@ -158,7 +158,7 @@ convenient. If they are not using a similar build process on their site,
 a single file is also faster to transfer to their users, mostly because
 the http overhead can be substantial and is of constant size per resource.
 
-Javascript files are interpreted in series by the browser so load-time
+Javascript files are interpreted in series by the browser at load-time
 dependencies must precede dependants. Unsurprisingly, separate files
 once concatenated following the same order as delivered to the browser
 will load more quickly but are functionally equivalent, at least barring
@@ -187,14 +187,16 @@ response to events. By resisting the static analysis the units will not
 be downloaded until they are needed.
 
 AMD is mostly of interest to web applications with a central hub but
-also some rarely used parts. Oboe does not fit this profile: everybody
+also some rarely used parts. For example, most visits to online banking
+will not need to create standing orders so it is better if this part is
+loaded on-demand than eagerly. Oboe does not fit this profile: everybody
 who uses it will use all of the library. Regardless, I hoped to use
 `optimise` to generate my combined Javascript file. Even after
 optimisation, Require's design necessitates that calls to `require` stay
-in the code and that the require.js run-time component is available to
-handle these calls. For a micro-library a ???k overhead was too large to
-accommodate. Overall, Require seems more suited to developing
-stand-alone applications than programming libraries.
+in the code and that the Require run-time component is available to
+handle them. Require's 5k would also have more than doubled
+Oboe's size. Overall, Require seems more suited to programmers creating
+stand-alone applications than library authors.
 
 Having abandoned Require, I decided to pick up the simplest tool which
 could possibly work. With only 15 source files and a fairly sparse
