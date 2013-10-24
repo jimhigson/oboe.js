@@ -312,17 +312,22 @@ describe("oboe integration (real http)", function() {
 
    it('fires error on 404', function () {
 
-      var gotError = false
+      var stubCallback = jasmine.createSpy('error callback');
 
       oboe(url('doesNotExist'))
-         .fail(function () {
-
-            gotError = true
-         });
+         .fail(stubCallback);
 
       waitsFor(function () {
-         return gotError;
+         return !!stubCallback.calls.length;
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+      
+      runs( function() {
+         expect( stubCallback )
+            .toHaveBeenCalledWith( 
+               404, 
+               jasmine.any(String) 
+            )
+      });
    })
    
    it('fires error on unreachable url', function () {

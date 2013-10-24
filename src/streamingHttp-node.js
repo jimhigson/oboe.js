@@ -24,7 +24,7 @@ function httpTransport(){
  */  
 function streamingHttp(fire, on, http, method, contentSource, data, headers) {
 
-   function readFromStream(readableStream) {
+   function readStreamToEventBus(readableStream) {
          
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
@@ -35,6 +35,20 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
       readableStream.on('end', function() {
                
          fire( END_OF_CONTENT );
+      });
+   }
+   
+   function readStreamToEnd(readableStream, callback){
+      var content = '';
+   
+      readableStream.on('data', function (chunk) {
+                                             
+         content += chunk.toString();
+      });
+      
+      readableStream.on('end', function() {
+               
+         callback( content );
       });
    }
    
@@ -59,11 +73,12 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
                                 
          if( sucessful ) {          
                
-            readFromStream(res)
+            readStreamToEventBus(res)
             
          } else {
-         
-            fire( ERROR_EVENT, statusCode );
+            readStreamToEnd(res, function(errorBody){
+               fire( ERROR_EVENT, statusCode, errorBody );
+            });
          }      
       });
       
@@ -87,7 +102,7 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
       fetchUrl(contentSource);
    } else {
       // contentsource is a stream
-      readFromStream(contentSource);   
+      readStreamToEventBus(contentSource);   
    }
 
 }
