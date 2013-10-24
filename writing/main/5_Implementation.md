@@ -4,30 +4,27 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js illustrating program flow
-from http transport to registered callbacks.** UML facet/receptacle 
-notation is used to show the flow of events with event names in capitals.
-For clarity events are depicted as transitioning directly between publisher
+![**Major components that make up Oboe.js illustrating program flow from
+http transport to registered callbacks.** UML facet/receptacle notation
+is used to show the flow of events with event names in capitals. For
+clarity events are depicted as transitioning directly between publisher
 and subscriber rather than through an intermediary.
 \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture follows a fairly linear
-pipeline with flow visiting various tasks between receiving http progress events
-and notifying application callbacks.
-The internal componentisation is designed primarily so that automated testing 
-can provide a high degree of confidence regarding the correct working of the 
-library.
-A local event bus facilitates communication between components inside 
-the Oboe instance and
-most components interact solely through this bus
-by receiving events, processing them and publishing further events in
-response.  This use of an event bus
-is a variation on the Observer pattern which removes the need for each
-unit to obtain a reference to the previous one so that it may observe
-it, giving a highly decoupled shape to the library. Once everything is
-wired into the bus no central control is required and the
-larger behaviours emerge as the consequence of interaction between
-finer ones.
+Oboe's architecture follows a fairly linear pipeline with flow visiting
+various tasks between receiving http progress events and notifying
+application callbacks. The internal componentisation is designed
+primarily so that automated testing can provide a high degree of
+confidence regarding the correct working of the library. A local event
+bus facilitates communication between components inside the Oboe
+instance and most components interact solely through this bus by
+receiving events, processing them and publishing further events in
+response. This use of an event bus is a variation on the Observer
+pattern which removes the need for each unit to obtain a reference to
+the previous one so that it may observe it, giving a highly decoupled
+shape to the library. Once everything is wired into the bus no central
+control is required and the larger behaviours emerge as the consequence
+of interaction between finer ones.
 
 Automated testing
 -----------------
@@ -80,9 +77,9 @@ data behind the logic which acts on them but I feel the departure is
 worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
-Dual-implementation of same interface for streamingHttp might be considered
-polymorphism, but a function not a class and both are never loaded at
-run time.
+Dual-implementation of same interface for streamingHttp might be
+considered polymorphism, but a function not a class and both are never
+loaded at run time.
 
 Largely for the sake of testing Oboe has also embraced dependency
 injection. This means that components do not create the further
