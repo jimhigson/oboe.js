@@ -67,47 +67,44 @@ behaviour is to get no callback for the sixth, even when running on
 platforms lacking support for XHR2 where all ten will have already been
 downloaded.
 
-Confidently black box testing a
-stateful unit is difficult. Because of side-effects and hidden state 
-we do not know if the same call will later give a different behaviour.
-Building up the parse result from SAX events is a fairly complex process which cannot 
-be done efficiently in Javascript without storing some state.
-The state is stored in a simple state-storing unit.
-The intricate logic may then be separately expressed as
-functions without side effects which transition between one state and the next
-and this part separately tested without having to double-guess the internals
-of the unit.
-Although proof of correctness is undecidable, whichever results the functions give while under test, 
-uninfluenced by state I can be confident that they will continue to give 
-in response to future similar events.
-The separate unit holding the parse result has exactly one responsibility and 
-is trivial to test.
-This approach slightly breaks with the object oriented principle of encapsulation
-by not hiding state behind the logic which acts on it but I feel the departure is
-justified by a more testable codebase.
+Confidently black box testing a stateful unit is difficult. Because of
+side-effects and hidden state we do not know if the same call will later
+give a different behaviour. Building up the parse result from SAX events
+is a fairly complex process which cannot be done efficiently in
+Javascript without storing some state. The state is stored in a simple
+state-storing unit. The intricate logic may then be separately expressed
+as functions without side effects which transition between one state and
+the next and this part separately tested without having to double-guess
+the internals of the unit. Although proof of correctness is undecidable,
+whichever results the functions give while under test, uninfluenced by
+state I can be confident that they will continue to give in response to
+future similar events. The separate unit holding the parse result has
+exactly one responsibility and is trivial to test. This approach
+slightly breaks with the object oriented principle of encapsulation by
+not hiding state behind the logic which acts on it but I feel the
+departure is justified by a more testable codebase.
 
-To enhance testability Oboe has also embraced dependency
-injection. This means that components do not create the further
-components that they require but rather rely on them being provided by
-an external wiring. The file `wire.js` performs the actual injection.
-One such example is the streamingHttp component which hides various
-incompatible http implementations by publishing their downloaded content
-progressively via the event bus. This unit does not know how to create
-the underlying browser XHR which it hides. Undoubtedly, by not
-instantiating its own dependencies a it presents a less friendly
-interface, although this is mitigated somewhat by the interface being
-purely internal, the objects it depends on are no longer a hidden
-implementation detail but exposed as a part of the component's API. The
-advantage of dependency injection here is that unit testing is much
-simpler. Unit tests should test exactly one behaviour of one unit. Were
-the streaming http object to create its own transport, that part would
-also be under test, plus whichever external service that it connects to.
-Because Javascript allows redefinition of built in types, this could be
-avoided by overwriting the XHR constructor to return a mock but
-modifying the built in types for tests opens up the possibilities of
-changes leaking between cases. Dependency injection allows a much
-simpler test style because it is trivial to inject a stub in place of
-the XHR.
+To enhance testability Oboe has also embraced dependency injection. This
+means that components do not create the further components that they
+require but rather rely on them being provided by an external wiring.
+The file `wire.js` performs the actual injection. One such example is
+the streamingHttp component which hides various incompatible http
+implementations by publishing their downloaded content progressively via
+the event bus. This unit does not know how to create the underlying
+browser XHR which it hides. Undoubtedly, by not instantiating its own
+dependencies a it presents a less friendly interface, although this is
+mitigated somewhat by the interface being purely internal, the objects
+it depends on are no longer a hidden implementation detail but exposed
+as a part of the component's API. The advantage of dependency injection
+here is that unit testing is much simpler. Unit tests should test
+exactly one behaviour of one unit. Were the streaming http object to
+create its own transport, that part would also be under test, plus
+whichever external service that it connects to. Because Javascript
+allows redefinition of built in types, this could be avoided by
+overwriting the XHR constructor to return a mock but modifying the built
+in types for tests opens up the possibilities of changes leaking between
+cases. Dependency injection allows a much simpler test style because it
+is trivial to inject a stub in place of the XHR.
 
 Running the tests
 -----------------
