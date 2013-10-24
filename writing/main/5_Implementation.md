@@ -120,7 +120,7 @@ built size is also checked. As a small, tightly focused project the
 majority of programming is refactoring already working code. Running
 tests on save provides quick feedback so that mistakes are found as soon
 as they are made. Agile practitioners emphasise the importance of tests
-that execute quickly [@cleancode P314, T9], the 220 unit and component
+that execute quickly [@cleancode p. 314:T9], the 220 unit and component
 tests run in less than a second so discovering mistakes is near instant.
 If the "content of any medium is always another medium” [@media p8], we
 might say that the content of programming is the program that is
