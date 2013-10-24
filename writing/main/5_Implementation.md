@@ -136,10 +136,10 @@ viewing the effect of code while we write it, we can build as a series
 of small, iterative, correct steps and programming can be more
 explorative and expressive.
 
-Integration tests are not run on save, they intentionally
-simulate a slow network so they take too long to run. I'd already have started
-the next work by the time they complete. Oboe is coded under git and hosted
-on github. The integration tests are used as the final check  
+Integration tests are not run on save, they intentionally simulate a
+slow network so they take too long to run. I'd already have started the
+next work by the time they complete. Oboe is coded under git and hosted
+on github. The integration tests are used as the final check\
 before a branch in git is merged into the master.
 
 Packaging as a single, distributable file
