@@ -111,28 +111,30 @@ Running the tests
 of sketch from notebook*](images/placeholder.png)
 
 The Grunt task runner is used to automate routine tasks such as
-executing the tests and building, configured so that the unit and component tests run
-automatically whenever a change is made to a source file or specification. As well as executing 
-correctly, the project is required not to surpass a certain size so this also checked on every save.
-Because Oboe is a small, tightly focused project the
-majority of the programming time is spent refactoring already working code. Running
+executing the tests and building, configured so that the unit and
+component tests run automatically whenever a change is made to a source
+file or specification. As well as executing correctly, the project is
+required not to surpass a certain size so this also checked on every
+save. Because Oboe is a small, tightly focused project the majority of
+the programming time is spent refactoring already working code. Running
 tests on save provides quick feedback so that mistakes are found as soon
-as they are made, before my mind has moved on to the next context.
-Agile practitioners emphasise the importance of tests
-that execute quickly [@cleancode p.314:T9] -- Oboe's 220 unit and component
-tests run in less than a second so discovering programming mistakes is almost instant.
-If the "content of any medium is always another medium” [@media p8], we
-might say that the content of programming is the effect that is
-realised by its execution. A person working in a physical medium sees the
-thing they are making but the programmer does usually not see their program's execution
-simultaneously as they create. Conway notes that an artisan works by
-transform-in-place "start with the working material in place and you
-step by step transform it into its final form" whereas software is
-created through intermediate proxies, and attempts to close this gap by
-merging programming with the results of programming [@humanize pp.8-9].
-I feel that if we bring together the medium and the message by viewing the
-effect of code while we write it, we can build as a series of small, iterative, correct
-steps and programming can be more explorative and expressive.
+as they are made, before my mind has moved on to the next context. Agile
+practitioners emphasise the importance of tests that execute quickly
+[@cleancode p.314:T9] -- Oboe's 220 unit and component tests run in less
+than a second so discovering programming mistakes is almost instant. If
+the "content of any medium is always another medium” [@media p8], we
+might say that the content of programming is the effect that is realised
+by its execution. A person working in a physical medium sees the thing
+they are making but the programmer does usually not see their program's
+execution simultaneously as they create. Conway notes that an artisan
+works by transform-in-place "start with the working material in place
+and you step by step transform it into its final form" whereas software
+is created through intermediate proxies, and attempts to close this gap
+by merging programming with the results of programming [@humanize
+pp.8-9]. I feel that if we bring together the medium and the message by
+viewing the effect of code while we write it, we can build as a series
+of small, iterative, correct steps and programming can be more
+explorative and expressive.
 
 The integration tests are not run on save because they intentionally
 simulate slow transfers and take some time to run. The integration tests
