@@ -371,7 +371,7 @@ Because explicit loops are replaced with declarations the code is usually
 about the same length as if you'd done JSON.parse:
 
 ``` js
-fs.readFile('/home/me/secretPlans.json', function( plansJson ){     
+fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){     
    if( err ) {
       console.log("Drat! Foiled again!");
       return;
