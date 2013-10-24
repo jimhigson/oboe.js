@@ -20,7 +20,7 @@ http.
 	- [Duck typing](#duck-typing)
 	- [Reacting before we get the whole object](#reacting-before-we-get-the-whole-object)
 	- [Giving some visual feedback as a page is updating](#giving-some-visual-feedback-as-a-page-is-updating)
-	- [The path passback](#the-path-passback)
+	- [The path parameter](#the-path-parameter)
 	- [Css4 style patterns](#css4-style-patterns)
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
 	- [Reading from any stream (Node.js only)](#reading-from-any-stream-nodejs-only)
@@ -199,18 +199,7 @@ oboe('/myapp/things.json')
    });   
 ```
 
-## Deregistering a callback
-
-Calling `this.forget()` from inside a callback deregisters that listener.
-
-``` js
-oboe('')
-   .node('', function(  ){
-      this.forget();
-   });
-```
-
-## The path passback
+## The path parameter
 
 The callback is also given the path to the node that it found in the json. It is sometimes preferable to
 register a wide-matching pattern and use the path parameter to decide what to do instead of
@@ -246,6 +235,34 @@ oboe('http://mysocialsite.example.com/homepage.json')
       My.App.getModuleCalled(moduleName).showNewData(moduleJson);
    });
 
+```
+
+## Deregistering a callback
+
+Calling `this.forget()` from inside a callback deregisters that listener.
+
+``` js
+
+// We have a list of items to plot on a map. We want to draw the first
+// ten while they're loading. After that we want to store the rest in a
+// model to be drawn later. 
+
+oboe('/listOfPlaces')
+   .node('list.*', function( item, path ){
+      var itemIndex = path[path.length-1];
+      
+      model.addItemToModel(item);      
+      view.drawItem(item);
+              
+      if( itemIndex == 10 ) {
+         this.forget();
+      }
+   })
+   .done(function( fullJson ){
+      var undrawnItems = fullJson.list.slice(10);
+            
+      model.addItemsToModel(undrawnItems);
+   });
 ```
 
 ## Css4 style patterns
