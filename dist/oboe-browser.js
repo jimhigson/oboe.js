@@ -411,11 +411,7 @@ else env = window;
     ];
 
   var buffers     = [ "textNode", "numberNode" ]
-    , streamWraps = clarinet.EVENTS.filter(function (ev) {
-          return ev !== "error" && ev !== "end";
-        })
     , S           = 0
-    , Stream
     ;
 
   clarinet.STATE =
@@ -529,8 +525,6 @@ else env = window;
     , resume : function () { this.error = null; return this; }
     , close  : function () { return this.write(null); }
     };
-
-  Stream = function () {};
 
   function emit(parser, event, data) {
     if(clarinet.INFO) console.log('-- emit', event, data);
