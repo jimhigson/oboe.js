@@ -23,7 +23,7 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalled();
    });
    
-   it('passes first argument through as the event', function(){
+   it('can pass through multiple parameters', function(){
    
       var events = pubSub(),
           listener = jasmine.createSpy('listener');
@@ -32,7 +32,7 @@ describe('pub sub', function(){
       
       events.fire('somethingHappening', 'a', 'b', 'c');
       
-      expect(listener).toHaveBeenCalledWith('a');
+      expect(listener).toHaveBeenCalledWith('a', 'b', 'c');
    });   
    
    it('notifies multiple listeners of the same event', function(){

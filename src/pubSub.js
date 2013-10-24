@@ -18,13 +18,13 @@ function pubSub(){
          return this; // chaining
       }, 
     
-      fire:function ( eventId, event ) {
+      fire:varArgs(function ( eventId, parameters ) {
                
-         each(
-            partialComplete( apply, [event || undefined] ), 
+         each( 
+            partialComplete( apply, parameters ), 
             listeners[eventId]
          );
-      },
+      }),
       
       un: function( eventId, handler ) {
          listeners[eventId] = without(listeners[eventId], handler);

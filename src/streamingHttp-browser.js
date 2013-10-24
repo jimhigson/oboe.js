@@ -95,7 +95,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             fire( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT, xhr.status );
+            fire( ERROR_EVENT, xhr.status, xhr.responseText );
          }
       }
    };

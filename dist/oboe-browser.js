@@ -1077,7 +1077,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             fire( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT, xhr.status );
+            fire( ERROR_EVENT, xhr.status, xhr.responseText );
          }
       }
    };
@@ -1808,13 +1808,13 @@ function pubSub(){
          return this; // chaining
       }, 
     
-      fire:function ( eventId, event ) {
+      fire:varArgs(function ( eventId, parameters ) {
                
-         each(
-            partialComplete( apply, [event || undefined] ), 
+         each( 
+            partialComplete( apply, parameters ), 
             listeners[eventId]
          );
-      },
+      }),
       
       un: function( eventId, handler ) {
          listeners[eventId] = without(listeners[eventId], handler);
