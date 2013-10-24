@@ -323,6 +323,21 @@ function foldR(fn, startValue, list) {
             ;
 }
 
+/**
+ * Return a list like the one given but with the first instance equal 
+ * to item removed 
+ */
+function without(list, item) {
+ 
+  return list  
+            ?  ( head(list) == item 
+                     ? tail(list) 
+                     : cons(head(list), without(tail(list), item))
+               ) 
+            : emptyList
+            ;
+}
+
 /** 
  * Returns true if the given function holds for every item in 
  * the list, false otherwise 
@@ -1195,6 +1210,10 @@ function pubSub(){
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
+      },
+      
+      un: function( eventId, handler ) {
+         listeners[eventId] = without(listeners[eventId], handler);
       }           
    };
 }
@@ -1223,7 +1242,8 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
  */
  
  
-function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
+function instanceController(  fire, on, un, 
+                              clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
 
@@ -1277,7 +1297,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
       // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function( ascent ){ 
+      on( eventId, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
@@ -1297,7 +1317,10 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            notifyCallback(callback, maybeMatchingMapping, ascent);                           
+            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            
+               un(eventId, handler);
+            }
          }
       });   
    }   
@@ -1317,16 +1340,24 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
           // To make a path, strip off the last item which is the special
           // ROOT_PATH token for the 'path' to the root node
           path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)); 
+          ancestors  = listAsArray(map(nodeOf, descent)),
+          keep       = true;
+          
+      oboeApi.forget = function(){
+         keep = false;
+      };           
       
-      try{
-      
+      try{      
          callback( nodeOf(matchingMapping), path, ancestors );   
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
          fire(ERROR_EVENT, e);
-      }          
+      }
+      
+      delete oboeApi.forget;
+      
+      return keep;          
    }
 
    /**
@@ -1389,7 +1420,7 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, 
+               eventBus.fire, eventBus.on, eventBus.un, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.fire) 
    );
