@@ -122,7 +122,7 @@ as they are made, before my mind has moved on to the next context. Agile
 practitioners emphasise the importance of tests that execute quickly
 [@cleancode p.314:T9] -- Oboe's 220 unit and component tests run in less
 than a second so discovering programming mistakes is almost instant. If
-the "content of any medium is always another medium” [@media p8], we
+the "content of any medium is always another medium” [@media p.8], we
 might say that the content of programming is the effect that is realised
 by its execution. A person working in a physical medium sees the thing
 they are making but the programmer does usually not see their program's
@@ -136,17 +136,11 @@ viewing the effect of code while we write it, we can build as a series
 of small, iterative, correct steps and programming can be more
 explorative and expressive.
 
-The integration tests are not run on save because they intentionally
-simulate slow transfers and take some time to run. The integration tests
-are used as a final check against built code before a branch in git can
-be merged into the master. Once the code has been packaged for
-distribution the internals are no longer visible the integration tests
-which are coded against the public API are the only runnable tests.
-While these tests don't individually test every component, they are
-designed to exercise the whole codebase so that a mistake in any
-component will be visible through them. Grunt executes the build,
-including starting up the test REST services that give the integration
-tests something to fetch.
+Integration tests are not run on save, they intentionally
+simulate a slow network so they take too long to run. I'd already have started
+the next work by the time they complete. Oboe is coded under git and hosted
+on github. The integration tests are used as the final check  
+before a branch in git is merged into the master.
 
 Packaging as a single, distributable file
 -----------------------------------------
