@@ -21,6 +21,7 @@ http.
 	- [Reacting before we get the whole object](#reacting-before-we-get-the-whole-object)
 	- [Giving some visual feedback as a page is updating](#giving-some-visual-feedback-as-a-page-is-updating)
 	- [The path parameter](#the-path-parameter)
+	- [Deregistering a callback](#deregistering-a-callback)
 	- [Css4 style patterns](#css4-style-patterns)
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
 	- [Reading from any stream (Node.js only)](#reading-from-any-stream-nodejs-only)
