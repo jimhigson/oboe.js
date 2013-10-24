@@ -354,10 +354,10 @@ var oboe = require('oboe'),
     fs = require('fs');
 
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
-   .node('!.schemes.*', function(scheme){
+   .node('schemes.*', function(scheme){
       console.log('Aha! ' + scheme);
    });
-   .node('!.plottings.*', function(deviousPlot){
+   .node('plottings.*', function(deviousPlot){
       console.log('Hmmm! ' + deviousPlot);   
    })
    .done(function(){
