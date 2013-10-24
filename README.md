@@ -206,7 +206,8 @@ The callback is also given the path to the node that it found in the json. It is
 register a wide-matching pattern and use the path parameter to decide what to do instead of
 
 ``` js
-// json from the server side. Each top-level object is for a different module on the page.
+// JSON from the server side. 
+// Each top-level object is for a different module on the page.
 {  "notifications":{
       "newNotifications": 5,
       "totalNotifications": 4
