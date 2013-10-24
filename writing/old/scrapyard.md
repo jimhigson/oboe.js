@@ -520,3 +520,10 @@ registering a listener against the fifth and aborting the request on
 seeing it. The correct behaviour is to get no callback for the sixth,
 even when running on platforms where the http is buffered so that all
 ten will have already been downloaded.
+
+Componentisation
+----------------
+
+Dual-implementation of same interface for streamingHttp might be
+considered polymorphism, but a function not a class and both are never
+loaded at run time.
