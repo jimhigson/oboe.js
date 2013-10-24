@@ -151,7 +151,31 @@ function instanceController(  fire, on, un,
       
       return this; // chaining
    }
-
+   
+   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+       addFailListner = partialComplete(on, ERROR_EVENT);
+   
+   /**
+    * implementation behind oboe().on()
+    */       
+   function addListener( eventId, listener ){
+                         
+      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
+                                
+         apply(arguments, addNodeOrPathListenerApi);
+         
+      } else if( eventId == 'done' ) {
+      
+         addDoneListener(listener);
+                              
+      } else if( eventId == 'fail' ) {
+      
+         addFailListner(listener);
+      }
+             
+      return this; // chaining
+   }   
+   
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
@@ -159,9 +183,9 @@ function instanceController(  fire, on, un,
    return oboeApi = { 
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addNodeOrPathListenerApi,
-      fail  :  partialComplete(on, ERROR_EVENT),
-      done  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+      on    :  addListener,
+      fail  :  addFailListner,
+      done  :  addDoneListener,
       abort :  partialComplete(fire, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
