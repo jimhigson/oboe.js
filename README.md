@@ -431,7 +431,7 @@ npm install oboe
 
 Then load as usual:
 
-```
+``` javascript
 var oboe = require('oboe');
 ```
 
