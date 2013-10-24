@@ -68,7 +68,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li><a href="#implementation"><span class="toc-section-number">5</span> Implementation</a><ul>
 <li><a href="#components-of-the-project"><span class="toc-section-number">5.1</span> Components of the project</a></li>
-<li><a href="#automated-testing"><span class="toc-section-number">5.2</span> Automated testing</a></li>
+<li><a href="#design-for-automated-testing"><span class="toc-section-number">5.2</span> Design for automated testing</a></li>
 <li><a href="#running-the-tests"><span class="toc-section-number">5.3</span> Running the tests</a></li>
 <li><a href="#packaging-as-a-single-distributable-file"><span class="toc-section-number">5.4</span> Packaging as a single, distributable file</a></li>
 <li><a href="#styles-of-programming"><span class="toc-section-number">5.5</span> Styles of Programming</a></li>
@@ -615,22 +615,20 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="components-of-the-project" class="section level2">
 <h2><a href="#components-of-the-project"><span class="header-section-number">5.1</span> Components of the project</a></h2>
 <div class="figure">
-<img src="images/overallDesign.png" alt="Major components that make up Oboe.js illustrating program flow from http transport to registered callbacks. Every component is not shown here. Particularly, components whose responsibility it is to initialise the oboe instance but have no role once it is running are omitted. UML facet/receptacle notation is used to show the flow of events with event names in capitals. " /><p class="caption"><strong>Major components that make up Oboe.js</strong> illustrating program flow from http transport to registered callbacks. Every component is not shown here. Particularly, components whose responsibility it is to initialise the oboe instance but have no role once it is running are omitted. UML facet/receptacle notation is used to show the flow of events with event names in capitals. </p>
+<img src="images/overallDesign.png" alt="Major components that make up Oboe.js illustrating program flow from http transport to registered callbacks. UML facet/receptacle notation is used to show the flow of events with event names in capitals. For clarity events are depicted as transitioning directly between publisher and subscriber rather than through an intermediary. " /><p class="caption"><strong>Major components that make up Oboe.js illustrating program flow from http transport to registered callbacks.</strong> UML facet/receptacle notation is used to show the flow of events with event names in capitals. For clarity events are depicted as transitioning directly between publisher and subscriber rather than through an intermediary. </p>
 </div>
-<p>Oboe's architecture has been designed to so that I may have as much confidence as possible regarding the correct working of the library through automated testing. Designing a system to be amenable to testing in this case meant splitting into many co-operating parts each with an easily specified remit.</p>
-<p>Internally, communication between components is facilitated by an event bus which is local to to Oboe instance. Most components interact solely by picking up events, processing them and publishing further events in response. Essentially, Oboe's architecture resembles a fairly linear pipeline visiting a series of units, starting with http data and sometimes ending with callbacks being notified. This use of an event bus is a variation on the Observer pattern which removes the need for each unit to obtain a reference to the previous one so that it may observe it, giving a highly decoupled shape to the library. Once everything is wired into the bus very little central control is required and the larger behaviours emerge as the consequence of this interaction between finer ones. One downside is perhaps that a central event bus does not lend itself to a UML class diagram, giving a diagram shape with an event bus as a central hub and everything else hanging off it as spokes.</p>
+<p>Oboe's architecture follows a fairly linear pipeline with flow visiting various tasks between receiving http progress events and notifying application callbacks. The internal componentisation is designed primarily so that automated testing can provide a high degree of confidence regarding the correct working of the library. A local event bus facilitates communication between components inside the Oboe instance and most components interact solely through this bus by receiving events, processing them and publishing further events in response. This use of an event bus is a variation on the Observer pattern which removes the need for each unit to obtain a reference to the previous one so that it may observe it, giving a highly decoupled shape to the library. Once everything is wired into the bus no central control is required and the larger behaviours emerge as the consequence of interaction between finer ones.</p>
 </div>
-<div id="automated-testing" class="section level2">
-<h2><a href="#automated-testing"><span class="header-section-number">5.2</span> Automated testing</a></h2>
-<p>Automated testing improves what can be written, not just making what is written more reliable. Tests deal with the problem of &quot;irreducible complexity&quot; - when a program is made out of parts whose correct behaviour cannot be observed without all of the program. Allows smaller units to be verified before verifying the whole.</p>
+<div id="design-for-automated-testing" class="section level2">
+<h2><a href="#design-for-automated-testing"><span class="header-section-number">5.2</span> Design for automated testing</a></h2>
 <div class="figure">
-<img src="images/testPyramid.png" alt="The test pyramid. Relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided. " /><p class="caption"><strong>The test pyramid</strong>. Relying on the assumption that verification of small parts provides a solid base from which to compose system-level behaviours. A Lot of testing is done on the low-level components of the system, less on the component level and less still on a whole-system level where only smoke tests are provided. </p>
+<img src="images/testPyramid.png" alt="The test pyramid. Much testing is done on the low-level components of the system, less on the component level, and less still on a whole-system level. " /><p class="caption"><strong>The test pyramid</strong>. Much testing is done on the low-level components of the system, less on the component level, and less still on a whole-system level. </p>
 </div>
-<p>The testing itself is a non-trivial undertaking with 80% of code written for this project being test specifications. Based on the idea that a correct system must be built from individually correct units, the majority of the specifications are unit tests, putting each unit under the microscope and describing the correct behaviour as completely as possible. Component tests zoom out from examining individual components to focus on their correct composition, falsifying only the http traffic. To avoid testing implementation details the component tests do not look at the means of coupling between the code units but rather check for the behaviours which should emerge as a consequence of their composition. At the apex of the test pyramid are a small number of integration tests. These verify Oboe as a black box without any knowledge of, or access to the internals, using only the APIs which are exposed to application programmers. When running the integration tests a REST service is first spun up so that correctness of the whole library may be examined against an actual server.</p>
-<p>The desire to be amenable to testing influences the boundaries on which the application splits into components. Confidently black box testing a stateful unit as is difficult; because of side-effects it may later react differently to the same calls. For this reason where state is required it is stored in very simple state-storing units with intricate program logic removed. The logic may then be separately expressed as functions which map from one state to the next. Although comprehensive coverage is of course impossible and tests are inevitably incomplete, for whatever results the functions give while under test, uninfluenced by state I can be sure that they will continue to give in any future situation. The separate unit holding the state is trivial to test, having exactly one responsibility: to store the result of a function call and later pass that result to the next function. This approach clearly breaks with object oriented style encapsulation by not hiding data behind the logic which acts on them but I feel the departure is worthwhile for the greater certainty it allows over the correct functioning of the program.</p>
-<p>Dual-implementation of same interface for streamingHttp might be considered polymorphism, but a function not a class and both are never loaded at run time.</p>
-<p>Largely for the sake of testing Oboe has also embraced dependency injection. This means that components do not create the further components that they require but rather rely on them being provided by an external wiring. The file <code>wire.js</code> performs the actual injection. One such example is the streamingHttp component which hides various incompatible http implementations by publishing their downloaded content progressively via the event bus. This unit does not know how to create the underlying browser XHR which it hides. Undoubtedly, by not instantiating its own dependencies a it presents a less friendly interface, although this is mitigated somewhat by the interface being purely internal, the objects it depends on are no longer a hidden implementation detail but exposed as a part of the component's API. The advantage of dependency injection here is that unit testing is much simpler. Unit tests should test exactly one behaviour of one unit. Were the streaming http object to create its own transport, that part would also be under test, plus whichever external service that it connects to. Because Javascript allows redefinition of built in types, this could be avoided by overwriting the XHR constructor to return a mock but modifying the built in types for tests opens up the possibilities of changes leaking between cases. Dependency injection allows a much simpler test style because it is trivial to inject a stub in place of the XHR.</p>
-<p>Integration tests run against a node service which returns known content according to known timings, somewhat emulating downloading via a slow internet connection. For example, the url <code>/tenSlowNumbers</code> writes out a JSON array of the first ten natural numbers at a rate of one per second, while <code>/echoBackHeaders</code> writes back the http headers that it received as a JSON object. The test specifications which use these services interact with Oboe through the public API alone as an application author would and try some tricky cases. For example, requesting ten numbers but registering a listener against the fifth and aborting the request on seeing it. The correct behaviour is to get no callback for the sixth, even when running on platforms where the http is buffered so that all ten will have already been downloaded. <em>ref apx for streamsource</em></p>
+<p>80% of the code written for this project is test specifications. Because the correct behaviour of a composition requires the correct behaviour of its components units, the majority of the specifications are <em>unit tests</em>. The general style of a unit test is to plug the item under test into a mock event bus and check that when it receives input events, the expected output events are consequently published.</p>
+<p>The <em>Component tests</em> step back from examining individual components to a position where their emergent behaviour in composition can be examined. Because the composition is quite simple there are much fewer component tests than unit tests. By examining the behaviour of the library through the public API the component tests do not take account of how the composition is drawn. The exception is that the is faked which requires the streamingXhr component to be switched for a stub.</p>
+<p>At the apex of the test pyramid are a small number of <em>integration tests</em>. These verify Oboe as a black box without any knowledge of, or access to the internals, using only the APIs which are exposed to application programmers. These tests are the most expensive to write but a small number are necessary in order to verify that Oboe works correctly end-to-end. Without access to the internals http traffic XHRs cannot be stubbed so before these specs can be checked a test REST service is created. This test service is written using Node and returns known content progressively according to known timings, somewhat emulating a slow internet connection. The integration tests particularly verify behaviours where platform differences could cause inconsistencies. For example, the test url <code>/tenSlowNumbers</code> writes out the first ten natural numbers as a JSON array at a rate of two per second. Oboe registers a JSONPath selector for the numbers against a callback that aborts the http request on seeing <code>5</code>. The correct behaviour is to get no callback for the sixth, even when running on platforms lacking support for XHR2 where all ten will have already been downloaded.</p>
+<p>Confidently black box testing a stateful unit is difficult. Because of side-effects and hidden state we do not know if the same call will later give a different behaviour. Building up the parse result from SAX events is a fairly complex process which cannot be done efficiently in Javascript without storing some state. The state is stored in a simple state-storing unit. The intricate logic may then be separately expressed as functions without side effects which transition between one state and the next and this part separately tested without having to double-guess the internals of the unit. Although proof of correctness is undecidable, whichever results the functions give while under test, uninfluenced by state I can be confident that they will continue to give in response to future similar events. The separate unit holding the parse result has exactly one responsibility and is trivial to test. This approach slightly breaks with the object oriented principle of encapsulation by not hiding state behind the logic which acts on it but I feel the departure is justified by a more testable codebase.</p>
+<p>To enhance testability Oboe has also embraced dependency injection. This means that components do not create the further components that they require but rather rely on them being provided by an external wiring. The file <code>wire.js</code> performs the actual injection. One such example is the streamingHttp component which hides various incompatible http implementations by publishing their downloaded content progressively via the event bus. This unit does not know how to create the underlying browser XHR which it hides. Undoubtedly, by not instantiating its own dependencies a it presents a less friendly interface, although this is mitigated somewhat by the interface being purely internal, the objects it depends on are no longer a hidden implementation detail but exposed as a part of the component's API. The advantage of dependency injection here is that unit testing is much simpler. Unit tests should test exactly one behaviour of one unit. Were the streaming http object to create its own transport, that part would also be under test, plus whichever external service that it connects to. Because Javascript allows redefinition of built in types, this could be avoided by overwriting the XHR constructor to return a mock but modifying the built in types for tests opens up the possibilities of changes leaking between cases. Dependency injection allows a much simpler test style because it is trivial to inject a stub in place of the XHR.</p>
 </div>
 <div id="running-the-tests" class="section level2">
 <h2><a href="#running-the-tests"><span class="header-section-number">5.3</span> Running the tests</a></h2>
@@ -894,7 +892,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="potential-future-work" class="section level2">
 <h2><a href="#potential-future-work"><span class="header-section-number">6.5</span> potential future work</a></h2>
 <p><em>Matching server-side tools</em></p>
-<p>There is nothing about Oboe which precludes working with other tree-shaped format. If there is demand, An XML/XPATH version seems like an obvious expansion. Currently Oboe only operates on http traffic.</p>
+<p>There is nothing about Oboe which precludes working with other tree-shaped format. If there is demand, An XML/XPATH version seems like an obvious expansion. Plug-ins for formats.</p>
 <p>Oboe stores all items that are parsed from the JSON it receives, resulting in a memory use which is as high as a DOM parser. These are kept in order to be able to provide a match to any possible JSONPath expression. However, in most cases memory would be saved if the parsed content were only stored so far as is needed to provide matches against the JSONPath expressions which have actually been registered. For typical use cases I expect this would allow the non-storage of large branches. Likewise, the current implementation takes a rather brute force approach when examining node for pattern matches: check every registered JSONPath expression against every node and path that are found in the JSON. For many expressions we are able to know there is no possibility of matching a JSON tree, either because we have already matched or because the the current node's ancestors already mandate failure. A more sophisticated programme might disregard provably unsatisfiable handlers for the duration of a subtree. Either of these changes would involve some rather difficult programming and because matching is fast enough I think brute force is the best approach for the time being.</p>
 <p>During JSONPath matching much of the computation is repeated. For example, matching the expression <code>b.*</code> against many children of a common parent will repeat the same test, checking if the parent's name is 'b', for each child node. Because the JSONPath matching is stateless, recursive and side-effect free there is a potential to cut out repeated computation by using a functional cache. This would reduce the overall amount of computation needed for JSONPath expressions with common substrings to their left side or nodes with a common ancestry. Current Javascript implementations make it difficult to manage a functional cache, or caches in general, from inside the language itself because there is no way to occupy only the unused memory. Weak references are proposed in ECMAScript 6 but currently only experimentally supported<sup><a href="#fn14" class="footnoteRef" id="fnref14">14</a></sup>. For future development they would be ideal.</p>
 <p>The nodes which Oboe hands to callbacks are mutable meaning that potentially the correct workings of the library could be broken if the containing application carelessly alters them. Newer implementations of Javascript allows a whole object to be made immutable, or just certain properties via an immutability decorator and the <code>defineProperty</code> method. This would probably be an improvement.</p>
@@ -1364,7 +1362,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co"> */</span>
  
  
-<span class="kw">function</span> <span class="fu">instanceController</span>(fire, on, clarinetParser, contentBuilderHandlers) {
+<span class="kw">function</span> <span class="fu">instanceController</span>(  fire, on, un, 
+                              clarinetParser, contentBuilderHandlers) {
   
    <span class="kw">var</span> oboeApi, rootNode;
 
@@ -1418,7 +1417,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="co">// Add a new callback adaptor to the eventBus.</span>
       <span class="co">// This listener first checks that he pattern matches then if it does, </span>
       <span class="co">// passes it onto the callback. </span>
-      <span class="fu">on</span>( eventId, <span class="kw">function</span>( ascent ){ 
+      <span class="fu">on</span>( eventId, <span class="kw">function</span> <span class="fu">handler</span>( ascent ){ 
  
          <span class="kw">var</span> maybeMatchingMapping = <span class="fu">matchesJsonPath</span>( ascent );
      
@@ -1438,7 +1437,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co">         */</span>
          <span class="kw">if</span>( maybeMatchingMapping !== <span class="kw">false</span> ) {                                 
 
-            <span class="fu">notifyCallback</span>(callback, maybeMatchingMapping, ascent);                           
+            <span class="kw">if</span>( !<span class="fu">notifyCallback</span>(callback, maybeMatchingMapping, ascent) ) {
+            
+               <span class="fu">un</span>(eventId, handler);
+            }
          }
       });   
    }   
@@ -1458,16 +1460,24 @@ code > span.er { color: #ff0000; font-weight: bold; }
           <span class="co">// To make a path, strip off the last item which is the special</span>
           <span class="co">// ROOT_PATH token for the &#39;path&#39; to the root node</span>
           path       = <span class="fu">listAsArray</span>(<span class="fu">tail</span>(<span class="fu">map</span>(keyOf,descent))),
-          ancestors  = <span class="fu">listAsArray</span>(<span class="fu">map</span>(nodeOf, descent)); 
+          ancestors  = <span class="fu">listAsArray</span>(<span class="fu">map</span>(nodeOf, descent)),
+          keep       = <span class="kw">true</span>;
+          
+      <span class="ot">oboeApi</span>.<span class="fu">forget</span> = <span class="kw">function</span>(){
+         keep = <span class="kw">false</span>;
+      };           
       
-      <span class="kw">try</span>{
-      
+      <span class="kw">try</span>{      
          <span class="fu">callback</span>( <span class="fu">nodeOf</span>(matchingMapping), path, ancestors );   
       }<span class="kw">catch</span>(e)  {
       
          <span class="co">// An error occured during the callback, publish it on the event bus </span>
          <span class="fu">fire</span>(ERROR_EVENT, e);
-      }          
+      }
+      
+      <span class="kw">delete</span> <span class="ot">oboeApi</span>.<span class="fu">forget</span>;
+      
+      <span class="kw">return</span> keep;          
    }
 
    <span class="co">/**</span>
@@ -2118,6 +2128,21 @@ code > span.er { color: #ff0000; font-weight: bold; }
             ;
 }
 
+<span class="co">/**</span>
+<span class="co"> * Return a list like the one given but with the first instance equal </span>
+<span class="co"> * to item removed </span>
+<span class="co"> */</span>
+<span class="kw">function</span> <span class="fu">without</span>(list, item) {
+ 
+  <span class="kw">return</span> list  
+            ?  ( <span class="fu">head</span>(list) == item 
+                     ? <span class="fu">tail</span>(list) 
+                     : <span class="fu">cons</span>(<span class="fu">head</span>(list), <span class="fu">without</span>(<span class="fu">tail</span>(list), item))
+               ) 
+            : emptyList
+            ;
+}
+
 <span class="co">/** </span>
 <span class="co"> * Returns true if the given function holds for every item in </span>
 <span class="co"> * the list, false otherwise </span>
@@ -2190,6 +2215,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
             <span class="fu">partialComplete</span>( apply, [event || <span class="kw">undefined</span>] ), 
             listeners[eventId]
          );
+      },
+      
+      <span class="dt">un</span>: <span class="kw">function</span>( eventId, handler ) {
+         listeners[eventId] = <span class="fu">without</span>(listeners[eventId], handler);
       }           
    };
 }</code></pre>
@@ -2534,7 +2563,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
                   httpMethodName, contentSource, body, headers );                              
      
    <span class="kw">return</span> <span class="fu">instanceController</span>( 
-               <span class="ot">eventBus</span>.<span class="fu">fire</span>, <span class="ot">eventBus</span>.<span class="fu">on</span>, 
+               <span class="ot">eventBus</span>.<span class="fu">fire</span>, <span class="ot">eventBus</span>.<span class="fu">on</span>, <span class="ot">eventBus</span>.<span class="fu">un</span>, 
                <span class="ot">clarinet</span>.<span class="fu">parser</span>(), 
                <span class="fu">incrementalContentBuilder</span>(<span class="ot">eventBus</span>.<span class="fu">fire</span>) 
    );
