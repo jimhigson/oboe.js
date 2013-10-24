@@ -4,11 +4,11 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js illustrating program flow from
-http transport to registered callbacks.** UML facet/receptacle notation
-is used to show the flow of events with event names in capitals. For
-clarity events are depicted as transitioning directly between publisher
-and subscriber rather than through an intermediary.
+![**Major components of Oboe.js illustrating program flow from
+http transport to application callbacks.** UML facet/receptacle notation
+is used to show the flow of events and event names are given in capitals. For
+clarity events are depicted as transferring directly between publisher
+and subscriber but this is actually performed through an intermediary.
 \label{overallDesign}](images/overallDesign.png)
 
 Oboe's architecture follows a fairly linear pipeline with flow visiting
