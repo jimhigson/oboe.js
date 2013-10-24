@@ -70,21 +70,21 @@ downloaded.
 Confidently black box testing a
 stateful unit is difficult. Because of side-effects and hidden state 
 we do not know if the same call will later give a different behaviour.
-Building up the JSON from SAX events is a fairly complex process cannot 
+Building up the parse result from SAX events is a fairly complex process which cannot 
 be done efficiently in Javascript without storing some state.
-It is stored in very simple state-storing units with intricate
-program logic removed. The logic may then be separately expressed as
-functions which map from one state to the next. Although proof of correctness is
-undecidable, whichever results the functions give while under test, 
+The state is stored in a simple state-storing unit.
+The intricate logic may then be separately expressed as
+functions without side effects which transition between one state and the next
+and this part separately tested without having to double-guess the internals
+of the unit.
+Although proof of correctness is undecidable, whichever results the functions give while under test, 
 uninfluenced by state I can be confident that they will continue to give 
 in response to future similar events.
-The separate unit holding the state is trivial to test,
-having exactly one responsibility: to store the result of a function
-call and later pass that result to the next function. This approach
-clearly breaks with object oriented style encapsulation by not hiding
-data behind the logic which acts on them but I feel the departure is
-worthwhile for the greater certainty it allows over the correct
-functioning of the program.
+The separate unit holding the parse result has exactly one responsibility and 
+is trivial to test.
+This approach slightly breaks with the object oriented principle of encapsulation
+by not hiding state behind the logic which acts on it but I feel the departure is
+justified by a more testable codebase.
 
 To enhance testability Oboe has also embraced dependency
 injection. This means that components do not create the further
