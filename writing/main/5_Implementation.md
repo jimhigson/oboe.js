@@ -167,57 +167,60 @@ as one. Several tools exist to automate this stage of the build
 process that topologically sort the dependency graph before concatenation in
 order to find a suitable script order.
 
-Early in this project I chose *Require.js* although I later moved on
+Early in this project I chose *Require.js* although I later abandoned it
 because it was too heavyweight. Javascript as a language doesn't have an
 import statement. Require contributes the importing ability to
-Javascript from inside the language sandbox as the `require` function, a
-standard asynchronous call. Calls to `require` AJAX in and execute the
-imported source, returning any exported symbols by a callback. For
-non-trivial applications this mode is intended mostly for debugging;
-because a network hop is involved the protocol is chatty and slowed by
-highly latent calls between modules. For efficient delivery Require also
-has the `optimise` command which concatenates into a single file by
+Javascript from inside the language sandbox as the asynchronous `require`
+function. Calls to `require` AJAX in and execute the
+imported source, returning any exported items to the given callback. For
+non-trivial applications loading each dependency individually over AJAX is 
+intended only for debugging
+because making so many requests is slow.
+For efficient delivery Require also
+has the `optimise` command which concatenates an application into a single file by
 using static analysis to deduce a workable source order. Because
-`require` may appear anywhere in the source, this in the general case is
-of course undecidable so Require falls back to lazy loading. In practice
-undecidability isn't a problem because imports are generally not subject
-to branching. In larger webapps lazy loading speeding up the initial
-page load and is actually an advantage. The technique of *Asynchronous
+the `require` function may be called from anywhere, this is
+undecidable in the general case so Require falls back to lazy loading. In practice
+this isn't a problem because imports are generally not subject
+to branching. For larger webapps lazy loading is a feature because it speeds up the initial
+page load. The technique of *Asynchronous
 Module Definition* (AMD) intentionally imports rarely-loaded modules in
-response to events. By resisting the static analysis the units will not
-be downloaded until they are needed.
-
-AMD is mostly of interest to web applications with a central hub but
+response to events; by resisting static analysis the dependant Javascript will not
+be downloaded until it is needed. AMD is mostly of interest to applications with a central hub but
 also some rarely used parts. For example, most visits to online banking
 will not need to create standing orders so it is better if this part is
-loaded on-demand than eagerly. Oboe does not fit this profile: everybody
-who uses it will use all of the library. Regardless, I hoped to use
-`optimise` to generate my combined Javascript file. Even after
-optimisation, Require's design necessitates that calls to `require` stay
-in the code and that the Require run-time component is available to
-handle them. Require's 5k would also have more than doubled
-Oboe's size. Overall, Require seems more suited to programmers creating
-stand-alone applications than library authors.
+loaded on-demand rather than increase the initial load time.
 
-Having abandoned Require, I decided to pick up the simplest tool which
-could possibly work. With only 15 source files and a fairly sparse
+I hoped to use
+`optimise` to automate the creation of a combined Javascript file for Oboe.
+Oboe would not benefit from AMD because everybody
+who uses it will use all of the library but using Require to find a working source
+order would save having to manually implement one.
+Unfortunately this was not feasible.
+Even after optimisation, Require's design necessitates that calls to the `require` function are left
+in the code and that the Require run-time component is available to
+handle them. At more than 5k gzipped, this would have more than doubled
+Oboe's download footprint.
+
+After removing Require I decided to pick up the simplest tool which
+could possibly work. With about 15 source files and a fairly sparse
 dependency graph finding a working order on paper wasn't a daunting
 task. Combined with a Grunt analogue to the unix `cat` command I quickly
-had a working build process. I adjusted each Javascript file to, when
-loaded directly, place its API in the global namespace, then
-post-concatenation wrapped the combined in a single function, converting
-the APIs inside the function from global to the scope of that function,
-thereby hiding the implementation for code outside of Oboe.
+had a working build process and a distributable library requiring no 
+run-time dependency management to be loaded. I adjusted each Javascript file so that
+if it is loaded directly it places its API in the global namespace, but
+post-concatenation the source is wrapped in a surrounding function,
+thereby hiding non-exposed values from outside the library.
 
 For future consideration there is Browserify. This library reverses the
-'browser first' image of Javascript by converting applications targeted
-at Node into a single file efficiently packaged for delivery to a web
-browser, conceptually making Node the primary environment for Javascript
-and adapting browser execution to match. Significantly,
-other than Adaptors
-presenting browser APIs as if they were the Node equivalents, 
+'browser first' Javascript mindset by viewing Node as the primary target for Javascript
+and adapting the browser to match. Browserify converts applications written
+for Node into a single file efficiently packaged for delivery to a web
+browser. Significantly, other than Adaptors
+presenting the browser APIs as if they were the Node equivalents, 
 Browserify leaves no trace of itself in the final Javascript. Browserify's http
-adaptor[^1] is complete but more verbose compared to Oboe's version[^2].
+adaptor[^1] is capable of using XHRs as a streaming source
+when run on supported browsers.
 
 After combining into a single file, Javascript source can made
 significantly smaller by removing comments and reducing names
