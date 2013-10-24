@@ -514,3 +514,9 @@ written more reliable. Tests deal with the problem of "irreducible
 complexity" - when a program is made out of parts whose correct
 behaviour cannot be observed without all of the program. Allows smaller
 units to be verified before verifying the whole.
+
+For example, requesting ten numbers but
+registering a listener against the fifth and aborting the request on
+seeing it. The correct behaviour is to get no callback for the sixth,
+even when running on platforms where the http is buffered so that all
+ten will have already been downloaded.

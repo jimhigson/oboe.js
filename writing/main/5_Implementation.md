@@ -51,21 +51,17 @@ to be switched for a stub.
 At the apex of the test pyramid are a small number of *integration tests*.
 These verify Oboe as a black box without any knowledge of, or access to
 the internals, using only the APIs which are exposed to application
-programmers. The http traffic cannot be stubbed so before these tests can
-be ran a test REST service is spun up. 
-These tests are the most expensive to write but a small number are necessary
+programmers. These tests are the most expensive to write but a small number are necessary
 in order to verify that Oboe works correctly end-to-end.
+Without access to the internals http traffic XHRs cannot be stubbed so 
+before these specs can be checked a test REST service is created. 
+This test service is written using 
+Node and returns known content progressively
+according to known timings, somewhat emulating a slow internet connection.
+For example, the url `/tenSlowNumbers` writes out the first ten natural numbers
+as a JSON array at a rate of one per second,
 
-node service which returns known content
-according to known timings, somewhat emulating downloading via a slow
-internet connection. For example, the url `/tenSlowNumbers` writes out a
-JSON array of the first ten natural numbers at a rate of one per second,
-while `/echoBackHeaders` writes back the http headers that it received
-as a JSON object. For example, requesting ten numbers but
-registering a listener against the fifth and aborting the request on
-seeing it. The correct behaviour is to get no callback for the sixth,
-even when running on platforms where the http is buffered so that all
-ten will have already been downloaded. 
+ 
 
 The desire to be amenable to testing influences the boundaries on which
 the application splits into components. Confidently black box testing a
