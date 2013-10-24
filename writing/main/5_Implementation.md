@@ -4,26 +4,22 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js** illustrating program flow
-from http transport to registered callbacks. Every component is not
-shown here. Particularly, components whose responsibility it is to
-initialise the oboe instance but have no role once it is running are
-omitted. UML facet/receptacle notation is used to show the flow of
-events with event names in capitals.
+![**Major components that make up Oboe.js illustrating program flow
+from http transport to registered callbacks.** UML facet/receptacle 
+notation is used to show the flow of events with event names in capitals.
 \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture has been designed to so that I may have as much
-confidence as possible regarding the correct working of the library
-through automated testing. Designing a system to be amenable to testing
-in this case meant splitting into many co-operating parts each with an
-easily specified remit.
-
-Internally, communication between components is facilitated by an event
-bus which is local to to Oboe instance. Most components interact solely
-by picking up events, processing them and publishing further events in
-response. Essentially, Oboe's architecture resembles a fairly linear
-pipeline visiting a series of units, starting with http data and
-sometimes ending with callbacks being notified. This use of an event bus
+Oboe's architecture follows a fairly linear
+pipeline, visiting various tasks between receiving http progress events
+and notifying application callbacks.
+The internal componentisation is designed primarily so that automated testing 
+can provide a high degree of confidence regarding the correct working of the 
+library.
+A local event bus facilitates communication between components inside 
+the Oboe instance and
+most components interact solely through this bus
+by receiving events, processing them and publishing further events in
+response.  This use of an event bus
 is a variation on the Observer pattern which removes the need for each
 unit to obtain a reference to the previous one so that it may observe
 it, giving a highly decoupled shape to the library. Once everything is
