@@ -361,6 +361,9 @@ oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    })
    .on('done', function(){
       console.log("*twiddles mustache*");
+   })
+   .fail(function(){
+      console.log("Drat! Foiled again!");   
    });
 ```
 
@@ -369,7 +372,12 @@ about the same length as if you'd done JSON.parse:
 
 ``` js
 fs.readFile('/home/me/secretPlans.json', function( plansJson ){
-   var plans = JSON.parse(plansJson);
+   var plans = JSON.parse(err, plansJson);
+   
+   if( err ) {
+      console.log("Drat! Foiled again!");
+      return;
+   }
    
    plans.schemes.forEach(function( scheme ){
       console.log('Aha! ' + scheme);   
@@ -377,7 +385,7 @@ fs.readFile('/home/me/secretPlans.json', function( plansJson ){
    plans.plottings.forEach(function(deviousPlot){
       console.log('Hmmm! ' + deviousPlot);
    });
-   
+      
    console.log("*twiddles mustache*");   
 });
 ```
