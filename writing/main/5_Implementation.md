@@ -67,17 +67,18 @@ behaviour is to get no callback for the sixth, even when running on
 platforms lacking support for XHR2 where all ten will have already been
 downloaded.
 
-The desire to be amenable to testing influences the boundaries on which
-the application splits into components. Confidently black box testing a
-stateful unit as is difficult; because of side-effects it may later
-react differently to the same calls. For this reason where state is
-required it is stored in very simple state-storing units with intricate
+Confidently black box testing a
+stateful unit is difficult. Because of side-effects and hidden state 
+we do not know if the same call will later give a different behaviour.
+Building up the JSON from SAX events is a fairly complex process cannot 
+be done efficiently in Javascript without storing some state.
+It is stored in very simple state-storing units with intricate
 program logic removed. The logic may then be separately expressed as
-functions which map from one state to the next. Although comprehensive
-coverage is of course impossible and tests are inevitably incomplete,
-for whatever results the functions give while under test, uninfluenced
-by state I can be sure that they will continue to give in any future
-situation. The separate unit holding the state is trivial to test,
+functions which map from one state to the next. Although proof of correctness is
+undecidable, for whatever results the functions give while under test, 
+uninfluenced by state I can be confident that they will continue to give 
+in response to future similar events.
+The separate unit holding the state is trivial to test,
 having exactly one responsibility: to store the result of a function
 call and later pass that result to the next function. This approach
 clearly breaks with object oriented style encapsulation by not hiding
@@ -85,11 +86,7 @@ data behind the logic which acts on them but I feel the departure is
 worthwhile for the greater certainty it allows over the correct
 functioning of the program.
 
-Dual-implementation of same interface for streamingHttp might be
-considered polymorphism, but a function not a class and both are never
-loaded at run time.
-
-Largely for the sake of testing Oboe has also embraced dependency
+To enhance testability Oboe has also embraced dependency
 injection. This means that components do not create the further
 components that they require but rather rely on them being provided by
 an external wiring. The file `wire.js` performs the actual injection.
