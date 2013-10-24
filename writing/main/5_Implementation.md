@@ -75,7 +75,7 @@ be done efficiently in Javascript without storing some state.
 It is stored in very simple state-storing units with intricate
 program logic removed. The logic may then be separately expressed as
 functions which map from one state to the next. Although proof of correctness is
-undecidable, for whatever results the functions give while under test, 
+undecidable, whichever results the functions give while under test, 
 uninfluenced by state I can be confident that they will continue to give 
 in response to future similar events.
 The separate unit holding the state is trivial to test,
