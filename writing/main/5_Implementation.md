@@ -218,9 +218,9 @@ presenting browser APIs as if they were the Node equivalents,
 Browserify leaves no trace of itself in the final Javascript. Browserify's http
 adaptor[^1] is complete but more verbose compared to Oboe's version[^2].
 
-As well as combining into a single file, Javascript source can made
-significantly smaller by removing comments and reducing inaccessible
-tokens to a single character. For Oboe the popular library *Uglify* is
+After combining into a single file, Javascript source can made
+significantly smaller by removing comments and reducing names
+to a single character. For Oboe the popular library *Uglify* is
 used for minification. Uglify performs only surface optimisations,
 operating on the AST level but concentrating mostly on compact syntax. I
 also considered Google's Closure compiler. Closure resembles a
