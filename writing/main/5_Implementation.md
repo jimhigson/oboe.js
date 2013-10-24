@@ -26,8 +26,8 @@ shape to the library. Once everything is wired into the bus no central
 control is required and the larger behaviours emerge as the consequence
 of interaction between finer ones.
 
-Automated testing
------------------
+Design for automated testing
+----------------------------
 
 ![**The test pyramid**. Much testing is done on the low-level components
 of the system, less on the component level, and less still on a
@@ -101,18 +101,16 @@ changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
 
-Integration tests run against a node service which returns known content
+node service which returns known content
 according to known timings, somewhat emulating downloading via a slow
 internet connection. For example, the url `/tenSlowNumbers` writes out a
 JSON array of the first ten natural numbers at a rate of one per second,
 while `/echoBackHeaders` writes back the http headers that it received
-as a JSON object. The test specifications which use these services
-interact with Oboe through the public API alone as an application author
-would and try some tricky cases. For example, requesting ten numbers but
+as a JSON object. For example, requesting ten numbers but
 registering a listener against the fifth and aborting the request on
 seeing it. The correct behaviour is to get no callback for the sixth,
 even when running on platforms where the http is buffered so that all
-ten will have already been downloaded. *ref apx for streamsource*
+ten will have already been downloaded.
 
 Running the tests
 -----------------
