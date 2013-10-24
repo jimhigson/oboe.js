@@ -33,41 +33,40 @@ Design for automated testing
 of the system, less on the component level, and less still on a
 whole-system level. \label{testpyramid}](images/testPyramid.png)
 
-80% of the code written for this project is test specifications.
-Because the correct behaviour of a composition requires the correct behaviour of
-its components units, the majority of the specifications are *unit tests*. The
-general style of a unit test is to plug the item under test into a mock
-event bus and check that when it receives input events,
-the expected output events are consequently published.
- 
-The *Component tests* step back from examining individual components
-to a position where their emergent behaviour in composition can be examined. Because
-the composition is quite simple there are much fewer component tests than unit
-tests. By examining the behaviour of the library through the public API the 
-component tests do not take account of how the composition is drawn.
-The exception is that the is faked which requires the streamingXhr component
-to be switched for a stub.
+80% of the code written for this project is test specifications. Because
+the correct behaviour of a composition requires the correct behaviour of
+its components units, the majority of the specifications are *unit
+tests*. The general style of a unit test is to plug the item under test
+into a mock event bus and check that when it receives input events, the
+expected output events are consequently published.
 
-At the apex of the test pyramid are a small number of *integration tests*.
-These verify Oboe as a black box without any knowledge of, or access to
-the internals, using only the APIs which are exposed to application
-programmers. These tests are the most expensive to write but a small number are necessary
-in order to verify that Oboe works correctly end-to-end.
-Without access to the internals http traffic XHRs cannot be stubbed so 
-before these specs can be checked a test REST service is created. 
-This test service is written using 
-Node and returns known content progressively
-according to known timings, somewhat emulating a slow internet connection.
-The integration tests particularly verify behaviours where platform differences
-could cause inconsistencies. 
-For example, the test url `/tenSlowNumbers` writes out the first ten natural numbers
-as a JSON array at a rate of two per second. Oboe
-registers a JSONPath selector for the numbers against a callback that aborts the http request on
-seeing `5`. The correct behaviour is to get no callback for the sixth,
-even when running on platforms lacking support for XHR2 where all
-ten will have already been downloaded.
+The *Component tests* step back from examining individual components to
+a position where their emergent behaviour in composition can be
+examined. Because the composition is quite simple there are much fewer
+component tests than unit tests. By examining the behaviour of the
+library through the public API the component tests do not take account
+of how the composition is drawn. The exception is that the is faked
+which requires the streamingXhr component to be switched for a stub.
 
- 
+At the apex of the test pyramid are a small number of *integration
+tests*. These verify Oboe as a black box without any knowledge of, or
+access to the internals, using only the APIs which are exposed to
+application programmers. These tests are the most expensive to write but
+a small number are necessary in order to verify that Oboe works
+correctly end-to-end. Without access to the internals http traffic XHRs
+cannot be stubbed so before these specs can be checked a test REST
+service is created. This test service is written using Node and returns
+known content progressively according to known timings, somewhat
+emulating a slow internet connection. The integration tests particularly
+verify behaviours where platform differences could cause
+inconsistencies. For example, the test url `/tenSlowNumbers` writes out
+the first ten natural numbers as a JSON array at a rate of two per
+second. Oboe registers a JSONPath selector for the numbers against a
+callback that aborts the http request on seeing `5`. The correct
+behaviour is to get no callback for the sixth, even when running on
+platforms lacking support for XHR2 where all ten will have already been
+downloaded.
+
 The desire to be amenable to testing influences the boundaries on which
 the application splits into components. Confidently black box testing a
 stateful unit as is difficult; because of side-effects it may later
@@ -112,8 +111,6 @@ modifying the built in types for tests opens up the possibilities of
 changes leaking between cases. Dependency injection allows a much
 simpler test style because it is trivial to inject a stub in place of
 the XHR.
-
-
 
 Running the tests
 -----------------
