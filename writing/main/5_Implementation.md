@@ -11,18 +11,19 @@ clarity events are depicted as transferring directly between publisher
 and subscriber but this is actually performed through an intermediary.
 \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture follows a fairly linear pipeline with flow visiting
-various tasks between receiving http progress events and notifying
+Oboe's architecture describes a fairly linear pipeline visiting
+a small number of tasks between receiving http content and notifying
 application callbacks. The internal componentisation is designed
 primarily so that automated testing can provide a high degree of
 confidence regarding the correct working of the library. A local event
-bus facilitates communication between components inside the Oboe
-instance and most components interact solely through this bus by
-receiving events, processing them and publishing further events in
-response. This use of an event bus is a variation on the Observer
-pattern which removes the need for each unit to obtain a reference to
-the previous one so that it may observe it, giving a highly decoupled
-shape to the library. Once everything is wired into the bus no central
+bus facilitates communication inside the Oboe
+instance and most components interact solely by using this bus;
+receiving events, processing them, and publishing further events in
+response. The use of an event bus is a variation on the Observer
+pattern which removes the need for each unit to locate specific 
+other units before it may listen to their events, giving a highly decoupled
+shape to the library in which each part knows the events it requires but
+not who publishes them. Once everything is wired into the bus no central
 control is required and the larger behaviours emerge as the consequence
 of interaction between finer ones.
 
@@ -30,59 +31,59 @@ Design for automated testing
 ----------------------------
 
 ![**The test pyramid**. Much testing is done on the low-level components
-of the system, less on the component level, and less still on a
+of the system, less on their composed behaviours, and less still on a
 whole-system level. \label{testpyramid}](images/testPyramid.png)
 
-80% of the code written for this project is test specifications. Because
+80% of the code written for this project is test specification. Because
 the correct behaviour of a composition requires the correct behaviour of
-its components units, the majority of the specifications are *unit
+its components, the majority are *unit
 tests*. The general style of a unit test is to plug the item under test
-into a mock event bus and check that when it receives input events, the
+into a mock event bus and check that when it receives input events the
 expected output events are consequently published.
 
 The *Component tests* step back from examining individual components to
-a position where their emergent behaviour in composition can be
-examined. Because the composition is quite simple there are much fewer
-component tests than unit tests. By examining the behaviour of the
-library through the public API the component tests do not take account
-of how the composition is drawn. The exception is that the is faked
-which requires the streamingXhr component to be switched for a stub.
+a position where their behaviour as a composition may be
+examined. Because the compositions are quite simple there are fewer
+component tests than unit tests. The component tests do not take account of *how* the composition is drawn
+and predominantly examine the behaviour of the library through its public API.
+One exception is that the streamingXHR component is switched for a stub 
+so that http traffic can be simulated.
 
 At the apex of the test pyramid are a small number of *integration
 tests*. These verify Oboe as a black box without any knowledge of, or
-access to the internals, using only the APIs which are exposed to
+access to, the internals, using the same API as is exposed to
 application programmers. These tests are the most expensive to write but
 a small number are necessary in order to verify that Oboe works
-correctly end-to-end. Without access to the internals http traffic XHRs
-cannot be stubbed so before these specs can be checked a test REST
-service is created. This test service is written using Node and returns
-known content progressively according to known timings, somewhat
+correctly end-to-end. Without access to the internals http traffic
+cannot be faked so before these tests can be performed a corresponding REST
+service is started. This test service is written using Node and returns
+known content progressively according to predefined timings, somewhat
 emulating a slow internet connection. The integration tests particularly
 verify behaviours where platform differences could cause
 inconsistencies. For example, the test url `/tenSlowNumbers` writes out
 the first ten natural numbers as a JSON array at a rate of two per
-second. Oboe registers a JSONPath selector for the numbers against a
-callback that aborts the http request on seeing `5`. The correct
-behaviour is to get no callback for the sixth, even when running on
-platforms lacking support for XHR2 where all ten will have already been
+second. The test registers a JSONPath selector that matches the numbers against a
+callback that aborts the http request on seeing the fifth. The correct
+behaviour is to get no sixth callback, even when running on a
+platform lacking support for XHR2 and all ten will have already been
 downloaded.
 
-Confidently black box testing a stateful unit is difficult. Because of
+Confidently black-box testing a stateful unit is difficult. Because of
 side-effects and hidden state we do not know if the same call will later
 give a different behaviour. Building up the parse result from SAX events
-is a fairly complex process which cannot be done efficiently in
-Javascript without storing some state. The state is stored in a simple
-state-storing unit. The intricate logic may then be separately expressed
-as functions without side effects which transition between one state and
-the next and this part separately tested without having to double-guess
-the internals of the unit. Although proof of correctness is undecidable,
-whichever results the functions give while under test, uninfluenced by
-state I can be confident that they will continue to give in response to
-future similar events. The separate unit holding the parse result has
-exactly one responsibility and is trivial to test. This approach
+is a fairly complex process which cannot be implemented efficiently as
+stateless Javascript. To promote testability the state is delegated to a simple
+state-storing unit. The intricate logic may then be expressed as a separately tested set of 
+side-effect free functions which transition between one state and
+the next. Although proof of correctness is impossible,
+for whichever results the functions give while under test, uninfluenced by
+state I can be confident that they will always yield the same response given
+the same future events. The separate unit maintaining the state has
+exactly one responsibility, to hold the parse result between function calls,
+and is trivial to test. This approach
 slightly breaks with the object oriented principle of encapsulation by
-not hiding state behind the logic which acts on it but I feel the
-departure is justified by a more testable codebase.
+hiding state behind the logic which acts on it but I feel that the
+departure is justified by the more testable codebase.
 
 To enhance testability Oboe has also embraced dependency injection. 
 Components do not instantiate their dependencies
