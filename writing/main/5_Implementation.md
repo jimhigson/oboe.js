@@ -130,7 +130,7 @@ simultaneously as they program. Conway observed that an artisan works by
 transform-in-place "start with the working material in place and you
 step by step transform it into its final form" whereas software is
 created through intermediate proxies, and attempts to close this gap by
-merging programming with the results of programming [@humanize side8-9].
+merging programming with the results of programming [@humanize pp. 8-9].
 When we bring together the medium and the message the cost of small
 experimentation is very low and I feel that programming becomes more
 explorative and expressive.
