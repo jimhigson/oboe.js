@@ -142,25 +142,21 @@ next work by the time they complete. Oboe is version controlled using
 git and hosted on github. The integration tests are used as the final
 check before a branch in git is merged into the master.
 
-Packaging as a single, distributable file
------------------------------------------
+Packaging to a single distributable file
+----------------------------------------
 
-![**Packaging of many javascript files into multiple single-file
-packages.** The packages are individually targeted at different
-execution contexts, either browsers or node *get from notebook, split
-sketch diagram in half*](images/placeholder.png)
-
-As an interpreted language, Javascript can be run directly
-without any prior compilation. While running the same code as I see in
-the editor is convenient while programming, it is much less so for
-distribution. Although the languages imposes no compulsory build phase,
-in practice one is necessary. Dependency managers have not yet become
-standard for client-side web development (although Bower is looking
-good) so most files are manually downloaded. For a developer wishing to
+As an interpreted language Javascript may be run
+without any prior compilation. Directly running the same files as are open in
+the editor is convenient while programming but, unless a project is written 
+as a single file, in practice some build phase is required to create an 
+easily distributable form.
+Dependency managers have not yet become
+standard for client-side web development so dependant libraries are
+usually manually downloaded. For a developer wishing to
 include my library in their own project a single file is much more
-convenient. Should they not have a build process of their own, a single
-file is also much faster to transfer to their users, mostly because of
-the cost of establishing connections and the http overhead.
+convenient. If they are not using a similar build process on their site,
+a single file is also faster to transfer to their users, mostly because
+the http overhead can be substantial and is of constant size per resource.
 
 Javascript files are interpreted in series by the browser so load-time
 dependencies must precede dependants. Unsurprisingly, separate files
@@ -214,9 +210,10 @@ For future consideration there is Browserify. This library reverses the
 'browser first' image of Javascript by converting applications targeted
 at Node into a single file efficiently packaged for delivery to a web
 browser, conceptually making Node the primary environment for Javascript
-and adapting browser execution to match. Significantly, require leaves
-no trace of itself in the concatenated Javascript other than Adaptors
-presenting browser APIs as the Node equivalents. Browserify's http
+and adapting browser execution to match. Significantly,
+other than Adaptors
+presenting browser APIs as if they were the Node equivalents, 
+Browserify leaves no trace of itself in the final Javascript. Browserify's http
 adaptor[^1] is complete but more verbose compared to Oboe's version[^2].
 
 As well as combining into a single file, Javascript source can made
