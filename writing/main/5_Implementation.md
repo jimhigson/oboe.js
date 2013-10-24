@@ -29,11 +29,9 @@ of interaction between finer ones.
 Automated testing
 -----------------
 
-![**The test pyramid**. 
-A Lot of testing is done on the low-level components of the
-system, less on the component level and less still on a whole-system
-level.
-\label{testpyramid}](images/testPyramid.png)
+![**The test pyramid**. Much testing is done on the low-level components
+of the system, less on the component level, and less still on a
+whole-system level. \label{testpyramid}](images/testPyramid.png)
 
 The testing itself is a non-trivial undertaking with 80% of code written
 for this project being test specifications. Based on the idea that a
