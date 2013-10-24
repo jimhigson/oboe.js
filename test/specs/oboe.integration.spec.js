@@ -332,20 +332,46 @@ describe("oboe integration (real http)", function() {
    
    it('fires error on unreachable url', function () {
 
-      var gotError = false
+      var stubCallback = jasmine.createSpy('error callback');
 
-      oboe('examples.bomz:754196/fooz/barz')
-         .fail(function () {
-
-            gotError = true
-         });
+      oboe('nowhere.ox.ac.uk:754196/fooz/barz')
+         .fail(stubCallback);
 
       waitsFor(function () {
-            return gotError;
-         }, 'the request to fail', 
-         30*1000 // need to allow time for failure
-      )
-   })   
+         return !!stubCallback.calls.length;
+      }, 'the request to fail', 30*1000)
+
+      runs( function() {
+         expect( stubCallback )
+            .toHaveBeenCalledWith( 
+               0, 
+               '',
+               jasmine.any(Error) 
+            )
+      });
+   })
+   
+   it('fires error on callback error', function () {
+
+      var stubCallback = jasmine.createSpy('error callback');
+
+      oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         .node('!.*', jasmine.createSpy().andThrow('I am a bad callback') )
+         .fail(stubCallback);
+         
+      waitsFor(function () {
+         return !!stubCallback.calls.length;
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+
+      runs( function() {
+         expect( stubCallback )
+            .toHaveBeenCalledWith( 
+               0, 
+               '',
+               jasmine.any(Error) 
+            )
+      });
+   })      
 
    function someSecondsToPass(waitSecs) {
 

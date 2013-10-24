@@ -1099,7 +1099,10 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+      window.setTimeout(
+         partialComplete(fire, ERROR_EVENT, 0, '', e)
+      ,  0
+      );
    }            
 }
 
@@ -1888,7 +1891,7 @@ function instanceController(  fire, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      fire(ERROR_EVENT, e);
+      fire(ERROR_EVENT, 0, '', e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1956,7 +1959,7 @@ function instanceController(  fire, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         fire(ERROR_EVENT, e);
+         fire(ERROR_EVENT, 0, '', Error('error in callbak', e));
       }
       
       delete oboeApi.forget;

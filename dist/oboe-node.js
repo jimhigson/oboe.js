@@ -445,7 +445,7 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
       });
    }
    
-   function readToEnd(readableStream, callback){
+   function readStreamToEnd(readableStream, callback){
       var content = '';
    
       readableStream.on('data', function (chunk) {
@@ -483,14 +483,14 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
             readStreamToEventBus(res)
             
          } else {
-            readToEnd(res, function(errorBody){
+            readStreamToEnd(res, function(errorBody){
                fire( ERROR_EVENT, statusCode, errorBody );
             });
          }      
       });
       
       req.on('error', function(e) {
-         fire( ERROR_EVENT, e );
+         fire( ERROR_EVENT, 0, '', e );
       });
       
       on( ABORTING, function(){              
@@ -1299,7 +1299,7 @@ function instanceController(  fire, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      fire(ERROR_EVENT, e);
+      fire(ERROR_EVENT, 0, '', e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1367,7 +1367,7 @@ function instanceController(  fire, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         fire(ERROR_EVENT, e);
+         fire(ERROR_EVENT, 0, '', Error('error in callbak', e));
       }
       
       delete oboeApi.forget;
