@@ -356,7 +356,7 @@ var oboe = require('oboe'),
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .node('schemes.*', function(scheme){
       console.log('Aha! ' + scheme);
-   });
+   })
    .node('plottings.*', function(deviousPlot){
       console.log('Hmmm! ' + deviousPlot);   
    })
