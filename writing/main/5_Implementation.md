@@ -29,11 +29,10 @@ of interaction between finer ones.
 Automated testing
 -----------------
 
-![**The test pyramid**. Relying on the assumption that verification of
-small parts provides a solid base from which to compose system-level
-behaviours. A Lot of testing is done on the low-level components of the
+![**The test pyramid**. 
+A Lot of testing is done on the low-level components of the
 system, less on the component level and less still on a whole-system
-level where only smoke tests are provided.
+level.
 \label{testpyramid}](images/testPyramid.png)
 
 The testing itself is a non-trivial undertaking with 80% of code written
