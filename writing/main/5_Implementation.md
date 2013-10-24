@@ -33,16 +33,20 @@ Automated testing
 of the system, less on the component level, and less still on a
 whole-system level. \label{testpyramid}](images/testPyramid.png)
 
-The testing itself is a non-trivial undertaking with 80% of code written
-for this project being test specifications. Based on the idea that a
-correct system must be built from individually correct units, the
-majority of the specifications are unit tests, putting each unit under
-the microscope and describing the correct behaviour as completely as
-possible. Component tests zoom out from examining individual components
+80% of the code written for this project is test specifications.
+Because the correct behaviour of a composition requires the correct behaviour of
+its components units, the majority of the specifications are *unit tests*. The
+general style of a unit test is to plug the item under test into a mock
+event bus and check that when it receives input events,
+the expected output events are consequently published.
+ 
+*Component tests* zoom out from examining individual components
 to focus on their correct composition, falsifying only the http traffic.
 To avoid testing implementation details the component tests do not look
 at the means of coupling between the code units but rather check for the
-behaviours which should emerge as a consequence of their composition. At
+behaviours which should emerge as a consequence of their composition.
+
+At
 the apex of the test pyramid are a small number of integration tests.
 These verify Oboe as a black box without any knowledge of, or access to
 the internals, using only the APIs which are exposed to application
