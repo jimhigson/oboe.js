@@ -29,12 +29,6 @@ of interaction between finer ones.
 Automated testing
 -----------------
 
-Automated testing improves what can be written, not just making what is
-written more reliable. Tests deal with the problem of "irreducible
-complexity" - when a program is made out of parts whose correct
-behaviour cannot be observed without all of the program. Allows smaller
-units to be verified before verifying the whole.
-
 ![**The test pyramid**. Relying on the assumption that verification of
 small parts provides a solid base from which to compose system-level
 behaviours. A Lot of testing is done on the low-level components of the

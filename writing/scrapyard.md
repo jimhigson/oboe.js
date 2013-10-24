@@ -507,3 +507,9 @@ unresponsive. Generally unreliable, has to be restarted frequently.
 JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
+
+Automated testing improves what can be written, not just making what is
+written more reliable. Tests deal with the problem of "irreducible
+complexity" - when a program is made out of parts whose correct
+behaviour cannot be observed without all of the program. Allows smaller
+units to be verified before verifying the whole.
