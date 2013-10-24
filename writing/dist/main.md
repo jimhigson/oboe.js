@@ -1763,121 +1763,123 @@ file or specification. As well as executing correctly, the project is
 required not to surpass a certain size so this also checked on every
 save. Because Oboe is a small, tightly focused project the majority of
 the programming time is spent refactoring already working code. Running
-tests on save provides quick feedback so that mistakes are found as soon
-as they are made, before my mind has moved on to the next context. Agile
-practitioners emphasise the importance of tests that execute quickly
-[@cleancode p.314:T9] -- Oboe's 220 unit and component tests run in less
-than a second so discovering programming mistakes is almost instant. If
-the "content of any medium is always another medium” [@media p.8], we
-might say that the content of programming is the effect that is realised
-by its execution. A person working in a physical medium sees the thing
-they are making but the programmer does usually not see their program's
-execution simultaneously as they create. Conway notes that an artisan
-works by transform-in-place "start with the working material in place
-and you step by step transform it into its final form" whereas software
-is created through intermediate proxies, and attempts to close this gap
-by merging programming with the results of programming [@humanize
-pp.8-9]. I feel that if we bring together the medium and the message by
-viewing the effect of code while we write it, we can build as a series
-of small, iterative, correct steps and programming can be more
-explorative and expressive.
+tests on save provides quick feedback so that mistakes are found before
+my mind has moved on to the next context. Agile practitioners emphasise
+the importance of tests that execute quickly [@cleancode p.314:T9] --
+Oboe's 220 unit and component tests run in less than a second so
+discovering programming mistakes is almost instant. If the "content of
+any medium is always another medium” [@media p.8], we might say that the
+content of programming is the process that is realised by its execution.
+A person working in a physical medium sees the thing they are making but
+the programmer does usually not see their program's execution
+simultaneously as they create. Conway notes that an artisan works by
+transform-in-place "start with the working material in place and you
+step by step transform it into its final form," but software is created
+through intermediate proxies. He attempts to close this gap by merging
+programming with the results of programming [@humanize pp.8-9]. I feel
+that if we bring together the medium and the message by viewing the
+result of code while we write it, we can build as a series of small,
+iterative, correct steps and programming can be more explorative and
+expressive. Running the tests subtly, automatically hundreds of times
+per day builds isn't merely convenient, this build process makes me a
+better programmer.
 
-Integration tests are not run on save, they intentionally simulate a
-slow network so they take some time to run. I'd already have started the
-next work by the time they complete. Oboe is version controlled using
-git and hosted on github. The integration tests are used as the final
-check before a branch in git is merged into the master.
+Integration tests are not run on save. They intentionally simulate a
+slow network so they take some time to run and I'd already have started
+the next micro-task by the time they complete. Oboe is version
+controlled using git and hosted on github. The integration tests are
+used as the final check before a branch in git is merged into the
+master.
 
 Packaging to a single distributable file
 ----------------------------------------
 
-As an interpreted language Javascript may be run
-without any prior compilation. Directly running the same files as are open in
-the editor is convenient while programming but, unless a project is written 
-as a single file, in practice some build phase is required to create an 
-easily distributable form.
-Dependency managers have not yet become
+As an interpreted language Javascript may be run without any prior
+compilation. Directly running the files that are open in the editor is
+convenient while programming but, unless a project is written as a
+single file, in practice some build phase is required to create an
+easily distributable form. Dependency managers have not yet become
 standard for client-side web development so dependant libraries are
-usually manually downloaded. For a developer wishing to
-include my library in their own project a single file is much more
-convenient. If they are not using a similar build process on their site,
-a single file is also faster to transfer to their users, mostly because
-the http overhead can be substantial and is of constant size per resource.
+usually manually downloaded. For a developer wishing to include my
+library in their own project a single file is much more convenient than
+the multi-file raw source. If they are not using a similar build process
+on their site, a single file is also faster to transfer to their users,
+mostly because the http overhead is of constant size per resource.
 
 Javascript files are interpreted in series by the browser so load-time
-dependencies must precede dependants. Unsurprisingly, separate files
-once concatenated following the same order as delivered to the browser
-will load more quickly but are functionally equivalent, at least barring
-syntax errors. Several tools exist to automate this stage of the build
-process, incorporating a topological sort of the dependency digraph in
-order to find a working concatenation order.
+dependencies must precede dependants. If several valid Javascript files
+are concatenated in the same order as delivered to the browser, the
+joined version is functionally equivalent to the individual files. This
+is a common technique so that code can be written and debugged as many
+files but distributed as one. Several tools exist to automate this stage
+of the build process that topologically sort the dependency graph before
+concatenation in order to find a suitable script order.
 
-Early in this project I chose *Require.js* although I later moved on
-because it was too heavyweight. Javascript as a language doesn't have an
-import statement. Require contributes the importing ability to
-Javascript from inside the language sandbox as the `require` function, a
-standard asynchronous call. Calls to `require` AJAX in and execute the
-imported source, returning any exported symbols by a callback. For
-non-trivial applications this mode is intended mostly for debugging;
-because a network hop is involved the protocol is chatty and slowed by
-highly latent calls between modules. For efficient delivery Require also
-has the `optimise` command which concatenates into a single file by
-using static analysis to deduce a workable source order. Because
-`require` may appear anywhere in the source, this in the general case is
-of course undecidable so Require falls back to lazy loading. In practice
-undecidability isn't a problem because imports are generally not subject
-to branching. In larger webapps lazy loading speeding up the initial
-page load and is actually an advantage. The technique of *Asynchronous
-Module Definition* (AMD) intentionally imports rarely-loaded modules in
-response to events. By resisting the static analysis the units will not
-be downloaded until they are needed.
+Early in the project I chose *Require.js* for this task. Javascript as a
+language doesn't have an import statement. Require contributes the
+importing ability to Javascript from inside the language itself by
+providing an asynchronous `require` function. Calls to `require` AJAX in
+and execute the imported source, passing any exported items to the given
+callback. For non-trivial applications loading each dependency
+individually over AJAX is intended only for debugging because making so
+many requests is slow. For efficient delivery Require also has the
+`optimise` command which concatenates an application into a single file
+by using static analysis to deduce a workable source order. Because the
+`require` function may be called from anywhere, this is undecidable in
+the general case so Require falls back to lazy loading. In practice this
+isn't a problem because imports are generally not subject to branching.
+For larger webapps lazy loading is a feature because it speeds up the
+initial page load. The technique of *Asynchronous Module Definition*
+(AMD) intentionally imports rarely-loaded modules in response to events;
+by resisting static analysis the dependant Javascript will not be
+downloaded until it is needed. AMD is mostly of interest to applications
+with a central hub but also some rarely used parts. For example, most
+visits to online banking will not need to create standing orders so it
+is better if this part is loaded on-demand rather than increase the
+initial page load time.
 
-AMD is mostly of interest to web applications with a central hub but
-also some rarely used parts. For example, most visits to online banking
-will not need to create standing orders so it is better if this part is
-loaded on-demand than eagerly. Oboe does not fit this profile: everybody
-who uses it will use all of the library. Regardless, I hoped to use
-`optimise` to generate my combined Javascript file. Even after
-optimisation, Require's design necessitates that calls to `require` stay
-in the code and that the Require run-time component is available to
-handle them. Require's 5k would also have more than doubled
-Oboe's size. Overall, Require seems more suited to programmers creating
-stand-alone applications than library authors.
+I hoped to use Require's `optimise` to automate the creation of a
+combined Javascript file for Oboe. Oboe would not benefit from AMD
+because everybody who uses it will use all of the library but using
+Require to find a working source order would save having to manually
+implement one. Unfortunately this was not feasible. Even after
+optimisation, Require's design necessitates that calls to the `require`
+function are left in the code and that the Require run-time component is
+available to handle them. At more than 5k gzipped this would have more
+than doubled Oboe's download footprint.
 
-Having abandoned Require, I decided to pick up the simplest tool which
-could possibly work. With only 15 source files and a fairly sparse
+After removing Require I decided to pick up the simplest tool which
+could possibly work. With about 15 source files and a fairly sparse
 dependency graph finding a working order on paper wasn't a daunting
 task. Combined with a Grunt analogue to the unix `cat` command I quickly
-had a working build process. I adjusted each Javascript file to, when
-loaded directly, place its API in the global namespace, then
-post-concatenation wrapped the combined in a single function, converting
-the APIs inside the function from global to the scope of that function,
-thereby hiding the implementation for code outside of Oboe.
+had a working build process and a distributable library requiring no
+run-time dependency management to be loaded.
 
 For future consideration there is Browserify. This library reverses the
-'browser first' image of Javascript by converting applications targeted
-at Node into a single file efficiently packaged for delivery to a web
-browser, conceptually making Node the primary environment for Javascript
-and adapting browser execution to match. Significantly,
-other than Adaptors
-presenting browser APIs as if they were the Node equivalents, 
-Browserify leaves no trace of itself in the final Javascript. Browserify's http
-adaptor[^5_Implementation1] is complete but more verbose compared to Oboe's version[^5_Implementation2].
+'browser first' Javascript mindset by viewing Node as the primary target
+for Javascript development and adapting the browser environment to
+match. Browserify converts applications written for Node into a single
+file packaged for delivery to a web browser. Significantly, other than
+Adaptors wrapping the browser APIs and presenting their features as if
+they were the Node equivalents, Browserify leaves no trace of itself in
+the final Javascript. Additionally, the http adaptor[^5_Implementation1] is capable of
+using XHRs as a streaming source when used with supporting browsers.
 
-As well as combining into a single file, Javascript source can made
-significantly smaller by removing comments and reducing inaccessible
-tokens to a single character. For Oboe the popular library *Uglify* is
-used for minification. Uglify performs only surface optimisations,
-operating on the AST level but concentrating mostly on compact syntax. I
-also considered Google's Closure compiler. Closure resembles a
-traditional compiler optimiser by leveraging a deeper understanding to
-search for smaller representations, unfortunately at the cost of safety.
-Decidability in highly dynamic languages is often impossible and Closure
-operates on a well-advised subset of Javascript, delivering no
-reasonable guarantee of equivalence when code is not written as the
-Closure authors expected. Integration tests should catch any such
-failures but for the time being I have a limited appetite for a workflow
-which forces me to be suspicious of the project's build process.
+After combining into a single file, Javascript source can be minified:
+made smaller using size-optimisations such as reducing scoped symbols to
+a single character or stripping out the comments. For Oboe the popular
+minification library *Uglify* was chosen. Uglify performs only surface
+optimisations, operating on the AST level but concentrating mostly on
+producing compact syntax. I also considered Google's *Closure Compiler*
+which resembles a traditional optimiser by leveraging a deeper
+understanding to search for smaller representations. Unfortunately,
+proving equivalence in highly dynamic languages is often impossible and
+Closure Compiler is only safe given a project that uses a well-advised
+subset of Javascript, delivering no reasonable guarantee of equivalence
+if code is not written as the Closure team expected. Integration tests
+should catch any such failures but for the time being I decided a
+slightly larger file is a worthwhile tradeoff for a slightly safer build
+process.
 
 Styles of Programming
 ---------------------
@@ -1991,7 +1993,7 @@ the current node is appended and removed many times whereas the root is
 immutable. This ordering was chosen because it is computationally very
 efficient since all updates to the list are at the head. Each link in
 the list is immutable, enforced by newer Javascript engines as frozen
-objects [^5_Implementation3].
+objects [^5_Implementation2].
 
 Linked lists were chosen in preference to the more conventional approach
 of using native Javascript Arrays for several reasons. Firstly, I find
@@ -2023,10 +2025,10 @@ Oboe JSONPath Implementation
 Not surprisingly given its importance, the JSONPath implementation is
 one of the most refactored and considered parts of the Oboe codebase.
 Like many small languages, on the first commit it was little more than a
-series of regular expressions[^5_Implementation4] but has slowly evolved into a
-featureful and efficient implementation[^5_Implementation5]. The extent of the rewriting
+series of regular expressions[^5_Implementation3] but has slowly evolved into a
+featureful and efficient implementation[^5_Implementation4]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
-specifications[^5_Implementation6].
+specifications[^5_Implementation5].
 
 The JSONPath compiler exposes a single higher-order function to the rest
 of Oboe. This function takes a JSONPath as a String and, proving it is a
@@ -2107,7 +2109,7 @@ saving time by avoiding repeated execution, this could potentially also
 save memory because where two JSONPath strings contain a common start
 they could share the inner parts of their functional expression.
 Although Javascript doesn't come with functional caching, it can be
-added using the language itself [^5_Implementation7]. I suspect, however, that hashing
+added using the language itself [^5_Implementation6]. I suspect, however, that hashing
 the parameters might be slower than performing the matching. Although
 the parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
@@ -2120,7 +2122,7 @@ they are the simplest form able to express the clause patterns. The
 regular expressions are hidden to the outside the tokenizer and only
 functions are exposed to the main body of the compiler. The regular
 expressions all start with `^` so that they only match at the head of
-the string. A more elegant alternative is the 'y' [^5_Implementation8] flag but as of
+the string. A more elegant alternative is the 'y' [^5_Implementation7] flag but as of
 now this lacks wide browser support.
 
 By verifying the tokens through their own unit tests it is simpler to
@@ -2140,32 +2142,29 @@ statementExpr pointing to the last clause](images/placeholder)
 
 [^5_Implementation1]: https://github.com/substack/http-browserify
 
-[^5_Implementation2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingXhr.js
-    This version is shorter mostly because it is not a generic solution
-
-[^5_Implementation3]: See
+[^5_Implementation2]: See
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
     Although older engines don't provide any ability to create immutable
     objects at run-time, we can be fairly certain that the code does not
     mutate these objects or the tests would fail when run in
     environments which are able to enforce this.
 
-[^5_Implementation4]: JSONPath compiler from the first commit can be found at line 159
+[^5_Implementation3]: JSONPath compiler from the first commit can be found at line 159
     here:
     https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
 
-[^5_Implementation5]: for contrast, the current source can be found at
+[^5_Implementation4]: for contrast, the current source can be found at
     https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
 
-[^5_Implementation6]: The current tests are viewable at
+[^5_Implementation5]: The current tests are viewable at
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^5_Implementation7]: Probably the best known example being `memoize` from
+[^5_Implementation6]: Probably the best known example being `memoize` from
     Underscore.js: http://underscorejs.org/\#memoize
 
-[^5_Implementation8]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^5_Implementation7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
 
 
 Conclusion
@@ -3089,7 +3088,31 @@ function instanceController(  fire, on, un,
       
       return this; // chaining
    }
-
+   
+   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+       addFailListner = partialComplete(on, ERROR_EVENT);
+   
+   /**
+    * implementation behind oboe().on()
+    */       
+   function addListener( eventId, listener ){
+                         
+      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
+                                
+         apply(arguments, addNodeOrPathListenerApi);
+         
+      } else if( eventId == 'done' ) {
+      
+         addDoneListener(listener);
+                              
+      } else if( eventId == 'fail' ) {
+      
+         addFailListner(listener);
+      }
+             
+      return this; // chaining
+   }   
+   
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
@@ -3097,9 +3120,9 @@ function instanceController(  fire, on, un,
    return oboeApi = { 
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addNodeOrPathListenerApi,
-      fail  :  partialComplete(on, ERROR_EVENT),
-      done  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+      on    :  addListener,
+      fail  :  addFailListner,
+      done  :  addDoneListener,
       abort :  partialComplete(fire, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
