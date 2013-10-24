@@ -158,13 +158,14 @@ convenient. If they are not using a similar build process on their site,
 a single file is also faster to transfer to their users, mostly because
 the http overhead can be substantial and is of constant size per resource.
 
-Javascript files are interpreted in series by the browser at load-time
-dependencies must precede dependants. Unsurprisingly, separate files
-once concatenated following the same order as delivered to the browser
-will load more quickly but are functionally equivalent, at least barring
-syntax errors. Several tools exist to automate this stage of the build
-process, incorporating a topological sort of the dependency digraph in
-order to find a working concatenation order.
+Because Javascript files are interpreted in series by the browser, load-time
+dependencies must precede dependants. If several valid Javascript files are
+concatenated in the same order as delivered to the browser
+the joined version is functionally equivalent to the individual files. This is
+a common technique so that code can be written and debugged as many files but distributed
+as one. Several tools exist to automate this stage of the build
+process that topologically sort the dependency graph before concatenation in
+order to find a suitable script order.
 
 Early in this project I chose *Require.js* although I later moved on
 because it was too heavyweight. Javascript as a language doesn't have an
