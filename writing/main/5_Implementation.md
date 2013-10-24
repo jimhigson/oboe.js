@@ -150,7 +150,7 @@ packages.** The packages are individually targeted at different
 execution contexts, either browsers or node *get from notebook, split
 sketch diagram in half*](images/placeholder.png)
 
-As an interpreted language, Javascript may of course be ran directly
+As an interpreted language, Javascript can be run directly
 without any prior compilation. While running the same code as I see in
 the editor is convenient while programming, it is much less so for
 distribution. Although the languages imposes no compulsory build phase,
