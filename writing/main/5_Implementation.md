@@ -7,10 +7,12 @@ Components of the project
 ![**Major components that make up Oboe.js illustrating program flow
 from http transport to registered callbacks.** UML facet/receptacle 
 notation is used to show the flow of events with event names in capitals.
+For clarity events are depicted as transitioning directly between publisher
+and subscriber rather than through an intermediary.
 \label{overallDesign}](images/overallDesign.png)
 
 Oboe's architecture follows a fairly linear
-pipeline, visiting various tasks between receiving http progress events
+pipeline with flow visiting various tasks between receiving http progress events
 and notifying application callbacks.
 The internal componentisation is designed primarily so that automated testing 
 can provide a high degree of confidence regarding the correct working of the 
@@ -23,11 +25,9 @@ response.  This use of an event bus
 is a variation on the Observer pattern which removes the need for each
 unit to obtain a reference to the previous one so that it may observe
 it, giving a highly decoupled shape to the library. Once everything is
-wired into the bus very little central control is required and the
-larger behaviours emerge as the consequence of this interaction between
-finer ones. One downside is perhaps that a central event bus does not
-lend itself to a UML class diagram, giving a diagram shape with an event
-bus as a central hub and everything else hanging off it as spokes.
+wired into the bus no central control is required and the
+larger behaviours emerge as the consequence of interaction between
+finer ones.
 
 Automated testing
 -----------------
