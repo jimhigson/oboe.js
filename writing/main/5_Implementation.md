@@ -219,21 +219,21 @@ they were the Node equivalents, Browserify leaves no trace of itself in
 the final Javascript. Additionally, the http adaptor[^1] is capable of
 using XHRs as a streaming source when used with supporting browsers.
 
-After combining into a single file, Javascript source can 
-be minified: made smaller using size-optimisations such as reducing scoped symbols to a
-single character or stripping out the comments. For Oboe the popular minification library *Uglify* was chosen.
-Uglify performs only surface optimisations, operating on
-the AST level but concentrating mostly on producing compact syntax. I also
-considered Google's *Closure Compiler* which resembles a traditional
-optimiser by leveraging a deeper understanding to search for
-smaller representations.
-Unfortunately, 
-proving equivalence in highly dynamic languages is often impossible and Closure Compiler is 
-only safe given a project that uses a well-advised subset of Javascript, delivering no
-reasonable guarantee of equivalence if code is not written as the
-Closure team expected. Integration tests should catch any such
-failures but for the time being I decided a slightly larger file is a worthwhile
-tradeoff for a slightly safer build process.
+After combining into a single file, Javascript source can be minified:
+made smaller using size-optimisations such as reducing scoped symbols to
+a single character or stripping out the comments. For Oboe the popular
+minification library *Uglify* was chosen. Uglify performs only surface
+optimisations, operating on the AST level but concentrating mostly on
+producing compact syntax. I also considered Google's *Closure Compiler*
+which resembles a traditional optimiser by leveraging a deeper
+understanding to search for smaller representations. Unfortunately,
+proving equivalence in highly dynamic languages is often impossible and
+Closure Compiler is only safe given a project that uses a well-advised
+subset of Javascript, delivering no reasonable guarantee of equivalence
+if code is not written as the Closure team expected. Integration tests
+should catch any such failures but for the time being I decided a
+slightly larger file is a worthwhile tradeoff for a slightly safer build
+process.
 
 Styles of Programming
 ---------------------
