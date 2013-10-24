@@ -84,27 +84,27 @@ slightly breaks with the object oriented principle of encapsulation by
 not hiding state behind the logic which acts on it but I feel the
 departure is justified by a more testable codebase.
 
-To enhance testability Oboe has also embraced dependency injection. This
-means that components do not create the further components that they
-require but rather rely on them being provided by an external wiring.
-The file `wire.js` performs the actual injection. One such example is
-the streamingHttp component which hides various incompatible http
-implementations by publishing their downloaded content progressively via
-the event bus. This unit does not know how to create the underlying
-browser XHR which it hides. Undoubtedly, by not instantiating its own
-dependencies a it presents a less friendly interface, although this is
-mitigated somewhat by the interface being purely internal, the objects
-it depends on are no longer a hidden implementation detail but exposed
-as a part of the component's API. The advantage of dependency injection
-here is that unit testing is much simpler. Unit tests should test
-exactly one behaviour of one unit. Were the streaming http object to
+To enhance testability Oboe has also embraced dependency injection. 
+Components do not instantiate their dependencies
+but rather rely on them being passed in by an inversion of control container
+during the wiring phase.
+The file `wire.js` performs the actual injection. 
+The streamingHttp component which hides browser differences
+does not know how to create the underlying
+XHR which it adapts. Undoubtedly, by not instantiating its own
+transport this part presents a less friendly interface: it's data source
+is no longer a hidden implementation detail but exposed
+as a part of the component's API; this is
+mitigated somewhat by the interface being purely internal.
+Dependency injection allows much simpler tests because it
+is easy to substitute the real XHR for a stub. Unit tests should test
+exactly one unit. Were the streaming http object to
 create its own transport, that part would also be under test, plus
 whichever external service that it connects to. Because Javascript
-allows redefinition of built in types, this could be avoided by
-overwriting the XHR constructor to return a mock but modifying the built
-in types for tests opens up the possibilities of changes leaking between
-cases. Dependency injection allows a much simpler test style because it
-is trivial to inject a stub in place of the XHR.
+allows redefinition of built in types, the stubbing could potentially also be done
+by overwriting the XHR constructor to return a mock but modifying the built
+in types would open up the possibility that our changes leaking between test
+cases.
 
 Running the tests
 -----------------
