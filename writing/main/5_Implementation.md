@@ -58,11 +58,16 @@ before these specs can be checked a test REST service is created.
 This test service is written using 
 Node and returns known content progressively
 according to known timings, somewhat emulating a slow internet connection.
-For example, the url `/tenSlowNumbers` writes out the first ten natural numbers
-as a JSON array at a rate of one per second,
+The integration tests particularly verify behaviours where platform differences
+could cause inconsistencies. 
+For example, the test url `/tenSlowNumbers` writes out the first ten natural numbers
+as a JSON array at a rate of two per second. Oboe
+registers a JSONPath selector for the numbers against a callback that aborts the http request on
+seeing `5`. The correct behaviour is to get no callback for the sixth,
+even when running on platforms lacking support for XHR2 where all
+ten will have already been downloaded.
 
  
-
 The desire to be amenable to testing influences the boundaries on which
 the application splits into components. Confidently black box testing a
 stateful unit as is difficult; because of side-effects it may later
