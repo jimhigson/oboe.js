@@ -117,6 +117,9 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+      window.setTimeout(
+         partialComplete(fire, ERROR_EVENT, 0, '', e)
+      ,  0
+      );
    }            
 }

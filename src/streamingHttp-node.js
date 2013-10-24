@@ -83,7 +83,7 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
       });
       
       req.on('error', function(e) {
-         fire( ERROR_EVENT, e );
+         fire( ERROR_EVENT, 0, '', e );
       });
       
       on( ABORTING, function(){              
