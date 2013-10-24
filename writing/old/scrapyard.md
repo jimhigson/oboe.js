@@ -1,3 +1,6 @@
+Text fragments from the dissertation that were't good enough to keep, but not quite bad enough to be deleted (yet)
+==================================================================================================================
+
 delivery methodology
 --------------------
 
@@ -350,12 +353,12 @@ lesser degree of server-side control but by using client-side rendering
 a much faster experience was possible than would otherwise be possible
 over low-speed networks [@news].
 
-Web developers agree that program
-architecture should separate presentation from operational logic but
-there is no firm consensus on where each concern should be exercised.
+Web developers agree that program architecture should separate
+presentation from operational logic but there is no firm consensus on
+where each concern should be exercised.
 
-Javascript has proven very effective as the language to meet
-Node's design goals but this suitability is not based on Javascript's
+Javascript has proven very effective as the language to meet Node's
+design goals but this suitability is not based on Javascript's
 association with web browsers, although it is certainly beneficial: for
 the first time it is possible to program presentation logic once which
 is capable of running on either client or server. Being already familiar
@@ -421,9 +424,8 @@ endeavour.*
 Drilling down in code
 ---------------------
 
-this
-extraction has become such a natural component of a workflow that it
-maye be used while thinking of it as wholly unremarkable. In the
+this extraction has become such a natural component of a workflow that
+it maye be used while thinking of it as wholly unremarkable. In the
 examples above we are interacting with the model in the way that the
 language makes the most easy to conceptualise. However se should
 consider that, however subtly embedded, the technique is an invented
@@ -433,10 +435,9 @@ been drawn.
 selector languages
 ------------------
 
-their employment is not
-the most natural coming from a programming context in which the
-application developer's responsibilities usually start where the
-demarshaller's end
+their employment is not the most natural coming from a programming
+context in which the application developer's responsibilities usually
+start where the demarshaller's end
 
 using (json|xml)path with sax
 -----------------------------
