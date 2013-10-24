@@ -40,19 +40,21 @@ general style of a unit test is to plug the item under test into a mock
 event bus and check that when it receives input events,
 the expected output events are consequently published.
  
-*Component tests* zoom out from examining individual components
-to focus on their correct composition, falsifying only the http traffic.
-To avoid testing implementation details the component tests do not look
-at the means of coupling between the code units but rather check for the
-behaviours which should emerge as a consequence of their composition.
+The *Component tests* step back from examining individual components
+to a position where their emergent behaviour in composition can be examined. Because
+the composition is quite simple there are much fewer component tests than unit
+tests. By examining the behaviour of the library through the public API the 
+component tests do not take account of how the composition is drawn.
+The exception is that the is faked which requires the streamingXhr component
+to be switched for a stub.
 
-At
-the apex of the test pyramid are a small number of integration tests.
+At the apex of the test pyramid are a small number of *integration tests*.
 These verify Oboe as a black box without any knowledge of, or access to
 the internals, using only the APIs which are exposed to application
-programmers. When running the integration tests a REST service is first
-spun up so that correctness of the whole library may be examined against
-an actual server.
+programmers. The http traffic cannot be stubbed so before these tests can
+be ran a test REST service is spun up. 
+These tests are the most expensive to write but a small number are necessary
+in order to verify that Oboe works correctly end-to-end. 
 
 The desire to be amenable to testing influences the boundaries on which
 the application splits into components. Confidently black box testing a
