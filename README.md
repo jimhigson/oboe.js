@@ -575,7 +575,7 @@ Browsers with Full support are:
 * Internet Explorer 10
 * Recent Safaris
 
-Browsers with partial support:
+Browsers that work but don't stream:
 
 * Internet explorer 8 and 9, given [appropriate shims for ECMAScript 5](https://github.com/kriskowal/es5-shim/blob/master/es5-sham.js)
  
@@ -585,7 +585,4 @@ Unfortunately, IE before version 10
 The good news is that in older versions of IE Oboe gracefully degrades,
 it'll just fall back to waiting for the whole response to return, then fire all the events together.
 You don't get streaming but it isn't any worse than if you'd have designed your code to non-streaming AJAX.
-
-I'm able to test in IE thanks to 
-[this rather wonderful script](https://github.com/xdissent/ievms).
 
