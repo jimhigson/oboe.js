@@ -88,23 +88,22 @@ departure is justified by the more testable codebase.
 To enhance testability Oboe has also embraced dependency injection. 
 Components do not instantiate their dependencies
 but rather rely on them being passed in by an inversion of control container
-during the wiring phase.
-The file `wire.js` performs the actual injection. 
-The streamingHttp component which hides browser differences
+during the wiring phase. 
+For example, the network component which hides browser differences
 does not know how to create the underlying
-XHR which it adapts. Undoubtedly, by not instantiating its own
-transport this part presents a less friendly interface: it's data source
+XHR that it adapts. Undoubtedly, by not instantiating its own
+transport this component presents a less friendly interface: it's data source
 is no longer a hidden implementation detail but exposed
-as a part of the component's API; this is
-mitigated somewhat by the interface being purely internal.
-Dependency injection allows much simpler tests because it
+as a part of the it's API at the responsibility of the caller. I feel this is
+mitigated by the interface being purely internal.
+Dependency injection in this case allows the tests to be written more simply because it
 is easy to substitute the real XHR for a stub. Unit tests should test
-exactly one unit. Were the streaming http object to
-create its own transport, that part would also be under test, plus
-whichever external service that it connects to. Because Javascript
-allows redefinition of built in types, the stubbing could potentially also be done
-by overwriting the XHR constructor to return a mock but modifying the built
-in types would open up the possibility that our changes leaking between test
+exactly one unit, were the streaming http object to
+create its own transport, the XHR would also be under test, plus
+whichever external service it connects to. Because Javascript
+allows redefinition of built in types the stubbing could have potentially also be done
+by overwriting the XHR constructor to return a mock. However this is to be avoided
+as it opens up the possibility of changes to the environment leaking between test
 cases.
 
 Running the tests
