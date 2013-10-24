@@ -350,9 +350,6 @@ Instead of giving a url you can pass any [readable stream](http://nodejs.org/api
 To load from a local file you'd do this:
 
 ``` js
-var oboe = require('oboe'),
-    fs = require('fs');
-
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .on('node', {
       'schemes.*': function(scheme){
@@ -365,10 +362,25 @@ oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .on('done', function(){
       console.log("*twiddles mustache*");
    });
-      
 ```
 
-(normally, local files should be fast enough that JSON.parse is just as good)
+Because explicit loops are replaced with declarations the code is usually 
+about the same length as if you'd done JSON.parse:
+
+``` js
+fs.readFile('/home/me/secretPlans.json', function( plansJson ){
+   var plans = JSON.parse(plansJson);
+   
+   plans.schemes.forEach(function( scheme ){
+      console.log('Aha! ' + scheme);   
+   });   
+   plans.plottings.forEach(function(deviousPlot){
+      console.log('Hmmm! ' + deviousPlot);
+   });
+   
+   console.log("*twiddles mustache*");   
+});
+```
 
 ## Error handling
 
