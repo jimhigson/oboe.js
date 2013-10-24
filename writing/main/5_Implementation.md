@@ -4,28 +4,27 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components of Oboe.js illustrating program flow from
-http transport to application callbacks.** UML facet/receptacle notation
-is used to show the flow of events and event names are given in capitals. For
-clarity events are depicted as transferring directly between publisher
-and subscriber but this is actually performed through an intermediary.
-\label{overallDesign}](images/overallDesign.png)
+![**Major components of Oboe.js illustrating program flow from http
+transport to application callbacks.** UML facet/receptacle notation is
+used to show the flow of events and event names are given in capitals.
+For clarity events are depicted as transferring directly between
+publisher and subscriber but this is actually performed through an
+intermediary. \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture describes a fairly linear pipeline visiting
-a small number of tasks between receiving http content and notifying
-application callbacks. The internal componentisation is designed
-primarily so that automated testing can provide a high degree of
-confidence regarding the correct working of the library. A local event
-bus facilitates communication inside the Oboe
-instance and most components interact solely by using this bus;
-receiving events, processing them, and publishing further events in
-response. The use of an event bus is a variation on the Observer
-pattern which removes the need for each unit to locate specific 
-other units before it may listen to their events, giving a highly decoupled
-shape to the library in which each part knows the events it requires but
-not who publishes them. Once everything is wired into the bus no central
-control is required and the larger behaviours emerge as the consequence
-of interaction between finer ones.
+Oboe's architecture describes a fairly linear pipeline visiting a small
+number of tasks between receiving http content and notifying application
+callbacks. The internal componentisation is designed primarily so that
+automated testing can provide a high degree of confidence regarding the
+correct working of the library. A local event bus facilitates
+communication inside the Oboe instance and most components interact
+solely by using this bus; receiving events, processing them, and
+publishing further events in response. The use of an event bus is a
+variation on the Observer pattern which removes the need for each unit
+to locate specific other units before it may listen to their events,
+giving a highly decoupled shape to the library in which each part knows
+the events it requires but not who publishes them. Once everything is
+wired into the bus no central control is required and the larger
+behaviours emerge as the consequence of interaction between finer ones.
 
 Design for automated testing
 ----------------------------
@@ -36,18 +35,18 @@ whole-system level. \label{testpyramid}](images/testPyramid.png)
 
 80% of the code written for this project is test specification. Because
 the correct behaviour of a composition requires the correct behaviour of
-its components, the majority are *unit
-tests*. The general style of a unit test is to plug the item under test
-into a mock event bus and check that when it receives input events the
-expected output events are consequently published.
+its components, the majority are *unit tests*. The general style of a
+unit test is to plug the item under test into a mock event bus and check
+that when it receives input events the expected output events are
+consequently published.
 
 The *Component tests* step back from examining individual components to
-a position where their behaviour as a composition may be
-examined. Because the compositions are quite simple there are fewer
-component tests than unit tests. The component tests do not take account of *how* the composition is drawn
-and predominantly examine the behaviour of the library through its public API.
-One exception is that the streamingXHR component is switched for a stub 
-so that http traffic can be simulated.
+a position where their behaviour as a composition may be examined.
+Because the compositions are quite simple there are fewer component
+tests than unit tests. The component tests do not take account of *how*
+the composition is drawn and predominantly examine the behaviour of the
+library through its public API. One exception is that the streamingXHR
+component is switched for a stub so that http traffic can be simulated.
 
 At the apex of the test pyramid are a small number of *integration
 tests*. These verify Oboe as a black box without any knowledge of, or
@@ -55,16 +54,16 @@ access to, the internals, using the same API as is exposed to
 application programmers. These tests are the most expensive to write but
 a small number are necessary in order to verify that Oboe works
 correctly end-to-end. Without access to the internals http traffic
-cannot be faked so before these tests can be performed a corresponding REST
-service is started. This test service is written using Node and returns
-known content progressively according to predefined timings, somewhat
-emulating a slow internet connection. The integration tests particularly
-verify behaviours where platform differences could cause
+cannot be faked so before these tests can be performed a corresponding
+REST service is started. This test service is written using Node and
+returns known content progressively according to predefined timings,
+somewhat emulating a slow internet connection. The integration tests
+particularly verify behaviours where platform differences could cause
 inconsistencies. For example, the test url `/tenSlowNumbers` writes out
 the first ten natural numbers as a JSON array at a rate of two per
-second. The test registers a JSONPath selector that matches the numbers against a
-callback that aborts the http request on seeing the fifth. The correct
-behaviour is to get no sixth callback, even when running on a
+second. The test registers a JSONPath selector that matches the numbers
+against a callback that aborts the http request on seeing the fifth. The
+correct behaviour is to get no sixth callback, even when running on a
 platform lacking support for XHR2 and all ten will have already been
 downloaded.
 
@@ -72,38 +71,37 @@ Confidently black-box testing a stateful unit is difficult. Because of
 side-effects and hidden state we do not know if the same call will later
 give a different behaviour. Building up the parse result from SAX events
 is a fairly complex process which cannot be implemented efficiently as
-stateless Javascript. To promote testability the state is delegated to a simple
-state-storing unit. The intricate logic may then be expressed as a separately tested set of 
-side-effect free functions which transition between one state and
-the next. Although proof of correctness is impossible,
-for whichever results the functions give while under test, uninfluenced by
-state I can be confident that they will always yield the same response given
-the same future events. The separate unit maintaining the state has
-exactly one responsibility, to hold the parse result between function calls,
-and is trivial to test. This approach
+stateless Javascript. To promote testability the state is delegated to a
+simple state-storing unit. The intricate logic may then be expressed as
+a separately tested set of side-effect free functions which transition
+between one state and the next. Although proof of correctness is
+impossible, for whichever results the functions give while under test,
+uninfluenced by state I can be confident that they will always yield the
+same response given the same future events. The separate unit
+maintaining the state has exactly one responsibility, to hold the parse
+result between function calls, and is trivial to test. This approach
 slightly breaks with the object oriented principle of encapsulation by
 hiding state behind the logic which acts on it but I feel that the
 departure is justified by the more testable codebase.
 
-To enhance testability Oboe has also embraced dependency injection. 
-Components do not instantiate their dependencies
-but rather rely on them being passed in by an inversion of control container
-during the wiring phase. 
-For example, the network component which hides browser differences
-does not know how to create the underlying
-XHR that it adapts. Undoubtedly, by not instantiating its own
-transport this component presents a less friendly interface: it's data source
-is no longer a hidden implementation detail but exposed
-as a part of the it's API at the responsibility of the caller. I feel this is
-mitigated by the interface being purely internal.
-Dependency injection in this case allows the tests to be written more simply because it
-is easy to substitute the real XHR for a stub. Unit tests should test
-exactly one unit, were the streaming http object to
-create its own transport, the XHR would also be under test, plus
-whichever external service it connects to. Because Javascript
-allows redefinition of built in types the stubbing could have potentially also be done
-by overwriting the XHR constructor to return a mock. However this is to be avoided
-as it opens up the possibility of changes to the environment leaking between test
+To enhance testability Oboe has also embraced dependency injection.
+Components do not instantiate their dependencies but rather rely on them
+being passed in by an inversion of control container during the wiring
+phase. For example, the network component which hides browser
+differences does not know how to create the underlying XHR that it
+adapts. Undoubtedly, by not instantiating its own transport this
+component presents a less friendly interface: it's data source is no
+longer a hidden implementation detail but exposed as a part of the it's
+API at the responsibility of the caller. I feel this is mitigated by the
+interface being purely internal. Dependency injection in this case
+allows the tests to be written more simply because it is easy to
+substitute the real XHR for a stub. Unit tests should test exactly one
+unit, were the streaming http object to create its own transport, the
+XHR would also be under test, plus whichever external service it
+connects to. Because Javascript allows redefinition of built in types
+the stubbing could have potentially also be done by overwriting the XHR
+constructor to return a mock. However this is to be avoided as it opens
+up the possibility of changes to the environment leaking between test
 cases.
 
 Running the tests
@@ -131,9 +129,9 @@ transform-in-place "start with the working material in place and you
 step by step transform it into its final form" whereas software is
 created through intermediate proxies, and attempts to close this gap by
 merging programming with the results of programming [@humanize pp. 8-9].
-I feel that when we bring together the medium and the message the cost of 
-small experimentation is very low and programming becomes more explorative 
-and expressive.
+I feel that when we bring together the medium and the message the cost
+of small experimentation is very low and programming becomes more
+explorative and expressive.
 
 The integration tests are not run on save because they intentionally
 simulate slow transfers and take some time to run. The integration tests
