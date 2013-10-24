@@ -412,7 +412,8 @@ oboe('people.json')
 
 # Installing
 
-For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js) or use [bower](http://bower.io/) like:
+For the client-side, grab either [oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js)
+or [oboe-browser.min.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.min.js), or use [bower](http://bower.io/) like:
 
 ```
 bower install oboe
