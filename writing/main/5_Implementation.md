@@ -131,9 +131,9 @@ transform-in-place "start with the working material in place and you
 step by step transform it into its final form" whereas software is
 created through intermediate proxies, and attempts to close this gap by
 merging programming with the results of programming [@humanize pp. 8-9].
-When we bring together the medium and the message the cost of small
-experimentation is very low and I feel that programming becomes more
-explorative and expressive.
+I feel that when we bring together the medium and the message the cost of 
+small experimentation is very low and programming becomes more explorative 
+and expressive.
 
 The integration tests are not run on save because they intentionally
 simulate slow transfers and take some time to run. The integration tests
