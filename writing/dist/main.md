@@ -1650,107 +1650,105 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js illustrating program flow from
-http transport to registered callbacks.** UML facet/receptacle notation
-is used to show the flow of events with event names in capitals. For
-clarity events are depicted as transitioning directly between publisher
-and subscriber rather than through an intermediary.
-\label{overallDesign}](images/overallDesign.png)
+![**Major components of Oboe.js illustrating program flow from http
+transport to application callbacks.** UML facet/receptacle notation is
+used to show the flow of events and event names are given in capitals.
+For clarity events are depicted as transferring directly between
+publisher and subscriber but this is actually performed through an
+intermediary. \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture follows a fairly linear pipeline with flow visiting
-various tasks between receiving http progress events and notifying
-application callbacks. The internal componentisation is designed
-primarily so that automated testing can provide a high degree of
-confidence regarding the correct working of the library. A local event
-bus facilitates communication between components inside the Oboe
-instance and most components interact solely through this bus by
-receiving events, processing them and publishing further events in
-response. This use of an event bus is a variation on the Observer
-pattern which removes the need for each unit to obtain a reference to
-the previous one so that it may observe it, giving a highly decoupled
-shape to the library. Once everything is wired into the bus no central
-control is required and the larger behaviours emerge as the consequence
-of interaction between finer ones.
+Oboe's architecture describes a fairly linear pipeline visiting a small
+number of tasks between receiving http content and notifying application
+callbacks. The internal componentisation is designed primarily so that
+automated testing can provide a high degree of confidence regarding the
+correct working of the library. A local event bus facilitates
+communication inside the Oboe instance and most components interact
+solely by using this bus; receiving events, processing them, and
+publishing further events in response. The use of an event bus is a
+variation on the Observer pattern which removes the need for each unit
+to locate specific other units before it may listen to their events,
+giving a highly decoupled shape to the library in which each part knows
+the events it requires but not who publishes them. Once everything is
+wired into the bus no central control is required and the larger
+behaviours emerge as the consequence of interaction between finer ones.
 
 Design for automated testing
 ----------------------------
 
 ![**The test pyramid**. Much testing is done on the low-level components
-of the system, less on the component level, and less still on a
+of the system, less on their composed behaviours, and less still on a
 whole-system level. \label{testpyramid}](images/testPyramid.png)
 
-80% of the code written for this project is test specifications. Because
+80% of the code written for this project is test specification. Because
 the correct behaviour of a composition requires the correct behaviour of
-its components units, the majority of the specifications are *unit
-tests*. The general style of a unit test is to plug the item under test
-into a mock event bus and check that when it receives input events, the
-expected output events are consequently published.
+its components, the majority are *unit tests*. The general style of a
+unit test is to plug the item under test into a mock event bus and check
+that when it receives input events the expected output events are
+consequently published.
 
 The *Component tests* step back from examining individual components to
-a position where their emergent behaviour in composition can be
-examined. Because the composition is quite simple there are much fewer
-component tests than unit tests. By examining the behaviour of the
-library through the public API the component tests do not take account
-of how the composition is drawn. The exception is that the is faked
-which requires the streamingXhr component to be switched for a stub.
+a position where their behaviour as a composition may be examined.
+Because the compositions are quite simple there are fewer component
+tests than unit tests. The component tests do not take account of *how*
+the composition is drawn and predominantly examine the behaviour of the
+library through its public API. One exception is that the streamingXHR
+component is switched for a stub so that http traffic can be simulated.
 
 At the apex of the test pyramid are a small number of *integration
 tests*. These verify Oboe as a black box without any knowledge of, or
-access to the internals, using only the APIs which are exposed to
+access to, the internals, using the same API as is exposed to
 application programmers. These tests are the most expensive to write but
 a small number are necessary in order to verify that Oboe works
-correctly end-to-end. Without access to the internals http traffic XHRs
-cannot be stubbed so before these specs can be checked a test REST
-service is created. This test service is written using Node and returns
-known content progressively according to known timings, somewhat
-emulating a slow internet connection. The integration tests particularly
-verify behaviours where platform differences could cause
+correctly end-to-end. Without access to the internals http traffic
+cannot be faked so before these tests can be performed a corresponding
+REST service is started. This test service is written using Node and
+returns known content progressively according to predefined timings,
+somewhat emulating a slow internet connection. The integration tests
+particularly verify behaviours where platform differences could cause
 inconsistencies. For example, the test url `/tenSlowNumbers` writes out
 the first ten natural numbers as a JSON array at a rate of two per
-second. Oboe registers a JSONPath selector for the numbers against a
-callback that aborts the http request on seeing `5`. The correct
-behaviour is to get no callback for the sixth, even when running on
-platforms lacking support for XHR2 where all ten will have already been
+second. The test registers a JSONPath selector that matches the numbers
+against a callback that aborts the http request on seeing the fifth. The
+correct behaviour is to get no sixth callback, even when running on a
+platform lacking support for XHR2 and all ten will have already been
 downloaded.
 
-Confidently black box testing a stateful unit is difficult. Because of
+Confidently black-box testing a stateful unit is difficult. Because of
 side-effects and hidden state we do not know if the same call will later
 give a different behaviour. Building up the parse result from SAX events
-is a fairly complex process which cannot be done efficiently in
-Javascript without storing some state. The state is stored in a simple
-state-storing unit. The intricate logic may then be separately expressed
-as functions without side effects which transition between one state and
-the next and this part separately tested without having to double-guess
-the internals of the unit. Although proof of correctness is undecidable,
-whichever results the functions give while under test, uninfluenced by
-state I can be confident that they will continue to give in response to
-future similar events. The separate unit holding the parse result has
-exactly one responsibility and is trivial to test. This approach
+is a fairly complex process which cannot be implemented efficiently as
+stateless Javascript. To promote testability the state is delegated to a
+simple state-storing unit. The intricate logic may then be expressed as
+a separately tested set of side-effect free functions which transition
+between one state and the next. Although proof of correctness is
+impossible, for whichever results the functions give while under test,
+uninfluenced by state I can be confident that they will always yield the
+same response given the same future events. The separate unit
+maintaining the state has exactly one responsibility, to hold the parse
+result between function calls, and is trivial to test. This approach
 slightly breaks with the object oriented principle of encapsulation by
-not hiding state behind the logic which acts on it but I feel the
-departure is justified by a more testable codebase.
+hiding state behind the logic which acts on it but I feel that the
+departure is justified by the more testable codebase.
 
-To enhance testability Oboe has also embraced dependency injection. This
-means that components do not create the further components that they
-require but rather rely on them being provided by an external wiring.
-The file `wire.js` performs the actual injection. One such example is
-the streamingHttp component which hides various incompatible http
-implementations by publishing their downloaded content progressively via
-the event bus. This unit does not know how to create the underlying
-browser XHR which it hides. Undoubtedly, by not instantiating its own
-dependencies a it presents a less friendly interface, although this is
-mitigated somewhat by the interface being purely internal, the objects
-it depends on are no longer a hidden implementation detail but exposed
-as a part of the component's API. The advantage of dependency injection
-here is that unit testing is much simpler. Unit tests should test
-exactly one behaviour of one unit. Were the streaming http object to
-create its own transport, that part would also be under test, plus
-whichever external service that it connects to. Because Javascript
-allows redefinition of built in types, this could be avoided by
-overwriting the XHR constructor to return a mock but modifying the built
-in types for tests opens up the possibilities of changes leaking between
-cases. Dependency injection allows a much simpler test style because it
-is trivial to inject a stub in place of the XHR.
+To enhance testability Oboe has also embraced dependency injection.
+Components do not instantiate their dependencies but rather rely on them
+being passed in by an inversion of control container during the wiring
+phase. For example, the network component which hides browser
+differences does not know how to create the underlying XHR that it
+adapts. Undoubtedly, by not instantiating its own transport this
+component presents a less friendly interface: it's data source is no
+longer a hidden implementation detail but exposed as a part of the it's
+API at the responsibility of the caller. I feel this is mitigated by the
+interface being purely internal. Dependency injection in this case
+allows the tests to be written more simply because it is easy to
+substitute the real XHR for a stub. Unit tests should test exactly one
+unit, were the streaming http object to create its own transport, the
+XHR would also be under test, plus whichever external service it
+connects to. Because Javascript allows redefinition of built in types
+the stubbing could have potentially also be done by overwriting the XHR
+constructor to return a mock. However this is to be avoided as it opens
+up the possibility of changes to the environment leaking between test
+cases.
 
 Running the tests
 -----------------
@@ -1758,60 +1756,53 @@ Running the tests
 ![**Relationship between various files and test libraries** *other half
 of sketch from notebook*](images/placeholder.png)
 
-The Grunt task runner was used to automate routine tasks such as
-executing the tests and building. Unit and component tests run
-automatically whenever a source file changes. As well as being correct
-execution, the project is required to not surpass a certain size so the
-built size is also checked. As a small, tightly focused project the
-majority of programming is refactoring already working code. Running
+The Grunt task runner is used to automate routine tasks such as
+executing the tests and building, configured so that the unit and
+component tests run automatically whenever a change is made to a source
+file or specification. As well as executing correctly, the project is
+required not to surpass a certain size so this also checked on every
+save. Because Oboe is a small, tightly focused project the majority of
+the programming time is spent refactoring already working code. Running
 tests on save provides quick feedback so that mistakes are found as soon
-as they are made. Agile practitioners emphasise the importance of tests
-that execute quickly [@cleancode P314, T9], the 220 unit and component
-tests run in less than a second so discovering mistakes is near instant.
-If the "content of any medium is always another medium” [@media p8], we
-might say that the content of programming is the program that is
-realised by its execution. A person working in arts and crafts sees the
-thing as they work but a programmer will usually not see the execution
-simultaneously as they program. Conway observed that an artisan works by
-transform-in-place "start with the working material in place and you
-step by step transform it into its final form" whereas software is
-created through intermediate proxies, and attempts to close this gap by
-merging programming with the results of programming [@humanize side8-9].
-When we bring together the medium and the message the cost of small
-experimentation is very low and I feel that programming becomes more
+as they are made, before my mind has moved on to the next context. Agile
+practitioners emphasise the importance of tests that execute quickly
+[@cleancode p.314:T9] -- Oboe's 220 unit and component tests run in less
+than a second so discovering programming mistakes is almost instant. If
+the "content of any medium is always another medium” [@media p.8], we
+might say that the content of programming is the effect that is realised
+by its execution. A person working in a physical medium sees the thing
+they are making but the programmer does usually not see their program's
+execution simultaneously as they create. Conway notes that an artisan
+works by transform-in-place "start with the working material in place
+and you step by step transform it into its final form" whereas software
+is created through intermediate proxies, and attempts to close this gap
+by merging programming with the results of programming [@humanize
+pp.8-9]. I feel that if we bring together the medium and the message by
+viewing the effect of code while we write it, we can build as a series
+of small, iterative, correct steps and programming can be more
 explorative and expressive.
 
-The integration tests are not run on save because they intentionally
-simulate slow transfers and take some time to run. The integration tests
-are used as a final check against built code before a branch in git can
-be merged into the master. Once the code has been packaged for
-distribution the internals are no longer visible the integration tests
-which are coded against the public API are the only runnable tests.
-While these tests don't individually test every component, they are
-designed to exercise the whole codebase so that a mistake in any
-component will be visible through them. Grunt executes the build,
-including starting up the test REST services that give the integration
-tests something to fetch.
+Integration tests are not run on save, they intentionally simulate a
+slow network so they take some time to run. I'd already have started the
+next work by the time they complete. Oboe is version controlled using
+git and hosted on github. The integration tests are used as the final
+check before a branch in git is merged into the master.
 
-Packaging as a single, distributable file
------------------------------------------
+Packaging to a single distributable file
+----------------------------------------
 
-![**Packaging of many javascript files into multiple single-file
-packages.** The packages are individually targeted at different
-execution contexts, either browsers or node *get from notebook, split
-sketch diagram in half*](images/placeholder.png)
-
-As an interpreted language, Javascript may of course be ran directly
-without any prior compilation. While running the same code as I see in
-the editor is convenient while programming, it is much less so for
-distribution. Although the languages imposes no compulsory build phase,
-in practice one is necessary. Dependency managers have not yet become
-standard for client-side web development (although Bower is looking
-good) so most files are manually downloaded. For a developer wishing to
+As an interpreted language Javascript may be run
+without any prior compilation. Directly running the same files as are open in
+the editor is convenient while programming but, unless a project is written 
+as a single file, in practice some build phase is required to create an 
+easily distributable form.
+Dependency managers have not yet become
+standard for client-side web development so dependant libraries are
+usually manually downloaded. For a developer wishing to
 include my library in their own project a single file is much more
-convenient. Should they not have a build process of their own, a single
-file is also much faster to transfer to their users, mostly because of
-the cost of establishing connections and the http overhead.
+convenient. If they are not using a similar build process on their site,
+a single file is also faster to transfer to their users, mostly because
+the http overhead can be substantial and is of constant size per resource.
 
 Javascript files are interpreted in series by the browser so load-time
 dependencies must precede dependants. Unsurprisingly, separate files
@@ -1842,14 +1833,16 @@ response to events. By resisting the static analysis the units will not
 be downloaded until they are needed.
 
 AMD is mostly of interest to web applications with a central hub but
-also some rarely used parts. Oboe does not fit this profile: everybody
+also some rarely used parts. For example, most visits to online banking
+will not need to create standing orders so it is better if this part is
+loaded on-demand than eagerly. Oboe does not fit this profile: everybody
 who uses it will use all of the library. Regardless, I hoped to use
 `optimise` to generate my combined Javascript file. Even after
 optimisation, Require's design necessitates that calls to `require` stay
-in the code and that the require.js run-time component is available to
-handle these calls. For a micro-library a ???k overhead was too large to
-accommodate. Overall, Require seems more suited to developing
-stand-alone applications than programming libraries.
+in the code and that the Require run-time component is available to
+handle them. Require's 5k would also have more than doubled
+Oboe's size. Overall, Require seems more suited to programmers creating
+stand-alone applications than library authors.
 
 Having abandoned Require, I decided to pick up the simplest tool which
 could possibly work. With only 15 source files and a fairly sparse
@@ -1865,9 +1858,10 @@ For future consideration there is Browserify. This library reverses the
 'browser first' image of Javascript by converting applications targeted
 at Node into a single file efficiently packaged for delivery to a web
 browser, conceptually making Node the primary environment for Javascript
-and adapting browser execution to match. Significantly, require leaves
-no trace of itself in the concatenated Javascript other than Adaptors
-presenting browser APIs as the Node equivalents. Browserify's http
+and adapting browser execution to match. Significantly,
+other than Adaptors
+presenting browser APIs as if they were the Node equivalents, 
+Browserify leaves no trace of itself in the final Javascript. Browserify's http
 adaptor[^5_Implementation1] is complete but more verbose compared to Oboe's version[^5_Implementation2].
 
 As well as combining into a single file, Javascript source can made
