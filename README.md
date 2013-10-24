@@ -362,7 +362,7 @@ oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .on('done', function(){
       console.log("*twiddles mustache*");
    })
-   .fail(function(){
+   .on('fail', function(){
       console.log("Drat! Foiled again!");   
    });
 ```
