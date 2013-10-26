@@ -16,12 +16,8 @@ function startServer( port, grunt ) {
    var verboseLog = grunt? grunt.verbose.ok : console.log,
        errorLog = grunt? grunt.log.error : console.error;
 
-   function echoBackBody(req, res) {
-   
-      // no need to wait for readable or end events on req because
-      // node-simple-router has already waited in the middleware
-      verboseLog('will just echo the same back\n');   
-      res.end(JSON.stringify(req.body));
+   function echoBackBody(req, res) {         
+      req.pipe(res);  
    }
    
    function echoBackHeaders(req, res) {
@@ -62,6 +58,10 @@ function startServer( port, grunt ) {
       }, NUMBER_INTERVAL);
    }
    
+   function replyWithInvalidJson(req, res) {
+      res.end('{{');      
+   }
+   
    function replyWithStaticJson(req, res) {
       sendJsonHeaders(res);
       
@@ -73,17 +73,12 @@ function startServer( port, grunt ) {
       
       verboseLog('will respond with contents of file ' + filename);
       
-      require('fs').readFile(filename, 'utf8', function (err,data) {
-         if (err) {
-            errorLog('could not read static file ' + filename + 
-             ' ' + err);
-            return;
-         }
+      require('fs').createReadStream(filename)
+         .on('error', function(err){
+             errorLog('could not read static file ' + filename + 
+                      ' ' + err);
+         }).pipe(res);
          
-         res.end(data);
-         
-         verboseLog('read file ' + filename.blue);
-      });   
    }
    
    function sendJsonHeaders(res) {
@@ -154,28 +149,27 @@ function startServer( port, grunt ) {
        });
    }   
    
-   function routing() {
-      var Router = require('node-simple-router'),
-          router = Router();
+   function makeApp() {
+      var express = require('express'),
+          app = express();
 
-      router.get(    '/echoBackBody',              function(req, res){ res.end("POST here, don't GET")});
-      router.post(   '/echoBackBody',              echoBackBody);
-      router.put(    '/echoBackBody',              echoBackBody);
-      router.patch(  '/echoBackBody',              echoBackBody);
-      router.get(    '/echoBackHeaders',           echoBackHeaders);
-      router.get(    '/static/json/:name.json',    replyWithStaticJson);
-      router.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
-      router.get(    '/twoHundredItems',           twoHundredItems);
-      router.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
+      app.get(    '/echoBackBody',              function(req, res){ res.end("POST here, don't GET")});
+      app.post(   '/echoBackBody',              echoBackBody);
+      app.put(    '/echoBackBody',              echoBackBody);
+      app.patch(  '/echoBackBody',              echoBackBody);
+      app.get(    '/echoBackHeaders',           echoBackHeaders);
+      app.get(    '/static/json/:name.json',    replyWithStaticJson);
+      app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
+      app.get(    '/twoHundredItems',           twoHundredItems);
+      app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
+      app.get(    '/invalidJson',               replyWithInvalidJson);
 
-      return router;
+      return app;
    }
          
-   var server = require('http').createServer(routing()).listen(port);
+   makeApp().listen(port);
    
    verboseLog('streaming source server started on port'.green, String(port).blue);
-
-   return server;        
 }
 
 
