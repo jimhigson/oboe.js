@@ -58,6 +58,10 @@ function startServer( port, grunt ) {
       }, NUMBER_INTERVAL);
    }
    
+   function replyWithInvalidJson(req, res) {
+      res.end('{{');      
+   }
+   
    function replyWithStaticJson(req, res) {
       sendJsonHeaders(res);
       
@@ -69,17 +73,12 @@ function startServer( port, grunt ) {
       
       verboseLog('will respond with contents of file ' + filename);
       
-      require('fs').readFile(filename, 'utf8', function (err,data) {
-         if (err) {
-            errorLog('could not read static file ' + filename + 
-             ' ' + err);
-            return;
-         }
+      require('fs').createReadStream(filename)
+         .on('error', function(err){
+             errorLog('could not read static file ' + filename + 
+                      ' ' + err);
+         }).pipe(res);
          
-         res.end(data);
-         
-         verboseLog('read file ' + filename.blue);
-      });   
    }
    
    function sendJsonHeaders(res) {
@@ -163,6 +162,7 @@ function startServer( port, grunt ) {
       app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
       app.get(    '/twoHundredItems',           twoHundredItems);
       app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
+      app.get(    '/invalidJson',               replyWithInvalidJson);
 
       return app;
    }
