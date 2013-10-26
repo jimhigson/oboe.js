@@ -1,7 +1,7 @@
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
- * to the low-level events from Clarinet and fires higher-level ones.
+ * to the low-level events from Clarinet and emits higher-level ones.
  *  
  * The building up is stateless so to track a JSON file
  * clarinetListenerAdaptor.js is required to store the ascent state
@@ -30,10 +30,10 @@ var ROOT_PATH = {};
 
 
 /**
- * Create a new set of handlers for clarinet's events, bound to the fire 
+ * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( fire) {
+function incrementalContentBuilder( emit ) {
 
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
@@ -62,7 +62,7 @@ function incrementalContentBuilder( fire) {
       
       if( !ascent ) {
          // we discovered the root node,
-         fire( ROOT_FOUND, newDeepestNode);
+         emit( ROOT_FOUND, newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -131,7 +131,7 @@ function incrementalContentBuilder( fire) {
                                  ascent
                               );
      
-      fire( PATH_FOUND, ascentWithNewPath);
+      emit( PATH_FOUND, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -142,7 +142,7 @@ function incrementalContentBuilder( fire) {
     */
    function curNodeFinished( ascent ) {
 
-      fire( NODE_FOUND, ascent);
+      emit( NODE_FOUND, ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);

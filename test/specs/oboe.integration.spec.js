@@ -319,7 +319,7 @@ describe("oboe integration (real http)", function() {
       
    });   
 
-   it('fires error on 404', function () {
+   it('emits error on 404', function () {
 
       var gotError = false
 
@@ -334,7 +334,7 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })
    
-   it('fires error on 404 in nodejs style too', function () {
+   it('emits error on 404 in nodejs style too', function () {
 
       var gotError = false
 
@@ -348,7 +348,7 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })   
    
-   it('fires error on unreachable url', function () {
+   it('emits error on unreachable url', function () {
 
       var gotError = false
 

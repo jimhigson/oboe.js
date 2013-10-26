@@ -18,7 +18,7 @@ describe('pub sub', function(){
 
       events.on('somethingHappening', listener);
       
-      events.fire('somethingHappening');
+      events.emit('somethingHappening');
       
       expect(listener).toHaveBeenCalled();
    });
@@ -30,7 +30,7 @@ describe('pub sub', function(){
        
       events.on('somethingHappening', listener);
       
-      events.fire('somethingHappening', 'a', 'b', 'c');
+      events.emit('somethingHappening', 'a', 'b', 'c');
       
       expect(listener).toHaveBeenCalledWith('a');
    });   
@@ -44,7 +44,7 @@ describe('pub sub', function(){
       events.on('eventA', listenerA);
       events.on('eventA', listenerA2);
       
-      events.fire('eventA');
+      events.emit('eventA');
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerA2).toHaveBeenCalled();           
@@ -80,10 +80,10 @@ describe('pub sub', function(){
       events.on('popularEventB', listenerB);
       events.on('popularEventB', listenerB);
                        
-      events.fire('popularEventB');
-      events.fire('popularEventA');
-      events.fire('popularEventB');
-      events.fire('popularEventA');
+      events.emit('popularEventB');
+      events.emit('popularEventA');
+      events.emit('popularEventB');
+      events.emit('popularEventA');
       
       expect(listenerA.calls.length).toBe(18);
       expect(listenerB.calls.length).toBe(18);           
@@ -97,7 +97,7 @@ describe('pub sub', function(){
       
       events.on('eventA', listenerA)
             .on('eventA', listenerB)
-            .fire('eventA');
+            .emit('eventA');
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerB).toHaveBeenCalled();           
@@ -113,12 +113,12 @@ describe('pub sub', function(){
       events.on('eventA', listenerA);
       events.on('eventB', listenerB);
       
-      events.fire('eventA');
+      events.emit('eventA');
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerB).not.toHaveBeenCalled();
       
-      events.fire('eventB');
+      events.emit('eventB');
       
       expect(listenerB).toHaveBeenCalled();      
    });
@@ -134,14 +134,14 @@ describe('pub sub', function(){
       events.on('eventA', listenerA2);
       events.on('eventB', listenerB);
       
-      events.fire('eventA');
-      events.fire('eventB');
+      events.emit('eventA');
+      events.emit('eventB');
       
       expect(listenerA.calls.length).toBe(1);      
       
       events.un('eventA', listenerA);      
 
-      events.fire('eventA');
+      events.emit('eventA');
 
       expect(listenerA.calls.length).toBe(1);
       expect(listenerA2.calls.length).toBe(2);      
@@ -157,23 +157,23 @@ describe('pub sub', function(){
       events.on(1, listenerA);
       events.on(2, listenerB);
       
-      events.fire(1);
+      events.emit(1);
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerB).not.toHaveBeenCalled();
       
-      events.fire(2);
+      events.emit(2);
       
       expect(listenerB).toHaveBeenCalled();      
    });   
    
-   it('does not crash if asked to fire an event that has no listeners', function(){
+   it('does not crash if asked to emit an event that has no listeners', function(){
    
       var events = pubSub();
       
       expect(function(){
       
-         events.fire('unknown event');
+         events.emit('unknown event');
       
       }).not.toThrow();
    

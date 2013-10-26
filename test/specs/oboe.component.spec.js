@@ -89,7 +89,7 @@ describe("oboe component (sXHR stubbed)", function(){
          .thenTheInstance( wasCalledbackWithContext(myObject) );
    })
 
-   it('find only fires when has whole object',  function() {
+   it('find only emits when has whole object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -105,7 +105,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
    })
 
-   it('fires path to listener when root object starts',  function() {
+   it('emits path to listener when root object starts',  function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -120,7 +120,7 @@ describe("oboe component (sXHR stubbed)", function(){
           );
    })
    
-   it('fires path to listener when root array starts',  function() {
+   it('emits path to listener when root array starts',  function() {
 
       // clarinet doesn't notify of matches to objects (onopenobject) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -129,7 +129,7 @@ describe("oboe component (sXHR stubbed)", function(){
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!')
          .whenGivenInput('[1') // the minimum string required for clarinet 
-                               // to fire onopenarray. Won't fire with '['.
+                               // to emit onopenarray. Won't emit with '['.
           .thenTheInstance(
             foundNMatches(1),
             matched([]).atRootOfJson()
@@ -137,7 +137,7 @@ describe("oboe component (sXHR stubbed)", function(){
    })
    
      
-   it('fires empty object node detected with single star',  function() {
+   it('emits empty object node detected with single star',  function() {
       // *
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
@@ -367,7 +367,7 @@ describe("oboe component (sXHR stubbed)", function(){
       givenAnOboeInstance()
          .whenGivenInput('[')
          .thenTheInstance(
-            // I would like this to be [] but clarinet doesn't fire array found until it has seen
+            // I would like this to be [] but clarinet doesn't emit array found until it has seen
             // the first element
             hasRootJson(undefined)
          )

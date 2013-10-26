@@ -10,7 +10,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} emit a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
@@ -21,7 +21,7 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, xhr, method, url, data, headers) {
+function streamingHttp(emit, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
@@ -65,7 +65,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         fire( NEW_CONTENT, newText );
+         emit( NEW_CONTENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -84,7 +84,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          var sucessful = String(xhr.status)[0] == 2;
          
          if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is fired when a response
+            // In Chrome 29 (not 28) no onprogress is emitted when a response
             // is complete before the onload. We need to always do handleInput
             // in case we get the load but have not had a final progress event.
             // This looks like a bug and may change in future but let's take
@@ -92,10 +92,10 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             // progress event for each part of the response
             handleProgress();
             
-            fire( END_OF_CONTENT );
+            emit( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT, xhr.status );
+            emit( ERROR_EVENT, xhr.status );
          }
       }
    };
@@ -111,12 +111,12 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       xhr.send(validatedRequestBody(data));
       
    } catch( e ) {
-      // To keep a consistent interface with Node, we can't fire an event here.
+      // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
-      // event rather than as an exception. If we fired now, the Oboe user
+      // event rather than as an exception. If we emitted now, the Oboe user
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+      window.setTimeout(partialComplete(emit, ERROR_EVENT, e), 0);
    }            
 }

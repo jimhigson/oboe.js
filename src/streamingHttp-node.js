@@ -10,7 +10,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} emit a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
@@ -22,19 +22,19 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, http, method, contentSource, data, headers) {
+function streamingHttp(emit, on, http, method, contentSource, data, headers) {
 
    function readFromStream(readableStream) {
          
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
                                              
-         fire( NEW_CONTENT, chunk.toString() );
+         emit( NEW_CONTENT, chunk.toString() );
       });
       
       readableStream.on('end', function() {
                
-         fire( END_OF_CONTENT );
+         emit( END_OF_CONTENT );
       });
    }
    
@@ -63,12 +63,12 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
             
          } else {
          
-            fire( ERROR_EVENT, statusCode );
+            emit( ERROR_EVENT, statusCode );
          }      
       });
       
       req.on('error', function(e) {
-         fire( ERROR_EVENT, e );
+         emit( ERROR_EVENT, e );
       });
       
       on( ABORTING, function(){              
