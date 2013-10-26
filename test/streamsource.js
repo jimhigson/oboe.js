@@ -62,6 +62,16 @@ function startServer( port, grunt ) {
       res.end('{{');      
    }
    
+   function serve404Json(req, res) {
+      // our little REST endpoint with errors:
+      res.status(404).send(JSON.stringify(      
+          {    
+               "found":"false",
+               "errorMessage":"was not found"
+          }      
+      ));   
+   }
+   
    function replyWithStaticJson(req, res) {
       sendJsonHeaders(res);
       
@@ -163,6 +173,7 @@ function startServer( port, grunt ) {
       app.get(    '/twoHundredItems',           twoHundredItems);
       app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
       app.get(    '/invalidJson',               replyWithInvalidJson);
+      app.get(    '/404json',                   serve404Json);
 
       return app;
    }
