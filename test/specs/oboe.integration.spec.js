@@ -256,7 +256,7 @@ describe("oboe integration (real http)", function() {
       }, 'all headers to have been detected back here', ASYNC_TEST_TIMEOUT)
    })
 
-   it('can listen for nodes via nodejs-style syntax', function () {
+   it('can listen for nodes nodejs style', function () {
 
       var countGotBack = 0;
 
@@ -270,7 +270,7 @@ describe("oboe integration (real http)", function() {
       }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
    })
 
-   it('can listen for paths via noedjs-style syntax', function () {
+   it('can listen for paths nodejs style', function () {
 
       var countGotBack = 0;
 
@@ -284,6 +284,15 @@ describe("oboe integration (real http)", function() {
          return countGotBack == 10
       }, 'ten callbacks', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('can listen for done nodejs style', function () {
+
+      oboe(url('static/json/firstTenNaturalNumbers.json'))
+      
+         .on('done', whenDoneFn);
+
+      waitsFor(doneCalled, 'the request to finish', ASYNC_TEST_TIMEOUT)
+   })   
    
    it('gets all callbacks and they are in correct order', function () {
       var order = [];
@@ -329,6 +338,20 @@ describe("oboe integration (real http)", function() {
             )
       });
    })
+   
+   it('fires error on 404 in nodejs style too', function () {
+
+      var gotError = false
+
+      oboe(url('doesNotExist'))
+         .on('fail', function () {
+            gotError = true
+         });
+
+      waitsFor(function () {
+         return gotError;
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+   })   
    
    it('fires error on unreachable url', function () {
 

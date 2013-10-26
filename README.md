@@ -350,23 +350,44 @@ Instead of giving a url you can pass any [readable stream](http://nodejs.org/api
 To load from a local file you'd do this:
 
 ``` js
-var oboe = require('oboe'),
-    fs = require('fs');
-
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
-   .node('!.schemes.*', function(scheme){
-      console.log('Aha! ' + scheme);
-   });
-   .node('!.plottings.*', function(deviousPlot){
-      console.log('Hmmm! ' + deviousPlot);   
+   .on('node', {
+      'schemes.*': function(scheme){
+         console.log('Aha! ' + scheme);
+      },
+      'plottings.*': function(deviousPlot){
+         console.log('Hmmm! ' + deviousPlot);
+      }   
    })
-   .done(function(){
+   .on('done', function(){
       console.log("*twiddles mustache*");
-   });   
-      
+   })
+   .on('fail', function(){
+      console.log("Drat! Foiled again!");   
+   });
 ```
 
-(normally, local files should be fast enough that JSON.parse is just as good)
+Because explicit loops are replaced with declarations the code is usually 
+about the same length as if you'd done JSON.parse:
+
+``` js
+fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){     
+   if( err ) {
+      console.log("Drat! Foiled again!");
+      return;
+   }
+   var plans = JSON.parse(err, plansJson);
+   
+   plans.schemes.forEach(function( scheme ){
+      console.log('Aha! ' + scheme);   
+   });   
+   plans.plottings.forEach(function(deviousPlot){
+      console.log('Hmmm! ' + deviousPlot);
+   });
+      
+   console.log("*twiddles mustache*");   
+});
+```
 
 ## Error handling
 
@@ -412,7 +433,8 @@ oboe('people.json')
 
 # Installing
 
-For the client-side, either grab [dist/oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js) or use [bower](http://bower.io/) like:
+For the client-side grab either [oboe-browser.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.js)
+or [oboe-browser.min.js](https://raw.github.com/jimhigson/oboe.js/master/dist/oboe-browser.min.js), or use [bower](http://bower.io/) like:
 
 ```
 bower install oboe
@@ -430,7 +452,7 @@ npm install oboe
 
 Then load as usual:
 
-```
+``` javascript
 var oboe = require('oboe');
 ```
 
@@ -574,7 +596,7 @@ Browsers with Full support are:
 * Internet Explorer 10
 * Recent Safaris
 
-Browsers with partial support:
+Browsers that work but don't stream:
 
 * Internet explorer 8 and 9, given [appropriate shims for ECMAScript 5](https://github.com/kriskowal/es5-shim/blob/master/es5-sham.js)
  
@@ -584,7 +606,4 @@ Unfortunately, IE before version 10
 The good news is that in older versions of IE Oboe gracefully degrades,
 it'll just fall back to waiting for the whole response to return, then fire all the events together.
 You don't get streaming but it isn't any worse than if you'd have designed your code to non-streaming AJAX.
-
-I'm able to test in IE thanks to 
-[this rather wonderful script](https://github.com/xdissent/ievms).
 

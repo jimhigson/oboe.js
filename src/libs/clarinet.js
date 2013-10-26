@@ -1,22 +1,18 @@
+/* This is a slightly hacked-up version of clarinet with some
+   Node.js specific features removed.
+ */
+
 ;(function (clarinet) {
   // non node-js needs to set clarinet debug on root
   var env
-    , fastlist
+    , fastlist = Array
     ;
 
 if(typeof process === 'object' && process.env) env = process.env;
 else env = window;
 
-if(typeof FastList === 'function') {
-  fastlist = FastList;
-} else if (typeof require === 'function') {
-  try { fastlist = require('fast-list'); } catch (exc) { fastlist = Array; }
-} else fastlist = Array;
-
   clarinet.parser            = function (opt) { return new CParser(opt);};
   clarinet.CParser           = CParser;
-  clarinet.CStream           = CStream;
-  clarinet.createStream      = createStream;
   clarinet.MAX_BUFFER_LENGTH = 64 * 1024;
   clarinet.DEBUG             = (env.CDEBUG==='debug');
   clarinet.INFO              = (env.CDEBUG==='debug' || env.CDEBUG==='info');
@@ -34,11 +30,7 @@ if(typeof FastList === 'function') {
     ];
 
   var buffers     = [ "textNode", "numberNode" ]
-    , streamWraps = clarinet.EVENTS.filter(function (ev) {
-          return ev !== "error" && ev !== "end";
-        })
     , S           = 0
-    , Stream
     ;
 
   clarinet.STATE =
@@ -152,77 +144,6 @@ if(typeof FastList === 'function') {
     , resume : function () { this.error = null; return this; }
     , close  : function () { return this.write(null); }
     };
-
-  try        { Stream = require("stream").Stream; }
-  catch (ex) { Stream = function () {}; }
-
-  function createStream (opt) { return new CStream(opt); }
-
-  function CStream (opt) {
-    if (!(this instanceof CStream)) return new CStream(opt);
-
-    this._parser = new CParser(opt);
-    this.writable = true;
-    this.readable = true;
-
-    var me = this;
-    Stream.apply(me);
-
-    this._parser.onend = function () { me.emit("end"); };
-    this._parser.onerror = function (er) {
-      me.emit("error", er);
-      me._parser.error = null;
-    };
-
-    streamWraps.forEach(function (ev) {
-      Object.defineProperty(me, "on" + ev,
-        { get          : function () { return me._parser["on" + ev]; }
-        , set          : function (h) {
-            if (!h) {
-              me.removeAllListeners(ev);
-              me._parser["on"+ev] = h;
-              return h;
-            }
-            me.on(ev, h);
-          }
-        , enumerable   : true
-        , configurable : false
-        });
-    });
-  }
-
-  CStream.prototype = Object.create(Stream.prototype,
-    { constructor: { value: CStream } });
-
-  CStream.prototype.write = function (data) {
-    this._parser.write(data.toString());
-    this.emit("data", data);
-    return true;
-  };
-
-  CStream.prototype.end = function (chunk) {
-    if (chunk && chunk.length) this._parser.write(chunk.toString());
-    this._parser.end();
-    return true;
-  };
-
-  CStream.prototype.on = function (ev, handler) {
-    var me = this;
-    if (!me._parser["on"+ev] && streamWraps.indexOf(ev) !== -1) {
-      me._parser["on"+ev] = function () {
-        var args = arguments.length === 1 ? [arguments[0]]
-                 : Array.apply(null, arguments);
-        args.splice(0, 0, ev);
-        me.emit.apply(me, args);
-      };
-    }
-    return Stream.prototype.on.call(me, ev, handler);
-  };
-
-  CStream.prototype.destroy = function () {
-    clearBuffers(this._parser);
-    this.emit("close");
-  };
 
   function emit(parser, event, data) {
     if(clarinet.INFO) console.log('-- emit', event, data);

@@ -1650,125 +1650,105 @@ Implementation
 Components of the project
 -------------------------
 
-![**Major components that make up Oboe.js** illustrating program flow
-from http transport to registered callbacks. Every component is not
-shown here. Particularly, components whose responsibility it is to
-initialise the oboe instance but have no role once it is running are
-omitted. UML facet/receptacle notation is used to show the flow of
-events with event names in capitals.
-\label{overallDesign}](images/overallDesign.png)
+![**Major components of Oboe.js illustrating program flow from http
+transport to application callbacks.** UML facet/receptacle notation is
+used to show the flow of events and event names are given in capitals.
+For clarity events are depicted as transferring directly between
+publisher and subscriber but this is actually performed through an
+intermediary. \label{overallDesign}](images/overallDesign.png)
 
-Oboe's architecture has been designed to so that I may have as much
-confidence as possible regarding the correct working of the library
-through automated testing. Designing a system to be amenable to testing
-in this case meant splitting into many co-operating parts each with an
-easily specified remit.
+Oboe's architecture describes a fairly linear pipeline visiting a small
+number of tasks between receiving http content and notifying application
+callbacks. The internal componentisation is designed primarily so that
+automated testing can provide a high degree of confidence regarding the
+correct working of the library. A local event bus facilitates
+communication inside the Oboe instance and most components interact
+solely by using this bus; receiving events, processing them, and
+publishing further events in response. The use of an event bus is a
+variation on the Observer pattern which removes the need for each unit
+to locate specific other units before it may listen to their events,
+giving a highly decoupled shape to the library in which each part knows
+the events it requires but not who publishes them. Once everything is
+wired into the bus no central control is required and the larger
+behaviours emerge as the consequence of interaction between finer ones.
 
-Internally, communication between components is facilitated by an event
-bus which is local to to Oboe instance. Most components interact solely
-by picking up events, processing them and publishing further events in
-response. Essentially, Oboe's architecture resembles a fairly linear
-pipeline visiting a series of units, starting with http data and
-sometimes ending with callbacks being notified. This use of an event bus
-is a variation on the Observer pattern which removes the need for each
-unit to obtain a reference to the previous one so that it may observe
-it, giving a highly decoupled shape to the library. Once everything is
-wired into the bus very little central control is required and the
-larger behaviours emerge as the consequence of this interaction between
-finer ones. One downside is perhaps that a central event bus does not
-lend itself to a UML class diagram, giving a diagram shape with an event
-bus as a central hub and everything else hanging off it as spokes.
+Design for automated testing
+----------------------------
 
-Automated testing
------------------
+![**The test pyramid**. Much testing is done on the low-level components
+of the system, less on their composed behaviours, and less still on a
+whole-system level. \label{testpyramid}](images/testPyramid.png)
 
-Automated testing improves what can be written, not just making what is
-written more reliable. Tests deal with the problem of "irreducible
-complexity" - when a program is made out of parts whose correct
-behaviour cannot be observed without all of the program. Allows smaller
-units to be verified before verifying the whole.
+80% of the code written for this project is test specification. Because
+the correct behaviour of a composition requires the correct behaviour of
+its components, the majority are *unit tests*. The general style of a
+unit test is to plug the item under test into a mock event bus and check
+that when it receives input events the expected output events are
+consequently published.
 
-![**The test pyramid**. Relying on the assumption that verification of
-small parts provides a solid base from which to compose system-level
-behaviours. A Lot of testing is done on the low-level components of the
-system, less on the component level and less still on a whole-system
-level where only smoke tests are provided.
-\label{testpyramid}](images/testPyramid.png)
+The *Component tests* step back from examining individual components to
+a position where their behaviour as a composition may be examined.
+Because the compositions are quite simple there are fewer component
+tests than unit tests. The component tests do not take account of *how*
+the composition is drawn and predominantly examine the behaviour of the
+library through its public API. One exception is that the streamingXHR
+component is switched for a stub so that http traffic can be simulated.
 
-The testing itself is a non-trivial undertaking with 80% of code written
-for this project being test specifications. Based on the idea that a
-correct system must be built from individually correct units, the
-majority of the specifications are unit tests, putting each unit under
-the microscope and describing the correct behaviour as completely as
-possible. Component tests zoom out from examining individual components
-to focus on their correct composition, falsifying only the http traffic.
-To avoid testing implementation details the component tests do not look
-at the means of coupling between the code units but rather check for the
-behaviours which should emerge as a consequence of their composition. At
-the apex of the test pyramid are a small number of integration tests.
-These verify Oboe as a black box without any knowledge of, or access to
-the internals, using only the APIs which are exposed to application
-programmers. When running the integration tests a REST service is first
-spun up so that correctness of the whole library may be examined against
-an actual server.
+At the apex of the test pyramid are a small number of *integration
+tests*. These verify Oboe as a black box without any knowledge of, or
+access to, the internals, using the same API as is exposed to
+application programmers. These tests are the most expensive to write but
+a small number are necessary in order to verify that Oboe works
+correctly end-to-end. Without access to the internals http traffic
+cannot be faked so before these tests can be performed a corresponding
+REST service is started. This test service is written using Node and
+returns known content progressively according to predefined timings,
+somewhat emulating a slow internet connection. The integration tests
+particularly verify behaviours where platform differences could cause
+inconsistencies. For example, the test url `/tenSlowNumbers` writes out
+the first ten natural numbers as a JSON array at a rate of two per
+second. The test registers a JSONPath selector that matches the numbers
+against a callback that aborts the http request on seeing the fifth. The
+correct behaviour is to get no sixth callback, even when running on a
+platform lacking support for XHR2 and all ten will have already been
+downloaded.
 
-The desire to be amenable to testing influences the boundaries on which
-the application splits into components. Confidently black box testing a
-stateful unit as is difficult; because of side-effects it may later
-react differently to the same calls. For this reason where state is
-required it is stored in very simple state-storing units with intricate
-program logic removed. The logic may then be separately expressed as
-functions which map from one state to the next. Although comprehensive
-coverage is of course impossible and tests are inevitably incomplete,
-for whatever results the functions give while under test, uninfluenced
-by state I can be sure that they will continue to give in any future
-situation. The separate unit holding the state is trivial to test,
-having exactly one responsibility: to store the result of a function
-call and later pass that result to the next function. This approach
-clearly breaks with object oriented style encapsulation by not hiding
-data behind the logic which acts on them but I feel the departure is
-worthwhile for the greater certainty it allows over the correct
-functioning of the program.
+Confidently black-box testing a stateful unit is difficult. Because of
+side-effects and hidden state we do not know if the same call will later
+give a different behaviour. Building up the parse result from SAX events
+is a fairly complex process which cannot be implemented efficiently as
+stateless Javascript. To promote testability the state is delegated to a
+simple state-storing unit. The intricate logic may then be expressed as
+a separately tested set of side-effect free functions which transition
+between one state and the next. Although proof of correctness is
+impossible, for whichever results the functions give while under test,
+uninfluenced by state I can be confident that they will always yield the
+same response given the same future events. The separate unit
+maintaining the state has exactly one responsibility, to hold the parse
+result between function calls, and is trivial to test. This approach
+slightly breaks with the object oriented principle of encapsulation by
+hiding state behind the logic which acts on it but I feel that the
+departure is justified by the more testable codebase.
 
-Dual-implementation of same interface for streamingHttp might be considered
-polymorphism, but a function not a class and both are never loaded at
-run time.
-
-Largely for the sake of testing Oboe has also embraced dependency
-injection. This means that components do not create the further
-components that they require but rather rely on them being provided by
-an external wiring. The file `wire.js` performs the actual injection.
-One such example is the streamingHttp component which hides various
-incompatible http implementations by publishing their downloaded content
-progressively via the event bus. This unit does not know how to create
-the underlying browser XHR which it hides. Undoubtedly, by not
-instantiating its own dependencies a it presents a less friendly
-interface, although this is mitigated somewhat by the interface being
-purely internal, the objects it depends on are no longer a hidden
-implementation detail but exposed as a part of the component's API. The
-advantage of dependency injection here is that unit testing is much
-simpler. Unit tests should test exactly one behaviour of one unit. Were
-the streaming http object to create its own transport, that part would
-also be under test, plus whichever external service that it connects to.
-Because Javascript allows redefinition of built in types, this could be
-avoided by overwriting the XHR constructor to return a mock but
-modifying the built in types for tests opens up the possibilities of
-changes leaking between cases. Dependency injection allows a much
-simpler test style because it is trivial to inject a stub in place of
-the XHR.
-
-Integration tests run against a node service which returns known content
-according to known timings, somewhat emulating downloading via a slow
-internet connection. For example, the url `/tenSlowNumbers` writes out a
-JSON array of the first ten natural numbers at a rate of one per second,
-while `/echoBackHeaders` writes back the http headers that it received
-as a JSON object. The test specifications which use these services
-interact with Oboe through the public API alone as an application author
-would and try some tricky cases. For example, requesting ten numbers but
-registering a listener against the fifth and aborting the request on
-seeing it. The correct behaviour is to get no callback for the sixth,
-even when running on platforms where the http is buffered so that all
-ten will have already been downloaded. *ref apx for streamsource*
+To enhance testability Oboe has also embraced dependency injection.
+Components do not instantiate their dependencies but rather rely on them
+being passed in by an inversion of control container during the wiring
+phase. For example, the network component which hides browser
+differences does not know how to create the underlying XHR that it
+adapts. Undoubtedly, by not instantiating its own transport this
+component presents a less friendly interface: it's data source is no
+longer a hidden implementation detail but exposed as a part of the it's
+API at the responsibility of the caller. I feel this is mitigated by the
+interface being purely internal. Dependency injection in this case
+allows the tests to be written more simply because it is easy to
+substitute the real XHR for a stub. Unit tests should test exactly one
+unit, were the streaming http object to create its own transport, the
+XHR would also be under test, plus whichever external service it
+connects to. Because Javascript allows redefinition of built in types
+the stubbing could have potentially also be done by overwriting the XHR
+constructor to return a mock. However this is to be avoided as it opens
+up the possibility of changes to the environment leaking between test
+cases.
 
 Running the tests
 -----------------
@@ -1776,132 +1756,130 @@ Running the tests
 ![**Relationship between various files and test libraries** *other half
 of sketch from notebook*](images/placeholder.png)
 
-The Grunt task runner was used to automate routine tasks such as
-executing the tests and building. Unit and component tests run
-automatically whenever a source file changes. As well as being correct
-execution, the project is required to not surpass a certain size so the
-built size is also checked. As a small, tightly focused project the
-majority of programming is refactoring already working code. Running
-tests on save provides quick feedback so that mistakes are found as soon
-as they are made. Agile practitioners emphasise the importance of tests
-that execute quickly [@cleancode P314, T9], the 220 unit and component
-tests run in less than a second so discovering mistakes is near instant.
-If the "content of any medium is always another medium” [@media p8], we
-might say that the content of programming is the program that is
-realised by its execution. A person working in arts and crafts sees the
-thing as they work but a programmer will usually not see the execution
-simultaneously as they program. Conway observed that an artisan works by
+The Grunt task runner is used to automate routine tasks such as
+executing the tests and building, configured so that the unit and
+component tests run automatically whenever a change is made to a source
+file or specification. As well as executing correctly, the project is
+required not to surpass a certain size so this also checked on every
+save. Because Oboe is a small, tightly focused project the majority of
+the programming time is spent refactoring already working code. Running
+tests on save provides quick feedback so that mistakes are found before
+my mind has moved on to the next context. Agile practitioners emphasise
+the importance of tests that execute quickly [@cleancode p.314:T9] --
+Oboe's 220 unit and component tests run in less than a second so
+discovering programming mistakes is almost instant. If the "content of
+any medium is always another medium” [@media p.8], we might say that the
+content of programming is the process that is realised by its execution.
+A person working in a physical medium sees the thing they are making but
+the programmer does usually not see their program's execution
+simultaneously as they create. Conway notes that an artisan works by
 transform-in-place "start with the working material in place and you
-step by step transform it into its final form" whereas software is
-created through intermediate proxies, and attempts to close this gap by
-merging programming with the results of programming [@humanize side8-9].
-When we bring together the medium and the message the cost of small
-experimentation is very low and I feel that programming becomes more
-explorative and expressive.
+step by step transform it into its final form," but software is created
+through intermediate proxies. He attempts to close this gap by merging
+programming with the results of programming [@humanize pp.8-9]. I feel
+that if we bring together the medium and the message by viewing the
+result of code while we write it, we can build as a series of small,
+iterative, correct steps and programming can be more explorative and
+expressive. Running the tests subtly, automatically hundreds of times
+per day builds isn't merely convenient, this build process makes me a
+better programmer.
 
-The integration tests are not run on save because they intentionally
-simulate slow transfers and take some time to run. The integration tests
-are used as a final check against built code before a branch in git can
-be merged into the master. Once the code has been packaged for
-distribution the internals are no longer visible the integration tests
-which are coded against the public API are the only runnable tests.
-While these tests don't individually test every component, they are
-designed to exercise the whole codebase so that a mistake in any
-component will be visible through them. Grunt executes the build,
-including starting up the test REST services that give the integration
-tests something to fetch.
+Integration tests are not run on save. They intentionally simulate a
+slow network so they take some time to run and I'd already have started
+the next micro-task by the time they complete. Oboe is version
+controlled using git and hosted on github. The integration tests are
+used as the final check before a branch in git is merged into the
+master.
 
-Packaging as a single, distributable file
------------------------------------------
+Packaging to a single distributable file
+----------------------------------------
 
-![**Packaging of many javascript files into multiple single-file
-packages.** The packages are individually targeted at different
-execution contexts, either browsers or node *get from notebook, split
-sketch diagram in half*](images/placeholder.png)
-
-As an interpreted language, Javascript may of course be ran directly
-without any prior compilation. While running the same code as I see in
-the editor is convenient while programming, it is much less so for
-distribution. Although the languages imposes no compulsory build phase,
-in practice one is necessary. Dependency managers have not yet become
-standard for client-side web development (although Bower is looking
-good) so most files are manually downloaded. For a developer wishing to
-include my library in their own project a single file is much more
-convenient. Should they not have a build process of their own, a single
-file is also much faster to transfer to their users, mostly because of
-the cost of establishing connections and the http overhead.
+As an interpreted language Javascript may be run without any prior
+compilation. Directly running the files that are open in the editor is
+convenient while programming but, unless a project is written as a
+single file, in practice some build phase is required to create an
+easily distributable form. Dependency managers have not yet become
+standard for client-side web development so dependant libraries are
+usually manually downloaded. For a developer wishing to include my
+library in their own project a single file is much more convenient than
+the multi-file raw source. If they are not using a similar build process
+on their site, a single file is also faster to transfer to their users,
+mostly because the http overhead is of constant size per resource.
 
 Javascript files are interpreted in series by the browser so load-time
-dependencies must precede dependants. Unsurprisingly, separate files
-once concatenated following the same order as delivered to the browser
-will load more quickly but are functionally equivalent, at least barring
-syntax errors. Several tools exist to automate this stage of the build
-process, incorporating a topological sort of the dependency digraph in
-order to find a working concatenation order.
+dependencies must precede dependants. If several valid Javascript files
+are concatenated in the same order as delivered to the browser, the
+joined version is functionally equivalent to the individual files. This
+is a common technique so that code can be written and debugged as many
+files but distributed as one. Several tools exist to automate this stage
+of the build process that topologically sort the dependency graph before
+concatenation in order to find a suitable script order.
 
-Early in this project I chose *Require.js* although I later moved on
-because it was too heavyweight. Javascript as a language doesn't have an
-import statement. Require contributes the importing ability to
-Javascript from inside the language sandbox as the `require` function, a
-standard asynchronous call. Calls to `require` AJAX in and execute the
-imported source, returning any exported symbols by a callback. For
-non-trivial applications this mode is intended mostly for debugging;
-because a network hop is involved the protocol is chatty and slowed by
-highly latent calls between modules. For efficient delivery Require also
-has the `optimise` command which concatenates into a single file by
-using static analysis to deduce a workable source order. Because
-`require` may appear anywhere in the source, this in the general case is
-of course undecidable so Require falls back to lazy loading. In practice
-undecidability isn't a problem because imports are generally not subject
-to branching. In larger webapps lazy loading speeding up the initial
-page load and is actually an advantage. The technique of *Asynchronous
-Module Definition* (AMD) intentionally imports rarely-loaded modules in
-response to events. By resisting the static analysis the units will not
-be downloaded until they are needed.
+Early in the project I chose *Require.js* for this task. Javascript as a
+language doesn't have an import statement. Require contributes the
+importing ability to Javascript from inside the language itself by
+providing an asynchronous `require` function. Calls to `require` AJAX in
+and execute the imported source, passing any exported items to the given
+callback. For non-trivial applications loading each dependency
+individually over AJAX is intended only for debugging because making so
+many requests is slow. For efficient delivery Require also has the
+`optimise` command which concatenates an application into a single file
+by using static analysis to deduce a workable source order. Because the
+`require` function may be called from anywhere, this is undecidable in
+the general case so Require falls back to lazy loading. In practice this
+isn't a problem because imports are generally not subject to branching.
+For larger webapps lazy loading is a feature because it speeds up the
+initial page load. The technique of *Asynchronous Module Definition*
+(AMD) intentionally imports rarely-loaded modules in response to events;
+by resisting static analysis the dependant Javascript will not be
+downloaded until it is needed. AMD is mostly of interest to applications
+with a central hub but also some rarely used parts. For example, most
+visits to online banking will not need to create standing orders so it
+is better if this part is loaded on-demand rather than increase the
+initial page load time.
 
-AMD is mostly of interest to web applications with a central hub but
-also some rarely used parts. Oboe does not fit this profile: everybody
-who uses it will use all of the library. Regardless, I hoped to use
-`optimise` to generate my combined Javascript file. Even after
-optimisation, Require's design necessitates that calls to `require` stay
-in the code and that the require.js run-time component is available to
-handle these calls. For a micro-library a ???k overhead was too large to
-accommodate. Overall, Require seems more suited to developing
-stand-alone applications than programming libraries.
+I hoped to use Require's `optimise` to automate the creation of a
+combined Javascript file for Oboe. Oboe would not benefit from AMD
+because everybody who uses it will use all of the library but using
+Require to find a working source order would save having to manually
+implement one. Unfortunately this was not feasible. Even after
+optimisation, Require's design necessitates that calls to the `require`
+function are left in the code and that the Require run-time component is
+available to handle them. At more than 5k gzipped this would have more
+than doubled Oboe's download footprint.
 
-Having abandoned Require, I decided to pick up the simplest tool which
-could possibly work. With only 15 source files and a fairly sparse
+After removing Require I decided to pick up the simplest tool which
+could possibly work. With about 15 source files and a fairly sparse
 dependency graph finding a working order on paper wasn't a daunting
 task. Combined with a Grunt analogue to the unix `cat` command I quickly
-had a working build process. I adjusted each Javascript file to, when
-loaded directly, place its API in the global namespace, then
-post-concatenation wrapped the combined in a single function, converting
-the APIs inside the function from global to the scope of that function,
-thereby hiding the implementation for code outside of Oboe.
+had a working build process and a distributable library requiring no
+run-time dependency management to be loaded.
 
 For future consideration there is Browserify. This library reverses the
-'browser first' image of Javascript by converting applications targeted
-at Node into a single file efficiently packaged for delivery to a web
-browser, conceptually making Node the primary environment for Javascript
-and adapting browser execution to match. Significantly, require leaves
-no trace of itself in the concatenated Javascript other than Adaptors
-presenting browser APIs as the Node equivalents. Browserify's http
-adaptor[^5_Implementation1] is complete but more verbose compared to Oboe's version[^5_Implementation2].
+'browser first' Javascript mindset by viewing Node as the primary target
+for Javascript development and adapting the browser environment to
+match. Browserify converts applications written for Node into a single
+file packaged for delivery to a web browser. Significantly, other than
+Adaptors wrapping the browser APIs and presenting their features as if
+they were the Node equivalents, Browserify leaves no trace of itself in
+the final Javascript. Additionally, the http adaptor[^5_Implementation1] is capable of
+using XHRs as a streaming source when used with supporting browsers.
 
-As well as combining into a single file, Javascript source can made
-significantly smaller by removing comments and reducing inaccessible
-tokens to a single character. For Oboe the popular library *Uglify* is
-used for minification. Uglify performs only surface optimisations,
-operating on the AST level but concentrating mostly on compact syntax. I
-also considered Google's Closure compiler. Closure resembles a
-traditional compiler optimiser by leveraging a deeper understanding to
-search for smaller representations, unfortunately at the cost of safety.
-Decidability in highly dynamic languages is often impossible and Closure
-operates on a well-advised subset of Javascript, delivering no
-reasonable guarantee of equivalence when code is not written as the
-Closure authors expected. Integration tests should catch any such
-failures but for the time being I have a limited appetite for a workflow
-which forces me to be suspicious of the project's build process.
+After combining into a single file, Javascript source can be minified:
+made smaller using size-optimisations such as reducing scoped symbols to
+a single character or stripping out the comments. For Oboe the popular
+minification library *Uglify* was chosen. Uglify performs only surface
+optimisations, operating on the AST level but concentrating mostly on
+producing compact syntax. I also considered Google's *Closure Compiler*
+which resembles a traditional optimiser by leveraging a deeper
+understanding to search for smaller representations. Unfortunately,
+proving equivalence in highly dynamic languages is often impossible and
+Closure Compiler is only safe given a project that uses a well-advised
+subset of Javascript, delivering no reasonable guarantee of equivalence
+if code is not written as the Closure team expected. Integration tests
+should catch any such failures but for the time being I decided a
+slightly larger file is a worthwhile tradeoff for a slightly safer build
+process.
 
 Styles of Programming
 ---------------------
@@ -2015,7 +1993,7 @@ the current node is appended and removed many times whereas the root is
 immutable. This ordering was chosen because it is computationally very
 efficient since all updates to the list are at the head. Each link in
 the list is immutable, enforced by newer Javascript engines as frozen
-objects [^5_Implementation3].
+objects [^5_Implementation2].
 
 Linked lists were chosen in preference to the more conventional approach
 of using native Javascript Arrays for several reasons. Firstly, I find
@@ -2047,10 +2025,10 @@ Oboe JSONPath Implementation
 Not surprisingly given its importance, the JSONPath implementation is
 one of the most refactored and considered parts of the Oboe codebase.
 Like many small languages, on the first commit it was little more than a
-series of regular expressions[^5_Implementation4] but has slowly evolved into a
-featureful and efficient implementation[^5_Implementation5]. The extent of the rewriting
+series of regular expressions[^5_Implementation3] but has slowly evolved into a
+featureful and efficient implementation[^5_Implementation4]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
-specifications[^5_Implementation6].
+specifications[^5_Implementation5].
 
 The JSONPath compiler exposes a single higher-order function to the rest
 of Oboe. This function takes a JSONPath as a String and, proving it is a
@@ -2131,7 +2109,7 @@ saving time by avoiding repeated execution, this could potentially also
 save memory because where two JSONPath strings contain a common start
 they could share the inner parts of their functional expression.
 Although Javascript doesn't come with functional caching, it can be
-added using the language itself [^5_Implementation7]. I suspect, however, that hashing
+added using the language itself [^5_Implementation6]. I suspect, however, that hashing
 the parameters might be slower than performing the matching. Although
 the parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
@@ -2144,7 +2122,7 @@ they are the simplest form able to express the clause patterns. The
 regular expressions are hidden to the outside the tokenizer and only
 functions are exposed to the main body of the compiler. The regular
 expressions all start with `^` so that they only match at the head of
-the string. A more elegant alternative is the 'y' [^5_Implementation8] flag but as of
+the string. A more elegant alternative is the 'y' [^5_Implementation7] flag but as of
 now this lacks wide browser support.
 
 By verifying the tokens through their own unit tests it is simpler to
@@ -2164,32 +2142,29 @@ statementExpr pointing to the last clause](images/placeholder)
 
 [^5_Implementation1]: https://github.com/substack/http-browserify
 
-[^5_Implementation2]: https://github.com/jimhigson/oboe.js/blob/master/src/streamingXhr.js
-    This version is shorter mostly because it is not a generic solution
-
-[^5_Implementation3]: See
+[^5_Implementation2]: See
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
     Although older engines don't provide any ability to create immutable
     objects at run-time, we can be fairly certain that the code does not
     mutate these objects or the tests would fail when run in
     environments which are able to enforce this.
 
-[^5_Implementation4]: JSONPath compiler from the first commit can be found at line 159
+[^5_Implementation3]: JSONPath compiler from the first commit can be found at line 159
     here:
     https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
 
-[^5_Implementation5]: for contrast, the current source can be found at
+[^5_Implementation4]: for contrast, the current source can be found at
     https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
 
-[^5_Implementation6]: The current tests are viewable at
+[^5_Implementation5]: The current tests are viewable at
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^5_Implementation7]: Probably the best known example being `memoize` from
+[^5_Implementation6]: Probably the best known example being `memoize` from
     Underscore.js: http://underscorejs.org/\#memoize
 
-[^5_Implementation8]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^5_Implementation7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
 
 
 Conclusion
@@ -2420,7 +2395,7 @@ potential future work
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
-an obvious expansion. Currently Oboe only operates on http traffic.
+an obvious expansion. Plug-ins for formats.
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
@@ -2967,7 +2942,8 @@ instanceController.js
  */
  
  
-function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
+function instanceController(  fire, on, un, 
+                              clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
 
@@ -3021,7 +2997,7 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
       // Add a new callback adaptor to the eventBus.
       // This listener first checks that he pattern matches then if it does, 
       // passes it onto the callback. 
-      on( eventId, function( ascent ){ 
+      on( eventId, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
@@ -3041,7 +3017,10 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            notifyCallback(callback, maybeMatchingMapping, ascent);                           
+            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            
+               un(eventId, handler);
+            }
          }
       });   
    }   
@@ -3061,16 +3040,24 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
           // To make a path, strip off the last item which is the special
           // ROOT_PATH token for the 'path' to the root node
           path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)); 
+          ancestors  = listAsArray(map(nodeOf, descent)),
+          keep       = true;
+          
+      oboeApi.forget = function(){
+         keep = false;
+      };           
       
-      try{
-      
+      try{      
          callback( nodeOf(matchingMapping), path, ancestors );   
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
          fire(ERROR_EVENT, e);
-      }          
+      }
+      
+      delete oboeApi.forget;
+      
+      return keep;          
    }
 
    /**
@@ -3101,7 +3088,31 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
       
       return this; // chaining
    }
-
+   
+   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+       addFailListner = partialComplete(on, ERROR_EVENT);
+   
+   /**
+    * implementation behind oboe().on()
+    */       
+   function addListener( eventId, listener ){
+                         
+      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
+                                
+         apply(arguments, addNodeOrPathListenerApi);
+         
+      } else if( eventId == 'done' ) {
+      
+         addDoneListener(listener);
+                              
+      } else if( eventId == 'fail' ) {
+      
+         addFailListner(listener);
+      }
+             
+      return this; // chaining
+   }   
+   
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
@@ -3109,9 +3120,9 @@ function instanceController(fire, on, clarinetParser, contentBuilderHandlers) {
    return oboeApi = { 
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addNodeOrPathListenerApi,
-      fail  :  partialComplete(on, ERROR_EVENT),
-      done  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
+      on    :  addListener,
+      fail  :  addFailListner,
+      done  :  addDoneListener,
       abort :  partialComplete(fire, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
@@ -3743,6 +3754,21 @@ function foldR(fn, startValue, list) {
             ;
 }
 
+/**
+ * Return a list like the one given but with the first instance equal 
+ * to item removed 
+ */
+function without(list, item) {
+ 
+  return list  
+            ?  ( head(list) == item 
+                     ? tail(list) 
+                     : cons(head(list), without(tail(list), item))
+               ) 
+            : emptyList
+            ;
+}
+
 /** 
  * Returns true if the given function holds for every item in 
  * the list, false otherwise 
@@ -3822,6 +3848,10 @@ function pubSub(){
             partialComplete( apply, [event || undefined] ), 
             listeners[eventId]
          );
+      },
+      
+      un: function( eventId, handler ) {
+         listeners[eventId] = without(listeners[eventId], handler);
       }           
    };
 }
@@ -4203,7 +4233,7 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, 
+               eventBus.fire, eventBus.on, eventBus.un, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.fire) 
    );

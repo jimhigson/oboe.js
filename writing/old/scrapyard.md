@@ -1,3 +1,6 @@
+Text fragments from the dissertation that were't good enough to keep, but not quite bad enough to be deleted (yet)
+==================================================================================================================
+
 delivery methodology
 --------------------
 
@@ -350,12 +353,12 @@ lesser degree of server-side control but by using client-side rendering
 a much faster experience was possible than would otherwise be possible
 over low-speed networks [@news].
 
-Web developers agree that program
-architecture should separate presentation from operational logic but
-there is no firm consensus on where each concern should be exercised.
+Web developers agree that program architecture should separate
+presentation from operational logic but there is no firm consensus on
+where each concern should be exercised.
 
-Javascript has proven very effective as the language to meet
-Node's design goals but this suitability is not based on Javascript's
+Javascript has proven very effective as the language to meet Node's
+design goals but this suitability is not based on Javascript's
 association with web browsers, although it is certainly beneficial: for
 the first time it is possible to program presentation logic once which
 is capable of running on either client or server. Being already familiar
@@ -421,9 +424,8 @@ endeavour.*
 Drilling down in code
 ---------------------
 
-this
-extraction has become such a natural component of a workflow that it
-maye be used while thinking of it as wholly unremarkable. In the
+this extraction has become such a natural component of a workflow that
+it maye be used while thinking of it as wholly unremarkable. In the
 examples above we are interacting with the model in the way that the
 language makes the most easy to conceptualise. However se should
 consider that, however subtly embedded, the technique is an invented
@@ -433,10 +435,9 @@ been drawn.
 selector languages
 ------------------
 
-their employment is not
-the most natural coming from a programming context in which the
-application developer's responsibilities usually start where the
-demarshaller's end
+their employment is not the most natural coming from a programming
+context in which the application developer's responsibilities usually
+start where the demarshaller's end
 
 using (json|xml)path with sax
 -----------------------------
@@ -507,3 +508,22 @@ unresponsive. Generally unreliable, has to be restarted frequently.
 JSTD, as a Java program, is difficult to start via Grunt. Also an issue
 that Grunt post-dates Karma by enough that JSTD doesn't have the
 attention of the Grunt community.
+
+Automated testing improves what can be written, not just making what is
+written more reliable. Tests deal with the problem of "irreducible
+complexity" - when a program is made out of parts whose correct
+behaviour cannot be observed without all of the program. Allows smaller
+units to be verified before verifying the whole.
+
+For example, requesting ten numbers but
+registering a listener against the fifth and aborting the request on
+seeing it. The correct behaviour is to get no callback for the sixth,
+even when running on platforms where the http is buffered so that all
+ten will have already been downloaded.
+
+Componentisation
+----------------
+
+Dual-implementation of same interface for streamingHttp might be
+considered polymorphism, but a function not a class and both are never
+loaded at run time.
