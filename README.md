@@ -407,10 +407,12 @@ oboe('people.json')
       // we just found out that person's name, lets add it to their div:
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
-   .fail(function( email ){
-      // oops, that didn't go so well. instead of leaving this dude half on the page,
-      // remove them altogether
-      currentPersonElement.remove();
+   .fail(function(){
+      if( currentPersonElement ) {
+         // oops, that didn't go so well. instead of leaving this dude half on the page,
+         // remove them altogether      
+         currentPersonElement.remove();
+      }
    })
 ```
 
