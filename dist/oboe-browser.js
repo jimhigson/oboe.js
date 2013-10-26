@@ -998,7 +998,13 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             emit( END_OF_CONTENT );
          } else {
          
-            emit( ERROR_EVENT, xhr.status, xhr.responseText );
+            emit( 
+               ERROR_EVENT, 
+               errorReport(
+                  xhr.status, 
+                  xhr.responseText
+               )
+            );
          }
       }
    };
@@ -1021,7 +1027,9 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, undefined, undefined, e)
+         partialComplete(emit, ERROR_EVENT, 
+             errorReport(undefined, undefined, e)
+         )
       ,  0
       );
    }            
@@ -1763,6 +1771,15 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     NEW_CONTENT = _S++,
     END_OF_CONTENT = _S++,
     ABORTING = _S++;
+    
+function errorReport(statusCode, body, error) {
+
+   return {
+      statusCode:statusCode,
+      body:body,
+      error:error
+   };
+}    
 /**
  * This file implements a light-touch central controller for an instance 
  * of Oboe which provides the methods used for interacting with the instance 
@@ -1812,7 +1829,10 @@ function instanceController(  emit, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      emit(ERROR_EVENT, undefined, undefined, e);
+      emit(
+         ERROR_EVENT, 
+         errorReport(undefined, undefined, e)
+      );
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1880,7 +1900,10 @@ function instanceController(  emit, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         emit(ERROR_EVENT, undefined, undefined, e);
+         emit(
+            ERROR_EVENT, 
+            errorReport(undefined, undefined, e)
+         );
       }
       
       delete oboeApi.forget;

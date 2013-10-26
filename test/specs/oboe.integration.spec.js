@@ -323,7 +323,7 @@ describe("oboe integration (real http)", function() {
 
       var stubCallback = jasmine.createSpy('error callback');
 
-      oboe(url('doesNotExist')) 
+      oboe(url('404json')) 
          .fail(stubCallback);
 
       waitsFor(function () {
@@ -332,6 +332,11 @@ describe("oboe integration (real http)", function() {
              
       runs( function() {
          expect( stubCallback ).toHaveBeenGivenErrorStatusCode( 404 );
+         expect( stubCallback ).toHaveBeenGivenBodyJson(
+            {  "found":"false",
+               "errorMessage":"was not found"
+            }         
+         );
       });
    })
    
@@ -485,10 +490,12 @@ describe("oboe integration (real http)", function() {
             
             return errorReport.statusCode === expectedCode;          
          },
-         toHaveBeenGivenBody:function(expectedBody){
+         toHaveBeenGivenBodyJson:function(expectedBodyJson){
             var errorReport = this.actual.mostRecentCall.args[0];
             
-            return expectedBody === errorReport.body;         
+            return JSON.stringify(expectedBodyJson) 
+                   === 
+                   errorReport.body;         
          }
       });      
    });   
