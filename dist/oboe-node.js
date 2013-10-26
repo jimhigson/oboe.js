@@ -1262,7 +1262,7 @@ function errorReport(statusCode, body, error) {
    return {
       statusCode:statusCode,
       body:body,
-      error:error
+      thrown:error
    };
 }    
 /**

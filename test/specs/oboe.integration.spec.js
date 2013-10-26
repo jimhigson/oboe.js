@@ -383,7 +383,7 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
 
       runs( function() {
-         expect( stubCallback ).toHaveBeenGivenError('I am a bad callback')
+         expect( stubCallback ).toHaveBeenGivenThrowee('I am a bad callback')
       });
    })
    
@@ -402,7 +402,7 @@ describe("oboe integration (real http)", function() {
 
  
       runs( function() {
-         expect( stubCallback ).toHaveBeenGivenError(callbackError)
+         expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
       })
    })         
 
@@ -480,10 +480,10 @@ describe("oboe integration (real http)", function() {
             
             return isAnError(errorReport.error);
          },
-         toHaveBeenGivenError:function(expectedError){
+         toHaveBeenGivenThrowee:function(expectedError){
             var errorReport = this.actual.mostRecentCall.args[0];
             
-            return errorReport.error === expectedError;
+            return errorReport.thrown === expectedError;
          },         
          toHaveBeenGivenErrorStatusCode:function(expectedCode){
             var errorReport = this.actual.mostRecentCall.args[0];
