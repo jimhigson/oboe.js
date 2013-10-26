@@ -29,9 +29,7 @@ module.exports = function(config) {
       ,  'src/publicApi.js'
         
       ,  'test/specs/*.unit.spec.js'
-      ,  'test/specs/*.component.spec.js'
-      
-      //,'test/specs/streamingXhr.integration.spec.js'
+      ,  'test/specs/*.component.spec.js'      
       ],
                             
       // level of logging
