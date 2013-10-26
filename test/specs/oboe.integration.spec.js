@@ -316,20 +316,20 @@ describe("oboe integration (real http)", function() {
       runs(function(){
          expect(order).toEqual([1,2,3,4,5,6,7,8]);
       });   
-      
-   });   
+     
+   });  
 
    it('fires error on 404', function () {
 
       var stubCallback = jasmine.createSpy('error callback');
 
-      oboe(url('doesNotExist'))
+      oboe(url('doesNotExist')) 
          .fail(stubCallback);
 
       waitsFor(function () {
          return !!stubCallback.calls.length;
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
-      
+             
       runs( function() {
          expect( stubCallback )
             .toHaveBeenCalledWith( 
@@ -354,12 +354,12 @@ describe("oboe integration (real http)", function() {
    })   
    
    it('fires error on unreachable url', function () {
-
+  
       var stubCallback = jasmine.createSpy('error callback');
 
       oboe('nowhere.ox.ac.uk:754196/fooz/barz')
          .fail(stubCallback);
-
+ 
       waitsFor(function () {
          return !!stubCallback.calls.length;
       }, 'the request to fail', 30*1000)
@@ -369,7 +369,7 @@ describe("oboe integration (real http)", function() {
             .toHaveBeenCalledWith( 
                0, 
                '',
-               jasmine.any(Error) 
+               anyError 
             )
       });
    })
@@ -391,7 +391,7 @@ describe("oboe integration (real http)", function() {
             .toHaveBeenCalledWith( 
                0, 
                '',
-               jasmine.any(Error) 
+               anyError 
             )
       });
    })      
@@ -431,6 +431,25 @@ describe("oboe integration (real http)", function() {
    function doneCalled(){
       return !!fullResponse         
    }
+
+   /**
+    * jasmine.any(Error) doesn't always work in Safari (tested v6.0.5)
+    * because:
+    * 
+    * ((new XMLHttpRequestException()) instanceof Error) == false
+    * 
+    */
+   var anyError = {
+      jasmineMatches: function(maybeErr){
+            
+         if( maybeErr instanceof Error ) {
+            return true;
+         }
+         
+         return window && window.XMLHttpRequestException &&
+                  maybeErr instanceof XMLHttpRequestException;
+      }
+   };
 
    beforeEach(function () {
       aborted = false;
