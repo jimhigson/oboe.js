@@ -5,12 +5,13 @@
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
   "scripts": {
-    "test": "node ./node_modules/grunt-cli/bin/grunt default",
-    "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
-    "test-run": "node ./node_modules/grunt-cli/bin/grunt test-run",
-    "test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
-    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
-    "node-build": "node ./node_modules/grunt-cli/bin/grunt node-build"
+    "test":                   "node ./node_modules/grunt-cli/bin/grunt default",
+    "test-start-server":      "node ./node_modules/grunt-cli/bin/grunt test-start-server",
+    "test-run":               "node ./node_modules/grunt-cli/bin/grunt test-run",
+    "browser-test-auto-run":  "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
+    "node-test-auto-run":     "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
+    "dist-sizes":             "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
+    "node":                   "node ./node_modules/grunt-cli/bin/grunt node"
   },
   "repository": {
     "type": "git",

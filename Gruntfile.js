@@ -204,7 +204,7 @@ module.exports = function (grunt) {
             files:FILES_TRIGGERING_KARMA,
             tasks:['karma:persist:run']
          },
-         
+                           
          // like above but reports the file size. This is good for 
          // watching while developing to make sure it doesn't get
          // too big. Doesn't run tests against minified.
@@ -212,10 +212,7 @@ module.exports = function (grunt) {
             files: FILES_TRIGGERING_KARMA,
             tasks:[
                'karma:persist:run',
-               'concat:browser', 
-               'wrap:browserPackage', 
-               'uglify',
-               'copy:browserDist',               
+               'browser-build',               
                'dist-sizes']
          },
          
@@ -225,7 +222,7 @@ module.exports = function (grunt) {
          testNode:{
             files: FILES_TRIGGERING_KARMA,
             tasks:[ 
-               'node-run-tests']
+               'node-build-run']
          },         
          
          restartStreamSourceAndRunTests:{
@@ -292,36 +289,42 @@ module.exports = function (grunt) {
       'karma:persist:run'
    ]);
    
-   // test-auto-run
-   //
-   // The most useful for developing. Start this task, capture some browsers
-   // then edit the code. Tests will be run as the code is saved.
-   grunt.registerTask('test-auto-run',   [
-      'start-stream-source',
-      'karma:persist',
-      'concurrent:watchDev'       
-   ]);
-   
-   grunt.registerTask('node-test-auto-run',   [
-      'start-stream-source',
-      'watch:testNode'       
-   ]);         
-
    grunt.registerTask('dist-sizes',   [
       'exec:reportMinifiedSize',
       'exec:reportMinifiedAndGzippedSize'
    ]);
-
-   grunt.registerTask('node-run-tests',      [
+            
+   grunt.registerTask('node-build',      [
       'concat:node', 
       'wrap:nodePackage',
-      'copy:nodeDist',
+      'copy:nodeDist'
+   ]);
+
+   grunt.registerTask('node-build-test',      [
+      'node-build',
       'jasmine_node_oboe'
    ]);
       
-   grunt.registerTask('node-build',      [
+   grunt.registerTask('node',      [
       'start-stream-source',
-      'node-run-tests'
+      'node-build-test'
+   ]);   
+
+   grunt.registerTask('browser-build',      [
+      'concat:browser', 
+      'concat:node', 
+      'wrap:browserPackage', 
+      'uglify',
+      'copy:browserDist'   
+   ]);
+   
+   grunt.registerTask('browser-build-test',      [
+      'karma:single-dev', 
+      'karma:single-browser-http',
+      'browser-build',
+      'karma:single-concat',                                         
+      'karma:single-minified',     
+      'karma:single-amd'   
    ]);   
    
    grunt.registerTask('default',      [
@@ -332,25 +335,27 @@ module.exports = function (grunt) {
       'start-stream-source',
       
       // browser tasks
-      'karma:single-dev', 
-      'karma:single-browser-http',
-      'concat:browser', 
-      'concat:node', 
-      'wrap:browserPackage', 
-      'uglify',
-      'copy:browserDist',
-      'karma:single-concat',                                         
-      'karma:single-minified',     
-      'karma:single-amd',     
+      'browser-build-test',     
 
       // now node:
-      'concat:node', 
-      'wrap:nodePackage',
-      'copy:nodeDist',
-      'jasmine_node_oboe',
+      'node-build-test',
       
       // how big are we?
       'dist-sizes'                                                            
    ]);
+   
+   grunt.registerTask('node-test-auto-run',   [
+      'start-stream-source',
+      'watch:testNode'       
+   ]);   
 
+   // test-auto-run
+   //
+   // The most useful for developing. Start this task, capture some browsers
+   // then edit the code. Tests will be run as the code is saved.
+   grunt.registerTask('browser-test-auto-run',   [
+      'start-stream-source',
+      'karma:persist',
+      'concurrent:watchDev'       
+   ]);
 };
