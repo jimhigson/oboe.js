@@ -47,7 +47,10 @@ function instanceController(  emit, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      emit(ERROR_EVENT, undefined, undefined, e);
+      emit(
+         ERROR_EVENT, 
+         errorReport(undefined, undefined, e)
+      );
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -115,7 +118,10 @@ function instanceController(  emit, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         emit(ERROR_EVENT, undefined, undefined, e);
+         emit(
+            ERROR_EVENT, 
+            errorReport(undefined, undefined, e)
+         );
       }
       
       delete oboeApi.forget;

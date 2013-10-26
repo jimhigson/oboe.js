@@ -77,13 +77,19 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
             
          } else {
             readStreamToEnd(res, function(errorBody){
-               emit( ERROR_EVENT, statusCode, errorBody );
+               emit( 
+                  ERROR_EVENT, 
+                  errorReport( statusCode, errorBody )
+               );
             });
          }      
       });
       
       req.on('error', function(e) {
-         emit( ERROR_EVENT, 0, '', e );
+         emit( 
+            ERROR_EVENT, 
+            errorReport(undefined, undefined, e )
+         );
       });
       
       on( ABORTING, function(){              

@@ -16,3 +16,12 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     NEW_CONTENT = _S++,
     END_OF_CONTENT = _S++,
     ABORTING = _S++;
+    
+function errorReport(statusCode, body, error) {
+
+   return {
+      statusCode:statusCode,
+      body:body,
+      error:error
+   };
+}    

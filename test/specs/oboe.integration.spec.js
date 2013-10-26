@@ -331,11 +331,7 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
              
       runs( function() {
-         expect( stubCallback )
-            .toHaveBeenCalledWith( 
-               404, 
-               jasmine.any(String) 
-            )
+         expect( stubCallback ).toHaveBeenGivenErrorStatusCode( 404 );
       });
    })
    
@@ -364,13 +360,8 @@ describe("oboe integration (real http)", function() {
          return !!stubCallback.calls.length;
       }, 'the request to fail', 30*1000)
 
-      runs( function() {      
-         expect( stubCallback )
-            .toHaveBeenCalledWith( 
-               undefined, 
-               undefined,
-               anyError 
-            );
+      runs( function() {     
+         expect(stubCallback).toHaveBeenGivenAnyError();       
       });
    })
    
@@ -387,12 +378,7 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
 
       runs( function() {
-         expect( stubCallback )
-            .toHaveBeenCalledWith( 
-               undefined, 
-               undefined,
-               'I am a bad callback'
-            )
+         expect( stubCallback ).toHaveBeenGivenError('I am a bad callback')
       });
    })
    
@@ -411,13 +397,8 @@ describe("oboe integration (real http)", function() {
 
  
       runs( function() {
-         expect( stubCallback )
-            .toHaveBeenCalledWith( 
-               undefined, 
-               undefined,
-               callbackError 
-            )
-      });
+         expect( stubCallback ).toHaveBeenGivenError(callbackError)
+      })
    })         
 
    function someSecondsToPass(waitSecs) {
@@ -456,6 +437,7 @@ describe("oboe integration (real http)", function() {
       return !!fullResponse         
    }
 
+
    /**
     * jasmine.any(Error) doesn't always work in Safari (tested v6.0.5)
     * because:
@@ -463,8 +445,8 @@ describe("oboe integration (real http)", function() {
     * ((new XMLHttpRequestException()) instanceof Error) == false
     * 
     */
-   var anyError = {
-      jasmineMatches: function(maybeErr){
+
+      function isAnError(maybeErr){
             
          if( maybeErr instanceof Error ) {
          
@@ -479,16 +461,36 @@ describe("oboe integration (real http)", function() {
          // if that didn't work fallback to some duck typing:
          return(  (typeof maybeErr.message != 'undefined') && 
                   (typeof maybeErr.lineNumber != 'undefined') );
-      },
-      jasmineToString: function() {
-         return 'any error object';
       }
-   };
+
 
    beforeEach(function () {
       aborted = false;
       fullResponse = null;
-      callbackSpy = jasmine.createSpy('callbackSpy');      
+      callbackSpy = jasmine.createSpy('callbackSpy');
+      
+      this.addMatchers({
+         toHaveBeenGivenAnyError:function(){
+            var errorReport = this.actual.mostRecentCall.args[0];
+            
+            return isAnError(errorReport.error);
+         },
+         toHaveBeenGivenError:function(expectedError){
+            var errorReport = this.actual.mostRecentCall.args[0];
+            
+            return errorReport.error === expectedError;
+         },         
+         toHaveBeenGivenErrorStatusCode:function(expectedCode){
+            var errorReport = this.actual.mostRecentCall.args[0];
+            
+            return errorReport.statusCode === expectedCode;          
+         },
+         toHaveBeenGivenBody:function(expectedBody){
+            var errorReport = this.actual.mostRecentCall.args[0];
+            
+            return expectedBody === errorReport.body;         
+         }
+      });      
    });   
 
 });  
