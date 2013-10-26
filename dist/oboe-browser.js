@@ -913,7 +913,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} emit a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
@@ -924,7 +924,7 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, xhr, method, url, data, headers) {
+function streamingHttp(emit, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
@@ -968,7 +968,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         fire( NEW_CONTENT, newText );
+         emit( NEW_CONTENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -987,7 +987,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          var sucessful = String(xhr.status)[0] == 2;
          
          if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is fired when a response
+            // In Chrome 29 (not 28) no onprogress is emitted when a response
             // is complete before the onload. We need to always do handleInput
             // in case we get the load but have not had a final progress event.
             // This looks like a bug and may change in future but let's take
@@ -995,10 +995,10 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             // progress event for each part of the response
             handleProgress();
             
-            fire( END_OF_CONTENT );
+            emit( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT, xhr.status, xhr.responseText );
+            emit( ERROR_EVENT, xhr.status, xhr.responseText );
          }
       }
    };
@@ -1014,14 +1014,14 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       xhr.send(validatedRequestBody(data));
       
    } catch( e ) {
-      // To keep a consistent interface with Node, we can't fire an event here.
+      // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
-      // event rather than as an exception. If we fired now, the Oboe user
+      // event rather than as an exception. If we emitted now, the Oboe user
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(fire, ERROR_EVENT, 0, '', e)
+         partialComplete(emit, ERROR_EVENT, 0, '', e)
       ,  0
       );
    }            
@@ -1145,7 +1145,7 @@ var jsonPathSyntax = (function() {
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
- * to the low-level events from Clarinet and fires higher-level ones.
+ * to the low-level events from Clarinet and emits higher-level ones.
  *  
  * The building up is stateless so to track a JSON file
  * clarinetListenerAdaptor.js is required to store the ascent state
@@ -1174,10 +1174,10 @@ var ROOT_PATH = {};
 
 
 /**
- * Create a new set of handlers for clarinet's events, bound to the fire 
+ * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( fire) {
+function incrementalContentBuilder( emit ) {
 
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
@@ -1206,7 +1206,7 @@ function incrementalContentBuilder( fire) {
       
       if( !ascent ) {
          // we discovered the root node,
-         fire( ROOT_FOUND, newDeepestNode);
+         emit( ROOT_FOUND, newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -1275,7 +1275,7 @@ function incrementalContentBuilder( fire) {
                                  ascent
                               );
      
-      fire( PATH_FOUND, ascentWithNewPath);
+      emit( PATH_FOUND, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -1286,7 +1286,7 @@ function incrementalContentBuilder( fire) {
     */
    function curNodeFinished( ascent ) {
 
-      fire( NODE_FOUND, ascent);
+      emit( NODE_FOUND, ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);
@@ -1715,9 +1715,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 /**
  * Isn't this the cutest little pub-sub you've ever seen?
  * 
- * Does not allow unsubscription because is never needed inside Oboe.
- * Instead, when an Oboe instance is finished the whole of it should be
- * available for GC'ing.
+ * Over time this should be refactored towards a Node-like
+ *    EventEmitter so that under Node an actual EE acn be used.
+ *    http://nodejs.org/api/events.html
  */
 function pubSub(){
 
@@ -1732,7 +1732,7 @@ function pubSub(){
          return this; // chaining
       }, 
     
-      fire:varArgs(function ( eventId, parameters ) {
+      emit:varArgs(function ( eventId, parameters ) {
                
          each( 
             partialComplete( apply, parameters ), 
@@ -1770,7 +1770,7 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
  */
  
  
-function instanceController(  fire, on, un, 
+function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
@@ -1812,7 +1812,7 @@ function instanceController(  fire, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      fire(ERROR_EVENT, 0, '', e);
+      emit(ERROR_EVENT, 0, '', e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1880,7 +1880,7 @@ function instanceController(  fire, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         fire(ERROR_EVENT, 0, '', Error('error in callbak', e));
+         emit(ERROR_EVENT, 0, '', Error('error in callback' + e.message));
       }
       
       delete oboeApi.forget;
@@ -1951,7 +1951,7 @@ function instanceController(  fire, on, un,
       on    :  addListener,
       fail  :  addFailListner,
       done  :  addDoneListener,
-      abort :  partialComplete(fire, ABORTING),
+      abort :  partialComplete(emit, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }
@@ -1967,14 +1967,14 @@ function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
-   streamingHttp( eventBus.fire, eventBus.on,
+   streamingHttp( eventBus.emit, eventBus.on,
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, eventBus.un, 
+               eventBus.emit, eventBus.on, eventBus.un, 
                clarinet.parser(), 
-               incrementalContentBuilder(eventBus.fire) 
+               incrementalContentBuilder(eventBus.emit) 
    );
 }
 

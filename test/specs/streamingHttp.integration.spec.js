@@ -9,7 +9,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                         
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
@@ -29,7 +29,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                         
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
@@ -58,7 +58,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                       
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/tenSlowNumbers',
@@ -80,7 +80,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                        
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'POST',
          '/testServer/echoBackBody',
@@ -102,7 +102,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'PUT',
           '/testServer/echoBackBody',
@@ -124,7 +124,7 @@ describe('streaming xhr integration (real http)', function() {
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'PATCH',
           '/testServer/echoBackBody',
@@ -147,7 +147,7 @@ describe('streaming xhr integration (real http)', function() {
       it('gives multiple callbacks when loading a streaming resource',  function(queue) {
                               
          streamingHttp(                           
-            fire, on,
+            emit, on,
             new XMLHttpRequest(),            
             'GET',
 
@@ -168,7 +168,7 @@ describe('streaming xhr integration (real http)', function() {
       it('gives multiple callbacks when loading a gzipped streaming resource',  function(queue) {
                               
          streamingHttp(                           
-            fire, on,
+            emit, on,
             new XMLHttpRequest(),            
             'GET',
  
@@ -188,7 +188,7 @@ describe('streaming xhr integration (real http)', function() {
                          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingHttp(              
-         fire, on,
+         emit, on,
          new XMLHttpRequest(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
@@ -213,7 +213,7 @@ describe('streaming xhr integration (real http)', function() {
        contentReceived,
        numberOfProgressCallbacks,
        dripsReceived,
-       fire, on;
+       emit, on;
    
    function waitForRequestToComplete(){
       waitsFor(function(){     
@@ -254,7 +254,7 @@ describe('streaming xhr integration (real http)', function() {
       
       on = jasmine.createSpy();
       
-      fire = jasmine.createSpy().andCallFake(function( eventName, eventContent ){
+      emit = jasmine.createSpy().andCallFake(function( eventName, eventContent ){
       
          if( eventName == NEW_CONTENT ) {
             numberOfProgressCallbacks ++;

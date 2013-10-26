@@ -4,13 +4,13 @@ describe("incremental content builder", function(){
      
       var eventBus = pubSub();
       
-      sinon.spy(eventBus, 'fire');
+      sinon.spy(eventBus, 'emit');
       sinon.spy(eventBus, 'on');
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
       
-      var builderInstance = incrementalContentBuilder(eventBus.fire, eventBus.on, this._clarinetStub);
+      var builderInstance = incrementalContentBuilder(eventBus.emit, eventBus.on, this._clarinetStub);
       
       clarinetListenerAdaptor( this._clarinetStub, builderInstance);
    }
@@ -29,7 +29,7 @@ describe("incremental content builder", function(){
    
    IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
      
-      this._eventBus.fire.apply(undefined, arguments);
+      this._eventBus.emit.apply(undefined, arguments);
       return this;
    };
    
@@ -38,9 +38,9 @@ describe("incremental content builder", function(){
       
       var builder = aContentBuilder().receivingParserEvent('onopenobject'); 
       
-      it('fires correct event', function(){
+      it('emits correct event', function(){
          expect( builder)
-            .toHaveFired(         
+            .toHaveEmitted(         
                PATH_FOUND
             ,  anAscentContaining(  
                   {key:ROOT_PATH, node:{}}
@@ -51,7 +51,7 @@ describe("incremental content builder", function(){
 
       it('reports correct root', function () {
 
-         expect(builder).toHaveFiredRootThatIsNow({})
+         expect(builder).toHaveEmittedRootThatIsNow({})
 
       });
    })
@@ -62,10 +62,10 @@ describe("incremental content builder", function(){
           .receivingParserEvent('onopenobject')
           .receivingParserEvent('onkey', 'flavour');
           
-      it('fires correct event', function(){
+      it('emits correct event', function(){
 
          expect( builder )
-            .toHaveFired(
+            .toHaveEmitted(
                 PATH_FOUND
              ,  anAscentContaining(  
                    {key:ROOT_PATH, node:{flavour:undefined}}
@@ -76,7 +76,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow({flavour:undefined});
+         expect(builder).toHaveEmittedRootThatIsNow({flavour:undefined});
       });
       
    })
@@ -87,9 +87,9 @@ describe("incremental content builder", function(){
       var builder = aContentBuilder()
           .receivingParserEvent('onopenobject', 'flavour');
           
-      it('fires correct event', function(){
+      it('emits correct event', function(){
           
-         expect(builder).toHaveFired(
+         expect(builder).toHaveEmitted(
              PATH_FOUND
           ,  anAscentContaining(  
                 {key:ROOT_PATH, node:{flavour:undefined}}
@@ -100,7 +100,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow({flavour:undefined});
+         expect(builder).toHaveEmittedRootThatIsNow({flavour:undefined});
       });      
       
    })   
@@ -112,8 +112,8 @@ describe("incremental content builder", function(){
                  .receivingParserEvent('onkey'    ,  'flavour')
                  .receivingParserEvent('onvalue'  ,  'strawberry');
                  
-      it('fires correct event', function(){                 
-         expect(builder).toHaveFired(
+      it('emits correct event', function(){                 
+         expect(builder).toHaveEmitted(
             NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
@@ -124,12 +124,12 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
        
-         expect(builder).toHaveFiredRootThatIsNow({flavour:'strawberry'});
+         expect(builder).toHaveEmittedRootThatIsNow({flavour:'strawberry'});
       });   
          
    })
    
-   describe('fires node found after root object closes', function() {
+   describe('emits node found after root object closes', function() {
 
       var builder = aContentBuilder()
                  .receivingParserEvent('onopenobject')
@@ -137,8 +137,8 @@ describe("incremental content builder", function(){
                  .receivingParserEvent('onvalue', 'strawberry')
                  .receivingParserEvent('oncloseobject');
                  
-      it('fires correct event', function(){                 
-         expect(builder).toHaveFired(
+      it('emits correct event', function(){                 
+         expect(builder).toHaveEmitted(
             NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
@@ -148,7 +148,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow({flavour:'strawberry'});      
+         expect(builder).toHaveEmittedRootThatIsNow({flavour:'strawberry'});      
       });   
                      
    })
@@ -161,9 +161,9 @@ describe("incremental content builder", function(){
           .receivingParserEvent('onopenarray')
           .receivingParserEvent('onvalue', 'a');
           
-      it('fires path event with numeric paths', function(){
+      it('emits path event with numeric paths', function(){
       
-         expect(builder).toHaveFired(
+         expect(builder).toHaveEmitted(
             PATH_FOUND
             , anAscentContaining(
                   {key:ROOT_PATH,  node:{'alphabet':['a']}    }
@@ -173,8 +173,8 @@ describe("incremental content builder", function(){
          );
       })
       
-      it('fired node event', function(){
-         expect(builder).toHaveFired(
+      it('emitted node event', function(){
+         expect(builder).toHaveEmitted(
             NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a']} }
@@ -186,7 +186,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow({'alphabet':['a']});
+         expect(builder).toHaveEmittedRootThatIsNow({'alphabet':['a']});
       });
 
    })
@@ -200,9 +200,9 @@ describe("incremental content builder", function(){
           .receivingParserEvent('onvalue', 'a')
           .receivingParserEvent('onvalue', 'b');
           
-      it('fires events with numeric paths', function(){    
+      it('emits events with numeric paths', function(){    
           
-         expect(builder).toHaveFired(
+         expect(builder).toHaveEmitted(
             PATH_FOUND
             ,  anAscentContaining(
                {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
@@ -212,8 +212,8 @@ describe("incremental content builder", function(){
          )
       })
       
-      it('fired node event', function(){
-         expect(builder).toHaveFired(
+      it('emitted node event', function(){
+         expect(builder).toHaveEmitted(
             NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a', 'b']} }
@@ -225,7 +225,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow({'alphabet':['a','b']});
+         expect(builder).toHaveEmittedRootThatIsNow({'alphabet':['a','b']});
       });
 
    })
@@ -237,9 +237,9 @@ describe("incremental content builder", function(){
           .receivingParserEvent('onvalue', 'a')
           .receivingParserEvent('onvalue', 'b');
           
-      it('fires events with numeric paths', function(){    
+      it('emits events with numeric paths', function(){    
           
-         expect(builder).toHaveFired(
+         expect(builder).toHaveEmitted(
             PATH_FOUND
             ,  anAscentContaining(
                  {key:ROOT_PATH,  node:['a','b']                }
@@ -248,8 +248,8 @@ describe("incremental content builder", function(){
          )
       })
       
-      it('fired node event', function(){
-         expect(builder).toHaveFired(
+      it('emitted node event', function(){
+         expect(builder).toHaveEmitted(
             NODE_FOUND
          ,  anAscentContaining(  
                {key:ROOT_PATH,    node:['a','b']                }
@@ -260,7 +260,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveFiredRootThatIsNow(['a','b']);
+         expect(builder).toHaveEmittedRootThatIsNow(['a','b']);
       });
 
    })      
@@ -275,17 +275,17 @@ describe("incremental content builder", function(){
    beforeEach(function(){
             
       this.addMatchers({
-         toHaveFiredRootThatIsNow: function( expectedRootObj ) {
+         toHaveEmittedRootThatIsNow: function( expectedRootObj ) {
             var asserter = this.actual;
-            var fire = asserter._eventBus.fire;
+            var emit = asserter._eventBus.emit;
 
-            return fire.calledWith(ROOT_FOUND, expectedRootObj);
+            return emit.calledWith(ROOT_FOUND, expectedRootObj);
          },
       
-         toHaveFired: function( eventName, expectedAscent ){
+         toHaveEmitted: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
-            var fire = asserter._eventBus.fire;
+            var emit = asserter._eventBus.emit;
             
             var ascentMatch = sinon.match(function ( foundAscent ) {
                      
@@ -318,8 +318,8 @@ describe("incremental content builder", function(){
          
                     
             this.message = function(){
-               if( !fire.called ) {
-                  return 'no events have been fired at all';
+               if( !emit.called ) {
+                  return 'no events have been emitted at all';
                }
 
                function reportCall(eventName, ascentList) {
@@ -337,16 +337,16 @@ describe("incremental content builder", function(){
             
                return   'expected a call with : \t' + reportCall(eventName, expectedAscent) +
                         '\n' +  
-                        'latest call had :      \t' + reportArgs(fire.lastCall.args) +
+                        'latest call had :      \t' + reportArgs(emit.lastCall.args) +
                         '\n' +
                         'all calls were :' +
                         '\n                     \t' +
-                        fire.args.map( reportArgs ).join('\n                     \t')
+                        emit.args.map( reportArgs ).join('\n                     \t')
             };
 
 
 
-            return fire.calledWithMatch( eventName, ascentMatch );
+            return emit.calledWithMatch( eventName, ascentMatch );
          }
                               
       });   

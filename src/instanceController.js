@@ -5,7 +5,7 @@
  */
  
  
-function instanceController(  fire, on, un, 
+function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
@@ -47,7 +47,7 @@ function instanceController(  fire, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      fire(ERROR_EVENT, 0, '', e);
+      emit(ERROR_EVENT, 0, '', e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -115,7 +115,7 @@ function instanceController(  fire, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         fire(ERROR_EVENT, 0, '', Error('error in callbak', e));
+         emit(ERROR_EVENT, 0, '', Error('error in callback' + e.message));
       }
       
       delete oboeApi.forget;
@@ -186,7 +186,7 @@ function instanceController(  fire, on, un,
       on    :  addListener,
       fail  :  addFailListner,
       done  :  addDoneListener,
-      abort :  partialComplete(fire, ABORTING),
+      abort :  partialComplete(emit, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

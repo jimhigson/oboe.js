@@ -319,7 +319,7 @@ describe("oboe integration (real http)", function() {
      
    });  
 
-   it('fires error on 404', function () {
+   it('emits error on 404', function () {
 
       var stubCallback = jasmine.createSpy('error callback');
 
@@ -339,7 +339,7 @@ describe("oboe integration (real http)", function() {
       });
    })
    
-   it('fires error on 404 in nodejs style too', function () {
+   it('emits error on 404 in nodejs style too', function () {
 
       var gotError = false
 
@@ -353,8 +353,8 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })   
    
-   it('fires error on unreachable url', function () {
-  
+   it('emits error on unreachable url', function () {
+     
       var stubCallback = jasmine.createSpy('error callback');
 
       oboe('nowhere.ox.ac.uk:754196/fooz/barz')
@@ -364,17 +364,17 @@ describe("oboe integration (real http)", function() {
          return !!stubCallback.calls.length;
       }, 'the request to fail', 30*1000)
 
-      runs( function() {
+      runs( function() {      
          expect( stubCallback )
             .toHaveBeenCalledWith( 
                0, 
                '',
                anyError 
-            )
+            );
       });
    })
    
-   it('fires error on callback error', function () {
+   it('emits error if callback throws a string', function () {
 
       var stubCallback = jasmine.createSpy('error callback');
 
@@ -394,7 +394,30 @@ describe("oboe integration (real http)", function() {
                anyError 
             )
       });
-   })      
+   })
+   
+   it('emits error if callback throws an error', function () {
+
+      var stubCallback = jasmine.createSpy('error callback');
+
+      oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         .node('!.*', jasmine.createSpy().andThrow(new Error('I am a bad callback')) )
+         .fail(stubCallback);
+         
+      waitsFor(function () {
+         return !!stubCallback.calls.length;
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+
+ 
+      runs( function() {
+         expect( stubCallback )
+            .toHaveBeenCalledWith( 
+               0, 
+               '',
+               anyError 
+            )
+      });
+   })         
 
    function someSecondsToPass(waitSecs) {
 
@@ -443,11 +466,21 @@ describe("oboe integration (real http)", function() {
       jasmineMatches: function(maybeErr){
             
          if( maybeErr instanceof Error ) {
+         
             return true;
          }
          
-         return window && window.XMLHttpRequestException &&
-                  maybeErr instanceof XMLHttpRequestException;
+         if( window && window.XMLHttpRequestException &&
+                  maybeErr instanceof XMLHttpRequestException ) {
+            return true;
+         }
+                  
+         // if that didn't work fallback to some duck typing:
+         return(  (typeof maybeErr.message != 'undefined') && 
+                  (typeof maybeErr.lineNumber != 'undefined') );
+      },
+      jasmineToString: function() {
+         return 'any error object';
       }
    };
 

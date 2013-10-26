@@ -329,33 +329,31 @@ module.exports = function (grunt) {
    
    grunt.registerTask('default',      [
    
-      // init
       'clear',   
       'clean',
       'start-stream-source',
       
-      // browser tasks
       'browser-build-test',     
 
-      // now node:
       'node-build-test',
       
-      // how big are we?
       'dist-sizes'                                                            
    ]);
    
-   grunt.registerTask('node-test-auto-run',   [
-      'start-stream-source',
-      'watch:testNode'       
-   ]);   
+   
 
-   // test-auto-run
+   // browser-test-auto-run or node-test-auto-run
    //
    // The most useful for developing. Start this task, capture some browsers
-   // then edit the code. Tests will be run as the code is saved.
+   // (unless node) then edit the code. Tests will be run as the code is 
+   // saved.
    grunt.registerTask('browser-test-auto-run',   [
       'start-stream-source',
       'karma:persist',
       'concurrent:watchDev'       
    ]);
+   grunt.registerTask('node-test-auto-run',   [
+      'start-stream-source',
+      'watch:testNode'       
+   ]);   
 };
