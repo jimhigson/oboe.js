@@ -367,8 +367,8 @@ describe("oboe integration (real http)", function() {
       runs( function() {      
          expect( stubCallback )
             .toHaveBeenCalledWith( 
-               0, 
-               '',
+               undefined, 
+               undefined,
                anyError 
             );
       });
@@ -389,19 +389,20 @@ describe("oboe integration (real http)", function() {
       runs( function() {
          expect( stubCallback )
             .toHaveBeenCalledWith( 
-               0, 
-               '',
-               anyError 
+               undefined, 
+               undefined,
+               'I am a bad callback'
             )
       });
    })
    
    it('emits error if callback throws an error', function () {
 
-      var stubCallback = jasmine.createSpy('error callback');
+      var stubCallback = jasmine.createSpy('error callback'),
+          callbackError = new Error('I am a bad callback');
 
       oboe(url('static/json/firstTenNaturalNumbers.json'))      
-         .node('!.*', jasmine.createSpy().andThrow(new Error('I am a bad callback')) )
+         .node('!.*', jasmine.createSpy().andThrow(callbackError) )
          .fail(stubCallback);
          
       waitsFor(function () {
@@ -412,9 +413,9 @@ describe("oboe integration (real http)", function() {
       runs( function() {
          expect( stubCallback )
             .toHaveBeenCalledWith( 
-               0, 
-               '',
-               anyError 
+               undefined, 
+               undefined,
+               callbackError 
             )
       });
    })         

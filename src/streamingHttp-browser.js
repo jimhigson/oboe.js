@@ -118,7 +118,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, 0, '', e)
+         partialComplete(emit, ERROR_EVENT, undefined, undefined, e)
       ,  0
       );
    }            

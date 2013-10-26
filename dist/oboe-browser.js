@@ -1021,7 +1021,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, 0, '', e)
+         partialComplete(emit, ERROR_EVENT, undefined, undefined, e)
       ,  0
       );
    }            
@@ -1812,7 +1812,7 @@ function instanceController(  emit, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      emit(ERROR_EVENT, 0, '', e);
+      emit(ERROR_EVENT, undefined, undefined, e);
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -1880,7 +1880,7 @@ function instanceController(  emit, on, un,
       }catch(e)  {
       
          // An error occured during the callback, publish it on the event bus 
-         emit(ERROR_EVENT, 0, '', Error('error in callback' + e.message));
+         emit(ERROR_EVENT, undefined, undefined, e);
       }
       
       delete oboeApi.forget;
