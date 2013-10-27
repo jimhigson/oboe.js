@@ -262,19 +262,26 @@ and that handlers it registers on the event bus are the class' public methods. I
 this regard, the high-level internal design of Oboe could be discussed
 using terms from a more standard object oriented metamodel.
 
-Event where it creates a larger
-final delivery I have generally preferred writing as short functions which can be 
-joined together using techniques from functional programming such as 
-partial completion and functional composition over longer ones. Short functions
-reduce the size of the minimum testable unit and means that the unit tests
-can be very simple.
+Javascript is of course an imperative language but over many iterations
+Oboe has evolved towards a declarative programming style. For example,
+incrementalContentBuilder.js [incrementalContentBuilder.js](#incrementalContentBuilder.js)
+(Appendix p.\pageref{incrementalContentBuilder.js}). was initially stateful and
+procedural, reading as instructions to perform a task. Over many
+refactors the flavour of the code has changed, now reading more like
+a description of desired behaviour.
+
+Event where it creates a larger deliverable
+library I have generally preferred writing as short functions which can be 
+joined together into longer ones. Short functions
+reduce the size of the minimum testable unit and allow very simple 
+unit tests.
 Because of the pressures on code size I decided not to use a general
 purpose functional library and created my own with only the parts
 that are needed. See [functional.js](#functional.js)
 (Appendix p.\pageref{functional.js}).  
 Functional programming in
 Javascript is known to be slower than other styles, particularly under
-Firefox because it lacks Lambda Lifting and other similar optimisations
+Firefox because it lacks optimisation such as Lambda Lifting
 [@functionalSpiderMonkey]. Considering to what degree performance
 concerns should dissuade us from a functional style, we may consider the
 library's execution context. Because of the single-threaded model any
@@ -292,12 +299,6 @@ single frame over many. For example, parsing and marshaling. Although
 the overall computation may be higher, the total performance of the
 system should be improved.
 
-Javascript is of course an imperative language but over many iterations
-Oboe has tended towards a declarative style. In
-incrementalContentBuilder.js programming was initially stateful and
-procedural, reading like the instructions to perform a task. Over many
-refactors the flavour of the code has changed, the reading now tending
-towards a description of desired behaviour.
 
 Incrementally building up the content
 -------------------------------------
