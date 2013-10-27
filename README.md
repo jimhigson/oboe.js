@@ -466,8 +466,7 @@ var oboe = require('oboe');
 
 ## Making a request
 
-Oboe exposes a single global at `window.oboe`. You can start a new AJAX request by 
-calling one of these methods:
+You can start a new AJAX request by calling one of these methods:
 
 ```js
    oboe( String url ) // makes a GET request
@@ -485,6 +484,13 @@ calling one of these methods:
       body: Object|String,
       headers:{ key: value }
    })         
+```
+
+If you are in Node.js or have AMD loaded in your browser Oboe won't register 
+a global so do:
+
+```js
+var oboe = require('oboe')
 ```   
 
 ## node and path
