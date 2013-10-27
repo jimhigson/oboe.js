@@ -25,7 +25,7 @@ http.
 	- [Css4 style patterns](#css4-style-patterns)
 	- [Using Oboe with d3.js](#using-oboe-with-d3js)
 	- [Reading from any stream (Node.js only)](#reading-from-any-stream-nodejs-only)
-	- [Error handling](#error-handling)
+	- [Rolling back on error](#rolling-back-on-error)
 	- [More patterns](#more-patterns)	
 - [Installing](#installing)	
 - [API](#api)
@@ -389,36 +389,20 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 });
 ```
 
-## Error handling
+## Rolling back on error
 
-Fetching a resource could fail for several reasons:
-
- * non-2xx status code
- * connection lost
- * invalid JSON from the server
- * error thrown by a callback 
-
-You can react to these my registering a handler with `.fail()`. This gives you
-an object describing the error. 
-
-``` js
-oboe('example.json')
-   .fail( function(errorReport){
-      console.error( errorReport );                  
-   });
-```
-
-## Rolling back on errors
-
-If you started putting building elements on the page then when the connection
-was lost you can two things: make a new request, or undo the changes. 
+[The fail function](#fail) is called when something goes wrong.
+If you started putting elements on the page then and then the connection
+goes down you probably want to do one of two things: make a new request 
+or undo the changes. 
  
 ``` js
 var currentPersonElement;
-oboe('people.json')
+oboe('everyone')
    .path('people.*', function(){
-      // we don't have the person's details yet but we know we found someone in the 
-      // json stream, we can use this to eagerly add them to the page:
+      // we don't have the person's details yet but we know we found 
+      // someone in the json stream, we can use this to eagerly add them to 
+      // the page:
       personDiv = jQuery('<div class="person">');
       jQuery('#people').append(personDiv);
    })
@@ -427,8 +411,8 @@ oboe('people.json')
       currentPersonElement.append('<span class="name"> + name + </span>');
    })
    .fail(function( email ){
-      // oops, that didn't go so well. instead of leaving this dude half on the page,
-      // remove them altogether
+      // oops, that didn't go so well. instead of leaving this dude half 
+      // on the page, remove them altogether
       currentPersonElement.remove();
    })
 ```
@@ -519,7 +503,7 @@ When the pattern is matched the callback is given the matching node and a path d
 `.path()` is the same as `.node()` except the callback is fired when the *path* matches, not when we have the
 thing. For the same pattern this will always fire before `.node()` and might be used to get things ready for that call.
 
-Alternatively, several patterns may be registered at once with either `.path` or `.node`:
+Alternatively, several patterns may be registered at once using either `.path` or `.node`:
 
 ```js
    .node({
@@ -533,17 +517,29 @@ Alternatively, several patterns may be registered at once with either `.path` or
    });
 ``` 
 
+## abort
+
 `abort()` Stops the http call at any time. This is useful if you want to read a json response only as
 far as is necessary. Everything stops. You are guaranteed not to get any further .path() or .node() 
 callbacks, even if the underlying xhr already has additional content buffered.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
 
+## fail
+
+Fetching a resource could fail for several reasons:
+
+ * non-2xx status code
+ * connection lost
+ * invalid JSON from the server
+ * error thrown by a callback
+
 ```js
-   .fail(callback({
-      statusCode:Number,
-      body:String,
-      jsonBody:Object,
-      thrown:Error }))
+   .fail(Function callback({
+            statusCode:Number,
+            body:String,
+            jsonBody:Object,
+            thrown:Error 
+   }))
 ```
 
 Supply a callback for when something goes wrong. An Object is given to the
@@ -553,6 +549,8 @@ callback with the fields:
  * `statusCode`: The status code, if the request got that far
  * `body`: The response body for the error, if any
  * `jsonBody`: If the server's error response was json, the parsed body. 
+
+## root
 
 ```js
    .root()
