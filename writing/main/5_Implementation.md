@@ -301,17 +301,17 @@ handle SAX events from the Clarinet JSON parser. By presenting to the
 controller a simpler interface than is provided by Clarinet, taken
 together these might be considered as an Adaptor pattern, albeit adapted
 to be even-driven rather than call-driven: we receive six event types
-and in response emit from a vocabulary of two, `NODE_FOUND` and `PATH_FOUND`.
-The events from Clarinet
-are low level, reporting the sequence of tokens in the markup; those
-emitted are at a much higher level of abstraction, reporting the JSON
-nodes and paths as they are discovered. Testing a JSONPath expression
-for a match against any particular node requires the node itself, the
-path to the node, and the ancestor nodes. For each newly found item in
-the JSON this information is delivered as the payload of the two
-event types emitted by the content builder. When the callback adaptors receive these events
-they have the information required to test for matches against registered patterns
-and notify application callbacks if required. 
+and in response emit from a vocabulary of two, `NODE_FOUND` and
+`PATH_FOUND`. The events from Clarinet are low level, reporting the
+sequence of tokens in the markup; those emitted are at a much higher
+level of abstraction, reporting the JSON nodes and paths as they are
+discovered. Testing a JSONPath expression for a match against any
+particular node requires the node itself, the path to the node, and the
+ancestor nodes. For each newly found item in the JSON this information
+is delivered as the payload of the two event types emitted by the
+content builder. When the callback adaptors receive these events they
+have the information required to test for matches against registered
+patterns and notify application callbacks if required.
 
 ![List representation of an ascent from leaf to root of a JSON tree.
 Note the special ROOT value which represents the location of the
@@ -321,66 +321,65 @@ object uniqueness to ensure that its location is unequal to all others.
 
 The path to the current node is maintained as a singly linked list in
 which each item holds the node and the field name that linked to the
-node from its parent. Each link in the list is
-immutable, enforced in newer Javascript engines by using frozen objects
-[^2]. The list is arranged as an ascent with the current node at the
-near end and the root at the far end. Although paths are typically
-written as a *descent*, ordering as an *ascent* is more efficient because as
-we traverse the JSON the current node is appended and removed many times.
-As nodes open and close all updates are
-at the head of the list giving constant time for access and mutation.
-For familiarity, where paths are passed to application callbacks they are
-first reversed and converted to arrays.
+node from its parent. Each link in the list is immutable, enforced in
+newer Javascript engines by using frozen objects [^2]. The list is
+arranged as an ascent with the current node at the near end and the root
+at the far end. Although paths are typically written as a *descent*,
+ordering as an *ascent* is more efficient because as we traverse the
+JSON the current node is appended and removed many times. As nodes open
+and close all updates are at the head of the list giving constant time
+for access and mutation. For familiarity, where paths are passed to
+application callbacks they are first reversed and converted to arrays.
 
 For each Clarinet event the builder provides a corresponding handler
 which, working from the current ascent, returns the next ascent after
 the event has been applied. For example, the `objectopen` and
 `arrayopen` event types are handled by adding a new item at the head of
-the ascent but for `closeobject` and `closearray` one is removed.
-Over the course of parsing a JSON resource the ascent will in this
-way be manipulated to visit every node, allowing each to be tested
-against the registered JSONPath expressions. Internally, the builder's
-handlers for SAX events are declared as the combination of a smaller number of
-basic reusable parts. Several of Clarinet's event types differ only
-by the type of the node that they announce but the builder is largely unconcerned regarding a
-JSON node's type. On picking up `openobject` and
-`openarray` events, both pass through to the same `nodeFound` function, differing
-only in the type of the node which is first created. Similarly, Clarinet emits
-a `value` event when a string or number is found in
-the markup. Because primitive nodes are always leaves the builder treats
-them as a node which instantaneously starts and ends, handled
-programmatically as the composition of the `nodeFound` and
+the ascent but for `closeobject` and `closearray` one is removed. Over
+the course of parsing a JSON resource the ascent will in this way be
+manipulated to visit every node, allowing each to be tested against the
+registered JSONPath expressions. Internally, the builder's handlers for
+SAX events are declared as the combination of a smaller number of basic
+reusable parts. Several of Clarinet's event types differ only by the
+type of the node that they announce but the builder is largely
+unconcerned regarding a JSON node's type. On picking up `openobject` and
+`openarray` events, both pass through to the same `nodeFound` function,
+differing only in the type of the node which is first created.
+Similarly, Clarinet emits a `value` event when a string or number is
+found in the markup. Because primitive nodes are always leaves the
+builder treats them as a node which instantaneously starts and ends,
+handled programmatically as the composition of the `nodeFound` and
 `nodeFinished` functions. The design of a small bank of smaller
 instructions that are combined to build up larger ones is perhaps
 reminiscent of the use of micro-instructions in CPU design.
 
 Although the builder functions are stateless and side-effect free, while
 visiting each JSON node the current ascent needs to be stored. This is
-handled by the ascent tracker which serves as a holder
-for this data. Starting with the ascent initialised as an empty list, on
-receiving a SAX event it passes the ascent to the handler and stores the
-result so that when the next SAX event is received the updated ascent
-can be given to the next handler.
+handled by the ascent tracker which serves as a holder for this data.
+Starting with the ascent initialised as an empty list, on receiving a
+SAX event it passes the ascent to the handler and stores the result so
+that when the next SAX event is received the updated ascent can be given
+to the next handler.
 
 For the ascents linked lists were chosen in preference to the more
 conventional approach of using native Javascript Arrays for several
-reasons. Firstly, I find the program more easy to test and
-debug given immutable data structures. Employing native Arrays without
-mutating would be very expensive because on each new path the whole array
-would have to be copied. Secondly, while debugging,
-unpicking a stack trace is easier if I know that every value revealed is
-the value that has always occupied that space and I don't have to
-imagine the different values that were in the same space earlier or will
-be there later. Thirdly, the lack of side effects means that I can try new commands in
-the debugger's CLI without worrying about breaking the execution of the
-program. Most Javascript virtual machines are also quite poor at array
-growing and shrinking so for collections whose size changes often, arrays are
-relatively inperformant. Finally, lists are a very
-convenient format for the JSONPath engine to match against as will
-be discussed in the next section. The Javascript file
-[lists.js](#lists.js) (Appendix p.\pageref{lists.js}) implements various
-list functions: `cons`, `head`, `tail`, `map`, `foldR`, `all`, `without`
-as well as providing conversions to and from arrays.
+reasons. Firstly, I find the program more easy to test and debug given
+immutable data structures. Employing native Arrays without mutating
+would be very expensive because on each new path the whole array would
+have to be copied. Secondly, while debugging, unpicking a stack trace is
+easier if I know that every value revealed is the value that has always
+occupied that space and I don't have to imagine the different values
+that were in the same space earlier or will be there later. Thirdly, the
+lack of side effects means that I can try new commands in the debugger's
+CLI without worrying about breaking the execution of the program. Most
+Javascript virtual machines are also quite poor at array growing and
+shrinking so for collections whose size changes often, arrays are
+relatively inperformant. Finally, lists are a very convenient format for
+the JSONPath engine to match against as will be discussed in the next
+section. The Javascript file [lists.js](#lists.js) (Appendix
+p.\pageref{lists.js}) implements various list functions: `cons`, `head`,
+`tail`, `map`, `foldR`, `all`, `without` as well as providing
+conversions to and from arrays.
 
 Oboe JSONPath Implementation
 ----------------------------
@@ -389,11 +388,11 @@ On the first commit the JSONPath implementation was little more than a
 series of regular expressions[^3] but has slowly evolved into a
 featureful and efficient implementation[^4]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
-specifications[^5]. The JSONPath compiler exposes a single higher-order function. This
-function takes the JSONPath as a string and, proving it is a valid
-expression, returns a function which tests for matches to the pattern.
-The type of the compiler is difficult to express in
-Javascript but expressed as Haskell would be:
+specifications[^5]. The JSONPath compiler exposes a single higher-order
+function. This function takes the JSONPath as a string and, proving it
+is a valid expression, returns a function which tests for matches to the
+pattern. The type of the compiler is difficult to express in Javascript
+but expressed as Haskell would be:
 
 ~~~~ {.haskell}
 String -> Ascent -> JsonPathMatchResult
@@ -402,10 +401,10 @@ String -> Ascent -> JsonPathMatchResult
 The match result is either a hit or a miss. If a hit, the return value
 is the node captured by the match. Should the pattern have an explicitly
 capturing clause the node corresponding to that clause is captured,
-otherwise it is the node at the head of the ascent. Implementation 
-as a higher-order function was chosen even though it might have been
-simpler to create a first-order version as seen in the original
-JSONPath implementation:
+otherwise it is the node at the head of the ascent. Implementation as a
+higher-order function was chosen even though it might have been simpler
+to create a first-order version as seen in the original JSONPath
+implementation:
 
 ~~~~ {.haskell}
 (String, Ascent) -> JsonPathMatchResult
@@ -415,9 +414,9 @@ This version was rejected because the pattern string would have to be
 freshly reinterpreted on each evaluation, repeating computation
 unnecessarily. Because a pattern is registered once but then evaluated
 perhaps hundreds of times per JSON file the most pressing performance
-consideration is for matching to execute quickly. The extra time needed to
-compile a pattern when new application callbacks are registered is relatively
-insignificant because it is performed much less often. 
+consideration is for matching to execute quickly. The extra time needed
+to compile a pattern when new application callbacks are registered is
+relatively insignificant because it is performed much less often.
 
 The compilation is performed by recursively by examining the left-most
 side of the string for a JSONPath clause. For each clause type there is
@@ -430,9 +429,9 @@ continues until there is nothing left to parse. On each recursive call
 the clause function generated wraps the result from the last recursive
 call, resulting ultimately in a concentric series of clause functions.
 The order of this series of functions mirrors the path ordering as an
-ascent, so that the outermost function matches against the deepest node, at
-the near end of the ascent, and the innermost against the shallowest, at
-the far end. When evaluated against an ascent, each clause function
+ascent, so that the outermost function matches against the deepest node,
+at the near end of the ascent, and the innermost against the shallowest,
+at the far end. When evaluated against an ascent, each clause function
 examines the head of the list and, if it matches, passes the list onto
 the next function. A special clause function, `skip1` is used for the
 `.` (parent) syntax and places no condition on the head of the list,
@@ -483,32 +482,32 @@ be hashed by object identity, in practice there is no way to access an
 object id from inside the language so any hash of a node parsed out of
 JSON would have to walk the entire subtree rooted from that node.
 
-Functions describing the tokenisation are split out into its their file and
-separately tested. Regular expressions are used because they are the simplest form able to express
-the clause patterns.
-The regular expressions each start with `^` so that they only match at
-the head of the string. A more elegant alternative is the 'y' flag but
-as of now this lacks browser support[^6].
-The tokenisation is unit tested independently of the compilation.
-By verifying the tokenisation functions through their own tests it is simpler to
-create thorough specifications because they are tested directly
-without going though another layer. For JSONPath matching we might
-consider the unit test layer of the test pyramid (figure
-\ref{testpyramid} p.\pageref{testpyramid}) to be split further into two
-sub-layers. Arguably, the upper of these sub-layer is not a unit test
-because it is verifying more than one unit, the tokeniser and the compiler, and there is some redundancy
-since the tokenisation is tested both independently and through the compiler. A
-more purist approach would not help because stubbing out the tokenizer
-functions would be a considerable effort and would not improve the rigor
-of the JSONPath specification.
+Functions describing the tokenisation are split out into its their file
+and separately tested. Regular expressions are used because they are the
+simplest form able to express the clause patterns. The regular
+expressions each start with `^` so that they only match at the head of
+the string. A more elegant alternative is the 'y' flag but as of now
+this lacks browser support[^6]. The tokenisation is unit tested
+independently of the compilation. By verifying the tokenisation
+functions through their own tests it is simpler to create thorough
+specifications because they are tested directly without going though
+another layer. For JSONPath matching we might consider the unit test
+layer of the test pyramid (figure \ref{testpyramid}
+p.\pageref{testpyramid}) to be split further into two sub-layers.
+Arguably, the upper of these sub-layer is not a unit test because it is
+verifying more than one unit, the tokeniser and the compiler, and there
+is some redundancy since the tokenisation is tested both independently
+and through the compiler. A more purist approach would not help because
+stubbing out the tokenizer functions would be a considerable effort and
+would not improve the rigor of the JSONPath specification.
 
 [^1]: https://github.com/substack/http-browserify
 
 [^2]: See
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze.
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
     Although older engines don't provide any ability to create immutable
-    objects, we can be fairly certain that the code does not
-    mutate these objects or the tests would fail with attempts to modify in
+    objects, we can be fairly certain that the code does not mutate
+    these objects or the tests would fail with attempts to modify in
     environments which are able to enforce it.
 
 [^3]: JSONPath compiler from the first commit can be found at line 159
@@ -523,4 +522,4 @@ of the JSONPath specification.
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+[^6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
