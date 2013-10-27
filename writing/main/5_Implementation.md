@@ -437,11 +437,10 @@ JSONPath implementation:
 
 If a first-order function were used the pattern string would have to be
 freshly reinterpreted on each evaluation, repeating computation
-unnecessarily.
-Because a pattern is registered once but then evaluated perhaps hundreds
-of times per JSON file the most pressing performance consideration is
-for matching to execute quickly. The time taken to compile is relatively
-unimportant.
+unnecessarily. Because a pattern is registered once but then evaluated
+perhaps hundreds of times per JSON file the most pressing performance
+consideration is for matching to execute quickly. The time taken to
+compile is relatively unimportant.
 
 The compilation is performed by recursively by examining the left-most
 side of the string for a JSONPath clause. For each kind of clause there
