@@ -392,9 +392,12 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 ## Rolling back on error
 
 [The fail function](#fail) gives a callback for when something goes wrong.
-If you started putting elements on the page then and then the connection
-goes down you probably want to do one of two things: make a new request 
-or undo the changes. 
+If you started putting elements on the page and the connection
+goes down you have a few options
+
+ * If the new elements you added are useful without the rest, leave them
+ * If they are useful but you need the rest, make a new request
+ * Rollback any half-done changes you made
  
 ``` js
 var currentPersonElement;
