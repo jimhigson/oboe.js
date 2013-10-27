@@ -471,17 +471,18 @@ indicating a fail.
 This JSONPath implementation allows the compilation of complex
 expressions into an executable form by combining many very simple
 functions. As an example, the pattern `!.$person..{height tShirtSize}`
-once compiled would roughly resemble the Javascript functional
-representation below:
+once compiled would resemble the Javascript functional representation
+below:
 
 ~~~~ {.javascript}
-statementExpr(             // wrapper, added when JSONPath is zero-length 
-   duckTypeClause(         // token 6, {height tShirtSize}
-      skipMany(            // token 5, '..'  
-         capture(          // token 4, css4-style '$' notation
-            nameClause(    // token 3, 'person'
-               skip1(      // token 2, '.'  
-                  rootExpr // token 1, '!' at start of JSONPath expression
+statementExpr(             // outermost wrapper, added when JSONPath 
+                           // is zero-length 
+   duckTypeClause(         // token 5, {height tShirtSize}
+      skipMany(            // token 4, '..', ancestor relationship 
+         capture(          // token 3, '$' from '$person'
+            nameClause(    // token 3, 'person' from '$person'
+               skip1(      // token 2, '.', parent relationship
+                  rootExpr // token 1, '!', matches only the root
                ) 
             'person' )
          )
@@ -489,38 +490,40 @@ statementExpr(             // wrapper, added when JSONPath is zero-length
 )      
 ~~~~
 
-Since I am only using a side-effect free subset of Javascript for this
-segment of Oboe it would be safe to use a functional cache. As well as
-saving time by avoiding repeated execution, this could potentially also
-save memory because where two JSONPath strings contain a common start
-they could share the inner parts of their functional expression.
-Although Javascript doesn't come with functional caching, it can be
-added using the language itself [^6]. I suspect, however, that hashing
-the parameters might be slower than performing the matching. Although
-the parameters are all immutable and could in theory be hashed by object
-identity, in practice there is no way to access an object id from inside
-the language so any hash of a node parsed out of JSON would have to walk
-the entire subtree rooted from that node.
+Since I am using a side-effect free subset of Javascript for pattern
+matching it would be safe to use a functional cache. As well as saving
+time by avoiding repeated execution this could potentially also save
+memory because where two JSONPath strings contain a common left side
+they could share the inner parts of their functional expression. Given
+the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
+JSONPath engine will currently create two identical evaluators for
+`!.animals.mammals.`. Although Javascript doesn't come with functional
+caching, it can be added using the language itself, probably the best
+known example being `memoize` from Underscore.js. I suspect, however,
+that hashing the cache parameters might be slower than performing the
+matching. Although the parameters are all immutable and could in theory
+be hashed by object identity, in practice there is no way to access an
+object id from inside the language so any hash of a node parsed out of
+JSON would have to walk the entire subtree rooted from that node.
 
-The JSONPath tokenisation is split out into its own file and separately
-tested. The tokenisation implementation is based on regular expressions,
-they are the simplest form able to express the clause patterns. The
-regular expressions are hidden to the outside the tokenizer and only
-functions are exposed to the main body of the compiler. The regular
-expressions all start with `^` so that they only match at the head of
-the string. A more elegant alternative is the 'y' [^7] flag but as of
-now this lacks wide browser support.
+The tokenisation of patterns is split out into its own file and
+separately tested. Because they are the simplest form able to express
+the clause patterns the tokenisation is based on regular expressions.
+The regular expressions each start with `^` so that they only match at
+the head of the string. A more elegant alternative is the 'y' flag but
+as of now this lacks wide browser support[^6].
 
 By verifying the tokens through their own unit tests it is simpler to
-thoroughly specify the tokenisation, producing simpler failure messages
-than if it were done through the full JSONPath engine. We might consider
-the unit test layer of the pyramid (figure \ref{testpyramid}) is further
-split into two sub-layers. Arguably, the upper of these sub-layer is not
-a unit test because it is verifying two units together. There is some
-redundancy with the tokens being tested both individually and as full
-expressions. I maintain that this is the best approach regardless
-because stubbing out the tokenizer functions would be a considerable
-effort and would not improve the rigor of the JSONPath specification.
+thoroughly specify the tokenisation because it can be tested directly
+without going though another layer. For pattern matching we might
+consider the unit test layer of the test pyramid (figure
+\ref{testpyramid} p.\pageref{testpyramid}) to be further split into two
+sub-layers. Arguably, the upper of these sub-layer is not a unit test
+because it is verifying more than one unit and there is some redundancy
+since the tokens are tested both individually and as full expressions. I
+maintain that a purist approach would not help because stubbing out the
+tokenizer functions would be a considerable effort and would not improve
+the rigor of the JSONPath specification.
 
 ![Some kind of diagram showing jsonPath expressions and functions
 partially completed to link back to the previous function. Include the
@@ -547,7 +550,4 @@ statementExpr pointing to the last clause](images/placeholder)
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^6]: Probably the best known example being `memoize` from
-    Underscore.js: http://underscorejs.org/\#memoize
-
-[^7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
