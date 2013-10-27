@@ -391,7 +391,7 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 
 ## Rolling back on error
 
-[The fail function](#fail) is called when something goes wrong.
+[The fail function](#fail) gives a callback for when something goes wrong.
 If you started putting elements on the page then and then the connection
 goes down you probably want to do one of two things: make a new request 
 or undo the changes. 
