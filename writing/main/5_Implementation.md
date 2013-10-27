@@ -443,23 +443,23 @@ consideration is for matching to execute quickly. The time taken to
 compile is relatively unimportant.
 
 The compilation is performed by recursively by examining the left-most
-side of the string for a JSONPath clause. For each kind of clause there
-is a function which matches ascents against that clause, for example by
-checking the name field. By partial completion this function is
-specialised to match against one particular name. Once a clause function
-is generated, compilation recurs by passing to itself the remaining
-unparsed portion of the JSONPath string. This continues until it is
-called with a zero-length JSONPath. On each recursive call the clause
-function is wrapped in the result from the next recursive call,
-resulting ultimately in a linked series of clause functions. When
-evaluated against an ascent, each clause functions examines the head of
-the ascent and passes the ascent onto the next function if it passes. A
-special clause functions, `skip1` is used for the `.` syntax and places
-no condition on the head of the ascent but passes on to the next clause
-only the tail, thus moving evaluation of the ascent one node up the
-parsed JSON tree. Similarly, there is a `skipMany` which maps onto the
-`..` syntax and recursively consumes nodes until it can find a match in
-the next clause.
+side of the string for a JSONPath clause. For each clause type there
+is a function which tests ascents for that clause, for example by
+checking the field name. By partial completion the field name function would be
+specialised to match against one particular name. Having generated a function
+to match against the left-most clause, compilation recurs by passing to itself the remaining
+unparsed right side of the string. This continues until there is
+nothing left to parse. On each recursive call the clause
+function is wraps the result from the last recursive call,
+resulting ultimately in a concentric series of clause functions.
+When evaluated against an ascent, each clause function examines the head of
+the list and, if it matches, passes the list onto the next function. A
+special clause function, `skip1` is used for the `.` (parent) syntax and places
+no condition on the head of the list, unconditionally passing the tail on to the next clause, 
+thus moving matching on to the parent node.
+Similarly, there is a function `skipMany` which maps onto the
+`..` (ancestor) syntax and recursively consumes the minimum number of ascent items necessary for the
+next clause to match, or fails if this cannot be done.
 
 JsonPath implementation allows the compilation of complex expressions
 into an executable form, but each part implementing the executable form
