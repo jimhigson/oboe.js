@@ -552,9 +552,24 @@ Alternatively, several patterns may be registered at once using either `.path` o
 
 ## done
 
-`.done(callback(Object json))` registers a callback that is passed the entire 
+```js
+   .done(callback(Object json))
+   
+   .on('done', callback(Object json))
+```
+
+Registers a callback that is passed the entire 
 json when the response is complete. Usually it is better to read the json in 
 small parts than waiting for it to completely download.
+
+## root
+
+```js
+   .root()
+```
+
+At any time, call .root() on the oboe instance to get the JSON received so far. 
+If nothing has been received yet this will return undefined, otherwise it will give the root Object.
 
 ## forget
 
@@ -599,17 +614,6 @@ callback with the fields:
  * `statusCode`: The status code, if the request got that far
  * `body`: The response body for the error, if any
  * `jsonBody`: If the server's error response was json, the parsed body. 
-
-## root
-
-```js
-   .root()
-```
-
-At any time, call .root() on the oboe instance to get the json recieved so far. 
-If nothing has been recieved yet this will return undefined, otherwise it will give the root Object.
-Technically, this could also return an Array but it is unusual for a json file to not have an Object at the
-top level.
 
 ## Pattern matching
 
