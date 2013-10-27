@@ -468,11 +468,11 @@ off layers from the ascent as we move through the functions list until
 we either exhaust the functions, indicating a match, or cannot continue,
 indicating a fail.
 
-This JSONPath implementation allows the compilation of complex expressions
-into an executable form by combining many very simple functions.
-As an example, the pattern `!.$person..{height tShirtSize}` once
-compiled would roughly resemble the Javascript functional representation
-below:
+This JSONPath implementation allows the compilation of complex
+expressions into an executable form by combining many very simple
+functions. As an example, the pattern `!.$person..{height tShirtSize}`
+once compiled would roughly resemble the Javascript functional
+representation below:
 
 ~~~~ {.javascript}
 statementExpr(             // wrapper, added when JSONPath is zero-length 
