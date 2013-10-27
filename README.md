@@ -583,9 +583,10 @@ the currently executing callback.
 
 ## .abort()
 
-`abort()` Stops the http call at any time. This is useful if you want to read a json response only as
-far as is necessary. Everything stops. You are guaranteed not to get any further .path() or .node() 
-callbacks, even if the underlying xhr already has additional content buffered.
+`.abort()` Stops the http call at any time. This is useful if you want to read a json response only as
+far as is necessary. You are guaranteed not to get any further .path() or .node() 
+callbacks, even if the underlying xhr already has additional content buffered and
+the .done() callback will not fire.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
 
 ## .fail()
