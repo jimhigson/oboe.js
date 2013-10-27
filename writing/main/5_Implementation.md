@@ -468,15 +468,8 @@ off layers from the ascent as we move through the functions list until
 we either exhaust the functions, indicating a match, or cannot continue,
 indicating a fail.
 
-JsonPath implementation allows the compilation of complex expressions
-into an executable form, but each part implementing the executable form
-is locally simple. By using recursion, assembling the simple functions
-into a more function expressing a more complex rule also follows as
-being locally simple but gaining a usefully sophisticated behaviour
-through composition of simple parts. Each recursive call of the parser
-identifies one token for non-empty input and then recursively digests
-the rest.
-
+This JSONPath implementation allows the compilation of complex expressions
+into an executable form by combining many very simple functions.
 As an example, the pattern `!.$person..{height tShirtSize}` once
 compiled would roughly resemble the Javascript functional representation
 below:
