@@ -303,14 +303,15 @@ the total system performance should be improved.
 Incrementally building up the content
 -------------------------------------
 
-As shown in figure \ref{overallDesign} on page \pageref{overallDesign}, there is an incremental content
-builder and ascent tracer which handle the output from the Clarinet JSON
-SAX parser. Taken together, these might be considered a variant of the
-Adaptor pattern, providing to the controller a simpler interface than is
-presented by Clarinet. However, this is not the model implementation of
-the pattern; the adapted interface is even-driven rather than
-call-driven: we receive six kinds of event and in response emmit from a
-narrower vocabulary of two.
+As shown in figure \ref{overallDesign} on page \pageref{overallDesign} there is an incremental content
+builder and ascent tracer which handle SAX events from the Clarinet JSON
+parser. By presenting to the controller a simpler interface than is
+provided by Clarinet, taken together these might be considered as an
+Adaptor pattern but adapted to be even-driven rather than
+call-driven: we receive six types of event and in response emit from a
+narrower vocabulary of two. The events received are low level, reporting 
+the sequence of tokens in the markup; those emitted are much higher
+level, reporting a sequence of JSON nodes and paths as they are discovered.
 
 To evaluate JSONPath expressions the controller requires a path to the
 current JSON node, the node itself, and any ancestor nodes. This is
