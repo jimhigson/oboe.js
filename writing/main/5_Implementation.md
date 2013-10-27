@@ -253,53 +253,46 @@ the closure the values are not only private as would be seen in an OO
 model, they are inherently unaddressable.
 
 Although not following an established object orientated metamodel, the
-high-level design hasn't departed very far from what could be made
-following that style and OO design patterns have influenced the design
-nonetheless. If we wish to think in terms of the OO paradigm we might
-say that values trapped inside the closure are private class attributes
-and that handlers it registers on the event bus are the class' public
-methods. In this regard, the high-level internal design of Oboe could be
+high-level componentisation hasn't departed very far from what I would make were I
+following that style and OO design patterns have influenced the design considerably.
+If we wish to think in terms of the OO paradigm we might
+say that values trapped inside closures are private attributes
+and that the handlers registered on the event bus are public
+methods. In this regard, the high-level internal design of Oboe can be
 discussed using terms from a more standard object oriented metamodel.
 
-Javascript is of course an imperative language but over many iterations
-Oboe has evolved towards a declarative programming style. For example,
-[incrementalContentBuilder.js](#incrementalContentBuilder.js) (Appendix
-p.\pageref{incrementalContentBuilder.js}). was initially stateful and
-procedural, reading as instructions to perform a task. Over many
-refactors the flavour of the code has changed, now reading more like a
-description of desired behaviour.
-
-Event where it creates a larger deliverable library I have generally
-preferred writing as short functions which can be joined together into
-longer ones. Short functions reduce the size of the minimum testable
-unit and allow very simple unit tests. Because of the pressures on code
+Even where it creates a larger deliverable library I have generally
+preferred writing as short functions which are combined to form
+longer ones. Writing shorter functions reduces the size of the minimum testable
+unit which, because each test can test a very small unit of functionality,
+encourages very simple unit tests. Because of the pressures on code
 size I decided not to use a general purpose functional library and
 created my own with only the parts that are needed. See
 [functional.js](#functional.js) (Appendix p.\pageref{functional.js}).
 Functional programming in Javascript is known to be slower than other
-styles, particularly in Firefox which lacks optimisation such as Lambda
-Lifting [@functionalSpiderMonkey] but I do not think this should be a
-major problem. Because of Javascript's single-threaded model, in the
-browser any script execution takes place during execution frames,
-interlaced with frames serving concurrent concerns. To minimise the
+styles, particularly in Firefox which lacks optimisations such as Lambda
+Lifting [@functionalSpiderMonkey]. I do not think this should be a
+major problem. Because of its single-threaded execution model, in the
+browser any Javascript is ran during script execution frames,
+interlaced with frames for other concurrent concerns. To minimise the
 impact on other tasks such as rendering it is important that no task
-occupies the CPU for very long. About 16ms is a fair target for the
-maximum duration of a script execution frame since most monitors refresh
-at 60Hz. In Node no limit can be implied from a display but any
-CPU-hogging task degrades the responsiveness of other concerns.
+occupies the CPU for very long. Since most monitors refresh
+at 60Hz, about 16ms is a fair target for the
+maximum duration of a script frame. In Node no limit can be implied from a display but any
+CPU-hogging task degrades the responsiveness of concurrent concerns.
 Switching tasks is cheap so sharing the CPU well generally prefers many
 small execution frames over a few larger ones. Whether running in a
 browser or server, the bottleneck is more often I/O than processing
-speed and so long as no task holds the CPU for an unusually long
-execution frame it can be considered fast enough. Oboe's progressive
-model favours sharing because it naturally splits tasks over many
-execution frames which by a non-progressive mode would be performed as a
-single task. Although the overall CPU time will be higher, Oboe should
+speed; providing no task contiguously holds the CPU for an unusually long
+time an application can be considered fast enough. Oboe's progressive
+model favours sharing because it naturally splits the work over many
+execution frames which by a non-progressive mode would be performed during a
+single frame. Although the overall CPU time will be higher, Oboe should
 share better with other concerns and because of better I/O management
 the total system performance should be improved.
 
-Incrementally building up the content
--------------------------------------
+Incrementally building the parsed content
+-----------------------------------------
 
 As shown in figure \ref{overallDesign} on page \pageref{overallDesign}
 there is an incremental content builder and ascent tracer which handle
@@ -506,8 +499,8 @@ consider the unit test layer of the test pyramid (figure
 \ref{testpyramid} p.\pageref{testpyramid}) to be further split into two
 sub-layers. Arguably, the upper of these sub-layer is not a unit test
 because it is verifying more than one unit and there is some redundancy
-since the tokens are tested both individually and as full expressions. I
-maintain that a purist approach would not help because stubbing out the
+since the tokens are tested both individually and as full expressions. A more
+purist approach would not help because stubbing out the
 tokenizer functions would be a considerable effort and would not improve
 the rigor of the JSONPath specification.
 
