@@ -263,7 +263,6 @@ discussed using terms from a more standard object oriented metamodel.
 
 Javascript is of course an imperative language but over many iterations
 Oboe has evolved towards a declarative programming style. For example,
-incrementalContentBuilder.js
 [incrementalContentBuilder.js](#incrementalContentBuilder.js) (Appendix
 p.\pageref{incrementalContentBuilder.js}). was initially stateful and
 procedural, reading as instructions to perform a task. Over many
