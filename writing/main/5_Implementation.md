@@ -238,16 +238,15 @@ for a safer build process
 Styles of Programming
 ---------------------
 
-Oboe does not follow any single programming paradigm and is made of components written in
-a mix of procedural, functional and object-oriented programming styles.
-Classical object orientation is used only so far as the library exposes
-an Object-oriented public API. Although Javascript supports them,
-classes and constructors are not used, nor is there any inheritance or
-notable polymorphism.
-Closures form the primary means of data storage and hiding. Most
-entities do not give a
-Javascript object on instantiation, they are constructed as a set of
-event handlers with access to shared values from a common closure. As
+Oboe does not follow any single programming paradigm and is made of
+components written in a mix of procedural, functional and
+object-oriented programming styles. Classical object orientation is used
+only so far as the library exposes an Object-oriented public API.
+Although Javascript supports them, classes and constructors are not
+used, nor is there any inheritance or notable polymorphism. Closures
+form the primary means of data storage and hiding. Most entities do not
+give a Javascript object on instantiation, they are constructed as a set
+of event handlers with access to shared values from a common closure. As
 inner-functions of the same containing function, the handlers share
 access to variables from the containing scope and their reachability is
 maintained because they are referenced by the event bus. From outside
@@ -257,52 +256,49 @@ model, they are inherently unaddressable.
 Although not following an established object orientated metamodel, the
 high-level design hasn't departed very far from what could be made
 following that style. If we wish to think in terms of the OO paradigm we
-might say that values trapped inside the closure are private class attributes
-and that handlers it registers on the event bus are the class' public methods. In
-this regard, the high-level internal design of Oboe could be discussed
-using terms from a more standard object oriented metamodel.
+might say that values trapped inside the closure are private class
+attributes and that handlers it registers on the event bus are the
+class' public methods. In this regard, the high-level internal design of
+Oboe could be discussed using terms from a more standard object oriented
+metamodel.
 
 Javascript is of course an imperative language but over many iterations
 Oboe has evolved towards a declarative programming style. For example,
-incrementalContentBuilder.js [incrementalContentBuilder.js](#incrementalContentBuilder.js)
-(Appendix p.\pageref{incrementalContentBuilder.js}). was initially stateful and
+incrementalContentBuilder.js
+[incrementalContentBuilder.js](#incrementalContentBuilder.js) (Appendix
+p.\pageref{incrementalContentBuilder.js}). was initially stateful and
 procedural, reading as instructions to perform a task. Over many
-refactors the flavour of the code has changed, now reading more like
-a description of desired behaviour.
+refactors the flavour of the code has changed, now reading more like a
+description of desired behaviour.
 
-Event where it creates a larger deliverable
-library I have generally preferred writing as short functions which can be 
-joined together into longer ones. Short functions
-reduce the size of the minimum testable unit and allow very simple 
-unit tests.
-Because of the pressures on code size I decided not to use a general
-purpose functional library and created my own with only the parts
-that are needed. See [functional.js](#functional.js)
-(Appendix p.\pageref{functional.js}).  
-Functional programming in
-Javascript is known to be slower than other styles, particularly in
-Firefox which lacks optimisation such as Lambda Lifting
-[@functionalSpiderMonkey] but I do not think this should be a major 
-problem.
-Because of Javascript's single-threaded model, in the browser any
-script execution takes place during execution frames, interlaced with frames serving
-concurrent concerns. To minimise the impact on other
-tasks such as rendering it is important that no task occupies the CPU for very long. 
-About 16ms is a fair target for the maximum duration of a script execution frame since most
-monitors refresh at 60Hz.
-In Node no limit can be implied from a display but any CPU-hogging
-task degrades the responsiveness of other concerns. Switching tasks is cheap
-so sharing the CPU well generally prefers
-many small execution frames over a few larger ones.
-Whether running in a browser or server, the bottleneck is more often I/O than
-processing speed and so long as no task holds the CPU for an unusually long execution frame 
-it can be considered fast enough.
-Oboe's progressive model favours sharing because it
-naturally splits tasks over many execution frames which by a non-progressive mode would be performed as
-a single task. Although
-the overall CPU time will be higher, Oboe should share better with other
-concerns and because of better I/O management the total system performance should be 
-improved.
+Event where it creates a larger deliverable library I have generally
+preferred writing as short functions which can be joined together into
+longer ones. Short functions reduce the size of the minimum testable
+unit and allow very simple unit tests. Because of the pressures on code
+size I decided not to use a general purpose functional library and
+created my own with only the parts that are needed. See
+[functional.js](#functional.js) (Appendix p.\pageref{functional.js}).
+Functional programming in Javascript is known to be slower than other
+styles, particularly in Firefox which lacks optimisation such as Lambda
+Lifting [@functionalSpiderMonkey] but I do not think this should be a
+major problem. Because of Javascript's single-threaded model, in the
+browser any script execution takes place during execution frames,
+interlaced with frames serving concurrent concerns. To minimise the
+impact on other tasks such as rendering it is important that no task
+occupies the CPU for very long. About 16ms is a fair target for the
+maximum duration of a script execution frame since most monitors refresh
+at 60Hz. In Node no limit can be implied from a display but any
+CPU-hogging task degrades the responsiveness of other concerns.
+Switching tasks is cheap so sharing the CPU well generally prefers many
+small execution frames over a few larger ones. Whether running in a
+browser or server, the bottleneck is more often I/O than processing
+speed and so long as no task holds the CPU for an unusually long
+execution frame it can be considered fast enough. Oboe's progressive
+model favours sharing because it naturally splits tasks over many
+execution frames which by a non-progressive mode would be performed as a
+single task. Although the overall CPU time will be higher, Oboe should
+share better with other concerns and because of better I/O management
+the total system performance should be improved.
 
 Incrementally building up the content
 -------------------------------------
@@ -383,10 +379,10 @@ execution of the program. Most Javascript virtual machines are also
 quite poor at array growing and shrinking so for collections whose size
 changes often are outperformed by linked lists. Finally, this is a very
 convenient format for the JSONPath engine to perform matching on as will
-be discussed in the next section. The Javascript file [lists.js](#lists.js)
-(Appendix p.\pageref{lists.js})
-implements the list functions: `cons`, `head`, `tail`, `map`, `foldR`,
-`all`, 'without' as well as converting lists to and from arrays.
+be discussed in the next section. The Javascript file
+[lists.js](#lists.js) (Appendix p.\pageref{lists.js}) implements the
+list functions: `cons`, `head`, `tail`, `map`, `foldR`, `all`, 'without'
+as well as converting lists to and from arrays.
 
 Because it is more common to quote paths as descents rather than ascent,
 on the boundary to the outside world Oboe reverses the order and,
