@@ -282,23 +282,27 @@ that are needed. See [functional.js](#functional.js)
 Functional programming in
 Javascript is known to be slower than other styles, particularly in
 Firefox which lacks optimisation such as Lambda Lifting
-[@functionalSpiderMonkey]. Considering to what degree performance
-concerns should dissuade us from a functional style, we may consider the
-library's execution context. Because of the single-threaded model any
-application's Javascript execution is in between frames serving
-concurrent concerns so to minimise the impact on latency for the other
-tasks it is important that no task occupies the CPU for very long. On
-the browser about 16ms is a fair maximum, allowing painting to occur at
-60 frames per second. In Node there is no hard limit but any CPU-hogging
-task degrades the responsiveness of other responses. Context switching
-imposes a very low overhead and responsive sharing generally proffers
-many small frames over a few larger ones. In any case, server-side tasks
-especially are more often i/o bound than CPU bound. Oboe's progressive
-design naturally splits tasks which would otherwise be performed in a
-single frame over many. For example, parsing and marshaling. Although
-the overall computation may be higher, the total performance of the
-system should be improved.
-
+[@functionalSpiderMonkey] but I do not think this should be a major 
+problem.
+Because of Javascript's single-threaded model, in the browser any
+script execution takes place during execution frames, interlaced with frames serving
+concurrent concerns. To minimise the impact on other
+tasks such as rendering it is important that no task occupies the CPU for very long. 
+About 16ms is a fair target for the maximum duration of a script execution frame since most
+monitors refresh at 60Hz.
+In Node no limit can be implied from a display but any CPU-hogging
+task degrades the responsiveness of other concerns. Switching tasks is cheap
+so sharing the CPU well generally prefers
+many small execution frames over a few larger ones.
+Whether running in a browser or server, the bottleneck is more often I/O than
+processing speed and so long as no task holds the CPU for an unusually long execution frame 
+it can be considered fast enough.
+Oboe's progressive model favours sharing because it
+naturally splits tasks over many execution frames which by a non-progressive mode would be performed as
+a single task. Although
+the overall CPU time will be higher, Oboe should share better with other
+concerns and because of better I/O management the total system performance should be 
+improved.
 
 Incrementally building up the content
 -------------------------------------
