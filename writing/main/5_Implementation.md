@@ -255,13 +255,12 @@ model, they are inherently unaddressable.
 
 Although not following an established object orientated metamodel, the
 high-level design hasn't departed very far from what could be made
-following that style and OO design patterns have influenced the design nonetheless.
-If we wish to think in terms of the OO paradigm we
-might say that values trapped inside the closure are private class
-attributes and that handlers it registers on the event bus are the
-class' public methods. In this regard, the high-level internal design of
-Oboe could be discussed using terms from a more standard object oriented
-metamodel.
+following that style and OO design patterns have influenced the design
+nonetheless. If we wish to think in terms of the OO paradigm we might
+say that values trapped inside the closure are private class attributes
+and that handlers it registers on the event bus are the class' public
+methods. In this regard, the high-level internal design of Oboe could be
+discussed using terms from a more standard object oriented metamodel.
 
 Javascript is of course an imperative language but over many iterations
 Oboe has evolved towards a declarative programming style. For example,
