@@ -472,13 +472,12 @@ a global so do this:
 var oboe = require('oboe')
 ```
 
-## Making a request
+## The oboe object
 
-You can start a new AJAX request by calling one of these methods:
+Start a new AJAX request by calling one of these methods:
 
 ```js
    oboe( String url ) // makes a GET request
-   oboe( ReadableStream source ) // node only
    
    oboe.doGet(    String url )
    oboe.doPut(    String url, String|Object body )
@@ -493,6 +492,12 @@ You can start a new AJAX request by calling one of these methods:
       headers:{ key: value }
    })         
 ```
+
+Any of the above methods work under Node.js, or you can read from any stream:
+
+```js
+   oboe( ReadableStream source ) // node.js only
+``` 
  
 ## .node() and .path()
 
