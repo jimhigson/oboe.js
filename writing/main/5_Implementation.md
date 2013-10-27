@@ -255,7 +255,8 @@ model, they are inherently unaddressable.
 
 Although not following an established object orientated metamodel, the
 high-level design hasn't departed very far from what could be made
-following that style. If we wish to think in terms of the OO paradigm we
+following that style and OO design patterns have influenced the design nonetheless.
+If we wish to think in terms of the OO paradigm we
 might say that values trapped inside the closure are private class
 attributes and that handlers it registers on the event bus are the
 class' public methods. In this regard, the high-level internal design of
@@ -326,18 +327,6 @@ object identity to ensure that the location is unequal to all others.
 This list form is built up by the incremental content builder and is the
 format that compiled JSONPath expressions test for matches.
 \label{ascent}](images/ascent.png)
-
-~~~~ {.javascript}
-{
-   animals:
-      insects:{},
-      reptiles:{},
-      mammals:{
-         humans:{}
-      },
-   plants:{}
-}
-~~~~
 
 The path of the current node is maintained as a singly linked list in
 which each item holds the node and the field name that linked to the
@@ -524,10 +513,6 @@ since the tokens are tested both individually and as full expressions. I
 maintain that a purist approach would not help because stubbing out the
 tokenizer functions would be a considerable effort and would not improve
 the rigor of the JSONPath specification.
-
-![Some kind of diagram showing jsonPath expressions and functions
-partially completed to link back to the previous function. Include the
-statementExpr pointing to the last clause](images/placeholder)
 
 [^1]: https://github.com/substack/http-browserify
 
