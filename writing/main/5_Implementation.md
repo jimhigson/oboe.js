@@ -386,9 +386,9 @@ Oboe JSONPath Implementation
 
 On the first commit the JSONPath implementation was little more than a
 series of regular expressions[^3] but has slowly evolved into a
-featureful and efficient implementation[^4]. The extent of the rewriting
-was possible because the correct behaviour is well defined by test
-specifications[^5]. The JSONPath compiler exposes a single higher-order
+featureful and efficient implementation. The extent of the rewriting was
+possible because the correct behaviour is well defined by test
+specifications[^4]. The JSONPath compiler exposes a single higher-order
 function. This function takes the JSONPath as a string and, proving it
 is a valid expression, returns a function which tests for matches to the
 pattern. The type of the compiler is difficult to express in Javascript
@@ -487,7 +487,7 @@ file and tested independently of the compilation. Regular expressions
 are used because they are the simplest form able to express the clause
 patterns. Each regular expressions starts with `^` so that they only
 match at the head of the string, the 'y' flag would be a more elegant
-alternative but as of now this lacks wider browser support[^6]. By
+alternative but as of now this lacks wider browser support[^5]. By
 verifying the tokenisation functions through their own tests it is
 simpler to create thorough specification because the tests may focus on
 the tokenisation more clearly without having to observe its results
@@ -514,13 +514,13 @@ specification.
 [^3]: JSONPath compiler from the first commit can be found at line 159
     here:
     https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
-
-[^4]: for contrast, the current source can be found at
+    for contrast, the current source can be found [in the
+    appendix](#jsonPath.js) on page \pageRef{jsonPath.js} or at
     https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
 
-[^5]: The current tests are viewable at
+[^4]: The current tests are viewable at
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^5]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
