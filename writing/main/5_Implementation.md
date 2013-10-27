@@ -303,31 +303,31 @@ the total system performance should be improved.
 Incrementally building up the content
 -------------------------------------
 
-As shown in figure \ref{overallDesign} on page \pageref{overallDesign} there is an incremental content
-builder and ascent tracer which handle SAX events from the Clarinet JSON
-parser. By presenting to the controller a simpler interface than is
-provided by Clarinet, taken together these might be considered as an
-Adaptor pattern but adapted to be even-driven rather than
-call-driven: we receive six types of event and in response emit from a
-narrower vocabulary of two. The events received are low level, reporting 
-the sequence of tokens in the markup; those emitted are much higher
-level, reporting a sequence of JSON nodes and paths as they are discovered.
-Testing a JSONPath expression for a match against any particular node 
-requires the node itself, the path to the node, and the ancestor nodes. 
-For every newly found item in the JSON this information is delivered as the payload of the
-`NODE\_FOUND` and `PATH\_FOUND` events so that the controller can test for matches against
+As shown in figure \ref{overallDesign} on page \pageref{overallDesign}
+there is an incremental content builder and ascent tracer which handle
+SAX events from the Clarinet JSON parser. By presenting to the
+controller a simpler interface than is provided by Clarinet, taken
+together these might be considered as an Adaptor pattern but adapted to
+be even-driven rather than call-driven: we receive six types of event
+and in response emit from a narrower vocabulary of two. The events
+received are low level, reporting the sequence of tokens in the markup;
+those emitted are much higher level, reporting a sequence of JSON nodes
+and paths as they are discovered. Testing a JSONPath expression for a
+match against any particular node requires the node itself, the path to
+the node, and the ancestor nodes. For every newly found item in the JSON
+this information is delivered as the payload of the `NODE\_FOUND` and
+`PATH\_FOUND` events so that the controller can test for matches against
 registered patterns.
 
 ![List representation of an ascent from leaf to root of a JSON tree.
 Note the special ROOT token which represents the special location of the
-root node, which has no path. ROOT is an object,
-taking advantage of object identity to ensure that the location is unequal
-to all others. This list form is built up by the incremental
-content builder and is the format that compiled JSONPath expressions
-test for matches. \label{ascent}
-](images/ascent.png)
+root node, which has no path. ROOT is an object, taking advantage of
+object identity to ensure that the location is unequal to all others.
+This list form is built up by the incremental content builder and is the
+format that compiled JSONPath expressions test for matches.
+\label{ascent}](images/ascent.png)
 
-```{.javascript} 
+~~~~ {.javascript}
 {
    animals:
       insects:{},
@@ -337,63 +337,65 @@ test for matches. \label{ascent}
       },
    plants:{}
 }
-```
+~~~~
 
-The path of the current node is maintained as a singly linked list in which
-each item holds the node and the field name that linked to the node from its parent.
-See figure \ref{ascent}. Each link in the list is immutable, enforced by newer 
-Javascript engines using frozen objects [^2]. The list is 
-arranged as an ascent with the current node at the near end and the root at the far end. 
-Although paths are more typically written as a descent, ordering
-as an ascent is more efficient because as we traverse the JSON
-the current node is appended and removed many times whereas the root is rarely
-replaced. As nodes open and close all updates to the list are at the head,
-giving constant time access and mutation.
-For familiarity, when paths are passed to application callbacks they are reversed 
-and converted to arrays.
+The path of the current node is maintained as a singly linked list in
+which each item holds the node and the field name that linked to the
+node from its parent. See figure \ref{ascent}. Each link in the list is
+immutable, enforced by newer Javascript engines using frozen objects
+[^2]. The list is arranged as an ascent with the current node at the
+near end and the root at the far end. Although paths are more typically
+written as a descent, ordering as an ascent is more efficient because as
+we traverse the JSON the current node is appended and removed many times
+whereas the root is rarely replaced. As nodes open and close all updates
+to the list are at the head, giving constant time access and mutation.
+For familiarity, when paths are passed to application callbacks they are
+reversed and converted to arrays.
 
-For each Clarinet event the builder
-provides a corresponding handler which, working from the current ascent,
-returns the next ascent after the event has been applied. For example, the
-`objectopen` and `arrayopen` event types are handled by adding a new item to the start of the ascent, whereas for
-`closeobject` and `closearray` one is removed. Over the course of parsing
-a complete JSON file the ascent will in this way be manipulated to visit
-every node, allowing each to be tested against the registered JSONPath
-expressions. Internally, the builder's event handlers are declared as
-the combination of a smaller number of basic reusable parts.
-The builder is largely unconcerned regarding a JSON node's type whereas 
-several of Clarinet's event types differ only by the type of the node that they
-announce. Picking up `openobject` and `openarray`
-events, both pass through to the same 'nodeFound', differing only in the type of node which is first created.
-Similarly, Clarinet has a `value` event type which is fired when
-a string or number is found in the markup. Because primitive nodes are
-always leaves the builder treats them as a node which instantaneously
-starts and ends, handled programmatically as the composition
-of the `nodeFound` and `nodeFinished` functions. The design of a small bank of
-smaller instructions that are combined to build up larger ones is perhaps reminiscent of
-the use of micro-instructions in CPU design.
+For each Clarinet event the builder provides a corresponding handler
+which, working from the current ascent, returns the next ascent after
+the event has been applied. For example, the `objectopen` and
+`arrayopen` event types are handled by adding a new item to the start of
+the ascent, whereas for `closeobject` and `closearray` one is removed.
+Over the course of parsing a complete JSON file the ascent will in this
+way be manipulated to visit every node, allowing each to be tested
+against the registered JSONPath expressions. Internally, the builder's
+event handlers are declared as the combination of a smaller number of
+basic reusable parts. The builder is largely unconcerned regarding a
+JSON node's type whereas several of Clarinet's event types differ only
+by the type of the node that they announce. Picking up `openobject` and
+`openarray` events, both pass through to the same 'nodeFound', differing
+only in the type of node which is first created. Similarly, Clarinet has
+a `value` event type which is fired when a string or number is found in
+the markup. Because primitive nodes are always leaves the builder treats
+them as a node which instantaneously starts and ends, handled
+programmatically as the composition of the `nodeFound` and
+`nodeFinished` functions. The design of a small bank of smaller
+instructions that are combined to build up larger ones is perhaps
+reminiscent of the use of micro-instructions in CPU design.
 
-Although the builder functions are stateless and side-effect free, while visiting
-each JSON node the current ascent needs to be stored.
-This is handled by the ascent tracker. This tiny component serves
-as a holder for this data. Starting with the ascent initialised as an empty list,
-on receiving a SAX event it passes the ascent to the handler and stores the result 
-so that when the next SAX event is received the updated ascent can be given to 
-the next handler.
+Although the builder functions are stateless and side-effect free, while
+visiting each JSON node the current ascent needs to be stored. This is
+handled by the ascent tracker. This tiny component serves as a holder
+for this data. Starting with the ascent initialised as an empty list, on
+receiving a SAX event it passes the ascent to the handler and stores the
+result so that when the next SAX event is received the updated ascent
+can be given to the next handler.
 
-Linked lists were chosen for the ascents in preference to the more conventional approach
-of using native Javascript Arrays for several reasons. Firstly, I find
-this area of the program more easy to test and debug given immutable
-data structures. Employing native Arrays without mutating would be very
-expensive because on each new path the array would have to be copied
-rather than edited in-place. While debugging, unpicking a stack trace is easier if I know
-that every value revealed is the value that has always occupied that
-space because I don't have to imagine the different values that were in the same space
-earlier or will be there later. The lack of side effects means I can try
-new commands in the debugger's CLI without worrying about breaking the
-execution of the program. Most Javascript virtual machines are also
-quite poor at array growing and shrinking so for collections whose size
-changes, arrays are often are outperformed by linked lists. Finally, lists are a very
+Linked lists were chosen for the ascents in preference to the more
+conventional approach of using native Javascript Arrays for several
+reasons. Firstly, I find this area of the program more easy to test and
+debug given immutable data structures. Employing native Arrays without
+mutating would be very expensive because on each new path the array
+would have to be copied rather than edited in-place. While debugging,
+unpicking a stack trace is easier if I know that every value revealed is
+the value that has always occupied that space because I don't have to
+imagine the different values that were in the same space earlier or will
+be there later. The lack of side effects means I can try new commands in
+the debugger's CLI without worrying about breaking the execution of the
+program. Most Javascript virtual machines are also quite poor at array
+growing and shrinking so for collections whose size changes, arrays are
+often are outperformed by linked lists. Finally, lists are a very
 convenient format for the JSONPath engine to perform matching on as will
 be discussed in the next section. The Javascript file
 [lists.js](#lists.js) (Appendix p.\pageref{lists.js}) implements various
@@ -409,34 +411,37 @@ featureful and efficient implementation[^4]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
 specifications[^5].
 
-The JSONPath compiler exposes a single higher-order function. This function takes the JSONPath as a String and, proving it is a
-valid expression, returns a function which tests for matches to the
-pattern. Both the compiler and the functions that it generates benefit
-from being stateless. The type of the compiler is difficult to express in Javascript but expressed in Haskell
-syntax would be:
+The JSONPath compiler exposes a single higher-order function. This
+function takes the JSONPath as a String and, proving it is a valid
+expression, returns a function which tests for matches to the pattern.
+Both the compiler and the functions that it generates benefit from being
+stateless. The type of the compiler is difficult to express in
+Javascript but expressed in Haskell syntax would be:
 
 ~~~~ {.haskell}
 String -> Ascent -> JsonPathMatchResult
 ~~~~
 
-The match result is either a miss or a hit. If a hit, the return value will be the node
-captured by the match. If the pattern has an explicitly capturing clause, the node
-corresponding to that clause is captured. Otherwise, it is the node at the head of the ascent.
+The match result is either a miss or a hit. If a hit, the return value
+will be the node captured by the match. If the pattern has an explicitly
+capturing clause, the node corresponding to that clause is captured.
+Otherwise, it is the node at the head of the ascent.
 
-Implementation as a function was chosen even though it might have been simpler
-to create a first-order version as seen in the published JSONPath implementation:
+Implementation as a function was chosen even though it might have been
+simpler to create a first-order version as seen in the published
+JSONPath implementation:
 
 ~~~~ {.haskell}
 (String, Ascent) -> JsonPathMatchResult
 ~~~~
 
-If a first-order
-function were used the pattern string would have to be freshly reinterpreted
-on each evaluation, repeating computation unnecessarily.   
-Because a pattern is registered once but then 
-evaluated perhaps hundreds of
-times per JSON file the most pressing performance consideration is for
-matching to execute quickly. The time taken to compile is relatively unimportant.
+If a first-order function were used the pattern string would have to be
+freshly reinterpreted on each evaluation, repeating computation
+unnecessarily.
+Because a pattern is registered once but then evaluated perhaps hundreds
+of times per JSON file the most pressing performance consideration is
+for matching to execute quickly. The time taken to compile is relatively
+unimportant.
 
 The compilation is performed by recursively by examining the left-most
 side of the string for a JSONPath clause. For each kind of clause there
