@@ -238,18 +238,18 @@ for a safer build process
 Styles of Programming
 ---------------------
 
-In terms of code style Oboe is mixed paradigm with components written in
+Oboe does not follow any single programming paradigm and is made of components written in
 a mix of procedural, functional and object-oriented programming styles.
 Classical object orientation is used only so far as the library exposes
 an Object-oriented public API. Although Javascript supports them,
 classes and constructors are not used, nor is there any inheritance or
-notable polymorphism. Higher-level functions are used throughout, with
-techniques from functional programming such as partial completion and
-functional composition. Most functions are short, with many being used
-together to build the required behaviours.
+notable polymorphism.
+Most functions are short and techniques from functional programming such as 
+partial completion and functional composition are used to join them together 
+into larger behaviours. 
 
-Closures are used as the primary means of data storage and hiding. Most
-of the entities painted in figure \ref{overallDesign} do not a
+Closures form the primary means of data storage and hiding. Most
+entities do not give a
 Javascript object on instantiation, they are constructed as a set of
 event handlers with access to shared values from a common closure. As
 inner-functions of the same containing function, the handlers share
@@ -261,9 +261,9 @@ model, they are inherently unaddressable.
 Although not following an established object orientated metamodel, the
 high-level design hasn't departed very far from what could be made
 following that style. If we wish to think in terms of the OO paradigm we
-might say that values trapped inside the closure are class attributes
-and that handlers it registers on the event bus are class methods. In
-this regard, the high-level internal design of Oboe may be discussed
+might say that values trapped inside the closure are private class attributes
+and that handlers it registers on the event bus are the class' public methods. In
+this regard, the high-level internal design of Oboe could be discussed
 using terms from a more standard object oriented metamodel.
 
 Because of the pressures on code size I decided not to use a general
