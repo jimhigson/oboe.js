@@ -303,7 +303,7 @@ the total system performance should be improved.
 Incrementally building up the content
 -------------------------------------
 
-As shown in figure \ref{overallDesign}, there is an incremental content
+As shown in figure \ref{overallDesign} on page \pageref{overallDesign}, there is an incremental content
 builder and ascent tracer which handle the output from the Clarinet JSON
 SAX parser. Taken together, these might be considered a variant of the
 Adaptor pattern, providing to the controller a simpler interface than is
