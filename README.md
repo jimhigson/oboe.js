@@ -391,8 +391,27 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 
 ## Error handling
 
-You use the error handler to roll back if there is an error while getting or parsing the json. 
-Oboe stops on error so won't give any further callbacks.
+Fetching a resource could fail for several reasons:
+
+ * non-2xx status code
+ * connection lost
+ * invalid JSON from the server
+ * error thrown by a callback 
+
+You can react to these my registering a handler with `.fail()`. This gives you
+an object describing the error. 
+
+``` js
+oboe('example.json')
+   .fail( function(errorReport){
+      console.error( errorReport );                  
+   });
+```
+
+## Rolling back on errors
+
+If you started putting building elements on the page then when the connection
+was lost you can two things: make a new request, or undo the changes. 
  
 ``` js
 var currentPersonElement;
@@ -520,10 +539,20 @@ callbacks, even if the underlying xhr already has additional content buffered.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
 
 ```js
-   .fail(callback(Error e))
+   .fail(callback({
+      statusCode:Number,
+      body:String,
+      jsonBody:Object,
+      thrown:Error }))
 ```
 
-Supply a callback for when something goes wrong
+Supply a callback for when something goes wrong. An Object is given to the
+callback with the fields:
+
+ * `thrown`: The error, if one was thrown
+ * `statusCode`: The status code, if the request got that far
+ * `body`: The response body for the error, if any
+ * `jsonBody`: If the server's error response was json, the parsed body. 
 
 ```js
    .root()

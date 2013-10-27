@@ -18,10 +18,14 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     ABORTING = _S++;
     
 function errorReport(statusCode, body, error) {
+   try{
+      var jsonBody = JSON.parse(body);
+   }catch(e){}
 
    return {
       statusCode:statusCode,
       body:body,
+      jsonBody:jsonBody,
       thrown:error
    };
 }    

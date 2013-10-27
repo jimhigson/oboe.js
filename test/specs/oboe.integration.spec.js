@@ -342,15 +342,13 @@ describe("oboe integration (real http)", function() {
    
    it('emits error on 404 in nodejs style too', function () {
 
-      var gotError = false
+      var stubCallback = jasmine.createSpy('error callback');
 
       oboe(url('doesNotExist'))
-         .on('fail', function () {
-            gotError = true
-         });
+         .on('fail', stubCallback);
 
       waitsFor(function () {
-         return gotError;
+         return !!stubCallback.calls.length;
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })   
    
@@ -443,32 +441,6 @@ describe("oboe integration (real http)", function() {
    }
 
 
-   /**
-    * jasmine.any(Error) doesn't always work in Safari (tested v6.0.5)
-    * because:
-    * 
-    * ((new XMLHttpRequestException()) instanceof Error) == false
-    * 
-    */
-
-      function isAnError(maybeErr){
-            
-         if( maybeErr instanceof Error ) {
-         
-            return true;
-         }
-         
-         if( window && window.XMLHttpRequestException &&
-                  maybeErr instanceof XMLHttpRequestException ) {
-            return true;
-         }
-                  
-         // if that didn't work fallback to some duck typing:
-         return(  (typeof maybeErr.message != 'undefined') && 
-                  (typeof maybeErr.lineNumber != 'undefined') );
-      }
-
-
    beforeEach(function () {
       aborted = false;
       fullResponse = null;
@@ -476,9 +448,29 @@ describe("oboe integration (real http)", function() {
       
       this.addMatchers({
          toHaveBeenGivenAnyError:function(){
-            var errorReport = this.actual.mostRecentCall.args[0];
+            var errorReport = this.actual.mostRecentCall.args[0],
+                maybeErr = errorReport.thrown;
             
-            return isAnError(errorReport.error);
+            if( typeof maybeErr != 'object' ) {
+               return false;
+            }            
+               
+            if( maybeErr instanceof Error ) {           
+               return true;
+            }
+            
+            // instanceof Error doesn't always work in Safari (tested v6.0.5)
+            // because:
+            //
+            // ((new XMLHttpRequestException()) instanceof Error) == false            
+            if( window && window.XMLHttpRequestException &&
+                     maybeErr instanceof XMLHttpRequestException ) {
+               return true;
+            }
+                     
+            // if that didn't work fallback to some duck typing:
+            return(  (typeof maybeErr.message != 'undefined') && 
+                     (typeof maybeErr.lineNumber != 'undefined') );
          },
          toHaveBeenGivenThrowee:function(expectedError){
             var errorReport = this.actual.mostRecentCall.args[0];
@@ -495,7 +487,7 @@ describe("oboe integration (real http)", function() {
             
             return JSON.stringify(expectedBodyJson) 
                    === 
-                   errorReport.body;         
+                   JSON.stringify(errorReport.jsonBody);         
          }
       });      
    });   

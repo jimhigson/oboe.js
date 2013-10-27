@@ -1773,11 +1773,15 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     ABORTING = _S++;
     
 function errorReport(statusCode, body, error) {
+   try{
+      var jsonBody = JSON.parse(body);
+   }catch(e){}
 
    return {
       statusCode:statusCode,
       body:body,
-      error:error
+      jsonBody:jsonBody,
+      thrown:error
    };
 }    
 /**
@@ -1895,21 +1899,25 @@ function instanceController(  emit, on, un,
          keep = false;
       };           
       
-      try{      
-         callback( nodeOf(matchingMapping), path, ancestors );   
-      }catch(e)  {
-      
-         // An error occured during the callback, publish it on the event bus 
-         emit(
-            ERROR_EVENT, 
-            errorReport(undefined, undefined, e)
-         );
-      }
-      
+      callback( nodeOf(matchingMapping), path, ancestors );         
+            
       delete oboeApi.forget;
       
       return keep;          
    }
+
+   function protectedCallback( callback, context ) {
+      return function() {
+         try{      
+            callback.apply(context||oboeApi, arguments);   
+         }catch(e)  {
+         
+            // An error occured during the callback, publish it on the event bus 
+            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+         }      
+      }   
+   }
+   
 
    /**
     * Add several listeners at a time, from a map
@@ -1930,8 +1938,8 @@ function instanceController(  emit, on, un,
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeCallback( 
             eventId, 
-            jsonPathOrListenerMap, 
-            callback.bind(callbackContext||oboeApi)
+            jsonPathOrListenerMap,
+            protectedCallback(callback, callbackContext)
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
