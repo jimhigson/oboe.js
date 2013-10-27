@@ -492,7 +492,7 @@ You can start a new AJAX request by calling one of these methods:
    })         
 ```
  
-## node and path
+## .node() and .path()
 
 When you make a request the returned Oboe instance exposes a few chainable methods:
 
@@ -549,7 +549,7 @@ Alternatively, several patterns may be registered at once using either `.path` o
    });
 ``` 
 
-## done
+## .done()
 
 ```js
    .done(callback(Object json))
@@ -561,7 +561,7 @@ Registers a callback that is passed the entire
 json when the response is complete. Usually it is better to read the json in 
 small parts than waiting for it to completely download.
 
-## root
+## .root()
 
 ```js
    .root()
@@ -570,7 +570,7 @@ small parts than waiting for it to completely download.
 At any time, call .root() on the oboe instance to get the JSON received so far. 
 If nothing has been received yet this will return undefined, otherwise it will give the root Object.
 
-## forget
+## .forget()
 
 ```js
 .node('*', function(){
@@ -581,14 +581,14 @@ If nothing has been received yet this will return undefined, otherwise it will g
 Calling .forget() on the Oboe instance from inside a callback de-registers
 the currently executing callback.
 
-## abort
+## .abort()
 
 `abort()` Stops the http call at any time. This is useful if you want to read a json response only as
 far as is necessary. Everything stops. You are guaranteed not to get any further .path() or .node() 
 callbacks, even if the underlying xhr already has additional content buffered.
 See [example above](#taking-ajax-only-as-far-as-is-needed).
 
-## fail
+## .fail()
 
 Fetching a resource could fail for several reasons:
 
