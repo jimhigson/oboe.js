@@ -280,8 +280,8 @@ purpose functional library and created my own with only the parts
 that are needed. See [functional.js](#functional.js)
 (Appendix p.\pageref{functional.js}).  
 Functional programming in
-Javascript is known to be slower than other styles, particularly under
-Firefox because it lacks optimisation such as Lambda Lifting
+Javascript is known to be slower than other styles, particularly in
+Firefox which lacks optimisation such as Lambda Lifting
 [@functionalSpiderMonkey]. Considering to what degree performance
 concerns should dissuade us from a functional style, we may consider the
 library's execution context. Because of the single-threaded model any
