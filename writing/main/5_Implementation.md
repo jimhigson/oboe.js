@@ -239,27 +239,40 @@ tradeoff for a safer build process
 Styles of Programming
 ---------------------
 
-The implementation of Oboe is mixed paradigm. Events flow throughout the
-whole library but in terms of code style the components are a mix of
-procedural, functional and object-oriented programming. Object
-orientation is used only to wrap the library in an Object-oriented
-public API and as a tuple-like store for multiple values. Constructors
+In terms of code style Oboe is mixed paradigm with components written in a
+mix of procedural, functional and object-oriented programming styles.
+Classical object
+orientation is used only so far as the library exposes an Object-oriented
+public API. Although Javascript supports them, classes and constructors
 are not used, nor is there any inheritance or notable polymorphism.
-Closures, not objects, are used as the primary means of data storage and
-hiding. Many of the entities painted in figure \ref{overallDesign} map
-onto no single, addressable language construct and exist only as a set
-of event handlers trapped inside the same closure, taking advantage of
-the fact that their reachability from some event emitter prevents
-required parameters from being garbage collected. From outside the
-closure hidden values are not only private as would be seen in an OO
-model, they are inherently unaddressable. Although only sparingly OO,
-the high-level design's componentisation hasn't departed from how it
-might be implemented in an OO metamodel and Object Oriented design
-patterns remain influential despite being only loosely followed.
+Higher-level functions are used throughout, with techniques from functional
+programming such as partial completion and functional composition. Most
+functions are short, with many being used together to build the required
+behaviours.
+
+Closures are used as the primary means of data storage and
+hiding. Most of the entities painted in figure \ref{overallDesign}
+do not a Javascript object on instantiation, they are constructed as a set
+of event handlers with access to shared values from a common closure.
+As inner-functions of the same containing function, the handlers 
+share access to variables from the containing scope and their 
+reachability is maintained because they are referenced by the event bus.
+From outside the
+closure the values are not only private as would be seen in an OO
+model, they are inherently unaddressable.
+
+Although not following an established object orientated metamodel,
+the high-level design hasn't departed very far from what could be made following that
+style.
+If we wish to think in terms of the OO paradigm we might say that
+values trapped inside the closure are class attributes and that handlers
+it registers on the event bus are class methods. In this regard, the
+high-level internal design of Oboe may be discussed using terms from  
+a more standard object oriented metamodel.
 
 Because of the pressures on code size I decided not to use a general
 purpose functional library and instead create my own with only the parts
-that I need; see functional.js. Functional programming in Javascript is
+that I need; see functional.js (ref appdx). Functional programming in Javascript is
 known to be slower than other styles, particularly under Firefox because
 it lacks Lambda Lifting and other similar optimisations
 [@functionalSpiderMonkey]. Considering to what degree performance
