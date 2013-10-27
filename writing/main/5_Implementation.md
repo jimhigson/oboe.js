@@ -445,13 +445,17 @@ compile is relatively unimportant.
 The compilation is performed by recursively by examining the left-most
 side of the string for a JSONPath clause. For each clause type there
 is a function which tests ascents for that clause, for example by
-checking the field name. By partial completion the field name function would be
+checking the field name; by partial completion the field name function would be
 specialised to match against one particular name. Having generated a function
 to match against the left-most clause, compilation recurs by passing to itself the remaining
 unparsed right side of the string. This continues until there is
 nothing left to parse. On each recursive call the clause
-function is wraps the result from the last recursive call,
+function generated wraps the result from the last recursive call,
 resulting ultimately in a concentric series of clause functions.
+The order of this series of functions mirrors the path ordering
+as an ascent, so that the outermost function matches against deepest node,
+at the near end of the ascent, and the innermost against the shallowest, at the
+far end.
 When evaluated against an ascent, each clause function examines the head of
 the list and, if it matches, passes the list onto the next function. A
 special clause function, `skip1` is used for the `.` (parent) syntax and places
@@ -459,7 +463,9 @@ no condition on the head of the list, unconditionally passing the tail on to the
 thus moving matching on to the parent node.
 Similarly, there is a function `skipMany` which maps onto the
 `..` (ancestor) syntax and recursively consumes the minimum number of ascent items necessary for the
-next clause to match, or fails if this cannot be done.
+next clause to match, or fails if this cannot be done. In this way, we peel off layers from the
+ascent as we move through the functions list until we either exhaust the functions, indicating
+a match, or cannot continue, indicating a fail. 
 
 JsonPath implementation allows the compilation of complex expressions
 into an executable form, but each part implementing the executable form
