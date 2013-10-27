@@ -611,8 +611,7 @@ Fetching a resource could fail for several reasons:
    .on('fail', Function callback(Object errorReport))   
 ```
 
-Supply a callback for when something goes wrong. An object is given to the
-callback with fields:
+An object is given to the callback with fields:
 
  * `thrown`: The error, if one was thrown
  * `statusCode`: The status code, if the request got that far
