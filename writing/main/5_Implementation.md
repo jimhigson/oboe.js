@@ -482,24 +482,25 @@ be hashed by object identity, in practice there is no way to access an
 object id from inside the language so any hash of a node parsed out of
 JSON would have to walk the entire subtree rooted from that node.
 
-Functions describing the tokenisation are split out to their own source file
-and tested independently of the compilation. Regular expressions are used because they are the
-simplest form able to express the clause patterns. Each regular
-expressions starts with `^` so that they only match at the head of
-the string, the 'y' flag would be a more elegant alternative but as of now
-this lacks wider browser support[^6]. By verifying the tokenisation
-functions through their own tests it is simpler to create thorough
-specification because the tests may focus on the tokenisation more clearly without having
-to observe its results though another layer.
-For JSONPath matching we might consider the unit test
-layer of the test pyramid (figure \ref{testpyramid}
-p.\pageref{testpyramid}) is split further into two sub-layers.
-Arguably, the upper of these sub-layer is not a unit test because it is
-verifying more than one unit, the tokeniser and the compiler, and there
-is some redundancy since the tokenisation is tested both independently
-and through the compiler. A more purist approach would not help because
+Functions describing the tokenisation are split out to their own source
+file and tested independently of the compilation. Regular expressions
+are used because they are the simplest form able to express the clause
+patterns. Each regular expressions starts with `^` so that they only
+match at the head of the string, the 'y' flag would be a more elegant
+alternative but as of now this lacks wider browser support[^6]. By
+verifying the tokenisation functions through their own tests it is
+simpler to create thorough specification because the tests may focus on
+the tokenisation more clearly without having to observe its results
+though another layer. For JSONPath matching we might consider the unit
+test layer of the test pyramid (figure \ref{testpyramid}
+p.\pageref{testpyramid}) is split further into two sub-layers. Arguably,
+the upper of these sub-layer is not a unit test because it is verifying
+more than one unit, the tokeniser and the compiler, and there is some
+redundancy since the tokenisation is tested both independently and
+through the compiler. A more purist approach would not help because
 stubbing out the tokenizer functions would be a considerable effort and
-I do not believe it would improve the rigor of the JSONPath specification.
+I do not believe it would improve the rigor of the JSONPath
+specification.
 
 [^1]: https://github.com/substack/http-browserify
 
