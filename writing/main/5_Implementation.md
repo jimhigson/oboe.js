@@ -244,10 +244,6 @@ Classical object orientation is used only so far as the library exposes
 an Object-oriented public API. Although Javascript supports them,
 classes and constructors are not used, nor is there any inheritance or
 notable polymorphism.
-Most functions are short and techniques from functional programming such as 
-partial completion and functional composition are used to join them together 
-into larger behaviours. 
-
 Closures form the primary means of data storage and hiding. Most
 entities do not give a
 Javascript object on instantiation, they are constructed as a set of
@@ -266,9 +262,17 @@ and that handlers it registers on the event bus are the class' public methods. I
 this regard, the high-level internal design of Oboe could be discussed
 using terms from a more standard object oriented metamodel.
 
+Event where it creates a larger
+final delivery I have generally preferred writing as short functions which can be 
+joined together using techniques from functional programming such as 
+partial completion and functional composition over longer ones. Short functions
+reduce the size of the minimum testable unit and means that the unit tests
+can be very simple.
 Because of the pressures on code size I decided not to use a general
-purpose functional library and instead create my own with only the parts
-that I need; see functional.js (ref appdx). Functional programming in
+purpose functional library and created my own with only the parts
+that are needed. See [functional.js](#functional.js)
+(Appendix p.\pageref{functional.js}).  
+Functional programming in
 Javascript is known to be slower than other styles, particularly under
 Firefox because it lacks Lambda Lifting and other similar optimisations
 [@functionalSpiderMonkey]. Considering to what degree performance
@@ -374,9 +378,10 @@ execution of the program. Most Javascript virtual machines are also
 quite poor at array growing and shrinking so for collections whose size
 changes often are outperformed by linked lists. Finally, this is a very
 convenient format for the JSONPath engine to perform matching on as will
-be discussed in the next section. The Javascript file lists.js
+be discussed in the next section. The Javascript file [lists.js](#lists.js)
+(Appendix p.\pageref{lists.js})
 implements the list functions: `cons`, `head`, `tail`, `map`, `foldR`,
-`all`.
+`all`, 'without' as well as converting lists to and from arrays.
 
 Because it is more common to quote paths as descents rather than ascent,
 on the boundary to the outside world Oboe reverses the order and,
