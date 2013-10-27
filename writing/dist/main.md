@@ -1272,6 +1272,8 @@ REST resources marshaled from an OO representation. In implementation,
 to conform to a duck-type a node must have all of the required fields
 but could also have any others.
 
+*limitations: why must be last term*
+
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
 
@@ -1865,237 +1867,258 @@ they were the Node equivalents, Browserify leaves no trace of itself in
 the final Javascript. Additionally, the http adaptor[^5_Implementation1] is capable of
 using XHRs as a streaming source when used with supporting browsers.
 
-After combining into a single file, Javascript source can be minified:
-made smaller using size-optimisations such as reducing scoped symbols to
-a single character or stripping out the comments. For Oboe the popular
-minification library *Uglify* was chosen. Uglify performs only surface
-optimisations, operating on the AST level but concentrating mostly on
-producing compact syntax. I also considered Google's *Closure Compiler*
-which resembles a traditional optimiser by leveraging a deeper
-understanding to search for smaller representations. Unfortunately,
+After combining into a single file Javascript source can be made
+significantly smaller by *minification* techniques such as reducing
+scoped symbols to a single character or deleting the comments. For Oboe
+the popular minifier library *Uglify* was chosen. Uglify performs only
+surface optimisations, concentrating mostly on producing compact syntax
+by manipulating the code's abstract syntax tree. I also considered
+Google's *Closure Compiler* which resembles a traditional optimiser by
+leveraging a deeper understanding of the code semantics. Unfortunately,
 proving equivalence in highly dynamic languages is often impossible and
-Closure Compiler is only safe given a project that uses a well-advised
-subset of Javascript, delivering no reasonable guarantee of equivalence
-if code is not written as the Closure team expected. Integration tests
-should catch any such failures but for the time being I decided a
-slightly larger file is a worthwhile tradeoff for a slightly safer build
-process.
+Closure Compiler is only safe given a well-advised subset of Javascript.
+It delivers no reasonable guarantee of equivalence if code is not
+written as the Closure team expected. Integration tests would catch any
+such failures but for the time being I decided that even given the
+micro-library limits, a slightly larger file is a worthwhile tradeoff
+for a safer build process
 
 Styles of Programming
 ---------------------
 
-The implementation of Oboe is mixed paradigm. Events flow throughout the
-whole library but in terms of code style the components are a mix of
-procedural, functional and object-oriented programming. Object
-orientation is used only to wrap the library in an Object-oriented
-public API and as a tuple-like store for multiple values. Constructors
-are not used, nor is there any inheritance or notable polymorphism.
-Closures, not objects, are used as the primary means of data storage and
-hiding. Many of the entities painted in figure \ref{overallDesign} map
-onto no single, addressable language construct and exist only as a set
-of event handlers trapped inside the same closure, taking advantage of
-the fact that their reachability from some event emitter prevents
-required parameters from being garbage collected. From outside the
-closure hidden values are not only private as would be seen in an OO
-model, they are inherently unaddressable. Although only sparingly OO,
-the high-level design's componentisation hasn't departed from how it
-might be implemented in an OO metamodel and Object Oriented design
-patterns remain influential despite being only loosely followed.
+Oboe does not follow any single programming paradigm and is made of
+components written in a mix of procedural, functional and
+object-oriented programming styles. Classical object orientation is used
+only so far as the library exposes an Object-oriented public API.
+Although Javascript supports them, classes and constructors are not
+used, nor is there any inheritance or notable polymorphism. Closures
+form the primary means of data storage and hiding. Most entities do not
+give a Javascript object on instantiation, they are constructed as a set
+of event handlers with access to shared values from a common closure. As
+inner-functions of the same containing function, the handlers share
+access to variables from the containing scope and their reachability is
+maintained because they are referenced by the event bus. From outside
+the closure the values are not only private as would be seen in an OO
+model, they are inherently unaddressable.
 
-Because of the pressures on code size I decided not to use a general
-purpose functional library and instead create my own with only the parts
-that I need; see functional.js. Functional programming in Javascript is
-known to be slower than other styles, particularly under Firefox because
-it lacks Lambda Lifting and other similar optimisations
-[@functionalSpiderMonkey]. Considering to what degree performance
-concerns should dissuade us from a functional style, we may consider the
-library's execution context. Because of the single-threaded model any
-application's Javascript execution is in between frames serving
-concurrent concerns so to minimise the impact on latency for the other
-tasks it is important that no task occupies the CPU for very long. On
-the browser about 16ms is a fair maximum, allowing painting to occur at
-60 frames per second. In Node there is no hard limit but any CPU-hogging
-task degrades the responsiveness of other responses. Context switching
-imposes a very low overhead and responsive sharing generally proffers
-many small frames over a few larger ones. In any case, server-side tasks
-especially are more often i/o bound than CPU bound. Oboe's progressive
-design naturally splits tasks which would otherwise be performed in a
-single frame over many. For example, parsing and marshaling. Although
-the overall computation may be higher, the total performance of the
-system should be improved.
+Although not following an established object orientated metamodel, the
+high-level design hasn't departed very far from what could be made
+following that style and OO design patterns have influenced the design
+nonetheless. If we wish to think in terms of the OO paradigm we might
+say that values trapped inside the closure are private class attributes
+and that handlers it registers on the event bus are the class' public
+methods. In this regard, the high-level internal design of Oboe could be
+discussed using terms from a more standard object oriented metamodel.
 
 Javascript is of course an imperative language but over many iterations
-Oboe has tended towards a declarative style. In
-incrementalContentBuilder.js programming was initially stateful and
-procedural, reading like the instructions to perform a task. Over many
-refactors the flavour of the code has changed, the reading now tending
-towards a description of desired behaviour.
+Oboe has evolved towards a declarative programming style. For example,
+incrementalContentBuilder.js
+[incrementalContentBuilder.js](#incrementalContentBuilder.js) (Appendix
+p.\pageref{incrementalContentBuilder.js}). was initially stateful and
+procedural, reading as instructions to perform a task. Over many
+refactors the flavour of the code has changed, now reading more like a
+description of desired behaviour.
+
+Event where it creates a larger deliverable library I have generally
+preferred writing as short functions which can be joined together into
+longer ones. Short functions reduce the size of the minimum testable
+unit and allow very simple unit tests. Because of the pressures on code
+size I decided not to use a general purpose functional library and
+created my own with only the parts that are needed. See
+[functional.js](#functional.js) (Appendix p.\pageref{functional.js}).
+Functional programming in Javascript is known to be slower than other
+styles, particularly in Firefox which lacks optimisation such as Lambda
+Lifting [@functionalSpiderMonkey] but I do not think this should be a
+major problem. Because of Javascript's single-threaded model, in the
+browser any script execution takes place during execution frames,
+interlaced with frames serving concurrent concerns. To minimise the
+impact on other tasks such as rendering it is important that no task
+occupies the CPU for very long. About 16ms is a fair target for the
+maximum duration of a script execution frame since most monitors refresh
+at 60Hz. In Node no limit can be implied from a display but any
+CPU-hogging task degrades the responsiveness of other concerns.
+Switching tasks is cheap so sharing the CPU well generally prefers many
+small execution frames over a few larger ones. Whether running in a
+browser or server, the bottleneck is more often I/O than processing
+speed and so long as no task holds the CPU for an unusually long
+execution frame it can be considered fast enough. Oboe's progressive
+model favours sharing because it naturally splits tasks over many
+execution frames which by a non-progressive mode would be performed as a
+single task. Although the overall CPU time will be higher, Oboe should
+share better with other concerns and because of better I/O management
+the total system performance should be improved.
 
 Incrementally building up the content
 -------------------------------------
 
-As shown in figure \ref{overallDesign}, there is an incremental content
-builder and ascent tracer which handle the output from the Clarinet JSON
-SAX parser. Taken together, these might be considered a variant of the
-Adaptor pattern, providing to the controller a simpler interface than is
-presented by Clarinet. However, this is not the model implementation of
-the pattern; the adapted interface is even-driven rather than
-call-driven: we receive six kinds of event and in response emmit from a
-narrower vocabulary of two.
-
-To evaluate JSONPath expressions the controller requires a path to the
-current JSON node, the node itself, and any ancestor nodes. This is
-delivered by the incremental content builder as the payload of the
-NODE\_FOUND and PATH\_FOUND events. For each Clarinet event the builder
-provides a corresponding function which, working from the current path,
-returns the next path after the event has been applied. For example, the
-`objectopen` and `arrayopen` events move the current node deeper in the
-document and are handled by adding new items to the path, whereas for
-`closeobject` and `closearray` we remove one. Over the course of parsing
-a complete JSON file the path will in this way be manipulated to visit
-every node, allowing each to be tested against the registered JSONPath
-expressions. Internally, the builder's event handlers are declared as
-the combination of a smaller number of basic reusable handler parts.
-Oboe is largely unconcerned regarding a JSON node's type so given that
-several of the Clarinet events differ only by the type of the nodes they
-announce, Oboe is able to generify their handling by composing from a
-common pool of handler-parts. Picking up `openobject` and `openarray`
-events, both fall through to the same 'nodeFound', differing only in a
-parameter. Similarly, consider the `value` event which is fired when
-Clarinet encounters a String or Number. Because primitive nodes are
-always leaves the builder regards this as a node which instantaneously
-starts and ends, handled programmatically as the functional composition
-of the `nodeFound` and `curNodeFinished`. The reuse of smaller
-instructions to build up larger ones is perhaps slightly reminiscent of
-CISC CPU design in which micro-instructions are combined to implement
-the chip's advertised interface.
-
-Although the builder functions are stateless, ultimately the state
-regarding the current path needs to be stored between clarinet calls.
-This is handled by the ascent tracker. This tiny component merely serves
-as a holder for this data, starting from an empty path it passes the
-path to each builder function and stores the result to be given to the
-next one.
+As shown in figure \ref{overallDesign} on page \pageref{overallDesign}
+there is an incremental content builder and ascent tracer which handle
+SAX events from the Clarinet JSON parser. By presenting to the
+controller a simpler interface than is provided by Clarinet, taken
+together these might be considered as an Adaptor pattern but adapted to
+be even-driven rather than call-driven: we receive six types of event
+and in response emit from a narrower vocabulary of two. The events
+received are low level, reporting the sequence of tokens in the markup;
+those emitted are much higher level, reporting a sequence of JSON nodes
+and paths as they are discovered. Testing a JSONPath expression for a
+match against any particular node requires the node itself, the path to
+the node, and the ancestor nodes. For every newly found item in the JSON
+this information is delivered as the payload of the `NODE\_FOUND` and
+`PATH\_FOUND` events so that the controller can test for matches against
+registered patterns.
 
 ![List representation of an ascent from leaf to root of a JSON tree.
-Note the special ROOT token which represents the path mapping to the
-root node (of course nothing maps to the root) - this is an object,
-taking advantage of object identity to ensure that the token is unequal
-to anything but itself. This list form is built up by the incremental
-content builder and is the format that compiled JSONPath expressions
-test against for matches \label{ascent}](images/ascent.png)
+Note the special ROOT token which represents the special location of the
+root node, which has no path. ROOT is an object, taking advantage of
+object identity to ensure that the location is unequal to all others.
+This list form is built up by the incremental content builder and is the
+format that compiled JSONPath expressions test for matches.
+\label{ascent}](images/ascent.png)
 
-The path of the current node is maintained as a singly linked list, with
-each list element holding the field name and the node and the node
-itself, see figure \ref{ascent}. The list is arranged with the JSON root
-at the far end and the current node at the head. As we traverse the JSON
-the current node is appended and removed many times whereas the root is
-immutable. This ordering was chosen because it is computationally very
-efficient since all updates to the list are at the head. Each link in
-the list is immutable, enforced by newer Javascript engines as frozen
-objects [^5_Implementation2].
+The path of the current node is maintained as a singly linked list in
+which each item holds the node and the field name that linked to the
+node from its parent. See figure \ref{ascent}. Each link in the list is
+immutable, enforced by newer Javascript engines using frozen objects
+[^5_Implementation2]. The list is arranged as an ascent with the current node at the
+near end and the root at the far end. Although paths are more typically
+written as a descent, ordering as an ascent is more efficient because as
+we traverse the JSON the current node is appended and removed many times
+whereas the root is rarely replaced. As nodes open and close all updates
+to the list are at the head, giving constant time access and mutation.
+For familiarity, when paths are passed to application callbacks they are
+reversed and converted to arrays.
 
-Linked lists were chosen in preference to the more conventional approach
-of using native Javascript Arrays for several reasons. Firstly, I find
-this area of the program more easy to test and debug given immutable
-data structures. Handling native Arrays without mutating would be very
-expensive because on each new path the array would have to be copied
-rather than edited in-place. Unpicking a stack trace is easier if I know
-that every value revealed is the value that has always occupied that
-space because I don't have to think four-dimensionally projecting my
-mind forwards and back in time to different values that were there when
-the variable was used. The lack of side effects means I can try explore
-new commands in the debugger's CLI without worrying about breaking the
-execution of the program. Most Javascript virtual machines are also
-quite poor at array growing and shrinking so for collections whose size
-changes often are outperformed by linked lists. Finally, this is a very
+For each Clarinet event the builder provides a corresponding handler
+which, working from the current ascent, returns the next ascent after
+the event has been applied. For example, the `objectopen` and
+`arrayopen` event types are handled by adding a new item to the start of
+the ascent, whereas for `closeobject` and `closearray` one is removed.
+Over the course of parsing a complete JSON file the ascent will in this
+way be manipulated to visit every node, allowing each to be tested
+against the registered JSONPath expressions. Internally, the builder's
+event handlers are declared as the combination of a smaller number of
+basic reusable parts. The builder is largely unconcerned regarding a
+JSON node's type whereas several of Clarinet's event types differ only
+by the type of the node that they announce. Picking up `openobject` and
+`openarray` events, both pass through to the same 'nodeFound', differing
+only in the type of node which is first created. Similarly, Clarinet has
+a `value` event type which is fired when a string or number is found in
+the markup. Because primitive nodes are always leaves the builder treats
+them as a node which instantaneously starts and ends, handled
+programmatically as the composition of the `nodeFound` and
+`nodeFinished` functions. The design of a small bank of smaller
+instructions that are combined to build up larger ones is perhaps
+reminiscent of the use of micro-instructions in CPU design.
+
+Although the builder functions are stateless and side-effect free, while
+visiting each JSON node the current ascent needs to be stored. This is
+handled by the ascent tracker. This tiny component serves as a holder
+for this data. Starting with the ascent initialised as an empty list, on
+receiving a SAX event it passes the ascent to the handler and stores the
+result so that when the next SAX event is received the updated ascent
+can be given to the next handler.
+
+Linked lists were chosen for the ascents in preference to the more
+conventional approach of using native Javascript Arrays for several
+reasons. Firstly, I find this area of the program more easy to test and
+debug given immutable data structures. Employing native Arrays without
+mutating would be very expensive because on each new path the array
+would have to be copied rather than edited in-place. While debugging,
+unpicking a stack trace is easier if I know that every value revealed is
+the value that has always occupied that space because I don't have to
+imagine the different values that were in the same space earlier or will
+be there later. The lack of side effects means I can try new commands in
+the debugger's CLI without worrying about breaking the execution of the
+program. Most Javascript virtual machines are also quite poor at array
+growing and shrinking so for collections whose size changes, arrays are
+often are outperformed by linked lists. Finally, lists are a very
 convenient format for the JSONPath engine to perform matching on as will
-be discussed in the next section. The Javascript file lists.js
-implements the list functions: `cons`, `head`, `tail`, `map`, `foldR`,
-`all`.
-
-Because it is more common to quote paths as descents rather than ascent,
-on the boundary to the outside world Oboe reverses the order and,
-because Javascript programmers will not be familiar with this structure,
-converts to arrays.
+be discussed in the next section. The Javascript file
+[lists.js](#lists.js) (Appendix p.\pageref{lists.js}) implements various
+list functions: `cons`, `head`, `tail`, `map`, `foldR`, `all`, 'without'
+as well as converting lists to and from arrays.
 
 Oboe JSONPath Implementation
 ----------------------------
 
-Not surprisingly given its importance, the JSONPath implementation is
-one of the most refactored and considered parts of the Oboe codebase.
-Like many small languages, on the first commit it was little more than a
+On the first commit the JSONPath implementation was little more than a
 series of regular expressions[^5_Implementation3] but has slowly evolved into a
 featureful and efficient implementation[^5_Implementation4]. The extent of the rewriting
 was possible because the correct behaviour is well defined by test
 specifications[^5_Implementation5].
 
-The JSONPath compiler exposes a single higher-order function to the rest
-of Oboe. This function takes a JSONPath as a String and, proving it is a
-valid expression, returns a function which tests for matches to the
-JSONPath. Both the compiler and the functions that it generates benefit
-from being stateless. The type of the compiler, expressed as Haskell
-syntax would be:
+The JSONPath compiler exposes a single higher-order function. This
+function takes the JSONPath as a String and, proving it is a valid
+expression, returns a function which tests for matches to the pattern.
+Both the compiler and the functions that it generates benefit from being
+stateless. The type of the compiler is difficult to express in
+Javascript but expressed in Haskell syntax would be:
 
 ~~~~ {.haskell}
 String -> Ascent -> JsonPathMatchResult
 ~~~~
 
-The match result is either a failure to match, or a hit, with the node
-that matched. In the case of path matching, the node may currently be
-unknown. If the pattern has a clause prefixed with `$`, the node
-matching that clause is captured and returned as the result. Otherwise,
-the last clause is implicitly capturing.
+The match result is either a miss or a hit. If a hit, the return value
+will be the node captured by the match. If the pattern has an explicitly
+capturing clause, the node corresponding to that clause is captured.
+Otherwise, it is the node at the head of the ascent.
 
-The usage profile for JSONPath expressions in Oboe is to be compiled
-once and then evaluated many times, once for each node encountered while
-parsing the JSON. Because matching is performed perhaps hundreds of
-times per file the most pressing performance consideration is for
-matching to execute quickly, the time required to compile is relatively
-unimportant. Oboe's JSONPath design contrasts with JSONPath's reference
-implementation which, because it provides a first order function,
-freshly reinterprets the JSONPath string each time it is invoked.
+Implementation as a function was chosen even though it might have been
+simpler to create a first-order version as seen in the published
+JSONPath implementation:
+
+~~~~ {.haskell}
+(String, Ascent) -> JsonPathMatchResult
+~~~~
+
+If a first-order function were used the pattern string would have to be
+freshly reinterpreted on each evaluation, repeating computation
+unnecessarily. Because a pattern is registered once but then evaluated
+perhaps hundreds of times per JSON file the most pressing performance
+consideration is for matching to execute quickly. The time taken to
+compile is relatively unimportant.
 
 The compilation is performed by recursively by examining the left-most
-side of the string for a JSONPath clause. For each kind of clause there
-is a function which matches ascents against that clause, for example by
-checking the name field. By partial completion this function is
-specialised to match against one particular name. Once a clause function
-is generated, compilation recurs by passing to itself the remaining
-unparsed portion of the JSONPath string. This continues until it is
-called with a zero-length JSONPath. On each recursive call the clause
-function is wrapped in the result from the next recursive call,
-resulting ultimately in a linked series of clause functions. When
-evaluated against an ascent, each clause functions examines the head of
-the ascent and passes the ascent onto the next function if it passes. A
-special clause functions, `skip1` is used for the `.` syntax and places
-no condition on the head of the ascent but passes on to the next clause
-only the tail, thus moving evaluation of the ascent one node up the
-parsed JSON tree. Similarly, there is a `skipMany` which maps onto the
-`..` syntax and recursively consumes nodes until it can find a match in
-the next clause.
+side of the string for a JSONPath clause. For each clause type there is
+a function which tests ascents for that clause, for example by checking
+the field name; by partial completion the field name function would be
+specialised to match against one particular name. Having generated a
+function to match against the left-most clause, compilation recurs by
+passing to itself the remaining unparsed right side of the string. This
+continues until there is nothing left to parse. On each recursive call
+the clause function generated wraps the result from the last recursive
+call, resulting ultimately in a concentric series of clause functions.
+The order of this series of functions mirrors the path ordering as an
+ascent, so that the outermost function matches against deepest node, at
+the near end of the ascent, and the innermost against the shallowest, at
+the far end. When evaluated against an ascent, each clause function
+examines the head of the list and, if it matches, passes the list onto
+the next function. A special clause function, `skip1` is used for the
+`.` (parent) syntax and places no condition on the head of the list,
+unconditionally passing the tail on to the next clause, thus moving
+matching on to the parent node. Similarly, there is a function
+`skipMany` which maps onto the `..` (ancestor) syntax and recursively
+consumes the minimum number of ascent items necessary for the next
+clause to match, or fails if this cannot be done. In this way, we peel
+off layers from the ascent as we move through the functions list until
+we either exhaust the functions, indicating a match, or cannot continue,
+indicating a fail.
 
-JsonPath implementation allows the compilation of complex expressions
-into an executable form, but each part implementing the executable form
-is locally simple. By using recursion, assembling the simple functions
-into a more function expressing a more complex rule also follows as
-being locally simple but gaining a usefully sophisticated behaviour
-through composition of simple parts. Each recursive call of the parser
-identifies one token for non-empty input and then recursively digests
-the rest.
-
-As an example, the pattern `!.$person..{height tShirtSize}` once
-compiled would roughly resemble the Javascript functional representation
+This JSONPath implementation allows the compilation of complex
+expressions into an executable form by combining many very simple
+functions. As an example, the pattern `!.$person..{height tShirtSize}`
+once compiled would resemble the Javascript functional representation
 below:
 
 ~~~~ {.javascript}
-statementExpr(             // wrapper, added when JSONPath is zero-length 
-   duckTypeClause(         // token 6, {height tShirtSize}
-      skipMany(            // token 5, '..'  
-         capture(          // token 4, css4-style '$' notation
-            nameClause(    // token 3, 'person'
-               skip1(      // token 2, '.'  
-                  rootExpr // token 1, '!' at start of JSONPath expression
+statementExpr(             // outermost wrapper, added when JSONPath 
+                           // is zero-length 
+   duckTypeClause(         // token 5, {height tShirtSize}
+      skipMany(            // token 4, '..', ancestor relationship 
+         capture(          // token 3, '$' from '$person'
+            nameClause(    // token 3, 'person' from '$person'
+               skip1(      // token 2, '.', parent relationship
+                  rootExpr // token 1, '!', matches only the root
                ) 
             'person' )
          )
@@ -2103,42 +2126,40 @@ statementExpr(             // wrapper, added when JSONPath is zero-length
 )      
 ~~~~
 
-Since I am only using a side-effect free subset of Javascript for this
-segment of Oboe it would be safe to use a functional cache. As well as
-saving time by avoiding repeated execution, this could potentially also
-save memory because where two JSONPath strings contain a common start
-they could share the inner parts of their functional expression.
-Although Javascript doesn't come with functional caching, it can be
-added using the language itself [^5_Implementation6]. I suspect, however, that hashing
-the parameters might be slower than performing the matching. Although
-the parameters are all immutable and could in theory be hashed by object
-identity, in practice there is no way to access an object id from inside
-the language so any hash of a node parsed out of JSON would have to walk
-the entire subtree rooted from that node.
+Since I am using a side-effect free subset of Javascript for pattern
+matching it would be safe to use a functional cache. As well as saving
+time by avoiding repeated execution this could potentially also save
+memory because where two JSONPath strings contain a common left side
+they could share the inner parts of their functional expression. Given
+the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
+JSONPath engine will currently create two identical evaluators for
+`!.animals.mammals.`. Although Javascript doesn't come with functional
+caching, it can be added using the language itself, probably the best
+known example being `memoize` from Underscore.js. I suspect, however,
+that hashing the cache parameters might be slower than performing the
+matching. Although the parameters are all immutable and could in theory
+be hashed by object identity, in practice there is no way to access an
+object id from inside the language so any hash of a node parsed out of
+JSON would have to walk the entire subtree rooted from that node.
 
-The JSONPath tokenisation is split out into its own file and separately
-tested. The tokenisation implementation is based on regular expressions,
-they are the simplest form able to express the clause patterns. The
-regular expressions are hidden to the outside the tokenizer and only
-functions are exposed to the main body of the compiler. The regular
-expressions all start with `^` so that they only match at the head of
-the string. A more elegant alternative is the 'y' [^5_Implementation7] flag but as of
-now this lacks wide browser support.
+The tokenisation of patterns is split out into its own file and
+separately tested. Because they are the simplest form able to express
+the clause patterns the tokenisation is based on regular expressions.
+The regular expressions each start with `^` so that they only match at
+the head of the string. A more elegant alternative is the 'y' flag but
+as of now this lacks wide browser support[^5_Implementation6].
 
 By verifying the tokens through their own unit tests it is simpler to
-thoroughly specify the tokenisation, producing simpler failure messages
-than if it were done through the full JSONPath engine. We might consider
-the unit test layer of the pyramid (figure \ref{testpyramid}) is further
-split into two sub-layers. Arguably, the upper of these sub-layer is not
-a unit test because it is verifying two units together. There is some
-redundancy with the tokens being tested both individually and as full
-expressions. I maintain that this is the best approach regardless
-because stubbing out the tokenizer functions would be a considerable
-effort and would not improve the rigor of the JSONPath specification.
-
-![Some kind of diagram showing jsonPath expressions and functions
-partially completed to link back to the previous function. Include the
-statementExpr pointing to the last clause](images/placeholder)
+thoroughly specify the tokenisation because it can be tested directly
+without going though another layer. For pattern matching we might
+consider the unit test layer of the test pyramid (figure
+\ref{testpyramid} p.\pageref{testpyramid}) to be further split into two
+sub-layers. Arguably, the upper of these sub-layer is not a unit test
+because it is verifying more than one unit and there is some redundancy
+since the tokens are tested both individually and as full expressions. I
+maintain that a purist approach would not help because stubbing out the
+tokenizer functions would be a considerable effort and would not improve
+the rigor of the JSONPath specification.
 
 [^5_Implementation1]: https://github.com/substack/http-browserify
 
@@ -2161,14 +2182,14 @@ statementExpr pointing to the last clause](images/placeholder)
     and
     https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
 
-[^5_Implementation6]: Probably the best known example being `memoize` from
-    Underscore.js: http://underscorejs.org/\#memoize
-
-[^5_Implementation7]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+[^5_Implementation6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
 
 
 Conclusion
 ==========
+
+*how it encourages slighlty differnet programs to be written.
+Compare mustache examples*
 
 Benchmarking vs non-progressive REST
 ------------------------------------
@@ -2537,6 +2558,19 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     NEW_CONTENT = _S++,
     END_OF_CONTENT = _S++,
     ABORTING = _S++;
+    
+function errorReport(statusCode, body, error) {
+   try{
+      var jsonBody = JSON.parse(body);
+   }catch(e){}
+
+   return {
+      statusCode:statusCode,
+      body:body,
+      jsonBody:jsonBody,
+      thrown:error
+   };
+}    
 ~~~~
 
 
@@ -2730,7 +2764,7 @@ incrementalContentBuilder.js
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
- * to the low-level events from Clarinet and fires higher-level ones.
+ * to the low-level events from Clarinet and emits higher-level ones.
  *  
  * The building up is stateless so to track a JSON file
  * clarinetListenerAdaptor.js is required to store the ascent state
@@ -2759,10 +2793,10 @@ var ROOT_PATH = {};
 
 
 /**
- * Create a new set of handlers for clarinet's events, bound to the fire 
+ * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( fire) {
+function incrementalContentBuilder( emit ) {
 
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
@@ -2791,7 +2825,7 @@ function incrementalContentBuilder( fire) {
       
       if( !ascent ) {
          // we discovered the root node,
-         fire( ROOT_FOUND, newDeepestNode);
+         emit( ROOT_FOUND, newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -2860,7 +2894,7 @@ function incrementalContentBuilder( fire) {
                                  ascent
                               );
      
-      fire( PATH_FOUND, ascentWithNewPath);
+      emit( PATH_FOUND, ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -2869,9 +2903,9 @@ function incrementalContentBuilder( fire) {
    /**
     * For when the current node ends
     */
-   function curNodeFinished( ascent ) {
+   function nodeFinished( ascent ) {
 
-      fire( NODE_FOUND, ascent);
+      emit( NODE_FOUND, ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);
@@ -2916,12 +2950,12 @@ function incrementalContentBuilder( fire) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose( curNodeFinished, nodeFound ),
+      value: compose( nodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.
-      closeobject: curNodeFinished,
-      closearray: curNodeFinished       
+      closeobject: nodeFinished,
+      closearray: nodeFinished
    };
 }
 ~~~~
@@ -2942,7 +2976,7 @@ instanceController.js
  */
  
  
-function instanceController(  fire, on, un, 
+function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
    var oboeApi, rootNode;
@@ -2984,7 +3018,10 @@ function instanceController(  fire, on, un,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      fire(ERROR_EVENT, e);
+      emit(
+         ERROR_EVENT, 
+         errorReport(undefined, undefined, e)
+      );
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
@@ -3047,18 +3084,25 @@ function instanceController(  fire, on, un,
          keep = false;
       };           
       
-      try{      
-         callback( nodeOf(matchingMapping), path, ancestors );   
-      }catch(e)  {
-      
-         // An error occured during the callback, publish it on the event bus 
-         fire(ERROR_EVENT, e);
-      }
-      
+      callback( nodeOf(matchingMapping), path, ancestors );         
+            
       delete oboeApi.forget;
       
       return keep;          
    }
+
+   function protectedCallback( callback, context ) {
+      return function() {
+         try{      
+            callback.apply(context||oboeApi, arguments);   
+         }catch(e)  {
+         
+            // An error occured during the callback, publish it on the event bus 
+            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+         }      
+      }   
+   }
+   
 
    /**
     * Add several listeners at a time, from a map
@@ -3079,8 +3123,8 @@ function instanceController(  fire, on, un,
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeCallback( 
             eventId, 
-            jsonPathOrListenerMap, 
-            callback.bind(callbackContext||oboeApi)
+            jsonPathOrListenerMap,
+            protectedCallback(callback, callbackContext)
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
@@ -3123,7 +3167,7 @@ function instanceController(  fire, on, un,
       on    :  addListener,
       fail  :  addFailListner,
       done  :  addDoneListener,
-      abort :  partialComplete(fire, ABORTING),
+      abort :  partialComplete(emit, ABORTING),
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }
@@ -3825,9 +3869,9 @@ pubSub.js
 /**
  * Isn't this the cutest little pub-sub you've ever seen?
  * 
- * Does not allow unsubscription because is never needed inside Oboe.
- * Instead, when an Oboe instance is finished the whole of it should be
- * available for GC'ing.
+ * Over time this should be refactored towards a Node-like
+ *    EventEmitter so that under Node an actual EE acn be used.
+ *    http://nodejs.org/api/events.html
  */
 function pubSub(){
 
@@ -3842,13 +3886,13 @@ function pubSub(){
          return this; // chaining
       }, 
     
-      fire:function ( eventId, event ) {
+      emit:varArgs(function ( eventId, parameters ) {
                
-         each(
-            partialComplete( apply, [event || undefined] ), 
+         each( 
+            partialComplete( apply, parameters ), 
             listeners[eventId]
          );
-      },
+      }),
       
       un: function( eventId, handler ) {
          listeners[eventId] = without(listeners[eventId], handler);
@@ -3930,7 +3974,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} emit a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
@@ -3941,7 +3985,7 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, xhr, method, url, data, headers) {
+function streamingHttp(emit, on, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
@@ -3985,7 +4029,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         fire( NEW_CONTENT, newText );
+         emit( NEW_CONTENT, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -4004,7 +4048,7 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
          var sucessful = String(xhr.status)[0] == 2;
          
          if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is fired when a response
+            // In Chrome 29 (not 28) no onprogress is emitted when a response
             // is complete before the onload. We need to always do handleInput
             // in case we get the load but have not had a final progress event.
             // This looks like a bug and may change in future but let's take
@@ -4012,10 +4056,16 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
             // progress event for each part of the response
             handleProgress();
             
-            fire( END_OF_CONTENT );
+            emit( END_OF_CONTENT );
          } else {
          
-            fire( ERROR_EVENT, xhr.status );
+            emit( 
+               ERROR_EVENT, 
+               errorReport(
+                  xhr.status, 
+                  xhr.responseText
+               )
+            );
          }
       }
    };
@@ -4031,13 +4081,18 @@ function streamingHttp(fire, on, xhr, method, url, data, headers) {
       xhr.send(validatedRequestBody(data));
       
    } catch( e ) {
-      // To keep a consistent interface with Node, we can't fire an event here.
+      // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
-      // event rather than as an exception. If we fired now, the Oboe user
+      // event rather than as an exception. If we emitted now, the Oboe user
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(partialComplete(fire, ERROR_EVENT, e), 0);
+      window.setTimeout(
+         partialComplete(emit, ERROR_EVENT, 
+             errorReport(undefined, undefined, e)
+         )
+      ,  0
+      );
    }            
 }
 
@@ -4064,7 +4119,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} fire a function to pass events to when something happens
+ * @param {Function} emit a function to pass events to when something happens
  * @param {Function} on a function to use to subscribe to events
  * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
@@ -4076,19 +4131,33 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(fire, on, http, method, contentSource, data, headers) {
+function streamingHttp(emit, on, http, method, contentSource, data, headers) {
 
-   function readFromStream(readableStream) {
+   function readStreamToEventBus(readableStream) {
          
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
                                              
-         fire( NEW_CONTENT, chunk.toString() );
+         emit( NEW_CONTENT, chunk.toString() );
       });
       
       readableStream.on('end', function() {
                
-         fire( END_OF_CONTENT );
+         emit( END_OF_CONTENT );
+      });
+   }
+   
+   function readStreamToEnd(readableStream, callback){
+      var content = '';
+   
+      readableStream.on('data', function (chunk) {
+                                             
+         content += chunk.toString();
+      });
+      
+      readableStream.on('end', function() {
+               
+         callback( content );
       });
    }
    
@@ -4113,16 +4182,23 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
                                 
          if( sucessful ) {          
                
-            readFromStream(res)
+            readStreamToEventBus(res)
             
          } else {
-         
-            fire( ERROR_EVENT, statusCode );
+            readStreamToEnd(res, function(errorBody){
+               emit( 
+                  ERROR_EVENT, 
+                  errorReport( statusCode, errorBody )
+               );
+            });
          }      
       });
       
       req.on('error', function(e) {
-         fire( ERROR_EVENT, e );
+         emit( 
+            ERROR_EVENT, 
+            errorReport(undefined, undefined, e )
+         );
       });
       
       on( ABORTING, function(){              
@@ -4141,7 +4217,7 @@ function streamingHttp(fire, on, http, method, contentSource, data, headers) {
       fetchUrl(contentSource);
    } else {
       // contentsource is a stream
-      readFromStream(contentSource);   
+      readStreamToEventBus(contentSource);   
    }
 
 }
@@ -4228,14 +4304,14 @@ function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
-   streamingHttp( eventBus.fire, eventBus.on,
+   streamingHttp( eventBus.emit, eventBus.on,
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
    return instanceController( 
-               eventBus.fire, eventBus.on, eventBus.un, 
+               eventBus.emit, eventBus.on, eventBus.un, 
                clarinet.parser(), 
-               incrementalContentBuilder(eventBus.fire) 
+               incrementalContentBuilder(eventBus.emit) 
    );
 }
 

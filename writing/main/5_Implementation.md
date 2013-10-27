@@ -238,8 +238,7 @@ for a safer build process
 Styles of Programming
 ---------------------
 
-Oboe does not follow any single programming paradigm and is made of
-components written in a mix of procedural, functional and
+Oboe does not follow any single programming paradigm and is made written in a mix of procedural, functional and
 object-oriented programming styles. Classical object orientation is used
 only so far as the library exposes an Object-oriented public API.
 Although Javascript supports them, classes and constructors are not
