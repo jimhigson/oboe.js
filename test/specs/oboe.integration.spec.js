@@ -402,7 +402,26 @@ describe("oboe integration (real http)", function() {
       runs( function() {
          expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
       })
-   })         
+   })
+   
+   it('emits error if done callback throws an error', function () {
+
+      var stubCallback = jasmine.createSpy('error callback'),
+          callbackError = new Error('I am a bad callback');
+
+      oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         .done(jasmine.createSpy().andThrow(callbackError) )
+         .fail(stubCallback);
+         
+      waitsFor(function () {
+         return !!stubCallback.calls.length;
+      }, 'the request to fail', ASYNC_TEST_TIMEOUT)
+
+ 
+      runs( function() {
+         expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
+      })
+   })            
 
    function someSecondsToPass(waitSecs) {
 
