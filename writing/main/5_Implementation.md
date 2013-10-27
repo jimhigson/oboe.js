@@ -219,62 +219,58 @@ they were the Node equivalents, Browserify leaves no trace of itself in
 the final Javascript. Additionally, the http adaptor[^1] is capable of
 using XHRs as a streaming source when used with supporting browsers.
 
-After combining into a single file Javascript source can be made significantly smaller by *minification*
-techniques such as reducing scoped symbols to
-a single character or deleting the comments. For Oboe the popular
-minifier library *Uglify* was chosen. Uglify performs only surface
-optimisations, concentrating mostly on
-producing compact syntax by manipulating the code's abstract syntax tree.
-I also considered Google's *Closure Compiler*
-which resembles a traditional optimiser by leveraging a deeper
-understanding of the code semantics. Unfortunately,
+After combining into a single file Javascript source can be made
+significantly smaller by *minification* techniques such as reducing
+scoped symbols to a single character or deleting the comments. For Oboe
+the popular minifier library *Uglify* was chosen. Uglify performs only
+surface optimisations, concentrating mostly on producing compact syntax
+by manipulating the code's abstract syntax tree. I also considered
+Google's *Closure Compiler* which resembles a traditional optimiser by
+leveraging a deeper understanding of the code semantics. Unfortunately,
 proving equivalence in highly dynamic languages is often impossible and
-Closure Compiler is only safe given a well-advised
-subset of Javascript. It delivers no reasonable guarantee of equivalence
-if code is not written as the Closure team expected. Integration tests
-would catch any such failures but for the time being I decided that even
-given the micro-library limits, a slightly larger file is a worthwhile 
-tradeoff for a safer build process
+Closure Compiler is only safe given a well-advised subset of Javascript.
+It delivers no reasonable guarantee of equivalence if code is not
+written as the Closure team expected. Integration tests would catch any
+such failures but for the time being I decided that even given the
+micro-library limits, a slightly larger file is a worthwhile tradeoff
+for a safer build process
 
 Styles of Programming
 ---------------------
 
-In terms of code style Oboe is mixed paradigm with components written in a
-mix of procedural, functional and object-oriented programming styles.
-Classical object
-orientation is used only so far as the library exposes an Object-oriented
-public API. Although Javascript supports them, classes and constructors
-are not used, nor is there any inheritance or notable polymorphism.
-Higher-level functions are used throughout, with techniques from functional
-programming such as partial completion and functional composition. Most
-functions are short, with many being used together to build the required
-behaviours.
+In terms of code style Oboe is mixed paradigm with components written in
+a mix of procedural, functional and object-oriented programming styles.
+Classical object orientation is used only so far as the library exposes
+an Object-oriented public API. Although Javascript supports them,
+classes and constructors are not used, nor is there any inheritance or
+notable polymorphism. Higher-level functions are used throughout, with
+techniques from functional programming such as partial completion and
+functional composition. Most functions are short, with many being used
+together to build the required behaviours.
 
-Closures are used as the primary means of data storage and
-hiding. Most of the entities painted in figure \ref{overallDesign}
-do not a Javascript object on instantiation, they are constructed as a set
-of event handlers with access to shared values from a common closure.
-As inner-functions of the same containing function, the handlers 
-share access to variables from the containing scope and their 
-reachability is maintained because they are referenced by the event bus.
-From outside the
-closure the values are not only private as would be seen in an OO
+Closures are used as the primary means of data storage and hiding. Most
+of the entities painted in figure \ref{overallDesign} do not a
+Javascript object on instantiation, they are constructed as a set of
+event handlers with access to shared values from a common closure. As
+inner-functions of the same containing function, the handlers share
+access to variables from the containing scope and their reachability is
+maintained because they are referenced by the event bus. From outside
+the closure the values are not only private as would be seen in an OO
 model, they are inherently unaddressable.
 
-Although not following an established object orientated metamodel,
-the high-level design hasn't departed very far from what could be made following that
-style.
-If we wish to think in terms of the OO paradigm we might say that
-values trapped inside the closure are class attributes and that handlers
-it registers on the event bus are class methods. In this regard, the
-high-level internal design of Oboe may be discussed using terms from  
-a more standard object oriented metamodel.
+Although not following an established object orientated metamodel, the
+high-level design hasn't departed very far from what could be made
+following that style. If we wish to think in terms of the OO paradigm we
+might say that values trapped inside the closure are class attributes
+and that handlers it registers on the event bus are class methods. In
+this regard, the high-level internal design of Oboe may be discussed
+using terms from a more standard object oriented metamodel.
 
 Because of the pressures on code size I decided not to use a general
 purpose functional library and instead create my own with only the parts
-that I need; see functional.js (ref appdx). Functional programming in Javascript is
-known to be slower than other styles, particularly under Firefox because
-it lacks Lambda Lifting and other similar optimisations
+that I need; see functional.js (ref appdx). Functional programming in
+Javascript is known to be slower than other styles, particularly under
+Firefox because it lacks Lambda Lifting and other similar optimisations
 [@functionalSpiderMonkey]. Considering to what degree performance
 concerns should dissuade us from a functional style, we may consider the
 library's execution context. Because of the single-threaded model any
