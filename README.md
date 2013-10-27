@@ -464,6 +464,8 @@ var oboe = require('oboe');
 
 # API
 
+## Making a request
+
 Oboe exposes a single global at `window.oboe`. You can start a new AJAX request by 
 calling one of these methods:
 
@@ -485,26 +487,48 @@ calling one of these methods:
    })         
 ```   
 
-`doneCallback` is passed the entire json when the response is complete.
-Usually it is better to read the json in small parts than waiting for it to completely 
-download but this is there for if you need to know when the request is done.
+## node and path
 
-The returned instance exposes a few chainable methods:
+When you make a request the returned Oboe instance exposes a few chainable methods:
 
 ```js
-   .node(String pattern, Function callback(thingFound, String[] path, context))
+   .node( String pattern, 
+          Function callback(node, String[] path, Object[] ancestors), 
+          callbackContext )
+   
+   .on( 'node', 
+        String pattern, 
+        Function callback(node, String[] path, Object[] ancestors), 
+        callbackContext )
 ```
 
-`.node()` registers our interest in nodes in the JSON which match the given `pattern`.
-Pattern syntax is for the most part standard [JSONPath](https://code.google.com/p/json-path/). 
-When the pattern is matched the callback is given the matching node and a path describing where it was found.
+Listening for nodes registers an interest in JSON nodes which match the given pattern so 
+that when the pattern is matched the callback is given the matching node.
+Inside the callback `this` will usually be the Oboe instance but this can be
+overridden by giving the callbackContext parameter.
+
+The parameters to callback are:
+
+ * `node` - the node that was found in the JSON stream 
+ * `path` - an array of strings describing the path from the root of the JSON to
+   the location where the node was found
+ * `ancestors` - an array of node's ancestors. `ancestors[ancestors.length-1]`
+   is the parent object, `ancestors[ancestors.length-2]` is the grandparent 
+   and so on. 
    
 ```js
-   .path(String pattern, Function callback(thingFound, String[] path, context))
+   .path( String pattern, 
+          Function callback( thingFound, String[] path, Object[] ancestors), 
+          context)
+   
+   .on( 'path', 
+        String pattern, 
+        Function callback(thingFound, String[] path, Object[] ancestors), 
+        context )
 ```
 
-`.path()` is the same as `.node()` except the callback is fired when the *path* matches, not when we have the
-thing. For the same pattern this will always fire before `.node()` and might be used to get things ready for that call.
+`.path()` is the same as `.node()` except the callback is fired when we know about the matching *path*,
+before we know about the thing at the path.
 
 Alternatively, several patterns may be registered at once using either `.path` or `.node`:
 
@@ -519,6 +543,23 @@ Alternatively, several patterns may be registered at once using either `.path` o
       pattern : callback
    });
 ``` 
+
+## done
+
+`.done(callback(Object json))` registers a callback that is passed the entire 
+json when the response is complete. Usually it is better to read the json in 
+small parts than waiting for it to completely download.
+
+## forget
+
+```js
+.node('*', function(){
+   this.forget();
+})
+```
+
+Calling .forget() on the Oboe instance from inside a callback de-registers
+the currently executing callback.
 
 ## abort
 
