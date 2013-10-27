@@ -234,6 +234,8 @@ REST resources marshaled from an OO representation. In implementation,
 to conform to a duck-type a node must have all of the required fields
 but could also have any others.
 
+*limitations: why must be last term*
+
 Importing CSS4's explicit capturing to Oboe's JSONPath
 ------------------------------------------------------
 

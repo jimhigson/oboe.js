@@ -1,6 +1,9 @@
 Conclusion
 ==========
 
+*how it encourages slighlty differnet programs to be written.
+Compare mustache examples*
+
 Benchmarking vs non-progressive REST
 ------------------------------------
 
