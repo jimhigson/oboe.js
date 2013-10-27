@@ -601,12 +601,9 @@ Fetching a resource could fail for several reasons:
  * error thrown by a callback
 
 ```js
-   .fail(Function callback({
-            statusCode:Number,
-            body:String,
-            jsonBody:Object,
-            thrown:Error 
-   }))
+   .fail(Function callback(Object errorReport))
+   
+   .on('fail', Function callback(Object errorReport))   
 ```
 
 Supply a callback for when something goes wrong. An object is given to the
