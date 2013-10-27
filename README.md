@@ -464,6 +464,13 @@ var oboe = require('oboe');
 
 # API
 
+If you are in Node.js or are in a browser and have AMD loaded Oboe won't register 
+a global so do this:
+
+```js
+var oboe = require('oboe')
+```
+
 ## Making a request
 
 You can start a new AJAX request by calling one of these methods:
@@ -485,14 +492,7 @@ You can start a new AJAX request by calling one of these methods:
       headers:{ key: value }
    })         
 ```
-
-If you are in Node.js or have AMD loaded in your browser Oboe won't register 
-a global so do:
-
-```js
-var oboe = require('oboe')
-```   
-
+ 
 ## node and path
 
 When you make a request the returned Oboe instance exposes a few chainable methods:
