@@ -259,30 +259,36 @@ without any parsing.
   Firefox 24.0.0                       547ms                    1.47
   IE 8.0.0 (Windows XP)              3,048ms                    0.26
 
-We can see that Firefox is much slower than other modern browsers
-despite its SpiderMonkey Javascript engine being otherwise quite fast.
-This is probably explicable in part by SpiderMonkey's just-in-time
-compiler being poor at optimising functional Javascript
-[@functionalSpiderMonkey]. Because the JSON nodes are not of a common
-type the related callsites are not monomorphic which Firefox also
-optimises poorly [@functionalSpiderMonkey]. When the test was repeated
-using a simpler JSONPath expression Firefox showed by far the largest
-improvement indicating that on this platform the functional pattern
-matching is the bottleneck.
+We can see that Firefox is slower than other modern browsers despite
+being normally quite fast. This is probably explicable because its
+SpiderMonkey just-in-time Javascript compiler is poor at optimising
+functional Javascript [@functionalSpiderMonkey]. The JSON nodes are not
+of a common type so many of the library's internal callsites are not
+monomorphic which Firefox also optimises poorly
+[@functionalSpiderMonkey]. When the test was later repeated with a
+simpler pattern Firefox showed by far the largest improvement,
+indicating that the functional JSONPath matching accounts for Firefox's
+lower than expected performance.
 
-During the project a new version of Chrome more than doubled the node
-throughput dur to including later version of the v8 Javascript engine.
-Node also uses v8 and should be updated to this version soon.
+During the project a new version of Chrome was released that performed
+more than twice as quickly as the last one due to an updated version of
+the v8 Javascript engine. Node also uses v8 and should catch up very
+soon. This reflects Javascript engine writers targeting functional
+performance now that functional Javascript is becoming a more popular
+style.
 
 Of these results I find only the very low performance on old versions of
-Internet Explorer concerning, almost certainly degrading user experience
-more than it is improved. It might be reasonable to conclude that for
-complex use cases Oboe is currently not unsuited to legacy platforms.
-Since this platform cannot progressively interpret an XHR response, if
-performance on legacy platforms becomes a serious concern one option
-might be to create a non-progressive library with the same API which
-could be selectively delivered to those platforms in place of the main
-version.
+Internet Explorer concerning. Since this platform cannot progressively
+interpret an XHR response, an improvement over traditional XHR was not
+possible but I would have liked to have maintained a rough pairity.
+Adding 3 seconds to a REST call will almost certainly impair the user
+experience. It might be reasonable to conclude that for complex use
+cases Oboe is currently unsuited to legacy platforms. If we strongly
+desired to improve performance on older platforms one solution might be
+to create a simpler, non-progressive implementation of the Oboe API for
+selective delivery to older platforms. However, it is possible that time
+spent writing a new version for legacy platforms would be better spend
+waiting for them to die.
 
 Nonetheless, in its current form Oboe may slow down the total time when
 working over the very fastest connections.
