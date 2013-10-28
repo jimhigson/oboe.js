@@ -206,7 +206,7 @@ getJson(DB_URL, function(err, records) {
 The code using JSON.parse is very closely coupled with the JSON format
 that it is handling. We can see this in the fragments `records.data`,
 `record.url`, and `record.name` which will only work if they find their
-desired sub-tree at exactly the anticipated location. The code might be
+desired subtree at exactly the anticipated location. The code might be
 said to contain a description of the format that it is for rather than a
 description of what is required from the format. The Oboe version
 describes the format only so far as is needed to identify the desired
@@ -340,40 +340,19 @@ memory as a DOM parser. These are not discarded so that all possible
 JSONPath expressions may be tested. However, in most cases memory could
 be freed if the parsed content were stored only so far as is required to
 test against the patterns which have actually been registered. For
-typical use cases I expect this would allow large sub-trees to be
+typical use cases I expect this would allow large subtrees to be
 unlinked inside Oboe, particularly once they have matched a pattern and
-have already been handed over to the application callbacks. Likewise,
+have already been handed over to the application callbacks. 
+Likewise,
 the current implementation takes a rather brute force approach when
-examining node for pattern matches: check every registered JSONPath
-expression against every node and path that are found in the JSON. For
-many expressions we are able to know there is no possibility of matching
-a JSON tree, either because we have already matched or because the the
-current node's ancestors already mandate failure. A more sophisticated
-programme might disregard provably unsatisfiable handlers for the
-duration of a subtree. Either of these changes would involve some rather
-difficult programming and because matching is fast enough I think brute
-force is the best approach for the time being.
-
-During JSONPath matching much of the computation is repeated. For
-example, matching the expression `b.*` against many children of a common
-parent will repeat the same test, checking if the parent's name is 'b',
-for each child node. Because the JSONPath matching is stateless,
-recursive and side-effect free there is a potential to cut out repeated
-computation by using a functional cache. This would reduce the overall
-amount of computation needed for JSONPath expressions with common
-substrings to their left side or nodes with a common ancestry. Current
-Javascript implementations make it difficult to manage a functional
-cache, or caches in general, from inside the language itself because
-there is no way to occupy only the unused memory. Weak references are
-proposed in ECMAScript 6 but currently only experimentally
-supported[^5]. For future development they would be ideal.
-
-The nodes which Oboe hands to callbacks are mutable meaning that
-potentially the correct workings of the library could be broken if the
-containing application carelessly alters them. Newer implementations of
-Javascript allows a whole object to be made immutable, or just certain
-properties via an immutability decorator and the `defineProperty`
-method. This would probably be an improvement.
+examining nodes for pattern matches by checking every registered JSONPath
+expression against every node parsed from the JSON. For
+many expressions we should be able to say that there will be no matches
+inside a particular JSON subtree, either because we have already matched 
+or because the the subtree's ancestors will invariably fail.
+A more sophisticated
+implementation might subdue provably unsatisfiable handlers until the
+SAX parser leaves that subtree.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
@@ -384,8 +363,3 @@ method. This would probably be an improvement.
 [^4]: See
     [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
 
-[^5]: At time of writing, Firefox is the only engine supporting
-    WeakHashMap by default. In Chome it is implemented but not available
-    to Javascript unless explicitly enabled by a browser flag.
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
-    retrieved 11th October 2013
