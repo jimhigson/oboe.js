@@ -309,28 +309,30 @@ would be interesting to see how much faster it would be.
 Status as a micro-library
 -------------------------
 
-The file `oboe-browser.min.js` is the minified, built version of
-Oboe ready to be sent to web browsers and can be found in the project's
-`dist` directory. 
-The size fluctuates as commits are made but after gzip it
-comes to about 4800 bytes; close to but comfortably under the 5120 limit. At
-roughly the size as a small image the download footprint of Oboe should not
-discourage adoption.
+The file `oboe-browser.min.js` is the minified, built version of Oboe
+ready to be sent to web browsers and can be found in the project's
+`dist` directory. The size fluctuates as commits are made but after gzip
+it comes to about 4800 bytes; close to but comfortably under the 5120
+limit. At roughly the size as a small image the download footprint of
+Oboe should not discourage adoption.
 
 potential future work
 ---------------------
 
 Although the project already delivers improvements to the programming
-model for REST clients, the most obvious
-expansion would be to create a matching server-side
-component that makes it intuitive to write JSON in a streaming way.
-So far writing out streaming JSON has required
-the resource be written out using programmer-assembled strings
-but this would be error prone and scale badly as messages become more complex.
+model for REST clients, the most obvious expansion would be to create a
+matching server-side component that makes it intuitive to write JSON in
+a streaming way. So far writing out streaming JSON has required the
+resource be written out using programmer-assembled strings but this
+would be error prone and scale badly as messages become more complex.
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
-an obvious expansion. Plug-ins for formats.
+an obvious expansion. This could be implemented by allowing resource formats
+to be added using plugins which would could be used by programmers to create a progressive
+interpretation of any resource type.
+A plug-in would require a SAX-like parser for the format a compiler for some
+kind of pattern matching language.
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
