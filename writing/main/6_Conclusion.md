@@ -162,8 +162,12 @@ footprint Clarinet might be preferable to Oboe.
 Comparative developer ergonomics
 --------------------------------
 
-For each of the benchmarks above the code was laid out in the most
-natural way for the strategy under test.
+A smaller code size is not in itself a guarantee of a
+easier programming but, so long as the code isn't forced to be more
+terse, I find it is a good indicator. The code sizes reported below report
+how much programming was required for each strategy to implement the
+database simulation above. For each library under test the programming was
+written using its most natural expression.
 
   Strategy       Code Required (lines)   Code required (chars)
   ------------ ----------------------- -----------------------
