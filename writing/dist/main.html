@@ -746,53 +746,53 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <tr class="header">
 <th align="left">Strategy</th>
 <th align="left">Network</th>
-<th align="right">First output (ms)</th>
-<th align="right">Total time (ms)</th>
-<th align="right">Max. Memory (Mb)</th>
+<th align="right">First output</th>
+<th align="right">Total time</th>
+<th align="right">Max. Memory</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">Oboe.js</td>
 <td align="left">Good</td>
-<td align="right">40</td>
-<td align="right">804</td>
-<td align="right">6.2</td>
+<td align="right">40ms</td>
+<td align="right">804ms</td>
+<td align="right">6.2Mb</td>
 </tr>
 <tr class="even">
 <td align="left">Oboe.js</td>
 <td align="left">Poor</td>
-<td align="right">60</td>
-<td align="right">1,526</td>
-<td align="right">6.2</td>
+<td align="right">60ms</td>
+<td align="right">1,526ms</td>
+<td align="right">6.2Mb</td>
 </tr>
 <tr class="odd">
 <td align="left">JSON.parse</td>
 <td align="left">Good</td>
-<td align="right">984</td>
-<td align="right">1,064</td>
-<td align="right">9,0</td>
+<td align="right">984ms</td>
+<td align="right">1,064ms</td>
+<td align="right">9,0Mb</td>
 </tr>
 <tr class="even">
 <td align="left">JSON.parse</td>
 <td align="left">Poor</td>
-<td align="right">2550</td>
-<td align="right">2,609</td>
-<td align="right">8.9</td>
+<td align="right">2550ms</td>
+<td align="right">2,609ms</td>
+<td align="right">8.9Mb</td>
 </tr>
 <tr class="odd">
 <td align="left">Clarinet</td>
 <td align="left">Good</td>
-<td align="right">34</td>
-<td align="right">781</td>
-<td align="right">5.5</td>
+<td align="right">34ms</td>
+<td align="right">781ms</td>
+<td align="right">5.5Mb</td>
 </tr>
 <tr class="even">
 <td align="left">Clarinet</td>
 <td align="left">Poor</td>
-<td align="right">52</td>
-<td align="right">1,510</td>
-<td align="right">5.5</td>
+<td align="right">52ms</td>
+<td align="right">1,510ms</td>
+<td align="right">5.5Mb</td>
 </tr>
 </tbody>
 </table>
@@ -851,7 +851,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="performance-of-code-styles-under-various-engines" class="section level2">
 <h2><a href="#performance-of-code-styles-under-various-engines"><span class="header-section-number">6.4</span> Performance of code styles under various engines</a></h2>
 <p>The 15% overhead of Oboe vs Clarinet suggests Oboe might be computationally expensive. With very fast networks the extra computation might outweigh a more efficient i/o strategy.</p>
-<p>The file <code>test/specs/oboe.performance.spec.js</code> contains a simple benchmark. This test registeres a very complex JSONPath expression which intentionally uses all of the language and fetches a JSON file containing 100 objects, each with 8 String properties against . Correspondingly the expression is evaluated just over 800 times and 100 matches are found. Although real http is used, it is kept within the localhost. The results below are averaged from ten runs. The tests executed on a Macbook Air, except for Chrome Mobile which was tested on an iPhone 5. Tests requiring Microsoft Windows were performed inside a virtual machine.</p>
+<p>The file <code>test/specs/oboe.performance.spec.js</code> contains a simple benchmark. This test registeres a very complex JSONPath expression which intentionally uses all of the language and fetches a JSON file containing 100 objects, each with 8 String properties against . Correspondingly the expression is evaluated just over 800 times and 100 matches are found. Although real http is used, it is kept within the localhost. The results below are averaged from ten runs. The tests executed on a Macbook Air running OS X 10.7.5, except for Chrome Mobile which was tested on an iPhone 5 with iOS 7.0.2. Tests requiring Microsoft Windows were performed inside a VirtualBox virtual machine.</p>
 <p>Curl is a simple download to stdout from the shell and is included as a control run to provide a baseline.</p>
 <table>
 <thead>
@@ -868,7 +868,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <td align="left"><em>n/a</em></td>
 </tr>
 <tr class="even">
-<td align="left">Chrome 31.0.1650.34 (Mac OS X 10.7.5)</td>
+<td align="left">Chrome 31.0.1650.34</td>
 <td align="left">84ms</td>
 <td align="left">9.57</td>
 </tr>
@@ -878,12 +878,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <td align="left">4.67</td>
 </tr>
 <tr class="even">
-<td align="left">Chrome 30.0.1599 (Mac OS X 10.7.5)</td>
+<td align="left">Chrome 30.0.1599</td>
 <td align="left">202ms</td>
 <td align="left">3.98</td>
 </tr>
 <tr class="odd">
-<td align="left">Safari 6.0.5 (Mac OS X 10.7.5)</td>
+<td align="left">Safari 6.0.5</td>
 <td align="left">231ms</td>
 <td align="left">3.48</td>
 </tr>
@@ -893,12 +893,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <td align="left">2.30</td>
 </tr>
 <tr class="odd">
-<td align="left">Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)</td>
+<td align="left">Chrome Mobile iOS 30.0.1599</td>
 <td align="left">431ms</td>
 <td align="left">1.86</td>
 </tr>
 <tr class="even">
-<td align="left">Firefox 24.0.0 (Mac OS X 10.7)</td>
+<td align="left">Firefox 24.0.0</td>
 <td align="left">547ms</td>
 <td align="left">1.47</td>
 </tr>

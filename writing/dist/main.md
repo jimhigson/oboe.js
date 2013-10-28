@@ -2294,14 +2294,14 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy     Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
-  ------------ --------- ------------------- ----------------- ------------------
-  Oboe.js      Good                       40               804                6.2
-  Oboe.js      Poor                       60             1,526                6.2
-  JSON.parse   Good                      984             1,064                9,0
-  JSON.parse   Poor                     2550             2,609                8.9
-  Clarinet     Good                       34               781                5.5
-  Clarinet     Poor                       52             1,510                5.5
+  Strategy     Network     First output   Total time   Max. Memory
+  ------------ --------- -------------- ------------ -------------
+  Oboe.js      Good                40ms        804ms         6.2Mb
+  Oboe.js      Poor                60ms      1,526ms         6.2Mb
+  JSON.parse   Good               984ms      1,064ms         9,0Mb
+  JSON.parse   Poor              2550ms      2,609ms         8.9Mb
+  Clarinet     Good                34ms        781ms         5.5Mb
+  Clarinet     Poor                52ms      1,510ms         5.5Mb
 
 Vs Json.parse shows a dramatic improvement over first output of about
 96% and a smaller but significant improvement of about 40% in time
@@ -2400,9 +2400,9 @@ containing 100 objects, each with 8 String properties against .
 Correspondingly the expression is evaluated just over 800 times and 100
 matches are found. Although real http is used, it is kept within the
 localhost. The results below are averaged from ten runs. The tests
-executed on a Macbook Air, except for Chrome Mobile which was tested on
-an iPhone 5. Tests requiring Microsoft Windows were performed inside a
-virtual machine.
+executed on a Macbook Air running OS X 10.7.5, except for Chrome Mobile which was tested on
+an iPhone 5 with iOS 7.0.2. Tests requiring Microsoft Windows were performed inside a
+VirtualBox virtual machine.
 
 Curl is a simple download to stdout from the shell and is included as a
 control run to provide a baseline.
@@ -2410,13 +2410,13 @@ control run to provide a baseline.
   Platform                                  Total Time   Throughput (nodes/ms)
   ----------------------------------------- ------------ -----------------------
   Curl (control)                            42ms         *n/a*
-  Chrome 31.0.1650.34 (Mac OS X 10.7.5)     84ms         9.57
+  Chrome 31.0.1650.34                       84ms         9.57
   Node.js v0.10.1                           172ms        4.67
-  Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
-  Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
+  Chrome 30.0.1599                          202ms        3.98
+  Safari 6.0.5                              231ms        3.48
   IE 10.0.0 (Windows 8)                     349ms        2.30
-  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)   431ms        1.86
-  Firefox 24.0.0 (Mac OS X 10.7)            547ms        1.47
+  Chrome Mobile iOS 30.0.1599               431ms        1.86
+  Firefox 24.0.0                            547ms        1.47
   IE 8.0.0 (Windows XP)                     3,048ms      0.26
 
 We can see that Firefox is much slower than other modern browsers

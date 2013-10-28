@@ -236,7 +236,7 @@ control run to provide a baseline.
 
   Platform                                  Total Time   Throughput (nodes/ms)
   ----------------------------------------- ------------ -----------------------
-  Curl (control)                            42ms         *n/a*
+  Curl (control)                            42ms         *unparsed, n/a*
   Chrome 31.0.1650.34                       84ms         9.57
   Node.js v0.10.1                           172ms        4.67
   Chrome 30.0.1599                          202ms        3.98
