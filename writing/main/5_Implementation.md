@@ -471,24 +471,23 @@ memory because where two JSONPath strings contain a common left side
 they could share the inner part of their functional expression. Given
 the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
 JSONPath engine will currently create two identical evaluators for
-`!.animals.mammals`. Likewise, while evaluating of a pattern that requires
-matches at multiple depths in the JSON hierarchy
-against sibling elements, the same JSONPath evaluator term could be tested
-against the parent element many times, always with the same result.  
-Although Javascript doesn't come with functional
-caching, it can be added using the language itself, probably the best
-known example being `memoize` from Underscore.js. I suspect, however,
-that hashing the cache parameters might be slower than performing the
-matching. Although the parameters are all immutable and could in theory
-be hashed by object identity, in practice there is no way to access an
-object id from inside the language so any hash of a node parsed out of
-JSON would have to walk the entire subtree rooted from that node.
-Current Javascript implementations also make it difficult to manage
-caches in general from inside the language because there is no way to
-occupy only spare memory. Weak references are proposed in ECMAScript 6
-but currently only experimentally supported[^5]. If the hashing problem
-were solved, for adding functional caching in future the WeakHashMap
-would be ideal.
+`!.animals.mammals`. Likewise, while evaluating of a pattern that
+requires matches at multiple depths in the JSON hierarchy against
+sibling elements, the same JSONPath evaluator term could be tested
+against the parent element many times, always with the same result.
+Although Javascript doesn't come with functional caching, it can be
+added using the language itself, probably the best known example being
+`memoize` from Underscore.js. I suspect, however, that hashing the cache
+parameters might be slower than performing the matching. Although the
+parameters are all immutable and could in theory be hashed by object
+identity, in practice there is no way to access an object id from inside
+the language so any hash of a node parsed out of JSON would have to walk
+the entire subtree rooted from that node. Current Javascript
+implementations also make it difficult to manage caches in general from
+inside the language because there is no way to occupy only spare memory.
+Weak references are proposed in ECMAScript 6 but currently only
+experimentally supported[^5]. If the hashing problem were solved, for
+adding functional caching in future the WeakHashMap would be ideal.
 
 Functions describing the tokenisation of the JSONPath language are split
 out to their own source file and tested independently of the
