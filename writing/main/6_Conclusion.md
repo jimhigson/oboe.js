@@ -233,18 +233,19 @@ The 15% overhead of Oboe vs Clarinet suggests Oboe might be
 computationally expensive. With very fast networks the extra computation
 might outweigh a more efficient i/o strategy.
 
-The file `oboe.performance.spec.js`[^4] contains a benchmark that concentrates
-on using Oboe for pattern matching.
-This test registers a complex pattern which
-intentionally uses all of the JSONPath language features and then fetches a JSON file
-containing approximately 800 nodes and 100 matches.
-Although real http is used, it over an unthrottled connection to
-localhost so the impact of the network should be negligible. The results below are averaged from ten runs. The tests
-were executed on a relatively low-powered Macbook Air laptop running OS X 10.7.5, except for Chrome Mobile
-which was tested on an iPhone 5 with iOS 7.0.2. Tests requiring
-Microsoft Windows were performed inside a VirtualBox virtual machine.
-Curl is used to provide a baseline, it is a simple download tool and is used to write the
-downloaded JSON to stdout without any parsing.
+The file `oboe.performance.spec.js`[^4] contains a benchmark that
+concentrates on using Oboe for pattern matching. This test registers a
+complex pattern which intentionally uses all of the JSONPath language
+features and then fetches a JSON file containing approximately 800 nodes
+and 100 matches. Although real http is used, it over an unthrottled
+connection to localhost so the impact of the network should be
+negligible. The results below are averaged from ten runs. The tests were
+executed on a relatively low-powered Macbook Air laptop running OS X
+10.7.5, except for Chrome Mobile which was tested on an iPhone 5 with
+iOS 7.0.2. Tests requiring Microsoft Windows were performed inside a
+VirtualBox virtual machine. Curl is used to provide a baseline, it is a
+simple download tool and is used to write the downloaded JSON to stdout
+without any parsing.
 
   Platform                        Total Time   Throughput (nodes/ms)
   ----------------------------- ------------ -----------------------
