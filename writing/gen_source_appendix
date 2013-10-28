@@ -10,6 +10,7 @@ function copyToMd {
    ommitpagebreak=$3
 
    sourceFilename=$(basename $source)
+   shortFilename=$(basename $source .js)
    
    touch $destination
    
@@ -23,8 +24,11 @@ function copyToMd {
    echo >> $destination         
    echo $sourceFilename >> $destination
    echo "---" >> $destination
-   echo >> $destination    
-   
+   echo >> $destination
+   echo "\\label{src_$shortFilename}" >> $destination
+      
+   echo >> $destination
+             
    echo "~~~~ {.javascript}" >> $destination
    cat $source >> $destination
    echo >> $destination
