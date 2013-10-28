@@ -342,17 +342,15 @@ be freed if the parsed content were stored only so far as is required to
 test against the patterns which have actually been registered. For
 typical use cases I expect this would allow large subtrees to be
 unlinked inside Oboe, particularly once they have matched a pattern and
-have already been handed over to the application callbacks. 
-Likewise,
+have already been handed over to the application callbacks. Likewise,
 the current implementation takes a rather brute force approach when
-examining nodes for pattern matches by checking every registered JSONPath
-expression against every node parsed from the JSON. For
-many expressions we should be able to say that there will be no matches
-inside a particular JSON subtree, either because we have already matched 
-or because the the subtree's ancestors will invariably fail.
-A more sophisticated
-implementation might subdue provably unsatisfiable handlers until the
-SAX parser leaves that subtree.
+examining nodes for pattern matches by checking every registered
+JSONPath expression against every node parsed from the JSON. For many
+expressions we should be able to say that there will be no matches
+inside a particular JSON subtree, either because we have already matched
+or because the the subtree's ancestors will invariably fail. A more
+sophisticated implementation might subdue provably unsatisfiable
+handlers until the SAX parser leaves that subtree.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
@@ -362,4 +360,3 @@ SAX parser leaves that subtree.
 
 [^4]: See
     [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
-
