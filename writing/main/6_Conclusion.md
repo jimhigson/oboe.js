@@ -328,11 +328,11 @@ would be error prone and scale badly as messages become more complex.
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
-an obvious expansion. This could be implemented by allowing resource formats
-to be added using plugins which would could be used by programmers to create a progressive
-interpretation of any resource type.
-A plug-in would require a SAX-like parser for the format a compiler for some
-kind of pattern matching language.
+an obvious expansion. This could be implemented by allowing resource
+formats to be added using plugins which would could be used by
+programmers to create a progressive interpretation of any resource type.
+A plug-in would require a SAX-like parser for the format a compiler for
+some kind of pattern matching language.
 
 Oboe stores all items that are parsed from the JSON it receives,
 resulting in a memory use which is as high as a DOM parser. These are
