@@ -283,20 +283,28 @@ describe("oboe integration (real http)", function() {
    })
    
    it('notifies of response starting', function () {
-      var called = false;   
+      var called = 0;   
    
       oboe(      
           {  url:url('echoBackHeadersAsBodyJson'),
              headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
           }   
       ).start(function(statusCode, headers){
+      
          expect(statusCode).toBe(200);
          expect(headers['x-snarfu']).toBe('SNARF');
-         called = true;
+         called++;
+         
+      }).on('start', function(statusCode, headers){
+      
+         expect(statusCode).toBe(200);
+         expect(headers['x-snarfu']).toBe('SNARF');
+         called++;
+         
       });      
       
       waitsFor(function () {
-         return called;
+         return called == 2;
       }, 'the response to start', ASYNC_TEST_TIMEOUT)      
    });      
 
