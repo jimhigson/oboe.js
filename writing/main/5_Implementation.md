@@ -471,7 +471,11 @@ memory because where two JSONPath strings contain a common left side
 they could share the inner part of their functional expression. Given
 the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
 JSONPath engine will currently create two identical evaluators for
-`!.animals.mammals`. Although Javascript doesn't come with functional
+`!.animals.mammals`. Likewise, while evaluating of a pattern that requires
+matches at multiple depths in the JSON hierarchy
+against sibling elements, the same JSONPath evaluator term could be tested
+against the parent element many times, always with the same result.  
+Although Javascript doesn't come with functional
 caching, it can be added using the language itself, probably the best
 known example being `memoize` from Underscore.js. I suspect, however,
 that hashing the cache parameters might be slower than performing the
