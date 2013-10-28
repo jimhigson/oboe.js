@@ -202,6 +202,14 @@ getJson(DB_URL, function(err, records) {
 });
 ~~~~
 
+The Clarinet version of the code may be seen in appendex (??). This
+version is greater in verbosity and obfuscation. I don't think a person
+could look at this source and understand what is being parsed without
+thinking about it for a long time. Parameter names such as 'key' or
+'value' must be chosen by the position of the token in the markup, prior
+to understanding the semantics it represents. By contrast, Oboe and
+JSON.parse both allow names to be given by the meaning of the token.
+
 The JSON.parse version is very closely coupled with the format that it
 is handling. We can see this in the fragments `records.data`,
 `record.url`, `record.name` which expects to find sub-trees at very
@@ -212,14 +220,6 @@ it is interested in; the remainder of the format could change and the
 code would continue to work. As well as being simpler to program against
 than the previous simplest mode, I believe this demonstrates a greater
 tolerance to changing formats.
-
-The Clarinet version of the code may be seen in appendex (??). This
-version is greater in verbosity and obfuscation. I don't think a person
-could look at this source and understand what is being parsed without
-thinking about it for a long time. Parameter names such as 'key' or
-'value' must be chosen by the position of the token in the markup, prior
-to understanding the semantics it represents. By contrast, Oboe and
-JSON.parse both allow names to be given by the meaning of the token.
 
 Performance of code styles under various engines
 ------------------------------------------------
