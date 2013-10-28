@@ -238,8 +238,8 @@ for a safer build process
 Styles of Programming
 ---------------------
 
-Oboe does not follow any single programming paradigm and is made written
-in a mix of procedural, functional and object-oriented programming
+Oboe does not follow any single paradigm and is written
+as a mix of procedural, functional and object-oriented programming
 styles. Classical object orientation is used only so far as the library
 exposes an Object-oriented public API. Although Javascript supports
 them, classes and constructors are not used, nor is there any
@@ -248,25 +248,25 @@ data storage and hiding. Most entities do not give a Javascript object
 on instantiation, they are constructed as a set of event handlers with
 access to shared values from a common closure. As inner-functions of the
 same containing function, the handlers share access to variables from
-the containing scope and their reachability is maintained because they
-are referenced by the event bus. From outside the closure the values are
-not only private as would be seen in an OO model, they are inherently
+the containing scope. From outside the closure the values are
+not only protected as private as would be seen in an OO model, they are inherently
 unaddressable.
 
 Although not following an established object orientated metamodel, the
 high-level componentisation hasn't departed very far from what I would
 make were I following that style and OO design patterns have influenced
-the design considerably. If we wish to think in terms of the OO paradigm
+their layout considerably. If we wished to think in terms of the OO paradigm
 we might say that values trapped inside closures are private attributes
 and that the handlers registered on the event bus are public methods. In
 this regard, the high-level internal design of Oboe can be discussed
-using terms from a more standard object oriented metamodel.
+using the terms from a more standard object oriented metamodel.
 
 Even where it creates a larger deliverable library I have generally
 preferred writing as short functions which are combined to form longer
 ones. Writing shorter functions reduces the size of the minimum testable
 unit which, because each test can test a very small unit of
-functionality, encourages very simple unit tests. Because of the
+functionality, encourages very simple unit tests. Because the tests are simple
+there is less room for unanticipated cases to hide. Due to
 pressures on code size I decided not to use a general purpose functional
 library and created my own with only the parts that are needed. See
 [functional.js](#functional.js) (Appendix p.\pageref{functional.js}).
@@ -276,7 +276,7 @@ Lifting [@functionalSpiderMonkey]. I do not think this should be a major
 problem. Because of its single-threaded execution model, in the browser
 any Javascript is ran during script execution frames, interlaced with
 frames for other concurrent concerns. To minimise the impact on other
-tasks such as rendering it is important that no task occupies the CPU
+concerns such as rendering it is important that no task occupies the CPU
 for very long. Since most monitors refresh at 60Hz, about 16ms is a fair
 target for the maximum duration of a script frame. In Node no limit can
 be implied from a display but any CPU-hogging task degrades the
@@ -284,7 +284,7 @@ responsiveness of concurrent concerns. Switching tasks is cheap so
 sharing the CPU well generally prefers many small execution frames over
 a few larger ones. Whether running in a browser or server, the
 bottleneck is more often I/O than processing speed; providing no task
-contiguously holds the CPU for an unusually long time an application can
+contiguously holds the CPU for an unusually long time an application can usually
 be considered fast enough. Oboe's progressive model favours sharing
 because it naturally splits the work over many execution frames which by
 a non-progressive mode would be performed during a single frame.
@@ -299,7 +299,7 @@ As shown in figure \ref{overallDesign} on page \pageref{overallDesign},
 there is an *incremental content builder* and *ascent tracer* which
 handle SAX events from the Clarinet JSON parser. By presenting to the
 controller a simpler interface than is provided by Clarinet, taken
-together these might be considered as an Adaptor pattern, albeit adapted
+together these might be considered as an Adaptor pattern, albeit modified
 to be even-driven rather than call-driven: we receive six event types
 and in response emit from a vocabulary of two, `NODE_FOUND` and
 `PATH_FOUND`. The events from Clarinet are low level, reporting the
@@ -310,25 +310,24 @@ particular node requires the node itself, the path to the node, and the
 ancestor nodes. For each newly found item in the JSON this information
 is delivered as the payload of the two event types emitted by the
 content builder. When the callback adaptors receive these events they
-have the information required to test for matches against registered
-patterns and notify application callbacks if required.
+have the information required to test registered
+patterns for matches and notify application callbacks if required.
 
-![List representation of an ascent from leaf to root of a JSON tree.
+![List representation of an ascent rising from leaf to root through a JSON tree.
 Note the special ROOT value which represents the location of the
 pathless root node. The ROOT value is an object, taking advantage of
 object uniqueness to ensure that its location is unequal to all others.
 \label{ascent}](images/ascent.png)
 
 The path to the current node is maintained as a singly linked list in
-which each item holds the node and the field name that linked to the
+which each item holds the node and the field name that links to the
 node from its parent. Each link in the list is immutable, enforced in
 newer Javascript engines by using frozen objects [^2]. The list is
 arranged as an ascent with the current node at the near end and the root
 at the far end. Although paths are typically written as a *descent*,
-ordering as an *ascent* is more efficient because as we traverse the
-JSON the current node is appended and removed many times. As nodes open
-and close all updates are at the head of the list giving constant time
-for access and mutation. For familiarity, where paths are passed to
+ordering as an *ascent* is more efficient because every SAX event can be processed in constant time by
+adding to or removing from the head of the list.
+For familiarity, where paths are passed to
 application callbacks they are first reversed and converted to arrays.
 
 For each Clarinet event the builder provides a corresponding handler
@@ -349,9 +348,7 @@ Similarly, Clarinet emits a `value` event when a string or number is
 found in the markup. Because primitive nodes are always leaves the
 builder treats them as a node which instantaneously starts and ends,
 handled programmatically as the composition of the `nodeFound` and
-`nodeFinished` functions. The design of a small bank of smaller
-instructions that are combined to build up larger ones is perhaps
-reminiscent of the use of micro-instructions in CPU design.
+`nodeFinished` functions.
 
 Although the builder functions are stateless and side-effect free, while
 visiting each JSON node the current ascent needs to be stored. This is
@@ -368,8 +365,8 @@ immutable data structures. Employing native Arrays without mutating
 would be very expensive because on each new path the whole array would
 have to be copied. Secondly, while debugging, unpicking a stack trace is
 easier if I know that every value revealed is the value that has always
-occupied that space and I don't have to imagine the different values
-that were in the same space earlier or will be there later. Thirdly, the
+occupied that space and I don't have to project along the time axis by imagining
+which values were in the same space earlier or will be later. Thirdly, the
 lack of side effects means that I can try new commands in the debugger's
 CLI without worrying about breaking the execution of the program. Most
 Javascript virtual machines are also quite poor at array growing and
@@ -391,7 +388,7 @@ possible because the correct behaviour is well defined by test
 specifications[^4]. The JSONPath compiler exposes a single higher-order
 function. This function takes the JSONPath as a string and, proving it
 is a valid expression, returns a function which tests for matches to the
-pattern. The type of the compiler is difficult to express in Javascript
+pattern. The type of is difficult to express in Javascript
 but expressed as Haskell would be:
 
 ~~~~ {.haskell}
@@ -423,15 +420,15 @@ side of the string for a JSONPath clause. For each clause type there is
 a function which tests ascents for that clause, for example by checking
 the field name; by partial completion the field name function would be
 specialised to match against one particular name. Having generated a
-function to match against the left-most clause, compilation recurs by
-passing itself the remaining unparsed right-side of the string. This
-continues until there is nothing left to parse. On each recursive call
+function to match against the left-most clause, compilation continues recursively by
+passing itself the remaining unparsed right-side of the string. The
+recursion continues until the terminal case where there is nothing left to parse. On each recursive call
 the clause function generated wraps the result from the last recursive
 call, resulting ultimately in a concentric series of clause functions.
-The order of this series of functions mirrors the path ordering as an
-ascent, so that the outermost function matches against the deepest node,
-at the near end of the ascent, and the innermost against the shallowest,
-at the far end. When evaluated against an ascent, each clause function
+The order of these functions mirrors the ordering of paths as an
+ascent, so that the outermost function matches against the node
+at the near end of the ascent, and the innermost against the far end.
+When evaluated against an ascent, each clause function
 examines the head of the list and, if it matches, passes the list onto
 the next function. A special clause function, `skip1` is used for the
 `.` (parent) syntax and places no condition on the head of the list,
@@ -439,8 +436,8 @@ unconditionally passing the tail on to the next clause, thus moving
 matching on to the parent node. Similarly, there is a function
 `skipMany` which maps onto the `..` (ancestor) syntax and recursively
 consumes the minimum number of ascent items necessary for the next
-clause to match, or fails if this cannot be done. In this way, we peel
-off layers from the ascent as we move through the functions list until
+clause to match or fails if this cannot be done. In this way, we peel
+off layers from the ascent as we move through the function list until
 we either exhaust the functions, indicating a match, or cannot continue,
 indicating a fail.
 
@@ -482,7 +479,7 @@ be hashed by object identity, in practice there is no way to access an
 object id from inside the language so any hash of a node parsed out of
 JSON would have to walk the entire subtree rooted from that node.
 
-Functions describing the tokenisation are split out to their own source
+Functions describing the tokenisation of the JSONPath language are split out to their own source
 file and tested independently of the compilation. Regular expressions
 are used because they are the simplest form able to express the clause
 patterns. Each regular expressions starts with `^` so that they only
@@ -494,11 +491,11 @@ the tokenisation more clearly without having to observe its results
 though another layer. For JSONPath matching we might consider the unit
 test layer of the test pyramid (figure \ref{testpyramid}
 p.\pageref{testpyramid}) is split further into two sub-layers. Arguably,
-the upper of these sub-layer is not a unit test because it is verifying
+the upper of these sub-layers is not a unit test because it is verifying
 more than one unit, the tokeniser and the compiler, and there is some
 redundancy since the tokenisation is tested both independently and
-through the compiler. A more purist approach would not help because
-stubbing out the tokenizer functions would be a considerable effort and
+through a proxy. However, a more purist approach would not be any more useful because
+stubbing out the tokeniser functions before testing the compiler would be a considerable effort and
 I do not believe it would improve the rigor of the JSONPath
 specification.
 
@@ -515,7 +512,7 @@ specification.
     here:
     https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
     for contrast, the current source can be found [in the
-    appendix](#jsonPath.js) on page \pageRef{jsonPath.js} or at
+    appendix](#jsonPath.js) on page \pageref{src_jsonPath} or at
     https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
 
 [^4]: The current tests are viewable at
