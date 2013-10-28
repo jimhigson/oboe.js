@@ -8,11 +8,15 @@
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode;
+   var oboeApi, rootNode, responseHeaders;
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
+   });
+   
+   on(STREAM_START, function(headers) {
+      responseHeaders = headers;
    });
                               
    on(STREAM_DATA,         
@@ -48,7 +52,7 @@ function instanceController(  emit, on, un,
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       emit(
-         ERROR_EVENT, 
+         FAIL_EVENT, 
          errorReport(undefined, undefined, e)
       );
       
@@ -127,7 +131,7 @@ function instanceController(  emit, on, un,
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -163,26 +167,28 @@ function instanceController(  emit, on, un,
    }
    
    var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, ERROR_EVENT);
+       addFailListner = partialComplete(on, FAIL_EVENT);
    
    /**
     * implementation behind oboe().on()
     */       
    function addListener( eventId, listener ){
-                         
-      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
-                                
-         apply(arguments, addNodeOrPathListenerApi);
          
-      } else if( eventId == 'done' ) {
-      
-         addDoneListener(listener);
-                              
-      } else if( eventId == 'fail' ) {
-      
-         addFailListner(listener);
-      }
-             
+      switch(eventId) {
+         case NODE_FOUND:
+         case PATH_FOUND:
+            apply(arguments, addNodeOrPathListenerApi);
+            break;
+            
+         case 'done':
+            addDoneListener(listener);         
+            break;
+            
+         default:
+            // for cases: 'fail', 'start'
+            on(eventId, listener);
+      }                     
+                                               
       return this; // chaining
    }   
    
@@ -194,9 +200,15 @@ function instanceController(  emit, on, un,
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
       on    :  addListener,
+      start :  addListener,
       fail  :  addFailListner,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
+      header:  function(name) {
+                  return name ? responseHeaders 
+                              : responseHeaders && responseHeaders[name]
+                              ;
+               },
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

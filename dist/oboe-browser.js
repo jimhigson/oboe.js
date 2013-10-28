@@ -980,32 +980,38 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    }
    
    xhr.onreadystatechange = function() {
-            
-      if(xhr.readyState == 4 ) {
 
-         // is this a 2xx http code?
-         var sucessful = String(xhr.status)[0] == 2;
-         
-         if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is emitted when a response
-            // is complete before the onload. We need to always do handleInput
-            // in case we get the load but have not had a final progress event.
-            // This looks like a bug and may change in future but let's take
-            // the safest approach and assume we might not have received a 
-            // progress event for each part of the response
-            handleProgress();
+      switch( xhr.readyState ) {
+      
+         case 3:       
+            emit( STREAM_START, {} );
+            return;
             
-            emit( STREAM_END );
-         } else {
-         
-            emit( 
-               ERROR_EVENT, 
-               errorReport(
-                  xhr.status, 
-                  xhr.responseText
-               )
-            );
-         }
+         case 4:       
+            // is this a 2xx http code?
+            // TODO: could 2xx check be done on readyState 3?
+            var sucessful = String(xhr.status)[0] == 2;
+            
+            if( sucessful ) {
+               // In Chrome 29 (not 28) no onprogress is emitted when a response
+               // is complete before the onload. We need to always do handleInput
+               // in case we get the load but have not had a final progress event.
+               // This looks like a bug and may change in future but let's take
+               // the safest approach and assume we might not have received a 
+               // progress event for each part of the response
+               handleProgress();
+               
+               emit( STREAM_END );
+            } else {
+            
+               emit( 
+                  ERROR_EVENT, 
+                  errorReport(
+                     xhr.status, 
+                     xhr.responseText
+                  )
+               );
+            }
       }
    };
 
@@ -1768,6 +1774,7 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
+    STREAM_START = _S++,
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;
@@ -1794,11 +1801,15 @@ function errorReport(statusCode, body, error) {
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode;
+   var oboeApi, rootNode, responseHeaders;
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
+   });
+   
+   on(STREAM_START, function(headers) {
+      responseHeaders = headers;
    });
                               
    on(STREAM_DATA,         
@@ -1983,6 +1994,11 @@ function instanceController(  emit, on, un,
       fail  :  addFailListner,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
+      header:  function(name) {
+                  return name ? responseHeaders 
+                              : responseHeaders && responseHeaders[name]
+                              ;
+               },
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

@@ -1253,6 +1253,7 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
+    STREAM_START = _S++,
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;
@@ -1279,11 +1280,15 @@ function errorReport(statusCode, body, error) {
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode;
+   var oboeApi, rootNode, responseHeaders;
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
+   });
+   
+   on(STREAM_START, function(headers) {
+      responseHeaders = headers;
    });
                               
    on(STREAM_DATA,         
@@ -1468,6 +1473,11 @@ function instanceController(  emit, on, un,
       fail  :  addFailListner,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
+      header:  function(name) {
+                  return name ? responseHeaders 
+                              : responseHeaders && responseHeaders[name]
+                              ;
+               },
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

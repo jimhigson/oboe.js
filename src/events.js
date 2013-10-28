@@ -11,8 +11,9 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     // these events are never exported so are kept as 
     // the smallest possible representation, numbers:
     _S = 0,
-    ERROR_EVENT   = _S++,    
+    FAIL_EVENT   = 'fail',    
     ROOT_FOUND    = _S++,    
+    STREAM_START = 'start',
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;

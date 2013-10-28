@@ -301,7 +301,7 @@ describe("oboe integration (real http)", function() {
          expect(headers['x-snarfu']).toBe('SNARF');
          called++;
          
-      });      
+      });
       
       waitsFor(function () {
          return called == 2;

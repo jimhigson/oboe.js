@@ -78,7 +78,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
          } else {
             readStreamToEnd(res, function(errorBody){
                emit( 
-                  ERROR_EVENT, 
+                  FAIL_EVENT, 
                   errorReport( statusCode, errorBody )
                );
             });
@@ -87,7 +87,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       
       req.on('error', function(e) {
          emit( 
-            ERROR_EVENT, 
+            FAIL_EVENT, 
             errorReport(undefined, undefined, e )
          );
       });

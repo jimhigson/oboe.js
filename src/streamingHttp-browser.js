@@ -78,29 +78,37 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    
    xhr.onreadystatechange = function() {
 
-         // is this a 2xx http code?
-         var sucessful = String(xhr.status)[0] == 2;
-         
-         if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is emitted when a response
-            // is complete before the onload. We need to always do handleInput
-            // in case we get the load but have not had a final progress event.
-            // This looks like a bug and may change in future but let's take
-            // the safest approach and assume we might not have received a 
-            // progress event for each part of the response
-            handleProgress();
+      switch( xhr.readyState ) {
+      
+         case 3:       
+            emit( STREAM_START, {} );
+            return;
             
-            emit( STREAM_END );
-         } else {
-         
-            emit( 
-               ERROR_EVENT, 
-               errorReport(
-                  xhr.status, 
-                  xhr.responseText
-               )
-            );
-         }
+         case 4:       
+            // is this a 2xx http code?
+            // TODO: could 2xx check be done on readyState 3?
+            var sucessful = String(xhr.status)[0] == 2;
+            
+            if( sucessful ) {
+               // In Chrome 29 (not 28) no onprogress is emitted when a response
+               // is complete before the onload. We need to always do handleInput
+               // in case we get the load but have not had a final progress event.
+               // This looks like a bug and may change in future but let's take
+               // the safest approach and assume we might not have received a 
+               // progress event for each part of the response
+               handleProgress();
+               
+               emit( STREAM_END );
+            } else {
+            
+               emit( 
+                  FAIL_EVENT, 
+                  errorReport(
+                     xhr.status, 
+                     xhr.responseText
+                  )
+               );
+            }
       }
    };
 
@@ -122,7 +130,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, 
+         partialComplete(emit, FAIL_EVENT, 
              errorReport(undefined, undefined, e)
          )
       ,  0
