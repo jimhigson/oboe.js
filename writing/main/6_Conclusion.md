@@ -278,31 +278,32 @@ performance now that functional Javascript is becoming a more popular
 style.
 
 Of these results I only find the performance under old versions of
-Internet Explorer poor enough that it could be concerning. Since this platform cannot progressively
-interpret an XHR response an improvement over traditional XHR was not
-possible, but I would have liked to have not degraded performance by much.
-Adding three seconds to a REST call will unacceptably impair a webapp's user
-experience so it might be reasonable to conclude that for complex use
-cases Oboe is currently unsuited to legacy platforms. If we strongly
-desired to improve performance on older platforms one solution might be
-to create a simpler, non-progressive implementation of the Oboe API for
-selective delivery to older platforms. However, I would argue that time
-spent writing a basic version for legacy platforms would be better spend
+Internet Explorer poor enough that it could be concerning. Since this
+platform cannot progressively interpret an XHR response an improvement
+over traditional XHR was not possible, but I would have liked to have
+not degraded performance by much. Adding three seconds to a REST call
+will unacceptably impair a webapp's user experience so it might be
+reasonable to conclude that for complex use cases Oboe is currently
+unsuited to legacy platforms. If we strongly desired to improve
+performance on older platforms one solution might be to create a
+simpler, non-progressive implementation of the Oboe API for selective
+delivery to older platforms. However, I would argue that time spent
+writing a basic version for legacy platforms would be better spend
 waiting for them to die.
 
 For an imperative language coded in a functional style the compiler may
 not optimise as effectively as if a functional language was used. This
 is especially the case under a highly dynamic language in which
-everything, even the built-in constructs are mutable. 
-Presenting a helpful API also means passing application callbacks eagerly evaluated parameters
-such as the the path and ancestor arrays which I anticipate will be predominantly ignored.
-Under a functional language these could be lazily evaluated without any extra effort.
-I think Javascript
-was a good choice of language, 
-giving a very large number of client- and server-side applications that may potentially 
-adopt the library. However,
-server-side Oboe would be very amicable to implementation using a purer functional
-language and it would be interesting to see the performance improvements.
+everything, even the built-in constructs are mutable. Presenting a
+helpful API also means passing application callbacks eagerly evaluated
+parameters such as the the path and ancestor arrays which I anticipate
+will be predominantly ignored. Under a functional language these could
+be lazily evaluated without any extra effort. I think Javascript was a
+good choice of language, giving a very large number of client- and
+server-side applications that may potentially adopt the library.
+However, server-side Oboe would be very amicable to implementation using
+a purer functional language and it would be interesting to see the
+performance improvements.
 
 Status as a micro-library
 -------------------------
