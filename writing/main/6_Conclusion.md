@@ -164,9 +164,10 @@ virtual machine.
 Curl is a simple download to stdout from the shell and is included as a
 control run to provide a baseline.
 
-  Platform                                  Total Time   Throughput (nodes per ms)
+  Platform                                  Total Time   Throughput (nodes/ms)
   ----------------------------------------- ------------ ---------------------------
   Curl (control)                            42ms         *n/a*
+  Chrome 31.0.1650.34 (Mac OS X 10.7.5)     84ms         9.57  
   Node.js v0.10.1                           172ms        4.67
   Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
   Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
@@ -176,7 +177,7 @@ control run to provide a baseline.
   IE 8.0.0 (Windows XP)                     3,048ms      0.26
 
 We can see that Firefox is much slower than other modern browsers
-despite its SpiderMonkey Javascript engine being normally quite fast.
+despite its SpiderMonkey Javascript engine being otherwise quite fast.
 This is probably explicable in part by SpiderMonkey's just-in-time
 compiler being poor at optimising functional Javascript
 [@functionalSpiderMonkey]. Because the JSON nodes are not of a common
@@ -185,6 +186,10 @@ optimises poorly [@functionalSpiderMonkey]. When the test was repeated
 using a simpler JSONPath expression Firefox showed by far the largest
 improvement indicating that on this platform the functional pattern
 matching is the bottleneck.
+
+During the project a new version of Chrome more than doubled the node throughput
+dur to including later version of the v8 Javascript engine. Node also uses
+v8 and should be updated to this version soon.
 
 Of these results I find only the very low performance on old versions of
 Internet Explorer concerning, almost certainly degrading user experience
