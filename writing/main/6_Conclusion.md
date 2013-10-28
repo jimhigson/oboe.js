@@ -277,17 +277,17 @@ soon. This reflects Javascript engine writers targeting functional
 performance now that functional Javascript is becoming a more popular
 style.
 
-Of these results I find only the very low performance on old versions of
-Internet Explorer concerning. Since this platform cannot progressively
-interpret an XHR response, an improvement over traditional XHR was not
-possible but I would have liked to have maintained a rough pairity.
-Adding 3 seconds to a REST call will almost certainly impair the user
-experience. It might be reasonable to conclude that for complex use
+Of these results I only find the performance under old versions of
+Internet Explorer poor enough that it could be concerning. Since this platform cannot progressively
+interpret an XHR response an improvement over traditional XHR was not
+possible, but I would have liked to have not degraded performance by much.
+Adding three seconds to a REST call will unacceptably impair a webapp's user
+experience so it might be reasonable to conclude that for complex use
 cases Oboe is currently unsuited to legacy platforms. If we strongly
 desired to improve performance on older platforms one solution might be
 to create a simpler, non-progressive implementation of the Oboe API for
-selective delivery to older platforms. However, it is possible that time
-spent writing a new version for legacy platforms would be better spend
+selective delivery to older platforms. However, I would argue that time
+spent writing a basic version for legacy platforms would be better spend
 waiting for them to die.
 
 Nonetheless, in its current form Oboe may slow down the total time when
