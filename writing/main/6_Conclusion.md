@@ -309,21 +309,24 @@ would be interesting to see how much faster it would be.
 Status as a micro-library
 -------------------------
 
-Built versions of Oboe as delivered reside in the project's `dist`
-folder. The file `oboe-browser.min.js` is the minified version which
-should be sent to browsers gzipped. After gzip is applied this file
-comes to 4966 bytes; close to but comfortably under the 5120 limit. At
-roughly the size as a very small image, the size of Oboe should not
+The file `oboe-browser.min.js` is the minified, built version of
+Oboe ready to be sent to web browsers and can be found in the project's
+`dist` directory. 
+The size fluctuates as commits are made but after gzip it
+comes to about 4800 bytes; close to but comfortably under the 5120 limit. At
+roughly the size as a small image the download footprint of Oboe should not
 discourage adoption.
 
 potential future work
 ---------------------
 
-Although the project delivers improvements already, the most obvious
-expansion to fully realise the potential would be a matching server-side
-component that writes JSON in a streaming way. So far this has required
-that the JSON be written out as strings but this scales badly as
-messages become more complex.
+Although the project already delivers improvements to the programming
+model for REST clients, the most obvious
+expansion would be to create a matching server-side
+component that makes it intuitive to write JSON in a streaming way.
+So far writing out streaming JSON has required
+the resource be written out using programmer-assembled strings
+but this would be error prone and scale badly as messages become more complex.
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
