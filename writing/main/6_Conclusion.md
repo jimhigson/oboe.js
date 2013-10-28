@@ -4,13 +4,13 @@ Conclusion
 Differences in the programs written using Oboe.js
 -------------------------------------------------
 
-I find it quite interesting that a program written using Oboe.js in the most 
-natural way will be subtly different from one written using JSON.parse, even
-if the programmer is trying to express the same thing. Consider the two
-examples below which use Node.js to read from a local file and write to
-the console.
+I find it quite interesting that a program written using Oboe.js in the
+most natural way will be subtly different from one written using
+JSON.parse, even if the programmer is trying to express the same thing.
+Consider the two examples below which use Node.js to read from a local
+file and write to the console.
 
-``` {.javascript}
+~~~~ {.javascript}
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .on('node', {
       'schemes.*': function(scheme){
@@ -26,9 +26,9 @@ oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
    .on('fail', function(){
       console.log("Drat! Foiled again!");   
    });
-```
+~~~~
 
-``` {.javascript}
+~~~~ {.javascript}
 fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){     
    if( err ) {
       console.log("Drat! Foiled again!");
@@ -45,38 +45,42 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
       
    console.log("*twiddles mustache*");   
 });
-```
+~~~~
 
 The first observation is that the explicit looping in the second example
-requires roughly the same amount of code as the pattern registration that
-serves as an analogue in the first. The first example has a more declarative
-style whereas the second is more imperative. If two levels of selection were
-required, such as `schemes.*.premise`, other than a longer JSONPath pattern
-the first example would not grow in complexity whereas the second would require 
-an additional loop inside the existing loop. We can say that the complexity of
-programming using Oboe stays roughly constant whereas in a more traditional style
-it grows linearly with the number of levels which must be traversed.
+requires roughly the same amount of code as the pattern registration
+that serves as an analogue in the first. The first example has a more
+declarative style whereas the second is more imperative. If two levels
+of selection were required, such as `schemes.*.premise`, other than a
+longer JSONPath pattern the first example would not grow in complexity
+whereas the second would require an additional loop inside the existing
+loop. We can say that the complexity of programming using Oboe stays
+roughly constant whereas in a more traditional style it grows linearly
+with the number of levels which must be traversed.
 
-While the intended behaviours are very similar, the unintended accidental side-behaviours
-differ between the two examples. In the first the order of the output for schemes and
-plans will match the order in the JSON, whereas for the second scheming is always
-done before plotting. In the second example the order could be easily changed by
-reversing the statements whereas in the first to change the order would require
-a change in the order of the JSON. Whether the programmer has been liberated to ignore order
-or restricted to be unable to easily change it probably depends on the situation.
-The error behaviours are also different. The first example will print until it
-has an error. The second will print if there are no errors.
+While the intended behaviours are very similar, the unintended
+accidental side-behaviours differ between the two examples. In the first
+the order of the output for schemes and plans will match the order in
+the JSON, whereas for the second scheming is always done before
+plotting. In the second example the order could be easily changed by
+reversing the statements whereas in the first to change the order would
+require a change in the order of the JSON. Whether the programmer has
+been liberated to ignore order or restricted to be unable to easily
+change it probably depends on the situation. The error behaviours are
+also different. The first example will print until it has an error. The
+second will print if there are no errors.
 
-In the second example it is most natural to check for errors before output 
-whereas in the first it feels most natural to register an error listener as 
-the last of the chained calls. I prefer the source order in the first because the 
-the normal case is listed before the abnormal one emphasises their roles as 
-main and secondary behaviours.
+In the second example it is most natural to check for errors before
+output whereas in the first it feels most natural to register an error
+listener as the last of the chained calls. I prefer the source order in
+the first because the the normal case is listed before the abnormal one
+emphasises their roles as main and secondary behaviours.
 
-Finally, the timings of the printing will be different. The first code prints the
-first output in constant time regardless of the size of the file and then outputs
-many lines individually as the JSON is read. The second will print all output at once
-after a time proportional to the size of the input.
+Finally, the timings of the printing will be different. The first code
+prints the first output in constant time regardless of the size of the
+file and then outputs many lines individually as the JSON is read. The
+second will print all output at once after a time proportional to the
+size of the input.
 
 Benchmarking vs non-progressive REST
 ------------------------------------
@@ -117,14 +121,14 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy           Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
-  ------------------ --------- ------------------- ----------------- ------------------
-  Oboe.js            Good                       40               804                6.2
-  Oboe.js            Poor                       60             1,526                6.2
-  JSON.parse (DOM)   Good                      984             1,064                9,0
-  JSON.parse (DOM)   Poor                     2550             2,609                8.9
-  Clarinet (SAX)     Good                       34               781                5.5
-  Clarinet (SAX)     Poor                       52             1,510                5.5
+  Strategy     Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
+  ------------ --------- ------------------- ----------------- ------------------
+  Oboe.js      Good                       40               804                6.2
+  Oboe.js      Poor                       60             1,526                6.2
+  JSON.parse   Good                      984             1,064                9,0
+  JSON.parse   Poor                     2550             2,609                8.9
+  Clarinet     Good                       34               781                5.5
+  Clarinet     Poor                       52             1,510                5.5
 
 Vs Json.parse shows a dramatic improvement over first output of about
 96% and a smaller but significant improvement of about 40% in time
@@ -157,11 +161,11 @@ Comparative Programmer Ergonomics
 For each of the benchmarks above the code was laid out in the most
 natural way for the strategy under test.
 
-  Strategy           Code Required (lines)   Code required (chars)
-  ---------------- ----------------------- -----------------------
-  Oboe.js                                3                      64
-  JSON.parse                             5                     102
-  Clarinet (SAX)                        30                   lots!
+  Strategy       Code Required (lines)   Code required (chars)
+  ------------ ----------------------- -----------------------
+  Oboe.js                            3                      64
+  JSON.parse                         5                     102
+  Clarinet                          30                   lots!
 
 Oboe was the shortest:
 
@@ -239,9 +243,9 @@ Curl is a simple download to stdout from the shell and is included as a
 control run to provide a baseline.
 
   Platform                                  Total Time   Throughput (nodes/ms)
-  ----------------------------------------- ------------ ---------------------------
+  ----------------------------------------- ------------ -----------------------
   Curl (control)                            42ms         *n/a*
-  Chrome 31.0.1650.34 (Mac OS X 10.7.5)     84ms         9.57  
+  Chrome 31.0.1650.34 (Mac OS X 10.7.5)     84ms         9.57
   Node.js v0.10.1                           172ms        4.67
   Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
   Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
@@ -261,9 +265,9 @@ using a simpler JSONPath expression Firefox showed by far the largest
 improvement indicating that on this platform the functional pattern
 matching is the bottleneck.
 
-During the project a new version of Chrome more than doubled the node throughput
-dur to including later version of the v8 Javascript engine. Node also uses
-v8 and should be updated to this version soon.
+During the project a new version of Chrome more than doubled the node
+throughput dur to including later version of the v8 Javascript engine.
+Node also uses v8 and should be updated to this version soon.
 
 Of these results I find only the very low performance on old versions of
 Internet Explorer concerning, almost certainly degrading user experience
