@@ -255,6 +255,32 @@ describe("oboe integration (real http)", function() {
          return countGotBack == 2
       }, 'all headers to have been detected back here', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('can read response headers', function () {
+
+      var done = false;
+
+      oboe(
+          {  url:url('echoBackHeadersAsBodyJson'),
+             headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
+          } 
+  
+      ).done(function(){
+         var headers = this.headers();
+         
+         expect(headers['x-snarfu']).toEqual('SNARF');
+         expect(headers['x-foo']).toEqual('BAR');
+         
+         expect(this.headers()['x-snarfu']).toEqual('SNARF');
+         expect(this.headers()['x-foo']).toEqual('BAR');
+         
+         done = true;
+      }) 
+  
+      waitsFor(function () {
+         return done;
+      }, 'the response to complete', ASYNC_TEST_TIMEOUT)
+   })   
 
    it('can listen for nodes nodejs style', function () {
 

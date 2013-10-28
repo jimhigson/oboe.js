@@ -25,6 +25,10 @@ function startServer( port, grunt ) {
    }
    
    function echoBackHeadersAsHeaders(req, res) {
+      for( var name in req.headers ) {
+         res.set(name, req.headers[name]);         
+      }
+      res.end('{"see":"headers", "for":"content"}');
    }   
    
    function replyWithTenSlowNumbers(_req, res) {
