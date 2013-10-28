@@ -236,7 +236,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          {  url:url('echoBackHeaders'),
+          {  url:url('echoBackHeadersAsBodyJson'),
              headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
           } 
   
