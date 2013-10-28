@@ -87,39 +87,36 @@ Benchmarking vs non-progressive REST
 
 I feel it is important to experimentally answer the question, *is this
 actually any faster?*. To do this I have created a small benchmarking
-suite that runs under Node.js. I chose Node because it at its code is a
-very basic platform which I feel it gives a more repeatable environment
-than modern browsers which at during the tests could be performing any
-number of background tasks. These tests may be seen in the `benchmark`
-folder of the project. Node also has the advantage in measuring the
-memory of a running process is not swamped by the memory taken up by the
-browser itself.
+suite that runs under Node.js. I chose Node because it is quite a
+very minimalist platform which should give a more repeatable test results
+than browsers which could be performing any
+number of simultaneous background tasks. Node also has the advantage that
+small changes when measuring the memory taken by the a running process 
+are not overwhelmed by a memory hungry browser environment. These tests may be seen in the `benchmark`
+folder of the project on p.\ref{src_benchmarkServer}.
 
-One of the proposed advantages of progressive REST is an improved user
-experience because of earlier, more progressive interface rendering and
-a perceptual improvement in speed. I am not focusing on this area for
-benchmarking because it would be much more difficult to measure,
-involving human participants. While I can't provide numbers on the
-perceptual improvements, I have created sites using Oboe and the
-improvement in responsiveness over slower networks is large enough to be
-obvious.
+One of the suggested advantages of incremental parsing is an improved user
+experience because of more progressive interface rendering and
+a perceptual improvement in speed. I am not focusing on user perception in this
+evaluation because it would be much more difficult to measure,
+but I will be measuring the time taken to provide the first output which
+correlates with how quickly interface redrawing can start.
+Third parties have reported creating webapps using Oboe and their
+increase in responsiveness is large enough to be obvious.
 
 The benchmark mimics a relational database-backed REST service.
-Relational databases serve data to a cursor one tuple at a time. The
-simulated service writes out twenty tuples as JSON objects, one every
-ten milliseconds. To simulate network slowness, Apple's *Network Line
-Conditioner* was used. I chose the named presets "3G, Average Case" and
-"Cable modem" to represent poor and good networks respectively [^1].
-Each test involves two node processes, one acting as the client and one
-as the server, with data transfer between them via normal http.
+Relational databases hand data via a result cursor one tuple at a time, the
+service simulates this by writing out forty tuples as JSON objects, one every
+ten milliseconds. 
+Each other object in the returned JSON contains a URL to a further resource which
+will also be fetched and aggregated.
+To simulate network slowness, Apple's *Network Line
+Conditioner* was used with the presets *3G, Average Case* and
+*Cable modem* to represent poor and good internet connections respectively [^1].
+The test involves two node processes, one acting as a REST client and one
+as a REST server. Memory was measured using Node's built in memory reporting tool,
+`process.memoryusage()` and the maximum figure reported on each run is used.
 
-Memory was measured using Node's built in memory reporting tool,
-`process.memoryusage()` and the maximum figure returned on each run was
-taken
-
-Each object in the returned JSON contains a URL to a further resource.
-Each further resource is fetched and parsed. The aggregation is complete
-when we have them all.
 
   Strategy     Network     First output   Total time   Max. Memory
   ------------ --------- -------------- ------------ -------------
