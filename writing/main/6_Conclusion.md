@@ -121,14 +121,14 @@ Each object in the returned JSON contains a URL to a further resource.
 Each further resource is fetched and parsed. The aggregation is complete
 when we have them all.
 
-  Strategy     Network     First output (ms)   Total time (ms)   Max. Memory (Mb)
-  ------------ --------- ------------------- ----------------- ------------------
-  Oboe.js      Good                       40               804                6.2
-  Oboe.js      Poor                       60             1,526                6.2
-  JSON.parse   Good                      984             1,064                9,0
-  JSON.parse   Poor                     2550             2,609                8.9
-  Clarinet     Good                       34               781                5.5
-  Clarinet     Poor                       52             1,510                5.5
+  Strategy     Network     First output   Total time   Max. Memory
+  ------------ --------- -------------- ------------ -------------
+  Oboe.js      Good                40ms        804ms         6.2Mb
+  Oboe.js      Poor                60ms      1,526ms         6.2Mb
+  JSON.parse   Good               984ms      1,064ms         9,0Mb
+  JSON.parse   Poor              2550ms      2,609ms         8.9Mb
+  Clarinet     Good                34ms        781ms         5.5Mb
+  Clarinet     Poor                52ms      1,510ms         5.5Mb
 
 Vs Json.parse shows a dramatic improvement over first output of about
 96% and a smaller but significant improvement of about 40% in time
