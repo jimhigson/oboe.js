@@ -46,34 +46,31 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 });
 ~~~~
 
-While the primary behaviours are similar, some
-accidental side-behaviours differ between the two examples. It is likely
-the programmer would not consider these differences as they write.
-In the first example,the order of the output for schemes and plans will match the order in
-the JSON, whereas for the second scheming is always done before
-plotting. In the second example the order could be easily changed by
-reversing the statements whereas the first id bound to echo the order 
-found in the JSON. The error behaviours are
-also different -- the first prints until it has an error, the
-second prints if there are no errors.
-In the second example it is *almost mandatory* to check for errors before
-output whereas in the first it feels most natural to register the error
-listener at the end of the chained calls. I prefer the source order in
-the first because the the normal case is listed before the abnormal one.
-When describing a system, it seems odd to me to describe the abnormal cases
-first.
+While the primary behaviours are similar, some accidental
+side-behaviours differ between the two examples. It is likely the
+programmer would not consider these differences as they write. In the
+first example,the order of the output for schemes and plans will match
+the order in the JSON, whereas for the second scheming is always done
+before plotting. In the second example the order could be easily changed
+by reversing the statements whereas the first id bound to echo the order
+found in the JSON. The error behaviours are also different -- the first
+prints until it has an error, the second prints if there are no errors.
+In the second example it is *almost mandatory* to check for errors
+before output whereas in the first it feels most natural to register the
+error listener at the end of the chained calls. I prefer the source
+order in the first because the the normal case is listed before the
+abnormal one. When describing a system, it seems odd to me to describe
+the abnormal cases first.
 
-Looking at the coding style that is encouraged, the first example takes a 
-more declarative form by specifying the items
-of interest using patterns whereas
-the second is more imperative by explicitly looping through the items.
-If several levels of
-selection were required, such as `schemes.*.steps.*`, other than a
-longer JSONPath pattern the first example would not grow in complexity
-whereas the second would require nested looping. We can say that the
-complexity of programming using Oboe stays roughly constant whereas in the
-second example it grows linearly with the number of levels that must be
-traversed.
+Looking at the coding style that is encouraged, the first example takes
+a more declarative form by specifying the items of interest using
+patterns whereas the second is more imperative by explicitly looping
+through the items. If several levels of selection were required, such as
+`schemes.*.steps.*`, other than a longer JSONPath pattern the first
+example would not grow in complexity whereas the second would require
+nested looping. We can say that the complexity of programming using Oboe
+stays roughly constant whereas in the second example it grows linearly
+with the number of levels that must be traversed.
 
 Benchmarking vs non-progressive REST
 ------------------------------------
