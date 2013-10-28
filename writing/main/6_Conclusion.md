@@ -4,11 +4,10 @@ Conclusion
 Differences in the programs written using Oboe.js
 -------------------------------------------------
 
-I find it quite interesting that a program written using Oboe.js in the
-most natural way will be subtly different from one written using
-JSON.parse, even if the programmer is trying to express the same thing.
-Consider the two examples below which use Node.js to read from a local
-file and write to the console.
+A program written using Oboe.js will be subtly different from one
+written using more conventional libraries, even if the programmer means
+to express the same thing. Consider the two examples below which use
+Node.js to read a local JSON file and write to the console.
 
 ~~~~ {.javascript}
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
@@ -47,40 +46,34 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 });
 ~~~~
 
-The first observation is that the explicit looping in the second example
-requires roughly the same amount of code as the pattern registration
-that serves as an analogue in the first. The first example has a more
-declarative style whereas the second is more imperative. If two levels
-of selection were required, such as `schemes.*.premise`, other than a
-longer JSONPath pattern the first example would not grow in complexity
-whereas the second would require an additional loop inside the existing
-loop. We can say that the complexity of programming using Oboe stays
-roughly constant whereas in a more traditional style it grows linearly
-with the number of levels which must be traversed.
-
-While the intended behaviours are very similar, the unintended
-accidental side-behaviours differ between the two examples. In the first
-the order of the output for schemes and plans will match the order in
+While the primary behaviours are similar, some
+accidental side-behaviours differ between the two examples. It is likely
+the programmer would not consider these differences as they write.
+In the first example,the order of the output for schemes and plans will match the order in
 the JSON, whereas for the second scheming is always done before
 plotting. In the second example the order could be easily changed by
-reversing the statements whereas in the first to change the order would
-require a change in the order of the JSON. Whether the programmer has
-been liberated to ignore order or restricted to be unable to easily
-change it probably depends on the situation. The error behaviours are
-also different. The first example will print until it has an error. The
-second will print if there are no errors.
+reversing the statements whereas the first id bound to echo the order 
+found in the JSON. The error behaviours are
+also different -- the first prints until it has an error, the
+second prints if there are no errors.
+In the second example it is *almost mandatory* to check for errors before
+output whereas in the first it feels most natural to register the error
+listener at the end of the chained calls. I prefer the source order in
+the first because the the normal case is listed before the abnormal one.
+When describing a system, it seems odd to me to describe the abnormal cases
+first.
 
-In the second example it is most natural to check for errors before
-output whereas in the first it feels most natural to register an error
-listener as the last of the chained calls. I prefer the source order in
-the first because the the normal case is listed before the abnormal one
-emphasises their roles as main and secondary behaviours.
-
-Finally, the timings of the printing will be different. The first code
-prints the first output in constant time regardless of the size of the
-file and then outputs many lines individually as the JSON is read. The
-second will print all output at once after a time proportional to the
-size of the input.
+Looking at the coding style that is encouraged, the first example takes a 
+more declarative form by specifying the items
+of interest using patterns whereas
+the second is more imperative by explicitly looping through the items.
+If several levels of
+selection were required, such as `schemes.*.steps.*`, other than a
+longer JSONPath pattern the first example would not grow in complexity
+whereas the second would require nested looping. We can say that the
+complexity of programming using Oboe stays roughly constant whereas in the
+second example it grows linearly with the number of levels that must be
+traversed.
 
 Benchmarking vs non-progressive REST
 ------------------------------------
