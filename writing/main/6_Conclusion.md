@@ -114,7 +114,7 @@ Conditioner* was used with the presets *3G, Average Case* and *Cable
 modem* to represent poor and good internet connections respectively
 [^1]. The test involves two node processes, one acting as a REST client
 and one as a REST server. Memory was measured using Node's built in
-memory reporting tool, `process.memoryusage()` and the maximum figure
+memory reporting tool, `process.memoryusage()` and the largest figure
 reported on each run is used.
 
   Strategy     Network     First output   Total time   Max. Memory
@@ -126,33 +126,41 @@ reported on each run is used.
   Clarinet     Good                34ms        781ms         5.5Mb
   Clarinet     Poor                52ms      1,510ms         5.5Mb
 
-Vs Json.parse shows a dramatic improvement over first output of about
-96% and a smaller but significant improvement of about 40% in time
-required to complete the task. Oboe's performance in terms of time is
-about 15% slower than Clarinet; since Oboe is built on Clarinet it could
-not be faster but I had hoped for these results to be closer.
+In comparison with JSON.parse, Oboe
+shows a dramatic improvement regarding the time taken for the first output of about
+96% and a smaller but significant improvement of about 40% in the total time
+required to complete the aggregation. Oboe's aggregation on a good network is
+about 15% slower than Clarinet; since Oboe is built on Clarinet I did not expect it to be 
+faster but I had hoped for the gap to be smaller. This is probably because
+Oboe is a more involved process computationally than a raw SAX parser.
+Clarinet is known to be slower than JSON.parse for a non-progressive parse of
+input which is already held in memory[^2] so on some extremely fast networks
+or loading from local files, there will come a point where the low 
+computational overhead of JSON.parse makes it the fastest solution.
 
-As expected, in this simulation of real-world usage, the extra
-computation\
-compared to JSON.parse which is needed by Oboe's more involved
-algorithms or Clarinet's less efficient parsing [^2] have been dwarfed
-by better i/o management. Reacting earlier using slower handlers has
+For this database aggregation example the extra
+computation time needed by Oboe's more sophisticated
+algorithms is relatively insignificant in comparison to the benefits of
+better i/o management. Reacting earlier using slower handlers has
 been shown to be faster overall than reacting later with quicker ones. I
 believe that this vindicates a focus on efficient management of i/o over
-faster algorithms. I believe that much programming takes a "Hurry up and
-wait" approach by concentrating overly on optimal computation rather
-than optimal i/o management.
+faster algorithms. I believe that much current programming takes a "Hurry up and
+wait" approach by concentrating overly on micro-optimisations to algorithms
+over choosing the best time to do something.
 
 There is an unexpected improvement vs JSON.parse in terms of memory
 usage. It is not clear why this would be but it may be attributable to
-the json fetching library used to simplify the JSON.parse tests having a
+the get-json library used to simplify these tests having a
 large dependency tree. As expected, Clarinet shows the largest
-improvements in terms of memory usage. For very large JSON I would
-expect Clarinet's memory usage to remain roughly constant whilst the two
-approaches rise linearly with the size of the resource.
+improvements in terms of memory usage because it never stores a complete version of
+the parsed JSON. As resource size increases I would
+expect Clarinet's memory usage to remain roughly constant while the other two
+rise linearly. Node is popular on RaspberryPi type devices with
+constrained RAM; where code clarity is less important than a small memory
+footprint Clarinet might be preferable to Oboe. 
 
-Comparative Programmer Ergonomics
----------------------------------
+Comparative developer ergonomics
+--------------------------------
 
 For each of the benchmarks above the code was laid out in the most
 natural way for the strategy under test.
