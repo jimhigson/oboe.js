@@ -334,26 +334,25 @@ programmers to create a progressive interpretation of any resource type.
 A plug-in would require a SAX-like parser for the format a compiler for
 some kind of pattern matching language.
 
-Oboe stores all JSON node that are parsed for the duration of its 
-lifetime so despite its similarity to a SAX parser, it consumes as much memory as a DOM parser. 
-These are not discarded so that all possible JSONPath
-expressions may be tested. However, in most cases memory could be freed if the parsed
-content were stored only so far as is required to test against
-the patterns which have actually been registered. For
-typical use cases I expect this would allow large
-sub-trees to be unlinked inside Oboe, particularly once they have matched a pattern
-and have already been handed over to the application callbacks.
-Likewise, the current implementation takes a rather brute
-force approach when examining node for pattern matches: check every
-registered JSONPath expression against every node and path that are
-found in the JSON. For many expressions we are able to know there is no
-possibility of matching a JSON tree, either because we have already
-matched or because the the current node's ancestors already mandate
-failure. A more sophisticated programme might disregard provably
-unsatisfiable handlers for the duration of a subtree. Either of these
-changes would involve some rather difficult programming and because
-matching is fast enough I think brute force is the best approach for the
-time being.
+Oboe stores all JSON node that are parsed for the duration of its
+lifetime so despite its similarity to a SAX parser, it consumes as much
+memory as a DOM parser. These are not discarded so that all possible
+JSONPath expressions may be tested. However, in most cases memory could
+be freed if the parsed content were stored only so far as is required to
+test against the patterns which have actually been registered. For
+typical use cases I expect this would allow large sub-trees to be
+unlinked inside Oboe, particularly once they have matched a pattern and
+have already been handed over to the application callbacks. Likewise,
+the current implementation takes a rather brute force approach when
+examining node for pattern matches: check every registered JSONPath
+expression against every node and path that are found in the JSON. For
+many expressions we are able to know there is no possibility of matching
+a JSON tree, either because we have already matched or because the the
+current node's ancestors already mandate failure. A more sophisticated
+programme might disregard provably unsatisfiable handlers for the
+duration of a subtree. Either of these changes would involve some rather
+difficult programming and because matching is fast enough I think brute
+force is the best approach for the time being.
 
 During JSONPath matching much of the computation is repeated. For
 example, matching the expression `b.*` against many children of a common
