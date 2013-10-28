@@ -290,21 +290,19 @@ selective delivery to older platforms. However, I would argue that time
 spent writing a basic version for legacy platforms would be better spend
 waiting for them to die.
 
-Nonetheless, in its current form Oboe may slow down the total time when
-working over the very fastest connections.
-
 For an imperative language coded in a functional style the compiler may
 not optimise as effectively as if a functional language was used. This
 is especially the case under a highly dynamic language in which
-everything, even the built-in constructs are mutable. I think Javascript
-was a good choice of language given it is already well adopted and
-allows the targeting of server and client side with only minimal effort,
-giving a very large number of applications with the potential to adopt
-Oboe. However, there are obvious inefficiencies such as the the descent
-and ancestor arrays which are always created to be handed to application
-callbacks but that I anticipate will be predominantly ignored. The
-design of Oboe is very amicable to implementation under a functional
-language and it would be interesting to see the results.
+everything, even the built-in constructs are mutable. 
+Presenting a helpful API also means passing application callbacks eagerly evaluated parameters
+such as the the path and ancestor arrays which I anticipate will be predominantly ignored.
+Under a functional language these could be lazily evaluated without any extra effort.
+I think Javascript
+was a good choice of language, 
+giving a very large number of client- and server-side applications that may potentially 
+adopt the library. However,
+server-side Oboe would be very amicable to implementation using a purer functional
+language and it would be interesting to see the performance improvements.
 
 Status as a micro-library
 -------------------------
