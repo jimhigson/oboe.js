@@ -334,14 +334,16 @@ programmers to create a progressive interpretation of any resource type.
 A plug-in would require a SAX-like parser for the format a compiler for
 some kind of pattern matching language.
 
-Oboe stores all items that are parsed from the JSON it receives,
-resulting in a memory use which is as high as a DOM parser. These are
-kept in order to be able to provide a match to any possible JSONPath
-expression. However, in most cases memory would be saved if the parsed
-content were only stored so far as is needed to provide matches against
-the JSONPath expressions which have actually been registered. For
-typical use cases I expect this would allow the non-storage of large
-branches. Likewise, the current implementation takes a rather brute
+Oboe stores all JSON node that are parsed for the duration of its 
+lifetime so despite its similarity to a SAX parser, it consumes as much memory as a DOM parser. 
+These are not discarded so that all possible JSONPath
+expressions may be tested. However, in most cases memory could be freed if the parsed
+content were stored only so far as is required to test against
+the patterns which have actually been registered. For
+typical use cases I expect this would allow large
+sub-trees to be unlinked inside Oboe, particularly once they have matched a pattern
+and have already been handed over to the application callbacks.
+Likewise, the current implementation takes a rather brute
 force approach when examining node for pattern matches: check every
 registered JSONPath expression against every node and path that are
 found in the JSON. For many expressions we are able to know there is no
