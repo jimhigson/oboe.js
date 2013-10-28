@@ -227,9 +227,9 @@ containing 100 objects, each with 8 String properties against .
 Correspondingly the expression is evaluated just over 800 times and 100
 matches are found. Although real http is used, it is kept within the
 localhost. The results below are averaged from ten runs. The tests
-executed on a Macbook Air, except for Chrome Mobile which was tested on
-an iPhone 5. Tests requiring Microsoft Windows were performed inside a
-virtual machine.
+executed on a Macbook Air running OS X 10.7.5, except for Chrome Mobile which was tested on
+an iPhone 5 with iOS 7.0.2. Tests requiring Microsoft Windows were performed inside a
+VirtualBox virtual machine.
 
 Curl is a simple download to stdout from the shell and is included as a
 control run to provide a baseline.
@@ -237,13 +237,13 @@ control run to provide a baseline.
   Platform                                  Total Time   Throughput (nodes/ms)
   ----------------------------------------- ------------ -----------------------
   Curl (control)                            42ms         *n/a*
-  Chrome 31.0.1650.34 (Mac OS X 10.7.5)     84ms         9.57
+  Chrome 31.0.1650.34                       84ms         9.57
   Node.js v0.10.1                           172ms        4.67
-  Chrome 30.0.1599 (Mac OS X 10.7.5)        202ms        3.98
-  Safari 6.0.5 (Mac OS X 10.7.5)            231ms        3.48
+  Chrome 30.0.1599                          202ms        3.98
+  Safari 6.0.5                              231ms        3.48
   IE 10.0.0 (Windows 8)                     349ms        2.30
-  Chrome Mobile iOS 30.0.1599 (iOS 7.0.2)   431ms        1.86
-  Firefox 24.0.0 (Mac OS X 10.7)            547ms        1.47
+  Chrome Mobile iOS 30.0.1599               431ms        1.86
+  Firefox 24.0.0                            547ms        1.47
   IE 8.0.0 (Windows XP)                     3,048ms      0.26
 
 We can see that Firefox is much slower than other modern browsers
