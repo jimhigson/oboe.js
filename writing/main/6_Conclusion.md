@@ -126,47 +126,48 @@ reported on each run is used.
   Clarinet     Good                34ms        781ms         5.5Mb
   Clarinet     Poor                52ms      1,510ms         5.5Mb
 
-In comparison with JSON.parse, Oboe
-shows a dramatic improvement regarding the time taken for the first output of about
-96% and a smaller but significant improvement of about 40% in the total time
-required to complete the aggregation. Oboe's aggregation on a good network is
-about 15% slower than Clarinet; since Oboe is built on Clarinet I did not expect it to be 
-faster but I had hoped for the gap to be smaller. This is probably because
-Oboe is a more involved process computationally than a raw SAX parser.
-Clarinet is known to be slower than JSON.parse for a non-progressive parse of
-input which is already held in memory[^2] so on some extremely fast networks
-or loading from local files, there will come a point where the low 
-computational overhead of JSON.parse makes it the fastest solution.
+In comparison with JSON.parse, Oboe shows a dramatic improvement
+regarding the time taken for the first output of about 96% and a smaller
+but significant improvement of about 40% in the total time required to
+complete the aggregation. Oboe's aggregation on a good network is about
+15% slower than Clarinet; since Oboe is built on Clarinet I did not
+expect it to be faster but I had hoped for the gap to be smaller. This
+is probably because Oboe is a more involved process computationally than
+a raw SAX parser. Clarinet is known to be slower than JSON.parse for a
+non-progressive parse of input which is already held in memory[^2] so on
+some extremely fast networks or loading from local files, there will
+come a point where the low computational overhead of JSON.parse makes it
+the fastest solution.
 
-For this database aggregation example the extra
-computation time needed by Oboe's more sophisticated
-algorithms is relatively insignificant in comparison to the benefits of
-better i/o management. Reacting earlier using slower handlers has
-been shown to be faster overall than reacting later with quicker ones. I
-believe that this vindicates a focus on efficient management of i/o over
-faster algorithms. I believe that much current programming takes a "Hurry up and
-wait" approach by concentrating overly on micro-optimisations to algorithms
-over choosing the best time to do something.
+For this database aggregation example the extra computation time needed
+by Oboe's more sophisticated algorithms is relatively insignificant in
+comparison to the benefits of better i/o management. Reacting earlier
+using slower handlers has been shown to be faster overall than reacting
+later with quicker ones. I believe that this vindicates a focus on
+efficient management of i/o over faster algorithms. I believe that much
+current programming takes a "Hurry up and wait" approach by
+concentrating overly on micro-optimisations to algorithms over choosing
+the best time to do something.
 
 There is an unexpected improvement vs JSON.parse in terms of memory
 usage. It is not clear why this would be but it may be attributable to
-the get-json library used to simplify these tests having a
-large dependency tree. As expected, Clarinet shows the largest
-improvements in terms of memory usage because it never stores a complete version of
-the parsed JSON. As resource size increases I would
-expect Clarinet's memory usage to remain roughly constant while the other two
-rise linearly. Node is popular on RaspberryPi type devices with
-constrained RAM; where code clarity is less important than a small memory
-footprint Clarinet might be preferable to Oboe. 
+the get-json library used to simplify these tests having a large
+dependency tree. As expected, Clarinet shows the largest improvements in
+terms of memory usage because it never stores a complete version of the
+parsed JSON. As resource size increases I would expect Clarinet's memory
+usage to remain roughly constant while the other two rise linearly. Node
+is popular on RaspberryPi type devices with constrained RAM; where code
+clarity is less important than a small memory footprint Clarinet might
+be preferable to Oboe.
 
 Comparative developer ergonomics
 --------------------------------
 
-A smaller code size is not in itself a guarantee of a
-easier programming but, so long as the code isn't forced to be more
-terse, I find it is a good indicator. The code sizes reported below report
-how much programming was required for each strategy to implement the
-database simulation above. For each library under test the programming was
+A smaller code size is not in itself a guarantee of a easier programming
+but, so long as the code isn't forced to be more terse, I find it is a
+good indicator. The code sizes reported below report how much
+programming was required for each strategy to implement the database
+simulation above. For each library under test the programming was
 written using its most natural expression.
 
   Strategy       Code Required (lines)   Code required (chars)
@@ -202,45 +203,48 @@ getJson(DB_URL, function(err, records) {
 });
 ~~~~
 
-The Clarinet version of the code may be seen in appendex (??). This
-version is greater in verbosity and obfuscation. I don't think a person
-could look at this source and understand what is being parsed without
-thinking about it for a long time. Parameter names such as 'key' or
-'value' must be chosen by the position of the token in the markup, prior
-to understanding the semantics it represents. By contrast, Oboe and
-JSON.parse both allow names to be given by the meaning of the token.
+The code using JSON.parse is very closely coupled with the JSON format
+that it is handling. We can see this in the fragments `records.data`,
+`record.url`, and `record.name` which will only work if they find their
+desired sub-tree at exactly the anticipated location. The code might be
+said to contain a description of the format that it is for rather than a
+description of what is required from the format. The Oboe version
+describes the format only so far as is needed to identify the desired
+parts; the remainder of the JSON could change and the code would
+continue to work. I believe this demonstrates a greater tolerance to
+changing formats that would be useful when programming against evolving
+services.
 
-The JSON.parse version is very closely coupled with the format that it
-is handling. We can see this in the fragments `records.data`,
-`record.url`, `record.name` which expects to find sub-trees at very
-specific locations in the JSON. The code might be said to contain a
-description of the format that it is for. Conversely, the Oboe version
-describes the format only so far as is needed to identify the parts that
-it is interested in; the remainder of the format could change and the
-code would continue to work. As well as being simpler to program against
-than the previous simplest mode, I believe this demonstrates a greater
-tolerance to changing formats.
+The Clarinet version of the code is too long to include here but may be
+seen [in the appendix](#header_benchmarkClient), on page
+\pageref{src_benchmarkClient}. By using SAX directly the code is more
+verbose and its purpose is obfuscated. I don't think a person looking at
+this source would understand what is being parsed without thinking about
+it for a long time. Functions handling SAX events must handle several
+different cases which means they tend to have parameter names such as
+'key' or 'value' which represent the token type. By contrast, Oboe and
+JSON.parse both allow names such as 'record' or 'url' which are chosen
+according to the semantics of the value which is passed in.
 
-Performance of code styles under various engines
-------------------------------------------------
+Performance under various Javascript engines
+--------------------------------------------
 
 The 15% overhead of Oboe vs Clarinet suggests Oboe might be
 computationally expensive. With very fast networks the extra computation
 might outweigh a more efficient i/o strategy.
 
-The file `test/specs/oboe.performance.spec.js` contains a simple
-benchmark. This test registeres a very complex JSONPath expression which
-intentionally uses all of the language and fetches a JSON file
-containing 100 objects, each with 8 String properties against .
-Correspondingly the expression is evaluated just over 800 times and 100
-matches are found. Although real http is used, it is kept within the
-localhost. The results below are averaged from ten runs. The tests
-executed on a Macbook Air running OS X 10.7.5, except for Chrome Mobile
+The file `oboe.performance.spec.js`[^4] contains a benchmark that concentrates
+on using Oboe for pattern matching.
+This test registers a complex pattern which
+intentionally uses all of the JSONPath language features and then fetches a JSON file
+containing approximately 800 nodes and 100 matches.
+Although real http is used, it over an unthrottled connection to
+localhost so the impact of the network should be negligible. The results below are averaged from ten runs. The tests
+were executed on a relatively low-powered Macbook Air laptop running OS X 10.7.5, except for Chrome Mobile
 which was tested on an iPhone 5 with iOS 7.0.2. Tests requiring
 Microsoft Windows were performed inside a VirtualBox virtual machine.
-
-Curl is a simple download to stdout from the shell and is included as a
-control run to provide a baseline.
+Curl is used to provide a baseline, it is a simple download tool and is used to write the
+downloaded JSON to stdout without any parsing.
 
   Platform                        Total Time   Throughput (nodes/ms)
   ----------------------------- ------------ -----------------------
@@ -349,7 +353,7 @@ Javascript implementations make it difficult to manage a functional
 cache, or caches in general, from inside the language itself because
 there is no way to occupy only the unused memory. Weak references are
 proposed in ECMAScript 6 but currently only experimentally
-supported[^4]. For future development they would be ideal.
+supported[^5]. For future development they would be ideal.
 
 The nodes which Oboe hands to callbacks are mutable meaning that
 potentially the correct workings of the library could be broken if the
@@ -364,7 +368,10 @@ method. This would probably be an improvement.
 
 [^3]: https://npmjs.org/package/get-json
 
-[^4]: At time of writing, Firefox is the only engine supporting
+[^4]: See
+    [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
+
+[^5]: At time of writing, Firefox is the only engine supporting
     WeakHashMap by default. In Chome it is implemented but not available
     to Javascript unless explicitly enabled by a browser flag.
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
