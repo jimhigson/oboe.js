@@ -256,12 +256,12 @@ describe('streaming xhr integration (real http)', function() {
       
       emit = jasmine.createSpy().andCallFake(function( eventName, eventContent ){
       
-         if( eventName == NEW_CONTENT ) {
+         if( eventName == STREAM_DATA ) {
             numberOfProgressCallbacks ++;
             contentReceived += eventContent;
             dripsReceived.push(eventContent);
                      
-         } else if( eventName == END_OF_CONTENT ) {
+         } else if( eventName == STREAM_END ) {
             requestCompleteListener();
          }
       });

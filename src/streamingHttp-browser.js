@@ -65,7 +65,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         emit( NEW_CONTENT, newText );
+         emit( STREAM_DATA, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -77,8 +77,6 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    }
    
    xhr.onreadystatechange = function() {
-            
-      if(xhr.readyState == 4 ) {
 
          // is this a 2xx http code?
          var sucessful = String(xhr.status)[0] == 2;
@@ -92,7 +90,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             // progress event for each part of the response
             handleProgress();
             
-            emit( END_OF_CONTENT );
+            emit( STREAM_END );
          } else {
          
             emit( 

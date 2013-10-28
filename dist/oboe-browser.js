@@ -968,7 +968,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         emit( NEW_CONTENT, newText );
+         emit( STREAM_DATA, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -995,7 +995,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             // progress event for each part of the response
             handleProgress();
             
-            emit( END_OF_CONTENT );
+            emit( STREAM_END );
          } else {
          
             emit( 
@@ -1768,8 +1768,8 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
-    NEW_CONTENT = _S++,
-    END_OF_CONTENT = _S++,
+    STREAM_DATA = _S++,
+    STREAM_END = _S++,
     ABORTING = _S++;
     
 function errorReport(statusCode, body, error) {
@@ -1801,7 +1801,7 @@ function instanceController(  emit, on, un,
       rootNode = root;   
    });
                               
-   on(NEW_CONTENT,         
+   on(STREAM_DATA,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -1819,7 +1819,7 @@ function instanceController(  emit, on, un,
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
+   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 

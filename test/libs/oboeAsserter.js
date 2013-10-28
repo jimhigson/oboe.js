@@ -94,7 +94,7 @@ function givenAnOboeInstance(jsonFileName) {
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
-            eventBusNotify(NEW_CONTENT, json.charAt(i)); 
+            eventBusNotify(STREAM_DATA, json.charAt(i)); 
          }                  
 
          return this;
@@ -106,7 +106,7 @@ function givenAnOboeInstance(jsonFileName) {
          // done callback
          var eventBusNotify = streamingHttp.firstCall.args[0];
          
-         eventBusNotify(END_OF_CONTENT);                  
+         eventBusNotify(STREAM_END);                  
 
          return this;         
       };

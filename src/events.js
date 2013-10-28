@@ -13,8 +13,8 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     ERROR_EVENT   = _S++,    
     ROOT_FOUND    = _S++,    
-    NEW_CONTENT = _S++,
-    END_OF_CONTENT = _S++,
+    STREAM_DATA = _S++,
+    STREAM_END = _S++,
     ABORTING = _S++;
     
 function errorReport(statusCode, body, error) {

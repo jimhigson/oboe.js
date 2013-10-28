@@ -29,12 +29,12 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
                                              
-         emit( NEW_CONTENT, chunk.toString() );
+         emit( STREAM_DATA, chunk.toString() );
       });
       
       readableStream.on('end', function() {
                
-         emit( END_OF_CONTENT );
+         emit( STREAM_END );
       });
    }
    

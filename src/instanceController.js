@@ -15,7 +15,7 @@ function instanceController(  emit, on, un,
       rootNode = root;   
    });
                               
-   on(NEW_CONTENT,         
+   on(STREAM_DATA,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -33,7 +33,7 @@ function instanceController(  emit, on, un,
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
+   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 
