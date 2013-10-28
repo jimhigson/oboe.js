@@ -171,9 +171,7 @@ Oboe was the shortest:
 
 ~~~~ {.javascript}
 oboe(DB_URL).node('{id url}.url', function(url){
-        
    oboe(url).node('name', function(name){
-                   
       console.log(name);               
    });      
 });
@@ -181,20 +179,14 @@ oboe(DB_URL).node('{id url}.url', function(url){
 
 Non-progressive parsing was slightly longer, requiring in addition a
 loop, an if statement, and programmatically selecting specific parts of
-the results:
+the results. The code below is shortened by using the get-json[^3]
+package which removes the need to explicitly parse:
 
 ~~~~ {.javascript}
-// JSON.parse. The code is shortened and simplified by get-json from NPM:
-// https://npmjs.org/package/get-json
-
 getJson(DB_URL, function(err, records) {
-    
    records.data.forEach( function( record ){
-    
       if( record.url ) {
-      
          getJson(record.url, function(err, record) {
-         
             console.log(record.name);
          });
       }
@@ -308,7 +300,11 @@ discourage adoption.
 potential future work
 ---------------------
 
-*Matching server-side tools*
+Although the project delivers improvements already, the most obvious
+expansion to fully realise the potential would be a matching server-side
+component that writes JSON in a streaming way. So far this has required
+that the JSON be written out as strings but this scales badly as
+messages become more complex.
 
 There is nothing about Oboe which precludes working with other
 tree-shaped format. If there is demand, An XML/XPATH version seems like
@@ -345,7 +341,7 @@ Javascript implementations make it difficult to manage a functional
 cache, or caches in general, from inside the language itself because
 there is no way to occupy only the unused memory. Weak references are
 proposed in ECMAScript 6 but currently only experimentally
-supported[^3]. For future development they would be ideal.
+supported[^4]. For future development they would be ideal.
 
 The nodes which Oboe hands to callbacks are mutable meaning that
 potentially the correct workings of the library could be broken if the
@@ -358,7 +354,9 @@ method. This would probably be an improvement.
 
 [^2]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
 
-[^3]: At time of writing, Firefox is the only engine supporting
+[^3]: https://npmjs.org/package/get-json
+
+[^4]: At time of writing, Firefox is the only engine supporting
     WeakHashMap by default. In Chome it is implemented but not available
     to Javascript unless explicitly enabled by a browser flag.
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
