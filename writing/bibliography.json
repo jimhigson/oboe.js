@@ -442,6 +442,21 @@
       ],
       "url":"http://duncan-cragg.org/blog/post/strest-service-trampled-rest-will-break-web-20/",
       "issued": { "date-parts":[ [2006] ] },
+      "type":"webpage"
+   },                  
+      
+   {
+      "id":"xmlorder",
+      "title":"Extensible Markup Language (XML) 1.0 (Fifth Edition)",
+      "author":[         
+         { "family": "Bray", "given":"Tim"},
+         { "family": "Paoli", "given":"Jean"},
+         { "family": "Sperberg-McQueen", "given":"C M"},
+         { "family": "Maler", "given":"Eve"},
+         { "family": "Yergeau", "given":"François"}
+      ],
+      "url":"http://www.w3.org/TR/REC-xml/#sec-starttags",
+      "issued": { "date-parts":[ [2008] ] },
       "type":"webpage"                  
    }
       
