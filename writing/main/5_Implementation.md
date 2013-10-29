@@ -510,6 +510,8 @@ functions before testing the compiler would be a considerable effort and
 I do not believe it would improve the rigor of the JSONPath
 specification.
 
+*Restriction: duck types only as last item. Why. Not currently enforced in the compiler.*
+
 [^1]: https://github.com/substack/http-browserify
 
 [^2]: See
