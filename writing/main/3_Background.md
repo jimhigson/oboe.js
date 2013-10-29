@@ -5,10 +5,10 @@ Background
 node is located, REST may be used as the means of communication. By
 focusing on REST clients, nodes in the middleware and presentation layer
 fall in our scope. Although network topology is often split about client
-and server side, for our purposes categorisation as tiers is a more
+and server side, for our purposes categorisation as data, middleware, and presentation is the more
 meaningful distinction. According to this split the client-side
 presentation layer and server-side presentation layer serve the same
-purpose, generating mark-up based on aggregated data created in the
+purpose, generating mark-up based on aggregated data prepared by the
 middle tier \label{architecture}](images/architecture.png)
 
 The web as an application platform
@@ -16,18 +16,18 @@ The web as an application platform
 
 Application design has historically charted an undulating path pulled by
 competing approaches of thick and thin clients. Having evolved from a
-document viewing system to an application platform for all but the most
-specialised tasks, the web perpetuates this narrative by resisting
+document viewing system to the preferred application platform for all but the most
+specialised interfaces, the web perpetuates this narrative by resisting
 categorisation as either mode.
 
-While the trend is generally for more client scripting and for some
-sites Javascript is now requisite, there are also counter-trends. In
+While the trend is generally for more client scripting and for many
+sites a Javascript runtime is now requisite, there are also counter-trends. In
 2012 twitter reduced load times to one fifth of their previous design by
 moving much of their rendering back to the server-side, commenting that
 "The future is coming and it looks just like the past" [@newTwitter].
 Under this architecture short, fast-loading pages are generated on the
-server-side but Javascript is also provides progressively enhancement.
-Although it does not generate the page anew, the Javascript must know
+server-side but Javascript also provides progressive enhancements.
+Although it does not generate pages anew, the Javascript must know
 how to create most of the interface elements so one weakness of this
 architecture is that much of the presentation layer logic must be
 expressed twice.
@@ -45,76 +45,73 @@ encourage a middle tier to execute business logic and produce aggregate
 data.
 
 While REST may not be the only communications technology employed by an
-application architecture, for this project we should examine where the
-REST clients fit into the picture. REST is used to pull data from
-middleware for the sake of presentation regardless of where the
+application architecture, for this project we should examine where 
+REST clients libraries may fit into the picture. REST is used by the presentation layer to pull data from
+middleware regardless of where the
 presentation resides. Likewise, rather than connect to databases
 directly, for portability middlewares often communicate with a thin REST
 layer which wraps data stores. This suggests three uses:
 
 -   From web browser to middleware
 -   From server-side presentation layer to middleware
--   From middleware to one or more nodes in a data tier
+-   From middleware to nodes in a data tier
 
-Fortunately, each of these contexts require a similar performance
-profile. The node is essentially acting as a router dealing with small
-messages containing only the information they requested rather than
-dealing with a whole model. As a part of an interactive system low
+Fortunately, each of these contexts requires a similar performance
+profile. The work done is computationally light and answering a request
+involves more time waiting than processing. The node is essentially acting as a data router serving
+messages containing a small subset of the data from a larger model. As a part of an interactive system low
 latency is important whereas throughput can be increased relatively
-cheaply by adding more hardware. As demand for the system increases the
-total work required grows but the complexity of any one of these tasks
-does remains constant. Although serving any particular request might be
-done in series, the workload as a whole at these tiers consists of many
-independent tasks and as such is embarrassingly parallelisable.
+cheaply by adding more hardware, especially in a cloud hosted environment.
+As demand for the system increases the
+total work required grows but the complexity in responding to any one of the requests
+remains constant. Although serving any particular request might be
+done in series, the workload as a whole is embarrassingly parallelisable.
 
 Node.js
 -------
 
 Node.js is a general purpose tool for executing Javascript outside of a
-browser. I has the aim of low-latency i/o and is used predominantly for
+browser. It has the aim of low-latency I/O and is used mostly for
 server applications and command line tools. It is difficult to judge to
 what degree Javascript is a distraction from Node's principled design
 and to what degree the language defines the platform.
 
-In most imperative languages the thread is the basic unit of
-concurrency. whereas Node presents the programmer with a single-threaded
+For most imperative languages the thread is the basic unit of
+concurrency, whereas Node presents the programmer with a single-threaded
 abstraction. Threads are an effective means to share parallel
 computation over multiple cores but are less well suited to scheduling
-concurrent tasks which are mostly i/o dependent. Programming threads
+concurrent tasks which are mostly I/O dependent. Programming threads
 safely with shared access to mutable objects requires great care and
 experience, otherwise the programmer is liable to create race
-conditions. Considering for example a Java http aggregator; because we
+conditions. Consider for example a Java http aggregator; because we
 wish to fetch in parallel each http request is assigned to a thread.
 These 'requester' tasks are computationally simple: make a request, wait
-for a complete response, and then participate in a Barrier to wait for
-the others. Each thread consumes considerable resources but during its
+for a complete response, and then participate in a Barrier while the other requesters complete.
+Each thread consumes considerable resources but during its
 multi-second lifespan requires only a fraction of a millisecond on the
-CPU. It is unlikely any two requests return at exactly the same moment
-so usually the threads will process in series rather than parallel
-anyway. Even if they do, the actual CPU time required in making an http
+CPU. It is unlikely any two requests return closely enough in time that the threads
+will process in series rather than parallel, loosing thread's natural strengths for utilising
+multiple cores. Even if they do, the actual CPU time required in making an http
 request is so short that any concurrent processing is a pyrrhic victory.
-Following Node's lead, traditionally thread-based environments are
-beginning to embrace asynchronous, single-threaded servers. The Netty
-project can be though of as roughly the Java equivalent of Node.
 
-![**Single-threaded vs multi-threaded scheduling for a http
+![**Single-threaded vs multi-threaded scheduling for an http
 aggregator**](images/placeholder.png)
 
-Node builds on a model of event-based, asynchronous i/o that was
-established by Javascript execution in web browsers. Although Javascript
+Node builds on the model of event-based, asynchronous i/o that was
+established by web browser Javascript execution. Although Javascript
 in a browser may be performing multiple tasks simultaneously, for
 example requesting several resources from the server side, it does so
-from within a single-threaded virtual machine. Node similarly
+from within a single-threaded virtual machine. Node
 facilitates concurrency by managing an event loop of queued tasks and
-providing exclusively non-blocking i/o. Unlike Erlang, Node does not
-swap tasks out preemptively, it always waits for tasks to complete
+providing exclusively non-blocking I/O. Unlike Erlang, Node does not
+swap tasks out preemptively, it always waits for a task to complete
 before moving onto the next. This means that each task must complete
 quickly to avoid holding up others. *Prima facie* this might seem like
 an onerous requirement to put on the programmer but in practice with
-only non-blocking i/o each task naturally exits quickly without any
+only non-blocking I/O available each task naturally exits quickly without any
 special effort. Accidental non-terminating loops or heavy
 number-crunching aside, with no reason for a task to wait it is
-difficult to write a node program where the tasks do not complete
+difficult to write a node program in which the tasks do not complete
 quickly.
 
 Each task in node is simply a Javascript function. Node is able to swap
@@ -122,7 +119,7 @@ its single Javascript thread between these tasks efficiently while
 providing the programmer with an intuitive interface because of
 closures. Utilising closures, the responsibility of maintaining state
 between issuing an asynchronous call and receiving the callback is
-removed from the programmer by folding it invisibly into the language.
+removed from the programmer by folding the storage invisibly into the language.
 This implicit data store requires no syntax and feels so natural and
 inevitable that it is often not obvious that the responsibility exists
 at all.
@@ -131,10 +128,11 @@ Consider the example below. The code schedules three tasks, each of
 which are very short and exit quickly allowing Node to finely interlace
 them between other concurrent concerns. The `on` method is used to
 attach functions as listeners to streams. However sophisticated and
-performant this style of programming, to the developer it is hardly more
-difficult an expression than if a blocking io model were followed. It is
-certainly easier to get right than synchronising mutable objects for
-sharing between threads.
+performant this style of programming, to the developer it is hardly any more
+difficult an expression than if I/O were used. It is
+certainly harder to make mistakes programming in this way than managing 
+synchronised access to mutable objects that are
+shared between threads.
 
 ~~~~ {.javascript}
 function printResourceToConsole(url) {
@@ -143,17 +141,19 @@ function printResourceToConsole(url) {
       .on('response', function(response){
       
          // This function will be called when the response starts.
-         // It logs to the console, adds a listener and quickly exits.
+         // It logs to the console, adds a listener and quickly 
+         // exits.
          
-         // Because it is captured by a closure we are able to reference 
-         // the url parameter after the scope that declared it has finished.            
-         console.log("The response has started for " + path);
+         // Because it is captured by a closure we are able to 
+         // reference the url parameter after the scope that 
+         // declared it has finished.            
+         console.log("The response has started for ", url);
       
          response.on('data', function(chunk) {      
-            // This function is called each time some data is received from the 
-            // http request. In this example we write the response to the console
-            // and quickly exit.
-            console.log('Got some response ' + chunk);
+            // This function is called each time some data is
+            // received from the http request. The task writes
+            // the response to the console and quickly exits.
+            console.log('Got some response ', chunk);
                    
          }).on('end', function(){
             console.log('The response is complete');
@@ -172,9 +172,10 @@ function printResourceToConsole(url) {
 > can handle any protocol/stream that also happens to be written in
 > JavaScript." [@nodeStream]
 
-In Node i/o is performed through a unified streaming interface
-regardless of the source. The streams follow a publisher-subscriber
-pattern fitting comfortably with the wider event-driven model. Although
+In Node I/O is performed using a unified data streaming interface
+regardless of the source. The streams fit comfortably with the wider event-driven 
+model by implementing Node's EventEmitter interface, a generic 
+Observer pattern API. Although
 the abstraction provided by streams is quite a thin layer on top of the
 host system's socket, it forms a powerful and intuitive interface. For
 many tasks it is preferable to program in a 'plumbing' style by joining
@@ -188,6 +189,10 @@ http.get(url)
    });
 ~~~~
 
+Following Node's lead, traditionally thread-based environments are
+beginning to embrace asynchronous, single-threaded servers. The Netty
+project can be though of as roughly the Java equivalent of Node.
+
 Json and XML data transfer formats {#jsonxml}
 ----------------------------------
 
@@ -195,7 +200,7 @@ Both XML and JSON are text based, tree shaped data formats with human
 and machine readability. One of the design goals of XML was to simplify
 SGML to the point that a graduate student could implement a full parser
 in a week [@javatools p287]. Continuing this arc of simpler data
-formats, JSON "The fat-free alternative to XML[@jsonorg]" isolates
+formats, JSON "The fat-free alternative to XML [@jsonorg]" isolates
 Javascript's syntax for literal values into a stand-alone serialisation
 language. For the graduate tackling JSON parsing the task is simpler
 still, being expressible as fifteen context free grammars.
@@ -207,9 +212,8 @@ XML parsers produce Elements, Text, Attributes, ProcessingInstruction
 which require extra translation before they are convenient to use inside
 a programming language. Because JSON already closely resembles how a
 programmer would construct a runtime model of their data, fewer steps
-are required before using the deserialised form in a given programming
-language. The JSON nodes: *strings*, *numbers*, *objects* and *arrays*
-will in many cases map directly onto their language types and, for
+are required before using the deserialised form. The JSON nodes: *strings*, *numbers*, *objects* and *arrays*
+will in many cases map directly onto language types and, for
 loosely typed languages at least, the parser output bears enough
 similarity to domain model objects that it may be used directly without
 any further transformation.
@@ -217,9 +221,9 @@ any further transformation.
 ~~~~ {.javascript}
 {
    people: [
-      {name: 'John', town:'Oxford'},
-      {name: 'Jack', town:'Bristol'}
-      {town:'Cambridge', name: 'Walter'}
+      {name: 'James', town:'London'},
+      {name: 'Thomas', town:'Bristol'}
+      {town:'Cambridge', name: 'Sally'}
    ]
 }
 ~~~~
