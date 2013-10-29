@@ -2,7 +2,7 @@ Introduction
 ============
 
 This purpose of this dissertation is to encourage the REST paradigm to
-be viewed through a novel lens which in application this may be used to
+be viewed through a novel lens which in application may be used to
 deliver tangible benefits to many common REST use cases. Although I
 express my thesis through programming, the contribution I hope to make
 is felt more strongly as a modification in how we *think* about http
@@ -11,16 +11,15 @@ than as the delivery of new software.
 In the interest of developer ergonomics, REST clients have tended to
 style the calling of remote resources similar to the call style of the
 host programming language. Depending on the language, one of two schemas
-are followed: a synchronous style in which a some invocation halts
+are followed: a synchronous, blocking style in which a some invocation halts
 execution for the duration of the request before evaluating to the
-fetched resource; or asynchronous in which the logic is specified to be
+fetched resource; or asynchronous, non-blocking in which some logic is specified to be
 applied to a response once it is available. Languages encourage our
-thinking to follow the terms that they easily support[@whorf56]. While
-there is some overlap, languages which promote concurrency though
-threading consider blocking in a single thread to be acceptable and will
-generally prefer the former mode whereas languages with first class
-functions are naturally conversant in callbacks and will prefer the
-latter. We should remember in programming that languages limit the
+thinking to follow the terms that they easily support[@whorf56]. Languages which promote concurrency though
+threading generally consider blocking in a single thread to be acceptable and will
+prefer the synchronous mode whereas languages with first class
+functions are naturally conversant in callbacks and will prefer asynchronous I/O.
+We should remember in programming that languages limit the
 patterns that we readily see [@rubylang] and that better mappings may be
 possible. This observation extends to graphical notations such as UML
 whose constructs strongly reflect the programming languages of the day.
@@ -50,18 +49,18 @@ composition. Every current web browser already implements such a schema;
 load any complex webpage -- essentially an aggregation of hypertext and
 other resources -- the HTML will be parsed and displayed incrementally
 while it is downloading and resources such as images are requested in
-parallel as soon as they are referenced. The images may themselves be
-presented incrementally in the case of progressive JPEGs or SVGs[^1].
+parallel as soon as they are referenced. in the case of progressive JPEGs or SVGs[^1] the images may themselves be
+presented incrementally.
 This incremental display is achieved through highly optimised software
 created for a single task, that of displaying web pages. The new
-contribution of this dissertation is to provide a generic analog
+contribution of this dissertation is to provide a generic analogue,
 applicable to any problem domain.
 
 How REST aggregation could be faster
 ------------------------------------
 
 ![**Sequence diagram showing the aggregation of low-level REST
-resources.** A client fetches an author's publication list and then
+resources by an intermediary.** A client fetches an author's publication list and then
 their first three articles. This sequence represents the most commonly
 used technique in which the client does not react to the response until
 it is complete. In this example the second wave of requests cannot be
@@ -76,7 +75,7 @@ process, I have introduced a lighter arrow notation representing
 fragments of an incremental response. Each request for an individual
 publication is made as soon as the its URL can be extracted from the
 publications list and once all required data has been read from the
-original response it is aborted rather than continue to download
+original response it is aborted rather than continuing to download
 unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
 
 Figures \ref{rest_timeline_1} and \ref{rest_timeline_2} comparatively
@@ -92,7 +91,7 @@ how the cadence of requests is more steady in Figure
 \ref{rest_timeline_2} with four connections opened at roughly equal
 intervals rather than a single request followed by a rapid burst of
 three. Both clients and servers routinely limit the number of
-simultaneous connections per peer so avoiding bursts of requests is
+simultaneous connections per peer so avoiding bursts is
 further to our advantage. [Appendix i](#appendix_http_limits) lists some
 actual limits.
 
@@ -100,22 +99,22 @@ Nodes in an n-tier architecture defy categorisation as 'client' or
 'server' in a way which is appropriate from all frames of reference. A
 node might be labeled as the 'server' from the layer below and 'client'
 from the layer above. Although the "client software" labels in the
-figures above hint at something running directly on a user's own device,
+figures \ref{rest_timeline_1} and \ref{rest_timeline_2} hint at something running directly on a user's own device,
 the same benefits apply if this layer is running remotely. If this layer
 were generating a web page on the server-side to be displayed by the
-client's browser, the perceptual speed improvements apply because of
+client's browser, the same perceptual speed improvements apply because of
 http chunked encoding [@perceptionHttpChunkedSpeed]. If this layer were
 a remote aggregation service, starting to write out the aggregated
-response early provides much the same benefits so long as the client is
-also able to interpret it progressively and, even if it were not, the
+response early provides much the same benefits for a client
+able to interpret it progressively and, even if it is not, the
 overall delivery remains faster.
 
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where a domain model contains data in a series with continuous ranges
-requestable via REST, I have often noticed a tradeoff in the client's
-design with regards to how much should be requested in each call.
+Where a domain model is requestable via REST and contains data in a series with continuous ranges
+I have often noticed a tradeoff in client
+design with regards to how much should be requested with each call.
 Because at any time it shows only a small window into a much larger
 model, the social networking site Twitter might be a good example. The
 Twitter interface designers adopted a popular interface pattern,
@@ -127,7 +126,7 @@ the page. Applied repeatedly the illusion of an infinitely long page in
 maintained, albeit punctuated with pauses whenever new content is
 loaded. For the programmers working on this presentation layer there is
 a tradeoff between sporadically requesting many tweets, yielding long,
-infrequent delays and frequently requesting a little, giving an
+infrequent delays and frequently requesting a few, giving an
 interface which stutters momentarily but often.
 
 I propose that progressive loading could render this tradeoff
@@ -138,7 +137,7 @@ individual tweets to the page as they are incrementally parsed out of
 the ongoing response. With a streaming transport, the time taken to
 receive the first tweet should not vary depending on the total number
 that are also being sent so there is no relationship between the size of
-the request made and the time taken to first update the interface.
+the request made and the time required to first update the interface.
 
 Staying fast on a fallible network
 ----------------------------------
@@ -149,7 +148,7 @@ existing http clients handle unexpected terminations suboptimally.
 Consider the everyday situation of a person using a smartphone browser
 to check their email. Mobile data coverage is often weak outside of
 major cities [@opensignal] so while travelling the signal will be lost
-and reestablished many times. The web developer's standard AJAX toolkit
+and reestablished many times. The web developer's standard toolkit
 is structured in a way that encourages early terminated connections to
 be considered as wholly unsuccessful rather than as partially
 successful. For example, the popular AJAX library jQuery automatically
@@ -164,7 +163,7 @@ the user checking her email, even if 90% of her inbox had been retrieved
 before her phone signal was lost, the web application will behave as if
 it received none and show her nothing. Later, when the network is
 available again the inbox will be downloaded from scratch, including the
-90% which previously delivered. I see much potential for improvement
+90% which has already been successfully delivered. I see much potential for improvement
 here.
 
 I propose moving away from this polarised view of
@@ -195,10 +194,10 @@ sub-system shouldn't pose a problem to the correct operation of the
 whole. In allowing a design to emerge organically it should be possible
 for the structure of resource formats to be realised slowly and
 iteratively while a greater understanding of the problem is gained.
-Unfortunately in practice the ability to change is hampered by tools
-which encourage programming against rigidly specified formats. If a
-program is allowed to be tightly coupled to a data format it will resist
-changes in the programs which produce data to that format. Working in
+Unfortunately in practice the ability to change often is hampered by tools
+which encourage programming against rigidly specified formats. When a
+data consumer is allowed to be tightly coupled to a data format it will resist
+changes to the programs which produce data in that format. Working in
 enterprise I have often seen the release of dozens of components
 cancelled because of a single unit that failed to meet acceptance
 criteria. By insisting on exact data formats, subsystems become tightly
@@ -208,7 +207,7 @@ the whole.
 
 An effective response to this problem would be to integrate into a REST
 clients the ability to use a response whilst being only loosely coupled
-to the *shape* of the message.
+to the overall *shape* of the message.
 
 Deliverables
 ------------
@@ -224,9 +223,11 @@ only solutions which interoperate with existing deployments. This is
 advantageous; to somebody looking to improve their system small
 enhancements are more inviting than wholesale change.
 
-To reify the vision above, a streaming client is the MVP. Because all
-network transmissions may be viewed though a streaming lens an
-explicitly streaming server is not required. Additionally, whilst http
+To reify the vision above a streaming client is the MVP. Although an explicitly streaming server would
+improve the situation further, because all
+network transmissions may be viewed though a streaming lens it
+is not required to start taking advantage of progressive REST.
+In the interest of creating something new, whilst http
 servers capable of streaming are quite common even if they are not
 always programmed as such, I have been unable to find any example of a
 streaming-receptive REST client.
@@ -234,17 +235,14 @@ streaming-receptive REST client.
 Criteria for success
 --------------------
 
-In evaluating this project, we may say it has been a success if
+In evaluating this project we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
 increase in the difficulty of programming the client. This improvement
 may be in terms of the absolute total time required to complete a
-representative task or in a user's perception of the speed in completing
+representative task or in a user's perception of the application responsiveness while performing
 the task. Because applications in the target domain are much more
-io-bound than CPU-bound, optimisation in terms of the execution time of
-a algorithms will be de-emphasised unless especially egregious. The
-measuring of speed will include a consideration of performance
-degradation due to connections which are terminated early.
-
+I/O-bound than CPU-bound, optimisation in terms of the execution time of
+a algorithms will be de-emphasised unless especially egregious.
 Additionally, I shall be considering how the semantics of a message are
 expanded as a system's design emerges and commenting on the value of
 loose coupling between data formats and the programs which act on them
