@@ -1174,27 +1174,23 @@ adoption for all but fringe uses.
 
 \section{Design and Reflection:}
 
-Using a combination of techniques from the previous chapter I propose
-that it is possible to combine the desirable properties from SAX and DOM
-parsers into a REST client library which allows streaming but is also
-convenient to program.
-
-By observing the flow of data streams through a SAX parser we can say
-that the REST workflow is more efficient if we do not wait until we have
-everything before we start using the parts that we do have. However, the
-SAX model presents poor developer ergonomics because it is not usually
-convenient to think on the level of abstraction that it presents: that
-of markup tokens. Using SAX, a programmer may only operate on a
-convenient abstraction after inferring it from a lengthy series of
-callbacks. In terms of ease of use, DOM is generally preferred because
-it provides the resource whole and in a convenient form. My design aims
-to duplicate this convenience and combine it with progressive
-interpretation by removing one restriction: that the node which is given
-is always the document root. From a hierarchical markup such as XML or
-JSON, when read in order, the sub-trees are fully known before we fully
-know their parent tree. We may select pertinent parts of a document and
-deliver them as fully-formed entities as soon as they are known, without
-waiting for the remainder of the document to arrive.
+The REST workflow is more efficient if we do not wait until we have
+everything before we start using the parts that we do have. The main
+tool to achieve this is the SAX parser whose model presents poor
+developer ergonomics because it is not usually convenient to think on
+the markup's level of abstraction. Using SAX, a programmer may only
+operate on a convenient abstraction after inferring it from a lengthy
+series of callbacks. In terms of ease of use, DOM is generally preferred
+because it provides the resource whole and in a convenient form. My
+design aims to duplicate this convenience and combine it with
+progressive interpretation by removing one restriction: that the node
+which is given is always the document root. From a hierarchical markup
+such as XML or JSON, when read in order, sub-trees are fully known
+before we fully know their parent tree. We may select pertinent parts of
+a document and deliver them as fully-formed entities as soon as they are
+known, without waiting for the remainder of the document to arrive. In
+this way I propose that it is possible to combine most of the desirable
+properties from SAX and DOM parsers into a new method.
 
 By my design, identifying the interesting parts of a document before it
 is complete involves turning the established model for drilling-down
@@ -1202,9 +1198,10 @@ inside-out. Under asynchronous I/O the programmer's callback
 traditionally receives the whole resource and then, inside the callback,
 locates the sub-parts that are required for a particular task. Inverting
 this process, I propose extracting the locating logic currently found
-inside the callback and using it to decide when the callback should be
-used. The callback will receive complete fragments from the response
-once they have been selected according to this logic.
+inside the callback, expressing as a selector language, and using it to
+declare the cases in which the callback should be notified. The callback
+will receive complete fragments from the response once they have been
+selected according to this declaration.
 
 I will be implementing using the Javascript language because it has good
 support for non-blocking I/O and covers both contexts where this project
@@ -1212,9 +1209,8 @@ will be most useful: in-browser programming and server programming.
 Focusing on the MVP, I will only be implementing the parsing of one
 mark-up language. Although this technique could be applied to any
 text-based, tree-shaped markup, I find that JSON best meets my goals
-because it is widely supported, easy to parse, and because it defines a
-single n-way tree, is amenable to selectors which span multiple format
-versions.
+because it is widely supported, easy to parse, and defines a single
+n-way tree, amenable to selectors which span multiple format versions.
 
 JSONPath is especially applicable to node selection as a document is
 read because it specifies only constraints on paths and `contains'
@@ -1228,10 +1224,10 @@ language is required because the existing JSONPath library is
 implemented only as a means to search through already gathered objects
 and is too narrow in applicability to be useful in our context.
 
-Not all of the JSONPath language is well suited when we consider we are
-selecting specifically inside a REST resource. Given this context it is
+If we consider we are selecting specifically inside a REST resource not
+all of the JSONPath language is well suited. Given this context it is
 likely that we will not be examining a full model but rather a subset
-that we requested and was assembled on our behalf according to the
+that we requested and was assembled on our behalf according to
 parameters that we supplied. We can expect to be interested in all of
 the content so search-style selections such as `books costing less than
 X' are less useful than queries which identify nodes because of their
@@ -1246,8 +1242,9 @@ tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
 of books might use branching to further select inside their callback. I
-anticipate that the selections will frequently involve types so it is
-useful to analyse the nature of type imposition with regards to JSON.
+anticipate that the selections will frequently be on high-level types so
+it is useful to analyse the nature of type imposition with regards to
+JSON.
 
 \subsection{Detecting types in JSON}
 
@@ -1262,7 +1259,7 @@ imposition of type is the responsibility of the observer rather than of
 the observed. The reader of a document is free to choose the taxonomy
 they will use to interpret it and this decision will vary depending on
 the purposes of the reader. The required specificity of taxonomy differs
-by the level of involvement in a field. Whereas `watch' may be a
+by the level of involvement in a field; whereas `watch' may be a
 reasonable type for most data consumers, to a horologist it is likely to
 be unsatisfactory without further sub-types. To serve disparate
 purposes, the JSONPath variant provided for node selection will have no
@@ -1271,8 +1268,10 @@ creating their own.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{<!--  XML leaves no doubt as to the labels we give to an Element's type.}
-\CommentTok{      Although we might further interpret, this is a 'person' -->}
+\CommentTok{<!--  }
+\CommentTok{  XML leaves no doubt as to the labels we give to an Element's type }
+\CommentTok{  type. Although we might further interpret, this is a 'person'}
+\CommentTok{-->}
 \KeywordTok{<person}\OtherTok{  name=}\StringTok{'...'}\OtherTok{ gender=}\StringTok{"male"}
 \OtherTok{         age=}\StringTok{"45"}\OtherTok{ height=}\StringTok{"175cm"}\OtherTok{ profession=}\StringTok{"architect"}\KeywordTok{>}
 \KeywordTok{</person>}
@@ -1281,10 +1280,11 @@ creating their own.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{/*    JSON meanwhile provides no built-in type concept. }
-\CommentTok{      This node's type might be 'thing', 'animal', 'human', 'male', 'man', }
-\CommentTok{      'architect', 'artist' or any other of many overlapping impositions }
-\CommentTok{      depending on our reason for examining this data */}
+\CommentTok{/* JSON meanwhile provides no built-in type concept. }
+\CommentTok{   This node's type might be 'thing', 'animal', 'human', 'male',}
+\CommentTok{   'man', 'architect', 'artist' or any other of many overlapping}
+\CommentTok{   impositions depending on our reason for examining this data}
+\CommentTok{*/}
 \NormalTok{\{  }\StringTok{"name"}\NormalTok{:}\StringTok{"..."}\NormalTok{, }\StringTok{"gender"}\NormalTok{:}\StringTok{"male"}\NormalTok{, }\StringTok{"age"}\NormalTok{:}\StringTok{"45"} 
    \StringTok{"height"}\NormalTok{:}\StringTok{"172cm"} \StringTok{"profession"}\NormalTok{:}\StringTok{"architect"}\NormalTok{>}
 \NormalTok{\}         }
@@ -1294,8 +1294,9 @@ creating their own.
 In the absence of node typing beyond categorisation as objects, arrays
 and various primitives, the key immediately mapping to an object is
 often taken as a loose marker of its type. In the below example we may
-impose the the type `address' prior to examining the contents because of
-the field name in the parent node.
+impose the the type `address' on two nodes prior to examining their
+contents because of the field name which maps to them from the parent
+node.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1316,7 +1317,7 @@ the field name in the parent node.
 \end{Highlighting}
 \end{Shaded}
 
-This means of imposing type is simply expressed in JSONPath. The
+This means of imposing type is simply expressed as JSONPath. The
 selector \texttt{address} would match all nodes whose parent maps to
 them via an address key.
 
@@ -1342,20 +1343,20 @@ which maps to the array.
 \end{Highlighting}
 \end{Shaded}
 
-In the above JSON, \texttt{addresses.*} would correctly identify the
-addresses. The pluralisation of field names such as `address' becoming
-`addresses' is common when marshaling from OO languages because the JSON
-keys are based on getters whose name typically reflects their
+In the above JSON, \texttt{addresses.*} would correctly identify three
+address nodes. The pluralisation of field names such as `address'
+becoming `addresses' is common when marshaling from OO languages because
+the JSON keys are based on getters whose name typically reflects their
 cardinality; \texttt{public Address getAddress()} or
 \texttt{public List\textless{}Address\textgreater{} getAddresses()}.
 This may pose a problem in some cases and it would be interesting in
 future to investigate a system such as Ruby on Rails that natively
 understands English pluralisation. I considered introducing unions as an
 easy way to cover this situation, allowing expressions resembling
-\texttt{address\textbar{}addresses.*} but decided that it is simpler if
-this problem is solves outside of the JSONPath language if the
-programmer registers two selection specifications against the same
-handler function.
+\texttt{address\textbar{}addresses.*} but decided that until I am sure
+of its usefulness it is simpler if this problem is solved outside of the
+JSONPath language by simply asking the programmer to register two
+selection specifications against the same handler function.
 
 In the below example types may not be easily inferred from ancestor
 keys.
@@ -1396,13 +1397,14 @@ QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
 what subset of duck-like behaviour you need (Martelli 2000)
 \end{quote}
 
-A `duck-definition' for the above JSON would be any object which has
-number, street, and town properties. We take an individualistic approach
-by deriving type from the node in itself rather than the situation in
-which it occurs. Because I find this selection technique simple and
-powerful I decided to add it to my JSONPath variant. As discussed in
-section \ref{jsonpathxpath}, JSONPath's syntax is designed to resemble
-the equivalent Javascript accessors, but Javascript has no syntax for a
+An address `duck-definition' for the above JSON would say that any
+object which has number, street, and town properties is an address.
+Applied to JSON, duck typing takes an individualistic approach by
+deriving type from the node in itself rather than the situaiton in which
+it is found. Because I find this selection technique simple and powerful
+I decided to add it to my JSONPath variant. As discussed in section
+\ref{jsonpathxpath}, JSONPath's syntax is designed to resemble the
+equivalent Javascript accessors but Javascript has no syntax for a
 value-free list of object keys. The closest available notation is for
 object literals so I created a duck-type syntax derived from this by
 omitting the values, quotation marks, and commas. The address type
@@ -1421,8 +1423,6 @@ sub-type applies neatly to JSON REST resources marshaled from an OO
 representation. In implementation, to conform to a duck-type a node must
 have all of the required fields but could also have any others.
 
-\emph{limitations: why must be last term}
-
 \subsection{Importing CSS4's explicit capturing to Oboe's JSONPath}
 
 JSONPath naturally expresses a `contained in' relationship using the dot
@@ -1431,9 +1431,9 @@ relationship. \emph{Cascading Style Sheets}, CSS, the web's styling
 language, has historically shared this restriction but a proposal for
 extended selectors which is currently at Editor's Draft stage (Etemad
 and Atkins 2013) introduces an elegant solution. Rather than add an
-explicit `containing' relationship, the draft observes that previously
-CSS has always selected the element conforming to the right-most of the
-selector terms, allowing only the deepest mentioned element to be
+explicit `containing' relationship, the draft observes that CSS has
+previously always selected the element conforming to the right-most of
+the selector terms, allowing only the deepest mentioned element to be
 styled. This restriction is lifted by allowing terms to be prefixed with
 \texttt{\$} in order to make them explicitly capturing; a selector
 without an explicit capturing term continues to work as before. The CSS
@@ -1442,19 +1442,19 @@ inputs inside important forms but
 \texttt{\$form.important input.mandatory} selects important forms with
 mandatory fields.
 
-The new css4 capturing technique will be adapted for Oboe JSONPath. By
+The new css4 capturing technique will be adapted for Oboe's JSONPath. By
 duplicating a syntax which the majority of web developers should become
 familiar with over the next few years I hope that Oboe's learning curve
 can be made a little more gradual. Taking on this feature, the selector
 \texttt{person.\$address.town} would identify an address node with a
-town child, or \texttt{\$people.\{name, dob\}} would provide the people
-array repeatedly whenever a new person is added to it. Javascript
-frameworks such as d3.js and Angular are designed to work with whole
-models as they change. Consequently, the interface they present
-converses more fluently with collections than individual entities. If we
-are downloading data to use with these libraries it is more convenient
-if we use explicit capturing so that we are notified whenever the
-collection is expanded and can pass it on.
+town child, or \texttt{\$people.\{name, dob\}} can be used to locate the
+same people array repeatedly whenever a new person is added to it.
+Javascript frameworks such as d3.js and Angular are designed to work
+with whole models as they change. Consequently, the interface they
+present converses more fluently with collections than individual
+entities. If we are downloading data to use with these libraries it is
+more convenient if we use explicit capturing so that we are notified
+whenever the collection is expanded and can pass it on.
 
 \subsection{Parsing the JSON response}
 
@@ -1482,7 +1482,7 @@ is a close enough equivalent to popular tools that it can be used as a
 direct drop-in replacement. Although used in this way no progressive
 loading would be enacted, when refactoring towards a goal the first step
 is often to create a new expression of the same logic (Martin 2008,
-212). By giving basic support for non-progressive downloading, the door
+212). By giving basic support for non-progressive downloading the door
 is open for apps to incrementally refactor towards a progressive
 expression. Allowing adoption as a series of small, easily manageable
 steps rather than a single leap is especially helpful for teams working
@@ -1495,7 +1495,7 @@ style for making an AJAX GET request is as follows:
 \begin{Highlighting}[]
 \OtherTok{jQuery}\NormalTok{.}\FunctionTok{ajax}\NormalTok{(}\StringTok{"resources/shortMessage.txt"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{done}\NormalTok{(}\KeywordTok{function}\NormalTok{( text ) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Got the text: "} \NormalTok{+ text ); }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Got the text: "}\NormalTok{, text ); }
    \NormalTok{\}).}
    \NormalTok{.}\FunctionTok{fail}\NormalTok{(}\KeywordTok{function}\NormalTok{() \{}
       \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"the request failed"} \NormalTok{);      }
@@ -1505,18 +1505,18 @@ style for making an AJAX GET request is as follows:
 
 While jQuery is callback-based and internally event driven, the public
 API it exposes does not wrap asynchronously retrieved content in event
-objects. Event type is expressed by the name of the method used to add
-the listener. These names, \texttt{done} and \texttt{fail}, follow
-generic phrasing and are common to every functionality that jQuery
-provides asynchronously. Promoting brevity, the methods are chainable so
-that several listeners may be added from one statement. Although
-Javascript supports exception throwing, a fail event is used. Exceptions
-are not applicable to non-blocking I/O because at the time of the
-failure the call which provoked the exception will have already been
-popped from the call stack.
+objects and event types are expressed by the name of the method used to
+add the listener. These names, \texttt{done} and \texttt{fail}, follow
+generic phrasing and are common to all asynchronous functionality that
+jQuery provides. Promoting brevity, the methods are chainable so that
+several listeners may be added from one statement. Although Javascript
+supports exception throwing, for asynchronous failures a fail event is
+used instead. Exceptions are not applicable to non-blocking I/O because
+at the time of the failure the call which provoked the exception will
+already have been popped from the call stack.
 
-\texttt{jQuery.ajax} is overloaded and the parameter may be an object,
-allowing more information to be given:
+\texttt{jQuery.ajax} is overloaded so that the parameter may be an
+object, allowing more detailed information to be given:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1527,13 +1527,13 @@ allowing more information to be given:
 \end{Highlighting}
 \end{Shaded}
 
-This pattern of passing arguments as an object literal is common in
+This pattern of passing arguments as object literals is common in
 Javascript for functions which take a large number of arguments,
 particularly if some are optional. This avoids having to pad unprovided
 optional arguments in the middle of the list with null values and,
-because the purpose of the values is apparent from the callee, also
-avoids an anti-pattern where a callsite can only be understood after
-counting the position of the arguments.
+because the use of the values is named from the callee, also avoids an
+anti-pattern where a callsite can only be understood after counting the
+position of the arguments.
 
 Taking on this style while extending it to cover events for progressive
 parsing, we arrive at the following Oboe public API:
@@ -1542,13 +1542,13 @@ parsing, we arrive at the following Oboe public API:
 \begin{Highlighting}[]
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/people.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"person.name"}\NormalTok{, }\KeywordTok{function}\NormalTok{(name, path, ancestors) \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"There is somebody called "} \NormalTok{+ name);   }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"There is somebody called "}\NormalTok{, name);   }
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{done}\NormalTok{( }\KeywordTok{function}\NormalTok{( wholeJson ) \{}
       \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"That is everyone!"}\NormalTok{);}
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{fail}\NormalTok{( }\KeywordTok{function}\NormalTok{() \{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Actually, the download failed. Please forget "} \NormalTok{+ }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Actually, the download failed. Please forget "}\NormalTok{, }
                   \StringTok{"the people I just told you about"}\NormalTok{);}
    \NormalTok{\});}
 \end{Highlighting}
@@ -1558,18 +1558,18 @@ In jQuery only one \texttt{done} handler is usually added to a request;
 the whole content is always given so there is only one thing to receive.
 Under Oboe there will usually be several separately selected areas of
 interest inside a JSON document so I anticipate that typically multiple
-handlers will be added. A shortcut style is provided for adding several
-selector/handler pairs at a time:
+node handlers will be added. Consequently, a shortcut style is provided
+for adding several selector-handler pairs at a time:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/people.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{node}\NormalTok{(\{  }
       \StringTok{"person.name"}\NormalTok{: }\KeywordTok{function}\NormalTok{(personName, path, ancestors) \{}
-         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Let me tell you about "} \NormalTok{+ name + }\StringTok{"..."}\NormalTok{);}
+         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Let me tell you about "}\NormalTok{, name, }\StringTok{"..."}\NormalTok{);}
       \NormalTok{\},}
       \StringTok{"person.address.town"}\NormalTok{: }\KeywordTok{function}\NormalTok{(townName, path, ancestors) \{}
-         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"they live in "} \NormalTok{+ townName);}
+         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"they live in "}\NormalTok{, townName);}
       \NormalTok{\}}
    \NormalTok{\});}
 \end{Highlighting}
@@ -1600,33 +1600,33 @@ important as their content. The \texttt{path} parameter provides the
 location as an array of strings plotting a descent from the JSON root to
 the found node. For example, Bolt has path
 \texttt{{[}'medalWinners', 'gold'{]}}. Similarly, the \texttt{ancestors}
-array is a list of the ancestors starting at the immediate parent of the
-found node and ending with the JSON root node. For all but the root
-node, which in any case has no ancestors, the nodes in the ancestor list
-will have been only partially parsed.
+array is a list of the ancestors starting with the JSON root node and
+ending at the immediate parent of the found node. For all but the root
+node, which in any case has no ancestors, the nodes given by the
+ancestor list will have been only partially parsed.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person, path) \{}
-   
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{+ }\StringTok{" won the "} \NormalTok{+ }\FunctionTok{lastOf}\NormalTok{(path) + }\StringTok{" medal "}
-         \NormalTok{+ }\StringTok{"with a time of "} \NormalTok{+ }\OtherTok{person}\NormalTok{.}\FunctionTok{time} \NormalTok{);}
+      \KeywordTok{let} \NormalTok{metal = }\FunctionTok{lastOf}\NormalTok{(path);}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\OtherTok{person}\NormalTok{.}\FunctionTok{name}\NormalTok{, }\StringTok{" won the "}\NormalTok{, metal, }
+        \StringTok{" medal with a time of "}\NormalTok{, }\OtherTok{person}\NormalTok{.}\FunctionTok{time} \NormalTok{);}
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
 Being loosely typed, Javascript would not enforce that ternary callbacks
 are used as selection handlers. Given that before a callback is made the
-application programmer must have provided a JSONPath selector for the
-locations in the document she is interested in, for most JSON formats
-the content alone is sufficient. The API design orders the callback
+application programmers must have provides a JSONPath selector for the
+locations in the document they are interested in, for most JSON formats
+the content alone will be sufficient. The API design orders the callback
 parameters so that in most common cases a unary or binary function can
 be given.
 
-Using Node.js the code style is more obviously event-based. Listeners
-are normally added using an \texttt{.on} method and the event name is a
-string given as the first argument. Adopting this style, my API design
+Under Node.js the code style is more obviously event-based. Listeners
+are normally added using an \texttt{.on} method where the event name is
+a string given as the first argument. Adopting this style, my API design
 for oboe.js also allows events to be added as:
 
 \begin{Shaded}
@@ -1634,46 +1634,55 @@ for oboe.js also allows events to be added as:
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"resources/someJson.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{on}\NormalTok{( }\StringTok{"node"}\NormalTok{, }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person) \{}
    
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Well done "} \NormalTok{+ }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{);}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{( }\StringTok{"Well done "}\NormalTok{, }\OtherTok{person}\NormalTok{.}\FunctionTok{name} \NormalTok{);}
    \NormalTok{\});}
 \end{Highlighting}
 \end{Shaded}
 
 While allowing both styles creates an API which is larger than it needs
 to be, creating a library which is targeted at both the client and
-server side is a ballance between self-consistency spanning environments
-and consistency \emph{with} the environment, I hope this will help
-adoption by either camp. The two styles are similar enough that a person
-familiar with one should be able to work with the other without
-difficulty. Implementating the duplicative parts of the API should
-require only a minimal degree of extra coding because they may be
-expressed in common using partial completion. Because \texttt{'!'} is
-the JSONPath for the root of the document, for some callback \texttt{c},
-\texttt{.done(c)} is a equal to \texttt{.node('!', c)}. Likewise,
-\texttt{.node} is easily expressible as a partial completion of
-\texttt{.on} with \texttt{'node'}. Below a thin interface layer may
-share a commonb implementation.
+server side is a balance between a consistent call syntax spanning
+environments and consistency with the environment. I hope that the dual
+interface will help adoption by either camp. The two styles are similar
+enough that a person familiar with one should be able to work with the
+other without difficulty. Implementating the duplicative parts of the
+API should require only a minimal degree of extra coding because they
+may be expressed in common using partial completion. Because
+\texttt{'!'} is the JSONPath for the root of the document, for some
+callback \texttt{c}, \texttt{.done(c)} is a equal to
+\texttt{.node('!', c)}. Likewise, \texttt{.node} is easily expressible
+as a partial completion of \texttt{.on} with \texttt{'node'}.
 
-\emph{API allows body to be given as Object and converts into JSON
-because it is anticipated that REST services which emmit JSON will also
-accept it}
+When making PUT, POST or PATCH requests the API allows the body to be
+given as an object and serialises it as JSON because it is anticipated
+that REST services which emit JSON will also accept it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPost}\NormalTok{(}\StringTok{"http://example.com/people"}\NormalTok{, \{}
+   \StringTok{"body"}\NormalTok{: \{}
+      \StringTok{"name"}\NormalTok{:}\StringTok{"Arnold"}\NormalTok{, }\StringTok{"location"}\NormalTok{:}\StringTok{"Sealands"}
+   \NormalTok{\}}
+\NormalTok{\});}
+\end{Highlighting}
+\end{Shaded}
 
 \subsection{Earlier callbacks when paths are found prior to nodes}
 
-Following with the project's aim of giving callbacks as early as
-possible, sometimes useful work can be done when a node is known to
-exist but before we have the contents of the node. This means that each
-node found in a JSON document can potentially trigger notifications at
-two points: when it is first addressed and when it is complete. The API
+Following the project's aim of giving callbacks as early as possible,
+sometimes useful work can be done when a node is known to exist but
+before we have the contents of the node. A design follows in which each
+node found in the JSON document can potentially trigger notifications at
+two stages: when it is first addressed and when it is complete. The API
 facilitates this by providing a \texttt{path} event following much the
-same pattern as \texttt{node}.
+same style as \texttt{node}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{oboe}\NormalTok{(}\StringTok{"events.json"}\NormalTok{)}
    \NormalTok{.}\FunctionTok{path}\NormalTok{( }\StringTok{"medalWinners"}\NormalTok{, }\KeywordTok{function}\NormalTok{() \{}
-      \CommentTok{// We don"t know the winners yet but we know we have some so let"s}
-      \CommentTok{// start drawing the table already:    }
+      \CommentTok{// We don"t know the winners yet but we know we have some }
+      \CommentTok{// so let's start drawing the table:    }
       \OtherTok{gui}\NormalTok{.}\FunctionTok{showMedalTable}\NormalTok{();}
    \NormalTok{\})}
    \NormalTok{.}\FunctionTok{node}\NormalTok{( }\StringTok{"medalWinners.*"}\NormalTok{, }\KeywordTok{function}\NormalTok{(person, path) \{    }
@@ -1687,7 +1696,7 @@ same pattern as \texttt{node}.
 \end{Highlighting}
 \end{Shaded}
 
-Implementing path notifications requires little extra code, requiring
+Implementing path notifications requires little extra code, only that
 JSONPath expressions can be evaluated when items are found in addition
 to when they are completed.
 
@@ -2358,6 +2367,9 @@ through a proxy. However, a more purist approach would not be any more
 useful because stubbing out the tokeniser functions before testing the
 compiler would be a considerable effort and I do not believe it would
 improve the rigor of the JSONPath specification.
+
+\emph{Restriction: duck types only as last item. Why. Not currently
+enforced in the compiler.}
 
 \section{Conclusion}
 
