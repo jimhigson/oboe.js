@@ -235,7 +235,7 @@ such failures but for the time being I decided that even given the
 micro-library limits, a slightly larger file is a worthwhile tradeoff
 for a safer build process
 
-Styles of Programming
+Styles of programming
 ---------------------
 
 Oboe does not follow any single paradigm and is written as a mix of
@@ -379,7 +379,7 @@ p.\pageref{lists.js}) implements various list functions: `cons`, `head`,
 `tail`, `map`, `foldR`, `all`, `without` as well as providing
 conversions to and from arrays.
 
-Oboe JSONPath Implementation
+Oboe JSONPath implementation
 ----------------------------
 
 On the first commit the JSONPath implementation was little more than a

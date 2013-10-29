@@ -490,7 +490,7 @@ with a present and known future version remains a valuable tool because
 it decouples service consumer and provider update schedules, removing
 the need for the client to march perfectly in sync with the service.
 
-Browser XML Http Request (XHR)
+Browser XML HTTP Request (XHR)
 ------------------------------
 
 Making http requests from Javascript, commonly termed AJAX, was so

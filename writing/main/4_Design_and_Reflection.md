@@ -269,7 +269,7 @@ with these libraries it is more convenient if we use explicit capturing
 so that we are notified whenever the collection is expanded and can pass
 it on.
 
-Parsing the JSON Response
+Parsing the JSON response
 -------------------------
 
 While SAX parsers provide an unappealing interface to application
@@ -584,7 +584,7 @@ request made for just the missed part; alternatively, if all the data is
 required for the actions to be valid, the application should take an optimistic 
 locking approach and perform a rollback.
 
-Oboe.js as a Micro-Library
+Oboe.js as a micro-library
 --------------------------
 
 Http traffic is often compressed using gzip so that it transfers more

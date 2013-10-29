@@ -1,8 +1,8 @@
 Conclusion
 ==========
 
-Differences in the programs written using Oboe.js
--------------------------------------------------
+Differences in programs written using Oboe.js
+---------------------------------------------
 
 A program written using Oboe.js will be subtly different from one
 written using more conventional libraries, even if the programmer means
@@ -310,7 +310,7 @@ it comes to about 4800 bytes; close to but comfortably under the 5120
 limit. At roughly the size as a small image the download footprint of
 Oboe should not discourage adoption.
 
-potential future work
+Potential future work
 ---------------------
 
 Although all network traffic can be viewed as a stream, the most obvious 
