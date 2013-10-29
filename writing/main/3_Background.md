@@ -252,17 +252,17 @@ gives different results depending on the order that fields are received.
 Common patterns for connecting to REST services
 -----------------------------------------------
 
-For languages such as Javascript or Clojure with a loosely-typed
+For languages such as Javascript or Clojure which use a loosely-typed
 representation of objects as generic key-value pairs, when a JSON REST
-resource is received, the output from the parser resembles the normal
+resource is received the output from the parser resembles the normal
 object types closely enough that it is acceptable to use it directly
-throughout the program. For XML this is not the case and some marshaling
+throughout the program. For XML this is not the case for any language and some marshaling
 is required. In more strongly typed OO languages such as Java or C\#,
-JSON's relatively freeform, classless objects are less convenient. For
-the example JSON from [the previous section](#jsonxml2) to be smoothly
-consumed, instantiating instances of a domain model Person class with
-methods such as `getName()` and `getTown()` would be preferable,
-representing the remote resource's objects no differently than if they
+JSON's classless, relatively freeform objects are less convenient. 
+To smoothly integrate
+the example JSON from the previous section, instances of a domain model Person class with
+methods such as `getName()` and `getLocation()` would have to be initialised,
+representing the remote objects no differently than if they
 had originated locally. Automatic marshaling generalises this process by
 providing a two-way mapping between the domain model and its
 serialisation, either completely automatically or based on a declarative
@@ -275,8 +275,8 @@ resources and the local domain model is to demarshal automatically only
 so far as *Data Transfer Objects* (DTOs). DTOs are instances of classes
 which implement no logic other than storage, and from these DTOs the
 domain model objects may be programmatically instantiated. DTOs are more
-necessary when using XML. For reading JSON resources we might say that
-the JSON objects *are* the DTOs.
+necessary when using XML. Reading resources encoded as JSON we might say that
+the JSON objects are already DTOs.
 
 The degree of marshaling that is used generally changes only the types
 of the entities that the REST client library hands over to the
