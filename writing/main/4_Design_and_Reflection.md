@@ -503,7 +503,7 @@ techniques to provide streaming over http encourage a dichotomous
 split of traffic as either stream or download. I find that this split is
 not necessary and that streaming may be used as the most effective means
 of downloading. Streaming services implemented using push pages or websockets are
-not REST. Under these frameworks a stream has a URL address but data
+not REST. Under these frameworks a stream has a URL address but the data
 in the stream is not addressable. This is similar to STREST, the *Service
 Trampled REST* anti-pattern [@strest], in which http URLs are viewed as
 locating endpoints for services rather than the actual resources.
@@ -511,18 +511,18 @@ Being unaddressable, the data in the stream is also
 uncacheable: an event which is streamed live cannot later, when it is
 historic, be retrieved from a cache which was populated by the stream.
 These frameworks use http as the underlying transport but I find they do
-not follow http's principled design. Because of these concerns, in the
+not follow http's principled design. Due to these concerns, in the
 browser I will only be supporting downloading using XHR.
 
 Although I am designing Oboe as a client for ordinary REST resources and not
 focusing on the library a means to receive live events, it is interesting
 to speculate if Oboe could be used as a REST-compatible
 bridge to unify live and static data. Consider a REST service which
-gives the results per-constituency for a UK general election. Requesting
-historic results, the data is delivered in JSON format much as usual.
+gives results per-constituency for a UK general elections. When requesting
+historic results the data is delivered in JSON format much as usual.
 Requesting the results for the current year on the night of the
 election, an incomplete JSON with the constituencies known so far would
-be immediately sent, followed by the remainder sent individually as the results are
+be immediately sent, followed by the remainder dispatched individually as the results are
 called. When all results are known the JSON would finally close leaving
 a complete resource. A few days later, somebody wishing to fetch the
 results would use the *same url for the historic data as was used on the
@@ -532,12 +532,13 @@ Because it eventually formed a complete http response, the data that was
 streamed is not incompatible with http caching and a cache which saw the
 data when it was live could store it as usual and later serve it as
 historic. More sophisticated intermediate caches sitting on the network between
-client and service recognise when
+client and service would recognise when
 a new request has the same url as an already ongoing request, serve
 the response received so far, and then continue by giving both inbound
 requests the content as it arrives from the already established outbound request.
 Hence, the resource would be cacheable even while the election results are
-streaming. An application developer programming with Oboe would not
+streaming and a service would only have to provide one stream to serve the same live data to
+multiple users fronted by the same cache. An application developer programming with Oboe would not
 have to handle live and historic data as separate cases because the node
 and path events they receive are the same. Without branching, the code which displays
 results as they are announced would automatically be able to show historic
@@ -546,8 +547,8 @@ data.
 Taking this idea one step further, Oboe might be used for infinite data
 which intentionally never completes. In principle this is not
 incompatible with http caching although more research would have to be
-done into how current caches handle requests which do not finish. A REST
-service which serves infinite resources would have to confirm that it is
+done into how well current caches handle requests which do not finish. A REST
+service which provides infinite resources would have to confirm that it is
 delivering to a streaming client, perhaps with a
 request header. Otherwise, if a non-streaming REST client were to
 use the service it would try to get 'all' of the data and never complete
@@ -563,12 +564,11 @@ until the document completes and then interpret the whole content as if
 it were streamed. Because nothing is done until the request is complete
 the callbacks will be fired later than on a more capable platform but
 will have the same content and be in the same order. By reverting to
-non-progressive AJAX on legacy platforms application authors will not
+non-progressive AJAX on legacy platforms, an application author will not
 have to write special cases and the performance should be no worse than
-with a traditional ajax library such as jQuery. On legacy browsers
-Oboe could not be used to receive live data because nothing can be read
-before the request finishes. In the election results example, no
-constituencies would be shown until they had all been called.
+with traditional AJAX libraries such as jQuery. On legacy browsers
+Oboe could not be used to receive live data -- in the election night example no
+constituencies could be shown until they had all been called.
 
 Node's standard http library provides a view of the response as a
 standard ReadableStream so there will be no problems programming to a
@@ -585,24 +585,24 @@ Handling transport failures
 Oboe cannot know the correct behaviour when a connection is lost so this
 decision is left to the containing application. Generally on request
 failure one of two behaviours are expected: if the actions performed in
-response to data so far remains valid in the
+response to data so far remain valid in the
 absence of a full transmission their effects will be kept and a new
 request made for just the missed part; alternatively, if all the data is
 required for the actions to be valid, the application should take an optimistic 
-locking approach and perform a rollback.
+locking approach and perform rollback.
 
 Oboe.js as a micro-library
 --------------------------
 
 Http traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
-Javascript. Measuring a library's download footprint it usually makes
+Javascript. WHen measuring a library's download footprint it usually makes
 more sense to compare post-compression. For the sake of adoption smaller
 is better because site creators are sensitive to the download size of
 their sites. Javascript micro-libraries are listed at
-[microjs.com](http://microjs.com), which includes this project, a
+[microjs.com](http://microjs.com), which includes this project. A
 library qualifies as being *micro* if it is delivered in 5kb or less,
-5120 bytes. Micro-libraries tend to follow the ethos that it is better
+5120 bytes but micro-libraries also tend to follow the ethos that it is better
 for an application developer to gather together several tiny libraries
 than find one with a one-size-fits-all approach, perhaps echoing the
 unix command line tradition for small programs which each do do exactly
@@ -611,5 +611,5 @@ micro-library a project should impose as few restrictions as possible on
 its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
-somewhat arbitrary, and keeping below this limit whilst writing readable
-code provides an interesting extra challenge.
+somewhat arbitrary, keeping below this limit whilst writing readable
+code should provide an interesting extra challenge.
