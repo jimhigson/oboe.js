@@ -511,9 +511,9 @@ any further transformation.
 ~~~~ {.javascript}
 {
    people: [
-      {name: 'James', townOrCity:'London'},
-      {name: 'Thomas', townOrCity:'Bristol'}
-      {townOrCity:'Cambridge', name: 'Sally'}
+      {name: 'John', townOrCity:'London'},
+      {name: 'Jack', townOrCity:'Bristol'}
+      {townOrCity:'Walter', name: 'Sally'}
    ]
 }
 ~~~~
@@ -533,7 +533,7 @@ quickly forgotten. When viewing a document through a streaming lens
 and interpreting while still incomplete it is easier to mistakenly
 react differently according to field order. If
 nodes from the example above were used when only the first field has arrived 
-Sally would find a different handling than James or Thomas. Because the
+Walter would find a different handling than John or Jack. Because the
 serialisation will contain items which are written to follow an
 indeterminate order it will be important to ensure that, despite the
 streaming, the REST client does not encourage programming in a way that
@@ -542,17 +542,17 @@ gives different results depending on the order that fields are received.
 Common patterns for connecting to REST services
 -----------------------------------------------
 
-For languages such as Javascript or Clojure with a loosely-typed
+For languages such as Javascript or Clojure which use a loosely-typed
 representation of objects as generic key-value pairs, when a JSON REST
-resource is received, the output from the parser resembles the normal
+resource is received the output from the parser resembles the normal
 object types closely enough that it is acceptable to use it directly
-throughout the program. For XML this is not the case and some marshaling
+throughout the program. For XML this is not the case for any language and some marshaling
 is required. In more strongly typed OO languages such as Java or C\#,
-JSON's relatively freeform, classless objects are less convenient. For
-the example JSON from [the previous section](#jsonxml2) to be smoothly
-consumed, instantiating instances of a domain model Person class with
-methods such as `getName()` and `getTown()` would be preferable,
-representing the remote resource's objects no differently than if they
+JSON's classless, relatively freeform objects are less convenient. 
+To smoothly integrate
+the example JSON from the previous section, instances of a domain model Person class with
+methods such as `getName()` and `getLocation()` would have to be initialised,
+representing the remote objects no differently than if they
 had originated locally. Automatic marshaling generalises this process by
 providing a two-way mapping between the domain model and its
 serialisation, either completely automatically or based on a declarative
@@ -565,20 +565,20 @@ resources and the local domain model is to demarshal automatically only
 so far as *Data Transfer Objects* (DTOs). DTOs are instances of classes
 which implement no logic other than storage, and from these DTOs the
 domain model objects may be programmatically instantiated. DTOs are more
-necessary when using XML. For reading JSON resources we might say that
-the JSON objects *are* the DTOs.
+necessary when using XML. Reading resources encoded as JSON we might say that
+the JSON objects are already DTOs.
 
 The degree of marshaling that is used generally changes only the types
 of the entities that the REST client library hands over to the
 application developer without affecting the overall structure of the
-message. Regardless of the exact types given, having received the
-response model the developer will usually start by addressing the
+message. Regardless of the exact types, having received the
+response model the developer will usually start by addressing in
 pertinent parts of the response by drilling down into the structures
-using assessor operators from the programming language itself.
+using the programming language itself.
 
 ~~~~ {.java}
-// Java example - programmatic approach to domain model interrogation 
-
+// Java example - programmatic approach to domain model 
+// interrogation
 // The methods used to drill down to desired components 
 // are all getters: getPeople, getName, and getTown.
  
@@ -593,7 +593,6 @@ void handleResponse( RestResponse response ) {
 ~~~~ {.javascript}
 // equivalent Javascript - the programming follows the same basic
 // process. This time using Javascript's dot operator.
-
 function handleResponse( response ){
 
    response.people.forEach( function( person ){
@@ -606,29 +605,29 @@ One weakness in this means of drilling down is that the code making the
 inspection is quite tightly coupled to the precise structure of the
 thing that it is inspecting. Taking the above example, if the resource
 being fetched were later refactored such that the town concept were
-refactored into a fuller address with a town-county-country tuple, the
+changed to a fuller address structure as a street-town-county-country tuple, the
 code addressing the structure would also have to change just to continue
 to do the same thing. Although this kind of drill-down programming is
 commonly practiced and not generally recognised as a code smell,
 requiring knock-on changes when an unrelated system is refactored seems
-to me as undesirable here as it would be anywhere else.
+to me as undesirable in relation to format structures as it would be anywhere else.
 
-In *the Red Queen's race* it took "all the running you can do, to keep
+In the *Red Queen's race* it took "all the running you can do, to keep
 in the same place". Ideally as a programmer I'd like to expend effort to
 make my code to do something new, or to perform something that it
-already did better, not so that it keeps the same. Following an object
+already did better, not to stay still. Following an object
 oriented encapsulation of data such that a caller does not have to
-concern themselves with the data structures behind an interface, the
+concern itself with the data structures behind an interface, the
 internal implementation may be changed without disruptions to the rest
-of the code base. However when the structure of the inter-object
+of the code base. However, when the structure of the inter-object
 composition is revised, isolation from the changes is less often
 recognised as a desirable trait. A method of programming which truly
 embraced extreme programming would allow structural refactoring to occur
-without disparate, parts having to be modified in parallel.
+without disparate parts having to be modified in parallel.
 
-Extraneous changes also dilute a VCS changelog, making it less easily to
+Extraneous changes also dilute a VCS changelog, making it less easy to
 later follow a narrative of code changes which are intrinsic to the
-difference in logic expressed by the program, and therefore harder to
+update in logic expressed by the program, and therefore harder to
 later understand the thinking behind the change and the reason for the
 change.
 
@@ -637,17 +636,16 @@ JsonPath and XPath selector languages
 
 \label{jsonpathxpath}
 
-The problem of drilling down to pertinent fragments of a message without
-tightly coupling to the format could be somewhat solved if instead of
+To address the problem of drilling down to pertinent fragments of a message without
+tightly coupling to the format, consider if instead of
 programmatically descending step-by-step, a language were used which
-allows the right amount of specificity regarding which parts to select.
-For markup languages there are associated query languages whose coupling
+allows the right amount of specificity to be given regarding which parts to select.
+Certain markup languages come with associated query languages whose coupling
 is loose enough that not every node that is descended through must be
 specified. The best known is XPATH but there is also JSONPath, a JSON
 equivalent [@jsonpath].
 
-As far as possible the JSONPath language follows the javascript to
-descend into the same sub-tree.
+As far as possible, JSONPath's syntax resembles the equivalent Javascript: 
 
 ~~~~ {.javascript}
 // in Javascript we can get the town of the second person as:
@@ -657,7 +655,8 @@ let town = subject.people[2].town
 let townSelector = "people[2].town"
 
 // We would be wise not to write overly-specific selectors.
-// JSONPath also provides an ancestor relationship not found in Javascript:
+// JSONPath also provides an ancestor relationship which is not found in 
+// Javascript:
 let betterTownSelector = "people[2]..town"
 ~~~~
 
@@ -673,8 +672,8 @@ Consider the resource below:
 }
 ~~~~
 
-The JSONPath `people.*..town` against the above JSON format would
-continue to select correctly after a refactor to the JSON below:
+The JSONPath `people.*..town` may be applied against the above JSON and would
+continue to select correctly after a refactor to the version below:
 
 ~~~~ {.javascript}
 {
@@ -703,10 +702,10 @@ distinct lists of child nodes, attribute children and node list
 children; from one perspective attributes are child nodes of their
 parent element but they can alternatively be considered as data stored
 in the element. Because of this classification ambiguity an XML document
-doesn't form a single, correct n-way tree. Because of the difference in
-expressivity between attributes which may only be strings and child
-nodes which allow recursive structure, this is a common refactor when a
-more detailed mapping is required and a scalar value is upgraded to be
+doesn't have a singly correct n-way tree. XML attributes
+may only contain strings and have a lesser expressivity than child
+nodes which allow recursive structure; it is a common refactor to change from attributes to elements when a
+scalar value is upgraded to be a
 compound. XPath selectors written in the most natural way do not track
 this change.
 
@@ -716,8 +715,8 @@ this change.
 </people>
 ~~~~
 
-The XPath `//person@town` matches the XML above but because of the
-refactor from attribute to child element fails to match the revised
+The XPath `//person@town` matches against the XML above but because of the
+switch from attribute to child element fails to match given the revised
 version below.
 
 ~~~~ {.xml}
@@ -733,7 +732,7 @@ version below.
 </people>
 ~~~~
 
-Reflecting its dual purpose for marking up for documents or data, XML
+Reflecting its dual purpose for marking up documents or data, XML
 also invites ambiguous interpretation of the whitespace between tags.
 Whitespace is usually meaningful for documents but ignorable for data.
 Strictly, whitespace text nodes are a part of the document but in
@@ -741,21 +740,21 @@ practice many tree walkers discard them as insignificant. In the XML
 above the `<person>` element may be enumerated as either the first or
 second child of `<people>` depending on whether the whitespace before it
 is considered. Likewise, the text inside `<name>` might be `'John'` or
-`'(newline)(tab)(tab)John'`. Inherited from JSON's programming language
+`'(newline)(tab)(tab)John'`. Inheriting from JSON's programming language
 ancestry, the space between tokens is never significant.
 
-Programming against a changing service is always going to be a moving
-target, but it is easier to miss with XPATH than with JSON. In JSON each
-nodes has only one, unambiguous set of children so the metamodel does
-not present the format author with a selection from logical equivalents
-that are addressed through different mechanisms. If a scalar value is
+Programming against a changing service is always going to present a moving
+target but it is easier to miss with XPATH than with JSON. In JSON each
+node has only one, unambiguous set of children so the metamodel does
+not give format authors a choice of logically equivalent features
+that must be addressed through different mechanisms. If a scalar value is
 updated to a compound only the node itself changes, the addressing of
 the node is unaffected.
 
 Generally in descriptive hierarchical data there is a trend for
 ancestorship to denote the same relationship between concepts regardless
 of the number of intermediate generations. In the example above, `town`
-transitioned from child to grandchild of `person` without disturbing the
+transitioned from a child to grandchild of `person` without disturbing the
 implicit 'lives in' relationship. In JSONPath the `..` operator provides
 matching through zero or more generations, unperturbed when extra levels
 are added. Of course, this trend will not hold for every conceivable way
@@ -764,25 +763,26 @@ intermediate node on the path from ancestor to descendant will change
 the nature of the expressed relationship. A slightly contrived example
 might be if we expanded our model to contain fuzzy knowledge:
 
-~~~~ {.xml}
-<people>
-   <person>
-      <name>
-         <isProbably>Bob</isProbably>
-      </name>
-   </person>
-</people>
+~~~~ {.javascript}
+{
+   "people": [
+      {  
+         "name":     {"isProbably":"Bob"},
+         "location": {"isNearTo":"Birmingham"}
+      }
+   ]   
+}
 ~~~~
 
 Considering the general case, it will not be possible to track all
 possible service refactors safely. By necessity a resource consumer
-should limit their ambitions to tracking ontology additions which do not
-change the meaning of the existing concepts. In practice integration
+should limit their ambitions to tracking ontology expansions which do not
+alter the existing concepts. In practice integration
 testing against the beta version of a service will be necessary to be
 pre-warned of upcoming, incompatible changes. If an incompatibility is
 found the ability to then create an expression which is compatible with
 with a present and known future version remains a valuable tool because
-it decouples service consumer and provider update schedules, removing
+it decouples the consumer and provider update schedules, removing
 the need for the client to march perfectly in sync with the service.
 
 Browser XML HTTP Request (XHR)
@@ -794,8 +794,7 @@ sometimes used synonymously with Javascript-rich web applications.
 Although AJAX is an acronym for **A**synchronous **J**avascript
 (**a**nd) **X**ML, this reflects the early millennial enthusiasm for XML
 as the one true data format and in practice any textual format may be
-transferred. Today JSON is generally preferred, especially for delivery
-to client-side web applications. During the 'browser war' years web
+transferred. During the 'browser war' years web
 browsers competed by adding non-standard features; Internet Explorer
 made AJAX possible in 2000 by exposing Microsoft's Active X *Xml Http
 Request* (XHR) class to the Javascript sandbox. This was widely copied
@@ -817,12 +816,13 @@ Prototype.js libraries promoting themselves as *"do more, write less"*
 and *"elegant APIs around the clumsy interfaces of Ajax"*. Written
 against the unadorned browser, Javascript applications read as a maze of
 platform-detection and special cases. Once applications were built using
-Javascript abstractions over the underlying browser differences, they
+abstractions over the underlying browser differences they
 could be written purposefully and were able to express more complex
 ideas without becoming incomprehensible.
 
-JSON is today the main format output by REST end points when requesting
-via AJAX. Javascript programmers occupy a privileged position whereby
+Today JSON is generally the preferred format, especially for REST endpoints
+designed for delivery
+to client-side web applications. Javascript programmers occupy a privileged position whereby
 their serialisation format maps exactly onto the inbuilt types of their
 programming language. As such there is never any confusion regarding
 which object structure to de-serialise to. Should this advantage seem
@@ -832,7 +832,7 @@ JSON's Object better resembles Java's Map interface than Java Objects,
 creating linguistic difficulties, and the confusion between JSON null,
 Java null, and Jackson's NullNode[^3_Background1] is a common cause of errors.
 Emboldened by certainty regarding deserialisation, AJAX libraries
-directly integrated JSON parsers, providing a call style for working
+directly integrate JSON parsers, providing a call style for working
 with remote resources so streamlined as to require hardly any additional
 effort.
 
@@ -854,10 +854,10 @@ XHRs and streaming
 
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
-lowest common denominator of the available browser abilities. At the
-time that the call style above was developed the most popular browser
-gave no means of access to partial responses. Inevitably, it draws a
-conceptualisation of the response as a one-time event with no
+lowest common denominator of available browser abilities. When the jQuery
+call style above was developed the most popular browser
+gave no access to in-progress responses so inevitably a
+conceptualisation was drawn of the response as a one-time event with no
 accommodation offered for progressively delivered data.
 
 The followup standard, XHR2 is now at Working Draft stage. Given
@@ -886,25 +886,25 @@ Browser streaming frameworks
 
 The web's remit is increasingly widening to encompass scenarios which
 would have previously been the domain of native applications. In order
-to use live data many current webapps employ frameworks which push soft
-real-time events to the client side. In comparison to the XHR2 progress
-event, this form of streaming has a different but overlapping purpose.
+to use live data many current webapps employ frameworks which push soft-real-time
+events to the client side. This form of streaming has a different but overlapping purpose
+from the XHR2 progress event.
 Whereas XHR2 enables downloads to be viewed as short-lived streams but
 does not otherwise disrupt the sequence of http's request-response
 model, streaming frameworks facilitate an entirely different sequence,
 that of perpetual data. Consider a webmail interface; initially the
 user's inbox is downloaded via REST and a streaming download might be
-used to speed its display. Regardless of if the response is interpreted
-progressively, this inbox download is a standard REST call and shares
-little in common with the push events which follow to provide instant
+used to make its display more responsive. Regardless, the inbox download is 
+a standard REST call and shares
+little in common with the push events which follow and provide instant
 notification as new messages arrive.
 
 **Push tables** sidestep the browser's absent data streaming abilities
-by leaning on a resource that it can stream: progressive html. From the
-client a page containing a table is hidden in an off-screen iframe. This
-table is served from a a page that never completes, fed by a connection
+by leaning on a resource that it can stream: progressive html. On the
+client a page containing a table is hidden in an off-screen iframe. The frame's content
+is served as an HTML page containing a table that never completes, fed by a connection
 that never closes. When the server wishes to push a message to the
-client it writes a new row in this table which is then noticed by
+client it writes a new row to the table which is then noticed by
 Javascript monitoring the iframe on the client. More recently,
 **Websockets** is a new standard that builds a standardised streaming
 transport on top of http's chunked mode. Websockets requires browser
@@ -915,34 +915,35 @@ patchy support means it cannot be used without a suitable fallback.
 These frameworks do not interoperate at all with REST. Because the
 resources they serve never complete they may not be read by a standard
 REST client. Unlike REST they also are not amenable to standard http
-mechanics such as caching. A server which writes to an esoteric format
+mechanisms such as caching. A server which writes to an esoteric format
 requiring a specific, known, specialised client also feels quite
 anti-REST, especially when we consider that the format design reflects
 the nature of the transport more so than the resource. This form of
 streaming is not, however, entirely alien to a SOA mindset. The data
 formats, while not designed primarily for human readability are
-nontheless text based and a person may take a peek inside the system's
-plumbing simply by observing the traffic at a particular URL. In the
-case of push-tables, an actual table of the event's properties may be
+nonetheless text based and a person may take a peek inside the system's
+plumbing simply by observing the traffic at a particular URL. For
+push tables, because the transport is based on a presentation format,
+an actual table of the event's properties may be
 viewed from a browser as the messages are streamed.
 
 Parsing: SAX and Dom
 --------------------
 
 From the XML world two standard parser types exist, SAX and DOM, with
-DOM by far the more popular. Although the terms originate in XML, both
+DOM by far the more popular. Both
 styles of parsers are also available for JSON. DOM performs a parse as a
-single evaluation and returns a single object model representing the
+single evaluation and returns an object model representing the
 whole of the document. Conversely, SAX parsers are probably better
-considered as tokenisers, providing a very low-level event driven
+considered as enhanced tokenisers, providing a very low-level event driven
 interface following the Observer pattern that notifies the programmer of
-each token separately as it is found. From DOM's level of abstraction
+each token separately as it is found. Working with DOM's level of abstraction
 the markup syntax is a distant concern whereas for SAX each element's
-opening and closing tag is noted so the developer may not put the data's
-serialisation aside. SAX has the advantages that it may read a document
+opening and closing is noted so the developer may not put the data's
+serialisation aside. SAX comes with the advantages that it may read a document
 progressively and has lower memory requirements because it does not
 store the parsed tree. Correspondingly, it it popular for embedded
-systems on limited hardware which need to handle documents larger than
+systems running on constrained hardware which need to handle documents larger than
 the available RAM.
 
 Suppose we have some json representing people and want to extract the
@@ -953,14 +954,13 @@ succinctly:
 function nameOfFirstPerson( myJsonString ) {
 
    // All recent browsers provide JSON.parse as standard. 
-
    var document = JSON.parse( myJsonString );
    return document.people[0].name; // that was easy!
 }
 ~~~~
 
-To contrast, the equivalent below uses SAX, expressed in the most
-natural way for the technology. [^3_Background2]
+To contrast, the equivalent below uses the Javascript Clarinet SAX parser, expressed in the most
+natural way for the technology[^3_Background2].
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
@@ -969,8 +969,8 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
    var clarinet = clarinet.parser(),
    
        // With a SAX parser it is the developer's responsibility 
-       // to track where in the document the cursor currently is,
-       // Several variables are used to maintain this state.        
+       // to track where in the document the cursor currently is.
+       // Several variables are required to maintain this state.        
        inPeopleArray = false,   
        inPersonObject = false,
        inNameAttribute = false,
@@ -997,7 +997,7 @@ function nameOfFirstPerson( myJsonString, callbackFunction ){
    };   
       
    clarinet.onkey = function(key){
-      inNameAttribute = ( inPeopleObject && key == 'name');
+      inNameAttribute = (inPeopleObject && key == 'name');
    };
 
    clarinet.onvalue = function(value){
@@ -1019,7 +1019,7 @@ maintaining state regarding the current position in the document and the
 nodes that have previously been seen onto the programmer. This
 maintenance of state tends to programmed once per usage rather than
 assembled as the composition of reusable parts. I find the order of the
-code under SAX quite unintuitive; event handlers cover multiple
+code under SAX also quite unintuitive; event handlers cover multiple
 unrelated cases and each concern spans multiple handlers. This lends to
 a style of programming in which separate concerns do not find separate
 expression in the code. It is also notable that, unlike DOM, as the
