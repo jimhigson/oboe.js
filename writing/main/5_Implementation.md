@@ -314,8 +314,8 @@ content builder. When the callback adaptors receive these events they
 have the information required to test registered patterns for matches
 and notify application callbacks if required.
 
-![List representation of an ascent rising from leaf to root through a
-JSON tree. Note the special ROOT value which represents the location of
+![**List representation of an ascent rising from leaf to root through a
+JSON tree.** Note the special ROOT value which represents the location of
 the pathless root node. The ROOT value is an object, taking advantage of
 object uniqueness to ensure that its location is unequal to all others.
 \label{ascent}](images/ascent.png)

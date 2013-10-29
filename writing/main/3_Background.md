@@ -97,8 +97,8 @@ Following Node's lead, traditionally thread-based environments are
 beginning to embrace asynchronous, single-threaded servers. The Netty
 project can be though of as roughly the Java equivalent of Node.
 
-![*Single-threaded vs multi-threaded scheduling for a http
-aggregator*](images/placeholder.png)
+![**Single-threaded vs multi-threaded scheduling for a http
+aggregator**](images/placeholder.png)
 
 Node builds on a model of event-based, asynchronous i/o that was
 established by Javascript execution in web browsers. Although Javascript
