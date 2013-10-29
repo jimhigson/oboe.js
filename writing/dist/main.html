@@ -78,31 +78,31 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#conclusion"><span class="toc-section-number">6</span> Conclusion</a><ul>
 <li><a href="#differences-in-the-programs-written-using-oboe.js"><span class="toc-section-number">6.1</span> Differences in the programs written using Oboe.js</a></li>
 <li><a href="#benchmarking-vs-non-progressive-rest"><span class="toc-section-number">6.2</span> Benchmarking vs non-progressive REST</a></li>
-<li><a href="#comparative-programmer-ergonomics"><span class="toc-section-number">6.3</span> Comparative Programmer Ergonomics</a></li>
-<li><a href="#performance-of-code-styles-under-various-engines"><span class="toc-section-number">6.4</span> Performance of code styles under various engines</a></li>
+<li><a href="#comparative-developer-ergonomics"><span class="toc-section-number">6.3</span> Comparative developer ergonomics</a></li>
+<li><a href="#performance-under-various-javascript-engines"><span class="toc-section-number">6.4</span> Performance under various Javascript engines</a></li>
 <li><a href="#status-as-a-micro-library"><span class="toc-section-number">6.5</span> Status as a micro-library</a></li>
 <li><a href="#potential-future-work"><span class="toc-section-number">6.6</span> potential future work</a></li>
 </ul></li>
 <li><a href="#appendix_http_limits"><span class="toc-section-number">7</span> Appendix i: Limits to number of simultaneous connections under various http clients</a></li>
 <li><a href="#appendix-ii-oboe.js-source-code-listing"><span class="toc-section-number">8</span> Appendix ii: Oboe.js source code listing</a><ul>
-<li><a href="#clarinetlisteneradaptor.js"><span class="toc-section-number">8.1</span> clarinetListenerAdaptor.js</a></li>
-<li><a href="#events.js"><span class="toc-section-number">8.2</span> events.js</a></li>
-<li><a href="#functional.js"><span class="toc-section-number">8.3</span> functional.js</a></li>
-<li><a href="#incrementalcontentbuilder.js"><span class="toc-section-number">8.4</span> incrementalContentBuilder.js</a></li>
-<li><a href="#instancecontroller.js"><span class="toc-section-number">8.5</span> instanceController.js</a></li>
-<li><a href="#jsonpath.js"><span class="toc-section-number">8.6</span> jsonPath.js</a></li>
-<li><a href="#jsonpathsyntax.js"><span class="toc-section-number">8.7</span> jsonPathSyntax.js</a></li>
-<li><a href="#lists.js"><span class="toc-section-number">8.8</span> lists.js</a></li>
-<li><a href="#pubsub.js"><span class="toc-section-number">8.9</span> pubSub.js</a></li>
-<li><a href="#publicapi.js"><span class="toc-section-number">8.10</span> publicApi.js</a></li>
-<li><a href="#streaminghttp-browser.js"><span class="toc-section-number">8.11</span> streamingHttp-browser.js</a></li>
-<li><a href="#streaminghttp-node.js"><span class="toc-section-number">8.12</span> streamingHttp-node.js</a></li>
-<li><a href="#util.js"><span class="toc-section-number">8.13</span> util.js</a></li>
-<li><a href="#wire.js"><span class="toc-section-number">8.14</span> wire.js</a></li>
+<li><a href="#header_clarinetListenerAdaptor"><span class="toc-section-number">8.1</span> clarinetListenerAdaptor.js</a></li>
+<li><a href="#header_events"><span class="toc-section-number">8.2</span> events.js</a></li>
+<li><a href="#header_functional"><span class="toc-section-number">8.3</span> functional.js</a></li>
+<li><a href="#header_incrementalContentBuilder"><span class="toc-section-number">8.4</span> incrementalContentBuilder.js</a></li>
+<li><a href="#header_instanceController"><span class="toc-section-number">8.5</span> instanceController.js</a></li>
+<li><a href="#header_jsonPath"><span class="toc-section-number">8.6</span> jsonPath.js</a></li>
+<li><a href="#header_jsonPathSyntax"><span class="toc-section-number">8.7</span> jsonPathSyntax.js</a></li>
+<li><a href="#header_lists"><span class="toc-section-number">8.8</span> lists.js</a></li>
+<li><a href="#header_pubSub"><span class="toc-section-number">8.9</span> pubSub.js</a></li>
+<li><a href="#header_publicApi"><span class="toc-section-number">8.10</span> publicApi.js</a></li>
+<li><a href="#header_streamingHttp-browser"><span class="toc-section-number">8.11</span> streamingHttp-browser.js</a></li>
+<li><a href="#header_streamingHttp-node"><span class="toc-section-number">8.12</span> streamingHttp-node.js</a></li>
+<li><a href="#header_util"><span class="toc-section-number">8.13</span> util.js</a></li>
+<li><a href="#header_wire"><span class="toc-section-number">8.14</span> wire.js</a></li>
 </ul></li>
 <li><a href="#appendix-iii-benchmarking"><span class="toc-section-number">9</span> Appendix iii: Benchmarking</a><ul>
-<li><a href="#benchmarkclient.js"><span class="toc-section-number">9.1</span> benchmarkClient.js</a></li>
-<li><a href="#benchmarkserver.js"><span class="toc-section-number">9.2</span> benchmarkServer.js</a></li>
+<li><a href="#header_benchmarkClient"><span class="toc-section-number">9.1</span> benchmarkClient.js</a></li>
+<li><a href="#header_benchmarkServer"><span class="toc-section-number">9.2</span> benchmarkServer.js</a></li>
 </ul></li>
 <li><a href="#bibliography"><span class="toc-section-number">10</span> Bibliography</a></li>
 </ul>
@@ -689,15 +689,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
          )
    ), [<span class="st">&#39;height&#39;</span>, <span class="st">&#39;tShirtSize&#39;</span>])
 )      </code></pre>
-<p>Since I am using a side-effect free subset of Javascript for pattern matching it would be safe to use a functional cache. As well as saving time by avoiding repeated execution this could potentially also save memory because where two JSONPath strings contain a common left side they could share the inner part of their functional expression. Given the patterns <code>!.animals.mammals.human</code> and <code>!.animals.mammals.cats</code>, the JSONPath engine will currently create two identical evaluators for <code>!.animals.mammals</code>. Although Javascript doesn't come with functional caching, it can be added using the language itself, probably the best known example being <code>memoize</code> from Underscore.js. I suspect, however, that hashing the cache parameters might be slower than performing the matching. Although the parameters are all immutable and could in theory be hashed by object identity, in practice there is no way to access an object id from inside the language so any hash of a node parsed out of JSON would have to walk the entire subtree rooted from that node.</p>
-<p>Functions describing the tokenisation of the JSONPath language are split out to their own source file and tested independently of the compilation. Regular expressions are used because they are the simplest form able to express the clause patterns. Each regular expressions starts with <code>^</code> so that they only match at the head of the string, the 'y' flag would be a more elegant alternative but as of now this lacks wider browser support<sup><a href="#fn8" class="footnoteRef" id="fnref8">8</a></sup>. By verifying the tokenisation functions through their own tests it is simpler to create thorough specification because the tests may focus on the tokenisation more clearly without having to observe its results though another layer. For JSONPath matching we might consider the unit test layer of the test pyramid (figure  p.) is split further into two sub-layers. Arguably, the upper of these sub-layers is not a unit test because it is verifying more than one unit, the tokeniser and the compiler, and there is some redundancy since the tokenisation is tested both independently and through a proxy. However, a more purist approach would not be any more useful because stubbing out the tokeniser functions before testing the compiler would be a considerable effort and I do not believe it would improve the rigor of the JSONPath specification.</p>
+<p>Since I am using a side-effect free subset of Javascript for pattern matching it would be safe to use a functional cache. As well as saving time by avoiding repeated execution this could potentially also save memory because where two JSONPath strings contain a common left side they could share the inner part of their functional expression. Given the patterns <code>!.animals.mammals.human</code> and <code>!.animals.mammals.cats</code>, the JSONPath engine will currently create two identical evaluators for <code>!.animals.mammals</code>. Likewise, while evaluating of a pattern that requires matches at multiple depths in the JSON hierarchy against sibling elements, the same JSONPath evaluator term could be tested against the parent element many times, always with the same result. Although Javascript doesn't come with functional caching, it can be added using the language itself, probably the best known example being <code>memoize</code> from Underscore.js. I suspect, however, that hashing the cache parameters might be slower than performing the matching. Although the parameters are all immutable and could in theory be hashed by object identity, in practice there is no way to access an object id from inside the language so any hash of a node parsed out of JSON would have to walk the entire subtree rooted from that node. Current Javascript implementations also make it difficult to manage caches in general from inside the language because there is no way to occupy only spare memory. Weak references are proposed in ECMAScript 6 but currently only experimentally supported<sup><a href="#fn8" class="footnoteRef" id="fnref8">8</a></sup>. If the hashing problem were solved, for adding functional caching in future the WeakHashMap would be ideal.</p>
+<p>Functions describing the tokenisation of the JSONPath language are split out to their own source file and tested independently of the compilation. Regular expressions are used because they are the simplest form able to express the clause patterns. Each regular expressions starts with <code>^</code> so that they only match at the head of the string, the 'y' flag would be a more elegant alternative but as of now this lacks wider browser support<sup><a href="#fn9" class="footnoteRef" id="fnref9">9</a></sup>. By verifying the tokenisation functions through their own tests it is simpler to create thorough specification because the tests may focus on the tokenisation more clearly without having to observe its results though another layer. For JSONPath matching we might consider the unit test layer of the test pyramid (figure  p.) is split further into two sub-layers. Arguably, the upper of these sub-layers is not a unit test because it is verifying more than one unit, the tokeniser and the compiler, and there is some redundancy since the tokenisation is tested both independently and through a proxy. However, a more purist approach would not be any more useful because stubbing out the tokeniser functions before testing the compiler would be a considerable effort and I do not believe it would improve the rigor of the JSONPath specification.</p>
 </div>
 </div>
 <div id="conclusion" class="section level1">
 <h1><a href="#conclusion"><span class="header-section-number">6</span> Conclusion</a></h1>
 <div id="differences-in-the-programs-written-using-oboe.js" class="section level2">
 <h2><a href="#differences-in-the-programs-written-using-oboe.js"><span class="header-section-number">6.1</span> Differences in the programs written using Oboe.js</a></h2>
-<p>I find it quite interesting that a program written using Oboe.js in the most natural way will be subtly different from one written using JSON.parse, even if the programmer is trying to express the same thing. Consider the two examples below which use Node.js to read from a local file and write to the console.</p>
+<p>A program written using Oboe.js will be subtly different from one written using more conventional libraries, even if the programmer means to express the same thing. Consider the two examples below which use Node.js to read a local JSON file and write to the console.</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">oboe</span>( <span class="ot">fs</span>.<span class="fu">createReadStream</span>( <span class="st">&#39;/home/me/secretPlans.json&#39;</span> ) )
    .<span class="fu">on</span>(<span class="st">&#39;node&#39;</span>, {
       <span class="st">&#39;schemes.*&#39;</span>: <span class="kw">function</span>(scheme){
@@ -729,22 +729,17 @@ code > span.er { color: #ff0000; font-weight: bold; }
       
    <span class="ot">console</span>.<span class="fu">log</span>(<span class="st">&quot;*twiddles mustache*&quot;</span>);   
 });</code></pre>
-<p>The first observation is that the explicit looping in the second example requires roughly the same amount of code as the pattern registration that serves as an analogue in the first. The first example has a more declarative style whereas the second is more imperative. If two levels of selection were required, such as <code>schemes.*.premise</code>, other than a longer JSONPath pattern the first example would not grow in complexity whereas the second would require an additional loop inside the existing loop. We can say that the complexity of programming using Oboe stays roughly constant whereas in a more traditional style it grows linearly with the number of levels which must be traversed.</p>
-<p>While the intended behaviours are very similar, the unintended accidental side-behaviours differ between the two examples. In the first the order of the output for schemes and plans will match the order in the JSON, whereas for the second scheming is always done before plotting. In the second example the order could be easily changed by reversing the statements whereas in the first to change the order would require a change in the order of the JSON. Whether the programmer has been liberated to ignore order or restricted to be unable to easily change it probably depends on the situation. The error behaviours are also different. The first example will print until it has an error. The second will print if there are no errors.</p>
-<p>In the second example it is most natural to check for errors before output whereas in the first it feels most natural to register an error listener as the last of the chained calls. I prefer the source order in the first because the the normal case is listed before the abnormal one emphasises their roles as main and secondary behaviours.</p>
-<p>Finally, the timings of the printing will be different. The first code prints the first output in constant time regardless of the size of the file and then outputs many lines individually as the JSON is read. The second will print all output at once after a time proportional to the size of the input.</p>
+<p>While the primary behaviours are similar, some accidental side-behaviours differ between the two examples. It is likely the programmer would not consider these differences as they write. In the first example,the order of the output for schemes and plans will match the order in the JSON, whereas for the second scheming is always done before plotting. In the second example the order could be easily changed by reversing the statements whereas the first id bound to echo the order found in the JSON. The error behaviours are also different -- the first prints until it has an error, the second prints if there are no errors. In the second example it is <em>almost mandatory</em> to check for errors before output whereas in the first it feels most natural to register the error listener at the end of the chained calls. I prefer the source order in the first because the the normal case is listed before the abnormal one. When describing a system, it seems odd to me to describe the abnormal cases first.</p>
+<p>Considering the coding style that is encouraged, the first example takes a more declarative form by specifying the items of interest using patterns whereas the second is more imperative by explicitly looping through the items. If several levels of selection were required, such as <code>schemes.*.steps.*</code>, other than a longer JSONPath pattern the first example would not grow in complexity whereas the second would require nested looping. We can say that the complexity of programming using Oboe stays roughly constant whereas in the second example it grows linearly with the number of levels that must be traversed.</p>
 </div>
 <div id="benchmarking-vs-non-progressive-rest" class="section level2">
 <h2><a href="#benchmarking-vs-non-progressive-rest"><span class="header-section-number">6.2</span> Benchmarking vs non-progressive REST</a></h2>
-<p>I feel it is important to experimentally answer the question, <em>is this actually any faster?</em>. To do this I have created a small benchmarking suite that runs under Node.js. I chose Node because it at its code is a very basic platform which I feel it gives a more repeatable environment than modern browsers which at during the tests could be performing any number of background tasks. These tests may be seen in the <code>benchmark</code> folder of the project. Node also has the advantage in measuring the memory of a running process is not swamped by the memory taken up by the browser itself.</p>
-<p>One of the proposed advantages of progressive REST is an improved user experience because of earlier, more progressive interface rendering and a perceptual improvement in speed. I am not focusing on this area for benchmarking because it would be much more difficult to measure, involving human participants. While I can't provide numbers on the perceptual improvements, I have created sites using Oboe and the improvement in responsiveness over slower networks is large enough to be obvious.</p>
-<p>The benchmark mimics a relational database-backed REST service. Relational databases serve data to a cursor one tuple at a time. The simulated service writes out twenty tuples as JSON objects, one every ten milliseconds. To simulate network slowness, Apple's <em>Network Line Conditioner</em> was used. I chose the named presets &quot;3G, Average Case&quot; and &quot;Cable modem&quot; to represent poor and good networks respectively.<sup><a href="#fn9" class="footnoteRef" id="fnref9">9</a></sup> Each test involves two node processes, one acting as the client and one as the server, with data transfer between them via normal http.</p>
-<p>Memory was measured using Node's built in memory reporting tool, <code>process.memoryusage()</code> and the maximum figure returned on each run was taken</p>
-<p>Each object in the returned JSON contains a URL to a further resource. Each further resource is fetched and parsed. The aggregation is complete when we have them all.</p>
+<p>I feel it is important to experimentally answer the question, <em>is this actually any faster?</em>. To measure performance I have created a small benchmarking suite that runs under Node.js. One of my suggested advantages of incremental parsing and perceptual improvement in speed. I am not focusing on user perception for this evaluation because it would be difficult to measure, requiring subjective judgement and human participants. I will be measuring the time taken to provide the first output which correlates with how quickly interface redrawing can start and should give some indication as to perceptual speed. I chose Node to host the tests because it is a minimalist platform which should give a more repeatable results than browsers which could be performing any number of simultaneous background tasks. Node also has the advantage that small changes in memory use are not overwhelmed by a memory hungry environment.</p>
+<p>The benchmark mimics a REST service backed by a relational database. Relational databases pass data from a result cursor one tuple at a time, the service simulates this by writing out forty tuples as JSON objects, one every ten milliseconds. Every other object in the returned JSON contains a URL to a further resource which will also be fetched and an aggregation created. To simulate real network conditions, Apple's <em>Network Line Conditioner</em> was used with the presets <em>3G, Average Case</em> and <em>Cable modem</em> to represent poor and good internet connections respectively.<sup><a href="#fn10" class="footnoteRef" id="fnref10">10</a></sup> The test involves two node processes, one acting as a REST client and one as a REST server. Memory was measured on the client using Node's built in memory reporting tool, <code>process.memoryusage()</code> and the largest figure reported on each run is used. The test server and client can be found in the project's <code>benchmark</code> directory, or in the appendix on pages  and .</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Strategy</th>
+<th align="left">Client Strategy</th>
 <th align="left">Network</th>
 <th align="right">First output</th>
 <th align="right">Total time</th>
@@ -796,13 +791,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </tr>
 </tbody>
 </table>
-<p>Vs Json.parse shows a dramatic improvement over first output of about 96% and a smaller but significant improvement of about 40% in time required to complete the task. Oboe's performance in terms of time is about 15% slower than Clarinet; since Oboe is built on Clarinet it could not be faster but I had hoped for these results to be closer.</p>
-<p>As expected, in this simulation of real-world usage, the extra computation<br />compared to JSON.parse which is needed by Oboe's more involved algorithms or Clarinet's less efficient parsing<sup><a href="#fn10" class="footnoteRef" id="fnref10">10</a></sup> have been dwarfed by better i/o management. Reacting earlier using slower handlers has been shown to be faster overall than reacting later with quicker ones. I believe that this vindicates a focus on efficient management of i/o over faster algorithms. I believe that much programming takes a &quot;Hurry up and wait&quot; approach by concentrating overly on optimal computation rather than optimal i/o management.</p>
-<p>There is an unexpected improvement vs JSON.parse in terms of memory usage. It is not clear why this would be but it may be attributable to the json fetching library used to simplify the JSON.parse tests having a large dependency tree. As expected, Clarinet shows the largest improvements in terms of memory usage. For very large JSON I would expect Clarinet's memory usage to remain roughly constant whilst the two approaches rise linearly with the size of the resource.</p>
+<p>In comparison with JSON.parse, Oboe shows a dramatic improvement of about 96% regarding the time taken for the first output and a smaller but significant improvement of about 40% in the total time required to create the aggregation. Oboe's aggregation on a good network is about 15% slower than Clarinet; since Oboe is built on Clarinet I did not expect it to be faster but I had hoped for the gap to be smaller. This is probably because Oboe encodes a more involved workflow than a raw SAX parser.</p>
+<p>Clarinet is known to be slower than JSON.parse for input which is already held in memory<sup><a href="#fn11" class="footnoteRef" id="fnref11">11</a></sup> but when reading from a network this offset by the ability to parse progressively. Compared to JSON.parse, the extra computation time needed by Oboe is shown to be relatively insignificant in comparison to the advantage of better i/o management. Reacting earlier using slower handlers is shown to be faster overall than reacting later with quicker ones. I believe that this vindicates the project focus on efficient management of I/O over faster algorithms; much current programming takes a &quot;Hurry up and wait&quot; approach by concentrating on small algorithm optimisation over performing a task at the earliest possible time.</p>
+<p>There is an unexpected improvement vs JSON.parse in terms of memory usage. It is not clear why this would be but it may be attributable to the large large dependency tree brought in by the get-json library which was used to simplify this version. As expected, Clarinet has the smallest memory usage because it never stores a complete version of the parsed JSON. As REST resource size increases I would expect Clarinet's memory usage to remain roughly constant while the other two rise linearly. Node is popular on RaspberryPi type devices with constrained RAM; Clarinet might be preferable to Oboe where code clarity is less important than a small memory footprint</p>
 </div>
-<div id="comparative-programmer-ergonomics" class="section level2">
-<h2><a href="#comparative-programmer-ergonomics"><span class="header-section-number">6.3</span> Comparative Programmer Ergonomics</a></h2>
-<p>For each of the benchmarks above the code was laid out in the most natural way for the strategy under test.</p>
+<div id="comparative-developer-ergonomics" class="section level2">
+<h2><a href="#comparative-developer-ergonomics"><span class="header-section-number">6.3</span> Comparative developer ergonomics</a></h2>
+<p>Writing less code is not in itself a guarantee of a better developer ergonomics but I find it is a good indicator so long as the code isn't forced to be overly terse. The code sizes below report the quantity of code required to implement the benchmark REST client under each strategy. Each version is written as the most natural expression for the library used.</p>
 <table>
 <thead>
 <tr class="header">
@@ -835,7 +830,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="ot">console</span>.<span class="fu">log</span>(name);               
    });      
 });</code></pre>
-<p>Non-progressive parsing was slightly longer, requiring in addition a loop, an if statement, and programmatically selecting specific parts of the results. The code below is shortened by using the get-json<sup><a href="#fn11" class="footnoteRef" id="fnref11">11</a></sup> package which removes the need to explicitly parse:</p>
+<p>Non-progressive parsing with JSON.parse was slightly longer, requiring a loop and an if statement, both to drill down into the results. The code below is shortened by using the get-json<sup><a href="#fn12" class="footnoteRef" id="fnref12">12</a></sup> package which combines parsing implicitly into the download:</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">getJson</span>(DB_URL, <span class="kw">function</span>(err, records) {
    <span class="ot">records</span>.<span class="ot">data</span>.<span class="fu">forEach</span>( <span class="kw">function</span>( record ){
       <span class="kw">if</span>( <span class="ot">record</span>.<span class="fu">url</span> ) {
@@ -845,87 +840,82 @@ code > span.er { color: #ff0000; font-weight: bold; }
       }
    });
 });</code></pre>
-<p>The JSON.parse version is very closely coupled with the format that it is handling. We can see this in the fragments <code>records.data</code>, <code>record.url</code>, <code>record.name</code> which expects to find sub-trees at very specific locations in the JSON. The code might be said to contain a description of the format that it is for. Conversely, the Oboe version describes the format only so far as is needed to identify the parts that it is interested in; the remainder of the format could change and the code would continue to work. As well as being simpler to program against than the previous simplest mode, I believe this demonstrates a greater tolerance to changing formats.</p>
-<p>The Clarinet version of the code may be seen in appendex (??). This version is greater in verbosity and obfuscation. I don't think a person could look at this source and understand what is being parsed without thinking about it for a long time. Parameter names such as 'key' or 'value' must be chosen by the position of the token in the markup, prior to understanding the semantics it represents. By contrast, Oboe and JSON.parse both allow names to be given by the meaning of the token.</p>
+<p>This is tightly coupled with the JSON format that it reads. We can see this in the fragments <code>records.data</code>, <code>record.url</code>, and <code>record.name</code> which will only work if they find the desired subtree at exactly the anticipated location. The code might be said to contain a description of the format that it is for rather than a description of what is required from the format. The Oboe version describes the format only so far as is needed to identify the desired parts; the remainder of the JSON could change and the code would continue to work. I believe this demonstrates a greater tolerance to changing formats and that this would be useful when programming against evolving services.</p>
+<p>The Clarinet version of the code is too long to include here but may be seen <a href="#header_benchmarkClient">in the appendix</a>, on page . By using SAX directly the code is more verbose and its purpose is obfuscated. I don't think a person looking at this source could deduce what is being done without thinking about it for some time. The functions receiving SAX events must handle several different cases and so tend to have generic parameter names such as 'key' or 'value' which represent the token type. By contrast, Oboe and JSON.parse both allow names such as 'record' or 'url' which are chosen according to the semantics of the value. I find this naming easier to interpret because it allows me to think in terms of the domain model rather than considering serialisation artifacts.</p>
 </div>
-<div id="performance-of-code-styles-under-various-engines" class="section level2">
-<h2><a href="#performance-of-code-styles-under-various-engines"><span class="header-section-number">6.4</span> Performance of code styles under various engines</a></h2>
-<p>The 15% overhead of Oboe vs Clarinet suggests Oboe might be computationally expensive. With very fast networks the extra computation might outweigh a more efficient i/o strategy.</p>
-<p>The file <code>test/specs/oboe.performance.spec.js</code> contains a simple benchmark. This test registeres a very complex JSONPath expression which intentionally uses all of the language and fetches a JSON file containing 100 objects, each with 8 String properties against . Correspondingly the expression is evaluated just over 800 times and 100 matches are found. Although real http is used, it is kept within the localhost. The results below are averaged from ten runs. The tests executed on a Macbook Air running OS X 10.7.5, except for Chrome Mobile which was tested on an iPhone 5 with iOS 7.0.2. Tests requiring Microsoft Windows were performed inside a VirtualBox virtual machine.</p>
-<p>Curl is a simple download to stdout from the shell and is included as a control run to provide a baseline.</p>
+<div id="performance-under-various-javascript-engines" class="section level2">
+<h2><a href="#performance-under-various-javascript-engines"><span class="header-section-number">6.4</span> Performance under various Javascript engines</a></h2>
+<p>The file <code>oboe.performance.spec.js</code><sup><a href="#fn13" class="footnoteRef" id="fnref13">13</a></sup> contains a benchmark which concentrates on using Oboe for pattern matching. This test registers a complex pattern which intentionally uses all features from the JSONPath language and then fetches a JSON file containing approximately 800 nodes, 100 of which will match. Although actual http is used, it is over an unthrottled connection to localhost so network delay should be negligible. The tests are executed on a relatively low-powered Macbook Air laptop running OS X 10.7.5, except for Chrome Mobile which was tested on an iPhone 5 with iOS 7.0.2. Test cases requiring Microsoft Windows were performed inside a VirtualBox virtual machine. Curl is a simple download tool that writes the resource to stdout without any parsing and is included as a baseline.</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Platform</th>
-<th align="left">Total Time</th>
-<th align="left">Throughput (nodes/ms)</th>
+<th align="right">Total Time</th>
+<th align="right">Throughput (nodes/ms)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Curl (control)</td>
-<td align="left">42ms</td>
-<td align="left"><em>n/a</em></td>
+<td align="left">Curl</td>
+<td align="right">42ms</td>
+<td align="right"><em>unparsed, n/a</em></td>
 </tr>
 <tr class="even">
 <td align="left">Chrome 31.0.1650.34</td>
-<td align="left">84ms</td>
-<td align="left">9.57</td>
+<td align="right">84ms</td>
+<td align="right">9.57</td>
 </tr>
 <tr class="odd">
 <td align="left">Node.js v0.10.1</td>
-<td align="left">172ms</td>
-<td align="left">4.67</td>
+<td align="right">172ms</td>
+<td align="right">4.67</td>
 </tr>
 <tr class="even">
 <td align="left">Chrome 30.0.1599</td>
-<td align="left">202ms</td>
-<td align="left">3.98</td>
+<td align="right">202ms</td>
+<td align="right">3.98</td>
 </tr>
 <tr class="odd">
 <td align="left">Safari 6.0.5</td>
-<td align="left">231ms</td>
-<td align="left">3.48</td>
+<td align="right">231ms</td>
+<td align="right">3.48</td>
 </tr>
 <tr class="even">
 <td align="left">IE 10.0.0 (Windows 8)</td>
-<td align="left">349ms</td>
-<td align="left">2.30</td>
+<td align="right">349ms</td>
+<td align="right">2.30</td>
 </tr>
 <tr class="odd">
 <td align="left">Chrome Mobile iOS 30.0.1599</td>
-<td align="left">431ms</td>
-<td align="left">1.86</td>
+<td align="right">431ms</td>
+<td align="right">1.86</td>
 </tr>
 <tr class="even">
 <td align="left">Firefox 24.0.0</td>
-<td align="left">547ms</td>
-<td align="left">1.47</td>
+<td align="right">547ms</td>
+<td align="right">1.47</td>
 </tr>
 <tr class="odd">
 <td align="left">IE 8.0.0 (Windows XP)</td>
-<td align="left">3,048ms</td>
-<td align="left">0.26</td>
+<td align="right">3,048ms</td>
+<td align="right">0.26</td>
 </tr>
 </tbody>
 </table>
-<p>We can see that Firefox is much slower than other modern browsers despite its SpiderMonkey Javascript engine being otherwise quite fast. This is probably explicable in part by SpiderMonkey's just-in-time compiler being poor at optimising functional Javascript <span class="citation">(Guo 2013)</span>. Because the JSON nodes are not of a common type the related callsites are not monomorphic which Firefox also optimises poorly <span class="citation">(Guo 2013)</span>. When the test was repeated using a simpler JSONPath expression Firefox showed by far the largest improvement indicating that on this platform the functional pattern matching is the bottleneck.</p>
-<p>During the project a new version of Chrome more than doubled the node throughput dur to including later version of the v8 Javascript engine. Node also uses v8 and should be updated to this version soon.</p>
-<p>Of these results I find only the very low performance on old versions of Internet Explorer concerning, almost certainly degrading user experience more than it is improved. It might be reasonable to conclude that for complex use cases Oboe is currently not unsuited to legacy platforms. Since this platform cannot progressively interpret an XHR response, if performance on legacy platforms becomes a serious concern one option might be to create a non-progressive library with the same API which could be selectively delivered to those platforms in place of the main version.</p>
-<p>Nonetheless, in its current form Oboe may slow down the total time when working over the very fastest connections.</p>
-<p>For an imperative language coded in a functional style the compiler may not optimise as effectively as if a functional language was used. This is especially the case under a highly dynamic language in which everything, even the built-in constructs are mutable. I think Javascript was a good choice of language given it is already well adopted and allows the targeting of server and client side with only minimal effort, giving a very large number of applications with the potential to adopt Oboe. However, there are obvious inefficiencies such as the the descent and ancestor arrays which are always created to be handed to application callbacks but that I anticipate will be predominantly ignored. The design of Oboe is very amicable to implementation under a functional language and it would be interesting to see the results.</p>
+<p>We can see that Firefox is slower than other modern browsers despite normally being quite fast. This is probably explicable by SpiderMonkey, the Mozilla just-in-time Javascript compiler being poor at optimising functional Javascript <span class="citation">(Guo 2013)</span>. The JSON nodes are not of a common type so many of the library's internal callsites are not monomorphic which is also optimised poorly <span class="citation">(Guo 2013)</span>. When the test was later repeated with a simpler pattern Firefox showed by far the largest improvement, indicating that the functional JSONPath matching accounts for Firefox's lower than expected performance.</p>
+<p>During the project version 31 of Chrome was released that performed more than twice as quickly as the version 30 due to an updated version of the v8 Javascript engine. Node also uses v8 and should catch up when it is next updated. This reflects Javascript engine writers targeting functional optimisation now that functional Javascript is becoming a more popular style.</p>
+<p>Of these results I find only the performance under old versions of Internet Explorer poor enough to be concerning. Since this platform cannot progressively interpret an XHR response an improvement over traditional XHR was not possible, but I would have liked performance to have not degraded by so much. Adding three seconds to a REST call will unacceptably impair a webapp's user experience so it might be reasonable to conclude that for complex use cases Oboe is currently unsuited to legacy platforms. If we desired to improve performance on older platforms one solution might be to create a simpler, non-progressive implementation of the Oboe API for selective delivery to older browsers. However, I would argue that time spent writing a basic legacy version would be better spent waiting for these moribund platforms to die.</p>
+<p>For an imperative language coded in a functional style the compiler may not optimise as effectively as if a functional language were used. This is especially the case for a highly dynamic language in which everything, even the basic built-in types, are mutable. Presenting a convenient API to application developers means passing eagerly evaluated parameters to application callbacks even when the parameters are of secondary importance and will be predominantly ignored. The the path and ancestor arrays are created for every matching node but I anticipate will be predominantly ignored. Under a functional language these could be lazily evaluated without requiring any special effort by the application programmer. I think Javascript was a good choice of language, giving a very large number of client- and server-side applications that may potentially adopt the library. However, server-side Oboe would be very amicable to implementation using a purer functional language and it would be interesting to see how much faster it could be.</p>
 </div>
 <div id="status-as-a-micro-library" class="section level2">
 <h2><a href="#status-as-a-micro-library"><span class="header-section-number">6.5</span> Status as a micro-library</a></h2>
-<p>Built versions of Oboe as delivered reside in the project's <code>dist</code> folder. The file <code>oboe-browser.min.js</code> is the minified version which should be sent to browsers gzipped. After gzip is applied this file comes to 4966 bytes; close to but comfortably under the 5120 limit. At roughly the size as a very small image, the size of Oboe should not discourage adoption.</p>
+<p>The file <code>oboe-browser.min.js</code> is the minified, built version of Oboe ready to be sent to web browsers and can be found in the project's <code>dist</code> directory. The size fluctuates as commits are made but after gzip it comes to about 4800 bytes; close to but comfortably under the 5120 limit. At roughly the size as a small image the download footprint of Oboe should not discourage adoption.</p>
 </div>
 <div id="potential-future-work" class="section level2">
 <h2><a href="#potential-future-work"><span class="header-section-number">6.6</span> potential future work</a></h2>
-<p>Although the project delivers improvements already, the most obvious expansion to fully realise the potential would be a matching server-side component that writes JSON in a streaming way. So far this has required that the JSON be written out as strings but this scales badly as messages become more complex.</p>
-<p>There is nothing about Oboe which precludes working with other tree-shaped format. If there is demand, An XML/XPATH version seems like an obvious expansion. Plug-ins for formats.</p>
-<p>Oboe stores all items that are parsed from the JSON it receives, resulting in a memory use which is as high as a DOM parser. These are kept in order to be able to provide a match to any possible JSONPath expression. However, in most cases memory would be saved if the parsed content were only stored so far as is needed to provide matches against the JSONPath expressions which have actually been registered. For typical use cases I expect this would allow the non-storage of large branches. Likewise, the current implementation takes a rather brute force approach when examining node for pattern matches: check every registered JSONPath expression against every node and path that are found in the JSON. For many expressions we are able to know there is no possibility of matching a JSON tree, either because we have already matched or because the the current node's ancestors already mandate failure. A more sophisticated programme might disregard provably unsatisfiable handlers for the duration of a subtree. Either of these changes would involve some rather difficult programming and because matching is fast enough I think brute force is the best approach for the time being.</p>
-<p>During JSONPath matching much of the computation is repeated. For example, matching the expression <code>b.*</code> against many children of a common parent will repeat the same test, checking if the parent's name is 'b', for each child node. Because the JSONPath matching is stateless, recursive and side-effect free there is a potential to cut out repeated computation by using a functional cache. This would reduce the overall amount of computation needed for JSONPath expressions with common substrings to their left side or nodes with a common ancestry. Current Javascript implementations make it difficult to manage a functional cache, or caches in general, from inside the language itself because there is no way to occupy only the unused memory. Weak references are proposed in ECMAScript 6 but currently only experimentally supported<sup><a href="#fn12" class="footnoteRef" id="fnref12">12</a></sup>. For future development they would be ideal.</p>
-<p>The nodes which Oboe hands to callbacks are mutable meaning that potentially the correct workings of the library could be broken if the containing application carelessly alters them. Newer implementations of Javascript allows a whole object to be made immutable, or just certain properties via an immutability decorator and the <code>defineProperty</code> method. This would probably be an improvement.</p>
+<p>Although all network traffic can be viewed as a stream, the most obvious future expansion would be to create a matching server-side component that provides an intuitive interface for writing JSON streams. So far, sending streaming JSON has required the resource be written out using programmer-assembled strings but this approach is error prone and would scale badly as messages become more complex. A stream-writer server side library would allow Oboe to be used as a REST-compatible streaming solution for situations which currently employ websockets. This would provide a form of streaming that operates according to the principled design of http rather than by sidestepping it.</p>
+<p>There is nothing about Oboe that precludes working with other tree-shaped formats. If there is demand, An XML/XPATH version seems like an obvious expansion. This could be implemented by allowing resource formats to be added using plugins which would allow programmers to create a progressive interpretation of any resource type. As a minimum, a plug-in would require a SAX-like parser and a compiler for some kind of pattern matching language.</p>
+<p>Oboe stores all JSON nodes that are parsed for the duration of its lifetime so despite being similar to a SAX parser so far as it is progressive, it consumes as much memory as a DOM parser. The nodes remain held so that all possible JSONPath expressions may be tested. However, in most cases memory could be freed if the parsed content were stored only so far as is required to test against the patterns which have actually been registered. For typical use cases I expect this would allow large subtrees to be unlinked inside Oboe, particularly once they have matched a pattern and have already been handed over to application callbacks. Likewise, the current implementation takes a rather brute force approach when examining nodes for pattern matches by checking every registered JSONPath expression against every node parsed from the JSON. For many expressions we should be able to say that there will be no matches inside a particular JSON subtree, either because we have already matched or because the the subtree's ancestors invariably imply failure. A more sophisticated implementation might subdue provably unsatisfiable handlers until the SAX parser leaves unmatchable subtrees.</p>
 </div>
 </div>
 <div id="appendix_http_limits" class="section level1">
@@ -960,8 +950,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="appendix-ii-oboe.js-source-code-listing" class="section level1">
 <h1><a href="#appendix-ii-oboe.js-source-code-listing"><span class="header-section-number">8</span> Appendix ii: Oboe.js source code listing</a></h1>
-<div id="clarinetlisteneradaptor.js" class="section level2">
-<h2><a href="#clarinetlisteneradaptor.js"><span class="header-section-number">8.1</span> clarinetListenerAdaptor.js</a></h2>
+<div id="header_clarinetListenerAdaptor" class="section level2">
+<h2><a href="#header_clarinetListenerAdaptor"><span class="header-section-number">8.1</span> clarinetListenerAdaptor.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">
 <span class="co">/** </span>
@@ -990,8 +980,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="events.js" class="section level2">
-<h2><a href="#events.js"><span class="header-section-number">8.2</span> events.js</a></h2>
+<div id="header_events" class="section level2">
+<h2><a href="#header_events"><span class="header-section-number">8.2</span> events.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file declares some constants to use as names for event types.</span>
@@ -1026,8 +1016,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }    </code></pre>
 <p></p>
 </div>
-<div id="functional.js" class="section level2">
-<h2><a href="#functional.js"><span class="header-section-number">8.3</span> functional.js</a></h2>
+<div id="header_functional" class="section level2">
+<h2><a href="#header_functional"><span class="header-section-number">8.3</span> functional.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/** </span>
 <span class="co"> * Partially complete a function.</span>
@@ -1198,8 +1188,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </code></pre>
 <p></p>
 </div>
-<div id="incrementalcontentbuilder.js" class="section level2">
-<h2><a href="#incrementalcontentbuilder.js"><span class="header-section-number">8.4</span> incrementalContentBuilder.js</a></h2>
+<div id="header_incrementalContentBuilder" class="section level2">
+<h2><a href="#header_incrementalContentBuilder"><span class="header-section-number">8.4</span> incrementalContentBuilder.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/** </span>
 <span class="co"> * This file provides various listeners which can be used to build up</span>
@@ -1400,8 +1390,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="instancecontroller.js" class="section level2">
-<h2><a href="#instancecontroller.js"><span class="header-section-number">8.5</span> instanceController.js</a></h2>
+<div id="header_instanceController" class="section level2">
+<h2><a href="#header_instanceController"><span class="header-section-number">8.5</span> instanceController.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file implements a light-touch central controller for an instance </span>
@@ -1609,8 +1599,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="jsonpath.js" class="section level2">
-<h2><a href="#jsonpath.js"><span class="header-section-number">8.6</span> jsonPath.js</a></h2>
+<div id="header_jsonPath" class="section level2">
+<h2><a href="#header_jsonPath"><span class="header-section-number">8.6</span> jsonPath.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * The jsonPath evaluator compiler used for Oboe.js. </span>
@@ -1986,8 +1976,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 });</code></pre>
 <p></p>
 </div>
-<div id="jsonpathsyntax.js" class="section level2">
-<h2><a href="#jsonpathsyntax.js"><span class="header-section-number">8.7</span> jsonPathSyntax.js</a></h2>
+<div id="header_jsonPathSyntax" class="section level2">
+<h2><a href="#header_jsonPathSyntax"><span class="header-section-number">8.7</span> jsonPathSyntax.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> jsonPathSyntax = (<span class="kw">function</span>() {
  
@@ -2106,8 +2096,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }());</code></pre>
 <p></p>
 </div>
-<div id="lists.js" class="section level2">
-<h2><a href="#lists.js"><span class="header-section-number">8.8</span> lists.js</a></h2>
+<div id="header_lists" class="section level2">
+<h2><a href="#header_lists"><span class="header-section-number">8.8</span> lists.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * Like cons in Lisp</span>
@@ -2272,8 +2262,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="pubsub.js" class="section level2">
-<h2><a href="#pubsub.js"><span class="header-section-number">8.9</span> pubSub.js</a></h2>
+<div id="header_pubSub" class="section level2">
+<h2><a href="#header_pubSub"><span class="header-section-number">8.9</span> pubSub.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * Isn&#39;t this the cutest little pub-sub you&#39;ve ever seen?</span>
@@ -2310,8 +2300,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="publicapi.js" class="section level2">
-<h2><a href="#publicapi.js"><span class="header-section-number">8.10</span> publicApi.js</a></h2>
+<div id="header_publicApi" class="section level2">
+<h2><a href="#header_publicApi"><span class="header-section-number">8.10</span> publicApi.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// export public API</span>
 <span class="kw">var</span> oboe = <span class="fu">apiMethod</span>(<span class="st">&#39;GET&#39;</span>);
@@ -2356,8 +2346,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }   </code></pre>
 <p></p>
 </div>
-<div id="streaminghttp-browser.js" class="section level2">
-<h2><a href="#streaminghttp-browser.js"><span class="header-section-number">8.11</span> streamingHttp-browser.js</a></h2>
+<div id="header_streamingHttp-browser" class="section level2">
+<h2><a href="#header_streamingHttp-browser"><span class="header-section-number">8.11</span> streamingHttp-browser.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">httpTransport</span>(){
    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">XMLHttpRequest</span>();
@@ -2494,8 +2484,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="streaminghttp-node.js" class="section level2">
-<h2><a href="#streaminghttp-node.js"><span class="header-section-number">8.12</span> streamingHttp-node.js</a></h2>
+<div id="header_streamingHttp-node" class="section level2">
+<h2><a href="#header_streamingHttp-node"><span class="header-section-number">8.12</span> streamingHttp-node.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">httpTransport</span>(){
    <span class="kw">return</span> <span class="fu">require</span>(<span class="st">&#39;http&#39;</span>);
@@ -2613,8 +2603,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="util.js" class="section level2">
-<h2><a href="#util.js"><span class="header-section-number">8.13</span> util.js</a></h2>
+<div id="header_util" class="section level2">
+<h2><a href="#header_util"><span class="header-section-number">8.13</span> util.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file defines some loosely associated syntactic sugar for </span>
@@ -2668,8 +2658,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="wire.js" class="section level2">
-<h2><a href="#wire.js"><span class="header-section-number">8.14</span> wire.js</a></h2>
+<div id="header_wire" class="section level2">
+<h2><a href="#header_wire"><span class="header-section-number">8.14</span> wire.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file sits just behind the API which is used to attain a new</span>
@@ -2695,8 +2685,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <div id="appendix-iii-benchmarking" class="section level1">
 <h1><a href="#appendix-iii-benchmarking"><span class="header-section-number">9</span> Appendix iii: Benchmarking</a></h1>
-<div id="benchmarkclient.js" class="section level2">
-<h2><a href="#benchmarkclient.js"><span class="header-section-number">9.1</span> benchmarkClient.js</a></h2>
+<div id="header_benchmarkClient" class="section level2">
+<h2><a href="#header_benchmarkClient"><span class="header-section-number">9.1</span> benchmarkClient.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript">
 <span class="co">/* call this script from the command line with first argument either</span>
@@ -2827,8 +2817,8 @@ strategies[strategyName]();
 </code></pre>
 <p></p>
 </div>
-<div id="benchmarkserver.js" class="section level2">
-<h2><a href="#benchmarkserver.js"><span class="header-section-number">9.2</span> benchmarkServer.js</a></h2>
+<div id="header_benchmarkServer" class="section level2">
+<h2><a href="#header_benchmarkServer"><span class="header-section-number">9.2</span> benchmarkServer.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**   </span>
 <span class="co"> */</span>
@@ -2961,11 +2951,12 @@ strategies[strategyName]();
 <li id="fn5"><p>See <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze</a>. Although older engines don't provide any ability to create immutable objects, we can be fairly certain that the code does not mutate these objects or the tests would fail with attempts to modify in environments which are able to enforce it.<a href="#fnref5">↩</a></p></li>
 <li id="fn6"><p>JSONPath compiler from the first commit can be found at line 159 here: <a href="https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js">https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js</a>#L159 for contrast, the current source can be found <a href="#jsonPath.js">in the appendix</a> on page  or at <a href="https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js">https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js</a>.<a href="#fnref6">↩</a></p></li>
 <li id="fn7"><p>The current tests are viewable at <a href="https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js">https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js</a> and <a href="https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js">https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js</a>.<a href="#fnref7">↩</a></p></li>
-<li id="fn8"><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions">Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref8">↩</a></p></li>
-<li id="fn9"><p><a href="http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref9">↩</a></p></li>
-<li id="fn10"><p><a href="http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">Http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a>.<a href="#fnref10">↩</a></p></li>
-<li id="fn11"><p><a href="https://npmjs.org/package/get-json">Https://npmjs.org/package/get-json</a>.<a href="#fnref11">↩</a></p></li>
-<li id="fn12"><p>At time of writing, Firefox is the only engine supporting WeakHashMap by default. In Chome it is implemented but not available to Javascript unless explicitly enabled by a browser flag. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a> retrieved 11th October 2013.<a href="#fnref12">↩</a></p></li>
+<li id="fn8"><p>At time of writing, Firefox is the only engine supporting WeakHashMap by default. In Chome it is implemented but not available to Javascript unless explicitly enabled by a browser flag. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a> retrieved 11th October 2013.<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions">Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a>.<a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p><a href="http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/">Http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/</a>.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p><a href="http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html">Http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html</a>.<a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p><a href="https://npmjs.org/package/get-json">Https://npmjs.org/package/get-json</a>.<a href="#fnref12">↩</a></p></li>
+<li id="fn13"><p>See <a href="https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js">tests/spec/oboe.performance.spec.js</a>.<a href="#fnref13">↩</a></p></li>
 </ol>
 </div>
 </body>
