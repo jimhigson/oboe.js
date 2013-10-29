@@ -22,7 +22,7 @@ function copyToMd {
    fi
           
    echo >> $destination         
-   echo $sourceFilename >> $destination
+   echo "$sourceFilename {#header_$shortFilename}" >> $destination
    echo "---" >> $destination
    echo >> $destination
    echo "\\label{src_$shortFilename}" >> $destination
