@@ -2167,49 +2167,15 @@ would not be any more useful because stubbing out the tokeniser
 functions before testing the compiler would be a considerable effort and
 I do not believe it would improve the rigor of the JSONPath
 specification.
+ 
+Differences in the working of programs that can be easily written using Oboe.js
+-------------------------------------------------------------------------------
 
-*Restriction: duck types only as last item. Why. Not currently enforced in the compiler.*
-
-[^5_Implementation1]: https://github.com/substack/http-browserify
-
-[^5_Implementation2]: See
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
-    Although older engines don't provide any ability to create immutable
-    objects, we can be fairly certain that the code does not mutate
-    these objects or the tests would fail with attempts to modify in
-    environments which are able to enforce it.
-
-[^5_Implementation3]: JSONPath compiler from the first commit can be found at line 159
-    here:
-    https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
-    for contrast, the current source can be found [in the
-    appendix](#jsonPath.js) on page \pageref{src_jsonPath} or at
-    https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
-
-[^5_Implementation4]: The current tests are viewable at
-    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
-    and
-    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
-
-[^5_Implementation5]: At time of writing, Firefox is the only engine supporting
-    WeakHashMap by default. In Chome it is implemented but not available
-    to Javascript unless explicitly enabled by a browser flag.
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
-    retrieved 11th October 2013
-
-[^5_Implementation6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
-
-
-Conclusion
-==========
-
-Differences in programs written using Oboe.js
----------------------------------------------
-
-A program written using Oboe.js will be subtly different from one
+Because of assumptions implicit in either technique, a program written using Oboe.js 
+will perform subtly different actions from one
 written using more conventional libraries, even if the programmer means
-to express the same thing. Consider the two examples below which use
-Node.js to read a local JSON file and write to the console.
+to express the same thing. Consider the two examples below in which
+Node.js is used to read a local JSON file and write to the console.
 
 ~~~~ {.javascript}
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
@@ -2248,31 +2214,62 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 });
 ~~~~
 
-While the primary behaviours are similar, some accidental
-side-behaviours differ between the two examples. It is likely the
-programmer would not consider these differences as they write. In the
-first example,the order of the output for schemes and plans will match
-the order in the JSON, whereas for the second scheming is always done
-before plotting. In the second example the order could be easily changed
-by reversing the statements whereas the first id bound to echo the order
-found in the JSON. The error behaviours are also different -- the first
+While the behaviours intended by the programmer are similar, the accidents
+differ between the two. It is likely that most
+programmers would not be aware of these differences as they write. In the
+first example the order of the output for schemes and plans will match
+their order in the JSON, whereas for the second scheming is always done
+before plotting. The error behaviours are also different -- the first
 prints until it has an error, the second prints if there are no errors.
 In the second example it is *almost mandatory* to check for errors
-before output whereas in the first it feels most natural to register the
+before starting the output whereas in the first it feels most natural to register the
 error listener at the end of the chained calls. I prefer the source
 order in the first because the the normal case is listed before the
-abnormal one. When describing a system, it seems odd to me to describe
-the abnormal cases first.
+abnormal one and it seems odd to me to describe a system's
+abnormal cases first.
 
-Considering the coding style that is encouraged, the first example takes
+Considering the code style that is encouraged, the first example takes
 a more declarative form by specifying the items of interest using
 patterns whereas the second is more imperative by explicitly looping
 through the items. If several levels of selection were required, such as
 `schemes.*.steps.*`, other than a longer JSONPath pattern the first
 example would not grow in complexity whereas the second would require
-nested looping. We can say that the complexity of programming using Oboe
-stays roughly constant whereas in the second example it grows linearly
+nested looping. The cyclic complexity of programming using Oboe
+would stay roughly constant whereas using programmatic drill-down it increases linearly
 with the number of levels that must be traversed.
+
+[^5_Implementation1]: https://github.com/substack/http-browserify
+
+[^5_Implementation2]: See
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Object/freeze.
+    Although older engines don't provide any ability to create immutable
+    objects, we can be fairly certain that the code does not mutate
+    these objects or the tests would fail with attempts to modify in
+    environments which are able to enforce it.
+
+[^5_Implementation3]: JSONPath compiler from the first commit can be found at line 159
+    here:
+    https://github.com/jimhigson/oboe.js/blob/a17db7accc3a371853a2a0fd755153b10994c91e/src/main/progressive.js\#L159
+    for contrast, the current source can be found [in the
+    appendix](#jsonPath.js) on page \pageref{src_jsonPath} or at
+    https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js
+
+[^5_Implementation4]: The current tests are viewable at
+    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js
+    and
+    https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js
+
+[^5_Implementation5]: At time of writing, Firefox is the only engine supporting
+    WeakHashMap by default. In Chome it is implemented but not available
+    to Javascript unless explicitly enabled by a browser flag.
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap
+    retrieved 11th October 2013
+
+[^5_Implementation6]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions
+
+
+Conclusion
+==========
 
 Benchmarking vs non-progressive REST
 ------------------------------------
