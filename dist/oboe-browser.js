@@ -983,8 +983,6 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
     * the progress event or the request being complete.
     */
    function handleProgress() {
-
-      console.log('made some progress');
                         
       var textSoFar = xhr.responseText,
           newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
@@ -1009,20 +1007,10 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    }
    
    xhr.onreadystatechange = function() {
-
-      /*console.log('GOT READYSTATE', xhr.readyState);
-      
-      try{
-         console.log(parseResponseHeaders(xhr.getAllResponseHeaders()));
-      } catch( e ){
-         console.log('could not get headers yet');
-      }*/
       
       switch( xhr.readyState ) {
                
          case 2:       
-         
-            console.log(parseResponseHeaders(xhr.getAllResponseHeaders()));
          
             emit(
                HTTP_START, 
@@ -1032,7 +1020,6 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             
          case 4:       
             // is this a 2xx http code?
-            // TODO: could 2xx check be done on readyState 3?
             var sucessful = String(xhr.status)[0] == 2;
             
             if( sucessful ) {
