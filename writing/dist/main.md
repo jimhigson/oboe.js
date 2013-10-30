@@ -9,13 +9,13 @@ Abstract
 A new design for http client libraries incorporating http streaming,
 pattern matching, and incremental parsing, with the aim of improving
 performance, fault tolerance, and encouraging a greater degree of loose
-coupling between programs. A Javascript client library capable of progressively
-parsing JSON resources is presented targeting both Node.js and web
-browsers. Loose coupling is particularly considered in light of the
-application of Agile methodologies to REST and SOA, providing a
+coupling between programs. A Javascript client library capable of
+progressively parsing JSON resources is presented targeting both Node.js
+and web browsers. Loose coupling is particularly considered in light of
+the application of Agile methodologies to REST and SOA, providing a
 framework in which it is acceptable to partially restructure the JSON
-format of a resource while maintaining compatibility
-with dependent systems.
+format of a resource while maintaining compatibility with dependent
+systems.
 
 A critique is made of current practice under which resources are
 entirely retrieved before items of interest are extracted
@@ -42,19 +42,20 @@ than as the delivery of new software.
 In the interest of developer ergonomics, REST clients have tended to
 style the calling of remote resources similar to the call style of the
 host programming language. Depending on the language, one of two schemas
-are followed: a synchronous, blocking style in which a some invocation halts
-execution for the duration of the request before evaluating to the
-fetched resource; or asynchronous, non-blocking in which some logic is specified to be
-applied to a response once it is available. Languages encourage our
-thinking to follow the terms that they easily support[@whorf56]. Languages which promote concurrency though
-threading generally consider blocking in a single thread to be acceptable and will
-prefer the synchronous mode whereas languages with first class
-functions are naturally conversant in callbacks and will prefer asynchronous I/O.
-We should remember in programming that languages limit the
-patterns that we readily see [@rubylang] and that better mappings may be
-possible. This observation extends to graphical notations such as UML
-whose constructs strongly reflect the programming languages of the day.
-For any multi-packet message sent via a network some parts will arrive
+are followed: a synchronous, blocking style in which a some invocation
+halts execution for the duration of the request before evaluating to the
+fetched resource; or asynchronous, non-blocking in which some logic is
+specified to be applied to a response once it is available. Languages
+encourage our thinking to follow the terms that they easily
+support[@whorf56]. Languages which promote concurrency though threading
+generally consider blocking in a single thread to be acceptable and will
+prefer the synchronous mode whereas languages with first class functions
+are naturally conversant in callbacks and will prefer asynchronous I/O.
+We should remember in programming that languages limit the patterns that
+we readily see [@rubylang] and that better mappings may be possible.
+This observation extends to graphical notations such as UML whose
+constructs strongly reflect the programming languages of the day. For
+any multi-packet message sent via a network some parts will arrive
 before others, at least approximately in-order, but viewed from inside a
 language whose statements invariably yield single, discrete values it
 comfortable to conceptualise the REST response as a discrete event. UML
@@ -80,8 +81,8 @@ composition. Every current web browser already implements such a schema;
 load any complex webpage -- essentially an aggregation of hypertext and
 other resources -- the HTML will be parsed and displayed incrementally
 while it is downloading and resources such as images are requested in
-parallel as soon as they are referenced. in the case of progressive JPEGs or SVGs[^2_Introduction1] the images may themselves be
-presented incrementally.
+parallel as soon as they are referenced. in the case of progressive
+JPEGs or SVGs[^2_Introduction1] the images may themselves be presented incrementally.
 This incremental display is achieved through highly optimised software
 created for a single task, that of displaying web pages. The new
 contribution of this dissertation is to provide a generic analogue,
@@ -90,13 +91,13 @@ applicable to any problem domain.
 How REST aggregation could be faster
 ------------------------------------
 
-![**Sequence diagram showing the aggregation of low-level REST
-resources by an intermediary.** A client fetches an author's publication list and then
-their first three articles. This sequence represents the most commonly
-used technique in which the client does not react to the response until
-it is complete. In this example the second wave of requests cannot be
-made until the original response is complete, at which time they are
-issued in quick succession.
+![**Sequence diagram showing the aggregation of low-level REST resources
+by an intermediary.** A client fetches an author's publication list and
+then their first three articles. This sequence represents the most
+commonly used technique in which the client does not react to the
+response until it is complete. In this example the second wave of
+requests cannot be made until the original response is complete, at
+which time they are issued in quick succession.
 \label{rest_timeline_1}](images/rest_timeline_1.png)
 
 ![**Revised aggregation sequence for a client capable of progressively
@@ -122,29 +123,29 @@ how the cadence of requests is more steady in Figure
 \ref{rest_timeline_2} with four connections opened at roughly equal
 intervals rather than a single request followed by a rapid burst of
 three. Both clients and servers routinely limit the number of
-simultaneous connections per peer so avoiding bursts is
-further to our advantage. [Appendix i](#appendix_http_limits) lists some
-actual limits.
+simultaneous connections per peer so avoiding bursts is further to our
+advantage. [Appendix i](#appendix_http_limits) lists some actual limits.
 
 Nodes in an n-tier architecture defy categorisation as 'client' or
 'server' in a way which is appropriate from all frames of reference. A
 node might be labeled as the 'server' from the layer below and 'client'
 from the layer above. Although the "client software" labels in the
-figures \ref{rest_timeline_1} and \ref{rest_timeline_2} hint at something running directly on a user's own device,
-the same benefits apply if this layer is running remotely. If this layer
-were generating a web page on the server-side to be displayed by the
-client's browser, the same perceptual speed improvements apply because of
-http chunked encoding [@perceptionHttpChunkedSpeed]. If this layer were
-a remote aggregation service, starting to write out the aggregated
-response early provides much the same benefits for a client
-able to interpret it progressively and, even if it is not, the
-overall delivery remains faster.
+figures \ref{rest_timeline_1} and \ref{rest_timeline_2} hint at
+something running directly on a user's own device, the same benefits
+apply if this layer is running remotely. If this layer were generating a
+web page on the server-side to be displayed by the client's browser, the
+same perceptual speed improvements apply because of http chunked
+encoding [@perceptionHttpChunkedSpeed]. If this layer were a remote
+aggregation service, starting to write out the aggregated response early
+provides much the same benefits for a client able to interpret it
+progressively and, even if it is not, the overall delivery remains
+faster.
 
 Stepping outside the big-small tradeoff
 ---------------------------------------
 
-Where a domain model is requestable via REST and contains data in a series with continuous ranges
-I have often noticed a tradeoff in client
+Where a domain model is requestable via REST and contains data in a
+series with continuous ranges I have often noticed a tradeoff in client
 design with regards to how much should be requested with each call.
 Because at any time it shows only a small window into a much larger
 model, the social networking site Twitter might be a good example. The
@@ -157,8 +158,8 @@ the page. Applied repeatedly the illusion of an infinitely long page in
 maintained, albeit punctuated with pauses whenever new content is
 loaded. For the programmers working on this presentation layer there is
 a tradeoff between sporadically requesting many tweets, yielding long,
-infrequent delays and frequently requesting a few, giving an
-interface which stutters momentarily but often.
+infrequent delays and frequently requesting a few, giving an interface
+which stutters momentarily but often.
 
 I propose that progressive loading could render this tradeoff
 unnecessary by simultaneously delivering the best of both strategies. In
@@ -179,13 +180,13 @@ existing http clients handle unexpected terminations suboptimally.
 Consider the everyday situation of a person using a smartphone browser
 to check their email. Mobile data coverage is often weak outside of
 major cities [@opensignal] so while travelling the signal will be lost
-and reestablished many times. The web developer's standard toolkit
-is structured in a way that encourages early terminated connections to
-be considered as wholly unsuccessful rather than as partially
-successful. For example, the popular AJAX library jQuery automatically
-parses JSON or XML responses before passing back to the application but
-given an early disconnection there is no attempt to hand over the
-partial response. To the programmer who knows where to look the partial
+and reestablished many times. The web developer's standard toolkit is
+structured in a way that encourages early terminated connections to be
+considered as wholly unsuccessful rather than as partially successful.
+For example, the popular AJAX library jQuery automatically parses JSON
+or XML responses before passing back to the application but given an
+early disconnection there is no attempt to hand over the partial
+response. To the programmer who knows where to look the partial
 responses are extractable as raw text but handling them involves writing
 a special case and is difficult because standard parsers are not
 amenable to incomplete markup. Because of this difficulty I can only
@@ -194,8 +195,8 @@ the user checking her email, even if 90% of her inbox had been retrieved
 before her phone signal was lost, the web application will behave as if
 it received none and show her nothing. Later, when the network is
 available again the inbox will be downloaded from scratch, including the
-90% which has already been successfully delivered. I see much potential for improvement
-here.
+90% which has already been successfully delivered. I see much potential
+for improvement here.
 
 I propose moving away from this polarised view of
 successful/unsuccessful requests to one in which identifiable parts of a
@@ -225,16 +226,16 @@ sub-system shouldn't pose a problem to the correct operation of the
 whole. In allowing a design to emerge organically it should be possible
 for the structure of resource formats to be realised slowly and
 iteratively while a greater understanding of the problem is gained.
-Unfortunately in practice the ability to change often is hampered by tools
-which encourage programming against rigidly specified formats. When a
-data consumer is allowed to be tightly coupled to a data format it will resist
-changes to the programs which produce data in that format. Working in
-enterprise I have often seen the release of dozens of components
-cancelled because of a single unit that failed to meet acceptance
-criteria. By insisting on exact data formats, subsystems become tightly
-coupled and the perfect environment is created for contagion whereby the
-updating of any single unit may only be done as part of the updating of
-the whole.
+Unfortunately in practice the ability to change often is hampered by
+tools which encourage programming against rigidly specified formats.
+When a data consumer is allowed to be tightly coupled to a data format
+it will resist changes to the programs which produce data in that
+format. Working in enterprise I have often seen the release of dozens of
+components cancelled because of a single unit that failed to meet
+acceptance criteria. By insisting on exact data formats, subsystems
+become tightly coupled and the perfect environment is created for
+contagion whereby the updating of any single unit may only be done as
+part of the updating of the whole.
 
 An effective response to this problem would be to integrate into a REST
 clients the ability to use a response whilst being only loosely coupled
@@ -254,14 +255,14 @@ only solutions which interoperate with existing deployments. This is
 advantageous; to somebody looking to improve their system small
 enhancements are more inviting than wholesale change.
 
-To reify the vision above a streaming client is the MVP. Although an explicitly streaming server would
-improve the situation further, because all
-network transmissions may be viewed though a streaming lens it
-is not required to start taking advantage of progressive REST.
-In the interest of creating something new, whilst http
-servers capable of streaming are quite common even if they are not
-always programmed as such, I have been unable to find any example of a
-streaming-receptive REST client.
+To reify the vision above a streaming client is the MVP. Although an
+explicitly streaming server would improve the situation further, because
+all network transmissions may be viewed though a streaming lens it is
+not required to start taking advantage of progressive REST. In the
+interest of creating something new, whilst http servers capable of
+streaming are quite common even if they are not always programmed as
+such, I have been unable to find any example of a streaming-receptive
+REST client.
 
 Criteria for success
 --------------------
@@ -270,14 +271,15 @@ In evaluating this project we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
 increase in the difficulty of programming the client. This improvement
 may be in terms of the absolute total time required to complete a
-representative task or in a user's perception of the application responsiveness while performing
-the task. Because applications in the target domain are much more
-I/O-bound than CPU-bound, optimisation in terms of the execution time of
-a algorithms will be de-emphasised unless especially egregious.
-Additionally, I shall be considering how the semantics of a message are
-expanded as a system's design emerges and commenting on the value of
-loose coupling between data formats and the programs which act on them
-in avoiding disruption given unanticipated format changes.
+representative task or in a user's perception of the application
+responsiveness while performing the task. Because applications in the
+target domain are much more I/O-bound than CPU-bound, optimisation in
+terms of the execution time of a algorithms will be de-emphasised unless
+especially egregious. Additionally, I shall be considering how the
+semantics of a message are expanded as a system's design emerges and
+commenting on the value of loose coupling between data formats and the
+programs which act on them in avoiding disruption given unanticipated
+format changes.
 
 [^2_Introduction1]: for quite an obviously visible example of progressive SVG loading,
     try loading this SVG using a recent version of Google Chrome:
@@ -295,32 +297,33 @@ Background
 node is located, REST may be used as the means of communication. By
 focusing on REST clients, nodes in the middleware and presentation layer
 fall in our scope. Although network topology is often split about client
-and server side, for our purposes categorisation as data, middleware, and presentation is the more
-meaningful distinction. According to this split the client-side
-presentation layer and server-side presentation layer serve the same
-purpose, generating mark-up based on aggregated data prepared by the
-middle tier \label{architecture}](images/architecture.png)
+and server side, for our purposes categorisation as data, middleware,
+and presentation is the more meaningful distinction. According to this
+split the client-side presentation layer and server-side presentation
+layer serve the same purpose, generating mark-up based on aggregated
+data prepared by the middle tier
+\label{architecture}](images/architecture.png)
 
 The web as an application platform
 ----------------------------------
 
 Application design has historically charted an undulating path pulled by
 competing approaches of thick and thin clients. Having evolved from a
-document viewing system to the preferred application platform for all but the most
-specialised interfaces, the web perpetuates this narrative by resisting
-categorisation as either mode.
+document viewing system to the preferred application platform for all
+but the most specialised interfaces, the web perpetuates this narrative
+by resisting categorisation as either mode.
 
 While the trend is generally for more client scripting and for many
-sites a Javascript runtime is now requisite, there are also counter-trends. In
-2012 twitter reduced load times to one fifth of their previous design by
-moving much of their rendering back to the server-side, commenting that
-"The future is coming and it looks just like the past" [@newTwitter].
-Under this architecture short, fast-loading pages are generated on the
-server-side but Javascript also provides progressive enhancements.
-Although it does not generate pages anew, the Javascript must know
-how to create most of the interface elements so one weakness of this
-architecture is that much of the presentation layer logic must be
-expressed twice.
+sites a Javascript runtime is now requisite, there are also
+counter-trends. In 2012 twitter reduced load times to one fifth of their
+previous design by moving much of their rendering back to the
+server-side, commenting that "The future is coming and it looks just
+like the past" [@newTwitter]. Under this architecture short,
+fast-loading pages are generated on the server-side but Javascript also
+provides progressive enhancements. Although it does not generate pages
+anew, the Javascript must know how to create most of the interface
+elements so one weakness of this architecture is that much of the
+presentation layer logic must be expressed twice.
 
 Despite client devices taking on responsibilities which would previously
 have been performed on a server, there is a limit to how much of the
@@ -335,9 +338,9 @@ encourage a middle tier to execute business logic and produce aggregate
 data.
 
 While REST may not be the only communications technology employed by an
-application architecture, for this project we should examine where 
-REST clients libraries may fit into the picture. REST is used by the presentation layer to pull data from
-middleware regardless of where the
+application architecture, for this project we should examine where REST
+clients libraries may fit into the picture. REST is used by the
+presentation layer to pull data from middleware regardless of where the
 presentation resides. Likewise, rather than connect to databases
 directly, for portability middlewares often communicate with a thin REST
 layer which wraps data stores. This suggests three uses:
@@ -348,23 +351,24 @@ layer which wraps data stores. This suggests three uses:
 
 Fortunately, each of these contexts requires a similar performance
 profile. The work done is computationally light and answering a request
-involves more time waiting than processing. The node is essentially acting as a data router serving
-messages containing a small subset of the data from a larger model. As a part of an interactive system low
+involves more time waiting than processing. The node is essentially
+acting as a data router serving messages containing a small subset of
+the data from a larger model. As a part of an interactive system low
 latency is important whereas throughput can be increased relatively
-cheaply by adding more hardware, especially in a cloud hosted environment.
-As demand for the system increases the
-total work required grows but the complexity in responding to any one of the requests
-remains constant. Although serving any particular request might be
-done in series, the workload as a whole is embarrassingly parallelisable.
+cheaply by adding more hardware, especially in a cloud hosted
+environment. As demand for the system increases the total work required
+grows but the complexity in responding to any one of the requests
+remains constant. Although serving any particular request might be done
+in series, the workload as a whole is embarrassingly parallelisable.
 
 Node.js
 -------
 
 Node.js is a general purpose tool for executing Javascript outside of a
-browser. It has the aim of low-latency I/O and is used mostly for
-server applications and command line tools. It is difficult to judge to
-what degree Javascript is a distraction from Node's principled design
-and to what degree the language defines the platform.
+browser. It has the aim of low-latency I/O and is used mostly for server
+applications and command line tools. It is difficult to judge to what
+degree Javascript is a distraction from Node's principled design and to
+what degree the language defines the platform.
 
 For most imperative languages the thread is the basic unit of
 concurrency, whereas Node presents the programmer with a single-threaded
@@ -373,32 +377,33 @@ computation over multiple cores but are less well suited to scheduling
 concurrent tasks which are mostly I/O dependent. Programming threads
 safely with shared access to mutable objects requires great care and
 experience, otherwise the programmer is liable to create race
-conditions. Consider for example a Java http aggregator; because we
-wish to fetch in parallel each http request is assigned to a thread.
-These 'requester' tasks are computationally simple: make a request, wait
-for a complete response, and then participate in a Barrier while the other requesters complete.
-Each thread consumes considerable resources but during its
-multi-second lifespan requires only a fraction of a millisecond on the
-CPU. It is unlikely any two requests return closely enough in time that the threads
-will process in series rather than parallel, loosing thread's natural strengths for utilising
-multiple cores. Even if they do, the actual CPU time required in making an http
+conditions. Consider for example a Java http aggregator; because we wish
+to fetch in parallel each http request is assigned to a thread. These
+'requester' tasks are computationally simple: make a request, wait for a
+complete response, and then participate in a Barrier while the other
+requesters complete. Each thread consumes considerable resources but
+during its multi-second lifespan requires only a fraction of a
+millisecond on the CPU. It is unlikely any two requests return closely
+enough in time that the threads will process in series rather than
+parallel, loosing thread's natural strengths for utilising multiple
+cores. Even if they do, the actual CPU time required in making an http
 request is so short that any concurrent processing is a pyrrhic victory.
 
 ![**Single-threaded vs multi-threaded scheduling for an http
 aggregator**](images/placeholder.png)
 
 Node builds on the model of event-based, asynchronous i/o that was
-established by web browser Javascript execution. Although Javascript
-in a browser may be performing multiple tasks simultaneously, for
-example requesting several resources from the server side, it does so
-from within a single-threaded virtual machine. Node
-facilitates concurrency by managing an event loop of queued tasks and
-providing exclusively non-blocking I/O. Unlike Erlang, Node does not
-swap tasks out preemptively, it always waits for a task to complete
-before moving onto the next. This means that each task must complete
-quickly to avoid holding up others. *Prima facie* this might seem like
-an onerous requirement to put on the programmer but in practice with
-only non-blocking I/O available each task naturally exits quickly without any
+established by web browser Javascript execution. Although Javascript in
+a browser may be performing multiple tasks simultaneously, for example
+requesting several resources from the server side, it does so from
+within a single-threaded virtual machine. Node facilitates concurrency
+by managing an event loop of queued tasks and providing exclusively
+non-blocking I/O. Unlike Erlang, Node does not swap tasks out
+preemptively, it always waits for a task to complete before moving onto
+the next. This means that each task must complete quickly to avoid
+holding up others. *Prima facie* this might seem like an onerous
+requirement to put on the programmer but in practice with only
+non-blocking I/O available each task naturally exits quickly without any
 special effort. Accidental non-terminating loops or heavy
 number-crunching aside, with no reason for a task to wait it is
 difficult to write a node program in which the tasks do not complete
@@ -409,20 +414,19 @@ its single Javascript thread between these tasks efficiently while
 providing the programmer with an intuitive interface because of
 closures. Utilising closures, the responsibility of maintaining state
 between issuing an asynchronous call and receiving the callback is
-removed from the programmer by folding the storage invisibly into the language.
-This implicit data store requires no syntax and feels so natural and
-inevitable that it is often not obvious that the responsibility exists
-at all.
+removed from the programmer by folding the storage invisibly into the
+language. This implicit data store requires no syntax and feels so
+natural and inevitable that it is often not obvious that the
+responsibility exists at all.
 
 Consider the example below. The code schedules three tasks, each of
 which are very short and exit quickly allowing Node to finely interlace
 them between other concurrent concerns. The `on` method is used to
 attach functions as listeners to streams. However sophisticated and
-performant this style of programming, to the developer it is hardly any more
-difficult an expression than if I/O were used. It is
-certainly harder to make mistakes programming in this way than managing 
-synchronised access to mutable objects that are
-shared between threads.
+performant this style of programming, to the developer it is hardly any
+more difficult an expression than if I/O were used. It is certainly
+harder to make mistakes programming in this way than managing
+synchronised access to mutable objects that are shared between threads.
 
 ~~~~ {.javascript}
 function printResourceToConsole(url) {
@@ -463,14 +467,14 @@ function printResourceToConsole(url) {
 > JavaScript." [@nodeStream]
 
 In Node I/O is performed using a unified data streaming interface
-regardless of the source. The streams fit comfortably with the wider event-driven 
-model by implementing Node's EventEmitter interface, a generic 
-Observer pattern API. Although
-the abstraction provided by streams is quite a thin layer on top of the
-host system's socket, it forms a powerful and intuitive interface. For
-many tasks it is preferable to program in a 'plumbing' style by joining
-one stream's output to another's input. In the example below a resource
-from the internet is written to the local filesystem.
+regardless of the source. The streams fit comfortably with the wider
+event-driven model by implementing Node's EventEmitter interface, a
+generic Observer pattern API. Although the abstraction provided by
+streams is quite a thin layer on top of the host system's socket, it
+forms a powerful and intuitive interface. For many tasks it is
+preferable to program in a 'plumbing' style by joining one stream's
+output to another's input. In the example below a resource from the
+internet is written to the local filesystem.
 
 ~~~~ {.javascript}
 http.get(url)
@@ -502,11 +506,11 @@ XML parsers produce Elements, Text, Attributes, ProcessingInstruction
 which require extra translation before they are convenient to use inside
 a programming language. Because JSON already closely resembles how a
 programmer would construct a runtime model of their data, fewer steps
-are required before using the deserialised form. The JSON nodes: *strings*, *numbers*, *objects* and *arrays*
-will in many cases map directly onto language types and, for
-loosely typed languages at least, the parser output bears enough
-similarity to domain model objects that it may be used directly without
-any further transformation.
+are required before using the deserialised form. The JSON nodes:
+*strings*, *numbers*, *objects* and *arrays* will in many cases map
+directly onto language types and, for loosely typed languages at least,
+the parser output bears enough similarity to domain model objects that
+it may be used directly without any further transformation.
 
 ~~~~ {.javascript}
 {
@@ -518,22 +522,21 @@ any further transformation.
 }
 ~~~~
 
-Both JSON and XML are used to serialise orderless constructs
-but but while expressed as text the
-encoding is inevitably written according to some serialisation order.
-XML specifically states that the order of attributes is not significant [@xmlorder],
-JSON has no such detailed specification but a similar order insignificance seems to be implied by
-the JSON object's likeness to Javascript objects.
-In the example above,
-the people objects would probably have been written as a representation of
-either a class with two public properties or a hash map. On receiving
-this data the text would be demarshalled into similar orderless structures and
-that the data found an ordered expression during transport would be
-quickly forgotten. When viewing a document through a streaming lens
-and interpreting while still incomplete it is easier to mistakenly
-react differently according to field order. If
-nodes from the example above were used when only the first field has arrived 
-Walter would find a different handling than John or Jack. Because the
+Both JSON and XML are used to serialise orderless constructs but but
+while expressed as text the encoding is inevitably written according to
+some serialisation order. XML specifically states that the order of
+attributes is not significant [@xmlorder], JSON has no such detailed
+specification but a similar order insignificance seems to be implied by
+the JSON object's likeness to Javascript objects. In the example above,
+the people objects would probably have been written as a representation
+of either a class with two public properties or a hash map. On receiving
+this data the text would be demarshalled into similar orderless
+structures and that the data found an ordered expression during
+transport would be quickly forgotten. When viewing a document through a
+streaming lens and interpreting while still incomplete it is easier to
+mistakenly react differently according to field order. If nodes from the
+example above were used when only the first field has arrived Walter
+would find a different handling than John or Jack. Because the
 serialisation will contain items which are written to follow an
 indeterminate order it will be important to ensure that, despite the
 streaming, the REST client does not encourage programming in a way that
@@ -546,14 +549,14 @@ For languages such as Javascript or Clojure which use a loosely-typed
 representation of objects as generic key-value pairs, when a JSON REST
 resource is received the output from the parser resembles the normal
 object types closely enough that it is acceptable to use it directly
-throughout the program. For XML this is not the case for any language and some marshaling
-is required. In more strongly typed OO languages such as Java or C\#,
-JSON's classless, relatively freeform objects are less convenient. 
-To smoothly integrate
-the example JSON from the previous section, instances of a domain model Person class with
-methods such as `getName()` and `getLocation()` would have to be initialised,
-representing the remote objects no differently than if they
-had originated locally. Automatic marshaling generalises this process by
+throughout the program. For XML this is not the case for any language
+and some marshaling is required. In more strongly typed OO languages
+such as Java or C\#, JSON's classless, relatively freeform objects are
+less convenient. To smoothly integrate the example JSON from the
+previous section, instances of a domain model Person class with methods
+such as `getName()` and `getLocation()` would have to be initialised,
+representing the remote objects no differently than if they had
+originated locally. Automatic marshaling generalises this process by
 providing a two-way mapping between the domain model and its
 serialisation, either completely automatically or based on a declarative
 specification. It is common in strongly typed languages for REST client
@@ -565,16 +568,16 @@ resources and the local domain model is to demarshal automatically only
 so far as *Data Transfer Objects* (DTOs). DTOs are instances of classes
 which implement no logic other than storage, and from these DTOs the
 domain model objects may be programmatically instantiated. DTOs are more
-necessary when using XML. Reading resources encoded as JSON we might say that
-the JSON objects are already DTOs.
+necessary when using XML. Reading resources encoded as JSON we might say
+that the JSON objects are already DTOs.
 
 The degree of marshaling that is used generally changes only the types
 of the entities that the REST client library hands over to the
 application developer without affecting the overall structure of the
-message. Regardless of the exact types, having received the
-response model the developer will usually start by addressing in
-pertinent parts of the response by drilling down into the structures
-using the programming language itself.
+message. Regardless of the exact types, having received the response
+model the developer will usually start by addressing in pertinent parts
+of the response by drilling down into the structures using the
+programming language itself.
 
 ~~~~ {.java}
 // Java example - programmatic approach to domain model 
@@ -605,47 +608,48 @@ One weakness in this means of drilling down is that the code making the
 inspection is quite tightly coupled to the precise structure of the
 thing that it is inspecting. Taking the above example, if the resource
 being fetched were later refactored such that the town concept were
-changed to a fuller address structure as a street-town-county-country tuple, the
-code addressing the structure would also have to change just to continue
-to do the same thing. Although this kind of drill-down programming is
-commonly practiced and not generally recognised as a code smell,
-requiring knock-on changes when an unrelated system is refactored seems
-to me as undesirable in relation to format structures as it would be anywhere else.
+changed to a fuller address structure as a street-town-county-country
+tuple, the code addressing the structure would also have to change just
+to continue to do the same thing. Although this kind of drill-down
+programming is commonly practiced and not generally recognised as a code
+smell, requiring knock-on changes when an unrelated system is refactored
+seems to me as undesirable in relation to format structures as it would
+be anywhere else.
 
 In the *Red Queen's race* it took "all the running you can do, to keep
 in the same place". Ideally as a programmer I'd like to expend effort to
 make my code to do something new, or to perform something that it
-already did better, not to stay still. Following an object
-oriented encapsulation of data such that a caller does not have to
-concern itself with the data structures behind an interface, the
-internal implementation may be changed without disruptions to the rest
-of the code base. However, when the structure of the inter-object
-composition is revised, isolation from the changes is less often
-recognised as a desirable trait. A method of programming which truly
-embraced extreme programming would allow structural refactoring to occur
-without disparate parts having to be modified in parallel.
+already did better, not to stay still. Following an object oriented
+encapsulation of data such that a caller does not have to concern itself
+with the data structures behind an interface, the internal
+implementation may be changed without disruptions to the rest of the
+code base. However, when the structure of the inter-object composition
+is revised, isolation from the changes is less often recognised as a
+desirable trait. A method of programming which truly embraced extreme
+programming would allow structural refactoring to occur without
+disparate parts having to be modified in parallel.
 
 Extraneous changes also dilute a VCS changelog, making it less easy to
 later follow a narrative of code changes which are intrinsic to the
-update in logic expressed by the program, and therefore harder to
-later understand the thinking behind the change and the reason for the
-change.
+update in logic expressed by the program, and therefore harder to later
+understand the thinking behind the change and the reason for the change.
 
 JsonPath and XPath selector languages
 -------------------------------------
 
 \label{jsonpathxpath}
 
-To address the problem of drilling down to pertinent fragments of a message without
-tightly coupling to the format, consider if instead of
+To address the problem of drilling down to pertinent fragments of a
+message without tightly coupling to the format, consider if instead of
 programmatically descending step-by-step, a language were used which
-allows the right amount of specificity to be given regarding which parts to select.
-Certain markup languages come with associated query languages whose coupling
-is loose enough that not every node that is descended through must be
-specified. The best known is XPATH but there is also JSONPath, a JSON
-equivalent [@jsonpath].
+allows the right amount of specificity to be given regarding which parts
+to select. Certain markup languages come with associated query languages
+whose coupling is loose enough that not every node that is descended
+through must be specified. The best known is XPATH but there is also
+JSONPath, a JSON equivalent [@jsonpath].
 
-As far as possible, JSONPath's syntax resembles the equivalent Javascript: 
+As far as possible, JSONPath's syntax resembles the equivalent
+Javascript:
 
 ~~~~ {.javascript}
 // in Javascript we can get the town of the second person as:
@@ -672,8 +676,9 @@ Consider the resource below:
 }
 ~~~~
 
-The JSONPath `people.*..town` may be applied against the above JSON and would
-continue to select correctly after a refactor to the version below:
+The JSONPath `people.*..town` may be applied against the above JSON and
+would continue to select correctly after a refactor to the version
+below:
 
 ~~~~ {.javascript}
 {
@@ -702,12 +707,12 @@ distinct lists of child nodes, attribute children and node list
 children; from one perspective attributes are child nodes of their
 parent element but they can alternatively be considered as data stored
 in the element. Because of this classification ambiguity an XML document
-doesn't have a singly correct n-way tree. XML attributes
-may only contain strings and have a lesser expressivity than child
-nodes which allow recursive structure; it is a common refactor to change from attributes to elements when a
-scalar value is upgraded to be a
-compound. XPath selectors written in the most natural way do not track
-this change.
+doesn't have a singly correct n-way tree. XML attributes may only
+contain strings and have a lesser expressivity than child nodes which
+allow recursive structure; it is a common refactor to change from
+attributes to elements when a scalar value is upgraded to be a compound.
+XPath selectors written in the most natural way do not track this
+change.
 
 ~~~~ {.xml}
 <people>
@@ -715,9 +720,9 @@ this change.
 </people>
 ~~~~
 
-The XPath `//person@town` matches against the XML above but because of the
-switch from attribute to child element fails to match given the revised
-version below.
+The XPath `//person@town` matches against the XML above but because of
+the switch from attribute to child element fails to match given the
+revised version below.
 
 ~~~~ {.xml}
 <people>
@@ -732,8 +737,8 @@ version below.
 </people>
 ~~~~
 
-Reflecting its dual purpose for marking up documents or data, XML
-also invites ambiguous interpretation of the whitespace between tags.
+Reflecting its dual purpose for marking up documents or data, XML also
+invites ambiguous interpretation of the whitespace between tags.
 Whitespace is usually meaningful for documents but ignorable for data.
 Strictly, whitespace text nodes are a part of the document but in
 practice many tree walkers discard them as insignificant. In the XML
@@ -743,25 +748,25 @@ is considered. Likewise, the text inside `<name>` might be `'John'` or
 `'(newline)(tab)(tab)John'`. Inheriting from JSON's programming language
 ancestry, the space between tokens is never significant.
 
-Programming against a changing service is always going to present a moving
-target but it is easier to miss with XPATH than with JSON. In JSON each
-node has only one, unambiguous set of children so the metamodel does
-not give format authors a choice of logically equivalent features
-that must be addressed through different mechanisms. If a scalar value is
-updated to a compound only the node itself changes, the addressing of
-the node is unaffected.
+Programming against a changing service is always going to present a
+moving target but it is easier to miss with XPATH than with JSON. In
+JSON each node has only one, unambiguous set of children so the
+metamodel does not give format authors a choice of logically equivalent
+features that must be addressed through different mechanisms. If a
+scalar value is updated to a compound only the node itself changes, the
+addressing of the node is unaffected.
 
 Generally in descriptive hierarchical data there is a trend for
 ancestorship to denote the same relationship between concepts regardless
 of the number of intermediate generations. In the example above, `town`
-transitioned from a child to grandchild of `person` without disturbing the
-implicit 'lives in' relationship. In JSONPath the `..` operator provides
-matching through zero or more generations, unperturbed when extra levels
-are added. Of course, this trend will not hold for every conceivable way
-of building message semantics because it is possible that an
-intermediate node on the path from ancestor to descendant will change
-the nature of the expressed relationship. A slightly contrived example
-might be if we expanded our model to contain fuzzy knowledge:
+transitioned from a child to grandchild of `person` without disturbing
+the implicit 'lives in' relationship. In JSONPath the `..` operator
+provides matching through zero or more generations, unperturbed when
+extra levels are added. Of course, this trend will not hold for every
+conceivable way of building message semantics because it is possible
+that an intermediate node on the path from ancestor to descendant will
+change the nature of the expressed relationship. A slightly contrived
+example might be if we expanded our model to contain fuzzy knowledge:
 
 ~~~~ {.javascript}
 {
@@ -776,14 +781,14 @@ might be if we expanded our model to contain fuzzy knowledge:
 
 Considering the general case, it will not be possible to track all
 possible service refactors safely. By necessity a resource consumer
-should limit their ambitions to tracking ontology expansions which do not
-alter the existing concepts. In practice integration
-testing against the beta version of a service will be necessary to be
-pre-warned of upcoming, incompatible changes. If an incompatibility is
-found the ability to then create an expression which is compatible with
-with a present and known future version remains a valuable tool because
-it decouples the consumer and provider update schedules, removing
-the need for the client to march perfectly in sync with the service.
+should limit their ambitions to tracking ontology expansions which do
+not alter the existing concepts. In practice integration testing against
+the beta version of a service will be necessary to be pre-warned of
+upcoming, incompatible changes. If an incompatibility is found the
+ability to then create an expression which is compatible with with a
+present and known future version remains a valuable tool because it
+decouples the consumer and provider update schedules, removing the need
+for the client to march perfectly in sync with the service.
 
 Browser XML HTTP Request (XHR)
 ------------------------------
@@ -794,17 +799,17 @@ sometimes used synonymously with Javascript-rich web applications.
 Although AJAX is an acronym for **A**synchronous **J**avascript
 (**a**nd) **X**ML, this reflects the early millennial enthusiasm for XML
 as the one true data format and in practice any textual format may be
-transferred. During the 'browser war' years web
-browsers competed by adding non-standard features; Internet Explorer
-made AJAX possible in 2000 by exposing Microsoft's Active X *Xml Http
-Request* (XHR) class to the Javascript sandbox. This was widely copied
-and near equivalents were added to all major browsers. In 2006 the
-interface was eventually formalised by the W3C [@xhrWorkingDraft]. XHR's
-slow progresss to standardisation reflected a period of general
-stagnation for web standards. HTML4 reached Recommendation status in
-2001 but having subsequently found several evolutionary dead ends such
-as XHTML, there would be no major updates until HTML5 started to gather
-pace some ten years later.
+transferred. During the 'browser war' years web browsers competed by
+adding non-standard features; Internet Explorer made AJAX possible in
+2000 by exposing Microsoft's Active X *Xml Http Request* (XHR) class to
+the Javascript sandbox. This was widely copied and near equivalents were
+added to all major browsers. In 2006 the interface was eventually
+formalised by the W3C [@xhrWorkingDraft]. XHR's slow progresss to
+standardisation reflected a period of general stagnation for web
+standards. HTML4 reached Recommendation status in 2001 but having
+subsequently found several evolutionary dead ends such as XHTML, there
+would be no major updates until HTML5 started to gather pace some ten
+years later.
 
 Despite a reputation for being poorly standardised, as a language
 Javascript enjoys consistent implementation. More accurately we would
@@ -816,14 +821,14 @@ Prototype.js libraries promoting themselves as *"do more, write less"*
 and *"elegant APIs around the clumsy interfaces of Ajax"*. Written
 against the unadorned browser, Javascript applications read as a maze of
 platform-detection and special cases. Once applications were built using
-abstractions over the underlying browser differences they
-could be written purposefully and were able to express more complex
-ideas without becoming incomprehensible.
+abstractions over the underlying browser differences they could be
+written purposefully and were able to express more complex ideas without
+becoming incomprehensible.
 
-Today JSON is generally the preferred format, especially for REST endpoints
-designed for delivery
-to client-side web applications. Javascript programmers occupy a privileged position whereby
-their serialisation format maps exactly onto the inbuilt types of their
+Today JSON is generally the preferred format, especially for REST
+endpoints designed for delivery to client-side web applications.
+Javascript programmers occupy a privileged position whereby their
+serialisation format maps exactly onto the inbuilt types of their
 programming language. As such there is never any confusion regarding
 which object structure to de-serialise to. Should this advantage seem
 insubstantial, contrast with the plethora of confusing and incompatible
@@ -832,8 +837,8 @@ JSON's Object better resembles Java's Map interface than Java Objects,
 creating linguistic difficulties, and the confusion between JSON null,
 Java null, and Jackson's NullNode[^3_Background1] is a common cause of errors.
 Emboldened by certainty regarding deserialisation, AJAX libraries
-directly integrate JSON parsers, providing a call style for working
-with remote resources so streamlined as to require hardly any additional
+directly integrate JSON parsers, providing a call style for working with
+remote resources so streamlined as to require hardly any additional
 effort.
 
 ~~~~ {.javascript}
@@ -854,11 +859,11 @@ XHRs and streaming
 
 Browser abstraction layers brought an improvement in expressivity to web
 application programming but were ultimately limited to supporting the
-lowest common denominator of available browser abilities. When the jQuery
-call style above was developed the most popular browser
-gave no access to in-progress responses so inevitably a
-conceptualisation was drawn of the response as a one-time event with no
-accommodation offered for progressively delivered data.
+lowest common denominator of available browser abilities. When the
+jQuery call style above was developed the most popular browser gave no
+access to in-progress responses so inevitably a conceptualisation was
+drawn of the response as a one-time event with no accommodation offered
+for progressively delivered data.
 
 The followup standard, XHR2 is now at Working Draft stage. Given
 ambitions to build a streaming REST client, of greatest interest is the
@@ -875,9 +880,9 @@ progressive image formats, html, svg, video, and Javascript itself
 (script interpretation starts before the script is fully loaded).
 
 The progress event is supported by the latest version of all major
-browsers. However, Internet Explorer only added support
-recently with version 10 and there is a significant user base remaining
-on versions 8 and 9.
+browsers. However, Internet Explorer only added support recently with
+version 10 and there is a significant user base remaining on versions 8
+and 9.
 
 Browser streaming frameworks
 ----------------------------
@@ -886,31 +891,31 @@ Browser streaming frameworks
 
 The web's remit is increasingly widening to encompass scenarios which
 would have previously been the domain of native applications. In order
-to use live data many current webapps employ frameworks which push soft-real-time
-events to the client side. This form of streaming has a different but overlapping purpose
-from the XHR2 progress event.
-Whereas XHR2 enables downloads to be viewed as short-lived streams but
-does not otherwise disrupt the sequence of http's request-response
-model, streaming frameworks facilitate an entirely different sequence,
-that of perpetual data. Consider a webmail interface; initially the
-user's inbox is downloaded via REST and a streaming download might be
-used to make its display more responsive. Regardless, the inbox download is 
-a standard REST call and shares
-little in common with the push events which follow and provide instant
-notification as new messages arrive.
+to use live data many current webapps employ frameworks which push
+soft-real-time events to the client side. This form of streaming has a
+different but overlapping purpose from the XHR2 progress event. Whereas
+XHR2 enables downloads to be viewed as short-lived streams but does not
+otherwise disrupt the sequence of http's request-response model,
+streaming frameworks facilitate an entirely different sequence, that of
+perpetual data. Consider a webmail interface; initially the user's inbox
+is downloaded via REST and a streaming download might be used to make
+its display more responsive. Regardless, the inbox download is a
+standard REST call and shares little in common with the push events
+which follow and provide instant notification as new messages arrive.
 
 **Push tables** sidestep the browser's absent data streaming abilities
 by leaning on a resource that it can stream: progressive html. On the
-client a page containing a table is hidden in an off-screen iframe. The frame's content
-is served as an HTML page containing a table that never completes, fed by a connection
-that never closes. When the server wishes to push a message to the
-client it writes a new row to the table which is then noticed by
-Javascript monitoring the iframe on the client. More recently,
-**Websockets** is a new standard that builds a standardised streaming
-transport on top of http's chunked mode. Websockets requires browser
-implementation and cannot be retrofitted to older browsers through
-Javascript. Websockets are a promising technology but for the time being
-patchy support means it cannot be used without a suitable fallback.
+client a page containing a table is hidden in an off-screen iframe. The
+frame's content is served as an HTML page containing a table that never
+completes, fed by a connection that never closes. When the server wishes
+to push a message to the client it writes a new row to the table which
+is then noticed by Javascript monitoring the iframe on the client. More
+recently, **Websockets** is a new standard that builds a standardised
+streaming transport on top of http's chunked mode. Websockets requires
+browser implementation and cannot be retrofitted to older browsers
+through Javascript. Websockets are a promising technology but for the
+time being patchy support means it cannot be used without a suitable
+fallback.
 
 These frameworks do not interoperate at all with REST. Because the
 resources they serve never complete they may not be read by a standard
@@ -922,29 +927,29 @@ the nature of the transport more so than the resource. This form of
 streaming is not, however, entirely alien to a SOA mindset. The data
 formats, while not designed primarily for human readability are
 nonetheless text based and a person may take a peek inside the system's
-plumbing simply by observing the traffic at a particular URL. For
-push tables, because the transport is based on a presentation format,
-an actual table of the event's properties may be
-viewed from a browser as the messages are streamed.
+plumbing simply by observing the traffic at a particular URL. For push
+tables, because the transport is based on a presentation format, an
+actual table of the event's properties may be viewed from a browser as
+the messages are streamed.
 
 Parsing: SAX and Dom
 --------------------
 
 From the XML world two standard parser types exist, SAX and DOM, with
-DOM by far the more popular. Both
-styles of parsers are also available for JSON. DOM performs a parse as a
-single evaluation and returns an object model representing the
-whole of the document. Conversely, SAX parsers are probably better
-considered as enhanced tokenisers, providing a very low-level event driven
-interface following the Observer pattern that notifies the programmer of
-each token separately as it is found. Working with DOM's level of abstraction
-the markup syntax is a distant concern whereas for SAX each element's
-opening and closing is noted so the developer may not put the data's
-serialisation aside. SAX comes with the advantages that it may read a document
-progressively and has lower memory requirements because it does not
-store the parsed tree. Correspondingly, it it popular for embedded
-systems running on constrained hardware which need to handle documents larger than
-the available RAM.
+DOM by far the more popular. Both styles of parsers are also available
+for JSON. DOM performs a parse as a single evaluation and returns an
+object model representing the whole of the document. Conversely, SAX
+parsers are probably better considered as enhanced tokenisers, providing
+a very low-level event driven interface following the Observer pattern
+that notifies the programmer of each token separately as it is found.
+Working with DOM's level of abstraction the markup syntax is a distant
+concern whereas for SAX each element's opening and closing is noted so
+the developer may not put the data's serialisation aside. SAX comes with
+the advantages that it may read a document progressively and has lower
+memory requirements because it does not store the parsed tree.
+Correspondingly, it it popular for embedded systems running on
+constrained hardware which need to handle documents larger than the
+available RAM.
 
 Suppose we have some json representing people and want to extract the
 name of the first person. Given a DOM parser this may be written quite
@@ -959,8 +964,8 @@ function nameOfFirstPerson( myJsonString ) {
 }
 ~~~~
 
-To contrast, the equivalent below uses the Javascript Clarinet SAX parser, expressed in the most
-natural way for the technology[^3_Background2].
+To contrast, the equivalent below uses the Javascript Clarinet SAX
+parser, expressed in the most natural way for the technology[^3_Background2].
 
 ~~~~ {.javascript}
 function nameOfFirstPerson( myJsonString, callbackFunction ){
@@ -1043,24 +1048,22 @@ Design and Reflection:
 ======================
 
 The REST workflow is more efficient if we do not wait until we have
-everything before we start using the parts that we do have. The 
-main tool to achieve this is the SAX parser whose 
-model presents poor developer ergonomics because it is not usually
-convenient to think on the markup's level of abstraction.
-Using SAX, a programmer may only operate on a
-convenient abstraction after inferring it from a lengthy series of
-callbacks. In terms of ease of use, DOM is generally preferred because
-it provides the resource whole and in a convenient form. My design aims
-to duplicate this convenience and combine it with progressive
-interpretation by removing one restriction: that the node which is given
-is always the document root. From a hierarchical markup such as XML or
-JSON, when read in order, sub-trees are fully known before we fully
-know their parent tree. We may select pertinent parts of a document and
-deliver them as fully-formed entities as soon as they are known, without
-waiting for the remainder of the document to arrive.
-In this way I propose
-that it is possible to combine most of the desirable properties from SAX and DOM
-parsers into a new method.
+everything before we start using the parts that we do have. The main
+tool to achieve this is the SAX parser whose model presents poor
+developer ergonomics because it is not usually convenient to think on
+the markup's level of abstraction. Using SAX, a programmer may only
+operate on a convenient abstraction after inferring it from a lengthy
+series of callbacks. In terms of ease of use, DOM is generally preferred
+because it provides the resource whole and in a convenient form. My
+design aims to duplicate this convenience and combine it with
+progressive interpretation by removing one restriction: that the node
+which is given is always the document root. From a hierarchical markup
+such as XML or JSON, when read in order, sub-trees are fully known
+before we fully know their parent tree. We may select pertinent parts of
+a document and deliver them as fully-formed entities as soon as they are
+known, without waiting for the remainder of the document to arrive. In
+this way I propose that it is possible to combine most of the desirable
+properties from SAX and DOM parsers into a new method.
 
 By my design, identifying the interesting parts of a document before it
 is complete involves turning the established model for drilling-down
@@ -1068,9 +1071,10 @@ inside-out. Under asynchronous I/O the programmer's callback
 traditionally receives the whole resource and then, inside the callback,
 locates the sub-parts that are required for a particular task. Inverting
 this process, I propose extracting the locating logic currently found
-inside the callback, expressing as a selector language, and using it to declare the cases in which the callback should be
-notified. The callback will receive complete fragments from the response
-once they have been selected according to this declaration.
+inside the callback, expressing as a selector language, and using it to
+declare the cases in which the callback should be notified. The callback
+will receive complete fragments from the response once they have been
+selected according to this declaration.
 
 I will be implementing using the Javascript language because it has good
 support for non-blocking I/O and covers both contexts where this project
@@ -1078,9 +1082,8 @@ will be most useful: in-browser programming and server programming.
 Focusing on the MVP, I will only be implementing the parsing of one
 mark-up language. Although this technique could be applied to any
 text-based, tree-shaped markup, I find that JSON best meets my goals
-because it is widely supported, easy to parse, and defines a
-single n-way tree, amenable to selectors which span multiple format
-versions.
+because it is widely supported, easy to parse, and defines a single
+n-way tree, amenable to selectors which span multiple format versions.
 
 JSONPath is especially applicable to node selection as a document is
 read because it specifies only constraints on paths and 'contains'
@@ -1094,9 +1097,8 @@ language is required because the existing JSONPath library is
 implemented only as a means to search through already gathered objects
 and is too narrow in applicability to be useful in our context.
 
-If we consider we are
-selecting specifically inside a REST resource not all of the JSONPath language is well suited.
-Given this context it is
+If we consider we are selecting specifically inside a REST resource not
+all of the JSONPath language is well suited. Given this context it is
 likely that we will not be examining a full model but rather a subset
 that we requested and was assembled on our behalf according to
 parameters that we supplied. We can expect to be interested in all of
@@ -1113,8 +1115,9 @@ tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
 of books might use branching to further select inside their callback. I
-anticipate that the selections will frequently be on high-level types so it is
-useful to analyse the nature of type imposition with regards to JSON.
+anticipate that the selections will frequently be on high-level types so
+it is useful to analyse the nature of type imposition with regards to
+JSON.
 
 Detecting types in JSON
 -----------------------
@@ -1161,8 +1164,9 @@ creating their own.
 In the absence of node typing beyond categorisation as objects, arrays
 and various primitives, the key immediately mapping to an object is
 often taken as a loose marker of its type. In the below example we may
-impose the the type 'address' on two nodes prior to examining their contents because of
-the field name which maps to them from the parent node.
+impose the the type 'address' on two nodes prior to examining their
+contents because of the field name which maps to them from the parent
+node.
 
 ~~~~ {.javascript}
 {
@@ -1205,18 +1209,20 @@ which maps to the array.
 }
 ~~~~
 
-In the above JSON, `addresses.*` would correctly identify three address nodes.
-The pluralisation of field names such as 'address' becoming 'addresses'
-is common when marshaling from OO languages because the JSON keys are
-based on getters whose name typically reflects their cardinality;
-`public Address getAddress()` or `public List<Address> getAddresses()`.
-This may pose a problem in some cases and it would be interesting in
-future to investigate a system such as Ruby on Rails that natively
-understands English pluralisation. I considered introducing unions as an
-easy way to cover this situation, allowing expressions resembling
-`address|addresses.*` but decided that until I am sure of its usefulness it is simpler if this problem is
-solved outside of the JSONPath language by simply asking the programmer to register two
-selection specifications against the same handler function.
+In the above JSON, `addresses.*` would correctly identify three address
+nodes. The pluralisation of field names such as 'address' becoming
+'addresses' is common when marshaling from OO languages because the JSON
+keys are based on getters whose name typically reflects their
+cardinality; `public Address getAddress()` or
+`public List<Address> getAddresses()`. This may pose a problem in some
+cases and it would be interesting in future to investigate a system such
+as Ruby on Rails that natively understands English pluralisation. I
+considered introducing unions as an easy way to cover this situation,
+allowing expressions resembling `address|addresses.*` but decided that
+until I am sure of its usefulness it is simpler if this problem is
+solved outside of the JSONPath language by simply asking the programmer
+to register two selection specifications against the same handler
+function.
 
 In the below example types may not be easily inferred from ancestor
 keys.
@@ -1253,13 +1259,14 @@ programing, as named in a 2000 usenet discussion:
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
 > what subset of duck-like behaviour you need [@pythonduck]
 
-An address 'duck-definition' for the above JSON would say that any object which has
-number, street, and town properties is an address. Applied to JSON, duck typing takes an individualistic approach
-by deriving type from the node in itself rather than the situaiton in
-which it is found. Because I find this selection technique simple and
-powerful I decided to add it to my JSONPath variant. As discussed in
-section \ref{jsonpathxpath}, JSONPath's syntax is designed to resemble
-the equivalent Javascript accessors but Javascript has no syntax for a
+An address 'duck-definition' for the above JSON would say that any
+object which has number, street, and town properties is an address.
+Applied to JSON, duck typing takes an individualistic approach by
+deriving type from the node in itself rather than the situaiton in which
+it is found. Because I find this selection technique simple and powerful
+I decided to add it to my JSONPath variant. As discussed in section
+\ref{jsonpathxpath}, JSONPath's syntax is designed to resemble the
+equivalent Javascript accessors but Javascript has no syntax for a
 value-free list of object keys. The closest available notation is for
 object literals so I created a duck-type syntax derived from this by
 omitting the values, quotation marks, and commas. The address type
@@ -1301,14 +1308,14 @@ duplicating a syntax which the majority of web developers should become
 familiar with over the next few years I hope that Oboe's learning curve
 can be made a little more gradual. Taking on this feature, the selector
 `person.$address.town` would identify an address node with a town child,
-or `$people.{name, dob}` can be used to locate the same people array repeatedly
-whenever a new person is added to it. Javascript frameworks such as
-d3.js and Angular are designed to work with whole models as they change.
-Consequently, the interface they present converses more fluently with
-collections than individual entities. If we are downloading data to use
-with these libraries it is more convenient if we use explicit capturing
-so that we are notified whenever the collection is expanded and can pass
-it on.
+or `$people.{name, dob}` can be used to locate the same people array
+repeatedly whenever a new person is added to it. Javascript frameworks
+such as d3.js and Angular are designed to work with whole models as they
+change. Consequently, the interface they present converses more fluently
+with collections than individual entities. If we are downloading data to
+use with these libraries it is more convenient if we use explicit
+capturing so that we are notified whenever the collection is expanded
+and can pass it on.
 
 Parsing the JSON response
 -------------------------
@@ -1359,17 +1366,18 @@ jQuery.ajax("resources/shortMessage.txt")
 
 While jQuery is callback-based and internally event driven, the public
 API it exposes does not wrap asynchronously retrieved content in event
-objects and event types are expressed by the name of the method used to add
-the listener. These names, `done` and `fail`, follow generic phrasing
-and are common to all asynchronous functionality that jQuery provides. Promoting brevity, the methods are chainable so that
-several listeners may be added from one statement. Although Javascript
-supports exception throwing, for asynchronous failures a fail event is used instead. Exceptions are not
-applicable to non-blocking I/O because at the time of the failure the
-call which provoked the exception will already have been popped from the
-call stack.
+objects and event types are expressed by the name of the method used to
+add the listener. These names, `done` and `fail`, follow generic
+phrasing and are common to all asynchronous functionality that jQuery
+provides. Promoting brevity, the methods are chainable so that several
+listeners may be added from one statement. Although Javascript supports
+exception throwing, for asynchronous failures a fail event is used
+instead. Exceptions are not applicable to non-blocking I/O because at
+the time of the failure the call which provoked the exception will
+already have been popped from the call stack.
 
-`jQuery.ajax` is overloaded so that the parameter may be an object, allowing
-more detailed information to be given:
+`jQuery.ajax` is overloaded so that the parameter may be an object,
+allowing more detailed information to be given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -1382,9 +1390,9 @@ This pattern of passing arguments as object literals is common in
 Javascript for functions which take a large number of arguments,
 particularly if some are optional. This avoids having to pad unprovided
 optional arguments in the middle of the list with null values and,
-because the use of the values is named from the callee, also
-avoids an anti-pattern where a callsite can only be understood after
-counting the position of the arguments.
+because the use of the values is named from the callee, also avoids an
+anti-pattern where a callsite can only be understood after counting the
+position of the arguments.
 
 Taking on this style while extending it to cover events for progressive
 parsing, we arrive at the following Oboe public API:
@@ -1407,8 +1415,8 @@ In jQuery only one `done` handler is usually added to a request; the
 whole content is always given so there is only one thing to receive.
 Under Oboe there will usually be several separately selected areas of
 interest inside a JSON document so I anticipate that typically multiple
-node handlers will be added. Consequently, a shortcut style is provided for adding several
-selector-handler pairs at a time:
+node handlers will be added. Consequently, a shortcut style is provided
+for adding several selector-handler pairs at a time:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -1444,10 +1452,10 @@ location communicates information which is as important as their
 content. The `path` parameter provides the location as an array of
 strings plotting a descent from the JSON root to the found node. For
 example, Bolt has path `['medalWinners', 'gold']`. Similarly, the
-`ancestors` array is a list of the ancestors starting with the JSON root node and ending at the immediate
-parent of the found node. For all but
-the root node, which in any case has no ancestors, the nodes given by the
-ancestor list will have been only partially parsed.
+`ancestors` array is a list of the ancestors starting with the JSON root
+node and ending at the immediate parent of the found node. For all but
+the root node, which in any case has no ancestors, the nodes given by
+the ancestor list will have been only partially parsed.
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
@@ -1467,9 +1475,9 @@ parameters so that in most common cases a unary or binary function can
 be given.
 
 Under Node.js the code style is more obviously event-based. Listeners
-are normally added using an `.on` method where the event name is a string
-given as the first argument. Adopting this style, my API design for
-oboe.js also allows events to be added as:
+are normally added using an `.on` method where the event name is a
+string given as the first argument. Adopting this style, my API design
+for oboe.js also allows events to be added as:
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
@@ -1481,20 +1489,20 @@ oboe("resources/someJson.json")
 
 While allowing both styles creates an API which is larger than it needs
 to be, creating a library which is targeted at both the client and
-server side is a balance between a consistent call syntax spanning environments
-and consistency with the environment. I hope that the dual interface will help adoption
-by either camp. The two styles are similar enough that a person familiar
-with one should be able to work with the other without difficulty.
-Implementating the duplicative parts of the API should require only a
-minimal degree of extra coding because they may be expressed in common
-using partial completion. Because `'!'` is the JSONPath for the root of
-the document, for some callback `c`, `.done(c)` is a equal to
-`.node('!', c)`. Likewise, `.node` is easily expressible as a partial
-completion of `.on` with `'node'`.
+server side is a balance between a consistent call syntax spanning
+environments and consistency with the environment. I hope that the dual
+interface will help adoption by either camp. The two styles are similar
+enough that a person familiar with one should be able to work with the
+other without difficulty. Implementating the duplicative parts of the
+API should require only a minimal degree of extra coding because they
+may be expressed in common using partial completion. Because `'!'` is
+the JSONPath for the root of the document, for some callback `c`,
+`.done(c)` is a equal to `.node('!', c)`. Likewise, `.node` is easily
+expressible as a partial completion of `.on` with `'node'`.
 
-When making PUT, POST or PATCH requests the API allows the body to 
-be given as an object and serialises it as JSON because it
-is anticipated that REST services which emit JSON will also accept it.
+When making PUT, POST or PATCH requests the API allows the body to be
+given as an object and serialises it as JSON because it is anticipated
+that REST services which emit JSON will also accept it.
 
 ~~~~ {.javascript}
 oboe.doPost("http://example.com/people", {
@@ -1507,9 +1515,9 @@ oboe.doPost("http://example.com/people", {
 Earlier callbacks when paths are found prior to nodes
 -----------------------------------------------------
 
-Following the project's aim of giving callbacks as early as
-possible, sometimes useful work can be done when a node is known to
-exist but before we have the contents of the node. A design follows in which each
+Following the project's aim of giving callbacks as early as possible,
+sometimes useful work can be done when a node is known to exist but
+before we have the contents of the node. A design follows in which each
 node found in the JSON document can potentially trigger notifications at
 two stages: when it is first addressed and when it is complete. The API
 facilitates this by providing a `path` event following much the same
@@ -1540,81 +1548,83 @@ Choice of streaming data transport
 ----------------------------------
 
 As discussed in section \ref{browserstreamingframeworks}, current
-techniques to provide streaming over http encourage a dichotomous
-split of traffic as either stream or download. I find that this split is
-not necessary and that streaming may be used as the most effective means
-of downloading. Streaming services implemented using push pages or websockets are
-not REST. Under these frameworks a stream has a URL address but the data
-in the stream is not addressable. This is similar to STREST, the *Service
-Trampled REST* anti-pattern [@strest], in which http URLs are viewed as
-locating endpoints for services rather than the actual resources.
-Being unaddressable, the data in the stream is also
+techniques to provide streaming over http encourage a dichotomous split
+of traffic as either stream or download. I find that this split is not
+necessary and that streaming may be used as the most effective means of
+downloading. Streaming services implemented using push pages or
+websockets are not REST. Under these frameworks a stream has a URL
+address but the data in the stream is not addressable. This is similar
+to STREST, the *Service Trampled REST* anti-pattern [@strest], in which
+http URLs are viewed as locating endpoints for services rather than the
+actual resources. Being unaddressable, the data in the stream is also
 uncacheable: an event which is streamed live cannot later, when it is
 historic, be retrieved from a cache which was populated by the stream.
 These frameworks use http as the underlying transport but I find they do
 not follow http's principled design. Due to these concerns, in the
 browser I will only be supporting downloading using XHR.
 
-Although I am designing Oboe as a client for ordinary REST resources and not
-focusing on the library a means to receive live events, it is interesting
-to speculate if Oboe could be used as a REST-compatible
+Although I am designing Oboe as a client for ordinary REST resources and
+not focusing on the library a means to receive live events, it is
+interesting to speculate if Oboe could be used as a REST-compatible
 bridge to unify live and static data. Consider a REST service which
-gives results per-constituency for a UK general elections. When requesting
-historic results the data is delivered in JSON format much as usual.
-Requesting the results for the current year on the night of the
+gives results per-constituency for a UK general elections. When
+requesting historic results the data is delivered in JSON format much as
+usual. Requesting the results for the current year on the night of the
 election, an incomplete JSON with the constituencies known so far would
-be immediately sent, followed by the remainder dispatched individually as the results are
-called. When all results are known the JSON would finally close leaving
-a complete resource. A few days later, somebody wishing to fetch the
-results would use the *same url for the historic data as was used on the
-night for the live data*. This is possible because the URL refers only to the
-data that is required, not to whether it is current or historic.
-Because it eventually formed a complete http response, the data that was
-streamed is not incompatible with http caching and a cache which saw the
-data when it was live could store it as usual and later serve it as
-historic. More sophisticated intermediate caches sitting on the network between
-client and service would recognise when
-a new request has the same url as an already ongoing request, serve
+be immediately sent, followed by the remainder dispatched individually
+as the results are called. When all results are known the JSON would
+finally close leaving a complete resource. A few days later, somebody
+wishing to fetch the results would use the *same url for the historic
+data as was used on the night for the live data*. This is possible
+because the URL refers only to the data that is required, not to whether
+it is current or historic. Because it eventually formed a complete http
+response, the data that was streamed is not incompatible with http
+caching and a cache which saw the data when it was live could store it
+as usual and later serve it as historic. More sophisticated intermediate
+caches sitting on the network between client and service would recognise
+when a new request has the same url as an already ongoing request, serve
 the response received so far, and then continue by giving both inbound
-requests the content as it arrives from the already established outbound request.
-Hence, the resource would be cacheable even while the election results are
-streaming and a service would only have to provide one stream to serve the same live data to
-multiple users fronted by the same cache. An application developer programming with Oboe would not
-have to handle live and historic data as separate cases because the node
-and path events they receive are the same. Without branching, the code which displays
-results as they are announced would automatically be able to show historic
-data.
+requests the content as it arrives from the already established outbound
+request. Hence, the resource would be cacheable even while the election
+results are streaming and a service would only have to provide one
+stream to serve the same live data to multiple users fronted by the same
+cache. An application developer programming with Oboe would not have to
+handle live and historic data as separate cases because the node and
+path events they receive are the same. Without branching, the code which
+displays results as they are announced would automatically be able to
+show historic data.
 
 Taking this idea one step further, Oboe might be used for infinite data
 which intentionally never completes. In principle this is not
 incompatible with http caching although more research would have to be
-done into how well current caches handle requests which do not finish. A REST
-service which provides infinite resources would have to confirm that it is
-delivering to a streaming client, perhaps with a
-request header. Otherwise, if a non-streaming REST client were to
-use the service it would try to get 'all' of the data and never complete
-its task.
+done into how well current caches handle requests which do not finish. A
+REST service which provides infinite resources would have to confirm
+that it is delivering to a streaming client, perhaps with a request
+header. Otherwise, if a non-streaming REST client were to use the
+service it would try to get 'all' of the data and never complete its
+task.
 
 Supporting only XHR as a transport unfortunately means that on older
 browsers which do not fire progress events (see section
-\ref{xhrsandstreaming}) a progressive conceptualisation of the data transfer
-is not possible. I will not be using streaming workarounds such as push
-tables because this would create a client which is unable to connect to
-the majority of REST services. Degrading gracefully, the best compatible behaviour is to wait
-until the document completes and then interpret the whole content as if
-it were streamed. Because nothing is done until the request is complete
-the callbacks will be fired later than on a more capable platform but
-will have the same content and be in the same order. By reverting to
-non-progressive AJAX on legacy platforms, an application author will not
-have to write special cases and the performance should be no worse than
-with traditional AJAX libraries such as jQuery. On legacy browsers
-Oboe could not be used to receive live data -- in the election night example no
-constituencies could be shown until they had all been called.
+\ref{xhrsandstreaming}) a progressive conceptualisation of the data
+transfer is not possible. I will not be using streaming workarounds such
+as push tables because this would create a client which is unable to
+connect to the majority of REST services. Degrading gracefully, the best
+compatible behaviour is to wait until the document completes and then
+interpret the whole content as if it were streamed. Because nothing is
+done until the request is complete the callbacks will be fired later
+than on a more capable platform but will have the same content and be in
+the same order. By reverting to non-progressive AJAX on legacy
+platforms, an application author will not have to write special cases
+and the performance should be no worse than with traditional AJAX
+libraries such as jQuery. On legacy browsers Oboe could not be used to
+receive live data -- in the election night example no constituencies
+could be shown until they had all been called.
 
 Node's standard http library provides a view of the response as a
 standard ReadableStream so there will be no problems programming to a
-progressive interpretation of http. In Node all streams provide
-a common API regardless of their origin so there is no reason not to allow
+progressive interpretation of http. In Node all streams provide a common
+API regardless of their origin so there is no reason not to allow
 arbitrary streams to be read. Although Oboe is intended primarily as a
 REST client, under Node it will be capable of reading data from any
 source. Oboe might be used to read from a local file, an ftp server, a
@@ -1626,30 +1636,30 @@ Handling transport failures
 Oboe cannot know the correct behaviour when a connection is lost so this
 decision is left to the containing application. Generally on request
 failure one of two behaviours are expected: if the actions performed in
-response to data so far remain valid in the
-absence of a full transmission their effects will be kept and a new
-request made for just the missed part; alternatively, if all the data is
-required for the actions to be valid, the application should take an optimistic 
-locking approach and perform rollback.
+response to data so far remain valid in the absence of a full
+transmission their effects will be kept and a new request made for just
+the missed part; alternatively, if all the data is required for the
+actions to be valid, the application should take an optimistic locking
+approach and perform rollback.
 
 Oboe.js as a micro-library
 --------------------------
 
 Http traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
-Javascript. WHen measuring a library's download footprint it usually makes
-more sense to compare post-compression. For the sake of adoption smaller
-is better because site creators are sensitive to the download size of
-their sites. Javascript micro-libraries are listed at
+Javascript. WHen measuring a library's download footprint it usually
+makes more sense to compare post-compression. For the sake of adoption
+smaller is better because site creators are sensitive to the download
+size of their sites. Javascript micro-libraries are listed at
 [microjs.com](http://microjs.com), which includes this project. A
 library qualifies as being *micro* if it is delivered in 5kb or less,
-5120 bytes but micro-libraries also tend to follow the ethos that it is better
-for an application developer to gather together several tiny libraries
-than find one with a one-size-fits-all approach, perhaps echoing the
-unix command line tradition for small programs which each do do exactly
-one thing. As well as being a small library, in the spirit of a
-micro-library a project should impose as few restrictions as possible on
-its use and be be agnostic as to which other libraries or programming
+5120 bytes but micro-libraries also tend to follow the ethos that it is
+better for an application developer to gather together several tiny
+libraries than find one with a one-size-fits-all approach, perhaps
+echoing the unix command line tradition for small programs which each do
+do exactly one thing. As well as being a small library, in the spirit of
+a micro-library a project should impose as few restrictions as possible
+on its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
 somewhat arbitrary, keeping below this limit whilst writing readable
@@ -1682,21 +1692,22 @@ to locate specific other units before it may listen to their output,
 giving a highly decoupled shape to the library in which each part knows
 the events it requires but not who publishes them. Once everything is
 wired into the bus no central control is required and the larger
-behaviours emerge as a consequence of the interactions between finer ones.
+behaviours emerge as a consequence of the interactions between finer
+ones.
 
 Design for automated testing
 ----------------------------
 
 ![**The test pyramid**. Many tests specify the low-level components,
-fewer on their composed behaviours, and fewer still on a
-whole-system level. \label{testpyramid}](images/testPyramid.png)
+fewer on their composed behaviours, and fewer still on a whole-system
+level. \label{testpyramid}](images/testPyramid.png)
 
 80% of the code written for this project is test specification. Because
 the correct behaviour of a composition requires the correct behaviour of
 its components, the majority are *unit tests*. The general style of a
 unit test is to plug the item under test into a mock event bus and check
-that when it receives certain input events the expected output events are
-consequently published.
+that when it receives certain input events the expected output events
+are consequently published.
 
 The *Component tests* step back from examining individual components to
 a position where their behaviour as a composition may be examined.
@@ -1712,11 +1723,11 @@ access to, the internals, using the same API as is exposed to
 application programmers. These tests are the most expensive to write but
 a small number are necessary in order to verify that Oboe works
 correctly end-to-end. Without access to the internals http traffic
-cannot be faked so before these tests are performed a corresponding
-REST service is started. This test service is written using Node and
-returns known content progressively according to predefined timings,
-somewhat emulating a slow internet connection. The integration tests
-particularly verify behaviours where platform differences could cause
+cannot be faked so before these tests are performed a corresponding REST
+service is started. This test service is written using Node and returns
+known content progressively according to predefined timings, somewhat
+emulating a slow internet connection. The integration tests particularly
+verify behaviours where platform differences could cause
 inconsistencies. For example, the test url `/tenSlowNumbers` writes out
 the first ten natural numbers as a JSON array at a rate of two per
 second. The test registers a JSONPath selector that matches the numbers
@@ -1726,21 +1737,22 @@ platform lacking support for XHR2 where all ten will have already been
 downloaded.
 
 Confidently black-box testing a stateful unit is difficult. Because of
-side-effects and hidden state we can not be certain that the same call won't later
-give a different behaviour. Building up the parse result from SAX events
-is a fairly complex process which cannot be implemented efficiently as
-wholly side-effect free Javascript. To promote testability the state is delegated to a
-simple state-storing unit. The intricate logic may then be expressed as
-a separately tested set of side-effect free functions which transition
-between one state and the next. Although proof of correctness is
-impossible, for whichever results the functions give while under test,
-uninfluenced by state I can be confident that they will always yield the
-same response given the same future events. The separate unit
-maintaining the state has exactly one responsibility, to hold the incremental parse
-output between function calls, and is trivial to test. This approach
-slightly breaks with the object oriented principle of encapsulation by
-hiding state behind the logic which acts on it but I feel that the
-departure is justified by the more testable codebase.
+side-effects and hidden state we can not be certain that the same call
+won't later give a different behaviour. Building up the parse result
+from SAX events is a fairly complex process which cannot be implemented
+efficiently as wholly side-effect free Javascript. To promote
+testability the state is delegated to a simple state-storing unit. The
+intricate logic may then be expressed as a separately tested set of
+side-effect free functions which transition between one state and the
+next. Although proof of correctness is impossible, for whichever results
+the functions give while under test, uninfluenced by state I can be
+confident that they will always yield the same response given the same
+future events. The separate unit maintaining the state has exactly one
+responsibility, to hold the incremental parse output between function
+calls, and is trivial to test. This approach slightly breaks with the
+object oriented principle of encapsulation by hiding state behind the
+logic which acts on it but I feel that the departure is justified by the
+more testable codebase.
 
 To enhance testability Oboe has also embraced dependency injection.
 Components do not instantiate their dependencies but rather rely on them
@@ -1750,17 +1762,17 @@ differences does not know how to create the underlying XHR that it
 adapts. Undoubtedly, by not instantiating its own transport this
 component presents a less friendly interface: it's data source is no
 longer a hidden implementation detail but exposed as a part of the it's
-API as the responsibility of the caller. I feel this disadvantage is mitigated by the
-interface being purely internal. Dependency injection in this case
-allows the tests to be written more simply because it is easy to
-substitute the real XHR for a stub. Unit tests should test exactly one
-unit; were the streaming http object to create its own transport, the
-XHR would also be under test, plus whichever external service it
-connects to. Because Javascript allows redefinition of built in types
-the stubbing could have potentially also been done by overwriting the XHR
-constructor to return a mock. However this is to be avoided as it opens
-up the possibility of changes to the environment leaking between test
-cases.
+API as the responsibility of the caller. I feel this disadvantage is
+mitigated by the interface being purely internal. Dependency injection
+in this case allows the tests to be written more simply because it is
+easy to substitute the real XHR for a stub. Unit tests should test
+exactly one unit; were the streaming http object to create its own
+transport, the XHR would also be under test, plus whichever external
+service it connects to. Because Javascript allows redefinition of built
+in types the stubbing could have potentially also been done by
+overwriting the XHR constructor to return a mock. However this is to be
+avoided as it opens up the possibility of changes to the environment
+leaking between test cases.
 
 Running the tests
 -----------------
@@ -1793,8 +1805,8 @@ that if we bring together the medium and the message by viewing the
 result of code while we write it, we can build as a series of small,
 iterative, correct steps and programming can be more explorative and
 expressive. Running the tests subtly, automatically hundreds of times
-per day isn't merely convenient, this build process makes me a
-better programmer.
+per day isn't merely convenient, this build process makes me a better
+programmer.
 
 Integration tests are not run on save. They intentionally simulate a
 slow network so they take some time to run and I'd already have started
@@ -1808,15 +1820,15 @@ Packaging to a single distributable file
 
 As an interpreted language Javascript may be run without any prior
 compilation. Directly running the files that are open in the editor is
-convenient while programming but unless a project is written as a
-single file in practice some build phase is required to create an
-easily distributable form. Dependency managers have not yet become
-standard for client-side web development so dependant libraries are
-usually manually downloaded. For a developer wishing to include my
-library in their own project a single file is much more convenient than
-the multi-file raw source. If they are not using a similar build process
-on their site, a single file is also faster to transfer to their users,
-mostly because the http overhead is of constant size per resource.
+convenient while programming but unless a project is written as a single
+file in practice some build phase is required to create an easily
+distributable form. Dependency managers have not yet become standard for
+client-side web development so dependant libraries are usually manually
+downloaded. For a developer wishing to include my library in their own
+project a single file is much more convenient than the multi-file raw
+source. If they are not using a similar build process on their site, a
+single file is also faster to transfer to their users, mostly because
+the http overhead is of constant size per resource.
 
 Javascript files are interpreted in series by the browser so load-time
 dependencies must precede dependants. If several valid Javascript files
@@ -1838,9 +1850,10 @@ many requests is slow. For efficient delivery Require provides the
 `optimise` command which concatenates an application into a single file
 by using static analysis to deduce a workable source order. Because the
 `require` function may be called from anywhere, this is undecidable in
-the general case so when a safe concatenation order cannot be found Require falls back to lazy loading. In practice this
-isn't a problem because imports are generally not subject to branching.
-For larger webapps lazy loading is actually a feature because it speeds up the
+the general case so when a safe concatenation order cannot be found
+Require falls back to lazy loading. In practice this isn't a problem
+because imports are generally not subject to branching. For larger
+webapps lazy loading is actually a feature because it speeds up the
 initial page load. The technique of *Asynchronous Module Definition*,
 AMD intentionally imports rarely-loaded modules in response to events;
 by resisting static analysis the dependant Javascript will not be
@@ -1863,52 +1876,50 @@ than doubled Oboe's download footprint.
 After removing Require I decided to pick up the simplest tool which
 could possibly work. With about 15 source files and a fairly sparse
 dependency graph finding a working order on paper wasn't a daunting
-task. After finding a free Grunt plugin analogous to the unix `cat` command I quickly
-had a working build process and a distributable library requiring no
-run-time dependency management to be loaded.
+task. After finding a free Grunt plugin analogous to the unix `cat`
+command I quickly had a working build process and a distributable
+library requiring no run-time dependency management to be loaded.
 
 For future consideration there is Browserify. This library reverses the
 'browser first' Javascript mindset by viewing Node as the primary target
 for Javascript development and adapting the browser environment to
 match. Browserify converts applications written for Node into a single
 file packaged for delivery to a web browser. Significantly, other than
-adaptors wrapping browser APIs in the call style of
-the Node equivalents, Browserify leaves no trace of itself in
-the final Javascript. Additionally, the http adaptor[^5_Implementation1] is capable of
-using XHRs as a streaming source when run on supporting browsers.
+adaptors wrapping browser APIs in the call style of the Node
+equivalents, Browserify leaves no trace of itself in the final
+Javascript. Additionally, the http adaptor[^5_Implementation1] is capable of using XHRs
+as a streaming source when run on supporting browsers.
 
-Javascript source can be made
-significantly smaller by *minification* techniques such as reducing
-scoped symbols to a single character or deleting the comments. For Oboe
-the popular minifier library *Uglify* was chosen. Uglify performs only
-surface optimisations, concentrating mostly on producing compact syntax
-by manipulating the code's abstract syntax tree. I also considered
-Google's *Closure Compiler* which resembles a traditional optimiser by
-leveraging a deeper understanding of the code semantics. Unfortunately,
-proving equivalence in highly dynamic languages is often impossible and
-Closure Compiler is only safe given a well-advised subset of Javascript.
-It delivers no reasonable guarantee of equivalence if code is not
-written as the Closure team expected. Integration tests would catch any
-such failures but for the time being I decided that even given the
-micro-library limits, a slightly larger file is a worthwhile tradeoff
-for a safer build process
+Javascript source can be made significantly smaller by *minification*
+techniques such as reducing scoped symbols to a single character or
+deleting the comments. For Oboe the popular minifier library *Uglify*
+was chosen. Uglify performs only surface optimisations, concentrating
+mostly on producing compact syntax by manipulating the code's abstract
+syntax tree. I also considered Google's *Closure Compiler* which
+resembles a traditional optimiser by leveraging a deeper understanding
+of the code semantics. Unfortunately, proving equivalence in highly
+dynamic languages is often impossible and Closure Compiler is only safe
+given a well-advised subset of Javascript. It delivers no reasonable
+guarantee of equivalence if code is not written as the Closure team
+expected. Integration tests would catch any such failures but for the
+time being I decided that even given the micro-library limits, a
+slightly larger file is a worthwhile tradeoff for a safer build process
 
 Styles of programming
 ---------------------
 
 Oboe does not follow any single paradigm and is written as a mix of
 procedural, functional and object-oriented programming styles. Classical
-object orientation is used only so far as the library exposes an
-OO public API. Although Javascript supports them, classes
-and constructors are not used, nor is there any inheritance or notable
-polymorphism. Closures form the primary means of data storage and
-hiding. Most entities do not give a Javascript object on instantiation,
-they are constructed as a set of event handlers with access to shared
-values from a common closure. As inner-functions of the same containing
-function, the handlers share access to variables from the containing
-scope. From outside the closure the values are not only protected as
-private as would be seen in an OO model, they are inherently
-unaddressable.
+object orientation is used only so far as the library exposes an OO
+public API. Although Javascript supports them, classes and constructors
+are not used, nor is there any inheritance or notable polymorphism.
+Closures form the primary means of data storage and hiding. Most
+entities do not give a Javascript object on instantiation, they are
+constructed as a set of event handlers with access to shared values from
+a common closure. As inner-functions of the same containing function,
+the handlers share access to variables from the containing scope. From
+outside the closure the values are not only protected as private as
+would be seen in an OO model, they are inherently unaddressable.
 
 Although not following an established object orientated metamodel, the
 high-level componentisation hasn't departed very far from what I would
@@ -1924,21 +1935,22 @@ Even where it creates a larger deliverable library I have generally
 preferred writing as short functions which are combined to form longer
 ones. Writing shorter functions reduces the size of the minimum testable
 unit which, because each test specifies a very small unit of
-functionality, encourages the writing of very simple unit tests. Because the tests are
-simple there is less room for unanticipated cases to hide. Due to
-pressures on code size I decided not to use a general purpose functional
-library and created my own with only the parts that are needed. See
-[functional.js](#header_functional) (Appendix p.\pageref{src_functional}).
-Functional programming in Javascript is known to be slower than other
-styles, particularly in Firefox which lacks optimisations such as Lambda
-Lifting [@functionalSpiderMonkey]. I do not think this should be a major
-problem. Because of its single-threaded execution model, in the browser
-any Javascript is ran during script execution frames, interlaced with
-frames for other concurrent concerns. To minimise the impact on other
-concerns such as rendering it is important that no task occupies the CPU
-for very long. Since most monitors refresh at 60Hz, about 16ms is a fair
-target for the maximum duration of a browser script frame. In Node no limit can
-be implied from a display but any CPU-hogging task degrades the
+functionality, encourages the writing of very simple unit tests. Because
+the tests are simple there is less room for unanticipated cases to hide.
+Due to pressures on code size I decided not to use a general purpose
+functional library and created my own with only the parts that are
+needed. See [functional.js](#header_functional) (Appendix
+p.\pageref{src_functional}). Functional programming in Javascript is
+known to be slower than other styles, particularly in Firefox which
+lacks optimisations such as Lambda Lifting [@functionalSpiderMonkey]. I
+do not think this should be a major problem. Because of its
+single-threaded execution model, in the browser any Javascript is ran
+during script execution frames, interlaced with frames for other
+concurrent concerns. To minimise the impact on other concerns such as
+rendering it is important that no task occupies the CPU for very long.
+Since most monitors refresh at 60Hz, about 16ms is a fair target for the
+maximum duration of a browser script frame. In Node no limit can be
+implied from a display but any CPU-hogging task degrades the
 responsiveness of any concurrent work. Switching tasks is cheap so
 sharing the CPU well generally prefers many small execution frames over
 a few larger ones. Whether running in a browser or server, the
@@ -1947,9 +1959,9 @@ contiguously holds the CPU for an unusually long time an application can
 usually be considered fast enough. Oboe's progressive model favours
 sharing because it naturally splits the work over many execution frames
 which by a non-progressive mode would be performed during a single
-frame. Although the overall CPU time will be higher, Oboe should share the processor
-more cooperatively and because of better I/O management the
-overall system responsiveness should be improved.
+frame. Although the overall CPU time will be higher, Oboe should share
+the processor more cooperatively and because of better I/O management
+the overall system responsiveness should be improved.
 
 Incrementally building the parsed content
 -----------------------------------------
@@ -1961,8 +1973,8 @@ controller a simpler interface than is provided by Clarinet, taken
 together these might be considered as an Adaptor pattern, albeit
 modified to be even-driven rather than call-driven: we receive six event
 types and in response emit from a vocabulary of two, `NODE_FOUND` and
-`PATH_FOUND`. The events received from Clarinet are low level, reporting the
-sequence of tokens in the markup; those emitted are at a much higher
+`PATH_FOUND`. The events received from Clarinet are low level, reporting
+the sequence of tokens in the markup; those emitted are at a much higher
 level of abstraction, reporting the JSON nodes and paths as they are
 discovered. Testing a JSONPath expression for a match against any
 particular node requires the node itself, the path to the node, and the
@@ -1973,21 +1985,21 @@ have the information required to test registered patterns for matches
 and notify application callbacks if required.
 
 ![**List representation of an ascent rising from leaf to root through a
-JSON tree.** Note the special ROOT value which represents the location of
-the pathless root node. The ROOT value is an object, taking advantage of
-object uniqueness to ensure that its location is unequal to all others.
-\label{ascent}](images/ascent.png)
+JSON tree.** Note the special ROOT value which represents the location
+of the pathless root node. The ROOT value is an object, taking advantage
+of object uniqueness to ensure that its location is unequal to all
+others. \label{ascent}](images/ascent.png)
 
 The path to the current node is maintained as a singly linked list in
 which each item holds the node and the field name that links to the node
-from its parent. The list and the items it contains are immutable, enforced in newer
-Javascript engines by using frozen objects [^5_Implementation2]. The list is arranged as
-an ascent with the current node at the near end and the root at the far
-end. Although paths are typically written as a *descent*, ordering as an
-*ascent* is more efficient because every SAX event can be processed in
-constant time by adding to or removing from the head of the list. For
-familiarity, where paths are passed to application callbacks they are
-first reversed and converted to arrays.
+from its parent. The list and the items it contains are immutable,
+enforced in newer Javascript engines by using frozen objects [^5_Implementation2]. The
+list is arranged as an ascent with the current node at the near end and
+the root at the far end. Although paths are typically written as a
+*descent*, ordering as an *ascent* is more efficient because every SAX
+event can be processed in constant time by adding to or removing from
+the head of the list. For familiarity, where paths are passed to
+application callbacks they are first reversed and converted to arrays.
 
 For each Clarinet event the builder provides a corresponding handler
 which, working from the current ascent, returns the next ascent after
@@ -2025,23 +2037,23 @@ would be very expensive because on each new path the whole array would
 have to be copied. Secondly, while debugging, unpicking a stack trace is
 easier if I know that every value revealed is the value that has always
 occupied that space and I don't have to project along the time axis by
-imagining which values were in the same space earlier or might be there later.
-Thirdly, the lack of side effects means that I can try new commands in
-the debugger's CLI without worrying about breaking the execution of the
-program. Most Javascript virtual machines are also quite poor at array
-growing and shrinking so for collections whose size changes often,
-arrays are relatively inperformant. Finally, lists are a very convenient
-format for the JSONPath engine to match against as will be discussed in
-the next section. The Javascript file [lists.js](#header_lists) (Appendix
-p.\pageref{src_lists}) implements various list functions: `cons`, `head`,
-`tail`, `map`, `foldR`, `all`, `without` as well as providing
-conversions to and from arrays.
+imagining which values were in the same space earlier or might be there
+later. Thirdly, the lack of side effects means that I can try new
+commands in the debugger's CLI without worrying about breaking the
+execution of the program. Most Javascript virtual machines are also
+quite poor at array growing and shrinking so for collections whose size
+changes often, arrays are relatively inperformant. Finally, lists are a
+very convenient format for the JSONPath engine to match against as will
+be discussed in the next section. The Javascript file
+[lists.js](#header_lists) (Appendix p.\pageref{src_lists}) implements
+various list functions: `cons`, `head`, `tail`, `map`, `foldR`, `all`,
+`without` as well as providing conversions to and from arrays.
 
 Oboe JSONPath implementation
 ----------------------------
 
-With the initial commit the JSONPath implementation was little more than a
-series of regular expressions[^5_Implementation3] but has slowly evolved into a
+With the initial commit the JSONPath implementation was little more than
+a series of regular expressions[^5_Implementation3] but has slowly evolved into a
 featureful and efficient implementation. The extent of the rewriting was
 possible because the correct behaviour is well defined by test
 specifications[^5_Implementation4]. The JSONPath compiler exposes a single higher-order
@@ -2066,13 +2078,13 @@ implementation:
 (String, Ascent) -> JsonPathMatchResult
 ~~~~
 
-This version was rejected because the pattern string would be
-freshly reinterpreted on each evaluation, repeating computation
-unnecessarily. Because a pattern is registered once but then evaluated
-perhaps hundreds of times per JSON file the most pressing performance
-consideration is for matching to execute quickly. The extra time needed
-to compile a pattern when new application callbacks are registered is
-relatively insignificant because it is performed much less often.
+This version was rejected because the pattern string would be freshly
+reinterpreted on each evaluation, repeating computation unnecessarily.
+Because a pattern is registered once but then evaluated perhaps hundreds
+of times per JSON file the most pressing performance consideration is
+for matching to execute quickly. The extra time needed to compile a
+pattern when new application callbacks are registered is relatively
+insignificant because it is performed much less often.
 
 The compilation is performed by recursively by examining the left-most
 side of the string for a JSONPath clause. For each clause type there is
@@ -2081,24 +2093,24 @@ the field name; by partial completion the field name function would be
 specialised to match against one particular name. Having generated a
 function to match against the left-most clause, compilation continues
 recursively by passing itself the remaining unparsed right-side of the
-string, which repeats until the terminal case where there is
-nothing left to parse. On each recursive call the clause function
-generated wraps the result from the last recursive call, resulting
-ultimately in a concentric series of clause functions. The order of
-these functions mirrors the ordering of paths as an ascent, so that the
-outermost function matches against the node at the near end of the
-ascent, and the innermost against the far end. When evaluated against an
-ascent, each clause function examines the head of the list and, if it
-matches, passes the list onto the next function. A special clause
-function, `skip1` is used for the `.` (parent) syntax and places no
-condition on the head of the list, unconditionally passing the tail on
-to the next clause, thus moving matching on to the parent node.
-Similarly, there is a function `skipMany` which maps onto the `..`
-(ancestor) syntax and recursively consumes the minimum number of ascent
-items necessary for the next clause to match or fails if this cannot be
-done. In this way, we peel off layers from the ascent as we move through
-the function list until we either exhaust the functions, indicating a
-match, or cannot continue, indicating a fail.
+string, which repeats until the terminal case where there is nothing
+left to parse. On each recursive call the clause function generated
+wraps the result from the last recursive call, resulting ultimately in a
+concentric series of clause functions. The order of these functions
+mirrors the ordering of paths as an ascent, so that the outermost
+function matches against the node at the near end of the ascent, and the
+innermost against the far end. When evaluated against an ascent, each
+clause function examines the head of the list and, if it matches, passes
+the list onto the next function. A special clause function, `skip1` is
+used for the `.` (parent) syntax and places no condition on the head of
+the list, unconditionally passing the tail on to the next clause, thus
+moving matching on to the parent node. Similarly, there is a function
+`skipMany` which maps onto the `..` (ancestor) syntax and recursively
+consumes the minimum number of ascent items necessary for the next
+clause to match or fails if this cannot be done. In this way, we peel
+off layers from the ascent as we move through the function list until we
+either exhaust the functions, indicating a match, or cannot continue,
+indicating a fail.
 
 This JSONPath implementation allows the compilation of complex
 expressions into an executable form by combining many very simple
@@ -2129,53 +2141,52 @@ memory because where two JSONPath strings contain a common left side
 they could share the inner part of their functional expression. Given
 the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
 JSONPath engine will currently create two identical evaluators for
-`!.animals.mammals`. Likewise, while evaluating a pattern that
-requires matches at multiple depths in the JSON hierarchy against several
-sibling elements, the same JSONPath evaluator term could be tested
-against the parent element many times, always with the same result.
-Although Javascript doesn't come with functional caching, it can be
-added using the language itself, probably the best known example being
-`memoize` from Underscore.js. I suspect, however, that hashing the cache
+`!.animals.mammals`. Likewise, while evaluating a pattern that requires
+matches at multiple depths in the JSON hierarchy against several sibling
+elements, the same JSONPath evaluator term could be tested against the
+parent element many times, always with the same result. Although
+Javascript doesn't come with functional caching, it can be added using
+the language itself, probably the best known example being `memoize`
+from Underscore.js. I suspect, however, that hashing the cache
 parameters might be slower than performing the matching. Although the
 parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
-the language so any hash function for a node parsed out of JSON would have to walk
-the entire subtree rooted from that node. Current Javascript
-implementations also make it difficult to manage caches in general from
-inside the language because there is no way to occupy only spare memory.
-Weak references are proposed in ECMAScript 6 but currently only
-experimentally supported[^5_Implementation5]. If the hashing problem were solved the 
-WeakHashMap would be ideal for adding functional caching in future.
+the language so any hash function for a node parsed out of JSON would
+have to walk the entire subtree rooted from that node. Current
+Javascript implementations also make it difficult to manage caches in
+general from inside the language because there is no way to occupy only
+spare memory. Weak references are proposed in ECMAScript 6 but currently
+only experimentally supported[^5_Implementation5]. If the hashing problem were solved
+the WeakHashMap would be ideal for adding functional caching in future.
 
 Functions describing the tokenisation of the JSONPath language are given
-their own source file and tested independently of the
-compilation. Regular expressions are used because they are the simplest
-form able to express the clause patterns. Each regular expressions
-starts with `^` so that they only match at the head of the string, the
-'y' flag would be a more elegant alternative but as of now this lacks
-wider browser support[^5_Implementation6]. By verifying the tokenisation functions
-through their own tests it is simpler to create thorough specification
-because the tests may focus on the tokenisation more clearly without
-having to observe its results though another layer. For JSONPath
-matching we might consider the unit test layer of the test pyramid
-(figure \ref{testpyramid} p.\pageref{testpyramid}) to be split into
-two further sub-layers. Arguably, the upper of these sub-layers is not a unit
-test because it is verifying more than one unit, the tokeniser and the
-compiler, and there is some redundancy since the tokenisation is tested
-both independently and through a proxy. However, a more purist approach
-would not be any more useful because stubbing out the tokeniser
-functions before testing the compiler would be a considerable effort and
-I do not believe it would improve the rigor of the JSONPath
-specification.
- 
+their own source file and tested independently of the compilation.
+Regular expressions are used because they are the simplest form able to
+express the clause patterns. Each regular expressions starts with `^` so
+that they only match at the head of the string, the 'y' flag would be a
+more elegant alternative but as of now this lacks wider browser
+support[^5_Implementation6]. By verifying the tokenisation functions through their own
+tests it is simpler to create thorough specification because the tests
+may focus on the tokenisation more clearly without having to observe its
+results though another layer. For JSONPath matching we might consider
+the unit test layer of the test pyramid (figure \ref{testpyramid}
+p.\pageref{testpyramid}) to be split into two further sub-layers.
+Arguably, the upper of these sub-layers is not a unit test because it is
+verifying more than one unit, the tokeniser and the compiler, and there
+is some redundancy since the tokenisation is tested both independently
+and through a proxy. However, a more purist approach would not be any
+more useful because stubbing out the tokeniser functions before testing
+the compiler would be a considerable effort and I do not believe it
+would improve the rigor of the JSONPath specification.
+
 Differences in the working of programs that can be easily written using Oboe.js
 -------------------------------------------------------------------------------
 
-Because of assumptions implicit in either technique, a program written using Oboe.js 
-will perform subtly different actions from one
-written using more conventional libraries, even if the programmer means
-to express the same thing. Consider the two examples below in which
-Node.js is used to read a local JSON file and write to the console.
+Because of assumptions implicit in either technique, a program written
+using Oboe.js will perform subtly different actions from one written
+using more conventional libraries, even if the programmer means to
+express the same thing. Consider the two examples below in which Node.js
+is used to read a local JSON file and write to the console.
 
 ~~~~ {.javascript}
 oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
@@ -2214,29 +2225,29 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
 });
 ~~~~
 
-While the behaviours intended by the programmer are similar, the accidents
-differ between the two. It is likely that most
-programmers would not be aware of these differences as they write. In the
-first example the order of the output for schemes and plans will match
-their order in the JSON, whereas for the second scheming is always done
-before plotting. The error behaviours are also different -- the first
-prints until it has an error, the second prints if there are no errors.
-In the second example it is *almost mandatory* to check for errors
-before starting the output whereas in the first it feels most natural to register the
-error listener at the end of the chained calls. I prefer the source
-order in the first because the the normal case is listed before the
-abnormal one and it seems odd to me to describe a system's
+While the behaviours intended by the programmer are similar, the
+accidents differ between the two. It is likely that most programmers
+would not be aware of these differences as they write. In the first
+example the order of the output for schemes and plans will match their
+order in the JSON, whereas for the second scheming is always done before
+plotting. The error behaviours are also different -- the first prints
+until it has an error, the second prints if there are no errors. In the
+second example it is *almost mandatory* to check for errors before
+starting the output whereas in the first it feels most natural to
+register the error listener at the end of the chained calls. I prefer
+the source order in the first because the the normal case is listed
+before the abnormal one and it seems odd to me to describe a system's
 abnormal cases first.
 
-Considering the code style that is encouraged, the first example takes
-a more declarative form by specifying the items of interest using
-patterns whereas the second is more imperative by explicitly looping
-through the items. If several levels of selection were required, such as
+Considering the code style that is encouraged, the first example takes a
+more declarative form by specifying the items of interest using patterns
+whereas the second is more imperative by explicitly looping through the
+items. If several levels of selection were required, such as
 `schemes.*.steps.*`, other than a longer JSONPath pattern the first
 example would not grow in complexity whereas the second would require
-nested looping. The cyclic complexity of programming using Oboe
-would stay roughly constant whereas using programmatic drill-down it increases linearly
-with the number of levels that must be traversed.
+nested looping. The cyclic complexity of programming using Oboe would
+stay roughly constant whereas using programmatic drill-down it increases
+linearly with the number of levels that must be traversed.
 
 [^5_Implementation1]: https://github.com/substack/http-browserify
 
@@ -2275,93 +2286,88 @@ Benchmarking vs non-progressive REST
 ------------------------------------
 
 I feel it is important to experimentally answer the question, *is this
-actually any faster?*.
-To measure performance I have created a small benchmarking
-suite that runs under Node.js.
-One of my suggested advantages of incremental parsing and
-perceptual improvement in speed. I am not focusing on user perception for
-this evaluation because it would be difficult to measure, requiring 
-subjective judgement and human participants.
-I will be measuring the time taken to provide the first output which
-correlates with how quickly interface redrawing can start and should give
-some indication as to perceptual speed.
-I chose Node to host the tests because it is a
-minimalist platform which should give a more repeatable results
-than browsers which could be performing any number of simultaneous
-background tasks. Node also has the advantage that small changes in memory use
-are not overwhelmed by a memory hungry environment.
+way actually any faster?*. To measure performance I have created a small
+benchmarking suite that runs under Node.js. One of the advantages suggested
+for incremental parsing was a perceptual improvement in speed. I
+am not focusing on user perception for this evaluation because it would
+be difficult to measure, requiring subjective judgement and human
+participants. I will be measuring the time taken to provide the first
+output which correlates with how quickly interface redrawing can start
+and should give a good indication as to perceptual speed. I chose Node to
+host the tests because it is a minimalist platform which should give a
+more repeatable results than browsers which could be performing any
+number of simultaneous background tasks. Node also has the advantage
+that small changes in memory use are not overwhelmed by a memory hungry
+environment.
 
-The benchmark mimics a REST service backed by a relational database.
-Relational databases pass data from a result cursor one tuple at a time,
+The benchmark involves two node processes, one acting as a
+REST client and the other as a REST server
+and mimics a REST service backed by a relational database.
+Relational database client libraries pass data from a result cursor one tuple at a time to be used by the application,
 the service simulates this by writing out forty tuples as JSON objects,
-one every ten milliseconds. Every other object in the returned JSON
-contains a URL to a further resource which will also be fetched and
-an aggregation created. To simulate real network conditions, 
-Apple's *Network Line
-Conditioner* was used with the presets *3G, Average Case* and *Cable
-modem* to represent poor and good internet connections respectively
-[^6_Conclusion1]. The test involves two node processes, one acting as a REST client
-and one as a REST server. Memory was measured on the client using Node's built in
-memory reporting tool, `process.memoryusage()` and the largest figure
-reported on each run is used.
- The test server and client can be found in the project's
-`benchmark` directory, or in the appendix
-on pages \ref{src_benchmarkServer} and \ref{src_benchmarkClient}.
+one every ten milliseconds. Half the tuples contain
+a URL to a further resource which will also be fetched so that an
+aggregation can be created. To simulate real network conditions, Apple's
+*Network Line Conditioner* was used with the presets *3G, Average Case*
+and *Cable modem* to represent poor and good internet connections
+respectively. Three client version were implemented using JSON.parse DOM-style
+parsing, Clarinet SAX-style parsing and Oboe. Memory was measured on the client
+using Node's built in memory reporting tool, `process.memoryusage()` and
+the largest figure reported during each run is taken. The test server and
+client can be found in the project's `benchmark` directory, or in the
+appendix on pages \ref{src_benchmarkServer} and
+\ref{src_benchmarkClient}.
 
+  Client Strategy   Network     First output   Total time   Max. Memory
+  ----------------- --------- -------------- ------------ -------------
+  Oboe.js           Good                40ms        804ms         6.2Mb
+  Oboe.js           Poor                60ms      1,526ms         6.2Mb
+  JSON.parse        Good               984ms      1,064ms         9,0Mb
+  JSON.parse        Poor              2550ms      2,609ms         8.9Mb
+  Clarinet          Good                34ms        781ms         5.5Mb
+  Clarinet          Poor                52ms      1,510ms         5.5Mb
 
-  Client Strategy     Network     First output   Total time   Max. Memory
-  ------------        --------- -------------- ------------ -------------
-  Oboe.js             Good                40ms        804ms         6.2Mb
-  Oboe.js             Poor                60ms      1,526ms         6.2Mb
-  JSON.parse          Good               984ms      1,064ms         9,0Mb
-  JSON.parse          Poor              2550ms      2,609ms         8.9Mb
-  Clarinet            Good                34ms        781ms         5.5Mb
-  Clarinet            Poor                52ms      1,510ms         5.5Mb
-
-In comparison with JSON.parse, Oboe shows a dramatic improvement
-of about 96%
-regarding the time taken for the first output and a smaller
+In comparison with JSON.parse, Oboe shows a dramatic improvement of
+about 96% regarding the time taken for the first output to be produced and a smaller
 but significant improvement of about 40% in the total time required to
 create the aggregation. Oboe's aggregation on a good network is about
 15% slower than Clarinet; since Oboe is built on Clarinet I did not
 expect it to be faster but I had hoped for the gap to be smaller. This
-is probably because Oboe encodes a more involved workflow than
-a raw SAX parser.
+is probably because Oboe encodes a more involved workflow than a raw SAX
+parser.
 
-Clarinet is known to be slower than JSON.parse for
-input which is already held in memory[^6_Conclusion2] but when reading from a network
-this offset by the ability to parse progressively.
-Compared to JSON.parse, the extra computation time needed
-by Oboe is shown to be relatively insignificant in
-comparison to the advantage of better i/o management. Reacting earlier
-using slower handlers is shown to be faster overall than reacting
-later with quicker ones. I believe that this vindicates the project focus on
-efficient management of I/O over faster algorithms; much
-current programming takes a "Hurry up and wait" approach by
-concentrating on small algorithm optimisation over performing
-a task at the earliest possible time.
+Clarinet is known to be slower than JSON.parse for input which is
+already held in memory[@clarinetspeed] but when reading from a network this offset
+by the ability to parse progressively. Compared to JSON.parse, the extra
+computation time needed by Oboe and Clarinet is shown to be relatively insignificant
+in comparison to the advantage of better I/O management. Reacting
+earlier using slower handlers is shown to be faster overall than
+reacting later with quicker ones. I believe that this vindicates the
+project focus on efficient management of I/O over faster algorithms;
+much current programming takes a "Hurry up and wait" approach by
+concentrating on algorithm micro-optimisation over performing tasks at
+the earliest possible time.
 
-There is an unexpected improvement vs JSON.parse in terms of memory
-usage. It is not clear why this would be but it may be attributable to
-the large large
-dependency tree brought in by the get-json library which was used to simplify 
-this version. As expected, Clarinet has the smallest memory usage because 
-it never stores a complete version of the
-parsed JSON. As REST resource size increases I would expect Clarinet's memory
-usage to remain roughly constant while the other two rise linearly. Node
-is popular on RaspberryPi type devices with constrained RAM; Clarinet might
-be preferable to Oboe where code clarity is less important than a small memory footprint 
+Oboe shows an unexpected improvement in terms of memory
+usage compared to JSON.parse. It is not clear why this would be but it may be attributable to
+the large dependency tree brought in by the get-json library used in the JSON.parse
+client version. As expected, Clarinet has the
+smallest memory usage because it never stores a complete version of the
+parsed JSON. As REST resource size increases I would expect Clarinet's
+memory usage to remain roughly constant while the other two rise
+linearly. Node is popular on RaspberryPi type devices with constrained
+RAM; Clarinet might be preferable to Oboe where code clarity is less
+important than a small memory footprint.
 
 Comparative developer ergonomics
 --------------------------------
 
-Writing less code is not in itself a guarantee of a better developer 
-ergonomics but I find it is a
-good indicator so long as the code isn't forced to be overly terse.
-The code sizes below report the quantity of
-code required to implement the benchmark REST 
-client under each strategy. Each version 
-is written as the most natural expression for the library used.
+Writing less code is not in itself a guarantee of a better developer
+ergonomics but I find it is a good indicator so long as the code isn't
+forced to be overly terse. The code sizes below report the quantity of
+code required to implement the benchmark REST client under each
+strategy. Each version is written as the most natural expression for the
+library used.
 
   Strategy       Code Required (lines)   Code required (chars)
   ------------ ----------------------- -----------------------
@@ -2380,9 +2386,9 @@ oboe(DB_URL).node('{id url}.url', function(url){
 ~~~~
 
 Non-progressive parsing with JSON.parse was slightly longer, requiring a
-loop and an if statement, both to drill down into
-the results. The code below is shortened by using the get-json[^6_Conclusion3]
-package which combines parsing implicitly into the download:
+loop and an if statement, both necessary to drill down into the results. The code
+below is shortened by using the get-json[^6_Conclusion3] package which combines
+parsing implicitly into the download:
 
 ~~~~ {.javascript}
 getJson(DB_URL, function(err, records) {
@@ -2396,47 +2402,45 @@ getJson(DB_URL, function(err, records) {
 });
 ~~~~
 
-This is tightly coupled with the JSON format
-that it reads. We can see this in the fragments `records.data`,
-`record.url`, and `record.name` which will only work if they find the
-desired subtree at exactly the anticipated location. The code might be
-said to contain a description of the format that it is for rather than a
-description of what is required from the format. The Oboe version
-describes the format only so far as is needed to identify the desired
-parts; the remainder of the JSON could change and the code would
-continue to work. I believe this demonstrates a greater tolerance to
-changing formats and that this would be useful when programming against 
-evolving services.
+This version is tightly coupled with the JSON format that it reads. We can see
+this in the fragments `records.data`, `record.url`, and `record.name`
+which will only work if they find the desired subtree at exactly the
+anticipated location. The code might be said to contain a description of
+the format that it is for rather than a description of what is required
+from the format. The Oboe version describes the format only so far as is
+needed to identify the desired parts; the remainder of the JSON could
+change and the code would continue to work. I believe this demonstrates
+a greater tolerance to changing formats and that this would be useful
+when programming against evolving services.
 
 The Clarinet version of the code is too long to include here but may be
 seen [in the appendix](#header_benchmarkClient), on page
 \pageref{src_benchmarkClient}. By using SAX directly the code is more
 verbose and its purpose is obfuscated. I don't think a person looking at
-this source could deduce what is being done without thinking about
-it for some time. The functions receiving SAX events must handle several
+this source could deduce what is being done without thinking about it
+for some time. The functions receiving SAX events must handle several
 different cases and so tend to have generic parameter names such as
 'key' or 'value' which represent the token type. By contrast, Oboe and
 JSON.parse both allow names such as 'record' or 'url' which are chosen
 according to the semantics of the value. I find this naming easier to
-interpret because it allows me to think in terms of the domain model 
+interpret because it allows me to think in terms of the domain model
 rather than considering serialisation artifacts.
 
 Performance under various Javascript engines
 --------------------------------------------
 
 The file `oboe.performance.spec.js`[^6_Conclusion4] contains a benchmark which
-concentrates on using Oboe for pattern matching. This test registers a
-complex pattern which intentionally uses all features from the JSONPath language
-and then fetches a JSON file containing approximately 800 nodes,
-100 of which will match. Although actual http is used, it is over an unthrottled
-connection to localhost so network delay should be
-negligible. The tests are
-executed on a relatively low-powered Macbook Air laptop running OS X
-10.7.5, except for Chrome Mobile which was tested on an iPhone 5 with
-iOS 7.0.2. Test cases requiring Microsoft Windows were performed inside a
-VirtualBox virtual machine. Curl is a
-simple download tool that writes the resource to stdout
-without any parsing and is included as a baseline. 
+concentrates on measuring the performance of Oboe's pattern matching. This test registers a
+complex pattern which intentionally uses all features from the JSONPath
+language and then fetches a JSON file containing approximately 800
+nodes, 100 of which will match. Although actual http is used, it is over
+an unthrottled connection to localhost so network delay should be
+negligible. The tests were executed on a relatively low-powered Macbook
+Air laptop running OS X 10.7.5, except for Chrome Mobile which was
+tested on an iPhone 5 with iOS 7.0.2. Test cases requiring Microsoft
+Windows were performed inside a VirtualBox virtual machine. Curl is a
+simple download tool that writes the resource to stdout without any
+parsing and is included as a baseline.
 
   Platform                        Total Time   Throughput (nodes/ms)
   ----------------------------- ------------ -----------------------
@@ -2451,53 +2455,51 @@ without any parsing and is included as a baseline.
   IE 8.0.0 (Windows XP)              3,048ms                    0.26
 
 We can see that Firefox is slower than other modern browsers despite
-normally being quite fast. This is probably explicable by
-SpiderMonkey, the Mozilla just-in-time Javascript compiler being poor at optimising
+normally being quite fast. This is probably explicable by SpiderMonkey,
+the Mozilla just-in-time Javascript compiler being poor at optimising
 functional Javascript [@functionalSpiderMonkey]. The JSON nodes are not
 of a common type so many of the library's internal callsites are not
-monomorphic which is also optimised poorly
-[@functionalSpiderMonkey]. When the test was later repeated with a
-simpler pattern Firefox showed by far the largest improvement,
-indicating that the functional JSONPath matching accounts for Firefox's
-lower than expected performance.
+monomorphic which is also optimised poorly [@functionalSpiderMonkey].
+When the test was later repeated with a simpler pattern Firefox showed
+by far the largest improvement, indicating that the functional JSONPath
+matching accounts for Firefox's lower than expected performance.
 
-During the project version 31 of Chrome was released that performed
-more than twice as quickly as the version 30 due to an updated version of
-the v8 Javascript engine. Node also uses v8 and should catch up when it
-is next updated. This reflects Javascript engine writers targeting functional
-optimisation now that functional Javascript is becoming a more popular
-style.
+During the project version 31 of Chrome was released that performed more
+than twice as quickly as version 30 due to an updated version of the
+v8 Javascript engine. Node also uses v8 and should catch up when it is
+next updated. This reflects Javascript engine writers targeting
+functional optimisation now that functional Javascript is becoming a
+more popular style.
 
 Of these results I find only the performance under old versions of
-Internet Explorer poor enough to be concerning. Since this
-platform cannot progressively interpret an XHR response an improvement
-over traditional XHR was not possible, but I would have liked performance to have
-not degraded by so much. Adding three seconds to a REST call
-will unacceptably impair a webapp's user experience so it might be
-reasonable to conclude that for complex use cases Oboe is currently
-unsuited to legacy platforms. If we desired to improve
-performance on older platforms one solution might be to create a
-simpler, non-progressive implementation of the Oboe API for selective
-delivery to older browsers. However, I would argue that time spent
-writing a basic legacy version would be better spent
-waiting for these moribund platforms to die.
+Internet Explorer poor enough to be concerning. Since this platform
+cannot progressively interpret an XHR response an improvement over
+traditional XHR was not possible, but I would have liked performance to
+have not degraded by so much. Adding three seconds to a REST call will
+unacceptably impair a webapp's user experience so it might be reasonable
+to conclude that for complex use cases Oboe is currently unsuited to
+legacy platforms. If we desired to improve performance on older
+platforms one solution might be to create a simpler, non-progressive
+implementation of the Oboe API for selective delivery to older browsers.
+However, I would argue that the time spent writing a basic legacy version
+would be better employed waiting for these moribund platforms to die.
 
 For an imperative language coded in a functional style the compiler may
 not optimise as effectively as if a functional language were used. This
 is especially the case for a highly dynamic language in which
 everything, even the basic built-in types, are mutable. Presenting a
-convenient API to application developers means passing eagerly evaluated 
-parameters to application 
-callbacks even when the parameters are of secondary importance and
-will be predominantly ignored. The the path and ancestor arrays are
-created for every matching node but I anticipate will be
-predominantly ignored. Under a functional language these could be lazily
-evaluated without requiring any special effort by the application
-programmer. I think Javascript was a good choice of language, giving a
-very large number of client- and server-side applications that may
-potentially adopt the library. However, server-side Oboe would be very
-amicable to implementation using a purer functional language and it
-would be interesting to see how much faster it could be.
+convenient API to application developers means passing eagerly evaluated
+parameters to application callbacks even when the parameters are of
+secondary importance, such as the path and
+ancestor arrays that are created for every matching node, and will be predominantly ignored. 
+will be predominantly ignored. Under a functional language these could
+be lazily evaluated without requiring any special effort by the
+application programmer. I think Javascript was a good choice of
+language, giving a very large number of client- and server-side
+applications that may potentially adopt the library. However,
+server-side Oboe would be very amicable to implementation using a purer
+functional language and it would be interesting to see how much faster
+it could be.
 
 Status as a micro-library
 -------------------------
@@ -2512,51 +2514,59 @@ Oboe should not discourage adoption.
 Potential future work
 ---------------------
 
-Although all network traffic can be viewed as a stream, the most obvious 
-future expansion would be to create a
-matching server-side component that provides an intuitive interface
-for writing JSON streams. So far, sending streaming JSON has required the
-resource be written out using programmer-assembled strings but this
-approach is error prone and would scale badly as messages become more complex.
-A stream-writer server side library would allow Oboe to be used
-as a REST-compatible streaming solution for situations which currently
-employ websockets. This would provide a form of streaming that operates
-according to the principled design of http rather than by sidestepping it.
+Although all network traffic can be viewed as a stream, the most obvious
+future expansion would be to create a matching server-side component
+that provides an intuitive interface for writing JSON streams. So far,
+sending streaming JSON has required that the resource be written out using
+programmer-assembled strings but this approach is error prone and would
+scale badly as messages become more complex. A stream-writer server side
+library would allow Oboe to be used as a REST-compatible streaming
+solution for situations which currently employ push tables or websockets. This would
+provide a form of REST streaming that operates according to the principled
+design of http rather than by sidestepping it.
 
-There is nothing about Oboe that precludes working with other
+Although JSON is particularly well suited, there is nothing about Oboe that precludes working with other
 tree-shaped formats. If there is demand, An XML/XPATH version seems like
 an obvious expansion. This could be implemented by allowing resource
-formats to be added using plugins which would allow
-programmers to create a progressive interpretation of any resource type.
-As a minimum, a plug-in would require a SAX-like parser and a compiler for
-some kind of pattern matching language.
+formats to be added using plugins which would allow programmers to
+create a progressive interpretation of any resource type. As a minimum,
+a plug-in would require a SAX-like parser and a compiler for some kind
+of node selection language.
 
 Oboe stores all JSON nodes that are parsed for the duration of its
-lifetime so despite being similar to a SAX parser so far as it is progressive,
-it consumes as much memory as a DOM parser.
-The nodes remain held so that all possible
-JSONPath expressions may be tested. However, in most cases memory could
-be freed if the parsed content were stored only so far as is required to
-test against the patterns which have actually been registered. For
-typical use cases I expect this would allow large subtrees to be
-unlinked inside Oboe, particularly once they have matched a pattern and
-have already been handed over to application callbacks. Likewise,
-the current implementation takes a rather brute force approach when
-examining nodes for pattern matches by checking every registered
-JSONPath expression against every node parsed from the JSON. For many
-expressions we should be able to say that there will be no matches
-inside a particular JSON subtree, either because we have already matched
-or because the the subtree's ancestors invariably imply failure. A more
-sophisticated implementation might subdue provably unsatisfiable
-handlers until the SAX parser leaves unmatchable subtrees.
+lifetime so despite being similar to a SAX parser in terms of being
+progressive, it consumes as much memory as a DOM parser. The nodes
+remain held so that all possible JSONPath expressions may later be tested.
+However, in most cases memory could be freed if the parsed content were
+stored only so far as is required to test against the patterns which
+have actually been registered. For typical use cases I expect this would
+allow large subtrees to be pruned, particularly once they
+have matched a pattern and have already been handed back to application
+callbacks. Likewise, the current implementation takes a rather brute
+force approach when examining nodes for pattern matches by checking
+every registered JSONPath expression against every node parsed from the
+JSON. For many expressions we should be able to say that there will be
+no matches inside a particular JSON subtree, either because we have
+already matched or because the the subtree's ancestors invariably imply
+failure. A more sophisticated implementation might subdue provably
+unsatisfiable handlers until the SAX parser leaves an unmatchable subtree.
 
-[^6_Conclusion1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
+Summing up
+----------
 
-[^6_Conclusion2]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+The community reaction to Oboe has been overwhelmingly positive with several
+projects already adopting it and reporting performance gains which are large
+enough to be obvious. I
+feel that, while some attention should be given to optimisation under
+Firefox, this project meets all if its intended aims, presenting a REST
+client library which in the best case allows the network to be used much
+more efficiently and in the worse case is as good as the previous best
+solution. At the same time the produced library is in many cases easier
+to use than the previous simplest solution.
 
 [^6_Conclusion3]: https://npmjs.org/package/get-json
 
-[^6_Conclusion4]: See
+[^6_Conclusion4]:
     [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
 
 
@@ -2572,9 +2582,9 @@ Appendix i: Limits to number of simultaneous connections under various http clie
   Internet        4
   Explorer        
 
-  Chrome /        32 sockets per proxy
+  Chrome /        32 sockets per proxy,
   Chromium        6 sockets per
-                  destination host 256
+                  destination host, 256
                   sockets per process
   -------------------------------------
 
