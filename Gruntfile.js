@@ -327,6 +327,15 @@ module.exports = function (grunt) {
       'karma:single-amd'   
    ]);   
    
+   // build and run just the integration tests.
+   grunt.registerTask('build-integration-test',      [
+      'browser-build',
+      'node-build',   
+      'start-stream-source',
+      'karma:single-concat',
+      'jasmine_node_oboe'
+   ]);
+   
    grunt.registerTask('default',      [
    
       'clear',   
