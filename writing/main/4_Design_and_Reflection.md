@@ -2,24 +2,22 @@ Design and Reflection:
 ======================
 
 The REST workflow is more efficient if we do not wait until we have
-everything before we start using the parts that we do have. The 
-main tool to achieve this is the SAX parser whose 
-model presents poor developer ergonomics because it is not usually
-convenient to think on the markup's level of abstraction.
-Using SAX, a programmer may only operate on a
-convenient abstraction after inferring it from a lengthy series of
-callbacks. In terms of ease of use, DOM is generally preferred because
-it provides the resource whole and in a convenient form. My design aims
-to duplicate this convenience and combine it with progressive
-interpretation by removing one restriction: that the node which is given
-is always the document root. From a hierarchical markup such as XML or
-JSON, when read in order, sub-trees are fully known before we fully
-know their parent tree. We may select pertinent parts of a document and
-deliver them as fully-formed entities as soon as they are known, without
-waiting for the remainder of the document to arrive.
-In this way I propose
-that it is possible to combine most of the desirable properties from SAX and DOM
-parsers into a new method.
+everything before we start using the parts that we do have. The main
+tool to achieve this is the SAX parser whose model presents poor
+developer ergonomics because it is not usually convenient to think on
+the markup's level of abstraction. Using SAX, a programmer may only
+operate on a convenient abstraction after inferring it from a lengthy
+series of callbacks. In terms of ease of use, DOM is generally preferred
+because it provides the resource whole and in a convenient form. My
+design aims to duplicate this convenience and combine it with
+progressive interpretation by removing one restriction: that the node
+which is given is always the document root. From a hierarchical markup
+such as XML or JSON, when read in order, sub-trees are fully known
+before we fully know their parent tree. We may select pertinent parts of
+a document and deliver them as fully-formed entities as soon as they are
+known, without waiting for the remainder of the document to arrive. In
+this way I propose that it is possible to combine most of the desirable
+properties from SAX and DOM parsers into a new method.
 
 By my design, identifying the interesting parts of a document before it
 is complete involves turning the established model for drilling-down
@@ -27,9 +25,10 @@ inside-out. Under asynchronous I/O the programmer's callback
 traditionally receives the whole resource and then, inside the callback,
 locates the sub-parts that are required for a particular task. Inverting
 this process, I propose extracting the locating logic currently found
-inside the callback, expressing as a selector language, and using it to declare the cases in which the callback should be
-notified. The callback will receive complete fragments from the response
-once they have been selected according to this declaration.
+inside the callback, expressing as a selector language, and using it to
+declare the cases in which the callback should be notified. The callback
+will receive complete fragments from the response once they have been
+selected according to this declaration.
 
 I will be implementing using the Javascript language because it has good
 support for non-blocking I/O and covers both contexts where this project
@@ -37,9 +36,8 @@ will be most useful: in-browser programming and server programming.
 Focusing on the MVP, I will only be implementing the parsing of one
 mark-up language. Although this technique could be applied to any
 text-based, tree-shaped markup, I find that JSON best meets my goals
-because it is widely supported, easy to parse, and defines a
-single n-way tree, amenable to selectors which span multiple format
-versions.
+because it is widely supported, easy to parse, and defines a single
+n-way tree, amenable to selectors which span multiple format versions.
 
 JSONPath is especially applicable to node selection as a document is
 read because it specifies only constraints on paths and 'contains'
@@ -53,9 +51,8 @@ language is required because the existing JSONPath library is
 implemented only as a means to search through already gathered objects
 and is too narrow in applicability to be useful in our context.
 
-If we consider we are
-selecting specifically inside a REST resource not all of the JSONPath language is well suited.
-Given this context it is
+If we consider we are selecting specifically inside a REST resource not
+all of the JSONPath language is well suited. Given this context it is
 likely that we will not be examining a full model but rather a subset
 that we requested and was assembled on our behalf according to
 parameters that we supplied. We can expect to be interested in all of
@@ -72,8 +69,9 @@ tasks, for the time being any functionality which is not covered may be
 implemented inside the callbacks themselves and later added to the
 selection language. For example, somebody wishing to filter on the price
 of books might use branching to further select inside their callback. I
-anticipate that the selections will frequently be on high-level types so it is
-useful to analyse the nature of type imposition with regards to JSON.
+anticipate that the selections will frequently be on high-level types so
+it is useful to analyse the nature of type imposition with regards to
+JSON.
 
 Detecting types in JSON
 -----------------------
@@ -120,8 +118,9 @@ creating their own.
 In the absence of node typing beyond categorisation as objects, arrays
 and various primitives, the key immediately mapping to an object is
 often taken as a loose marker of its type. In the below example we may
-impose the the type 'address' on two nodes prior to examining their contents because of
-the field name which maps to them from the parent node.
+impose the the type 'address' on two nodes prior to examining their
+contents because of the field name which maps to them from the parent
+node.
 
 ~~~~ {.javascript}
 {
@@ -164,18 +163,20 @@ which maps to the array.
 }
 ~~~~
 
-In the above JSON, `addresses.*` would correctly identify three address nodes.
-The pluralisation of field names such as 'address' becoming 'addresses'
-is common when marshaling from OO languages because the JSON keys are
-based on getters whose name typically reflects their cardinality;
-`public Address getAddress()` or `public List<Address> getAddresses()`.
-This may pose a problem in some cases and it would be interesting in
-future to investigate a system such as Ruby on Rails that natively
-understands English pluralisation. I considered introducing unions as an
-easy way to cover this situation, allowing expressions resembling
-`address|addresses.*` but decided that until I am sure of its usefulness it is simpler if this problem is
-solved outside of the JSONPath language by simply asking the programmer to register two
-selection specifications against the same handler function.
+In the above JSON, `addresses.*` would correctly identify three address
+nodes. The pluralisation of field names such as 'address' becoming
+'addresses' is common when marshaling from OO languages because the JSON
+keys are based on getters whose name typically reflects their
+cardinality; `public Address getAddress()` or
+`public List<Address> getAddresses()`. This may pose a problem in some
+cases and it would be interesting in future to investigate a system such
+as Ruby on Rails that natively understands English pluralisation. I
+considered introducing unions as an easy way to cover this situation,
+allowing expressions resembling `address|addresses.*` but decided that
+until I am sure of its usefulness it is simpler if this problem is
+solved outside of the JSONPath language by simply asking the programmer
+to register two selection specifications against the same handler
+function.
 
 In the below example types may not be easily inferred from ancestor
 keys.
@@ -212,13 +213,14 @@ programing, as named in a 2000 usenet discussion:
 > QUACKS-like-a duck, WALKS-like-a duck, etc, etc, depending on exactly
 > what subset of duck-like behaviour you need [@pythonduck]
 
-An address 'duck-definition' for the above JSON would say that any object which has
-number, street, and town properties is an address. Applied to JSON, duck typing takes an individualistic approach
-by deriving type from the node in itself rather than the situaiton in
-which it is found. Because I find this selection technique simple and
-powerful I decided to add it to my JSONPath variant. As discussed in
-section \ref{jsonpathxpath}, JSONPath's syntax is designed to resemble
-the equivalent Javascript accessors but Javascript has no syntax for a
+An address 'duck-definition' for the above JSON would say that any
+object which has number, street, and town properties is an address.
+Applied to JSON, duck typing takes an individualistic approach by
+deriving type from the node in itself rather than the situaiton in which
+it is found. Because I find this selection technique simple and powerful
+I decided to add it to my JSONPath variant. As discussed in section
+\ref{jsonpathxpath}, JSONPath's syntax is designed to resemble the
+equivalent Javascript accessors but Javascript has no syntax for a
 value-free list of object keys. The closest available notation is for
 object literals so I created a duck-type syntax derived from this by
 omitting the values, quotation marks, and commas. The address type
@@ -260,14 +262,14 @@ duplicating a syntax which the majority of web developers should become
 familiar with over the next few years I hope that Oboe's learning curve
 can be made a little more gradual. Taking on this feature, the selector
 `person.$address.town` would identify an address node with a town child,
-or `$people.{name, dob}` can be used to locate the same people array repeatedly
-whenever a new person is added to it. Javascript frameworks such as
-d3.js and Angular are designed to work with whole models as they change.
-Consequently, the interface they present converses more fluently with
-collections than individual entities. If we are downloading data to use
-with these libraries it is more convenient if we use explicit capturing
-so that we are notified whenever the collection is expanded and can pass
-it on.
+or `$people.{name, dob}` can be used to locate the same people array
+repeatedly whenever a new person is added to it. Javascript frameworks
+such as d3.js and Angular are designed to work with whole models as they
+change. Consequently, the interface they present converses more fluently
+with collections than individual entities. If we are downloading data to
+use with these libraries it is more convenient if we use explicit
+capturing so that we are notified whenever the collection is expanded
+and can pass it on.
 
 Parsing the JSON response
 -------------------------
@@ -318,17 +320,18 @@ jQuery.ajax("resources/shortMessage.txt")
 
 While jQuery is callback-based and internally event driven, the public
 API it exposes does not wrap asynchronously retrieved content in event
-objects and event types are expressed by the name of the method used to add
-the listener. These names, `done` and `fail`, follow generic phrasing
-and are common to all asynchronous functionality that jQuery provides. Promoting brevity, the methods are chainable so that
-several listeners may be added from one statement. Although Javascript
-supports exception throwing, for asynchronous failures a fail event is used instead. Exceptions are not
-applicable to non-blocking I/O because at the time of the failure the
-call which provoked the exception will already have been popped from the
-call stack.
+objects and event types are expressed by the name of the method used to
+add the listener. These names, `done` and `fail`, follow generic
+phrasing and are common to all asynchronous functionality that jQuery
+provides. Promoting brevity, the methods are chainable so that several
+listeners may be added from one statement. Although Javascript supports
+exception throwing, for asynchronous failures a fail event is used
+instead. Exceptions are not applicable to non-blocking I/O because at
+the time of the failure the call which provoked the exception will
+already have been popped from the call stack.
 
-`jQuery.ajax` is overloaded so that the parameter may be an object, allowing
-more detailed information to be given:
+`jQuery.ajax` is overloaded so that the parameter may be an object,
+allowing more detailed information to be given:
 
 ~~~~ {.javascript}
 jQuery.ajax({ "url":"resources/shortMessage.txt",
@@ -341,9 +344,9 @@ This pattern of passing arguments as object literals is common in
 Javascript for functions which take a large number of arguments,
 particularly if some are optional. This avoids having to pad unprovided
 optional arguments in the middle of the list with null values and,
-because the use of the values is named from the callee, also
-avoids an anti-pattern where a callsite can only be understood after
-counting the position of the arguments.
+because the use of the values is named from the callee, also avoids an
+anti-pattern where a callsite can only be understood after counting the
+position of the arguments.
 
 Taking on this style while extending it to cover events for progressive
 parsing, we arrive at the following Oboe public API:
@@ -366,8 +369,8 @@ In jQuery only one `done` handler is usually added to a request; the
 whole content is always given so there is only one thing to receive.
 Under Oboe there will usually be several separately selected areas of
 interest inside a JSON document so I anticipate that typically multiple
-node handlers will be added. Consequently, a shortcut style is provided for adding several
-selector-handler pairs at a time:
+node handlers will be added. Consequently, a shortcut style is provided
+for adding several selector-handler pairs at a time:
 
 ~~~~ {.javascript}
 oboe("resources/people.json")
@@ -403,10 +406,10 @@ location communicates information which is as important as their
 content. The `path` parameter provides the location as an array of
 strings plotting a descent from the JSON root to the found node. For
 example, Bolt has path `['medalWinners', 'gold']`. Similarly, the
-`ancestors` array is a list of the ancestors starting with the JSON root node and ending at the immediate
-parent of the found node. For all but
-the root node, which in any case has no ancestors, the nodes given by the
-ancestor list will have been only partially parsed.
+`ancestors` array is a list of the ancestors starting with the JSON root
+node and ending at the immediate parent of the found node. For all but
+the root node, which in any case has no ancestors, the nodes given by
+the ancestor list will have been only partially parsed.
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
@@ -426,9 +429,9 @@ parameters so that in most common cases a unary or binary function can
 be given.
 
 Under Node.js the code style is more obviously event-based. Listeners
-are normally added using an `.on` method where the event name is a string
-given as the first argument. Adopting this style, my API design for
-oboe.js also allows events to be added as:
+are normally added using an `.on` method where the event name is a
+string given as the first argument. Adopting this style, my API design
+for oboe.js also allows events to be added as:
 
 ~~~~ {.javascript}
 oboe("resources/someJson.json")
@@ -440,20 +443,20 @@ oboe("resources/someJson.json")
 
 While allowing both styles creates an API which is larger than it needs
 to be, creating a library which is targeted at both the client and
-server side is a balance between a consistent call syntax spanning environments
-and consistency with the environment. I hope that the dual interface will help adoption
-by either camp. The two styles are similar enough that a person familiar
-with one should be able to work with the other without difficulty.
-Implementating the duplicative parts of the API should require only a
-minimal degree of extra coding because they may be expressed in common
-using partial completion. Because `'!'` is the JSONPath for the root of
-the document, for some callback `c`, `.done(c)` is a equal to
-`.node('!', c)`. Likewise, `.node` is easily expressible as a partial
-completion of `.on` with `'node'`.
+server side is a balance between a consistent call syntax spanning
+environments and consistency with the environment. I hope that the dual
+interface will help adoption by either camp. The two styles are similar
+enough that a person familiar with one should be able to work with the
+other without difficulty. Implementating the duplicative parts of the
+API should require only a minimal degree of extra coding because they
+may be expressed in common using partial completion. Because `'!'` is
+the JSONPath for the root of the document, for some callback `c`,
+`.done(c)` is a equal to `.node('!', c)`. Likewise, `.node` is easily
+expressible as a partial completion of `.on` with `'node'`.
 
-When making PUT, POST or PATCH requests the API allows the body to 
-be given as an object and serialises it as JSON because it
-is anticipated that REST services which emit JSON will also accept it.
+When making PUT, POST or PATCH requests the API allows the body to be
+given as an object and serialises it as JSON because it is anticipated
+that REST services which emit JSON will also accept it.
 
 ~~~~ {.javascript}
 oboe.doPost("http://example.com/people", {
@@ -466,9 +469,9 @@ oboe.doPost("http://example.com/people", {
 Earlier callbacks when paths are found prior to nodes
 -----------------------------------------------------
 
-Following the project's aim of giving callbacks as early as
-possible, sometimes useful work can be done when a node is known to
-exist but before we have the contents of the node. A design follows in which each
+Following the project's aim of giving callbacks as early as possible,
+sometimes useful work can be done when a node is known to exist but
+before we have the contents of the node. A design follows in which each
 node found in the JSON document can potentially trigger notifications at
 two stages: when it is first addressed and when it is complete. The API
 facilitates this by providing a `path` event following much the same
@@ -499,81 +502,83 @@ Choice of streaming data transport
 ----------------------------------
 
 As discussed in section \ref{browserstreamingframeworks}, current
-techniques to provide streaming over http encourage a dichotomous
-split of traffic as either stream or download. I find that this split is
-not necessary and that streaming may be used as the most effective means
-of downloading. Streaming services implemented using push pages or websockets are
-not REST. Under these frameworks a stream has a URL address but the data
-in the stream is not addressable. This is similar to STREST, the *Service
-Trampled REST* anti-pattern [@strest], in which http URLs are viewed as
-locating endpoints for services rather than the actual resources.
-Being unaddressable, the data in the stream is also
+techniques to provide streaming over http encourage a dichotomous split
+of traffic as either stream or download. I find that this split is not
+necessary and that streaming may be used as the most effective means of
+downloading. Streaming services implemented using push pages or
+websockets are not REST. Under these frameworks a stream has a URL
+address but the data in the stream is not addressable. This is similar
+to STREST, the *Service Trampled REST* anti-pattern [@strest], in which
+http URLs are viewed as locating endpoints for services rather than the
+actual resources. Being unaddressable, the data in the stream is also
 uncacheable: an event which is streamed live cannot later, when it is
 historic, be retrieved from a cache which was populated by the stream.
 These frameworks use http as the underlying transport but I find they do
 not follow http's principled design. Due to these concerns, in the
 browser I will only be supporting downloading using XHR.
 
-Although I am designing Oboe as a client for ordinary REST resources and not
-focusing on the library a means to receive live events, it is interesting
-to speculate if Oboe could be used as a REST-compatible
+Although I am designing Oboe as a client for ordinary REST resources and
+not focusing on the library a means to receive live events, it is
+interesting to speculate if Oboe could be used as a REST-compatible
 bridge to unify live and static data. Consider a REST service which
-gives results per-constituency for a UK general elections. When requesting
-historic results the data is delivered in JSON format much as usual.
-Requesting the results for the current year on the night of the
+gives results per-constituency for a UK general elections. When
+requesting historic results the data is delivered in JSON format much as
+usual. Requesting the results for the current year on the night of the
 election, an incomplete JSON with the constituencies known so far would
-be immediately sent, followed by the remainder dispatched individually as the results are
-called. When all results are known the JSON would finally close leaving
-a complete resource. A few days later, somebody wishing to fetch the
-results would use the *same url for the historic data as was used on the
-night for the live data*. This is possible because the URL refers only to the
-data that is required, not to whether it is current or historic.
-Because it eventually formed a complete http response, the data that was
-streamed is not incompatible with http caching and a cache which saw the
-data when it was live could store it as usual and later serve it as
-historic. More sophisticated intermediate caches sitting on the network between
-client and service would recognise when
-a new request has the same url as an already ongoing request, serve
+be immediately sent, followed by the remainder dispatched individually
+as the results are called. When all results are known the JSON would
+finally close leaving a complete resource. A few days later, somebody
+wishing to fetch the results would use the *same url for the historic
+data as was used on the night for the live data*. This is possible
+because the URL refers only to the data that is required, not to whether
+it is current or historic. Because it eventually formed a complete http
+response, the data that was streamed is not incompatible with http
+caching and a cache which saw the data when it was live could store it
+as usual and later serve it as historic. More sophisticated intermediate
+caches sitting on the network between client and service would recognise
+when a new request has the same url as an already ongoing request, serve
 the response received so far, and then continue by giving both inbound
-requests the content as it arrives from the already established outbound request.
-Hence, the resource would be cacheable even while the election results are
-streaming and a service would only have to provide one stream to serve the same live data to
-multiple users fronted by the same cache. An application developer programming with Oboe would not
-have to handle live and historic data as separate cases because the node
-and path events they receive are the same. Without branching, the code which displays
-results as they are announced would automatically be able to show historic
-data.
+requests the content as it arrives from the already established outbound
+request. Hence, the resource would be cacheable even while the election
+results are streaming and a service would only have to provide one
+stream to serve the same live data to multiple users fronted by the same
+cache. An application developer programming with Oboe would not have to
+handle live and historic data as separate cases because the node and
+path events they receive are the same. Without branching, the code which
+displays results as they are announced would automatically be able to
+show historic data.
 
 Taking this idea one step further, Oboe might be used for infinite data
 which intentionally never completes. In principle this is not
 incompatible with http caching although more research would have to be
-done into how well current caches handle requests which do not finish. A REST
-service which provides infinite resources would have to confirm that it is
-delivering to a streaming client, perhaps with a
-request header. Otherwise, if a non-streaming REST client were to
-use the service it would try to get 'all' of the data and never complete
-its task.
+done into how well current caches handle requests which do not finish. A
+REST service which provides infinite resources would have to confirm
+that it is delivering to a streaming client, perhaps with a request
+header. Otherwise, if a non-streaming REST client were to use the
+service it would try to get 'all' of the data and never complete its
+task.
 
 Supporting only XHR as a transport unfortunately means that on older
 browsers which do not fire progress events (see section
-\ref{xhrsandstreaming}) a progressive conceptualisation of the data transfer
-is not possible. I will not be using streaming workarounds such as push
-tables because this would create a client which is unable to connect to
-the majority of REST services. Degrading gracefully, the best compatible behaviour is to wait
-until the document completes and then interpret the whole content as if
-it were streamed. Because nothing is done until the request is complete
-the callbacks will be fired later than on a more capable platform but
-will have the same content and be in the same order. By reverting to
-non-progressive AJAX on legacy platforms, an application author will not
-have to write special cases and the performance should be no worse than
-with traditional AJAX libraries such as jQuery. On legacy browsers
-Oboe could not be used to receive live data -- in the election night example no
-constituencies could be shown until they had all been called.
+\ref{xhrsandstreaming}) a progressive conceptualisation of the data
+transfer is not possible. I will not be using streaming workarounds such
+as push tables because this would create a client which is unable to
+connect to the majority of REST services. Degrading gracefully, the best
+compatible behaviour is to wait until the document completes and then
+interpret the whole content as if it were streamed. Because nothing is
+done until the request is complete the callbacks will be fired later
+than on a more capable platform but will have the same content and be in
+the same order. By reverting to non-progressive AJAX on legacy
+platforms, an application author will not have to write special cases
+and the performance should be no worse than with traditional AJAX
+libraries such as jQuery. On legacy browsers Oboe could not be used to
+receive live data -- in the election night example no constituencies
+could be shown until they had all been called.
 
 Node's standard http library provides a view of the response as a
 standard ReadableStream so there will be no problems programming to a
-progressive interpretation of http. In Node all streams provide
-a common API regardless of their origin so there is no reason not to allow
+progressive interpretation of http. In Node all streams provide a common
+API regardless of their origin so there is no reason not to allow
 arbitrary streams to be read. Although Oboe is intended primarily as a
 REST client, under Node it will be capable of reading data from any
 source. Oboe might be used to read from a local file, an ftp server, a
@@ -585,30 +590,30 @@ Handling transport failures
 Oboe cannot know the correct behaviour when a connection is lost so this
 decision is left to the containing application. Generally on request
 failure one of two behaviours are expected: if the actions performed in
-response to data so far remain valid in the
-absence of a full transmission their effects will be kept and a new
-request made for just the missed part; alternatively, if all the data is
-required for the actions to be valid, the application should take an optimistic 
-locking approach and perform rollback.
+response to data so far remain valid in the absence of a full
+transmission their effects will be kept and a new request made for just
+the missed part; alternatively, if all the data is required for the
+actions to be valid, the application should take an optimistic locking
+approach and perform rollback.
 
 Oboe.js as a micro-library
 --------------------------
 
 Http traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
-Javascript. WHen measuring a library's download footprint it usually makes
-more sense to compare post-compression. For the sake of adoption smaller
-is better because site creators are sensitive to the download size of
-their sites. Javascript micro-libraries are listed at
+Javascript. WHen measuring a library's download footprint it usually
+makes more sense to compare post-compression. For the sake of adoption
+smaller is better because site creators are sensitive to the download
+size of their sites. Javascript micro-libraries are listed at
 [microjs.com](http://microjs.com), which includes this project. A
 library qualifies as being *micro* if it is delivered in 5kb or less,
-5120 bytes but micro-libraries also tend to follow the ethos that it is better
-for an application developer to gather together several tiny libraries
-than find one with a one-size-fits-all approach, perhaps echoing the
-unix command line tradition for small programs which each do do exactly
-one thing. As well as being a small library, in the spirit of a
-micro-library a project should impose as few restrictions as possible on
-its use and be be agnostic as to which other libraries or programming
+5120 bytes but micro-libraries also tend to follow the ethos that it is
+better for an application developer to gather together several tiny
+libraries than find one with a one-size-fits-all approach, perhaps
+echoing the unix command line tradition for small programs which each do
+do exactly one thing. As well as being a small library, in the spirit of
+a micro-library a project should impose as few restrictions as possible
+on its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
 somewhat arbitrary, keeping below this limit whilst writing readable
