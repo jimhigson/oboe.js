@@ -477,9 +477,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       req.on('response', function(res){
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
-                   
-         console.log('http has started', res.statusCode, res.headers);                   
-                                
+                                                   
          emit(HTTP_START, res.statusCode, res.headers);                                
                                 
          if( sucessful ) {          
@@ -1284,7 +1282,11 @@ function errorReport(statusCode, body, error) {
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode, responseHeaders;
+   var oboeApi, rootNode, responseHeaders,
+       addDoneListener = partialComplete(
+                              addNodeOrPathListenerApi, 
+                              NODE_FOUND, 
+                              '!');
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
@@ -1441,10 +1443,7 @@ function instanceController(  emit, on, un,
       
       return this; // chaining
    }
-   
-   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, FAIL_EVENT);
-   
+      
    /**
     * implementation behind oboe().on()
     */       
@@ -1476,8 +1475,8 @@ function instanceController(  emit, on, un,
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
       on    :  addListener,
-      start :  addListener,
-      fail  :  addFailListner,
+      start :  partialComplete(addListener, HTTP_START),
+      fail  :  partialComplete(on, FAIL_EVENT),
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
       header:  function(name) {

@@ -984,7 +984,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       switch( xhr.readyState ) {
       
          case 3:       
-            emit( STREAM_START, {} );
+            emit( HTTP_START, {} );
             return;
             
          case 4:       
@@ -1774,7 +1774,7 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     FAIL_EVENT   = 'fail',    
     ROOT_FOUND    = _S++,    
-    STREAM_START = 'start',
+    HTTP_START = 'start',
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;
@@ -1801,14 +1801,18 @@ function errorReport(statusCode, body, error) {
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode, responseHeaders;
+   var oboeApi, rootNode, responseHeaders,
+       addDoneListener = partialComplete(
+                              addNodeOrPathListenerApi, 
+                              NODE_FOUND, 
+                              '!');
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });
    
-   on(STREAM_START, function(headers) {
+   on(HTTP_START, function(_statusCode, headers) {
       responseHeaders = headers;
    });
                               
@@ -1958,10 +1962,7 @@ function instanceController(  emit, on, un,
       
       return this; // chaining
    }
-   
-   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, FAIL_EVENT);
-   
+      
    /**
     * implementation behind oboe().on()
     */       
@@ -1993,13 +1994,13 @@ function instanceController(  emit, on, un,
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
       on    :  addListener,
-      start :  addListener,
-      fail  :  addFailListner,
+      start :  partialComplete(addListener, HTTP_START),
+      fail  :  partialComplete(on, FAIL_EVENT),
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
       header:  function(name) {
-                  return name ? responseHeaders 
-                              : responseHeaders && responseHeaders[name]
+                  return name ? responseHeaders && responseHeaders[name] 
+                              : responseHeaders
                               ;
                },
       root  :  function rootNodeFunctor() {
