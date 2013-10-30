@@ -1472,12 +1472,12 @@ function instanceController(  emit, on, un,
     * returned to the calling application
     */
    return oboeApi = { 
-      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
+      on    :  addListener,   
+      done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addListener,
-      start :  partialComplete(addListener, HTTP_START),
+      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND),      
+      start :  partialComplete(on, HTTP_START),
       fail  :  partialComplete(on, FAIL_EVENT),
-      done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
       header:  function(name) {
                   return name ? responseHeaders && responseHeaders[name] 

@@ -11,6 +11,7 @@ module.exports = function (grunt) {
    ,  'src/lists.js'                    
    ,  'src/libs/clarinet.js'               
    ,  'src/clarinetListenerAdaptor.js'
+   ,  'src/parseResponseHeaders.browser.js'
    ,  'src/streamingHttp-browser.js'
    ,  'src/jsonPathSyntax.js'
    ,  'src/incrementalContentBuilder.js'            

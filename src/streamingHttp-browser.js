@@ -81,7 +81,10 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       switch( xhr.readyState ) {
       
          case 3:       
-            emit( HTTP_START, {} );
+            emit(
+               HTTP_START, 
+               xhr.status,
+               parseResponseHeaders(xhr.getAllResponseHeaders()) );
             return;
             
          case 4:       
