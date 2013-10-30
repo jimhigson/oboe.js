@@ -6,31 +6,33 @@ Benchmarking vs non-progressive REST
 
 I feel it is important to experimentally answer the question, *is this
 way actually any faster?*. To measure performance I have created a small
-benchmarking suite that runs under Node.js. One of my suggested
-advantages of incremental parsing and perceptual improvement in speed. I
+benchmarking suite that runs under Node.js. One of the advantages suggested
+for incremental parsing was a perceptual improvement in speed. I
 am not focusing on user perception for this evaluation because it would
 be difficult to measure, requiring subjective judgement and human
 participants. I will be measuring the time taken to provide the first
 output which correlates with how quickly interface redrawing can start
-and should give some indication as to perceptual speed. I chose Node to
+and should give a good indication as to perceptual speed. I chose Node to
 host the tests because it is a minimalist platform which should give a
 more repeatable results than browsers which could be performing any
 number of simultaneous background tasks. Node also has the advantage
 that small changes in memory use are not overwhelmed by a memory hungry
 environment.
 
-The benchmark mimics a REST service backed by a relational database.
-Relational databases pass data from a result cursor one tuple at a time,
+The benchmark involves two node processes, one acting as a
+REST client and the other as a REST server
+and mimics a REST service backed by a relational database.
+Relational database client libraries pass data from a result cursor one tuple at a time to be used by the application,
 the service simulates this by writing out forty tuples as JSON objects,
-one every ten milliseconds. Every other object in the returned JSON
-contains a URL to a further resource which will also be fetched and an
-aggregation created. To simulate real network conditions, Apple's
+one every ten milliseconds. Half the tuples contain
+a URL to a further resource which will also be fetched so that an
+aggregation can be created. To simulate real network conditions, Apple's
 *Network Line Conditioner* was used with the presets *3G, Average Case*
 and *Cable modem* to represent poor and good internet connections
-respectively [^1]. The test involves two node processes, one acting as a
-REST client and one as a REST server. Memory was measured on the client
+respectively. Three client version were implemented using JSON.parse DOM-style
+parsing, Clarinet SAX-style parsing and Oboe. Memory was measured on the client
 using Node's built in memory reporting tool, `process.memoryusage()` and
-the largest figure reported on each run is used. The test server and
+the largest figure reported during each run is taken. The test server and
 client can be found in the project's `benchmark` directory, or in the
 appendix on pages \ref{src_benchmarkServer} and
 \ref{src_benchmarkClient}.
@@ -45,7 +47,7 @@ appendix on pages \ref{src_benchmarkServer} and
   Clarinet          Poor                52ms      1,510ms         5.5Mb
 
 In comparison with JSON.parse, Oboe shows a dramatic improvement of
-about 96% regarding the time taken for the first output and a smaller
+about 96% regarding the time taken for the first output to be produced and a smaller
 but significant improvement of about 40% in the total time required to
 create the aggregation. Oboe's aggregation on a good network is about
 15% slower than Clarinet; since Oboe is built on Clarinet I did not
@@ -54,27 +56,27 @@ is probably because Oboe encodes a more involved workflow than a raw SAX
 parser.
 
 Clarinet is known to be slower than JSON.parse for input which is
-already held in memory[^2] but when reading from a network this offset
+already held in memory[@clarinetspeed] but when reading from a network this offset
 by the ability to parse progressively. Compared to JSON.parse, the extra
-computation time needed by Oboe is shown to be relatively insignificant
-in comparison to the advantage of better i/o management. Reacting
+computation time needed by Oboe and Clarinet is shown to be relatively insignificant
+in comparison to the advantage of better I/O management. Reacting
 earlier using slower handlers is shown to be faster overall than
 reacting later with quicker ones. I believe that this vindicates the
 project focus on efficient management of I/O over faster algorithms;
 much current programming takes a "Hurry up and wait" approach by
-concentrating on small algorithm optimisation over performing a task at
+concentrating on algorithm micro-optimisation over performing tasks at
 the earliest possible time.
 
-There is an unexpected improvement vs JSON.parse in terms of memory
-usage. It is not clear why this would be but it may be attributable to
-the large large dependency tree brought in by the get-json library which
-was used to simplify this version. As expected, Clarinet has the
+Oboe shows an unexpected improvement in terms of memory
+usage compared to JSON.parse. It is not clear why this would be but it may be attributable to
+the large dependency tree brought in by the get-json library used in the JSON.parse
+client version. As expected, Clarinet has the
 smallest memory usage because it never stores a complete version of the
 parsed JSON. As REST resource size increases I would expect Clarinet's
 memory usage to remain roughly constant while the other two rise
 linearly. Node is popular on RaspberryPi type devices with constrained
 RAM; Clarinet might be preferable to Oboe where code clarity is less
-important than a small memory footprint
+important than a small memory footprint.
 
 Comparative developer ergonomics
 --------------------------------
@@ -103,7 +105,7 @@ oboe(DB_URL).node('{id url}.url', function(url){
 ~~~~
 
 Non-progressive parsing with JSON.parse was slightly longer, requiring a
-loop and an if statement, both to drill down into the results. The code
+loop and an if statement, both necessary to drill down into the results. The code
 below is shortened by using the get-json[^3] package which combines
 parsing implicitly into the download:
 
@@ -119,7 +121,7 @@ getJson(DB_URL, function(err, records) {
 });
 ~~~~
 
-This is tightly coupled with the JSON format that it reads. We can see
+This version is tightly coupled with the JSON format that it reads. We can see
 this in the fragments `records.data`, `record.url`, and `record.name`
 which will only work if they find the desired subtree at exactly the
 anticipated location. The code might be said to contain a description of
@@ -147,12 +149,12 @@ Performance under various Javascript engines
 --------------------------------------------
 
 The file `oboe.performance.spec.js`[^4] contains a benchmark which
-concentrates on using Oboe for pattern matching. This test registers a
+concentrates on measuring the performance of Oboe's pattern matching. This test registers a
 complex pattern which intentionally uses all features from the JSONPath
 language and then fetches a JSON file containing approximately 800
 nodes, 100 of which will match. Although actual http is used, it is over
 an unthrottled connection to localhost so network delay should be
-negligible. The tests are executed on a relatively low-powered Macbook
+negligible. The tests were executed on a relatively low-powered Macbook
 Air laptop running OS X 10.7.5, except for Chrome Mobile which was
 tested on an iPhone 5 with iOS 7.0.2. Test cases requiring Microsoft
 Windows were performed inside a VirtualBox virtual machine. Curl is a
@@ -182,7 +184,7 @@ by far the largest improvement, indicating that the functional JSONPath
 matching accounts for Firefox's lower than expected performance.
 
 During the project version 31 of Chrome was released that performed more
-than twice as quickly as the version 30 due to an updated version of the
+than twice as quickly as version 30 due to an updated version of the
 v8 Javascript engine. Node also uses v8 and should catch up when it is
 next updated. This reflects Javascript engine writers targeting
 functional optimisation now that functional Javascript is becoming a
@@ -198,8 +200,8 @@ to conclude that for complex use cases Oboe is currently unsuited to
 legacy platforms. If we desired to improve performance on older
 platforms one solution might be to create a simpler, non-progressive
 implementation of the Oboe API for selective delivery to older browsers.
-However, I would argue that time spent writing a basic legacy version
-would be better spent waiting for these moribund platforms to die.
+However, I would argue that the time spent writing a basic legacy version
+would be better employed waiting for these moribund platforms to die.
 
 For an imperative language coded in a functional style the compiler may
 not optimise as effectively as if a functional language were used. This
@@ -207,8 +209,8 @@ is especially the case for a highly dynamic language in which
 everything, even the basic built-in types, are mutable. Presenting a
 convenient API to application developers means passing eagerly evaluated
 parameters to application callbacks even when the parameters are of
-secondary importance and will be predominantly ignored. The the path and
-ancestor arrays are created for every matching node but I anticipate
+secondary importance, such as the path and
+ancestor arrays that are created for every matching node, and will be predominantly ignored. 
 will be predominantly ignored. Under a functional language these could
 be lazily evaluated without requiring any special effort by the
 application programmer. I think Javascript was a good choice of
@@ -234,31 +236,31 @@ Potential future work
 Although all network traffic can be viewed as a stream, the most obvious
 future expansion would be to create a matching server-side component
 that provides an intuitive interface for writing JSON streams. So far,
-sending streaming JSON has required the resource be written out using
+sending streaming JSON has required that the resource be written out using
 programmer-assembled strings but this approach is error prone and would
 scale badly as messages become more complex. A stream-writer server side
 library would allow Oboe to be used as a REST-compatible streaming
-solution for situations which currently employ websockets. This would
-provide a form of streaming that operates according to the principled
+solution for situations which currently employ push tables or websockets. This would
+provide a form of REST streaming that operates according to the principled
 design of http rather than by sidestepping it.
 
-There is nothing about Oboe that precludes working with other
+Although JSON is particularly well suited, there is nothing about Oboe that precludes working with other
 tree-shaped formats. If there is demand, An XML/XPATH version seems like
 an obvious expansion. This could be implemented by allowing resource
 formats to be added using plugins which would allow programmers to
 create a progressive interpretation of any resource type. As a minimum,
 a plug-in would require a SAX-like parser and a compiler for some kind
-of pattern matching language.
+of node selection language.
 
 Oboe stores all JSON nodes that are parsed for the duration of its
-lifetime so despite being similar to a SAX parser so far as it is
+lifetime so despite being similar to a SAX parser in terms of being
 progressive, it consumes as much memory as a DOM parser. The nodes
-remain held so that all possible JSONPath expressions may be tested.
+remain held so that all possible JSONPath expressions may later be tested.
 However, in most cases memory could be freed if the parsed content were
 stored only so far as is required to test against the patterns which
 have actually been registered. For typical use cases I expect this would
-allow large subtrees to be unlinked inside Oboe, particularly once they
-have matched a pattern and have already been handed over to application
+allow large subtrees to be pruned, particularly once they
+have matched a pattern and have already been handed back to application
 callbacks. Likewise, the current implementation takes a rather brute
 force approach when examining nodes for pattern matches by checking
 every registered JSONPath expression against every node parsed from the
@@ -266,26 +268,22 @@ JSON. For many expressions we should be able to say that there will be
 no matches inside a particular JSON subtree, either because we have
 already matched or because the the subtree's ancestors invariably imply
 failure. A more sophisticated implementation might subdue provably
-unsatisfiable handlers until the SAX parser leaves unmatchable subtrees.
+unsatisfiable handlers until the SAX parser leaves an unmatchable subtree.
 
 Summing up
 ----------
 
-The reaction to Oboe has been overwhelmingly positive with several
-projects already adopting it. It was the number one trending project on
-Github for some time and has been the subject of hundreds of tweets. I
+The community reaction to Oboe has been overwhelmingly positive with several
+projects already adopting it and reporting performance gains which are large
+enough to be obvious. I
 feel that, while some attention should be given to optimisation under
 Firefox, this project meets all if its intended aims, presenting a REST
 client library which in the best case allows the network to be used much
 more efficiently and in the worse case is as good as the previous best
-solution. At the same time it is no more difficult to program with and
-by being declarative will often be easier.
-
-[^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
-
-[^2]: http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html
+solution. At the same time the produced library is in many cases easier
+to use than the previous simplest solution.
 
 [^3]: https://npmjs.org/package/get-json
 
-[^4]: See
+[^4]:
     [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)

@@ -458,6 +458,17 @@
       "url":"http://www.w3.org/TR/REC-xml/#sec-starttags",
       "issued": { "date-parts":[ [2008] ] },
       "type":"webpage"                  
+   },
+   
+   {
+      "id":"clarinetspeed",
+      "title":"Clarinet - SAX based evented streaming JSON parser in JavaScript for the browser and nodejs",
+      "author":[         
+         { "family": "Job", "given":"Nuno"}
+      ],
+      "url":"http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html",
+      "issued": { "date-parts":[ [2012] ] },
+      "type":"webpage"                  
    }
       
    
