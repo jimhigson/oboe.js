@@ -20,9 +20,16 @@ function startServer( port, grunt ) {
       req.pipe(res);  
    }
    
-   function echoBackHeaders(req, res) {
+   function echoBackHeadersAsBodyJson(req, res) {
       res.end(JSON.stringify(req.headers));
    }
+   
+   function echoBackHeadersAsHeaders(req, res) {
+      for( var name in req.headers ) {
+         res.set(name, req.headers[name]);         
+      }
+      res.end('{"see":"headers", "for":"content"}');
+   }   
    
    function replyWithTenSlowNumbers(_req, res) {
       sendJsonHeaders(res);
@@ -167,7 +174,8 @@ function startServer( port, grunt ) {
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);
       app.patch(  '/echoBackBody',              echoBackBody);
-      app.get(    '/echoBackHeaders',           echoBackHeaders);
+      app.get(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
+      app.get(    '/echoBackHeadersAsHeaders',  echoBackHeadersAsHeaders);      
       app.get(    '/static/json/:name.json',    replyWithStaticJson);
       app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
       app.get(    '/twoHundredItems',           twoHundredItems);

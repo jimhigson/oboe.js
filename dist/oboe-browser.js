@@ -901,6 +901,30 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
                                        };
    });
 }
+// based on gist https://gist.github.com/monsur/706839
+
+/**
+ * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
+ * headers according to the format described here:
+ * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
+ * This method parses that string into a user-friendly key/value pair object.
+ */
+function parseResponseHeaders(headerStr) {
+   var headers = {};
+   
+   headerStr && headerStr.split('\u000d\u000a')
+      .forEach(function(headerPair){
+   
+         // Can't use split() here because it does the wrong thing
+         // if the header value has the string ": " in it.
+         var index = headerPair.indexOf('\u003a\u0020');
+         
+         headers[headerPair.substring(0, index)] 
+                     = headerPair.substring(index + 2);
+      });
+   
+   return headers;
+}
 function httpTransport(){
    return new XMLHttpRequest();
 }
@@ -968,7 +992,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         emit( NEW_CONTENT, newText );
+         emit( STREAM_DATA, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -980,32 +1004,41 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    }
    
    xhr.onreadystatechange = function() {
-            
-      if(xhr.readyState == 4 ) {
-
-         // is this a 2xx http code?
-         var sucessful = String(xhr.status)[0] == 2;
+      
+      switch( xhr.readyState ) {
+               
+         case 2:       
          
-         if( sucessful ) {
-            // In Chrome 29 (not 28) no onprogress is emitted when a response
-            // is complete before the onload. We need to always do handleInput
-            // in case we get the load but have not had a final progress event.
-            // This looks like a bug and may change in future but let's take
-            // the safest approach and assume we might not have received a 
-            // progress event for each part of the response
-            handleProgress();
+            emit(
+               HTTP_START, 
+               xhr.status,
+               parseResponseHeaders(xhr.getAllResponseHeaders()) );
+            return;
             
-            emit( END_OF_CONTENT );
-         } else {
-         
-            emit( 
-               ERROR_EVENT, 
-               errorReport(
-                  xhr.status, 
-                  xhr.responseText
-               )
-            );
-         }
+         case 4:       
+            // is this a 2xx http code?
+            var sucessful = String(xhr.status)[0] == 2;
+            
+            if( sucessful ) {
+               // In Chrome 29 (not 28) no onprogress is emitted when a response
+               // is complete before the onload. We need to always do handleInput
+               // in case we get the load but have not had a final progress event.
+               // This looks like a bug and may change in future but let's take
+               // the safest approach and assume we might not have received a 
+               // progress event for each part of the response
+               handleProgress();
+               
+               emit( STREAM_END );
+            } else {
+            
+               emit( 
+                  FAIL_EVENT, 
+                  errorReport(
+                     xhr.status, 
+                     xhr.responseText
+                  )
+               );
+            }
       }
    };
 
@@ -1027,7 +1060,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, 
+         partialComplete(emit, FAIL_EVENT, 
              errorReport(undefined, undefined, e)
          )
       ,  0
@@ -1766,10 +1799,11 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     // these events are never exported so are kept as 
     // the smallest possible representation, numbers:
     _S = 0,
-    ERROR_EVENT   = _S++,    
+    FAIL_EVENT   = 'fail',    
     ROOT_FOUND    = _S++,    
-    NEW_CONTENT = _S++,
-    END_OF_CONTENT = _S++,
+    HTTP_START = 'start',
+    STREAM_DATA = _S++,
+    STREAM_END = _S++,
     ABORTING = _S++;
     
 function errorReport(statusCode, body, error) {
@@ -1794,14 +1828,22 @@ function errorReport(statusCode, body, error) {
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode;
+   var oboeApi, rootNode, responseHeaders,
+       addDoneListener = partialComplete(
+                              addNodeOrPathListenerApi, 
+                              NODE_FOUND, 
+                              '!');
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });
+   
+   on(HTTP_START, function(_statusCode, headers) {
+      responseHeaders = headers;
+   });
                               
-   on(NEW_CONTENT,         
+   on(STREAM_DATA,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -1819,7 +1861,7 @@ function instanceController(  emit, on, un,
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
+   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 
@@ -1834,7 +1876,7 @@ function instanceController(  emit, on, un,
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       emit(
-         ERROR_EVENT, 
+         FAIL_EVENT, 
          errorReport(undefined, undefined, e)
       );
       
@@ -1913,7 +1955,7 @@ function instanceController(  emit, on, un,
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -1947,28 +1989,27 @@ function instanceController(  emit, on, un,
       
       return this; // chaining
    }
-   
-   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, ERROR_EVENT);
-   
+      
    /**
     * implementation behind oboe().on()
     */       
    function addListener( eventId, listener ){
-                         
-      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
-                                
-         apply(arguments, addNodeOrPathListenerApi);
          
-      } else if( eventId == 'done' ) {
-      
-         addDoneListener(listener);
-                              
-      } else if( eventId == 'fail' ) {
-      
-         addFailListner(listener);
-      }
-             
+      switch(eventId) {
+         case NODE_FOUND:
+         case PATH_FOUND:
+            apply(arguments, addNodeOrPathListenerApi);
+            break;
+            
+         case 'done':
+            addDoneListener(listener);         
+            break;
+            
+         default:
+            // for cases: 'fail', 'start'
+            on(eventId, listener);
+      }                     
+                                               
       return this; // chaining
    }   
    
@@ -1977,12 +2018,18 @@ function instanceController(  emit, on, un,
     * returned to the calling application
     */
    return oboeApi = { 
-      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
+      on    :  addListener,   
+      done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addListener,
-      fail  :  addFailListner,
-      done  :  addDoneListener,
+      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND),      
+      start :  partialComplete(on, HTTP_START),
+      fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
+      header:  function(name) {
+                  return name ? responseHeaders && responseHeaders[name] 
+                              : responseHeaders
+                              ;
+               },
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

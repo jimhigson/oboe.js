@@ -236,7 +236,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(
-          {  url:url('echoBackHeaders'),
+          {  url:url('echoBackHeadersAsBodyJson'),
              headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
           } 
   
@@ -255,13 +255,77 @@ describe("oboe integration (real http)", function() {
          return countGotBack == 2
       }, 'all headers to have been detected back here', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('can read response headers', function () {
+
+      var done = false;
+
+      oboe(
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-sso':'sso', 'x-sso2':'sso2'}
+          } 
+  
+      ).done(function(){
+
+         expect(this.header('x-sso')).toEqual('sso');
+         expect(this.header('x-sso2')).toEqual('sso2');
+                  
+         expect(this.header()['x-sso']).toEqual('sso');
+         expect(this.header()['x-sso2']).toEqual('sso2');
+         expect(this.header()['x-sso3']).toBeUndefined();
+                  
+         done = true;         
+      }) 
+  
+      waitsFor(function () {
+         return done;
+      }, 'the response to complete', ASYNC_TEST_TIMEOUT)
+   })
+   
+   it('gives undefined for headers before they are ready', function () {
+
+      var o = oboe(
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-sso':'sso', 'x-sso2':'sso2'}
+          } 
+      )
+      
+      expect(o.header()).toBeUndefined();
+      expect(o.header('x-sso')).toBeUndefined();
+      expect(o.header('x-sso2')).toBeUndefined();
+   })   
+   
+   it('notifies of response starting by giving status code and headers to callback', function () {
+      var called = 0;   
+   
+      oboe(      
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-a':'A', 'x-b':'B'}
+          }   
+      ).start(function(statusCode, headers){
+      
+         expect(statusCode).toBe(200);
+         expect(headers['x-a']).toBe('A');
+         called++;
+         
+      }).on('start', function(statusCode, headers){
+      
+         expect(statusCode).toBe(200);
+         expect(headers['x-b']).toBe('B');
+         called++;
+      });
+      
+      waitsFor(function () {
+         return called == 2;
+      }, 'the response to call both start callbacks', ASYNC_TEST_TIMEOUT)      
+   });      
 
    it('can listen for nodes nodejs style', function () {
 
       var countGotBack = 0;
 
       oboe(url('static/json/firstTenNaturalNumbers.json'))
-         .on('node', '!.*', function (number) {
+         .on('node', '!.*', function () {
             countGotBack++;
          });
 

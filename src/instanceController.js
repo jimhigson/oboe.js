@@ -8,14 +8,22 @@
 function instanceController(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   var oboeApi, rootNode;
+   var oboeApi, rootNode, responseHeaders,
+       addDoneListener = partialComplete(
+                              addNodeOrPathListenerApi, 
+                              NODE_FOUND, 
+                              '!');
 
    // when the root node is found grap a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });
+   
+   on(HTTP_START, function(_statusCode, headers) {
+      responseHeaders = headers;
+   });
                               
-   on(NEW_CONTENT,         
+   on(STREAM_DATA,         
       function (nextDrip) {
          // callback for when a bit more data arrives from the streaming XHR         
           
@@ -33,7 +41,7 @@ function instanceController(  emit, on, un,
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   on(END_OF_CONTENT, clarinetParser.close.bind(clarinetParser));
+   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 
@@ -48,7 +56,7 @@ function instanceController(  emit, on, un,
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       emit(
-         ERROR_EVENT, 
+         FAIL_EVENT, 
          errorReport(undefined, undefined, e)
       );
       
@@ -127,7 +135,7 @@ function instanceController(  emit, on, un,
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -161,28 +169,27 @@ function instanceController(  emit, on, un,
       
       return this; // chaining
    }
-   
-   var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, ERROR_EVENT);
-   
+      
    /**
     * implementation behind oboe().on()
     */       
    function addListener( eventId, listener ){
-                         
-      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
-                                
-         apply(arguments, addNodeOrPathListenerApi);
          
-      } else if( eventId == 'done' ) {
-      
-         addDoneListener(listener);
-                              
-      } else if( eventId == 'fail' ) {
-      
-         addFailListner(listener);
-      }
-             
+      switch(eventId) {
+         case NODE_FOUND:
+         case PATH_FOUND:
+            apply(arguments, addNodeOrPathListenerApi);
+            break;
+            
+         case 'done':
+            addDoneListener(listener);         
+            break;
+            
+         default:
+            // for cases: 'fail', 'start'
+            on(eventId, listener);
+      }                     
+                                               
       return this; // chaining
    }   
    
@@ -191,12 +198,18 @@ function instanceController(  emit, on, un,
     * returned to the calling application
     */
    return oboeApi = { 
-      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
+      on    :  addListener,   
+      done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      on    :  addListener,
-      fail  :  addFailListner,
-      done  :  addDoneListener,
+      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND),      
+      start :  partialComplete(on, HTTP_START),
+      fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
+      header:  function(name) {
+                  return name ? responseHeaders && responseHeaders[name] 
+                              : responseHeaders
+                              ;
+               },
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }

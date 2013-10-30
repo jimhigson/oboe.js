@@ -29,12 +29,12 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
                                              
-         emit( NEW_CONTENT, chunk.toString() );
+         emit( STREAM_DATA, chunk.toString() );
       });
       
       readableStream.on('end', function() {
                
-         emit( END_OF_CONTENT );
+         emit( STREAM_END );
       });
    }
    
@@ -52,7 +52,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       });
    }
    
-   function fetchUrl( url ) {
+   function fetchHttpUrl( url ) {
       if( !contentSource.match(/http:\/\//) ) {
          contentSource = 'http://' + contentSource;
       }                           
@@ -70,6 +70,8 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       req.on('response', function(res){
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
+                                                   
+         emit(HTTP_START, res.statusCode, res.headers);                                
                                 
          if( sucessful ) {          
                
@@ -78,7 +80,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
          } else {
             readStreamToEnd(res, function(errorBody){
                emit( 
-                  ERROR_EVENT, 
+                  FAIL_EVENT, 
                   errorReport( statusCode, errorBody )
                );
             });
@@ -87,7 +89,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       
       req.on('error', function(e) {
          emit( 
-            ERROR_EVENT, 
+            FAIL_EVENT, 
             errorReport(undefined, undefined, e )
          );
       });
@@ -105,7 +107,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
    }
    
    if( isString(contentSource) ) {
-      fetchUrl(contentSource);
+      fetchHttpUrl(contentSource);
    } else {
       // contentsource is a stream
       readStreamToEventBus(contentSource);   

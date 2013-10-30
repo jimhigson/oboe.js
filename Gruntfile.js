@@ -11,6 +11,7 @@ module.exports = function (grunt) {
    ,  'src/lists.js'                    
    ,  'src/libs/clarinet.js'               
    ,  'src/clarinetListenerAdaptor.js'
+   ,  'src/parseResponseHeaders.browser.js'
    ,  'src/streamingHttp-browser.js'
    ,  'src/jsonPathSyntax.js'
    ,  'src/incrementalContentBuilder.js'            
@@ -326,6 +327,15 @@ module.exports = function (grunt) {
       'karma:single-minified',     
       'karma:single-amd'   
    ]);   
+   
+   // build and run just the integration tests.
+   grunt.registerTask('build-integration-test',      [
+      'browser-build',
+      'node-build',   
+      'start-stream-source',
+      'karma:single-concat',
+      'jasmine_node_oboe'
+   ]);
    
    grunt.registerTask('default',      [
    
