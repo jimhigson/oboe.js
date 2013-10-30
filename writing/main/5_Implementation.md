@@ -1,8 +1,8 @@
 Implementation
 ==============
 
-Components of the project
--------------------------
+Componentisation of the project
+-------------------------------
 
 ![**Major components of Oboe.js illustrating program flow from http
 transport to application callbacks.** UML facet/receptacle notation is
@@ -16,34 +16,34 @@ number of tasks between receiving http content and notifying application
 callbacks. The internal componentisation is designed primarily so that
 automated testing can provide a high degree of confidence regarding the
 correct working of the library. A local event bus facilitates
-communication inside the Oboe instance and most components interact
+communication inside an Oboe instance and most components interact
 solely by using this bus; receiving events, processing them, and
 publishing further events in response. The use of an event bus is a
 variation on the Observer pattern which removes the need for each unit
-to locate specific other units before it may listen to their events,
+to locate specific other units before it may listen to their output,
 giving a highly decoupled shape to the library in which each part knows
 the events it requires but not who publishes them. Once everything is
 wired into the bus no central control is required and the larger
-behaviours emerge as the consequence of interaction between finer ones.
+behaviours emerge as a consequence of the interactions between finer ones.
 
 Design for automated testing
 ----------------------------
 
-![**The test pyramid**. Much testing is done on the low-level components
-of the system, less on their composed behaviours, and less still on a
+![**The test pyramid**. Many tests specify the low-level components,
+fewer on their composed behaviours, and fewer still on a
 whole-system level. \label{testpyramid}](images/testPyramid.png)
 
 80% of the code written for this project is test specification. Because
 the correct behaviour of a composition requires the correct behaviour of
 its components, the majority are *unit tests*. The general style of a
 unit test is to plug the item under test into a mock event bus and check
-that when it receives input events the expected output events are
+that when it receives certain input events the expected output events are
 consequently published.
 
 The *Component tests* step back from examining individual components to
 a position where their behaviour as a composition may be examined.
 Because the compositions are quite simple there are fewer component
-tests than unit tests. The component tests do not take account of *how*
+tests than unit tests. The component tests do not take account of how
 the composition is drawn and predominantly examine the behaviour of the
 library through its public API. One exception is that the streamingXHR
 component is switched for a stub so that http traffic can be simulated.
@@ -54,7 +54,7 @@ access to, the internals, using the same API as is exposed to
 application programmers. These tests are the most expensive to write but
 a small number are necessary in order to verify that Oboe works
 correctly end-to-end. Without access to the internals http traffic
-cannot be faked so before these tests can be performed a corresponding
+cannot be faked so before these tests are performed a corresponding
 REST service is started. This test service is written using Node and
 returns known content progressively according to predefined timings,
 somewhat emulating a slow internet connection. The integration tests
@@ -64,22 +64,22 @@ the first ten natural numbers as a JSON array at a rate of two per
 second. The test registers a JSONPath selector that matches the numbers
 against a callback that aborts the http request on seeing the fifth. The
 correct behaviour is to get no sixth callback, even when running on a
-platform lacking support for XHR2 and all ten will have already been
+platform lacking support for XHR2 where all ten will have already been
 downloaded.
 
 Confidently black-box testing a stateful unit is difficult. Because of
-side-effects and hidden state we do not know if the same call will later
+side-effects and hidden state we can not be certain that the same call won't later
 give a different behaviour. Building up the parse result from SAX events
 is a fairly complex process which cannot be implemented efficiently as
-stateless Javascript. To promote testability the state is delegated to a
+wholly side-effect free Javascript. To promote testability the state is delegated to a
 simple state-storing unit. The intricate logic may then be expressed as
 a separately tested set of side-effect free functions which transition
 between one state and the next. Although proof of correctness is
 impossible, for whichever results the functions give while under test,
 uninfluenced by state I can be confident that they will always yield the
 same response given the same future events. The separate unit
-maintaining the state has exactly one responsibility, to hold the parse
-result between function calls, and is trivial to test. This approach
+maintaining the state has exactly one responsibility, to hold the incremental parse
+output between function calls, and is trivial to test. This approach
 slightly breaks with the object oriented principle of encapsulation by
 hiding state behind the logic which acts on it but I feel that the
 departure is justified by the more testable codebase.
@@ -92,14 +92,14 @@ differences does not know how to create the underlying XHR that it
 adapts. Undoubtedly, by not instantiating its own transport this
 component presents a less friendly interface: it's data source is no
 longer a hidden implementation detail but exposed as a part of the it's
-API at the responsibility of the caller. I feel this is mitigated by the
+API as the responsibility of the caller. I feel this disadvantage is mitigated by the
 interface being purely internal. Dependency injection in this case
 allows the tests to be written more simply because it is easy to
 substitute the real XHR for a stub. Unit tests should test exactly one
-unit, were the streaming http object to create its own transport, the
+unit; were the streaming http object to create its own transport, the
 XHR would also be under test, plus whichever external service it
 connects to. Because Javascript allows redefinition of built in types
-the stubbing could have potentially also be done by overwriting the XHR
+the stubbing could have potentially also been done by overwriting the XHR
 constructor to return a mock. However this is to be avoided as it opens
 up the possibility of changes to the environment leaking between test
 cases.
@@ -135,7 +135,7 @@ that if we bring together the medium and the message by viewing the
 result of code while we write it, we can build as a series of small,
 iterative, correct steps and programming can be more explorative and
 expressive. Running the tests subtly, automatically hundreds of times
-per day builds isn't merely convenient, this build process makes me a
+per day isn't merely convenient, this build process makes me a
 better programmer.
 
 Integration tests are not run on save. They intentionally simulate a
@@ -150,8 +150,8 @@ Packaging to a single distributable file
 
 As an interpreted language Javascript may be run without any prior
 compilation. Directly running the files that are open in the editor is
-convenient while programming but, unless a project is written as a
-single file, in practice some build phase is required to create an
+convenient while programming but unless a project is written as a
+single file in practice some build phase is required to create an
 easily distributable form. Dependency managers have not yet become
 standard for client-side web development so dependant libraries are
 usually manually downloaded. For a developer wishing to include my
@@ -176,15 +176,15 @@ providing an asynchronous `require` function. Calls to `require` AJAX in
 and execute the imported source, passing any exported items to the given
 callback. For non-trivial applications loading each dependency
 individually over AJAX is intended only for debugging because making so
-many requests is slow. For efficient delivery Require also has the
+many requests is slow. For efficient delivery Require provides the
 `optimise` command which concatenates an application into a single file
 by using static analysis to deduce a workable source order. Because the
 `require` function may be called from anywhere, this is undecidable in
-the general case so Require falls back to lazy loading. In practice this
+the general case so when a safe concatenation order cannot be found Require falls back to lazy loading. In practice this
 isn't a problem because imports are generally not subject to branching.
-For larger webapps lazy loading is a feature because it speeds up the
-initial page load. The technique of *Asynchronous Module Definition*
-(AMD) intentionally imports rarely-loaded modules in response to events;
+For larger webapps lazy loading is actually a feature because it speeds up the
+initial page load. The technique of *Asynchronous Module Definition*,
+AMD intentionally imports rarely-loaded modules in response to events;
 by resisting static analysis the dependant Javascript will not be
 downloaded until it is needed. AMD is mostly of interest to applications
 with a central hub but also some rarely used parts. For example, most
@@ -205,7 +205,7 @@ than doubled Oboe's download footprint.
 After removing Require I decided to pick up the simplest tool which
 could possibly work. With about 15 source files and a fairly sparse
 dependency graph finding a working order on paper wasn't a daunting
-task. Combined with a Grunt analogue to the unix `cat` command I quickly
+task. After finding a free Grunt plugin analogous to the unix `cat` command I quickly
 had a working build process and a distributable library requiring no
 run-time dependency management to be loaded.
 
@@ -214,12 +214,12 @@ For future consideration there is Browserify. This library reverses the
 for Javascript development and adapting the browser environment to
 match. Browserify converts applications written for Node into a single
 file packaged for delivery to a web browser. Significantly, other than
-Adaptors wrapping the browser APIs and presenting their features as if
-they were the Node equivalents, Browserify leaves no trace of itself in
+adaptors wrapping browser APIs in the call style of
+the Node equivalents, Browserify leaves no trace of itself in
 the final Javascript. Additionally, the http adaptor[^1] is capable of
-using XHRs as a streaming source when used with supporting browsers.
+using XHRs as a streaming source when run on supporting browsers.
 
-After combining into a single file Javascript source can be made
+Javascript source can be made
 significantly smaller by *minification* techniques such as reducing
 scoped symbols to a single character or deleting the comments. For Oboe
 the popular minifier library *Uglify* was chosen. Uglify performs only
@@ -241,7 +241,7 @@ Styles of programming
 Oboe does not follow any single paradigm and is written as a mix of
 procedural, functional and object-oriented programming styles. Classical
 object orientation is used only so far as the library exposes an
-Object-oriented public API. Although Javascript supports them, classes
+OO public API. Although Javascript supports them, classes
 and constructors are not used, nor is there any inheritance or notable
 polymorphism. Closures form the primary means of data storage and
 hiding. Most entities do not give a Javascript object on instantiation,
@@ -258,19 +258,19 @@ make were I following that style and OO design patterns have influenced
 their layout considerably. If we wished to think in terms of the OO
 paradigm we might say that values trapped inside closures are private
 attributes and that the handlers registered on the event bus are public
-methods. In this regard, the high-level internal design of Oboe can be
+methods. In this regard the high-level internal design of Oboe can be
 discussed using the terms from a more standard object oriented
 metamodel.
 
 Even where it creates a larger deliverable library I have generally
 preferred writing as short functions which are combined to form longer
 ones. Writing shorter functions reduces the size of the minimum testable
-unit which, because each test can test a very small unit of
-functionality, encourages very simple unit tests. Because the tests are
+unit which, because each test specifies a very small unit of
+functionality, encourages the writing of very simple unit tests. Because the tests are
 simple there is less room for unanticipated cases to hide. Due to
 pressures on code size I decided not to use a general purpose functional
 library and created my own with only the parts that are needed. See
-[functional.js](#functional.js) (Appendix p.\pageref{functional.js}).
+[functional.js](#header_functional) (Appendix p.\pageref{src_functional}).
 Functional programming in Javascript is known to be slower than other
 styles, particularly in Firefox which lacks optimisations such as Lambda
 Lifting [@functionalSpiderMonkey]. I do not think this should be a major
@@ -279,9 +279,9 @@ any Javascript is ran during script execution frames, interlaced with
 frames for other concurrent concerns. To minimise the impact on other
 concerns such as rendering it is important that no task occupies the CPU
 for very long. Since most monitors refresh at 60Hz, about 16ms is a fair
-target for the maximum duration of a script frame. In Node no limit can
+target for the maximum duration of a browser script frame. In Node no limit can
 be implied from a display but any CPU-hogging task degrades the
-responsiveness of concurrent concerns. Switching tasks is cheap so
+responsiveness of any concurrent work. Switching tasks is cheap so
 sharing the CPU well generally prefers many small execution frames over
 a few larger ones. Whether running in a browser or server, the
 bottleneck is more often I/O than processing speed; providing no task
@@ -289,9 +289,9 @@ contiguously holds the CPU for an unusually long time an application can
 usually be considered fast enough. Oboe's progressive model favours
 sharing because it naturally splits the work over many execution frames
 which by a non-progressive mode would be performed during a single
-frame. Although the overall CPU time will be higher, Oboe should share
-better with other concerns and because of better I/O management the
-total system performance should be improved.
+frame. Although the overall CPU time will be higher, Oboe should share the processor
+more cooperatively and because of better I/O management the
+overall system responsiveness should be improved.
 
 Incrementally building the parsed content
 -----------------------------------------
@@ -303,7 +303,7 @@ controller a simpler interface than is provided by Clarinet, taken
 together these might be considered as an Adaptor pattern, albeit
 modified to be even-driven rather than call-driven: we receive six event
 types and in response emit from a vocabulary of two, `NODE_FOUND` and
-`PATH_FOUND`. The events from Clarinet are low level, reporting the
+`PATH_FOUND`. The events received from Clarinet are low level, reporting the
 sequence of tokens in the markup; those emitted are at a much higher
 level of abstraction, reporting the JSON nodes and paths as they are
 discovered. Testing a JSONPath expression for a match against any
@@ -322,7 +322,7 @@ object uniqueness to ensure that its location is unequal to all others.
 
 The path to the current node is maintained as a singly linked list in
 which each item holds the node and the field name that links to the node
-from its parent. Each link in the list is immutable, enforced in newer
+from its parent. The list and the items it contains are immutable, enforced in newer
 Javascript engines by using frozen objects [^2]. The list is arranged as
 an ascent with the current node at the near end and the root at the far
 end. Although paths are typically written as a *descent*, ordering as an
@@ -354,35 +354,35 @@ handled programmatically as the composition of the `nodeFound` and
 Although the builder functions are stateless and side-effect free, while
 visiting each JSON node the current ascent needs to be stored. This is
 handled by the ascent tracker which serves as a holder for this data.
-Starting with the ascent initialised as an empty list, on receiving a
+Starting with the ascent initialised as the empty list, on receiving a
 SAX event it passes the ascent to the handler and stores the result so
 that when the next SAX event is received the updated ascent can be given
 to the next handler.
 
-For the ascents linked lists were chosen in preference to the more
-conventional approach of using native Javascript Arrays for several
+Linked lists were chosen for the ascents in preference to the more
+conventional approach of using native Javascript arrays for several
 reasons. Firstly, I find the program more easy to test and debug given
 immutable data structures. Employing native Arrays without mutating
 would be very expensive because on each new path the whole array would
 have to be copied. Secondly, while debugging, unpicking a stack trace is
 easier if I know that every value revealed is the value that has always
 occupied that space and I don't have to project along the time axis by
-imagining which values were in the same space earlier or will be later.
+imagining which values were in the same space earlier or might be there later.
 Thirdly, the lack of side effects means that I can try new commands in
 the debugger's CLI without worrying about breaking the execution of the
 program. Most Javascript virtual machines are also quite poor at array
 growing and shrinking so for collections whose size changes often,
 arrays are relatively inperformant. Finally, lists are a very convenient
 format for the JSONPath engine to match against as will be discussed in
-the next section. The Javascript file [lists.js](#lists.js) (Appendix
-p.\pageref{lists.js}) implements various list functions: `cons`, `head`,
+the next section. The Javascript file [lists.js](#header_lists) (Appendix
+p.\pageref{src_lists}) implements various list functions: `cons`, `head`,
 `tail`, `map`, `foldR`, `all`, `without` as well as providing
 conversions to and from arrays.
 
 Oboe JSONPath implementation
 ----------------------------
 
-On the first commit the JSONPath implementation was little more than a
+With the initial commit the JSONPath implementation was little more than a
 series of regular expressions[^3] but has slowly evolved into a
 featureful and efficient implementation. The extent of the rewriting was
 possible because the correct behaviour is well defined by test
@@ -408,7 +408,7 @@ implementation:
 (String, Ascent) -> JsonPathMatchResult
 ~~~~
 
-This version was rejected because the pattern string would have to be
+This version was rejected because the pattern string would be
 freshly reinterpreted on each evaluation, repeating computation
 unnecessarily. Because a pattern is registered once but then evaluated
 perhaps hundreds of times per JSON file the most pressing performance
@@ -423,7 +423,7 @@ the field name; by partial completion the field name function would be
 specialised to match against one particular name. Having generated a
 function to match against the left-most clause, compilation continues
 recursively by passing itself the remaining unparsed right-side of the
-string. The recursion continues until the terminal case where there is
+string, which repeats until the terminal case where there is
 nothing left to parse. On each recursive call the clause function
 generated wraps the result from the last recursive call, resulting
 ultimately in a concentric series of clause functions. The order of
@@ -471,8 +471,8 @@ memory because where two JSONPath strings contain a common left side
 they could share the inner part of their functional expression. Given
 the patterns `!.animals.mammals.human` and `!.animals.mammals.cats`, the
 JSONPath engine will currently create two identical evaluators for
-`!.animals.mammals`. Likewise, while evaluating of a pattern that
-requires matches at multiple depths in the JSON hierarchy against
+`!.animals.mammals`. Likewise, while evaluating a pattern that
+requires matches at multiple depths in the JSON hierarchy against several
 sibling elements, the same JSONPath evaluator term could be tested
 against the parent element many times, always with the same result.
 Although Javascript doesn't come with functional caching, it can be
@@ -481,16 +481,16 @@ added using the language itself, probably the best known example being
 parameters might be slower than performing the matching. Although the
 parameters are all immutable and could in theory be hashed by object
 identity, in practice there is no way to access an object id from inside
-the language so any hash of a node parsed out of JSON would have to walk
+the language so any hash function for a node parsed out of JSON would have to walk
 the entire subtree rooted from that node. Current Javascript
 implementations also make it difficult to manage caches in general from
 inside the language because there is no way to occupy only spare memory.
 Weak references are proposed in ECMAScript 6 but currently only
-experimentally supported[^5]. If the hashing problem were solved, for
-adding functional caching in future the WeakHashMap would be ideal.
+experimentally supported[^5]. If the hashing problem were solved the 
+WeakHashMap would be ideal for adding functional caching in future.
 
-Functions describing the tokenisation of the JSONPath language are split
-out to their own source file and tested independently of the
+Functions describing the tokenisation of the JSONPath language are given
+their own source file and tested independently of the
 compilation. Regular expressions are used because they are the simplest
 form able to express the clause patterns. Each regular expressions
 starts with `^` so that they only match at the head of the string, the
@@ -500,8 +500,8 @@ through their own tests it is simpler to create thorough specification
 because the tests may focus on the tokenisation more clearly without
 having to observe its results though another layer. For JSONPath
 matching we might consider the unit test layer of the test pyramid
-(figure \ref{testpyramid} p.\pageref{testpyramid}) is split further into
-two sub-layers. Arguably, the upper of these sub-layers is not a unit
+(figure \ref{testpyramid} p.\pageref{testpyramid}) to be split into
+two further sub-layers. Arguably, the upper of these sub-layers is not a unit
 test because it is verifying more than one unit, the tokeniser and the
 compiler, and there is some redundancy since the tokenisation is tested
 both independently and through a proxy. However, a more purist approach
