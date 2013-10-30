@@ -90,7 +90,6 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             
          case 4:       
             // is this a 2xx http code?
-            // TODO: could 2xx check be done on readyState 3?
             var sucessful = String(xhr.status)[0] == 2;
             
             if( sucessful ) {
