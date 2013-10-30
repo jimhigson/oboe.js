@@ -564,9 +564,36 @@ Alternatively, several patterns may be registered at once using either `.path` o
    .on('done', callback(Object json))
 ```
 
-Registers a callback that is passed the entire 
-json when the response is complete. Usually it is better to read the json in 
+Register a callback for when the response is complete. Gets passed the entire 
+JSON. Usually it is better to read the json in 
 small parts than waiting for it to completely download.
+
+## .start()
+
+```js
+   .start(callback(Object json))
+   
+   .on('start', callback(Number statusCode, Object headers))
+```
+
+Registers a listener for when the http response starts. When the
+callback is called we have the status code and the headers but no 
+content yet.
+
+## .header([name])
+
+```js
+   .header()
+   
+   .header(name)      
+```
+
+Get http response headers if we have received them yet. When a parameter name
+is given the named header will be returned, or undefined if it does not exist.
+If no name is given all headers will be returned. 
+These will be available from inside `node`, `path`, `start` or `done` callbacks,
+or after any of those callbacks have been called. If we do not have the headers
+yet, `.header()` will always return `undefined`. 
 
 ## .root()
 
