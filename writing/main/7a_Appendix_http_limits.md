@@ -10,9 +10,9 @@ Appendix i: Limits to number of simultaneous connections under various http clie
   Internet        4
   Explorer        
 
-  Chrome /        32 sockets per proxy
+  Chrome /        32 sockets per proxy,
   Chromium        6 sockets per
-                  destination host 256
+                  destination host, 256
                   sockets per process
   -------------------------------------
 
