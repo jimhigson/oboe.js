@@ -901,7 +901,7 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
                                        };
    });
 }
-// from gist https://gist.github.com/monsur/706839
+// based on gist https://gist.github.com/monsur/706839
 
 /**
  * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
@@ -911,21 +911,18 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
  */
 function parseResponseHeaders(headerStr) {
    var headers = {};
-   if (!headerStr) {
-      return headers;
-   }
-   var headerPairs = headerStr.split('\u000d\u000a');
-   for (var i = 0; i < headerPairs.length; i++) {
-      var headerPair = headerPairs[i];
-      // Can't use split() here because it does the wrong thing
-      // if the header value has the string ": " in it.
-      var index = headerPair.indexOf('\u003a\u0020');
-      if (index > 0) {
-         var key = headerPair.substring(0, index);
-         var val = headerPair.substring(index + 2);
-         headers[key] = val;
-      }
-   }
+   
+   headerStr && headerStr.split('\u000d\u000a')
+      .forEach(function(headerPair){
+   
+         // Can't use split() here because it does the wrong thing
+         // if the header value has the string ": " in it.
+         var index = headerPair.indexOf('\u003a\u0020');
+         
+         headers[headerPair.substring(0, index)] 
+                     = headerPair.substring(index + 2);
+      });
+   
    return headers;
 }
 function httpTransport(){
