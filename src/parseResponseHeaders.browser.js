@@ -11,9 +11,8 @@ function parseResponseHeaders(headerStr) {
    if (!headerStr) {
       return headers;
    }
-   var headerPairs = headerStr.split('\u000d\u000a');
-   for (var i = 0; i < headerPairs.length; i++) {
-      var headerPair = headerPairs[i];
+   headerStr.split('\u000d\u000a').forEach(function(headerPair){
+
       // Can't use split() here because it does the wrong thing
       // if the header value has the string ": " in it.
       var index = headerPair.indexOf('\u003a\u0020');
@@ -22,6 +21,7 @@ function parseResponseHeaders(headerStr) {
          var val = headerPair.substring(index + 2);
          headers[key] = val;
       }
-   }
+
+   });
    return headers;
 }
