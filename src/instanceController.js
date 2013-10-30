@@ -15,7 +15,7 @@ function instanceController(  emit, on, un,
       rootNode = root;   
    });
    
-   on(HTTP_START, function(headers) {
+   on(HTTP_START, function(_statusCode, headers) {
       responseHeaders = headers;
    });
                               
@@ -205,8 +205,8 @@ function instanceController(  emit, on, un,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
       header:  function(name) {
-                  return name ? responseHeaders 
-                              : responseHeaders && responseHeaders[name]
+                  return name ? responseHeaders && responseHeaders[name] 
+                              : responseHeaders
                               ;
                },
       root  :  function rootNodeFunctor() {

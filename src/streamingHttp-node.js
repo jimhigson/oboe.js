@@ -70,8 +70,8 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       req.on('response', function(res){
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
-                                
-         emit(HTTP_START, res.statusCode, req.headers);                                
+                                                   
+         emit(HTTP_START, res.statusCode, res.headers);                                
                                 
          if( sucessful ) {          
                

@@ -477,8 +477,10 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       req.on('response', function(res){
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
+                   
+         console.log('http has started', res.statusCode, res.headers);                   
                                 
-         emit(HTTP_START, res.statusCode, req.headers);                                
+         emit(HTTP_START, res.statusCode, res.headers);                                
                                 
          if( sucessful ) {          
                
@@ -1289,7 +1291,7 @@ function instanceController(  emit, on, un,
       rootNode = root;   
    });
    
-   on(HTTP_START, function(headers) {
+   on(HTTP_START, function(_statusCode, headers) {
       responseHeaders = headers;
    });
                               
@@ -1479,8 +1481,8 @@ function instanceController(  emit, on, un,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
       header:  function(name) {
-                  return name ? responseHeaders 
-                              : responseHeaders && responseHeaders[name]
+                  return name ? responseHeaders && responseHeaders[name] 
+                              : responseHeaders
                               ;
                },
       root  :  function rootNodeFunctor() {

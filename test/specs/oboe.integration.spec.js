@@ -261,18 +261,17 @@ describe("oboe integration (real http)", function() {
       var done = false;
 
       oboe(
-          {  url:url('echoBackHeadersAsBodyJson'),
-             headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-sso':'sso', 'x-sso2':'sso2'}
           } 
   
       ).done(function(){
-         var headers = this.headers();
          
-         expect(headers['x-snarfu']).toEqual('SNARF');
-         expect(headers['x-foo']).toEqual('BAR');
+         expect(this.header()['x-sso']).toEqual('sso');
+         expect(this.header()['x-sso2']).toEqual('sso2');
          
-         expect(this.headers()['x-snarfu']).toEqual('SNARF');
-         expect(this.headers()['x-foo']).toEqual('BAR');
+         expect(this.header()['x-sso']).toEqual('sso');
+         expect(this.header()['x-sso2']).toEqual('sso2');
          
          done = true;
       }) 
@@ -282,30 +281,29 @@ describe("oboe integration (real http)", function() {
       }, 'the response to complete', ASYNC_TEST_TIMEOUT)
    })
    
-   it('notifies of response starting', function () {
+   it('notifies of response starting by giving status code and headers to callback', function () {
       var called = 0;   
    
       oboe(      
-          {  url:url('echoBackHeadersAsBodyJson'),
-             headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-a':'A', 'x-b':'B'}
           }   
       ).start(function(statusCode, headers){
       
          expect(statusCode).toBe(200);
-         expect(headers['x-snarfu']).toBe('SNARF');
+         expect(headers['x-a']).toBe('A');
          called++;
          
       }).on('start', function(statusCode, headers){
       
          expect(statusCode).toBe(200);
-         expect(headers['x-snarfu']).toBe('SNARF');
+         expect(headers['x-b']).toBe('B');
          called++;
-         
       });
       
       waitsFor(function () {
          return called == 2;
-      }, 'the response to start', ASYNC_TEST_TIMEOUT)      
+      }, 'the response to call both start callbacks', ASYNC_TEST_TIMEOUT)      
    });      
 
    it('can listen for nodes nodejs style', function () {
