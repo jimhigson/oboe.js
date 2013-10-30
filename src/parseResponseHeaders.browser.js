@@ -8,9 +8,7 @@
  */
 function parseResponseHeaders(headerStr) {
    var headers = {};
-   if (!headerStr) {
-      return headers;
-   }
+
    headerStr.split('\u000d\u000a').forEach(function(headerPair){
 
       // Can't use split() here because it does the wrong thing
