@@ -13,7 +13,7 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     _S = 0,
     FAIL_EVENT   = 'fail',    
     ROOT_FOUND    = _S++,    
-    STREAM_START = 'start',
+    HTTP_START = 'start',
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;

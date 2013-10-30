@@ -15,7 +15,7 @@ function instanceController(  emit, on, un,
       rootNode = root;   
    });
    
-   on(STREAM_START, function(headers) {
+   on(HTTP_START, function(headers) {
       responseHeaders = headers;
    });
                               

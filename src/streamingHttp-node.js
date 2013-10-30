@@ -52,7 +52,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       });
    }
    
-   function fetchUrl( url ) {
+   function fetchHttpUrl( url ) {
       if( !contentSource.match(/http:\/\//) ) {
          contentSource = 'http://' + contentSource;
       }                           
@@ -70,6 +70,8 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       req.on('response', function(res){
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
+                                
+         emit(HTTP_START, res.statusCode, req.headers);                                
                                 
          if( sucessful ) {          
                
@@ -105,7 +107,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
    }
    
    if( isString(contentSource) ) {
-      fetchUrl(contentSource);
+      fetchHttpUrl(contentSource);
    } else {
       // contentsource is a stream
       readStreamToEventBus(contentSource);   

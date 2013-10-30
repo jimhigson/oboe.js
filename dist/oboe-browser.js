@@ -1005,7 +1005,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
             } else {
             
                emit( 
-                  ERROR_EVENT, 
+                  FAIL_EVENT, 
                   errorReport(
                      xhr.status, 
                      xhr.responseText
@@ -1033,7 +1033,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, ERROR_EVENT, 
+         partialComplete(emit, FAIL_EVENT, 
              errorReport(undefined, undefined, e)
          )
       ,  0
@@ -1772,9 +1772,9 @@ var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature
     // these events are never exported so are kept as 
     // the smallest possible representation, numbers:
     _S = 0,
-    ERROR_EVENT   = _S++,    
+    FAIL_EVENT   = 'fail',    
     ROOT_FOUND    = _S++,    
-    STREAM_START = _S++,
+    STREAM_START = 'start',
     STREAM_DATA = _S++,
     STREAM_END = _S++,
     ABORTING = _S++;
@@ -1845,7 +1845,7 @@ function instanceController(  emit, on, un,
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
       emit(
-         ERROR_EVENT, 
+         FAIL_EVENT, 
          errorReport(undefined, undefined, e)
       );
       
@@ -1924,7 +1924,7 @@ function instanceController(  emit, on, un,
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(ERROR_EVENT, errorReport(undefined, undefined, e));
+            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -1960,26 +1960,28 @@ function instanceController(  emit, on, un,
    }
    
    var addDoneListener = partialComplete(addNodeOrPathListenerApi, NODE_FOUND, '!'),
-       addFailListner = partialComplete(on, ERROR_EVENT);
+       addFailListner = partialComplete(on, FAIL_EVENT);
    
    /**
     * implementation behind oboe().on()
     */       
    function addListener( eventId, listener ){
-                         
-      if( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
-                                
-         apply(arguments, addNodeOrPathListenerApi);
          
-      } else if( eventId == 'done' ) {
-      
-         addDoneListener(listener);
-                              
-      } else if( eventId == 'fail' ) {
-      
-         addFailListner(listener);
-      }
-             
+      switch(eventId) {
+         case NODE_FOUND:
+         case PATH_FOUND:
+            apply(arguments, addNodeOrPathListenerApi);
+            break;
+            
+         case 'done':
+            addDoneListener(listener);         
+            break;
+            
+         default:
+            // for cases: 'fail', 'start'
+            on(eventId, listener);
+      }                     
+                                               
       return this; // chaining
    }   
    
@@ -1991,6 +1993,7 @@ function instanceController(  emit, on, un,
       path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND), 
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
       on    :  addListener,
+      start :  addListener,
       fail  :  addFailListner,
       done  :  addDoneListener,
       abort :  partialComplete(emit, ABORTING),
