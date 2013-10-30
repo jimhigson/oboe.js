@@ -311,7 +311,7 @@ describe("oboe integration (real http)", function() {
       var countGotBack = 0;
 
       oboe(url('static/json/firstTenNaturalNumbers.json'))
-         .on('node', '!.*', function (number) {
+         .on('node', '!.*', function () {
             countGotBack++;
          });
 
