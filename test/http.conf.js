@@ -16,7 +16,8 @@ module.exports = function(config) {
 
       ,  'src/events.js'
       ,  'src/functional.js'                  
-      ,  'src/util.js'           
+      ,  'src/util.js'
+      ,  'src/parseResponseHeaders.browser.js'           
       ,  'src/streamingHttp-browser.js'      
       
             
