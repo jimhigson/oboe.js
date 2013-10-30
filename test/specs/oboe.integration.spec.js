@@ -266,14 +266,14 @@ describe("oboe integration (real http)", function() {
           } 
   
       ).done(function(){
-         
+
+         expect(this.header('x-sso')).toEqual('sso');
+         expect(this.header('x-sso2')).toEqual('sso2');
+                  
          expect(this.header()['x-sso']).toEqual('sso');
          expect(this.header()['x-sso2']).toEqual('sso2');
-         
-         expect(this.header()['x-sso']).toEqual('sso');
-         expect(this.header()['x-sso2']).toEqual('sso2');
-         
-         done = true;
+                  
+         done = true;         
       }) 
   
       waitsFor(function () {
