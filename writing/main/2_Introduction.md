@@ -26,7 +26,7 @@ This observation extends to graphical notations such as UML whose
 constructs strongly reflect the programming languages of the day. For
 any multi-packet message sent via a network some parts will arrive
 before others, at least approximately in-order, but viewed from inside a
-language whose statements invariably yield single, discrete values it
+language whose statements invariably yield single, discrete values it is
 comfortable to conceptualise the REST response as a discrete event. UML
 sequence diagrams contain the syntax for instantaneously delivered
 return values, with no corresponding notation for a resource whose data
@@ -74,7 +74,7 @@ interpreting the resources.** Because arrows in UML sequence diagrams
 draw returned values as a one-off happening rather than a continuous
 process, I have introduced a lighter arrow notation representing
 fragments of an incremental response. Each request for an individual
-publication is made as soon as the its URL can be extracted from the
+publication is made as soon as its URL can be extracted from the
 publications list and once all required data has been read from the
 original response it is aborted rather than continuing to download
 unnecessary data. \label{rest_timeline_2}](images/rest_timeline_2.png)
@@ -123,7 +123,7 @@ Infinite Scrolling [@infinitescroll]. Starting from an initial page
 showing some finite number of tweets, once the user scrolls and reaches
 the end of the list the next batch is automatically requested. When
 loaded, this new batch is converted to HTML and added to the bottom of
-the page. Applied repeatedly the illusion of an infinitely long page in
+the page. Applied repeatedly the illusion of an infinitely long page is
 maintained, albeit punctuated with pauses whenever new content is
 loaded. For the programmers working on this presentation layer there is
 a tradeoff between sporadically requesting many tweets, yielding long,
@@ -207,14 +207,14 @@ contagion whereby the updating of any single unit may only be done as
 part of the updating of the whole.
 
 An effective response to this problem would be to integrate into a REST
-clients the ability to use a response whilst being only loosely coupled
+client programs the ability to use a response whilst being only loosely coupled
 to the overall *shape* of the message.
 
 Deliverables
 ------------
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest work which can we said to realise my thesis, the guiding
+smallest work which can be said to realise my thesis, the guiding
 principle being that it is preferable to produce a little well than more
 badly. Amongst commentators on start-up companies this is known as a
 *zoom-in pivot* [@lean p172] and the work it produces should be the
@@ -243,7 +243,7 @@ may be in terms of the absolute total time required to complete a
 representative task or in a user's perception of the application
 responsiveness while performing the task. Because applications in the
 target domain are much more I/O-bound than CPU-bound, optimisation in
-terms of the execution time of a algorithms will be de-emphasised unless
+terms of the execution time of algorithms will be de-emphasised unless
 especially egregious. Additionally, I shall be considering how the
 semantics of a message are expanded as a system's design emerges and
 commenting on the value of loose coupling between data formats and the

@@ -25,7 +25,8 @@
 \IfFileExists{microtype.sty}{\usepackage{microtype}}{}
 \usepackage{color}
 \usepackage{fancyvrb}
-\DefineShortVerb[commandchars=\\\{\}]{\|}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
 % Add ',fontsize=\small' for more characters per line
 \newenvironment{Shaded}{}{}
@@ -76,7 +77,7 @@
 \setcounter{secnumdepth}{5}
 
 \title{Oboe.js: An approach to I/O for REST clients which is neither batch nor
-       stream; nor SAX nor DOM}
+stream; nor SAX nor DOM}
 \author{Jim Higson}
 \date{2013}
 
@@ -96,7 +97,7 @@
 
 \clearpage
 
-\section{Abstract}
+\section{Abstract}\label{abstract}
 
 A new design for http client libraries incorporating http streaming,
 pattern matching, and incremental parsing, with the aim of improving
@@ -120,7 +121,7 @@ In addition to a consideration of performance in absolute terms, the
 usability implications of an incremental model are also considered with
 regards to developer ergonomics and user perception of performance.
 
-\section{Introduction}
+\section{Introduction}\label{introduction}
 
 This purpose of this dissertation is to encourage the REST paradigm to
 be viewed through a novel lens which in application may be used to
@@ -148,10 +149,11 @@ graphical notations such as UML whose constructs strongly reflect the
 programming languages of the day. For any multi-packet message sent via
 a network some parts will arrive before others, at least approximately
 in-order, but viewed from inside a language whose statements invariably
-yield single, discrete values it comfortable to conceptualise the REST
-response as a discrete event. UML sequence diagrams contain the syntax
-for instantaneously delivered return values, with no corresponding
-notation for a resource whose data is progressively revealed.
+yield single, discrete values it is comfortable to conceptualise the
+REST response as a discrete event. UML sequence diagrams contain the
+syntax for instantaneously delivered return values, with no
+corresponding notation for a resource whose data is progressively
+revealed.
 
 In most practical cases where we wish to be fast in performing a task
 there is no reasonable distinction between acting \emph{earlier} and
@@ -172,7 +174,7 @@ load any complex webpage -- essentially an aggregation of hypertext and
 other resources -- the HTML will be parsed and displayed incrementally
 while it is downloading and resources such as images are requested in
 parallel as soon as they are referenced. in the case of progressive
-JPEGs or SVGs\footnote{For quite an obviously visible example of
+JPEGs or SVGs\footnote{for quite an obviously visible example of
   progressive SVG loading, try loading this SVG using a recent version
   of Google Chrome:
   \url{http://upload.wikimedia.org/wikipedia/commons/0/04/Marriage_(Same-Sex_Couples)_Bill,_Second_Reading.svg}
@@ -185,7 +187,8 @@ optimised software created for a single task, that of displaying web
 pages. The new contribution of this dissertation is to provide a generic
 analogue, applicable to any problem domain.
 
-\subsection{How REST aggregation could be faster}
+\subsection{How REST aggregation could be
+faster}\label{how-rest-aggregation-could-be-faster}
 
 \begin{figure}[htbp]
 \centering
@@ -208,9 +211,9 @@ progressively interpreting the resources.} Because arrows in UML
 sequence diagrams draw returned values as a one-off happening rather
 than a continuous process, I have introduced a lighter arrow notation
 representing fragments of an incremental response. Each request for an
-individual publication is made as soon as the its URL can be extracted
-from the publications list and once all required data has been read from
-the original response it is aborted rather than continuing to download
+individual publication is made as soon as its URL can be extracted from
+the publications list and once all required data has been read from the
+original response it is aborted rather than continuing to download
 unnecessary data. \label{rest_timeline_2}}
 \end{figure}
 
@@ -228,8 +231,8 @@ also how the cadence of requests is more steady in Figure
 intervals rather than a single request followed by a rapid burst of
 three. Both clients and servers routinely limit the number of
 simultaneous connections per peer so avoiding bursts is further to our
-advantage. \hyperref[appendix_http_limits]{Appendix i} lists some actual
-limits.
+advantage. \hyperref[appendixux5fhttpux5flimits]{Appendix i} lists some
+actual limits.
 
 Nodes in an n-tier architecture defy categorisation as `client' or
 `server' in a way which is appropriate from all frames of reference. A
@@ -245,7 +248,8 @@ service, starting to write out the aggregated response early provides
 much the same benefits for a client able to interpret it progressively
 and, even if it is not, the overall delivery remains faster.
 
-\subsection{Stepping outside the big-small tradeoff}
+\subsection{Stepping outside the big-small
+tradeoff}\label{stepping-outside-the-big-small-tradeoff}
 
 Where a domain model is requestable via REST and contains data in a
 series with continuous ranges I have often noticed a tradeoff in client
@@ -257,7 +261,7 @@ Infinite Scrolling (Ahuvia 2013). Starting from an initial page showing
 some finite number of tweets, once the user scrolls and reaches the end
 of the list the next batch is automatically requested. When loaded, this
 new batch is converted to HTML and added to the bottom of the page.
-Applied repeatedly the illusion of an infinitely long page in
+Applied repeatedly the illusion of an infinitely long page is
 maintained, albeit punctuated with pauses whenever new content is
 loaded. For the programmers working on this presentation layer there is
 a tradeoff between sporadically requesting many tweets, yielding long,
@@ -274,7 +278,8 @@ receive the first tweet should not vary depending on the total number
 that are also being sent so there is no relationship between the size of
 the request made and the time required to first update the interface.
 
-\subsection{Staying fast on a fallible network}
+\subsection{Staying fast on a fallible
+network}\label{staying-fast-on-a-fallible-network}
 
 REST operates over networks whose reliability varies widely. On
 unreliable networks connections are abruptly dropped and in my opinion
@@ -318,7 +323,8 @@ parts may be used immediately but their effect rolled back should a
 notification of failure be received.
 
 \subsection{Agile methodologies, frequent deployments, and compatibility
-today with versions tomorrow}
+today with versions
+tomorrow}\label{agile-methodologies-frequent-deployments-and-compatibility-today-with-versions-tomorrow}
 
 In most respects a SOA architecture fits well with the fast release
 cycle encouraged by Agile methodologies. Because in SOA we may consider
@@ -340,13 +346,13 @@ contagion whereby the updating of any single unit may only be done as
 part of the updating of the whole.
 
 An effective response to this problem would be to integrate into a REST
-clients the ability to use a response whilst being only loosely coupled
-to the overall \emph{shape} of the message.
+client programs the ability to use a response whilst being only loosely
+coupled to the overall \emph{shape} of the message.
 
-\subsection{Deliverables}
+\subsection{Deliverables}\label{deliverables}
 
 To avoid feature creep I am paring down the software deliverables to the
-smallest work which can we said to realise my thesis, the guiding
+smallest work which can be said to realise my thesis, the guiding
 principle being that it is preferable to produce a little well than more
 badly. Amongst commentators on start-up companies this is known as a
 \emph{zoom-in pivot} (Reis 2011 p172) and the work it produces should be
@@ -365,7 +371,7 @@ streaming are quite common even if they are not always programmed as
 such, I have been unable to find any example of a streaming-receptive
 REST client.
 
-\subsection{Criteria for success}
+\subsection{Criteria for success}\label{criteria-for-success}
 
 In evaluating this project we may say it has been a success if
 non-trivial improvements in speed can be made without a corresponding
@@ -374,14 +380,14 @@ may be in terms of the absolute total time required to complete a
 representative task or in a user's perception of the application
 responsiveness while performing the task. Because applications in the
 target domain are much more I/O-bound than CPU-bound, optimisation in
-terms of the execution time of a algorithms will be de-emphasised unless
+terms of the execution time of algorithms will be de-emphasised unless
 especially egregious. Additionally, I shall be considering how the
 semantics of a message are expanded as a system's design emerges and
 commenting on the value of loose coupling between data formats and the
 programs which act on them in avoiding disruption given unanticipated
 format changes.
 
-\section{Background}
+\section{Background}\label{background}
 
 \begin{figure}[htbp]
 \centering
@@ -398,7 +404,8 @@ mark-up based on aggregated data prepared by the middle tier
 \label{architecture}}
 \end{figure}
 
-\subsection{The web as an application platform}
+\subsection{The web as an application
+platform}\label{the-web-as-an-application-platform}
 
 Application design has historically charted an undulating path pulled by
 competing approaches of thick and thin clients. Having evolved from a
@@ -432,7 +439,7 @@ data.
 
 While REST may not be the only communications technology employed by an
 application architecture, for this project we should examine where REST
-clients libraries may fit into the picture. REST is used by the
+client libraries may fit into the picture. REST is used by the
 presentation layer to pull data from middleware regardless of where the
 presentation resides. Likewise, rather than connect to databases
 directly, for portability middlewares often communicate with a thin REST
@@ -460,7 +467,7 @@ grows but the complexity in responding to any one of the requests
 remains constant. Although serving any particular request might be done
 in series, the workload as a whole is embarrassingly parallelisable.
 
-\subsection{Node.js}
+\subsection{Node.js}\label{node.js}
 
 Node.js is a general purpose tool for executing Javascript outside of a
 browser. It has the aim of low-latency I/O and is used mostly for server
@@ -511,7 +518,7 @@ number-crunching aside, with no reason for a task to wait it is
 difficult to write a node program in which the tasks do not complete
 quickly.
 
-Each task in node is simply a Javascript function. Node is able to swap
+Each task in Node is simply a Javascript function. Node is able to swap
 its single Javascript thread between these tasks efficiently while
 providing the programmer with an intuitive interface because of
 closures. Utilising closures, the responsibility of maintaining state
@@ -593,9 +600,9 @@ internet is written to the local filesystem.
 
 Following Node's lead, traditionally thread-based environments are
 beginning to embrace asynchronous, single-threaded servers. The Netty
-project can be though of as roughly the Java equivalent of Node.
+project can be thought of as roughly the Java equivalent of Node.
 
-\subsection{Json and XML data transfer formats}
+\subsection{JSON and XML data transfer formats}\label{jsonxml}
 
 Both XML and JSON are text based, tree shaped data formats with human
 and machine readability. One of the design goals of XML was to simplify
@@ -608,7 +615,7 @@ parsing the task is simpler still, being expressible as fifteen context
 free grammars.
 
 Whereas XML's design can be traced to document formats, JSON's lineage
-is in a programming language. From these roots isn't surprising that
+is in a programming language. From these roots it isn't surprising that
 JSON maps more directly to the metamodel that most programmers think in.
 XML parsers produce Elements, Text, Attributes, ProcessingInstruction
 which require extra translation before they are convenient to use inside
@@ -633,9 +640,9 @@ transformation.
 \end{Highlighting}
 \end{Shaded}
 
-Both JSON and XML are used to serialise orderless constructs but but
-while expressed as text the encoding is inevitably written according to
-some serialisation order. XML specifically states that the order of
+Both JSON and XML are used to serialise orderless constructs but while
+expressed as text the encoding is inevitably written according to some
+serialisation order. XML specifically states that the order of
 attributes is not significant (Bray et al. 2008), JSON has no such
 detailed specification but a similar order insignificance seems to be
 implied by the JSON object's likeness to Javascript objects. In the
@@ -653,7 +660,8 @@ an indeterminate order it will be important to ensure that, despite the
 streaming, the REST client does not encourage programming in a way that
 gives different results depending on the order that fields are received.
 
-\subsection{Common patterns for connecting to REST services}
+\subsection{Common patterns for connecting to REST
+services}\label{common-patterns-for-connecting-to-rest-services}
 
 For languages such as Javascript or Clojure which use a loosely-typed
 representation of objects as generic key-value pairs, when a JSON REST
@@ -748,7 +756,8 @@ later follow a narrative of code changes which are intrinsic to the
 update in logic expressed by the program, and therefore harder to later
 understand the thinking behind the change and the reason for the change.
 
-\subsection{JsonPath and XPath selector languages}
+\subsection{JSONPath and XPath selector
+languages}\label{jsonpath-and-xpath-selector-languages}
 
 \label{jsonpathxpath}
 
@@ -913,12 +922,13 @@ should limit their ambitions to tracking ontology expansions which do
 not alter the existing concepts. In practice integration testing against
 the beta version of a service will be necessary to be pre-warned of
 upcoming, incompatible changes. If an incompatibility is found the
-ability to then create an expression which is compatible with with a
-present and known future version remains a valuable tool because it
-decouples the consumer and provider update schedules, removing the need
-for the client to march perfectly in sync with the service.
+ability to then create an expression which is compatible with a present
+and known future version remains a valuable tool because it decouples
+the consumer and provider update schedules, removing the need for the
+client to march perfectly in sync with the service.
 
-\subsection{Browser XML HTTP Request (XHR)}
+\subsection{Browser XML HTTP Request
+(XHR)}\label{browser-xml-http-request-xhr}
 
 Making http requests from Javascript, commonly termed AJAX, was so
 significant in establishing the modern web architecture that it is
@@ -963,7 +973,7 @@ representations of JSON that are output by the various Java parsers:
 JSON's Object better resembles Java's Map interface than Java Objects,
 creating linguistic difficulties, and the confusion between JSON null,
 Java null, and Jackson's NullNode\footnote{See
-  \url{http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html}.}
+  \url{http://jackson.codehaus.org/1.0.1/javadoc/org/codehaus/jackson/node/NullNode.html}}
 is a common cause of errors. Emboldened by certainty regarding
 deserialisation, AJAX libraries directly integrate JSON parsers,
 providing a call style for working with remote resources so streamlined
@@ -982,7 +992,7 @@ as to require hardly any additional effort.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{XHRs and streaming}
+\subsection{XHRs and streaming}\label{xhrs-and-streaming}
 
 \label{xhrsandstreaming}
 
@@ -1015,7 +1025,8 @@ browsers. However, Internet Explorer only added support recently with
 version 10 and there is a significant user base remaining on versions 8
 and 9.
 
-\subsection{Browser streaming frameworks}
+\subsection{Browser streaming
+frameworks}\label{browser-streaming-frameworks}
 
 \label{browserstreamingframeworks}
 
@@ -1043,7 +1054,7 @@ table which is then noticed by Javascript monitoring the iframe on the
 client. More recently, \textbf{Websockets} is a new standard that builds
 a standardised streaming transport on top of http's chunked mode.
 Websockets requires browser implementation and cannot be retrofitted to
-older browsers through Javascript. Websockets are a promising technology
+older browsers through Javascript. Websockets is a promising technology
 but for the time being patchy support means it cannot be used without a
 suitable fallback.
 
@@ -1062,7 +1073,7 @@ tables, because the transport is based on a presentation format, an
 actual table of the event's properties may be viewed from a browser as
 the messages are streamed.
 
-\subsection{Parsing: SAX and Dom}
+\subsection{Parsing: SAX and DOM}\label{parsing-sax-and-dom}
 
 From the XML world two standard parser types exist, SAX and DOM, with
 DOM by far the more popular. Both styles of parsers are also available
@@ -1080,7 +1091,7 @@ Correspondingly, it it popular for embedded systems running on
 constrained hardware which need to handle documents larger than the
 available RAM.
 
-Suppose we have some json representing people and want to extract the
+Suppose we have some JSON representing people and want to extract the
 name of the first person. Given a DOM parser this may be written quite
 succinctly:
 
@@ -1098,7 +1109,7 @@ succinctly:
 To contrast, the equivalent below uses the Javascript Clarinet SAX
 parser, expressed in the most natural way for the technology\footnote{For
   an example closer to the real world see
-  \url{https://github.com/dscape/clarinet/blob/master/samples/twitter.js}.}.
+  \url{https://github.com/dscape/clarinet/blob/master/samples/twitter.js}}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1172,7 +1183,7 @@ While SAX addresses many of the problems raised in this dissertation, I
 find the unfriendly developer ergonomics pose too high a barrier to its
 adoption for all but fringe uses.
 
-\section{Design and Reflection:}
+\section{Design and Reflection:}\label{design-and-reflection}
 
 The REST workflow is more efficient if we do not wait until we have
 everything before we start using the parts that we do have. The main
@@ -1246,7 +1257,7 @@ anticipate that the selections will frequently be on high-level types so
 it is useful to analyse the nature of type imposition with regards to
 JSON.
 
-\subsection{Detecting types in JSON}
+\subsection{Detecting types in JSON}\label{detecting-types-in-json}
 
 JSON markup describes only a few basic types. On a certain level this is
 also true for XML -- most nodes are either of type Element or Text.
@@ -1335,7 +1346,7 @@ which maps to the array.
    \StringTok{"residences"}\NormalTok{: \{}
       \StringTok{"addresses"}\NormalTok{: [}
          \NormalTok{[}\StringTok{"10"}\NormalTok{, }\StringTok{"Downing street"}\NormalTok{, }\StringTok{"London"}\NormalTok{]}
-      \NormalTok{,  [}\StringTok{"Chequers Court"}\NormalTok{, }\StringTok{"Ellesborough, "}\NormalTok{Buckinghamshire}\StringTok{"]      }
+      \NormalTok{,  [}\StringTok{"Chequers Court"}\NormalTok{, }\StringTok{"Ellesborough"}\NormalTok{, }\StringTok{"Buckinghamshire"}\NormalTok{]      }
       \NormalTok{,  [}\StringTok{"Beach Hut"}\NormalTok{, }\StringTok{"Secret Island"}\NormalTok{, }\StringTok{"Bahamas"}\NormalTok{]}
       \NormalTok{]}
    \NormalTok{\}}
@@ -1423,7 +1434,8 @@ sub-type applies neatly to JSON REST resources marshaled from an OO
 representation. In implementation, to conform to a duck-type a node must
 have all of the required fields but could also have any others.
 
-\subsection{Importing CSS4's explicit capturing to Oboe's JSONPath}
+\subsection{Importing CSS4's explicit capturing to Oboe's
+JSONPath}\label{importing-css4s-explicit-capturing-to-oboes-jsonpath}
 
 JSONPath naturally expresses a `contained in' relationship using the dot
 notation but no provision is made for the inverse `containing'
@@ -1442,7 +1454,7 @@ inputs inside important forms but
 \texttt{\$form.important input.mandatory} selects important forms with
 mandatory fields.
 
-The new css4 capturing technique will be adapted for Oboe's JSONPath. By
+The new CSS4 capturing technique will be adapted for Oboe's JSONPath. By
 duplicating a syntax which the majority of web developers should become
 familiar with over the next few years I hope that Oboe's learning curve
 can be made a little more gradual. Taking on this feature, the selector
@@ -1456,7 +1468,7 @@ entities. If we are downloading data to use with these libraries it is
 more convenient if we use explicit capturing so that we are notified
 whenever the collection is expanded and can pass it on.
 
-\subsection{Parsing the JSON response}
+\subsection{Parsing the JSON response}\label{parsing-the-json-response}
 
 While SAX parsers provide an unappealing interface to application
 developers, as a starting point to handle low-level parsing in
@@ -1466,7 +1478,7 @@ liberally licenced, and compact, meeting our needs perfectly. The name
 of this project, Oboe.js, was chosen in tribute to the value delivered
 by Clarinet.
 
-\subsection{API design}
+\subsection{API design}\label{api-design}
 
 Everything that Oboe is designed to do can already be achieved by
 combining a SAX parser with imperatively coded node selection. This has
@@ -1618,7 +1630,7 @@ ancestor list will have been only partially parsed.
 
 Being loosely typed, Javascript would not enforce that ternary callbacks
 are used as selection handlers. Given that before a callback is made the
-application programmers must have provides a JSONPath selector for the
+application programmers must have provided a JSONPath selector for the
 locations in the document they are interested in, for most JSON formats
 the content alone will be sufficient. The API design orders the callback
 parameters so that in most common cases a unary or binary function can
@@ -1667,7 +1679,8 @@ that REST services which emit JSON will also accept it.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Earlier callbacks when paths are found prior to nodes}
+\subsection{Earlier callbacks when paths are found prior to
+nodes}\label{earlier-callbacks-when-paths-are-found-prior-to-nodes}
 
 Following the project's aim of giving callbacks as early as possible,
 sometimes useful work can be done when a node is known to exist but
@@ -1700,7 +1713,8 @@ Implementing path notifications requires little extra code, only that
 JSONPath expressions can be evaluated when items are found in addition
 to when they are completed.
 
-\subsection{Choice of streaming data transport}
+\subsection{Choice of streaming data
+transport}\label{choice-of-streaming-data-transport}
 
 As discussed in section \ref{browserstreamingframeworks}, current
 techniques to provide streaming over http encourage a dichotomous split
@@ -1722,9 +1736,9 @@ Although I am designing Oboe as a client for ordinary REST resources and
 not focusing on the library a means to receive live events, it is
 interesting to speculate if Oboe could be used as a REST-compatible
 bridge to unify live and static data. Consider a REST service which
-gives results per-constituency for a UK general elections. When
-requesting historic results the data is delivered in JSON format much as
-usual. Requesting the results for the current year on the night of the
+gives results per-constituency for UK general elections. When requesting
+historic results the data is delivered in JSON format much as usual.
+Requesting the results for the current year on the night of the
 election, an incomplete JSON with the constituencies known so far would
 be immediately sent, followed by the remainder dispatched individually
 as the results are called. When all results are known the JSON would
@@ -1785,7 +1799,8 @@ REST client, under Node it will be capable of reading data from any
 source. Oboe might be used to read from a local file, an ftp server, a
 cryptography source, or the process's standard input.
 
-\subsection{Handling transport failures}
+\subsection{Handling transport
+failures}\label{handling-transport-failures}
 
 Oboe cannot know the correct behaviour when a connection is lost so this
 decision is left to the containing application. Generally on request
@@ -1796,11 +1811,12 @@ the missed part; alternatively, if all the data is required for the
 actions to be valid, the application should take an optimistic locking
 approach and perform rollback.
 
-\subsection{Oboe.js as a micro-library}
+\subsection{Oboe.js as a
+micro-library}\label{oboe.js-as-a-micro-library}
 
-Http traffic is often compressed using gzip so that it transfers more
+HTTP traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
-Javascript. WHen measuring a library's download footprint it usually
+Javascript. When measuring a library's download footprint it usually
 makes more sense to compare post-compression. For the sake of adoption
 smaller is better because site creators are sensitive to the download
 size of their sites. Javascript micro-libraries are listed at
@@ -1810,17 +1826,18 @@ less, 5120 bytes but micro-libraries also tend to follow the ethos that
 it is better for an application developer to gather together several
 tiny libraries than find one with a one-size-fits-all approach, perhaps
 echoing the unix command line tradition for small programs which each do
-do exactly one thing. As well as being a small library, in the spirit of
-a micro-library a project should impose as few restrictions as possible
-on its use and be be agnostic as to which other libraries or programming
+exactly one thing. As well as being a small library, in the spirit of a
+micro-library a project should impose as few restrictions as possible on
+its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
 possible to elegantly do as a micro-library so while the limit is
 somewhat arbitrary, keeping below this limit whilst writing readable
 code should provide an interesting extra challenge.
 
-\section{Implementation}
+\section{Implementation}\label{implementation}
 
-\subsection{Componentisation of the project}
+\subsection{Componentisation of the
+project}\label{componentisation-of-the-project}
 
 \begin{figure}[htbp]
 \centering
@@ -1849,7 +1866,8 @@ wired into the bus no central control is required and the larger
 behaviours emerge as a consequence of the interactions between finer
 ones.
 
-\subsection{Design for automated testing}
+\subsection{Design for automated
+testing}\label{design-for-automated-testing}
 
 \begin{figure}[htbp]
 \centering
@@ -1919,8 +1937,8 @@ phase. For example, the network component which hides browser
 differences does not know how to create the underlying XHR that it
 adapts. Undoubtedly, by not instantiating its own transport this
 component presents a less friendly interface: it's data source is no
-longer a hidden implementation detail but exposed as a part of the it's
-API as the responsibility of the caller. I feel this disadvantage is
+longer a hidden implementation detail but exposed as a part of it's API
+as the responsibility of the caller. I feel this disadvantage is
 mitigated by the interface being purely internal. Dependency injection
 in this case allows the tests to be written more simply because it is
 easy to substitute the real XHR for a stub. Unit tests should test
@@ -1932,7 +1950,7 @@ overwriting the XHR constructor to return a mock. However this is to be
 avoided as it opens up the possibility of changes to the environment
 leaking between test cases.
 
-\subsection{Running the tests}
+\subsection{Running the tests}\label{running-the-tests}
 
 \begin{figure}[htbp]
 \centering
@@ -1976,7 +1994,8 @@ controlled using git and hosted on github. The integration tests are
 used as the final check before a branch in git is merged into the
 master.
 
-\subsection{Packaging to a single distributable file}
+\subsection{Packaging to a single distributable
+file}\label{packaging-to-a-single-distributable-file}
 
 As an interpreted language Javascript may be run without any prior
 compilation. Directly running the files that are open in the editor is
@@ -2048,7 +2067,7 @@ match. Browserify converts applications written for Node into a single
 file packaged for delivery to a web browser. Significantly, other than
 adaptors wrapping browser APIs in the call style of the Node
 equivalents, Browserify leaves no trace of itself in the final
-Javascript. Additionally, the http adaptor\footnote{\href{https://github.com/substack/http-browserify}{Https://github.com/substack/http-browserify}.}
+Javascript. Additionally, the http adaptor\footnote{\url{https://github.com/substack/http-browserify}}
 is capable of using XHRs as a streaming source when run on supporting
 browsers.
 
@@ -2066,9 +2085,9 @@ It delivers no reasonable guarantee of equivalence if code is not
 written as the Closure team expected. Integration tests would catch any
 such failures but for the time being I decided that even given the
 micro-library limits, a slightly larger file is a worthwhile tradeoff
-for a safer build process
+for a safer build process.
 
-\subsection{Styles of programming}
+\subsection{Styles of programming}\label{styles-of-programming}
 
 Oboe does not follow any single paradigm and is written as a mix of
 procedural, functional and object-oriented programming styles. Classical
@@ -2101,12 +2120,12 @@ functionality, encourages the writing of very simple unit tests. Because
 the tests are simple there is less room for unanticipated cases to hide.
 Due to pressures on code size I decided not to use a general purpose
 functional library and created my own with only the parts that are
-needed. See \hyperref[header_functional]{functional.js} (Appendix
+needed. See \hyperref[headerux5ffunctional]{functional.js} (Appendix
 p.\pageref{src_functional}). Functional programming in Javascript is
 known to be slower than other styles, particularly in Firefox which
 lacks optimisations such as Lambda Lifting (Guo 2013). I do not think
 this should be a major problem. Because of its single-threaded execution
-model, in the browser any Javascript is ran during script execution
+model, in the browser any Javascript is run during script execution
 frames, interlaced with frames for other concurrent concerns. To
 minimise the impact on other concerns such as rendering it is important
 that no task occupies the CPU for very long. Since most monitors refresh
@@ -2125,15 +2144,16 @@ higher, Oboe should share the processor more cooperatively and because
 of better I/O management the overall system responsiveness should be
 improved.
 
-\subsection{Incrementally building the parsed content}
+\subsection{Incrementally building the parsed
+content}\label{incrementally-building-the-parsed-content}
 
 As shown in figure \ref{overallDesign} on page \pageref{overallDesign},
 there is an \emph{incremental content builder} and \emph{ascent tracer}
 which handle SAX events from the Clarinet JSON parser. By presenting to
 the controller a simpler interface than is provided by Clarinet, taken
 together these might be considered as an Adaptor pattern, albeit
-modified to be even-driven rather than call-driven: we receive six event
-types and in response emit from a vocabulary of two,
+modified to be event-driven rather than call-driven: we receive six
+event types and in response emit from a vocabulary of two,
 \texttt{NODE\_FOUND} and \texttt{PATH\_FOUND}. The events received from
 Clarinet are low level, reporting the sequence of tokens in the markup;
 those emitted are at a much higher level of abstraction, reporting the
@@ -2160,7 +2180,7 @@ The path to the current node is maintained as a singly linked list in
 which each item holds the node and the field name that links to the node
 from its parent. The list and the items it contains are immutable,
 enforced in newer Javascript engines by using frozen objects.\footnote{See
-  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\textbackslash{}_Objects/Object/freeze}.
+  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/Object/freeze}.
   Although older engines don't provide any ability to create immutable
   objects, we can be fairly certain that the code does not mutate these
   objects or the tests would fail with attempts to modify in
@@ -2174,8 +2194,8 @@ they are first reversed and converted to arrays.
 
 For each Clarinet event the builder provides a corresponding handler
 which, working from the current ascent, returns the next ascent after
-the event has been applied. For example, the \texttt{objectopen} and
-\texttt{arrayopen} event types are handled by adding a new item at the
+the event has been applied. For example, the \texttt{openobject} and
+\texttt{openarray} event types are handled by adding a new item at the
 head of the ascent but for \texttt{closeobject} and \texttt{closearray}
 one is removed. Over the course of parsing a JSON resource the ascent
 will in this way be manipulated to visit every node, allowing each to be
@@ -2217,12 +2237,13 @@ quite poor at array growing and shrinking so for collections whose size
 changes often, arrays are relatively inperformant. Finally, lists are a
 very convenient format for the JSONPath engine to match against as will
 be discussed in the next section. The Javascript file
-\hyperref[header_lists]{lists.js} (Appendix p.\pageref{src_lists})
+\hyperref[headerux5flists]{lists.js} (Appendix p.\pageref{src_lists})
 implements various list functions: \texttt{cons}, \texttt{head},
 \texttt{tail}, \texttt{map}, \texttt{foldR}, \texttt{all},
 \texttt{without} as well as providing conversions to and from arrays.
 
-\subsection{Oboe JSONPath implementation}
+\subsection{Oboe JSONPath
+implementation}\label{oboe-jsonpath-implementation}
 
 With the initial commit the JSONPath implementation was little more than
 a series of regular expressions\footnote{JSONPath compiler from the
@@ -2231,19 +2252,19 @@ a series of regular expressions\footnote{JSONPath compiler from the
   for contrast, the current source can be found
   \hyperref[jsonPath.js]{in the appendix} on page \pageref{src_jsonPath}
   or at
-  \url{https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js}.}
+  \url{https://github.com/jimhigson/oboe.js/blob/master/src/jsonPath.js}}
 but has slowly evolved into a featureful and efficient implementation.
 The extent of the rewriting was possible because the correct behaviour
 is well defined by test specifications\footnote{The current tests are
   viewable at
   \url{https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPath.unit.spec.js}
   and
-  \url{https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js}.}.
+  \url{https://github.com/jimhigson/oboe.js/blob/master/test/specs/jsonPathTokens.unit.spec.js}}.
 The JSONPath compiler exposes a single higher-order function. This
 function takes the JSONPath as a string and, proving it is a valid
 expression, returns a function which tests for matches to the pattern.
-The type of is difficult to express in Javascript but expressed as
-Haskell would be:
+The type is difficult to express in Javascript but expressed as Haskell
+would be:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2273,9 +2294,9 @@ for matching to execute quickly. The extra time needed to compile a
 pattern when new application callbacks are registered is relatively
 insignificant because it is performed much less often.
 
-The compilation is performed by recursively by examining the left-most
-side of the string for a JSONPath clause. For each clause type there is
-a function which tests ascents for that clause, for example by checking
+The compilation is performed by recursively examining the left-most side
+of the string for a JSONPath clause. For each clause type there is a
+function which tests ascents for that clause, for example by checking
 the field name; by partial completion the field name function would be
 specialised to match against one particular name. Having generated a
 function to match against the left-most clause, compilation continues
@@ -2340,7 +2361,7 @@ probably the best known example being \texttt{memoize} from
 Underscore.js. I suspect, however, that hashing the cache parameters
 might be slower than performing the matching. Although the parameters
 are all immutable and could in theory be hashed by object identity, in
-practice there is no way to access an object id from inside the language
+practice there is no way to access an object ID from inside the language
 so any hash function for a node parsed out of JSON would have to walk
 the entire subtree rooted from that node. Current Javascript
 implementations also make it difficult to manage caches in general from
@@ -2350,17 +2371,17 @@ experimentally supported\footnote{At time of writing, Firefox is the
   only engine supporting WeakHashMap by default. In Chome it is
   implemented but not available to Javascript unless explicitly enabled
   by a browser flag.
-  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\textbackslash{}_Objects/WeakMap}
-  retrieved 11th October 2013.}. If the hashing problem were solved the
+  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global/_Objects/WeakMap}
+  retrieved 11th October 2013}. If the hashing problem were solved the
 WeakHashMap would be ideal for adding functional caching in future.
 
 Functions describing the tokenisation of the JSONPath language are given
 their own source file and tested independently of the compilation.
 Regular expressions are used because they are the simplest form able to
-express the clause patterns. Each regular expressions starts with
+express the clause patterns. Each regular expression starts with
 \texttt{\^{}} so that they only match at the head of the string, the `y'
 flag would be a more elegant alternative but as of now this lacks wider
-browser support\footnote{\href{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\textbackslash{}_Expressions}{Https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\textbackslash{}\_Expressions}.}.
+browser support\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular/_Expressions}}.
 By verifying the tokenisation functions through their own tests it is
 simpler to create thorough specification because the tests may focus on
 the tokenisation more clearly without having to observe its results
@@ -2376,7 +2397,8 @@ the compiler would be a considerable effort and I do not believe it
 would improve the rigor of the JSONPath specification.
 
 \subsection{Differences in the working of programs that can be easily
-written using Oboe.js}
+written using
+Oboe.js}\label{differences-in-the-working-of-programs-that-can-be-easily-written-using-oboe.js}
 
 Because of assumptions implicit in either technique, a program written
 using Oboe.js will perform subtly different actions from one written
@@ -2386,19 +2408,19 @@ is used to read a local JSON file and write to the console.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{oboe}\NormalTok{( }\OtherTok{fs}\NormalTok{.}\FunctionTok{createReadStream}\NormalTok{( }\StringTok{'/home/me/secretPlans.json'} \NormalTok{) )}
-   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'node'}\NormalTok{, \{}
-      \StringTok{'schemes.*'}\NormalTok{: }\KeywordTok{function}\NormalTok{(scheme)\{}
-         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{'Aha! '} \NormalTok{+ scheme);}
+\FunctionTok{oboe}\NormalTok{( }\OtherTok{fs}\NormalTok{.}\FunctionTok{createReadStream}\NormalTok{( }\StringTok{"/home/me/secretPlans.json"} \NormalTok{) )}
+   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{"node"}\NormalTok{, \{}
+      \StringTok{"schemes.*"}\NormalTok{: }\KeywordTok{function}\NormalTok{(scheme)\{}
+         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Aha! "} \NormalTok{+ scheme);}
       \NormalTok{\},}
-      \StringTok{'plottings.*'}\NormalTok{: }\KeywordTok{function}\NormalTok{(deviousPlot)\{}
-         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{'Hmmm! '} \NormalTok{+ deviousPlot);}
+      \StringTok{"plottings.*"}\NormalTok{: }\KeywordTok{function}\NormalTok{(deviousPlot)\{}
+         \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Hmmm! "} \NormalTok{+ deviousPlot);}
       \NormalTok{\}   }
    \NormalTok{\})}
-   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'done'}\NormalTok{, }\KeywordTok{function}\NormalTok{()\{}
+   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{"done"}\NormalTok{, }\KeywordTok{function}\NormalTok{()\{}
       \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"*twiddles mustache*"}\NormalTok{);}
    \NormalTok{\})}
-   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'fail'}\NormalTok{, }\KeywordTok{function}\NormalTok{()\{}
+   \NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{"fail"}\NormalTok{, }\KeywordTok{function}\NormalTok{()\{}
       \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Drat! Foiled again!"}\NormalTok{);   }
    \NormalTok{\});}
 \end{Highlighting}
@@ -2406,7 +2428,7 @@ is used to read a local JSON file and write to the console.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\OtherTok{fs}\NormalTok{.}\FunctionTok{readFile}\NormalTok{(}\StringTok{'/home/me/secretPlans.json'}\NormalTok{, }\KeywordTok{function}\NormalTok{( err, plansJson )\{     }
+\OtherTok{fs}\NormalTok{.}\FunctionTok{readFile}\NormalTok{(}\StringTok{"/home/me/secretPlans.json"}\NormalTok{, }\KeywordTok{function}\NormalTok{( err, plansJson )\{     }
    \KeywordTok{if}\NormalTok{( err ) \{}
       \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Drat! Foiled again!"}\NormalTok{);}
       \KeywordTok{return}\NormalTok{;}
@@ -2414,10 +2436,10 @@ is used to read a local JSON file and write to the console.
    \KeywordTok{var} \NormalTok{plans = }\OtherTok{JSON}\NormalTok{.}\FunctionTok{parse}\NormalTok{(err, plansJson);}
    
    \OtherTok{plans}\NormalTok{.}\OtherTok{schemes}\NormalTok{.}\FunctionTok{forEach}\NormalTok{(}\KeywordTok{function}\NormalTok{( scheme )\{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{'Aha! '} \NormalTok{+ scheme);   }
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Aha! "} \NormalTok{+ scheme);   }
    \NormalTok{\});   }
    \OtherTok{plans}\NormalTok{.}\OtherTok{plottings}\NormalTok{.}\FunctionTok{forEach}\NormalTok{(}\KeywordTok{function}\NormalTok{(deviousPlot)\{}
-      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{'Hmmm! '} \NormalTok{+ deviousPlot);}
+      \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"Hmmm! "} \NormalTok{+ deviousPlot);}
    \NormalTok{\});}
       
    \OtherTok{console}\NormalTok{.}\FunctionTok{log}\NormalTok{(}\StringTok{"*twiddles mustache*"}\NormalTok{);   }
@@ -2449,12 +2471,13 @@ require nested looping. The cyclic complexity of programming using Oboe
 would stay roughly constant whereas using programmatic drill-down it
 increases linearly with the number of levels that must be traversed.
 
-\section{Conclusion}
+\section{Conclusion}\label{conclusion}
 
-\subsection{Benchmarking vs non-progressive REST}
+\subsection{Benchmarking vs non-progressive
+REST}\label{benchmarking-vs-non-progressive-rest}
 
 I feel it is important to experimentally answer the question, \emph{is
-this way actually any faster?}. To measure performance I have created a
+this way actually any faster?} To measure performance I have created a
 small benchmarking suite that runs under Node.js. One of the advantages
 suggested for incremental parsing was a perceptual improvement in speed.
 I am not focusing on user perception for this evaluation because it
@@ -2463,7 +2486,7 @@ participants. I will be measuring the time taken to provide the first
 output which correlates with how quickly interface redrawing can start
 and should give a good indication as to perceptual speed. I chose Node
 to host the tests because it is a minimalist platform which should give
-a more repeatable results than browsers which could be performing any
+more repeatable results than browsers which could be performing any
 number of simultaneous background tasks. Node also has the advantage
 that small changes in memory use are not overwhelmed by a memory hungry
 environment.
@@ -2538,7 +2561,8 @@ rise linearly. Node is popular on RaspberryPi type devices with
 constrained RAM; Clarinet might be preferable to Oboe where code clarity
 is less important than a small memory footprint.
 
-\subsection{Comparative developer ergonomics}
+\subsection{Comparative developer
+ergonomics}\label{comparative-developer-ergonomics}
 
 Writing less code is not in itself a guarantee of a better developer
 ergonomics but I find it is a good indicator so long as the code isn't
@@ -2575,7 +2599,7 @@ Oboe was the shortest:
 
 Non-progressive parsing with JSON.parse was slightly longer, requiring a
 loop and an if statement, both necessary to drill down into the results.
-The code below is shortened by using the get-json\footnote{\href{https://npmjs.org/package/get-json}{Https://npmjs.org/package/get-json}.}
+The code below is shortened by using the get-json\footnote{\url{https://npmjs.org/package/get-json}}
 package which combines parsing implicitly into the download:
 
 \begin{Shaded}
@@ -2605,7 +2629,7 @@ changing formats and that this would be useful when programming against
 evolving services.
 
 The Clarinet version of the code is too long to include here but may be
-seen \hyperref[header_benchmarkClient]{in the appendix}, on page
+seen \hyperref[headerux5fbenchmarkClient]{in the appendix}, on page
 \pageref{src_benchmarkClient}. By using SAX directly the code is more
 verbose and its purpose is obfuscated. I don't think a person looking at
 this source could deduce what is being done without thinking about it
@@ -2617,9 +2641,10 @@ according to the semantics of the value. I find this naming easier to
 interpret because it allows me to think in terms of the domain model
 rather than considering serialisation artifacts.
 
-\subsection{Performance under various Javascript engines}
+\subsection{Performance under various Javascript
+engines}\label{performance-under-various-javascript-engines}
 
-The file \texttt{oboe.performance.spec.js}\footnote{\href{https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js}{Tests/spec/oboe.performance.spec.js}.}
+The file \texttt{oboe.performance.spec.js}\footnote{\href{https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js}{tests/spec/oboe.performance.spec.js}}
 contains a benchmark which concentrates on measuring the performance of
 Oboe's pattern matching. This test registers a complex pattern which
 intentionally uses all features from the JSONPath language and then
@@ -2697,16 +2722,16 @@ everything, even the basic built-in types, are mutable. Presenting a
 convenient API to application developers means passing eagerly evaluated
 parameters to application callbacks even when the parameters are of
 secondary importance, such as the path and ancestor arrays that are
-created for every matching node, and will be predominantly ignored. will
-be predominantly ignored. Under a functional language these could be
-lazily evaluated without requiring any special effort by the application
-programmer. I think Javascript was a good choice of language, giving a
-very large number of client- and server-side applications that may
-potentially adopt the library. However, server-side Oboe would be very
-amicable to implementation using a purer functional language and it
-would be interesting to see how much faster it could be.
+created for every matching node, and will be predominantly ignored.
+Under a functional language these could be lazily evaluated without
+requiring any special effort by the application programmer. I think
+Javascript was a good choice of language, giving a very large number of
+client- and server-side applications that may potentially adopt the
+library. However, server-side Oboe would be very amicable to
+implementation using a purer functional language and it would be
+interesting to see how much faster it could be.
 
-\subsection{Status as a micro-library}
+\subsection{Status as a micro-library}\label{status-as-a-micro-library}
 
 The file \texttt{oboe-browser.min.js} is the minified, built version of
 Oboe ready to be sent to web browsers and can be found in the project's
@@ -2715,7 +2740,7 @@ after gzip it comes to about 4800 bytes; close to but comfortably under
 the 5120 limit. At roughly the size as a small image the download
 footprint of Oboe should not discourage adoption.
 
-\subsection{Potential future work}
+\subsection{Potential future work}\label{potential-future-work}
 
 Although all network traffic can be viewed as a stream, the most obvious
 future expansion would be to create a matching server-side component
@@ -2725,13 +2750,13 @@ using programmer-assembled strings but this approach is error prone and
 would scale badly as messages become more complex. A stream-writer
 server side library would allow Oboe to be used as a REST-compatible
 streaming solution for situations which currently employ push tables or
-websockets. This would provide a form of REST streaming that operates
+Websockets. This would provide a form of REST streaming that operates
 according to the principled design of http rather than by sidestepping
 it.
 
 Although JSON is particularly well suited, there is nothing about Oboe
 that precludes working with other tree-shaped formats. If there is
-demand, An XML/XPATH version seems like an obvious expansion. This could
+demand, an XML/XPATH version seems like an obvious expansion. This could
 be implemented by allowing resource formats to be added using plugins
 which would allow programmers to create a progressive interpretation of
 any resource type. As a minimum, a plug-in would require a SAX-like
@@ -2756,46 +2781,46 @@ imply failure. A more sophisticated implementation might subdue provably
 unsatisfiable handlers until the SAX parser leaves an unmatchable
 subtree.
 
-\subsection{Summing up}
+\subsection{Summing up}\label{summing-up}
 
 The community reaction to Oboe has been overwhelmingly positive with
 several projects already adopting it and reporting performance gains
 which are large enough to be obvious. I feel that, while some attention
-should be given to optimisation under Firefox, this project meets all if
+should be given to optimisation under Firefox, this project meets all of
 its intended aims, presenting a REST client library which in the best
 case allows the network to be used much more efficiently and in the
 worse case is as good as the previous best solution. At the same time
 the produced library is in many cases easier to use than the previous
 simplest solution.
 
-\hyperdef{}{appendix_http_limits}{\section{Appendix i: Limits to number
-of simultaneous connections under various http
-clients}\label{appendix_http_limits}}
+\hyperdef{}{appendixux5fhttpux5flimits}{\section{Appendix i: Limits to
+number of simultaneous connections under various http
+clients}\label{appendixux5fhttpux5flimits}}
 
 \begin{longtable}[c]{@{}ll@{}}
 \hline\noalign{\medskip}
-\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\begin{minipage}[b]{0.21\columnwidth}\raggedright
 http Client
-\end{minipage} & \begin{minipage}[b]{0.29\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{0.27\columnwidth}\raggedright
 connection limit per server
 \end{minipage}
 \\\noalign{\medskip}
 \hline\noalign{\medskip}
-\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\begin{minipage}[t]{0.21\columnwidth}\raggedright
 Firefox
-\end{minipage} & \begin{minipage}[t]{0.29\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[t]{0.27\columnwidth}\raggedright
 6
 \end{minipage}
 \\\noalign{\medskip}
-\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\begin{minipage}[t]{0.21\columnwidth}\raggedright
 Internet Explorer
-\end{minipage} & \begin{minipage}[t]{0.29\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[t]{0.27\columnwidth}\raggedright
 4
 \end{minipage}
 \\\noalign{\medskip}
-\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\begin{minipage}[t]{0.21\columnwidth}\raggedright
 Chrome / Chromium
-\end{minipage} & \begin{minipage}[t]{0.29\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[t]{0.27\columnwidth}\raggedright
 32 sockets per proxy, 6 sockets per destination host, 256 sockets per
 process
 \end{minipage}
@@ -2809,9 +2834,10 @@ process
 
 \url{http://dev.chromium.org/developers/design-documents/network-stack}\#TOC-Connection-Management
 
-\section{Appendix ii: Oboe.js source code listing}
+\section{Appendix ii: Oboe.js source code
+listing}\label{appendix-ii-oboe.js-source-code-listing}
 
-\subsection{clarinetListenerAdaptor.js}
+\subsection{clarinetListenerAdaptor.js}\label{headerux5fclarinetListenerAdaptor}
 
 \label{src_clarinetListenerAdaptor}
 
@@ -2847,7 +2873,7 @@ process
 
 \pagebreak
 
-\subsection{events.js}
+\subsection{events.js}\label{headerux5fevents}
 
 \label{src_events}
 
@@ -2889,7 +2915,7 @@ process
 
 \pagebreak
 
-\hyperdef{}{header_functional}{\subsection{functional.js}\label{header_functional}}
+\hyperdef{}{headerux5ffunctional}{\subsection{functional.js}\label{headerux5ffunctional}}
 
 \label{src_functional}
 
@@ -2945,14 +2971,14 @@ process
 
 \CommentTok{/**}
 \CommentTok{ * Call a list of functions with the same args until one returns a }
-\CommentTok{ * truthy result. Similar to the \textbar{}\textbar{} operator.}
+\CommentTok{ * truthy result. Similar to the || operator.}
 \CommentTok{ * }
 \CommentTok{ * So:}
 \CommentTok{ *      lazyUnion([f1,f2,f3 ... fn])( p1, p2 ... pn )}
 \CommentTok{ *      }
 \CommentTok{ * Is equivalent to: }
-\CommentTok{ *      apply([p1, p2 ... pn], f1) \textbar{}\textbar{} }
-\CommentTok{ *      apply([p1, p2 ... pn], f2) \textbar{}\textbar{} }
+\CommentTok{ *      apply([p1, p2 ... pn], f1) || }
+\CommentTok{ *      apply([p1, p2 ... pn], f2) || }
 \CommentTok{ *      apply([p1, p2 ... pn], f3) ... apply(fn, [p1, p2 ... pn])  }
 \CommentTok{ *  }
 \CommentTok{ * }\KeywordTok{@returns}\CommentTok{ the first return value that is given that is truthy.}
@@ -3067,7 +3093,7 @@ process
 
 \pagebreak
 
-\subsection{incrementalContentBuilder.js}
+\subsection{incrementalContentBuilder.js}\label{headerux5fincrementalContentBuilder}
 
 \label{src_incrementalContentBuilder}
 
@@ -3173,8 +3199,8 @@ process
    \CommentTok{/**}
 \CommentTok{    * Get a new key->node mapping}
 \CommentTok{    * }
-\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\textbar{}Number\}}\CommentTok{ key}
-\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{Object\textbar{}Array\textbar{}String\textbar{}Number\textbar{}null\}}\CommentTok{ node a value found in the json}
+\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String|Number\}}\CommentTok{ key}
+\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{Object|Array|String|Number|null\}}\CommentTok{ node a value found in the json}
 \CommentTok{    */}
    \KeywordTok{function} \FunctionTok{namedNode}\NormalTok{(key, node) \{}
       \KeywordTok{return} \NormalTok{\{}\DataTypeTok{key}\NormalTok{:key, }\DataTypeTok{node}\NormalTok{:node\};}
@@ -3183,11 +3209,11 @@ process
    \CommentTok{/**}
 \CommentTok{    * For when we find a new key in the json.}
 \CommentTok{    * }
-\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\textbar{}Number\textbar{}Object\}}\CommentTok{ newDeepestName the key. If we are in an }
+\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String|Number|Object\}}\CommentTok{ newDeepestName the key. If we are in an }
 \CommentTok{    *    array will be a number, otherwise a string. May take the special }
 \CommentTok{    *    value ROOT_PATH if the root node has just been found}
 \CommentTok{    *    }
-\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\textbar{}Number\textbar{}Object\textbar{}Array\textbar{}Null\textbar{}undefined\}}\CommentTok{ [maybeNewDeepestNode] }
+\CommentTok{    * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String|Number|Object|Array|Null|undefined\}}\CommentTok{ [maybeNewDeepestNode] }
 \CommentTok{    *    usually this won't be known so can be undefined. Can't use null }
 \CommentTok{    *    to represent unknown because null is a valid value in JSON}
 \CommentTok{    **/}  
@@ -3275,7 +3301,7 @@ process
 
 \pagebreak
 
-\subsection{instanceController.js}
+\subsection{instanceController.js}\label{headerux5finstanceController}
 
 \label{src_instanceController}
 
@@ -3406,7 +3432,7 @@ process
    \KeywordTok{function} \FunctionTok{protectedCallback}\NormalTok{( callback, context ) \{}
       \KeywordTok{return} \KeywordTok{function}\NormalTok{() \{}
          \KeywordTok{try}\NormalTok{\{      }
-            \OtherTok{callback}\NormalTok{.}\FunctionTok{apply}\NormalTok{(context\textbar{}\textbar{}oboeApi, arguments);   }
+            \OtherTok{callback}\NormalTok{.}\FunctionTok{apply}\NormalTok{(context||oboeApi, arguments);   }
          \NormalTok{\}}\KeywordTok{catch}\NormalTok{(e)  \{}
          
             \CommentTok{// An error occured during the callback, publish it on the event bus }
@@ -3453,7 +3479,7 @@ process
 \CommentTok{    */}       
    \KeywordTok{function} \FunctionTok{addListener}\NormalTok{( eventId, listener )\{}
                          
-      \KeywordTok{if}\NormalTok{( eventId == NODE_FOUND \textbar{}\textbar{} eventId == PATH_FOUND ) \{}
+      \KeywordTok{if}\NormalTok{( eventId == NODE_FOUND || eventId == PATH_FOUND ) \{}
                                 
          \FunctionTok{apply}\NormalTok{(arguments, addNodeOrPathListenerApi);}
          
@@ -3490,7 +3516,7 @@ process
 
 \pagebreak
 
-\subsection{jsonPath.js}
+\subsection{jsonPath.js}\label{headerux5fjsonPath}
 
 \label{src_jsonPath}
 
@@ -3502,7 +3528,7 @@ process
 \CommentTok{ * One function is exposed. This function takes a String JSONPath spec and }
 \CommentTok{ * returns a function to test candidate ascents for matches.}
 \CommentTok{ * }
-\CommentTok{ *  String jsonPath -> (List ascent) -> Boolean\textbar{}Object}
+\CommentTok{ *  String jsonPath -> (List ascent) -> Boolean|Object}
 \CommentTok{ *}
 \CommentTok{ * This file is coded in a pure functional style. That is, no function has }
 \CommentTok{ * side effects, every function evaluates to the same value for the same }
@@ -3533,7 +3559,7 @@ process
      
       \KeywordTok{var} \NormalTok{name = detection[NAME_INDEX],}
             
-          \NormalTok{matchesName = ( !name \textbar{}\textbar{} name == }\StringTok{'*'} \NormalTok{) }
+          \NormalTok{matchesName = ( !name || name == }\StringTok{'*'} \NormalTok{) }
                            \NormalTok{?  always}
                            \NormalTok{:  }\KeywordTok{function}\NormalTok{(ascent)\{}\KeywordTok{return} \FunctionTok{headKey}\NormalTok{(ascent) == name\};}
      
@@ -3873,7 +3899,7 @@ process
 
 \pagebreak
 
-\subsection{jsonPathSyntax.js}
+\subsection{jsonPathSyntax.js}\label{headerux5fjsonPathSyntax}
 
 \label{src_jsonPathSyntax}
 
@@ -3921,10 +3947,10 @@ process
        \NormalTok{\})}
        
    \NormalTok{,   possiblyCapturing =           }\OtherTok{/}\FloatTok{(\textbackslash{}$?)}\OtherTok{/}
-   \NormalTok{,   namedNode =                   }\OtherTok{/}\FloatTok{(}\BaseNTok{[}\FloatTok{\textbackslash{}w}\BaseNTok{-_]}\FloatTok{+\textbar{}\textbackslash{}*)}\OtherTok{/}
+   \NormalTok{,   namedNode =                   }\OtherTok{/}\FloatTok{(}\BaseNTok{[}\FloatTok{\textbackslash{}w}\BaseNTok{-_]}\FloatTok{+|\textbackslash{}*)}\OtherTok{/}
    \NormalTok{,   namePlaceholder =             }\OtherTok{/}\FloatTok{()}\OtherTok{/}
    \NormalTok{,   nodeInArrayNotation =         }\OtherTok{/}\FloatTok{\textbackslash{}[}\OtherTok{"}\FloatTok{(}\BaseNTok{[}\FloatTok{^}\BaseNTok{"]}\FloatTok{+)}\OtherTok{"}\FloatTok{\textbackslash{}]}\OtherTok{/}
-   \NormalTok{,   numberedNodeInArrayNotation = }\OtherTok{/}\FloatTok{\textbackslash{}[(}\BaseNTok{\textbackslash{}d}\FloatTok{+\textbar{}\textbackslash{}*)\textbackslash{}]}\OtherTok{/}
+   \NormalTok{,   numberedNodeInArrayNotation = }\OtherTok{/}\FloatTok{\textbackslash{}[(}\BaseNTok{\textbackslash{}d}\FloatTok{+|\textbackslash{}*)\textbackslash{}]}\OtherTok{/}
    \NormalTok{,   fieldList =                      }\OtherTok{/\{}\FloatTok{(}\BaseNTok{[}\FloatTok{\textbackslash{}w}\BaseNTok{ ]}\FloatTok{*?)}\OtherTok{\}/}
    \NormalTok{,   optionalFieldList =           }\OtherTok{/}\FloatTok{(?}\OtherTok{:\{}\FloatTok{(}\BaseNTok{[}\FloatTok{\textbackslash{}w}\BaseNTok{ ]}\FloatTok{*?)}\OtherTok{\}}\FloatTok{)?}\OtherTok{/}
     
@@ -3999,7 +4025,7 @@ process
 
 \pagebreak
 
-\hyperdef{}{header_lists}{\subsection{lists.js}\label{header_lists}}
+\hyperdef{}{headerux5flists}{\subsection{lists.js}\label{headerux5flists}}
 
 \label{src_lists}
 
@@ -4130,7 +4156,7 @@ process
 \CommentTok{ */}
 \KeywordTok{function} \FunctionTok{all}\NormalTok{(fn, list) \{}
    
-   \KeywordTok{return} \NormalTok{!list \textbar{}\textbar{} }
+   \KeywordTok{return} \NormalTok{!list || }
           \FunctionTok{fn}\NormalTok{(}\FunctionTok{head}\NormalTok{(list)) && }\FunctionTok{all}\NormalTok{(fn, }\FunctionTok{tail}\NormalTok{(list));}
 \NormalTok{\}}
 
@@ -4171,7 +4197,7 @@ process
 
 \pagebreak
 
-\subsection{pubSub.js}
+\subsection{pubSub.js}\label{headerux5fpubSub}
 
 \label{src_pubSub}
 
@@ -4215,7 +4241,7 @@ process
 
 \pagebreak
 
-\subsection{publicApi.js}
+\subsection{publicApi.js}\label{headerux5fpublicApi}
 
 \label{src_publicApi}
 
@@ -4267,7 +4293,7 @@ process
 
 \pagebreak
 
-\subsection{streamingHttp-browser.js}
+\subsection{streamingHttp-browser.js}\label{headerux5fstreamingHttp-browser}
 
 \label{src_streamingHttp-browser}
 
@@ -4292,7 +4318,7 @@ process
 \CommentTok{ *          but for tests a stub can be provided instead.}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\}}\CommentTok{ method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\}}\CommentTok{ url the url to make a request to}
-\CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\textbar{}Object\}}\CommentTok{ data some content to be sent with the request.}
+\CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String|Object\}}\CommentTok{ data some content to be sent with the request.}
 \CommentTok{ *                        Only valid if method is POST or PUT.}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{Object\}}\CommentTok{ [headers] the http request headers to send                       }
 \CommentTok{ */}  
@@ -4411,7 +4437,7 @@ process
 
 \pagebreak
 
-\subsection{streamingHttp-node.js}
+\subsection{streamingHttp-node.js}\label{headerux5fstreamingHttp-node}
 
 \label{src_streamingHttp-node}
 
@@ -4437,7 +4463,7 @@ process
 \CommentTok{ *          but for tests a stub may be provided instead.}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\}}\CommentTok{ method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\}}\CommentTok{ contentSource the url to make a request to, or a stream to read from}
-\CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String\textbar{}Object\}}\CommentTok{ data some content to be sent with the request.}
+\CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{String|Object\}}\CommentTok{ data some content to be sent with the request.}
 \CommentTok{ *                        Only valid if method is POST or PUT.}
 \CommentTok{ * }\KeywordTok{@param}\CommentTok{ }\KeywordTok{\{Object\}}\CommentTok{ [headers] the http request headers to send                       }
 \CommentTok{ */}  
@@ -4536,7 +4562,7 @@ process
 
 \pagebreak
 
-\subsection{util.js}
+\subsection{util.js}\label{headerux5futil}
 
 \label{src_util}
 
@@ -4597,7 +4623,7 @@ process
 
 \pagebreak
 
-\subsection{wire.js}
+\subsection{wire.js}\label{headerux5fwire}
 
 \label{src_wire}
 
@@ -4626,9 +4652,9 @@ process
 \end{Highlighting}
 \end{Shaded}
 
-\section{Appendix iii: Benchmarking}
+\section{Appendix iii: Benchmarking}\label{appendix-iii-benchmarking}
 
-\hyperdef{}{header_benchmarkClient}{\subsection{benchmarkClient.js}\label{header_benchmarkClient}}
+\hyperdef{}{headerux5fbenchmarkClient}{\subsection{benchmarkClient.js}\label{headerux5fbenchmarkClient}}
 
 \label{src_benchmarkClient}
 
@@ -4766,7 +4792,7 @@ process
 
 \pagebreak
 
-\subsection{benchmarkServer.js}
+\subsection{benchmarkServer.js}\label{headerux5fbenchmarkServer}
 
 \label{src_benchmarkServer}
 
@@ -4869,11 +4895,11 @@ process
 \end{Highlighting}
 \end{Shaded}
 
-\section{Bibliography}
+\section{Bibliography}\label{bibliography}
 
 Ahuvia, Yogev. 2013. ``Design Patterns: Infinite Scrolling: Let's Get To
 The Bottom Of This
-http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/.''
+Http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/.''
 Smashing Magazine.
 
 Bray, Tim, Jean Paoli, C M Sperberg-McQueen, Eve Maler, and François
@@ -4888,7 +4914,7 @@ Cragg, Duncan. 2006. ``Duncan Cragg on Declarative Architectures: STREST
 (Service-Trampled REST) Will Break Web 2.0.''
 \url{http://duncan-cragg.org/blog/post/strest-service-trampled-rest-will-break-web-20/}.
 
-Douglas, Crockford. 2009. ``JSON: The fat-free alternative to XML.''
+Douglas, Crockford. 2009. ``JSON: The Fat-free Alternative to XML.''
 \url{http://json.org}.
 
 Eberhart, Andreas, and Stefan Fischer. 2002. \emph{Java Tools: Using
@@ -4897,11 +4923,11 @@ XML, EJB, CORBA, Servlets and SOAP}.
 Etemad, Elika J, and Tab Atkins. 2013. ``Selectors Level 4.''
 \url{http://dev.w3.org/csswg/selectors4/}.
 
-Fielding, R. T. 2000. ``Principled design of the modern Web
-architecture.''
+Fielding, R. T. 2000. ``Principled Design of the Modern Web
+Architecture.''
 
 Geelhoed, Erik, Peter Toft, Suzanne Roberts, and Patrick Hyland. 1995.
-``To influence Time Perception.'' Hewlett Packard Labs.
+``To Influence Time Perception.'' Hewlett Packard Labs.
 \url{http://www.sigchi.org/chi95/proceedings/shortppr/egd_bdy.htm}.
 
 Gill, Brendan. 2013. ``OpenSignal.''
@@ -4913,17 +4939,17 @@ Guo, shu-yu. 2013. ``Two Reasons Functional Style Is Slow in
 SpiderMonkey.''
 \url{http://rfrn.org//~shu/2013/03/20/two-reasons-functional-style-is-slow-in-spidermonkey.html}.
 
-Job, Nuno. 2012. ``Clarinet - SAX based evented streaming JSON parser in
-JavaScript for the browser and nodejs.''
+Job, Nuno. 2012. ``Clarinet - SAX Based Evented Streaming JSON Parser in
+JavaScript for the Browser and Nodejs.''
 \url{http://writings.nunojob.com/2011/12/clarinet-sax-based-evented-streaming-json-parser-in-javascript-for-the-browser-and-nodejs.html}.
 
-Lea, Tom. 2012. ``Improving performance on twitter.com.''
+Lea, Tom. 2012. ``Improving Performance on Twitter.com.''
 \url{{[}https://blog.twitter.com/2012/improving-performance-twittercom{]}}.
 
-Martelli, Alex. 2000. ``Discussion of typing in Python language, 2000.''
-\url{https://groups.google.com/forum/?hl=en\textbackslash{}\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ}.
+Martelli, Alex. 2000. ``Discussion of Typing in Python Language, 2000.''
+\url{https://groups.google.com/forum/?hl=en/\#!msg/comp.lang.python/CCs2oJdyuzc/NYjla5HKMOIJ}.
 
-Martin, Robert ``Uncle Bob.'' 2008. \emph{Clean Code: A Handbook of
+Martin, Robert ``Uncle Bob''. 2008. \emph{Clean Code: A Handbook of
 Agile Software Craftsmanship}.
 
 McLuhan, Marshall. 1964. \emph{Understanding Media: The Extensions of
@@ -4936,19 +4962,19 @@ Reis, Eric. 2011. \emph{The Lean Startup: How Today's Entrepreneurs Use
 Continuous Innovation to Create Radically Successful Businesses.} Crown
 Business Publishing.
 
-Stefanov, Stoyan. 2009. ``Progressive rendering via multiple flushes.''
+Stefanov, Stoyan. 2009. ``Progressive Rendering via Multiple Flushes.''
 \url{http://www.phpied.com/progressive-rendering-via-multiple-flushes/}.
-
-Whorf, B. L. 1956. ``Language, Thought and Reality (ed. J. B.
-Carroll).'' Cambridge, MA: MIT Press.
-
-Yukihiro, Matsumoto. 2003. ``The Power and Philosophy of Ruby.''
-\url{http://www.rubyist.net/~matz/slides/oscon2003/index.html}.
 
 van Kesteren, Anne. 2012. ``XMLHttpRequest Level 2 Working Draft.''
 \url{http://www.w3.org/TR/XMLHttpRequest2/\#make-progress-notifications}.
 
 van Kesteren, Anne, and Dean Jackson. 2006. ``The XMLHttpRequest
 Object.'' \url{http://www.w3.org/TR/2006/WD-XMLHttpRequest-20060405/}.
+
+Whorf, B. L. 1956. ``Language, Thought and Reality (Ed. J. B.
+Carroll).'' Cambridge, MA: MIT Press.
+
+Yukihiro, Matsumoto. 2003. ``The Power and Philosophy of Ruby.''
+\url{http://www.rubyist.net/~matz/slides/oscon2003/index.html}.
 
 \end{document}

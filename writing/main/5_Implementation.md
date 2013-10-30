@@ -93,7 +93,7 @@ phase. For example, the network component which hides browser
 differences does not know how to create the underlying XHR that it
 adapts. Undoubtedly, by not instantiating its own transport this
 component presents a less friendly interface: it's data source is no
-longer a hidden implementation detail but exposed as a part of the it's
+longer a hidden implementation detail but exposed as a part of it's
 API as the responsibility of the caller. I feel this disadvantage is
 mitigated by the interface being purely internal. Dependency injection
 in this case allows the tests to be written more simply because it is
@@ -235,7 +235,7 @@ given a well-advised subset of Javascript. It delivers no reasonable
 guarantee of equivalence if code is not written as the Closure team
 expected. Integration tests would catch any such failures but for the
 time being I decided that even given the micro-library limits, a
-slightly larger file is a worthwhile tradeoff for a safer build process
+slightly larger file is a worthwhile tradeoff for a safer build process.
 
 Styles of programming
 ---------------------
@@ -276,7 +276,7 @@ p.\pageref{src_functional}). Functional programming in Javascript is
 known to be slower than other styles, particularly in Firefox which
 lacks optimisations such as Lambda Lifting [@functionalSpiderMonkey]. I
 do not think this should be a major problem. Because of its
-single-threaded execution model, in the browser any Javascript is ran
+single-threaded execution model, in the browser any Javascript is run
 during script execution frames, interlaced with frames for other
 concurrent concerns. To minimise the impact on other concerns such as
 rendering it is important that no task occupies the CPU for very long.
@@ -303,7 +303,7 @@ there is an *incremental content builder* and *ascent tracer* which
 handle SAX events from the Clarinet JSON parser. By presenting to the
 controller a simpler interface than is provided by Clarinet, taken
 together these might be considered as an Adaptor pattern, albeit
-modified to be even-driven rather than call-driven: we receive six event
+modified to be event-driven rather than call-driven: we receive six event
 types and in response emit from a vocabulary of two, `NODE_FOUND` and
 `PATH_FOUND`. The events received from Clarinet are low level, reporting
 the sequence of tokens in the markup; those emitted are at a much higher
@@ -335,8 +335,8 @@ application callbacks they are first reversed and converted to arrays.
 
 For each Clarinet event the builder provides a corresponding handler
 which, working from the current ascent, returns the next ascent after
-the event has been applied. For example, the `objectopen` and
-`arrayopen` event types are handled by adding a new item at the head of
+the event has been applied. For example, the `openobject` and
+`openarray` event types are handled by adding a new item at the head of
 the ascent but for `closeobject` and `closearray` one is removed. Over
 the course of parsing a JSON resource the ascent will in this way be
 manipulated to visit every node, allowing each to be tested against the
@@ -391,7 +391,7 @@ possible because the correct behaviour is well defined by test
 specifications[^4]. The JSONPath compiler exposes a single higher-order
 function. This function takes the JSONPath as a string and, proving it
 is a valid expression, returns a function which tests for matches to the
-pattern. The type of is difficult to express in Javascript but expressed
+pattern. The type is difficult to express in Javascript but expressed
 as Haskell would be:
 
 ~~~~ {.haskell}
@@ -418,7 +418,7 @@ for matching to execute quickly. The extra time needed to compile a
 pattern when new application callbacks are registered is relatively
 insignificant because it is performed much less often.
 
-The compilation is performed by recursively by examining the left-most
+The compilation is performed by recursively examining the left-most
 side of the string for a JSONPath clause. For each clause type there is
 a function which tests ascents for that clause, for example by checking
 the field name; by partial completion the field name function would be
@@ -482,7 +482,7 @@ the language itself, probably the best known example being `memoize`
 from Underscore.js. I suspect, however, that hashing the cache
 parameters might be slower than performing the matching. Although the
 parameters are all immutable and could in theory be hashed by object
-identity, in practice there is no way to access an object id from inside
+identity, in practice there is no way to access an object ID from inside
 the language so any hash function for a node parsed out of JSON would
 have to walk the entire subtree rooted from that node. Current
 Javascript implementations also make it difficult to manage caches in
@@ -494,7 +494,7 @@ the WeakHashMap would be ideal for adding functional caching in future.
 Functions describing the tokenisation of the JSONPath language are given
 their own source file and tested independently of the compilation.
 Regular expressions are used because they are the simplest form able to
-express the clause patterns. Each regular expressions starts with `^` so
+express the clause patterns. Each regular expression starts with `^` so
 that they only match at the head of the string, the 'y' flag would be a
 more elegant alternative but as of now this lacks wider browser
 support[^6]. By verifying the tokenisation functions through their own
@@ -521,25 +521,25 @@ express the same thing. Consider the two examples below in which Node.js
 is used to read a local JSON file and write to the console.
 
 ~~~~ {.javascript}
-oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
-   .on('node', {
-      'schemes.*': function(scheme){
-         console.log('Aha! ' + scheme);
+oboe( fs.createReadStream( "/home/me/secretPlans.json" ) )
+   .on("node", {
+      "schemes.*": function(scheme){
+         console.log("Aha! " + scheme);
       },
-      'plottings.*': function(deviousPlot){
-         console.log('Hmmm! ' + deviousPlot);
+      "plottings.*": function(deviousPlot){
+         console.log("Hmmm! " + deviousPlot);
       }   
    })
-   .on('done', function(){
+   .on("done", function(){
       console.log("*twiddles mustache*");
    })
-   .on('fail', function(){
+   .on("fail", function(){
       console.log("Drat! Foiled again!");   
    });
 ~~~~
 
 ~~~~ {.javascript}
-fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){     
+fs.readFile("/home/me/secretPlans.json", function( err, plansJson ){     
    if( err ) {
       console.log("Drat! Foiled again!");
       return;
@@ -547,10 +547,10 @@ fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){
    var plans = JSON.parse(err, plansJson);
    
    plans.schemes.forEach(function( scheme ){
-      console.log('Aha! ' + scheme);   
+      console.log("Aha! " + scheme);   
    });   
    plans.plottings.forEach(function(deviousPlot){
-      console.log('Hmmm! ' + deviousPlot);
+      console.log("Hmmm! " + deviousPlot);
    });
       
    console.log("*twiddles mustache*");   

@@ -5,7 +5,7 @@ Benchmarking vs non-progressive REST
 ------------------------------------
 
 I feel it is important to experimentally answer the question, *is this
-way actually any faster?*. To measure performance I have created a small
+way actually any faster?* To measure performance I have created a small
 benchmarking suite that runs under Node.js. One of the advantages suggested
 for incremental parsing was a perceptual improvement in speed. I
 am not focusing on user perception for this evaluation because it would
@@ -13,7 +13,7 @@ be difficult to measure, requiring subjective judgement and human
 participants. I will be measuring the time taken to provide the first
 output which correlates with how quickly interface redrawing can start
 and should give a good indication as to perceptual speed. I chose Node to
-host the tests because it is a minimalist platform which should give a
+host the tests because it is a minimalist platform which should give
 more repeatable results than browsers which could be performing any
 number of simultaneous background tasks. Node also has the advantage
 that small changes in memory use are not overwhelmed by a memory hungry
@@ -211,7 +211,7 @@ convenient API to application developers means passing eagerly evaluated
 parameters to application callbacks even when the parameters are of
 secondary importance, such as the path and
 ancestor arrays that are created for every matching node, and will be predominantly ignored. 
-will be predominantly ignored. Under a functional language these could
+Under a functional language these could
 be lazily evaluated without requiring any special effort by the
 application programmer. I think Javascript was a good choice of
 language, giving a very large number of client- and server-side
@@ -240,12 +240,12 @@ sending streaming JSON has required that the resource be written out using
 programmer-assembled strings but this approach is error prone and would
 scale badly as messages become more complex. A stream-writer server side
 library would allow Oboe to be used as a REST-compatible streaming
-solution for situations which currently employ push tables or websockets. This would
+solution for situations which currently employ push tables or Websockets. This would
 provide a form of REST streaming that operates according to the principled
 design of http rather than by sidestepping it.
 
 Although JSON is particularly well suited, there is nothing about Oboe that precludes working with other
-tree-shaped formats. If there is demand, An XML/XPATH version seems like
+tree-shaped formats. If there is demand, an XML/XPATH version seems like
 an obvious expansion. This could be implemented by allowing resource
 formats to be added using plugins which would allow programmers to
 create a progressive interpretation of any resource type. As a minimum,
@@ -277,7 +277,7 @@ The community reaction to Oboe has been overwhelmingly positive with several
 projects already adopting it and reporting performance gains which are large
 enough to be obvious. I
 feel that, while some attention should be given to optimisation under
-Firefox, this project meets all if its intended aims, presenting a REST
+Firefox, this project meets all of its intended aims, presenting a REST
 client library which in the best case allows the network to be used much
 more efficiently and in the worse case is as good as the previous best
 solution. At the same time the produced library is in many cases easier

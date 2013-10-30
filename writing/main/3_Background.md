@@ -47,7 +47,7 @@ data.
 
 While REST may not be the only communications technology employed by an
 application architecture, for this project we should examine where REST
-clients libraries may fit into the picture. REST is used by the
+client libraries may fit into the picture. REST is used by the
 presentation layer to pull data from middleware regardless of where the
 presentation resides. Likewise, rather than connect to databases
 directly, for portability middlewares often communicate with a thin REST
@@ -117,7 +117,7 @@ number-crunching aside, with no reason for a task to wait it is
 difficult to write a node program in which the tasks do not complete
 quickly.
 
-Each task in node is simply a Javascript function. Node is able to swap
+Each task in Node is simply a Javascript function. Node is able to swap
 its single Javascript thread between these tasks efficiently while
 providing the programmer with an intuitive interface because of
 closures. Utilising closures, the responsibility of maintaining state
@@ -193,9 +193,9 @@ http.get(url)
 
 Following Node's lead, traditionally thread-based environments are
 beginning to embrace asynchronous, single-threaded servers. The Netty
-project can be though of as roughly the Java equivalent of Node.
+project can be thought of as roughly the Java equivalent of Node.
 
-Json and XML data transfer formats {#jsonxml}
+JSON and XML data transfer formats {#jsonxml}
 ----------------------------------
 
 Both XML and JSON are text based, tree shaped data formats with human
@@ -208,7 +208,7 @@ language. For the graduate tackling JSON parsing the task is simpler
 still, being expressible as fifteen context free grammars.
 
 Whereas XML's design can be traced to document formats, JSON's lineage
-is in a programming language. From these roots isn't surprising that
+is in a programming language. From these roots it isn't surprising that
 JSON maps more directly to the metamodel that most programmers think in.
 XML parsers produce Elements, Text, Attributes, ProcessingInstruction
 which require extra translation before they are convenient to use inside
@@ -230,7 +230,7 @@ it may be used directly without any further transformation.
 }
 ~~~~
 
-Both JSON and XML are used to serialise orderless constructs but but
+Both JSON and XML are used to serialise orderless constructs but
 while expressed as text the encoding is inevitably written according to
 some serialisation order. XML specifically states that the order of
 attributes is not significant [@xmlorder], JSON has no such detailed
@@ -342,7 +342,7 @@ later follow a narrative of code changes which are intrinsic to the
 update in logic expressed by the program, and therefore harder to later
 understand the thinking behind the change and the reason for the change.
 
-JsonPath and XPath selector languages
+JSONPath and XPath selector languages
 -------------------------------------
 
 \label{jsonpathxpath}
@@ -493,7 +493,7 @@ should limit their ambitions to tracking ontology expansions which do
 not alter the existing concepts. In practice integration testing against
 the beta version of a service will be necessary to be pre-warned of
 upcoming, incompatible changes. If an incompatibility is found the
-ability to then create an expression which is compatible with with a
+ability to then create an expression which is compatible with a
 present and known future version remains a valuable tool because it
 decouples the consumer and provider update schedules, removing the need
 for the client to march perfectly in sync with the service.
@@ -621,7 +621,7 @@ is then noticed by Javascript monitoring the iframe on the client. More
 recently, **Websockets** is a new standard that builds a standardised
 streaming transport on top of http's chunked mode. Websockets requires
 browser implementation and cannot be retrofitted to older browsers
-through Javascript. Websockets are a promising technology but for the
+through Javascript. Websockets is a promising technology but for the
 time being patchy support means it cannot be used without a suitable
 fallback.
 
@@ -640,7 +640,7 @@ tables, because the transport is based on a presentation format, an
 actual table of the event's properties may be viewed from a browser as
 the messages are streamed.
 
-Parsing: SAX and Dom
+Parsing: SAX and DOM
 --------------------
 
 From the XML world two standard parser types exist, SAX and DOM, with
@@ -659,7 +659,7 @@ Correspondingly, it it popular for embedded systems running on
 constrained hardware which need to handle documents larger than the
 available RAM.
 
-Suppose we have some json representing people and want to extract the
+Suppose we have some JSON representing people and want to extract the
 name of the first person. Given a DOM parser this may be written quite
 succinctly:
 

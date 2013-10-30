@@ -156,7 +156,7 @@ which maps to the array.
    "residences": {
       "addresses": [
          ["10", "Downing street", "London"]
-      ,  ["Chequers Court", "Ellesborough, "Buckinghamshire"]      
+      ,  ["Chequers Court", "Ellesborough", "Buckinghamshire"]      
       ,  ["Beach Hut", "Secret Island", "Bahamas"]
       ]
    }
@@ -257,7 +257,7 @@ continues to work as before. The CSS selector
 important forms but `$form.important input.mandatory` selects important
 forms with mandatory fields.
 
-The new css4 capturing technique will be adapted for Oboe's JSONPath. By
+The new CSS4 capturing technique will be adapted for Oboe's JSONPath. By
 duplicating a syntax which the majority of web developers should become
 familiar with over the next few years I hope that Oboe's learning curve
 can be made a little more gradual. Taking on this feature, the selector
@@ -422,7 +422,7 @@ oboe("resources/someJson.json")
 
 Being loosely typed, Javascript would not enforce that ternary callbacks
 are used as selection handlers. Given that before a callback is made the
-application programmers must have provides a JSONPath selector for the
+application programmers must have provided a JSONPath selector for the
 locations in the document they are interested in, for most JSON formats
 the content alone will be sufficient. The API design orders the callback
 parameters so that in most common cases a unary or binary function can
@@ -521,7 +521,7 @@ Although I am designing Oboe as a client for ordinary REST resources and
 not focusing on the library a means to receive live events, it is
 interesting to speculate if Oboe could be used as a REST-compatible
 bridge to unify live and static data. Consider a REST service which
-gives results per-constituency for a UK general elections. When
+gives results per-constituency for UK general elections. When
 requesting historic results the data is delivered in JSON format much as
 usual. Requesting the results for the current year on the night of the
 election, an incomplete JSON with the constituencies known so far would
@@ -599,9 +599,9 @@ approach and perform rollback.
 Oboe.js as a micro-library
 --------------------------
 
-Http traffic is often compressed using gzip so that it transfers more
+HTTP traffic is often compressed using gzip so that it transfers more
 quickly, particularly for entropy-sparse text formats such as
-Javascript. WHen measuring a library's download footprint it usually
+Javascript. When measuring a library's download footprint it usually
 makes more sense to compare post-compression. For the sake of adoption
 smaller is better because site creators are sensitive to the download
 size of their sites. Javascript micro-libraries are listed at
@@ -611,7 +611,7 @@ library qualifies as being *micro* if it is delivered in 5kb or less,
 better for an application developer to gather together several tiny
 libraries than find one with a one-size-fits-all approach, perhaps
 echoing the unix command line tradition for small programs which each do
-do exactly one thing. As well as being a small library, in the spirit of
+exactly one thing. As well as being a small library, in the spirit of
 a micro-library a project should impose as few restrictions as possible
 on its use and be be agnostic as to which other libraries or programming
 styles it will be combined with. Oboe feels on the edge of what is
