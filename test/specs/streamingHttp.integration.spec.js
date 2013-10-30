@@ -13,7 +13,7 @@ describe('streaming xhr integration (real http)', function() {
          new XMLHttpRequest(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
-         null // this is a GET, no data to send);
+         null // this is a GET, no data to send
       ); 
       
       waitForRequestToComplete();            
@@ -22,6 +22,32 @@ describe('streaming xhr integration (real http)', function() {
          expect(contentReceived).toParseTo({}); 
       });  
    })
+   
+   it('can get http headers',  function() {
+     
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingHttp(                         
+         emit, on,
+         new XMLHttpRequest(),
+         'GET', 
+         '/testServer/echoBackHeadersAsHeaders',
+         null, // this is a GET, no data to send
+         {'specialheader':'specialValue'}
+      ); 
+      
+      waitForRequestToComplete();            
+
+      runs(function(){
+         expect(emit)
+            .toHaveBeenCalledWith(
+               HTTP_START,
+               200,
+               jasmine.objectContaining({specialheader:'specialValue'}
+            )
+         ); 
+      });  
+   })   
               
    it('can ajax in a very large file without missing any',  function() {
    
