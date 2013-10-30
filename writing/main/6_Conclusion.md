@@ -4,7 +4,7 @@ Conclusion
 Benchmarking vs non-progressive REST
 ------------------------------------
 
-I feel it is important to experimentally answer the question, *is this
+I feel it is important to experimentally answer the question, *is this way
 actually any faster?*.
 To measure performance I have created a small benchmarking
 suite that runs under Node.js.
@@ -279,6 +279,18 @@ inside a particular JSON subtree, either because we have already matched
 or because the the subtree's ancestors invariably imply failure. A more
 sophisticated implementation might subdue provably unsatisfiable
 handlers until the SAX parser leaves unmatchable subtrees.
+
+Summing up
+----------
+
+The reaction to Oboe has been overwhelmingly positive with several projects
+already adopting it. It was the number one trending project on Github for some
+time and has been the subject of hundreds of tweets. I feel that, while some
+attention should be given to optimisation under Firefox, this project
+meets all if its intended aims, presenting a REST client library which in the best case allows
+the network to be used much more efficiently and in the worse case is as good
+as the previous best solution. At the same time it is no more difficult to
+program with and by being declarative will often be easier.
 
 [^1]: http://mattgemmell.com/2011/07/25/network-link-conditioner-in-lion/
 
