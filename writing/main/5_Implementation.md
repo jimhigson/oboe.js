@@ -509,8 +509,77 @@ would not be any more useful because stubbing out the tokeniser
 functions before testing the compiler would be a considerable effort and
 I do not believe it would improve the rigor of the JSONPath
 specification.
+ 
+Differences in the working of programs that can be easily written using Oboe.js
+-------------------------------------------------------------------------------
 
-*Restriction: duck types only as last item. Why. Not currently enforced in the compiler.*
+A program written using Oboe.js will be subtly different from one
+written using more conventional libraries, even if the programmer means
+to express the same thing. Consider the two examples below which use
+Node.js to read a local JSON file and write to the console.
+
+~~~~ {.javascript}
+oboe( fs.createReadStream( '/home/me/secretPlans.json' ) )
+   .on('node', {
+      'schemes.*': function(scheme){
+         console.log('Aha! ' + scheme);
+      },
+      'plottings.*': function(deviousPlot){
+         console.log('Hmmm! ' + deviousPlot);
+      }   
+   })
+   .on('done', function(){
+      console.log("*twiddles mustache*");
+   })
+   .on('fail', function(){
+      console.log("Drat! Foiled again!");   
+   });
+~~~~
+
+~~~~ {.javascript}
+fs.readFile('/home/me/secretPlans.json', function( err, plansJson ){     
+   if( err ) {
+      console.log("Drat! Foiled again!");
+      return;
+   }
+   var plans = JSON.parse(err, plansJson);
+   
+   plans.schemes.forEach(function( scheme ){
+      console.log('Aha! ' + scheme);   
+   });   
+   plans.plottings.forEach(function(deviousPlot){
+      console.log('Hmmm! ' + deviousPlot);
+   });
+      
+   console.log("*twiddles mustache*");   
+});
+~~~~
+
+While the primary behaviours are similar, some accidental
+side-behaviours differ between the two examples. It is likely the
+programmer would not consider these differences as they write. In the
+first example,the order of the output for schemes and plans will match
+the order in the JSON, whereas for the second scheming is always done
+before plotting. In the second example the order could be easily changed
+by reversing the statements whereas the first id bound to echo the order
+found in the JSON. The error behaviours are also different -- the first
+prints until it has an error, the second prints if there are no errors.
+In the second example it is *almost mandatory* to check for errors
+before output whereas in the first it feels most natural to register the
+error listener at the end of the chained calls. I prefer the source
+order in the first because the the normal case is listed before the
+abnormal one. When describing a system, it seems odd to me to describe
+the abnormal cases first.
+
+Considering the coding style that is encouraged, the first example takes
+a more declarative form by specifying the items of interest using
+patterns whereas the second is more imperative by explicitly looping
+through the items. If several levels of selection were required, such as
+`schemes.*.steps.*`, other than a longer JSONPath pattern the first
+example would not grow in complexity whereas the second would require
+nested looping. We can say that the complexity of programming using Oboe
+stays roughly constant whereas in the second example it grows linearly
+with the number of levels that must be traversed.
 
 [^1]: https://github.com/substack/http-browserify
 
