@@ -272,6 +272,7 @@ describe("oboe integration (real http)", function() {
                   
          expect(this.header()['x-sso']).toEqual('sso');
          expect(this.header()['x-sso2']).toEqual('sso2');
+         expect(this.header()['x-sso3']).toBeUndefined();
                   
          done = true;         
       }) 
@@ -280,6 +281,19 @@ describe("oboe integration (real http)", function() {
          return done;
       }, 'the response to complete', ASYNC_TEST_TIMEOUT)
    })
+   
+   it('gives undefined for headers before they are ready', function () {
+
+      var o = oboe(
+          {  url:url('echoBackHeadersAsHeaders'),
+             headers:{'x-sso':'sso', 'x-sso2':'sso2'}
+          } 
+      )
+      
+      expect(o.header()).toBeUndefined();
+      expect(o.header('x-sso')).toBeUndefined();
+      expect(o.header('x-sso2')).toBeUndefined();
+   })   
    
    it('notifies of response starting by giving status code and headers to callback', function () {
       var called = 0;   
