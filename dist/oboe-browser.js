@@ -983,6 +983,8 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
     * the progress event or the request being complete.
     */
    function handleProgress() {
+
+      console.log('made some progress');
                         
       var textSoFar = xhr.responseText,
           newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
@@ -1008,13 +1010,20 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
    
    xhr.onreadystatechange = function() {
 
-      switch( xhr.readyState ) {
+      /*console.log('GOT READYSTATE', xhr.readyState);
       
-         case 3:       
-            console.log(
-               parseResponseHeaders(xhr.getAllResponseHeaders()) 
-            );
-            
+      try{
+         console.log(parseResponseHeaders(xhr.getAllResponseHeaders()));
+      } catch( e ){
+         console.log('could not get headers yet');
+      }*/
+      
+      switch( xhr.readyState ) {
+               
+         case 2:       
+         
+            console.log(parseResponseHeaders(xhr.getAllResponseHeaders()));
+         
             emit(
                HTTP_START, 
                xhr.status,
