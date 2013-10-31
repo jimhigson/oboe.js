@@ -4,7 +4,7 @@ function oboe(firstArg) {
    if (firstArg.url) {
 
       // method signature is:
-      //    .doMethod({url:u, body:b, complete:c, headers:{...}})
+      //    .oboe({method:m, url:u, body:b, complete:c, headers:{...}})
 
       return wire(
           (firstArg.method || 'GET'),
