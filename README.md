@@ -345,7 +345,7 @@ oboe('/data/things.json')
 
 ## Reading from any stream (Node.js only)
 
-Instead of giving a url you can pass any [readable stream](http://nodejs.org/api/stream.html#stream_class_stream_readable).
+Instead of giving a url you can pass any [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable).
 To load from a local file you'd do this:
 
 ``` js
@@ -487,12 +487,18 @@ Start a new AJAX request by calling one of these methods:
    })         
 ```
 
-The above is supported under Browsers or Node.js. Under Node you can also
-read from arbitrary streams:
+If a body is given as an object it will be serialised using JSON.stringify
+before being sent.
+
+The above are supported under Browsers or Node.js. Under Node you can also
+give Oboe a [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable):
 
 ```js
    oboe( ReadableStream source ) // node.js only
 ``` 
+
+When reading from a stream http headers and status code will not be available
+via the `start` event or the `.header()` method.
  
 ## .node() and .path()
 
