@@ -220,6 +220,11 @@ var jsonPathCompiler = jsonPathSyntax(function (namedNodeSyntax,
       
       return function(ascent) {
    
+         // this won't work unless individual clauses are also callback-based.
+         // ie, call callback of containing expression instead of returning a
+         // value to it. Don't call if no match. That way, can defer to call
+         // it back later.
+   
          // kick off the evaluation by passing through to the last clause
          var exprMatch = lastClause(ascent);
                                                      
