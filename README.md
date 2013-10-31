@@ -506,21 +506,19 @@ When you make a request the returned Oboe instance exposes a few chainable metho
 
 ```js
 .node( String pattern, 
-       Function callback(node, String[] path, Object[] ancestors), 
-       [callbackContext]
+       Function callback(node, String[] path, Object[] ancestors)
 )
 
 .on( 'node', 
      String pattern, 
-     Function callback(node, String[] path, Object[] ancestors), 
-     [callbackContext]
+     Function callback(node, String[] path, Object[] ancestors)
 )
 ```
 
 Listening for nodes registers an interest in JSON nodes which match the given pattern so 
 that when the pattern is matched the callback is given the matching node.
-Inside the callback `this` will usually be the Oboe instance but this can be
-overridden by giving a callbackContext parameter.
+Inside the callback `this` will be the Oboe instance
+(unless you bound the callback)
 
 The parameters to callback are:
 
@@ -534,14 +532,12 @@ The parameters to callback are:
    
 ```js
 .path( String pattern, 
-       Function callback( thingFound, String[] path, Object[] ancestors), 
-       [callbackContext]
+       Function callback( thingFound, String[] path, Object[] ancestors)
 )
 
 .on( 'path', 
      String pattern, 
-     Function callback(thingFound, String[] path, Object[] ancestors), 
-     [callbackContext]
+     Function callback(thingFound, String[] path, Object[] ancestors)
 )
 ```
 

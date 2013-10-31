@@ -125,10 +125,10 @@ function instanceController(  emit, on, un,
       return keep;          
    }
 
-   function protectedCallback( callback, context ) {
+   function protectedCallback( callback ) {
       return function() {
          try{      
-            callback.apply(context||oboeApi, arguments);   
+            callback.apply(oboeApi, arguments);   
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
@@ -151,14 +151,13 @@ function instanceController(  emit, on, un,
    /**
     * implementation behind .onPath() and .onNode()
     */       
-   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap,
-                                      callback, callbackContext ){
+   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
  
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeCallback( 
             eventId, 
             jsonPathOrListenerMap,
-            protectedCallback(callback, callbackContext)
+            protectedCallback(callback)
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
@@ -194,7 +193,7 @@ function instanceController(  emit, on, un,
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
     */
-   return oboeApi = { 
+   return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),

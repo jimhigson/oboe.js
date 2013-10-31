@@ -72,7 +72,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
    })   
    
-   it('gives the oboe instance as context when nothing given explicitly',  function() {
+   it('gives the oboe instance as context',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -80,14 +80,6 @@ describe("oboe component (sXHR stubbed)", function(){
          .thenTheInstance( wasGivenTheOboeAsContext() );
    })
    
-   it('calls on given context',  function() {
-      var myObject = { doSomething: function(){} };
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!', myObject.doSomething, myObject)
-         .whenGivenInput('{}')
-         .thenTheInstance( wasCalledbackWithContext(myObject) );
-   })
 
    it('find only emits when has whole object',  function() {
 
