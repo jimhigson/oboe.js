@@ -269,7 +269,33 @@ describe("oboe component (sXHR stubbed)", function(){
             matched(null).atPath(['pencils']),
             foundOneMatch
          );
-   })   
+   })
+   
+   it('is able to notify of boolean true',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!.pencils')
+         .whenGivenInput('{"pens":false, "pencils":true}')
+         .thenTheInstance(
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(true).atPath(['pencils']),
+            foundOneMatch
+         );
+   })
+   
+   it('is able to notify of boolean false',  function() {
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!.pens')
+         .whenGivenInput('{"pens":false, "pencils":true}')
+         .thenTheInstance(
+            // undefined because the parser hasn't been given the value yet.
+            // can't be null because that is an allowed value
+            matched(false).atPath(['pens']),
+            foundOneMatch
+         );
+   })         
 
    it('notifies of multiple children of root',  function() {
 
