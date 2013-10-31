@@ -4,7 +4,7 @@ function oboe(firstArg) {
    if (firstArg.url) {
 
       // method signature is:
-      //    .oboe({method:m, url:u, body:b, complete:c, headers:{...}})
+      //    oboe({method:m, url:u, body:b, complete:c, headers:{...}})
 
       return wire(
           (firstArg.method || 'GET'),
@@ -14,13 +14,8 @@ function oboe(firstArg) {
       );
    } else {
 
-      // parameters specified as arguments
-      //
-      //  if (mayHaveContext == true) method signature is:
-      //     .doMethod( url, content )
-      //
-      //  else it is:
-      //     .doMethod( url )            
+      //  simple version for GETs. Signature is:
+      //    oboe( url )            
       //                                
       return wire(
           'GET',

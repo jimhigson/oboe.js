@@ -481,20 +481,20 @@ Start a new AJAX request by calling one of these methods:
          
    oboe({
       url: String,
-      method: String
+      method: String  // defaults to GET
       body: Object|String,
-      headers:{ key: value }
+      headers:{ key: value, ... }
    })         
 ```
 
 If a body is given as an object it will be serialised using JSON.stringify
-before being sent.
+before being sent. Method, body and headers are all optional.
 
 The above are supported under Browsers or Node.js. Under Node you can also
 give Oboe a [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable):
 
 ```js
-   oboe( ReadableStream source ) // node.js only
+   oboe( ReadableStream source ) // Node.js only
 ``` 
 
 When reading from a stream http headers and status code will not be available
