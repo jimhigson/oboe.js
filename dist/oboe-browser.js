@@ -1887,10 +1887,7 @@ function instanceController(  emit, on, un,
    function addPathOrNodeCallback( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
-   
-      // Add a new callback adaptor to the eventBus.
-      // This listener first checks that the pattern matches then if it 
-      // does, passes  onto the callback. 
+    
       on( eventId, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
@@ -2057,45 +2054,35 @@ function wire (httpMethodName, contentSource, body, headers){
 }
 
 // export public API
-var oboe = apiMethod('GET');
-oboe.doGet    = oboe;
-oboe.doDelete = apiMethod('DELETE');
-oboe.doPost   = apiMethod('POST', true);
-oboe.doPut    = apiMethod('PUT', true);
-oboe.doPatch  = apiMethod('PATCH', true);
+function oboe(firstArg) {
 
-function apiMethod(httpMethodName, mayHaveRequestBody) {
-               
-   return function(firstArg) {
+   if (firstArg.url) {
 
-      if (firstArg.url) {
+      // method signature is:
+      //    .doMethod({url:u, body:b, complete:c, headers:{...}})
 
-         // method signature is:
-         //    .doMethod({url:u, body:b, complete:c, headers:{...}})
+      return wire(
+          (firstArg.method || 'GET'),
+          firstArg.url,
+          firstArg.body,
+          firstArg.headers
+      );
+   } else {
 
-         return wire(
-             httpMethodName,
-             firstArg.url,
-             firstArg.body,
-             firstArg.headers
-         );
-      } else {
+      // parameters specified as arguments
+      //
+      //  if (mayHaveContext == true) method signature is:
+      //     .doMethod( url, content )
+      //
+      //  else it is:
+      //     .doMethod( url )            
+      //                                
+      return wire(
+          'GET',
+          firstArg // url
+      );
+   }
+}
 
-         // parameters specified as arguments
-         //
-         //  if (mayHaveContext == true) method signature is:
-         //     .doMethod( url, content )
-         //
-         //  else it is:
-         //     .doMethod( url )            
-         //                                
-         return wire(
-             httpMethodName,
-             firstArg, // url
-             mayHaveRequestBody && arguments[1]         // body
-         );
-      }
-   };
-}   
 
 ;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error);

@@ -7,7 +7,7 @@ function oboe(firstArg) {
       //    .doMethod({url:u, body:b, complete:c, headers:{...}})
 
       return wire(
-          firstArg.method,
+          (firstArg.method || 'GET'),
           firstArg.url,
           firstArg.body,
           firstArg.headers
