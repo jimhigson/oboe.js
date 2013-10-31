@@ -94,12 +94,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#header_jsonPath"><span class="toc-section-number">8.6</span> jsonPath.js</a></li>
 <li><a href="#header_jsonPathSyntax"><span class="toc-section-number">8.7</span> jsonPathSyntax.js</a></li>
 <li><a href="#header_lists"><span class="toc-section-number">8.8</span> lists.js</a></li>
-<li><a href="#header_pubSub"><span class="toc-section-number">8.9</span> pubSub.js</a></li>
-<li><a href="#header_publicApi"><span class="toc-section-number">8.10</span> publicApi.js</a></li>
-<li><a href="#header_streamingHttp-browser"><span class="toc-section-number">8.11</span> streamingHttp-browser.js</a></li>
-<li><a href="#header_streamingHttp-node"><span class="toc-section-number">8.12</span> streamingHttp-node.js</a></li>
-<li><a href="#header_util"><span class="toc-section-number">8.13</span> util.js</a></li>
-<li><a href="#header_wire"><span class="toc-section-number">8.14</span> wire.js</a></li>
+<li><a href="#header_parseResponseHeaders.browser"><span class="toc-section-number">8.9</span> parseResponseHeaders.browser.js</a></li>
+<li><a href="#header_pubSub"><span class="toc-section-number">8.10</span> pubSub.js</a></li>
+<li><a href="#header_publicApi"><span class="toc-section-number">8.11</span> publicApi.js</a></li>
+<li><a href="#header_streamingHttp.browser"><span class="toc-section-number">8.12</span> streamingHttp.browser.js</a></li>
+<li><a href="#header_streamingHttp.node"><span class="toc-section-number">8.13</span> streamingHttp.node.js</a></li>
+<li><a href="#header_util"><span class="toc-section-number">8.14</span> util.js</a></li>
+<li><a href="#header_wire"><span class="toc-section-number">8.15</span> wire.js</a></li>
 </ul></li>
 <li><a href="#appendix-iii-benchmarking"><span class="toc-section-number">9</span> Appendix iii: Benchmarking</a><ul>
 <li><a href="#header_benchmarkClient"><span class="toc-section-number">9.1</span> benchmarkClient.js</a></li>
@@ -1008,10 +1009,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
     <span class="co">// these events are never exported so are kept as </span>
     <span class="co">// the smallest possible representation, numbers:</span>
     _S = <span class="dv">0</span>,
-    ERROR_EVENT   = _S++,    
+    FAIL_EVENT   = <span class="st">&#39;fail&#39;</span>,    
     ROOT_FOUND    = _S++,    
-    NEW_CONTENT = _S++,
-    END_OF_CONTENT = _S++,
+    HTTP_START = <span class="st">&#39;start&#39;</span>,
+    STREAM_DATA = _S++,
+    STREAM_END = _S++,
     ABORTING = _S++;
     
 <span class="kw">function</span> <span class="fu">errorReport</span>(statusCode, body, error) {
@@ -1415,14 +1417,22 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="kw">function</span> <span class="fu">instanceController</span>(  emit, on, un, 
                               clarinetParser, contentBuilderHandlers) {
   
-   <span class="kw">var</span> oboeApi, rootNode;
+   <span class="kw">var</span> oboeApi, rootNode, responseHeaders,
+       addDoneListener = <span class="fu">partialComplete</span>(
+                              addNodeOrPathListenerApi, 
+                              NODE_FOUND, 
+                              <span class="st">&#39;!&#39;</span>);
 
    <span class="co">// when the root node is found grap a reference to it for later      </span>
    <span class="fu">on</span>(ROOT_FOUND, <span class="kw">function</span>(root) {
       rootNode = root;   
    });
+   
+   <span class="fu">on</span>(HTTP_START, <span class="kw">function</span>(_statusCode, headers) {
+      responseHeaders = headers;
+   });
                               
-   <span class="fu">on</span>(NEW_CONTENT,         
+   <span class="fu">on</span>(STREAM_DATA,         
       <span class="kw">function</span> (nextDrip) {
          <span class="co">// callback for when a bit more data arrives from the streaming XHR         </span>
           
@@ -1440,7 +1450,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
    <span class="co">/* At the end of the http content close the clarinet parser.</span>
 <span class="co">      This will provide an error if the total content provided was not </span>
 <span class="co">      valid json, ie if not all arrays, objects and Strings closed properly */</span>
-   <span class="fu">on</span>(END_OF_CONTENT, <span class="ot">clarinetParser</span>.<span class="ot">close</span>.<span class="fu">bind</span>(clarinetParser));
+   <span class="fu">on</span>(STREAM_END, <span class="ot">clarinetParser</span>.<span class="ot">close</span>.<span class="fu">bind</span>(clarinetParser));
    
 
    <span class="co">/* If we abort this Oboe&#39;s request stop listening to the clarinet parser. </span>
@@ -1455,7 +1465,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
    <span class="co">// react to errors by putting them on the event bus</span>
    <span class="ot">clarinetParser</span>.<span class="fu">onerror</span> = <span class="kw">function</span>(e) {          
       <span class="fu">emit</span>(
-         ERROR_EVENT, 
+         FAIL_EVENT, 
          <span class="fu">errorReport</span>(<span class="kw">undefined</span>, <span class="kw">undefined</span>, e)
       );
       
@@ -1466,10 +1476,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
    <span class="kw">function</span> <span class="fu">addPathOrNodeCallback</span>( eventId, pattern, callback ) {
    
       <span class="kw">var</span> matchesJsonPath = <span class="fu">jsonPathCompiler</span>( pattern );
-   
-      <span class="co">// Add a new callback adaptor to the eventBus.</span>
-      <span class="co">// This listener first checks that he pattern matches then if it does, </span>
-      <span class="co">// passes it onto the callback. </span>
+    
       <span class="fu">on</span>( eventId, <span class="kw">function</span> <span class="fu">handler</span>( ascent ){ 
  
          <span class="kw">var</span> maybeMatchingMapping = <span class="fu">matchesJsonPath</span>( ascent );
@@ -1534,7 +1541,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
          }<span class="kw">catch</span>(e)  {
          
             <span class="co">// An error occured during the callback, publish it on the event bus </span>
-            <span class="fu">emit</span>(ERROR_EVENT, <span class="fu">errorReport</span>(<span class="kw">undefined</span>, <span class="kw">undefined</span>, e));
+            <span class="fu">emit</span>(FAIL_EVENT, <span class="fu">errorReport</span>(<span class="kw">undefined</span>, <span class="kw">undefined</span>, e));
          }      
       }   
    }
@@ -1568,28 +1575,27 @@ code > span.er { color: #ff0000; font-weight: bold; }
       
       <span class="kw">return</span> <span class="kw">this</span>; <span class="co">// chaining</span>
    }
-   
-   <span class="kw">var</span> addDoneListener = <span class="fu">partialComplete</span>(addNodeOrPathListenerApi, NODE_FOUND, <span class="st">&#39;!&#39;</span>),
-       addFailListner = <span class="fu">partialComplete</span>(on, ERROR_EVENT);
-   
+      
    <span class="co">/**</span>
 <span class="co">    * implementation behind oboe().on()</span>
 <span class="co">    */</span>       
    <span class="kw">function</span> <span class="fu">addListener</span>( eventId, listener ){
-                         
-      <span class="kw">if</span>( eventId == NODE_FOUND || eventId == PATH_FOUND ) {
-                                
-         <span class="fu">apply</span>(arguments, addNodeOrPathListenerApi);
          
-      } <span class="kw">else</span> <span class="kw">if</span>( eventId == <span class="st">&#39;done&#39;</span> ) {
-      
-         <span class="fu">addDoneListener</span>(listener);
-                              
-      } <span class="kw">else</span> <span class="kw">if</span>( eventId == <span class="st">&#39;fail&#39;</span> ) {
-      
-         <span class="fu">addFailListner</span>(listener);
-      }
-             
+      <span class="kw">switch</span>(eventId) {
+         <span class="kw">case</span> <span class="dt">NODE_FOUND</span>:
+         <span class="kw">case</span> <span class="dt">PATH_FOUND</span>:
+            <span class="fu">apply</span>(arguments, addNodeOrPathListenerApi);
+            <span class="kw">break</span>;
+            
+         <span class="kw">case</span> <span class="st">&#39;done&#39;</span>:
+            <span class="fu">addDoneListener</span>(listener);         
+            <span class="kw">break</span>;
+            
+         <span class="kw">default</span>:
+            <span class="co">// for cases: &#39;fail&#39;, &#39;start&#39;</span>
+            <span class="fu">on</span>(eventId, listener);
+      }                     
+                                               
       <span class="kw">return</span> <span class="kw">this</span>; <span class="co">// chaining</span>
    }   
    
@@ -1598,12 +1604,18 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co">    * returned to the calling application</span>
 <span class="co">    */</span>
    <span class="kw">return</span> oboeApi = { 
-      <span class="dt">path  </span>:  <span class="fu">partialComplete</span>(addNodeOrPathListenerApi, PATH_FOUND), 
+      <span class="dt">on    </span>:  addListener,   
+      <span class="dt">done  </span>:  addDoneListener,       
       <span class="dt">node  </span>:  <span class="fu">partialComplete</span>(addNodeOrPathListenerApi, NODE_FOUND),
-      <span class="dt">on    </span>:  addListener,
-      <span class="dt">fail  </span>:  addFailListner,
-      <span class="dt">done  </span>:  addDoneListener,
+      <span class="dt">path  </span>:  <span class="fu">partialComplete</span>(addNodeOrPathListenerApi, PATH_FOUND),      
+      <span class="dt">start </span>:  <span class="fu">partialComplete</span>(on, HTTP_START),
+      <span class="dt">fail  </span>:  <span class="fu">partialComplete</span>(on, FAIL_EVENT),
       <span class="dt">abort </span>:  <span class="fu">partialComplete</span>(emit, ABORTING),
+      <span class="dt">header</span>:  <span class="kw">function</span>(name) {
+                  <span class="kw">return</span> name ? responseHeaders &amp;&amp; responseHeaders[name] 
+                              : responseHeaders
+                              ;
+               },
       <span class="dt">root  </span>:  <span class="kw">function</span> <span class="fu">rootNodeFunctor</span>() {
                   <span class="kw">return</span> rootNode;
                }
@@ -2274,8 +2286,37 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
+<div id="header_parseResponseHeaders.browser" class="section level2">
+<h2><a href="#header_parseResponseHeaders.browser"><span class="header-section-number">8.9</span> parseResponseHeaders.browser.js</a></h2>
+<p></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// based on gist https://gist.github.com/monsur/706839</span>
+
+<span class="co">/**</span>
+<span class="co"> * XmlHttpRequest&#39;s getAllResponseHeaders() method returns a string of response</span>
+<span class="co"> * headers according to the format described here:</span>
+<span class="co"> * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method</span>
+<span class="co"> * This method parses that string into a user-friendly key/value pair object.</span>
+<span class="co"> */</span>
+<span class="kw">function</span> <span class="fu">parseResponseHeaders</span>(headerStr) {
+   <span class="kw">var</span> headers = {};
+   
+   headerStr &amp;&amp; <span class="ot">headerStr</span>.<span class="fu">split</span>(<span class="st">&#39;\u000d\u000a&#39;</span>)
+      .<span class="fu">forEach</span>(<span class="kw">function</span>(headerPair){
+   
+         <span class="co">// Can&#39;t use split() here because it does the wrong thing</span>
+         <span class="co">// if the header value has the string &quot;: &quot; in it.</span>
+         <span class="kw">var</span> index = <span class="ot">headerPair</span>.<span class="fu">indexOf</span>(<span class="st">&#39;\u003a\u0020&#39;</span>);
+         
+         headers[<span class="ot">headerPair</span>.<span class="fu">substring</span>(<span class="dv">0</span>, index)] 
+                     = <span class="ot">headerPair</span>.<span class="fu">substring</span>(index + <span class="dv">2</span>);
+      });
+   
+   <span class="kw">return</span> headers;
+}</code></pre>
+<p></p>
+</div>
 <div id="header_pubSub" class="section level2">
-<h2><a href="#header_pubSub"><span class="header-section-number">8.9</span> pubSub.js</a></h2>
+<h2><a href="#header_pubSub"><span class="header-section-number">8.10</span> pubSub.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * Isn&#39;t this the cutest little pub-sub you&#39;ve ever seen?</span>
@@ -2313,7 +2354,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p></p>
 </div>
 <div id="header_publicApi" class="section level2">
-<h2><a href="#header_publicApi"><span class="header-section-number">8.10</span> publicApi.js</a></h2>
+<h2><a href="#header_publicApi"><span class="header-section-number">8.11</span> publicApi.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// export public API</span>
 <span class="kw">var</span> oboe = <span class="fu">apiMethod</span>(<span class="st">&#39;GET&#39;</span>);
@@ -2358,8 +2399,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }   </code></pre>
 <p></p>
 </div>
-<div id="header_streamingHttp-browser" class="section level2">
-<h2><a href="#header_streamingHttp-browser"><span class="header-section-number">8.11</span> streamingHttp-browser.js</a></h2>
+<div id="header_streamingHttp.browser" class="section level2">
+<h2><a href="#header_streamingHttp.browser"><span class="header-section-number">8.12</span> streamingHttp.browser.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">httpTransport</span>(){
    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">XMLHttpRequest</span>();
@@ -2428,7 +2469,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co">         last progress. */</span>
          
       <span class="kw">if</span>( newText ) {
-         <span class="fu">emit</span>( NEW_CONTENT, newText );
+         <span class="fu">emit</span>( STREAM_DATA, newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = <span class="fu">len</span>(textSoFar);
@@ -2440,32 +2481,41 @@ code > span.er { color: #ff0000; font-weight: bold; }
    }
    
    <span class="ot">xhr</span>.<span class="fu">onreadystatechange</span> = <span class="kw">function</span>() {
-            
-      <span class="kw">if</span>(<span class="ot">xhr</span>.<span class="fu">readyState</span> == <span class="dv">4</span> ) {
-
-         <span class="co">// is this a 2xx http code?</span>
-         <span class="kw">var</span> sucessful = <span class="fu">String</span>(<span class="ot">xhr</span>.<span class="fu">status</span>)[<span class="dv">0</span>] == <span class="dv">2</span>;
+      
+      <span class="kw">switch</span>( <span class="ot">xhr</span>.<span class="fu">readyState</span> ) {
+               
+         <span class="kw">case</span> <span class="dv">2</span>:       
          
-         <span class="kw">if</span>( sucessful ) {
-            <span class="co">// In Chrome 29 (not 28) no onprogress is emitted when a response</span>
-            <span class="co">// is complete before the onload. We need to always do handleInput</span>
-            <span class="co">// in case we get the load but have not had a final progress event.</span>
-            <span class="co">// This looks like a bug and may change in future but let&#39;s take</span>
-            <span class="co">// the safest approach and assume we might not have received a </span>
-            <span class="co">// progress event for each part of the response</span>
-            <span class="fu">handleProgress</span>();
+            <span class="fu">emit</span>(
+               HTTP_START, 
+               <span class="ot">xhr</span>.<span class="fu">status</span>,
+               <span class="fu">parseResponseHeaders</span>(<span class="ot">xhr</span>.<span class="fu">getAllResponseHeaders</span>()) );
+            <span class="kw">return</span>;
             
-            <span class="fu">emit</span>( END_OF_CONTENT );
-         } <span class="kw">else</span> {
-         
-            <span class="fu">emit</span>( 
-               ERROR_EVENT, 
-               <span class="fu">errorReport</span>(
-                  <span class="ot">xhr</span>.<span class="fu">status</span>, 
-                  <span class="ot">xhr</span>.<span class="fu">responseText</span>
-               )
-            );
-         }
+         <span class="kw">case</span> <span class="dv">4</span>:       
+            <span class="co">// is this a 2xx http code?</span>
+            <span class="kw">var</span> sucessful = <span class="fu">String</span>(<span class="ot">xhr</span>.<span class="fu">status</span>)[<span class="dv">0</span>] == <span class="dv">2</span>;
+            
+            <span class="kw">if</span>( sucessful ) {
+               <span class="co">// In Chrome 29 (not 28) no onprogress is emitted when a response</span>
+               <span class="co">// is complete before the onload. We need to always do handleInput</span>
+               <span class="co">// in case we get the load but have not had a final progress event.</span>
+               <span class="co">// This looks like a bug and may change in future but let&#39;s take</span>
+               <span class="co">// the safest approach and assume we might not have received a </span>
+               <span class="co">// progress event for each part of the response</span>
+               <span class="fu">handleProgress</span>();
+               
+               <span class="fu">emit</span>( STREAM_END );
+            } <span class="kw">else</span> {
+            
+               <span class="fu">emit</span>( 
+                  FAIL_EVENT, 
+                  <span class="fu">errorReport</span>(
+                     <span class="ot">xhr</span>.<span class="fu">status</span>, 
+                     <span class="ot">xhr</span>.<span class="fu">responseText</span>
+                  )
+               );
+            }
       }
    };
 
@@ -2487,7 +2537,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="co">// the event could be useful. For both these reasons defer the</span>
       <span class="co">// firing to the next JS frame.  </span>
       <span class="ot">window</span>.<span class="fu">setTimeout</span>(
-         <span class="fu">partialComplete</span>(emit, ERROR_EVENT, 
+         <span class="fu">partialComplete</span>(emit, FAIL_EVENT, 
              <span class="fu">errorReport</span>(<span class="kw">undefined</span>, <span class="kw">undefined</span>, e)
          )
       ,  <span class="dv">0</span>
@@ -2496,8 +2546,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }</code></pre>
 <p></p>
 </div>
-<div id="header_streamingHttp-node" class="section level2">
-<h2><a href="#header_streamingHttp-node"><span class="header-section-number">8.12</span> streamingHttp-node.js</a></h2>
+<div id="header_streamingHttp.node" class="section level2">
+<h2><a href="#header_streamingHttp.node"><span class="header-section-number">8.13</span> streamingHttp.node.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">httpTransport</span>(){
    <span class="kw">return</span> <span class="fu">require</span>(<span class="st">&#39;http&#39;</span>);
@@ -2530,12 +2580,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="co">// use stream in flowing mode   </span>
       <span class="ot">readableStream</span>.<span class="fu">on</span>(<span class="st">&#39;data&#39;</span>, <span class="kw">function</span> (chunk) {
                                              
-         <span class="fu">emit</span>( NEW_CONTENT, <span class="ot">chunk</span>.<span class="fu">toString</span>() );
+         <span class="fu">emit</span>( STREAM_DATA, <span class="ot">chunk</span>.<span class="fu">toString</span>() );
       });
       
       <span class="ot">readableStream</span>.<span class="fu">on</span>(<span class="st">&#39;end&#39;</span>, <span class="kw">function</span>() {
                
-         <span class="fu">emit</span>( END_OF_CONTENT );
+         <span class="fu">emit</span>( STREAM_END );
       });
    }
    
@@ -2553,7 +2603,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       });
    }
    
-   <span class="kw">function</span> <span class="fu">fetchUrl</span>( url ) {
+   <span class="kw">function</span> <span class="fu">fetchHttpUrl</span>( url ) {
       <span class="kw">if</span>( !<span class="ot">contentSource</span>.<span class="fu">match</span>(<span class="ot">/http:</span><span class="fl">\/\/</span><span class="ot">/</span>) ) {
          contentSource = <span class="st">&#39;http://&#39;</span> + contentSource;
       }                           
@@ -2571,6 +2621,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="ot">req</span>.<span class="fu">on</span>(<span class="st">&#39;response&#39;</span>, <span class="kw">function</span>(res){
          <span class="kw">var</span> statusCode = <span class="ot">res</span>.<span class="fu">statusCode</span>,
              sucessful = <span class="fu">String</span>(statusCode)[<span class="dv">0</span>] == <span class="dv">2</span>;
+                                                   
+         <span class="fu">emit</span>(HTTP_START, <span class="ot">res</span>.<span class="fu">statusCode</span>, <span class="ot">res</span>.<span class="fu">headers</span>);                                
                                 
          <span class="kw">if</span>( sucessful ) {          
                
@@ -2579,7 +2631,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
          } <span class="kw">else</span> {
             <span class="fu">readStreamToEnd</span>(res, <span class="kw">function</span>(errorBody){
                <span class="fu">emit</span>( 
-                  ERROR_EVENT, 
+                  FAIL_EVENT, 
                   <span class="fu">errorReport</span>( statusCode, errorBody )
                );
             });
@@ -2588,7 +2640,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
       
       <span class="ot">req</span>.<span class="fu">on</span>(<span class="st">&#39;error&#39;</span>, <span class="kw">function</span>(e) {
          <span class="fu">emit</span>( 
-            ERROR_EVENT, 
+            FAIL_EVENT, 
             <span class="fu">errorReport</span>(<span class="kw">undefined</span>, <span class="kw">undefined</span>, e )
          );
       });
@@ -2606,7 +2658,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
    }
    
    <span class="kw">if</span>( <span class="fu">isString</span>(contentSource) ) {
-      <span class="fu">fetchUrl</span>(contentSource);
+      <span class="fu">fetchHttpUrl</span>(contentSource);
    } <span class="kw">else</span> {
       <span class="co">// contentsource is a stream</span>
       <span class="fu">readStreamToEventBus</span>(contentSource);   
@@ -2616,7 +2668,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p></p>
 </div>
 <div id="header_util" class="section level2">
-<h2><a href="#header_util"><span class="header-section-number">8.13</span> util.js</a></h2>
+<h2><a href="#header_util"><span class="header-section-number">8.14</span> util.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file defines some loosely associated syntactic sugar for </span>
@@ -2671,7 +2723,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p></p>
 </div>
 <div id="header_wire" class="section level2">
-<h2><a href="#header_wire"><span class="header-section-number">8.14</span> wire.js</a></h2>
+<h2><a href="#header_wire"><span class="header-section-number">8.15</span> wire.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co"> * This file sits just behind the API which is used to attain a new</span>
@@ -2968,7 +3020,7 @@ strategies[strategyName]();
 <li id="fn8"><p>At time of writing, Firefox is the only engine supporting WeakHashMap by default. In Chome it is implemented but not available to Javascript unless explicitly enabled by a browser flag. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap</a> retrieved 11th October 2013<a href="#fnref8">↩</a></p></li>
 <li id="fn9"><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular\_Expressions</a><a href="#fnref9">↩</a></p></li>
 <li id="fn10"><p><a href="https://npmjs.org/package/get-json">https://npmjs.org/package/get-json</a><a href="#fnref10">↩</a></p></li>
-<li id="fn11"><p><a href="https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js">tests/spec/oboe.performance.spec.js</a><a href="#fnref11">↩</a></p></li>
+<li id="fn11"><p>In git repository, <a href="https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js">test/specs/oboe.performance.spec.js</a><a href="#fnref11">↩</a></p></li>
 </ol>
 </div>
 </body>

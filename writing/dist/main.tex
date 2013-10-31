@@ -2644,7 +2644,8 @@ rather than considering serialisation artifacts.
 \subsection{Performance under various Javascript
 engines}\label{performance-under-various-javascript-engines}
 
-The file \texttt{oboe.performance.spec.js}\footnote{\href{https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js}{tests/spec/oboe.performance.spec.js}}
+The file \texttt{oboe.performance.spec.js}\footnote{In git repository,
+  \href{https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js}{test/specs/oboe.performance.spec.js}}
 contains a benchmark which concentrates on measuring the performance of
 Oboe's pattern matching. This test registers a complex pattern which
 intentionally uses all features from the JSONPath language and then
@@ -2892,10 +2893,11 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
     \CommentTok{// these events are never exported so are kept as }
     \CommentTok{// the smallest possible representation, numbers:}
     \NormalTok{_S = }\DecValTok{0}\NormalTok{,}
-    \NormalTok{ERROR_EVENT   = _S++,    }
+    \NormalTok{FAIL_EVENT   = }\StringTok{'fail'}\NormalTok{,    }
     \NormalTok{ROOT_FOUND    = _S++,    }
-    \NormalTok{NEW_CONTENT = _S++,}
-    \NormalTok{END_OF_CONTENT = _S++,}
+    \NormalTok{HTTP_START = }\StringTok{'start'}\NormalTok{,}
+    \NormalTok{STREAM_DATA = _S++,}
+    \NormalTok{STREAM_END = _S++,}
     \NormalTok{ABORTING = _S++;}
     
 \KeywordTok{function} \FunctionTok{errorReport}\NormalTok{(statusCode, body, error) \{}
@@ -3317,14 +3319,22 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 \KeywordTok{function} \FunctionTok{instanceController}\NormalTok{(  emit, on, un, }
                               \NormalTok{clarinetParser, contentBuilderHandlers) \{}
   
-   \KeywordTok{var} \NormalTok{oboeApi, rootNode;}
+   \KeywordTok{var} \NormalTok{oboeApi, rootNode, responseHeaders,}
+       \NormalTok{addDoneListener = }\FunctionTok{partialComplete}\NormalTok{(}
+                              \NormalTok{addNodeOrPathListenerApi, }
+                              \NormalTok{NODE_FOUND, }
+                              \StringTok{'!'}\NormalTok{);}
 
    \CommentTok{// when the root node is found grap a reference to it for later      }
    \FunctionTok{on}\NormalTok{(ROOT_FOUND, }\KeywordTok{function}\NormalTok{(root) \{}
       \NormalTok{rootNode = root;   }
    \NormalTok{\});}
+   
+   \FunctionTok{on}\NormalTok{(HTTP_START, }\KeywordTok{function}\NormalTok{(_statusCode, headers) \{}
+      \NormalTok{responseHeaders = headers;}
+   \NormalTok{\});}
                               
-   \FunctionTok{on}\NormalTok{(NEW_CONTENT,         }
+   \FunctionTok{on}\NormalTok{(STREAM_DATA,         }
       \KeywordTok{function} \NormalTok{(nextDrip) \{}
          \CommentTok{// callback for when a bit more data arrives from the streaming XHR         }
           
@@ -3342,7 +3352,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \CommentTok{/* At the end of the http content close the clarinet parser.}
 \CommentTok{      This will provide an error if the total content provided was not }
 \CommentTok{      valid json, ie if not all arrays, objects and Strings closed properly */}
-   \FunctionTok{on}\NormalTok{(END_OF_CONTENT, }\OtherTok{clarinetParser}\NormalTok{.}\OtherTok{close}\NormalTok{.}\FunctionTok{bind}\NormalTok{(clarinetParser));}
+   \FunctionTok{on}\NormalTok{(STREAM_END, }\OtherTok{clarinetParser}\NormalTok{.}\OtherTok{close}\NormalTok{.}\FunctionTok{bind}\NormalTok{(clarinetParser));}
    
 
    \CommentTok{/* If we abort this Oboe's request stop listening to the clarinet parser. }
@@ -3357,7 +3367,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \CommentTok{// react to errors by putting them on the event bus}
    \OtherTok{clarinetParser}\NormalTok{.}\FunctionTok{onerror} \NormalTok{= }\KeywordTok{function}\NormalTok{(e) \{          }
       \FunctionTok{emit}\NormalTok{(}
-         \NormalTok{ERROR_EVENT, }
+         \NormalTok{FAIL_EVENT, }
          \FunctionTok{errorReport}\NormalTok{(}\KeywordTok{undefined}\NormalTok{, }\KeywordTok{undefined}\NormalTok{, e)}
       \NormalTok{);}
       
@@ -3368,10 +3378,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \KeywordTok{function} \FunctionTok{addPathOrNodeCallback}\NormalTok{( eventId, pattern, callback ) \{}
    
       \KeywordTok{var} \NormalTok{matchesJsonPath = }\FunctionTok{jsonPathCompiler}\NormalTok{( pattern );}
-   
-      \CommentTok{// Add a new callback adaptor to the eventBus.}
-      \CommentTok{// This listener first checks that he pattern matches then if it does, }
-      \CommentTok{// passes it onto the callback. }
+    
       \FunctionTok{on}\NormalTok{( eventId, }\KeywordTok{function} \FunctionTok{handler}\NormalTok{( ascent )\{ }
  
          \KeywordTok{var} \NormalTok{maybeMatchingMapping = }\FunctionTok{matchesJsonPath}\NormalTok{( ascent );}
@@ -3436,7 +3443,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
          \NormalTok{\}}\KeywordTok{catch}\NormalTok{(e)  \{}
          
             \CommentTok{// An error occured during the callback, publish it on the event bus }
-            \FunctionTok{emit}\NormalTok{(ERROR_EVENT, }\FunctionTok{errorReport}\NormalTok{(}\KeywordTok{undefined}\NormalTok{, }\KeywordTok{undefined}\NormalTok{, e));}
+            \FunctionTok{emit}\NormalTok{(FAIL_EVENT, }\FunctionTok{errorReport}\NormalTok{(}\KeywordTok{undefined}\NormalTok{, }\KeywordTok{undefined}\NormalTok{, e));}
          \NormalTok{\}      }
       \NormalTok{\}   }
    \NormalTok{\}}
@@ -3470,28 +3477,27 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       
       \KeywordTok{return} \KeywordTok{this}\NormalTok{; }\CommentTok{// chaining}
    \NormalTok{\}}
-   
-   \KeywordTok{var} \NormalTok{addDoneListener = }\FunctionTok{partialComplete}\NormalTok{(addNodeOrPathListenerApi, NODE_FOUND, }\StringTok{'!'}\NormalTok{),}
-       \NormalTok{addFailListner = }\FunctionTok{partialComplete}\NormalTok{(on, ERROR_EVENT);}
-   
+      
    \CommentTok{/**}
 \CommentTok{    * implementation behind oboe().on()}
 \CommentTok{    */}       
    \KeywordTok{function} \FunctionTok{addListener}\NormalTok{( eventId, listener )\{}
-                         
-      \KeywordTok{if}\NormalTok{( eventId == NODE_FOUND || eventId == PATH_FOUND ) \{}
-                                
-         \FunctionTok{apply}\NormalTok{(arguments, addNodeOrPathListenerApi);}
          
-      \NormalTok{\} }\KeywordTok{else} \KeywordTok{if}\NormalTok{( eventId == }\StringTok{'done'} \NormalTok{) \{}
-      
-         \FunctionTok{addDoneListener}\NormalTok{(listener);}
-                              
-      \NormalTok{\} }\KeywordTok{else} \KeywordTok{if}\NormalTok{( eventId == }\StringTok{'fail'} \NormalTok{) \{}
-      
-         \FunctionTok{addFailListner}\NormalTok{(listener);}
-      \NormalTok{\}}
-             
+      \KeywordTok{switch}\NormalTok{(eventId) \{}
+         \KeywordTok{case} \DataTypeTok{NODE_FOUND}\NormalTok{:}
+         \KeywordTok{case} \DataTypeTok{PATH_FOUND}\NormalTok{:}
+            \FunctionTok{apply}\NormalTok{(arguments, addNodeOrPathListenerApi);}
+            \KeywordTok{break}\NormalTok{;}
+            
+         \KeywordTok{case} \StringTok{'done'}\NormalTok{:}
+            \FunctionTok{addDoneListener}\NormalTok{(listener);         }
+            \KeywordTok{break}\NormalTok{;}
+            
+         \KeywordTok{default}\NormalTok{:}
+            \CommentTok{// for cases: 'fail', 'start'}
+            \FunctionTok{on}\NormalTok{(eventId, listener);}
+      \NormalTok{\}                     }
+                                               
       \KeywordTok{return} \KeywordTok{this}\NormalTok{; }\CommentTok{// chaining}
    \NormalTok{\}   }
    
@@ -3500,12 +3506,18 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 \CommentTok{    * returned to the calling application}
 \CommentTok{    */}
    \KeywordTok{return} \NormalTok{oboeApi = \{ }
-      \DataTypeTok{path  }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(addNodeOrPathListenerApi, PATH_FOUND), }
+      \DataTypeTok{on    }\NormalTok{:  addListener,   }
+      \DataTypeTok{done  }\NormalTok{:  addDoneListener,       }
       \DataTypeTok{node  }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(addNodeOrPathListenerApi, NODE_FOUND),}
-      \DataTypeTok{on    }\NormalTok{:  addListener,}
-      \DataTypeTok{fail  }\NormalTok{:  addFailListner,}
-      \DataTypeTok{done  }\NormalTok{:  addDoneListener,}
+      \DataTypeTok{path  }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(addNodeOrPathListenerApi, PATH_FOUND),      }
+      \DataTypeTok{start }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(on, HTTP_START),}
+      \DataTypeTok{fail  }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(on, FAIL_EVENT),}
       \DataTypeTok{abort }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(emit, ABORTING),}
+      \DataTypeTok{header}\NormalTok{:  }\KeywordTok{function}\NormalTok{(name) \{}
+                  \KeywordTok{return} \NormalTok{name ? responseHeaders && responseHeaders[name] }
+                              \NormalTok{: responseHeaders}
+                              \NormalTok{;}
+               \NormalTok{\},}
       \DataTypeTok{root  }\NormalTok{:  }\KeywordTok{function} \FunctionTok{rootNodeFunctor}\NormalTok{() \{}
                   \KeywordTok{return} \NormalTok{rootNode;}
                \NormalTok{\}}
@@ -4197,6 +4209,41 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 
 \pagebreak
 
+\subsection{parseResponseHeaders.browser.js}\label{headerux5fparseResponseHeaders.browser}
+
+\label{src_parseResponseHeaders.browser}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// based on gist https://gist.github.com/monsur/706839}
+
+\CommentTok{/**}
+\CommentTok{ * XmlHttpRequest's getAllResponseHeaders() method returns a string of response}
+\CommentTok{ * headers according to the format described here:}
+\CommentTok{ * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method}
+\CommentTok{ * This method parses that string into a user-friendly key/value pair object.}
+\CommentTok{ */}
+\KeywordTok{function} \FunctionTok{parseResponseHeaders}\NormalTok{(headerStr) \{}
+   \KeywordTok{var} \NormalTok{headers = \{\};}
+   
+   \NormalTok{headerStr && }\OtherTok{headerStr}\NormalTok{.}\FunctionTok{split}\NormalTok{(}\StringTok{'\textbackslash{}u000d\textbackslash{}u000a'}\NormalTok{)}
+      \NormalTok{.}\FunctionTok{forEach}\NormalTok{(}\KeywordTok{function}\NormalTok{(headerPair)\{}
+   
+         \CommentTok{// Can't use split() here because it does the wrong thing}
+         \CommentTok{// if the header value has the string ": " in it.}
+         \KeywordTok{var} \NormalTok{index = }\OtherTok{headerPair}\NormalTok{.}\FunctionTok{indexOf}\NormalTok{(}\StringTok{'\textbackslash{}u003a\textbackslash{}u0020'}\NormalTok{);}
+         
+         \NormalTok{headers[}\OtherTok{headerPair}\NormalTok{.}\FunctionTok{substring}\NormalTok{(}\DecValTok{0}\NormalTok{, index)] }
+                     \NormalTok{= }\OtherTok{headerPair}\NormalTok{.}\FunctionTok{substring}\NormalTok{(index + }\DecValTok{2}\NormalTok{);}
+      \NormalTok{\});}
+   
+   \KeywordTok{return} \NormalTok{headers;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\pagebreak
+
 \subsection{pubSub.js}\label{headerux5fpubSub}
 
 \label{src_pubSub}
@@ -4293,9 +4340,9 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 
 \pagebreak
 
-\subsection{streamingHttp-browser.js}\label{headerux5fstreamingHttp-browser}
+\subsection{streamingHttp.browser.js}\label{headerux5fstreamingHttp.browser}
 
-\label{src_streamingHttp-browser}
+\label{src_streamingHttp.browser}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4366,7 +4413,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 \CommentTok{         last progress. */}
          
       \KeywordTok{if}\NormalTok{( newText ) \{}
-         \FunctionTok{emit}\NormalTok{( NEW_CONTENT, newText );}
+         \FunctionTok{emit}\NormalTok{( STREAM_DATA, newText );}
       \NormalTok{\} }
 
       \NormalTok{numberOfCharsAlreadyGivenToCallback = }\FunctionTok{len}\NormalTok{(textSoFar);}
@@ -4378,32 +4425,41 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \NormalTok{\}}
    
    \OtherTok{xhr}\NormalTok{.}\FunctionTok{onreadystatechange} \NormalTok{= }\KeywordTok{function}\NormalTok{() \{}
-            
-      \KeywordTok{if}\NormalTok{(}\OtherTok{xhr}\NormalTok{.}\FunctionTok{readyState} \NormalTok{== }\DecValTok{4} \NormalTok{) \{}
-
-         \CommentTok{// is this a 2xx http code?}
-         \KeywordTok{var} \NormalTok{sucessful = }\FunctionTok{String}\NormalTok{(}\OtherTok{xhr}\NormalTok{.}\FunctionTok{status}\NormalTok{)[}\DecValTok{0}\NormalTok{] == }\DecValTok{2}\NormalTok{;}
+      
+      \KeywordTok{switch}\NormalTok{( }\OtherTok{xhr}\NormalTok{.}\FunctionTok{readyState} \NormalTok{) \{}
+               
+         \KeywordTok{case} \DecValTok{2}\NormalTok{:       }
          
-         \KeywordTok{if}\NormalTok{( sucessful ) \{}
-            \CommentTok{// In Chrome 29 (not 28) no onprogress is emitted when a response}
-            \CommentTok{// is complete before the onload. We need to always do handleInput}
-            \CommentTok{// in case we get the load but have not had a final progress event.}
-            \CommentTok{// This looks like a bug and may change in future but let's take}
-            \CommentTok{// the safest approach and assume we might not have received a }
-            \CommentTok{// progress event for each part of the response}
-            \FunctionTok{handleProgress}\NormalTok{();}
+            \FunctionTok{emit}\NormalTok{(}
+               \NormalTok{HTTP_START, }
+               \OtherTok{xhr}\NormalTok{.}\FunctionTok{status}\NormalTok{,}
+               \FunctionTok{parseResponseHeaders}\NormalTok{(}\OtherTok{xhr}\NormalTok{.}\FunctionTok{getAllResponseHeaders}\NormalTok{()) );}
+            \KeywordTok{return}\NormalTok{;}
             
-            \FunctionTok{emit}\NormalTok{( END_OF_CONTENT );}
-         \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
-         
-            \FunctionTok{emit}\NormalTok{( }
-               \NormalTok{ERROR_EVENT, }
-               \FunctionTok{errorReport}\NormalTok{(}
-                  \OtherTok{xhr}\NormalTok{.}\FunctionTok{status}\NormalTok{, }
-                  \OtherTok{xhr}\NormalTok{.}\FunctionTok{responseText}
-               \NormalTok{)}
-            \NormalTok{);}
-         \NormalTok{\}}
+         \KeywordTok{case} \DecValTok{4}\NormalTok{:       }
+            \CommentTok{// is this a 2xx http code?}
+            \KeywordTok{var} \NormalTok{sucessful = }\FunctionTok{String}\NormalTok{(}\OtherTok{xhr}\NormalTok{.}\FunctionTok{status}\NormalTok{)[}\DecValTok{0}\NormalTok{] == }\DecValTok{2}\NormalTok{;}
+            
+            \KeywordTok{if}\NormalTok{( sucessful ) \{}
+               \CommentTok{// In Chrome 29 (not 28) no onprogress is emitted when a response}
+               \CommentTok{// is complete before the onload. We need to always do handleInput}
+               \CommentTok{// in case we get the load but have not had a final progress event.}
+               \CommentTok{// This looks like a bug and may change in future but let's take}
+               \CommentTok{// the safest approach and assume we might not have received a }
+               \CommentTok{// progress event for each part of the response}
+               \FunctionTok{handleProgress}\NormalTok{();}
+               
+               \FunctionTok{emit}\NormalTok{( STREAM_END );}
+            \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
+            
+               \FunctionTok{emit}\NormalTok{( }
+                  \NormalTok{FAIL_EVENT, }
+                  \FunctionTok{errorReport}\NormalTok{(}
+                     \OtherTok{xhr}\NormalTok{.}\FunctionTok{status}\NormalTok{, }
+                     \OtherTok{xhr}\NormalTok{.}\FunctionTok{responseText}
+                  \NormalTok{)}
+               \NormalTok{);}
+            \NormalTok{\}}
       \NormalTok{\}}
    \NormalTok{\};}
 
@@ -4425,7 +4481,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       \CommentTok{// the event could be useful. For both these reasons defer the}
       \CommentTok{// firing to the next JS frame.  }
       \OtherTok{window}\NormalTok{.}\FunctionTok{setTimeout}\NormalTok{(}
-         \FunctionTok{partialComplete}\NormalTok{(emit, ERROR_EVENT, }
+         \FunctionTok{partialComplete}\NormalTok{(emit, FAIL_EVENT, }
              \FunctionTok{errorReport}\NormalTok{(}\KeywordTok{undefined}\NormalTok{, }\KeywordTok{undefined}\NormalTok{, e)}
          \NormalTok{)}
       \NormalTok{,  }\DecValTok{0}
@@ -4437,9 +4493,9 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 
 \pagebreak
 
-\subsection{streamingHttp-node.js}\label{headerux5fstreamingHttp-node}
+\subsection{streamingHttp.node.js}\label{headerux5fstreamingHttp.node}
 
-\label{src_streamingHttp-node}
+\label{src_streamingHttp.node}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4474,12 +4530,12 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       \CommentTok{// use stream in flowing mode   }
       \OtherTok{readableStream}\NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'data'}\NormalTok{, }\KeywordTok{function} \NormalTok{(chunk) \{}
                                              
-         \FunctionTok{emit}\NormalTok{( NEW_CONTENT, }\OtherTok{chunk}\NormalTok{.}\FunctionTok{toString}\NormalTok{() );}
+         \FunctionTok{emit}\NormalTok{( STREAM_DATA, }\OtherTok{chunk}\NormalTok{.}\FunctionTok{toString}\NormalTok{() );}
       \NormalTok{\});}
       
       \OtherTok{readableStream}\NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'end'}\NormalTok{, }\KeywordTok{function}\NormalTok{() \{}
                
-         \FunctionTok{emit}\NormalTok{( END_OF_CONTENT );}
+         \FunctionTok{emit}\NormalTok{( STREAM_END );}
       \NormalTok{\});}
    \NormalTok{\}}
    
@@ -4497,7 +4553,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       \NormalTok{\});}
    \NormalTok{\}}
    
-   \KeywordTok{function} \FunctionTok{fetchUrl}\NormalTok{( url ) \{}
+   \KeywordTok{function} \FunctionTok{fetchHttpUrl}\NormalTok{( url ) \{}
       \KeywordTok{if}\NormalTok{( !}\OtherTok{contentSource}\NormalTok{.}\FunctionTok{match}\NormalTok{(}\OtherTok{/http:}\FloatTok{\textbackslash{}/\textbackslash{}/}\OtherTok{/}\NormalTok{) ) \{}
          \NormalTok{contentSource = }\StringTok{'http://'} \NormalTok{+ contentSource;}
       \NormalTok{\}                           }
@@ -4515,6 +4571,8 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       \OtherTok{req}\NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'response'}\NormalTok{, }\KeywordTok{function}\NormalTok{(res)\{}
          \KeywordTok{var} \NormalTok{statusCode = }\OtherTok{res}\NormalTok{.}\FunctionTok{statusCode}\NormalTok{,}
              \NormalTok{sucessful = }\FunctionTok{String}\NormalTok{(statusCode)[}\DecValTok{0}\NormalTok{] == }\DecValTok{2}\NormalTok{;}
+                                                   
+         \FunctionTok{emit}\NormalTok{(HTTP_START, }\OtherTok{res}\NormalTok{.}\FunctionTok{statusCode}\NormalTok{, }\OtherTok{res}\NormalTok{.}\FunctionTok{headers}\NormalTok{);                                }
                                 
          \KeywordTok{if}\NormalTok{( sucessful ) \{          }
                
@@ -4523,7 +4581,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
          \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
             \FunctionTok{readStreamToEnd}\NormalTok{(res, }\KeywordTok{function}\NormalTok{(errorBody)\{}
                \FunctionTok{emit}\NormalTok{( }
-                  \NormalTok{ERROR_EVENT, }
+                  \NormalTok{FAIL_EVENT, }
                   \FunctionTok{errorReport}\NormalTok{( statusCode, errorBody )}
                \NormalTok{);}
             \NormalTok{\});}
@@ -4532,7 +4590,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       
       \OtherTok{req}\NormalTok{.}\FunctionTok{on}\NormalTok{(}\StringTok{'error'}\NormalTok{, }\KeywordTok{function}\NormalTok{(e) \{}
          \FunctionTok{emit}\NormalTok{( }
-            \NormalTok{ERROR_EVENT, }
+            \NormalTok{FAIL_EVENT, }
             \FunctionTok{errorReport}\NormalTok{(}\KeywordTok{undefined}\NormalTok{, }\KeywordTok{undefined}\NormalTok{, e )}
          \NormalTok{);}
       \NormalTok{\});}
@@ -4550,7 +4608,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \NormalTok{\}}
    
    \KeywordTok{if}\NormalTok{( }\FunctionTok{isString}\NormalTok{(contentSource) ) \{}
-      \FunctionTok{fetchUrl}\NormalTok{(contentSource);}
+      \FunctionTok{fetchHttpUrl}\NormalTok{(contentSource);}
    \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
       \CommentTok{// contentsource is a stream}
       \FunctionTok{readStreamToEventBus}\NormalTok{(contentSource);   }

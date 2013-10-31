@@ -230,8 +230,8 @@
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:snap-global="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1152"
+     inkscape:window-width="1366"
+     inkscape:window-height="724"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -257,7 +257,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -344,7 +344,7 @@
          sodipodi:cy="477.36218"
          sodipodi:rx="22.5"
          sodipodi:ry="20"
-         d="m 270,477.36218 a 22.5,20 0 1 1 -45,0 22.5,20 0 1 1 45,0 z"
+         d="m 270,477.36218 c 0,11.0457 -10.07359,20 -22.5,20 -12.42641,0 -22.5,-8.9543 -22.5,-20 0,-11.04569 10.07359,-20 22.5,-20 12.42641,0 22.5,8.95431 22.5,20 z"
          transform="matrix(1.3224827,0,0,0.9245605,-197.5586,-76.746826)" />
       <text
          xml:space="preserve"
@@ -379,7 +379,7 @@
          sodipodi:cy="257.36218"
          sodipodi:rx="5"
          sodipodi:ry="5"
-         d="m 245,257.36218 a 5,5 0 1 1 -10,0 5,5 0 1 1 10,0 z"
+         d="m 245,257.36218 c 0,2.76143 -2.23858,5 -5,5 -2.76142,0 -5,-2.23857 -5,-5 0,-2.76142 2.23858,-5 5,-5 2.76142,0 5,2.23858 5,5 z"
          transform="translate(-5,0)" />
     </g>
     <g
@@ -645,7 +645,7 @@
            y="259.79041"
            x="410.24414"
            sodipodi:role="line"
-           id="tspan5148">jsonPath</tspan><tspan
+           id="tspan5148">JSONPath</tspan><tspan
            y="272.29041"
            x="410.24414"
            sodipodi:role="line"
@@ -685,7 +685,7 @@
        transform="translate(-50,-3.75)">
       <path
          transform="translate(-77.744141,-152.75879)"
-         d="m 270,477.36218 a 22.5,20 0 1 1 -45,0 22.5,20 0 1 1 45,0 z"
+         d="m 270,477.36218 c 0,11.0457 -10.07359,20 -22.5,20 -12.42641,0 -22.5,-8.9543 -22.5,-20 0,-11.04569 10.07359,-20 22.5,-20 12.42641,0 22.5,8.95431 22.5,20 z"
          sodipodi:ry="20"
          sodipodi:rx="22.5"
          sodipodi:cy="477.36218"
