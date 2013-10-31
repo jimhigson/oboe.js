@@ -590,10 +590,10 @@ content yet.
 
 Get http response headers if we have received them yet. When a parameter name
 is given the named header will be returned, or undefined if it does not exist.
-If no name is given all headers will be returned. 
-These will be available from inside `node`, `path`, `start` or `done` callbacks,
-or after any of those callbacks have been called. If we do not have the headers
-yet, `.header()` will always return `undefined`. 
+When no name is given all headers will be returned as an Object.
+The headers will be available from inside `node`, `path`, `start` or `done` callbacks,
+or after any of those callbacks have been called. If have not recieved the headers
+yet `.header()` returns `undefined`.
 
 ## .root()
 
