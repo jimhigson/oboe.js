@@ -221,7 +221,7 @@ describe("oboe integration (real http)", function() {
 
    it('gives full json to callback when request finishes', function () {
 
-      oboe.doGet(url('static/json/firstTenNaturalNumbers.json'))
+      oboe(url('static/json/firstTenNaturalNumbers.json'))
           .done(whenDoneFn);
 
       waitsFor(doneCalled, 'the request to give full response', ASYNC_TEST_TIMEOUT)
@@ -361,7 +361,8 @@ describe("oboe integration (real http)", function() {
    it('gets all callbacks and they are in correct order', function () {
       var order = [];
    
-      oboe.doPost({
+      oboe({
+         method:'POST',
          url: url('echoBackBody')
       ,  body: {a:'A', b:'B', c:'C'}
       })

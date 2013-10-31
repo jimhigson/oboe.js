@@ -30,8 +30,8 @@ function givenAnOboeInstance(jsonFileName) {
          asserter.isComplete = true;
       } 
        
-      oboeInstance = oboe.doGet( jsonFileName 
-                               ).done(requestComplete);      
+      oboeInstance = oboe( jsonFileName 
+                         ).done(requestComplete);      
                               
       oboeInstance.fail(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.

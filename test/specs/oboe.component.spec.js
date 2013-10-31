@@ -7,7 +7,7 @@ describe("oboe component (sXHR stubbed)", function(){
       expect(function(){      
          function fn(){}
          
-         oboe.doGet('http://example.com/oboez')
+         oboe('http://example.com/oboez')
             .path('*', fn).node('*', fn).fail(fn).path('*', fn)
             .path({'*':fn}).node({'*': fn}).path({'*':fn})
             .on('path','*', fn).on('node','*', fn).fail(fn).on('path','*', fn)

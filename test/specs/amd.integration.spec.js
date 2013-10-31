@@ -39,8 +39,7 @@ describe("oboe loaded using require", function() {
             var potentialOboe = this.actual;
             
             return !!(  potentialOboe && 
-                        potentialOboe.doGet && 
-                        potentialOboe.doPost 
+                        potentialOboe('foo.json').node
                      );          
          }
       })

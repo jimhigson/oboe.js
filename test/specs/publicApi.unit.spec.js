@@ -31,7 +31,7 @@ describe("browser api", function(){
          
          it('works via arguments', function(){   
          
-            oboe.doGet('http://example.com/oboez')
+            oboe('http://example.com/oboez')
          
             expect(wire).toHaveBeenCalledWith(
                 'GET',
@@ -43,7 +43,7 @@ describe("browser api", function(){
             
          it('works via options object', function(){   
               
-            oboe.doGet({url: 'http://example.com/oboez'})
+            oboe({url: 'http://example.com/oboez'})
             
             expect(wire).toHaveBeenCalledWith(              
                'GET',
@@ -57,8 +57,9 @@ describe("browser api", function(){
 
             var headers = {'X-HEADER-1':'value1', 'X-HEADER-2':'value2'};
             
-            oboe.doGet({url: 'http://example.com/oboez', 
-                        headers:headers})
+            oboe({url: 'http://example.com/oboez',
+                  method:'GET', 
+                  headers:headers})
             
             expect(wire).toHaveBeenCalledWith(              
                'GET',
@@ -71,20 +72,12 @@ describe("browser api", function(){
       });
       
       describe('delete', function(){
-         it('works via arguments', function(){
-              
-            oboe.doDelete('http://example.com/oboez')
-          
-            expect(wire).toHaveBeenCalledWith(
-               'DELETE',
-               'http://example.com/oboez',
-               undefined
-            )
-         })
+
          
          it('works via options object', function(){   
                
-            oboe.doDelete({url: 'http://example.com/oboez'})
+            oboe({url: 'http://example.com/oboez',
+                  method: 'DELETE'})
             
             expect(wire).toHaveBeenCalledWith(
                'DELETE',
@@ -97,20 +90,13 @@ describe("browser api", function(){
         
             
       describe('post', function(){
-         it('works via arguments', function(){
-               
-            oboe.doPost('http://example.com/oboez', 'my_data')
-            
-            expect(wire).toHaveBeenCalledWith(
-               'POST',
-               'http://example.com/oboez',
-               'my_data'
-            )   
-         })
          
          it('can post an object', function(){
                
-            oboe.doPost('http://example.com/oboez', [1,2,3,4,5])
+            oboe({   method:'POST',
+                     url:'http://example.com/oboez',
+                     body:[1,2,3,4,5]
+            })
             
             expect(wire).toHaveBeenCalledWith(
                'POST',
@@ -119,15 +105,17 @@ describe("browser api", function(){
             )   
          })   
          
-         it('works via options object', function(){   
-               
-            oboe.doPost({url: 'http://example.com/oboez', body:'my_data'})
+         it('can post a string', function(){
+                        
+            oboe({   method:'POST',
+                     url:'http://example.com/oboez',
+                     body:'my_data'
+            })
             
-            expect(wire).toHaveBeenCalledWith(              
+            expect(wire).toHaveBeenCalledWith(
                'POST',
                'http://example.com/oboez',
-               'my_data',
-               undefined
+               'my_data'
             )   
          })   
       });
@@ -135,7 +123,9 @@ describe("browser api", function(){
       describe('put', function(){   
          it('can put a string', function(){
                
-            oboe.doPut('http://example.com/oboez', 'my_data')
+            oboe({   method:'PUT',
+                     url:'http://example.com/oboez', 
+                     'body':'my_data'})
             
             expect(wire).toHaveBeenCalledWith(
                'PUT',
@@ -147,7 +137,9 @@ describe("browser api", function(){
 
       describe('patch', function(){
          it('can patch a string', function(){
-            oboe.doPatch('http://example.com/oboez', 'my_data');
+            oboe({url:'http://example.com/oboez',
+                  body:'my_data',
+                  method:'PATCH');
 
             expect(wire).toHaveBeenCalledWith(
                'PATCH',
