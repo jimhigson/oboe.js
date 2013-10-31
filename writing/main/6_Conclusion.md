@@ -287,4 +287,4 @@ simplest solution.
 
 [^1]: https://npmjs.org/package/get-json
 
-[^2]: [tests/spec/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
+[^2]: In git repository, [test/specs/oboe.performance.spec.js](https://github.com/jimhigson/oboe.js/blob/master/test/specs/oboe.performance.spec.js)
