@@ -1341,10 +1341,7 @@ function instanceController(  emit, on, un,
    function addPathOrNodeCallback( eventId, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern );
-   
-      // Add a new callback adaptor to the eventBus.
-      // This listener first checks that the pattern matches then if it 
-      // does, passes  onto the callback. 
+    
       on( eventId, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );

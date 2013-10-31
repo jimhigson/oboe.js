@@ -70,30 +70,28 @@ function instanceController(  emit, on, un,
     
       on( eventId, function handler( ascent ){ 
  
-         var maybeMatchingMapping = matchesJsonPath( ascent );
+         matchesJsonPath( ascent, function( matchingMapping ){
+            /* Possible values for maybeMatchingMapping are now:
+               
+               an object/array/string/number/null: 
+                  we matched and have the node that matched.
+                  Because nulls are valid json values this can be null.
      
-         /* Possible values for maybeMatchingMapping are now:
+               undefined: 
+                  we matched but don't have the matching node yet.
+                  ie, we know there is an upcoming node that matches but we 
+                  can't say anything else about it. 
+            */   
+            if( !notifyCallback(callback, matchingMapping, ascent) ) {
 
-            false: 
-               we did not match 
-  
-            an object/array/string/number/null: 
-               we matched and have the node that matched.
-               Because nulls are valid json values this can be null.
-  
-            undefined: 
-               we matched but don't have the matching node yet.
-               ie, we know there is an upcoming node that matches but we 
-               can't say anything else about it. 
-         */
-         if( maybeMatchingMapping !== false ) {                                 
-
-            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
-            
+               // TODO: how to deregister future matching?
+               // or is it ok for .forget() not to cover nodes which were
+               // already parsed (but not matched) when it was called?
+               // might want to change .forget() to .deregister()
                un(eventId, handler);
             }
-         }
-      });   
+         });
+      });
    }   
    
    function notifyCallback(callback, matchingMapping, ascent) {

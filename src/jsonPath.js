@@ -12,7 +12,7 @@
  */  
 // the call to jsonPathSyntax injects the token syntaxes that are needed 
 // inside the compiler
-var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax, 
+var jsonPathCompiler = jsonPathSyntax(function (namedNodeSyntax, 
                                                 doubleDotSyntax, 
                                                 dotSyntax,
                                                 bangSyntax,
@@ -70,6 +70,31 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 
       return lazyIntersection(isMatch, previousExpr);
    }
+
+   /**
+    * 
+    * @param previousExpr
+    * @param _detection
+    */
+   function lastOfArrayClause(previousExpr, _detection) {
+
+      var isLastItemInArray =  function( mapping ){
+         var node = nodeOf(mapping),
+             parentNode = head(tail(mapping));
+             
+         if( !parentNode._oboe.isComplete ) {
+            on(NODE_FOUND + pathTo(parentNode));
+         }                      
+      };
+      
+      // this is undecidable until the parent node is complete.
+      //    could we here listen for that node becoming complete?
+      //
+      //    need to split node_found and node_matched events out.
+      //    ie: on(NODE_FOUND + pathTo(parentNode));
+
+      return lazyIntersection(isLastItemInArray, previousExpr);
+   }   
 
    /**
     * Expression for $, returns the evaluator function
@@ -290,10 +315,15 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     */     
    var clauseForJsonPath = lazyUnion(
 
-      clauseMatcher(pathNodeSyntax   , list( capture, 
+      clauseMatcher(namedNodeSyntax  , list( capture, 
                                              duckTypeClause, 
                                              nameClause, 
                                              skip1 ))
+                                      
+   ,  clauseMatcher(lastOfArraySyntax , list(capture,
+                                             lastOfArrayClause,
+                                             skip1))                                             
+                                             
                                                      
    ,  clauseMatcher(doubleDotSyntax  , list( skipMany))
        
