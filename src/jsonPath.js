@@ -216,14 +216,17 @@ var jsonPathCompiler = jsonPathSyntax(function (namedNodeSyntax,
     * Handles the case where the capturing is implicit because the JSONPath
     * did not contain a '$' by returning the last node.
     */   
-   function statementExpr(lastClause) {
+   function statementExpr(lastClause, callback) {
       
       return function(ascent) {
    
          // kick off the evaluation by passing through to the last clause
          var exprMatch = lastClause(ascent);
                                                      
-         return exprMatch === true ? head(ascent) : exprMatch;
+         if( exprMatch ) {
+                                                              
+            callback( exprMatch === true ? head(ascent) : exprMatch );
+         }
       };
    }      
                           
