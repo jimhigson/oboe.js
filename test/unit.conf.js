@@ -19,7 +19,7 @@ module.exports = function(config) {
       ,  'src/libs/clarinet.js'
       ,  'src/clarinetListenerAdaptor.js'
       ,  'src/parseResponseHeaders.browser.js'      
-      ,  'src/streamingHttp-browser.js'
+      ,  'src/streamingHttp.browser.js'
       ,  'src/jsonPathSyntax.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'

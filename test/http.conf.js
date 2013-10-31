@@ -18,7 +18,7 @@ module.exports = function(config) {
       ,  'src/functional.js'                  
       ,  'src/util.js'
       ,  'src/parseResponseHeaders.browser.js'           
-      ,  'src/streamingHttp-browser.js'      
+      ,  'src/streamingHttp.browser.js'      
       
             
       ,  'test/specs/streamingHttp.integration.spec.js'
