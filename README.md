@@ -478,22 +478,17 @@ Start a new AJAX request by calling one of these methods:
 
 ```js
    oboe( String url ) // makes a GET request
-   
-   oboe.doGet(    String url )
-   oboe.doPut(    String url, String|Object body )
-   oboe.doPatch(  String url, String|Object body )
-   oboe.doPost(   String url, String|Object body )
-   oboe.doDelete( String url )
-   
-// the calls above alternatively accept an options object:
-   oboe.doPost({
+         
+   oboe({
       url: String,
+      method: String
       body: Object|String,
       headers:{ key: value }
    })         
 ```
 
-Any of the above methods work under Node.js, or you can read from any stream:
+The above is supported under Browsers or Node.js. Under Node you can also
+read from arbitrary streams:
 
 ```js
    oboe( ReadableStream source ) // node.js only
