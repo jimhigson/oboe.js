@@ -477,14 +477,14 @@ var oboe = require('oboe')
 Start a new AJAX request by calling one of these methods:
 
 ```js
-   oboe( String url ) // makes a GET request
-         
-   oboe({
-      url: String,
-      method: String  // defaults to GET
-      body: Object|String,
-      headers:{ key: value, ... }
-   })         
+oboe( String url ) // makes a GET request
+      
+oboe({
+   url: String,
+   method: String  // defaults to GET
+   body: Object|String,
+   headers:{ key: value, ... }
+})         
 ```
 
 If a body is given as an object it will be serialised using JSON.stringify
@@ -494,7 +494,7 @@ The above are supported under Browsers or Node.js. Under Node you can also
 give Oboe a [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable):
 
 ```js
-   oboe( ReadableStream source ) // Node.js only
+oboe( ReadableStream source ) // Node.js only
 ``` 
 
 When reading from a stream http headers and status code will not be available
@@ -505,24 +505,27 @@ via the `start` event or the `.header()` method.
 When you make a request the returned Oboe instance exposes a few chainable methods:
 
 ```js
-   .node( String pattern, 
-          Function callback(node, String[] path, Object[] ancestors), 
-          callbackContext )
-   
-   .on( 'node', 
-        String pattern, 
-        Function callback(node, String[] path, Object[] ancestors), 
-        callbackContext )
+.node( String pattern, 
+       Function callback(node, String[] path, Object[] ancestors), 
+       [callbackContext]
+)
+
+.on( 'node', 
+     String pattern, 
+     Function callback(node, String[] path, Object[] ancestors), 
+     [callbackContext]
+)
 ```
 
 Listening for nodes registers an interest in JSON nodes which match the given pattern so 
 that when the pattern is matched the callback is given the matching node.
 Inside the callback `this` will usually be the Oboe instance but this can be
-overridden by giving the callbackContext parameter.
+overridden by giving a callbackContext parameter.
 
 The parameters to callback are:
 
- * `node` - the node that was found in the JSON stream 
+ * `node` - the node that was found in the JSON stream. This can be any valid
+      JSON type - `Array`, `Object`, `String`, `true`, `false` or `null`. 
  * `path` - an array of strings describing the path from the root of the JSON to
    the location where the node was found
  * `ancestors` - an array of node's ancestors. `ancestors[ancestors.length-1]`
@@ -530,14 +533,16 @@ The parameters to callback are:
    and so on. 
    
 ```js
-   .path( String pattern, 
-          Function callback( thingFound, String[] path, Object[] ancestors), 
-          context)
-   
-   .on( 'path', 
-        String pattern, 
-        Function callback(thingFound, String[] path, Object[] ancestors), 
-        context )
+.path( String pattern, 
+       Function callback( thingFound, String[] path, Object[] ancestors), 
+       [callbackContext]
+)
+
+.on( 'path', 
+     String pattern, 
+     Function callback(thingFound, String[] path, Object[] ancestors), 
+     [callbackContext]
+)
 ```
 
 `.path()` is the same as `.node()` except the callback is fired when we know about the matching *path*,
@@ -546,35 +551,35 @@ before we know about the thing at the path.
 Alternatively, several patterns may be registered at once using either `.path` or `.node`:
 
 ```js
-   .node({
-      pattern : callback,
-      pattern : callback
-   });
-   
-   .path({
-      pattern : callback,
-      pattern : callback
-   });
+.node({
+   pattern1 : Function callback,
+   pattern2 : Function callback
+});
+
+.path({
+   pattern3 : Function callback,
+   pattern4 : Function callback
+});
 ``` 
 
 ## .done()
 
 ```js
-   .done(callback(Object json))
-   
-   .on('done', callback(Object json))
+.done(Function callback(Object wholeJson))
+
+.on('done', Function callback(Object wholeJson))
 ```
 
 Register a callback for when the response is complete. Gets passed the entire 
-JSON. Usually it is better to read the json in 
-small parts than waiting for it to completely download.
+JSON. Usually it is better to read the json in small parts than waiting for it
+to completely download but this is there when you need the whole picture.
 
 ## .start()
 
 ```js
-   .start(callback(Object json))
-   
-   .on('start', callback(Number statusCode, Object headers))
+.start(Function callback(Object json))
+
+.on('start', Function callback(Number statusCode, Object headers))
 ```
 
 Registers a listener for when the http response starts. When the
@@ -584,9 +589,9 @@ content yet.
 ## .header([name])
 
 ```js
-   .header()
-   
-   .header(name)      
+.header()
+
+.header(name)
 ```
 
 Get http response headers if we have received them yet. When a parameter name
@@ -599,7 +604,7 @@ yet `.header()` returns `undefined`.
 ## .root()
 
 ```js
-   .root()
+.root()
 ```
 
 At any time, call .root() on the oboe instance to get the JSON received so far. 
