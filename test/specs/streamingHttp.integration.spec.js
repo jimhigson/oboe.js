@@ -10,7 +10,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                         
          emit, on,
-         new XMLHttpRequest(),
+         httpTransport(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
          null // this is a GET, no data to send
@@ -19,17 +19,18 @@ describe('streaming xhr integration (real http)', function() {
       waitForRequestToComplete();            
 
       runs(function(){
-         expect(contentReceived).toParseTo({}); 
+         expect(emit).toHaveGivenStreamEventsInCorrectOrder()
+         expect(contentReceived).toParseTo({}) 
       });  
    })
    
-   it('can get http headers',  function() {
+   it('fires HTTP_START with status and headers',  function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                         
          emit, on,
-         new XMLHttpRequest(),
+         httpTransport(),
          'GET', 
          '/testServer/echoBackHeadersAsHeaders',
          null, // this is a GET, no data to send
@@ -45,10 +46,30 @@ describe('streaming xhr integration (real http)', function() {
                200,
                jasmine.objectContaining({specialheader:'specialValue'}
             )
-         ); 
+         );          
       });  
-   })   
-              
+   })
+   
+   it('fires HTTP_START, STREAM_DATA and STREAM_END in correct order',  function() {
+     
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingHttp(                         
+         emit, on,
+         httpTransport(),
+         'GET', 
+         '/testServer/echoBackHeadersAsHeaders',
+         null, // this is a GET, no data to send
+         {'specialheader':'specialValue'}
+      ); 
+      
+      waitForRequestToComplete();            
+
+      runs(function(){
+         expect(emit).toHaveGivenStreamEventsInCorrectOrder()
+      });            
+   })      
+            
    it('can ajax in a very large file without missing any',  function() {
    
   
@@ -56,7 +77,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                         
          emit, on,
-         new XMLHttpRequest(),         
+         httpTransport(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET, no data to send      
@@ -78,16 +99,16 @@ describe('streaming xhr integration (real http)', function() {
       });  
    })
    
-   it('can ajax in a streaming file without missing any',  function(queue) {
+   it('can ajax in a streaming file without missing any',  function() {
    
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
       streamingHttp(                       
          emit, on,
-         new XMLHttpRequest(),         
+         httpTransport(),         
          'GET', 
-         '/testServer/tenSlowNumbers',
+         '/testServer/tenSlowNumbers?withoutMissingAny',
           null // this is a GET, no data to send      
       );
       
@@ -96,10 +117,11 @@ describe('streaming xhr integration (real http)', function() {
       runs(function(){ 
          // as per the name, should have ten numbers in that file:         
          expect(contentReceived).toParseTo([0,1,2,3,4,5,6,7,8,9]);
+         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
       });              
    }) 
    
-   it('can make a post request',  function(queue) {
+   it('can make a post request',  function() {
    
       var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
    
@@ -107,7 +129,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(                        
          emit, on,
-         new XMLHttpRequest(),         
+         httpTransport(),         
          'POST',
          '/testServer/echoBackBody',
          payload       
@@ -117,11 +139,12 @@ describe('streaming xhr integration (real http)', function() {
  
       runs(function(){
          expect(contentReceived).toParseTo(payload);
+         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
       });
      
    })
    
-   it('can make a put request',  function(queue) {
+   it('can make a put request',  function() {
    
       var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
    
@@ -129,7 +152,7 @@ describe('streaming xhr integration (real http)', function() {
       // we'll probably only get one callback         
       streamingHttp(
          emit, on,
-         new XMLHttpRequest(),         
+         httpTransport(),         
          'PUT',
           '/testServer/echoBackBody',
           payload       
@@ -139,42 +162,49 @@ describe('streaming xhr integration (real http)', function() {
 
       runs(function(){
          expect(contentReceived).toParseTo(payload);
+         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
       });
      
    }) 
 
-   it('can make a patch request',  function(queue) {
+   if( !internetExplorer ) {
+      // IE seems to have problems with PATCH requests. Nothing I can do to
+      // make it work :-(
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
-   
-      // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback         
-      streamingHttp(
-         emit, on,
-         new XMLHttpRequest(),         
-         'PATCH',
-          '/testServer/echoBackBody',
-          payload       
-      );
+      it('can make a patch request',  function() {
       
-      waitForRequestToComplete();            
-
-      runs(function(){
-         expect(contentReceived).toParseTo(payload);
-      });
-     
-   })   
+         var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+      
+         // in practice, since we're running on an internal network and this is a small file,
+         // we'll probably only get one callback         
+         streamingHttp(
+            emit, on,
+            httpTransport(),         
+            'PATCH',
+             '/testServer/echoBackBody',
+             payload       
+         );
+         
+         waitForRequestToComplete();            
+   
+         runs(function(){
+            expect(contentReceived).toParseTo(payload)
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder()            
+         });
+        
+      })
+   }   
           
    // this test is only activated for non-IE browsers and IE 10 or newer.
    // old and rubbish browsers buffer the xhr response meaning that this 
    // will never pass. But for good browsers it is good to have an integration
    // test to confirm that we're getting it right.           
    if( !internetExplorer || internetExplorer >= 10 ) {          
-      it('gives multiple callbacks when loading a streaming resource',  function(queue) {
+      it('gives multiple callbacks when loading a streaming resource',  function() {
                               
          streamingHttp(                           
             emit, on,
-            new XMLHttpRequest(),            
+            httpTransport(),            
             'GET',
 
             '/testServer/tenSlowNumbers',
@@ -187,15 +217,16 @@ describe('streaming xhr integration (real http)', function() {
                                    
             // realistically, should have had 10 or 20, but this isn't deterministic so
             // 3 is enough to indicate the results didn't all arrive in one big blob.
-            expect(numberOfProgressCallbacks).toBeGreaterThan(3);
+            expect(numberOfProgressCallbacks).toBeGreaterThan(3)
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder()            
          });      
       })
                      
-      it('gives multiple callbacks when loading a gzipped streaming resource',  function(queue) {
+      it('gives multiple callbacks when loading a gzipped streaming resource',  function() {
                               
          streamingHttp(                           
             emit, on,
-            new XMLHttpRequest(),            
+            httpTransport(),            
             'GET',
  
             '/testServer/gzippedTwoHundredItems',
@@ -206,18 +237,19 @@ describe('streaming xhr integration (real http)', function() {
    
          runs(function(){
             expect(numberOfProgressCallbacks).toBeGreaterThan(1);
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder();
          });      
       })      
    }
    
-   it('does not call back with zero-length data',  function(queue) {
+   it('does not call back with zero-length data',  function() {
                          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
       streamingHttp(              
          emit, on,
-         new XMLHttpRequest(),         
+         httpTransport(),         
          'GET', 
-         '/testServer/static/json/twentyThousandRecords.json',
+         '/testServer/static/json/oneHundredRecords.json',
          null // this is a GET: no data to send      
       );         
 
@@ -243,7 +275,11 @@ describe('streaming xhr integration (real http)', function() {
    
    function waitForRequestToComplete(){
       waitsFor(function(){     
-         return requestCompleteListener.called;      
+         // did we emit with STREAM_END as the event name yet?
+         
+         return emit.calls.some(function( call ){         
+            return call.args[0] == STREAM_END;         
+         });      
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);   
    }
    
@@ -251,9 +287,34 @@ describe('streaming xhr integration (real http)', function() {
       contentReceived = '';      
       numberOfProgressCallbacks = 0;
       dripsReceived = [];
-      requestCompleteListener = sinon.stub();
+      requestCompleteListener = jasmine.createSpy();
             
       this.addMatchers({
+         toHaveGivenStreamEventsInCorrectOrder: function(){
+         
+            var emitSpy = this.actual;
+            
+            var eventsOrder = emitSpy.calls.map(function(call){
+               return call.args[0];
+            });
+            
+            this.message = function(){
+               return 'events not in correct order. We have: [' +
+                        eventsOrder.map(function(event){
+                           switch(event) {
+                              case HTTP_START: return 'start';
+                              case STREAM_DATA: return 'data';
+                              case STREAM_END: return 'end';
+                           }                           
+                        }) 
+                           .join(', ') + ']';
+            };
+            
+            return   eventsOrder[0] === HTTP_START
+                  && eventsOrder[1] === STREAM_DATA
+                  && eventsOrder[eventsOrder.length-1] === STREAM_END;
+         },
+      
          toParseTo:function( expectedObj ){
             
             var normalisedActual;
@@ -287,8 +348,6 @@ describe('streaming xhr integration (real http)', function() {
             contentReceived += eventContent;
             dripsReceived.push(eventContent);
                      
-         } else if( eventName == STREAM_END ) {
-            requestCompleteListener();
          }
       });
       
