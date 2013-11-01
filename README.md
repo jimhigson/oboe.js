@@ -486,16 +486,17 @@ oboe({
    headers:{ key: value, ... }
 })
 
-// DEPRECATED: These forms will be removed for oboe v2.0.0:
-oboe.doGet(    String url )          
-oboe.doGet(    {url:String, headers:{...}} )
-oboe.doDelete( String url )       
-oboe.doDelete( {url:String, headers:{...}} )
-oboe.doPost(   String url, Object|String body )   
+// DEPRECATED: The .doFoo() methods will be removed for oboe v2.0.0:
+oboe.doGet(    String url )
+oboe.doDelete( String url )
+oboe.doPost(   String url, Object|String body )
+oboe.doPut(    String url, Object|String body )
+oboe.doPatch(  String url, Object|String body )              
+
+oboe.doGet(    {url:String, headers:{...}} )       
+oboe.doDelete( {url:String, headers:{...}} )   
 oboe.doPost(   {url:String, headers:{...}, body:Object|String} )
-oboe.doPut(    String url, Object|String body )    
-oboe.doPut(    {url:String, headers:{...}, body:Object|String} )     
-oboe.doPatch(  String url, Object|String body )  
+oboe.doPut(    {url:String, headers:{...}, body:Object|String} )       
 oboe.doPatch(  {url:String, headers:{...}, body:Object|String} )
 ```
 
