@@ -497,13 +497,6 @@ parallel, loosing thread's natural strengths for utilising multiple
 cores. Even if they do, the actual CPU time required in making an http
 request is so short that any concurrent processing is a pyrrhic victory.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics{images/placeholder.png}
-\caption{\textbf{Single-threaded vs multi-threaded scheduling for an
-http aggregator}}
-\end{figure}
-
 Node builds on the model of event-based, asynchronous i/o that was
 established by web browser Javascript execution. Although Javascript in
 a browser may be performing multiple tasks simultaneously, for example
@@ -1954,13 +1947,6 @@ avoided as it opens up the possibility of changes to the environment
 leaking between test cases.
 
 \subsection{Running the tests}\label{running-the-tests}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{images/placeholder.png}
-\caption{\textbf{Relationship between various files and test libraries}
-\emph{other half of sketch from notebook}}
-\end{figure}
 
 The Grunt task runner is used to automate routine tasks such as
 executing the tests and building, configured so that the unit and

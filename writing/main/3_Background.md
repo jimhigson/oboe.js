@@ -97,9 +97,6 @@ parallel, loosing thread's natural strengths for utilising multiple
 cores. Even if they do, the actual CPU time required in making an http
 request is so short that any concurrent processing is a pyrrhic victory.
 
-![**Single-threaded vs multi-threaded scheduling for an http
-aggregator**](images/placeholder.png)
-
 Node builds on the model of event-based, asynchronous i/o that was
 established by web browser Javascript execution. Although Javascript in
 a browser may be performing multiple tasks simultaneously, for example

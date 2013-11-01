@@ -109,9 +109,6 @@ leaking between test cases.
 Running the tests
 -----------------
 
-![**Relationship between various files and test libraries** *other half
-of sketch from notebook*](images/placeholder.png)
-
 The Grunt task runner is used to automate routine tasks such as
 executing the tests and building, configured so that the unit and
 component tests run automatically whenever a change is made to a source
