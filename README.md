@@ -480,10 +480,10 @@ Start a new AJAX request by calling one of these methods:
 oboe( String url ) // makes a GET request
       
 oboe({
+   method: String,  // defaults to GET
    url: String,
-   method: String  // defaults to GET
-   body: Object|String,
-   headers:{ key: value, ... }
+   headers:{ key: value, ... },
+   body: Object|String   
 })
 
 // DEPRECATED: The .doFoo() methods will be removed for oboe v2.0.0:
