@@ -486,7 +486,7 @@ oboe({
    body: Object|String   
 })
 
-// DEPRECATED: The .doFoo() methods will be removed for oboe v2.0.0:
+// DEPRECATED: The oboe.doFoo() methods will be removed for oboe v2.0.0:
 oboe.doGet(    String url )
 oboe.doDelete( String url )
 oboe.doPost(   String url, Object|String body )
