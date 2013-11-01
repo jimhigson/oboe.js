@@ -1,4 +1,4 @@
-\documentclass[]{article}
+\documentclass[12pt, ]{article}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
@@ -23,6 +23,9 @@
 \fi
 % use microtype if available
 \IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+
+\usepackage[margin=3cm]{geometry}
+
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -3436,10 +3439,10 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
       \KeywordTok{return} \NormalTok{keep;          }
    \NormalTok{\}}
 
-   \KeywordTok{function} \FunctionTok{protectedCallback}\NormalTok{( callback, context ) \{}
+   \KeywordTok{function} \FunctionTok{protectedCallback}\NormalTok{( callback ) \{}
       \KeywordTok{return} \KeywordTok{function}\NormalTok{() \{}
          \KeywordTok{try}\NormalTok{\{      }
-            \OtherTok{callback}\NormalTok{.}\FunctionTok{apply}\NormalTok{(context||oboeApi, arguments);   }
+            \OtherTok{callback}\NormalTok{.}\FunctionTok{apply}\NormalTok{(oboeApi, arguments);   }
          \NormalTok{\}}\KeywordTok{catch}\NormalTok{(e)  \{}
          
             \CommentTok{// An error occured during the callback, publish it on the event bus }
@@ -3462,14 +3465,13 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
    \CommentTok{/**}
 \CommentTok{    * implementation behind .onPath() and .onNode()}
 \CommentTok{    */}       
-   \KeywordTok{function} \FunctionTok{addNodeOrPathListenerApi}\NormalTok{( eventId, jsonPathOrListenerMap,}
-                                      \NormalTok{callback, callbackContext )\{}
+   \KeywordTok{function} \FunctionTok{addNodeOrPathListenerApi}\NormalTok{( eventId, jsonPathOrListenerMap, callback )\{}
  
       \KeywordTok{if}\NormalTok{( }\FunctionTok{isString}\NormalTok{(jsonPathOrListenerMap) ) \{}
          \FunctionTok{addPathOrNodeCallback}\NormalTok{( }
             \NormalTok{eventId, }
             \NormalTok{jsonPathOrListenerMap,}
-            \FunctionTok{protectedCallback}\NormalTok{(callback, callbackContext)}
+            \FunctionTok{protectedCallback}\NormalTok{(callback)}
          \NormalTok{);}
       \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
          \FunctionTok{addListenersMap}\NormalTok{(eventId, jsonPathOrListenerMap);}
@@ -3505,7 +3507,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 \CommentTok{    * Construct and return the public API of the Oboe instance to be }
 \CommentTok{    * returned to the calling application}
 \CommentTok{    */}
-   \KeywordTok{return} \NormalTok{oboeApi = \{ }
+   \KeywordTok{return} \NormalTok{oboeApi = \{}
       \DataTypeTok{on    }\NormalTok{:  addListener,   }
       \DataTypeTok{done  }\NormalTok{:  addDoneListener,       }
       \DataTypeTok{node  }\NormalTok{:  }\FunctionTok{partialComplete}\NormalTok{(addNodeOrPathListenerApi, NODE_FOUND),}
@@ -4295,46 +4297,39 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// export public API}
-\KeywordTok{var} \NormalTok{oboe = }\FunctionTok{apiMethod}\NormalTok{(}\StringTok{'GET'}\NormalTok{);}
+\KeywordTok{function} \FunctionTok{apiMethod}\NormalTok{(defaultHttpMethod, arg1, arg2) \{}
+
+   \KeywordTok{if} \NormalTok{(}\OtherTok{arg1}\NormalTok{.}\FunctionTok{url}\NormalTok{) \{}
+
+      \CommentTok{// method signature is:}
+      \CommentTok{//    oboe(\{method:m, url:u, body:b, complete:c, headers:\{...\}\})}
+
+      \KeywordTok{return} \FunctionTok{wire}\NormalTok{(}
+         \NormalTok{(}\OtherTok{arg1}\NormalTok{.}\FunctionTok{method} \NormalTok{|| defaultHttpMethod),}
+         \OtherTok{arg1}\NormalTok{.}\FunctionTok{url}\NormalTok{,}
+         \OtherTok{arg1}\NormalTok{.}\FunctionTok{body}\NormalTok{,}
+         \OtherTok{arg1}\NormalTok{.}\FunctionTok{headers}
+      \NormalTok{);}
+   \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
+
+      \CommentTok{//  simple version for GETs. Signature is:}
+      \CommentTok{//    oboe( url )            }
+      \CommentTok{//                                }
+      \KeywordTok{return} \FunctionTok{wire}\NormalTok{(}
+         \NormalTok{defaultHttpMethod,}
+         \NormalTok{arg1, }\CommentTok{// url}
+         \NormalTok{arg2  }\CommentTok{// body. Deprecated, use \{url:u, body:b\} instead}
+      \NormalTok{);}
+   \NormalTok{\}}
+\NormalTok{\}}
+
+\KeywordTok{var} \NormalTok{oboe = }\FunctionTok{partialComplete}\NormalTok{(apiMethod, }\StringTok{'GET'}\NormalTok{);}
+\CommentTok{// add deprecated methods, to be removed in v2.0.0:}
 \OtherTok{oboe}\NormalTok{.}\FunctionTok{doGet}    \NormalTok{= oboe;}
-\OtherTok{oboe}\NormalTok{.}\FunctionTok{doDelete} \NormalTok{= }\FunctionTok{apiMethod}\NormalTok{(}\StringTok{'DELETE'}\NormalTok{);}
-\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPost}   \NormalTok{= }\FunctionTok{apiMethod}\NormalTok{(}\StringTok{'POST'}\NormalTok{, }\KeywordTok{true}\NormalTok{);}
-\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPut}    \NormalTok{= }\FunctionTok{apiMethod}\NormalTok{(}\StringTok{'PUT'}\NormalTok{, }\KeywordTok{true}\NormalTok{);}
-\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPatch}  \NormalTok{= }\FunctionTok{apiMethod}\NormalTok{(}\StringTok{'PATCH'}\NormalTok{, }\KeywordTok{true}\NormalTok{);}
-
-\KeywordTok{function} \FunctionTok{apiMethod}\NormalTok{(httpMethodName, mayHaveRequestBody) \{}
-               
-   \KeywordTok{return} \KeywordTok{function}\NormalTok{(firstArg) \{}
-
-      \KeywordTok{if} \NormalTok{(}\OtherTok{firstArg}\NormalTok{.}\FunctionTok{url}\NormalTok{) \{}
-
-         \CommentTok{// method signature is:}
-         \CommentTok{//    .doMethod(\{url:u, body:b, complete:c, headers:\{...\}\})}
-
-         \KeywordTok{return} \FunctionTok{wire}\NormalTok{(}
-             \NormalTok{httpMethodName,}
-             \OtherTok{firstArg}\NormalTok{.}\FunctionTok{url}\NormalTok{,}
-             \OtherTok{firstArg}\NormalTok{.}\FunctionTok{body}\NormalTok{,}
-             \OtherTok{firstArg}\NormalTok{.}\FunctionTok{headers}
-         \NormalTok{);}
-      \NormalTok{\} }\KeywordTok{else} \NormalTok{\{}
-
-         \CommentTok{// parameters specified as arguments}
-         \CommentTok{//}
-         \CommentTok{//  if (mayHaveContext == true) method signature is:}
-         \CommentTok{//     .doMethod( url, content )}
-         \CommentTok{//}
-         \CommentTok{//  else it is:}
-         \CommentTok{//     .doMethod( url )            }
-         \CommentTok{//                                }
-         \KeywordTok{return} \FunctionTok{wire}\NormalTok{(}
-             \NormalTok{httpMethodName,}
-             \NormalTok{firstArg, }\CommentTok{// url}
-             \NormalTok{mayHaveRequestBody && arguments[}\DecValTok{1}\NormalTok{]         }\CommentTok{// body}
-         \NormalTok{);}
-      \NormalTok{\}}
-   \NormalTok{\};}
-\NormalTok{\}   }
+\OtherTok{oboe}\NormalTok{.}\FunctionTok{doDelete} \NormalTok{= }\FunctionTok{partialComplete}\NormalTok{(apiMethod, }\StringTok{'DELETE'}\NormalTok{);}
+\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPost}   \NormalTok{= }\FunctionTok{partialComplete}\NormalTok{(apiMethod, }\StringTok{'POST'}\NormalTok{);}
+\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPut}    \NormalTok{= }\FunctionTok{partialComplete}\NormalTok{(apiMethod, }\StringTok{'PUT'}\NormalTok{);}
+\OtherTok{oboe}\NormalTok{.}\FunctionTok{doPatch}  \NormalTok{= }\FunctionTok{partialComplete}\NormalTok{(apiMethod, }\StringTok{'PATCH'}\NormalTok{);}
 \end{Highlighting}
 \end{Shaded}
 

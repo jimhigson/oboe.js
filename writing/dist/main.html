@@ -1534,10 +1534,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
       <span class="kw">return</span> keep;          
    }
 
-   <span class="kw">function</span> <span class="fu">protectedCallback</span>( callback, context ) {
+   <span class="kw">function</span> <span class="fu">protectedCallback</span>( callback ) {
       <span class="kw">return</span> <span class="kw">function</span>() {
          <span class="kw">try</span>{      
-            <span class="ot">callback</span>.<span class="fu">apply</span>(context||oboeApi, arguments);   
+            <span class="ot">callback</span>.<span class="fu">apply</span>(oboeApi, arguments);   
          }<span class="kw">catch</span>(e)  {
          
             <span class="co">// An error occured during the callback, publish it on the event bus </span>
@@ -1560,14 +1560,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
    <span class="co">/**</span>
 <span class="co">    * implementation behind .onPath() and .onNode()</span>
 <span class="co">    */</span>       
-   <span class="kw">function</span> <span class="fu">addNodeOrPathListenerApi</span>( eventId, jsonPathOrListenerMap,
-                                      callback, callbackContext ){
+   <span class="kw">function</span> <span class="fu">addNodeOrPathListenerApi</span>( eventId, jsonPathOrListenerMap, callback ){
  
       <span class="kw">if</span>( <span class="fu">isString</span>(jsonPathOrListenerMap) ) {
          <span class="fu">addPathOrNodeCallback</span>( 
             eventId, 
             jsonPathOrListenerMap,
-            <span class="fu">protectedCallback</span>(callback, callbackContext)
+            <span class="fu">protectedCallback</span>(callback)
          );
       } <span class="kw">else</span> {
          <span class="fu">addListenersMap</span>(eventId, jsonPathOrListenerMap);
@@ -1603,7 +1602,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co">    * Construct and return the public API of the Oboe instance to be </span>
 <span class="co">    * returned to the calling application</span>
 <span class="co">    */</span>
-   <span class="kw">return</span> oboeApi = { 
+   <span class="kw">return</span> oboeApi = {
       <span class="dt">on    </span>:  addListener,   
       <span class="dt">done  </span>:  addDoneListener,       
       <span class="dt">node  </span>:  <span class="fu">partialComplete</span>(addNodeOrPathListenerApi, NODE_FOUND),
@@ -2357,46 +2356,39 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h2><a href="#header_publicApi"><span class="header-section-number">8.11</span> publicApi.js</a></h2>
 <p></p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// export public API</span>
-<span class="kw">var</span> oboe = <span class="fu">apiMethod</span>(<span class="st">&#39;GET&#39;</span>);
+<span class="kw">function</span> <span class="fu">apiMethod</span>(defaultHttpMethod, arg1, arg2) {
+
+   <span class="kw">if</span> (<span class="ot">arg1</span>.<span class="fu">url</span>) {
+
+      <span class="co">// method signature is:</span>
+      <span class="co">//    oboe({method:m, url:u, body:b, complete:c, headers:{...}})</span>
+
+      <span class="kw">return</span> <span class="fu">wire</span>(
+         (<span class="ot">arg1</span>.<span class="fu">method</span> || defaultHttpMethod),
+         <span class="ot">arg1</span>.<span class="fu">url</span>,
+         <span class="ot">arg1</span>.<span class="fu">body</span>,
+         <span class="ot">arg1</span>.<span class="fu">headers</span>
+      );
+   } <span class="kw">else</span> {
+
+      <span class="co">//  simple version for GETs. Signature is:</span>
+      <span class="co">//    oboe( url )            </span>
+      <span class="co">//                                </span>
+      <span class="kw">return</span> <span class="fu">wire</span>(
+         defaultHttpMethod,
+         arg1, <span class="co">// url</span>
+         arg2  <span class="co">// body. Deprecated, use {url:u, body:b} instead</span>
+      );
+   }
+}
+
+<span class="kw">var</span> oboe = <span class="fu">partialComplete</span>(apiMethod, <span class="st">&#39;GET&#39;</span>);
+<span class="co">// add deprecated methods, to be removed in v2.0.0:</span>
 <span class="ot">oboe</span>.<span class="fu">doGet</span>    = oboe;
-<span class="ot">oboe</span>.<span class="fu">doDelete</span> = <span class="fu">apiMethod</span>(<span class="st">&#39;DELETE&#39;</span>);
-<span class="ot">oboe</span>.<span class="fu">doPost</span>   = <span class="fu">apiMethod</span>(<span class="st">&#39;POST&#39;</span>, <span class="kw">true</span>);
-<span class="ot">oboe</span>.<span class="fu">doPut</span>    = <span class="fu">apiMethod</span>(<span class="st">&#39;PUT&#39;</span>, <span class="kw">true</span>);
-<span class="ot">oboe</span>.<span class="fu">doPatch</span>  = <span class="fu">apiMethod</span>(<span class="st">&#39;PATCH&#39;</span>, <span class="kw">true</span>);
-
-<span class="kw">function</span> <span class="fu">apiMethod</span>(httpMethodName, mayHaveRequestBody) {
-               
-   <span class="kw">return</span> <span class="kw">function</span>(firstArg) {
-
-      <span class="kw">if</span> (<span class="ot">firstArg</span>.<span class="fu">url</span>) {
-
-         <span class="co">// method signature is:</span>
-         <span class="co">//    .doMethod({url:u, body:b, complete:c, headers:{...}})</span>
-
-         <span class="kw">return</span> <span class="fu">wire</span>(
-             httpMethodName,
-             <span class="ot">firstArg</span>.<span class="fu">url</span>,
-             <span class="ot">firstArg</span>.<span class="fu">body</span>,
-             <span class="ot">firstArg</span>.<span class="fu">headers</span>
-         );
-      } <span class="kw">else</span> {
-
-         <span class="co">// parameters specified as arguments</span>
-         <span class="co">//</span>
-         <span class="co">//  if (mayHaveContext == true) method signature is:</span>
-         <span class="co">//     .doMethod( url, content )</span>
-         <span class="co">//</span>
-         <span class="co">//  else it is:</span>
-         <span class="co">//     .doMethod( url )            </span>
-         <span class="co">//                                </span>
-         <span class="kw">return</span> <span class="fu">wire</span>(
-             httpMethodName,
-             firstArg, <span class="co">// url</span>
-             mayHaveRequestBody &amp;&amp; arguments[<span class="dv">1</span>]         <span class="co">// body</span>
-         );
-      }
-   };
-}   </code></pre>
+<span class="ot">oboe</span>.<span class="fu">doDelete</span> = <span class="fu">partialComplete</span>(apiMethod, <span class="st">&#39;DELETE&#39;</span>);
+<span class="ot">oboe</span>.<span class="fu">doPost</span>   = <span class="fu">partialComplete</span>(apiMethod, <span class="st">&#39;POST&#39;</span>);
+<span class="ot">oboe</span>.<span class="fu">doPut</span>    = <span class="fu">partialComplete</span>(apiMethod, <span class="st">&#39;PUT&#39;</span>);
+<span class="ot">oboe</span>.<span class="fu">doPatch</span>  = <span class="fu">partialComplete</span>(apiMethod, <span class="st">&#39;PATCH&#39;</span>);</code></pre>
 <p></p>
 </div>
 <div id="header_streamingHttp.browser" class="section level2">
