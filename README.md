@@ -499,8 +499,8 @@ oboe.doPatch(  String url, Object|String body )
 oboe.doPatch(  {url:String, headers:{...}, body:Object|String} )
 ```
 
-If the body is given as an object it will be serialised using JSON.stringify
-before being sent. Method, body and headers are all optional.
+If the body is given as an object it will be serialised using JSON.stringify.
+Method, body and headers arguments are all optional.
 
 The above are supported under Browsers or Node.js. Under Node you can also
 give Oboe a [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable):
