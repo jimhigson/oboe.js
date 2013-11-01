@@ -493,11 +493,11 @@ oboe.doPost(   String url, Object|String body )
 oboe.doPut(    String url, Object|String body )
 oboe.doPatch(  String url, Object|String body )              
 
-oboe.doGet(    {url:String, headers:{...}} )       
-oboe.doDelete( {url:String, headers:{...}} )   
-oboe.doPost(   {url:String, headers:{...}, body:Object|String} )
-oboe.doPut(    {url:String, headers:{...}, body:Object|String} )       
-oboe.doPatch(  {url:String, headers:{...}, body:Object|String} )
+oboe.doGet(    {url:String, headers:{ key: value, ... }} )       
+oboe.doDelete( {url:String, headers:{ key: value, ... }} )   
+oboe.doPost(   {url:String, headers:{ key: value, ... }, body:Object|String} )
+oboe.doPut(    {url:String, headers:{ key: value, ... }, body:Object|String} )       
+oboe.doPatch(  {url:String, headers:{ key: value, ... }, body:Object|String} )
 ```
 
 If the body is given as an object it will be serialised using JSON.stringify.
