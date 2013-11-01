@@ -36,7 +36,7 @@ function copyToMd {
    echo >> $destination         
 }
 
-SOURCE_APPENDIX_MARKDOWN_DIR=main/7b_Appendix_oboe_source
+SOURCE_APPENDIX_MARKDOWN_DIR=markdown/7b_Appendix_oboe_source
 
 rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md
 
@@ -56,7 +56,7 @@ for JS_FILE in $(ls ../src/*.js | sort); do
 done
 
 
-SOURCE_APPENDIX_MARKDOWN_DIR=main/7c_Appendix_benchmarks
+SOURCE_APPENDIX_MARKDOWN_DIR=markdown/7c_Appendix_benchmarks
 
 rm $SOURCE_APPENDIX_MARKDOWN_DIR/*.js.md
 
