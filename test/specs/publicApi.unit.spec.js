@@ -25,14 +25,14 @@ describe("public api", function(){
             var equals = this.env.equals_.bind(this.env);
             
             this.message = function() {
-                 var invertedMessage = "Expected spy " + this.actual.identity + " not to have been called like " + jasmine.pp(expectedArgs) + " but it was.";
-                 var positiveMessage = "";
-                 if (this.actual.callCount === 0) {
-                   positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but it was never called.";
-                 } else {
-                   positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but actual calls were " + jasmine.pp(this.actual.argsForCall).replace(/^\[ | \]$/g, '')
-                 }
-                 return [positiveMessage, invertedMessage];
+               var invertedMessage = "Expected spy " + this.actual.identity + " not to have been called like " + jasmine.pp(expectedArgs) + " but it was.";
+               var positiveMessage = "";
+               if (this.actual.callCount === 0) {
+                  positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but it was never called.";
+               } else {
+                  positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but actual calls were " + jasmine.pp(this.actual.argsForCall).replace(/^\[ | \]$/g, '')
+               }
+               return [positiveMessage, invertedMessage];
             };            
                         
             return actualCalls.some(function( actualCall ){
