@@ -2053,18 +2053,18 @@ function wire (httpMethodName, contentSource, body, headers){
 }
 
 // export public API
-function oboe(firstArg) {
+function apiMethod(defaultHttpMethod, arg1, arg2) {
 
-   if (firstArg.url) {
+   if (arg1.url) {
 
       // method signature is:
       //    oboe({method:m, url:u, body:b, complete:c, headers:{...}})
 
       return wire(
-          (firstArg.method || 'GET'),
-          firstArg.url,
-          firstArg.body,
-          firstArg.headers
+         (arg1.method || defaultHttpMethod),
+         arg1.url,
+         arg1.body,
+         arg1.headers
       );
    } else {
 
@@ -2072,11 +2072,19 @@ function oboe(firstArg) {
       //    oboe( url )            
       //                                
       return wire(
-          'GET',
-          firstArg // url
+         defaultHttpMethod,
+         arg1, // url
+         arg2  // body. Deprecated, use {url:u, body:b} instead
       );
    }
 }
 
+var oboe = partialComplete(apiMethod, 'GET');
+// add deprecated methods, to be removed in v2.0.0:
+oboe.doGet    = oboe;
+oboe.doDelete = partialComplete(apiMethod, 'DELETE');
+oboe.doPost   = partialComplete(apiMethod, 'POST');
+oboe.doPut    = partialComplete(apiMethod, 'PUT');
+oboe.doPatch  = partialComplete(apiMethod, 'PATCH');
 
 ;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error);

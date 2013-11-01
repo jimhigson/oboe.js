@@ -63,8 +63,34 @@ describe("public api", function(){
                undefined,
                headers
             )   
-         })         
+         })       
+         
+         describe('deprecated form', function(){
+            it('can doGet with plain arguments', function(){   
             
+               oboe.doGet('http://example.com/oboez')
+            
+               expect(wire).toHaveBeenCalledLike(
+                   'GET',
+                   'http://example.com/oboez'
+               )
+            })
+            it('can doGet with an object argument', function(){   
+               var headers = {'X-HEADER-1':'value1', 'X-HEADER-2':'value2'};            
+            
+               oboe.doGet({
+                  url:'http://example.com/oboez',
+                  headers:headers
+               })
+            
+               expect(wire).toHaveBeenCalledLike(
+                   'GET',
+                   'http://example.com/oboez',
+                   undefined,
+                   headers
+               )
+            })             
+         });          
       });
       
       describe('delete', function(){
@@ -80,6 +106,29 @@ describe("public api", function(){
                'http://example.com/oboez'
             )   
          })   
+         
+         describe('deprecated form', function(){
+         
+            it('can doDelete with plain arguments', function(){
+                 
+               oboe.doDelete('http://example.com/oboez')
+             
+               expect(wire).toHaveBeenCalledLike(
+                  'DELETE',
+                  'http://example.com/oboez'
+               )
+            })
+            
+            it('can doDelete with object arguments', function(){   
+                  
+               oboe.doDelete({url: 'http://example.com/oboez'})
+               
+               expect(wire).toHaveBeenCalledLike(
+                  'DELETE',
+                  'http://example.com/oboez'
+               )   
+            })
+         })         
       });
         
             
@@ -112,6 +161,35 @@ describe("public api", function(){
                'my_data'
             )   
          })   
+         
+         describe('deprecated form', function(){
+            it('doPost with options object', function(){   
+               var headers = {'X-HEADER-1':'value1', 'X-HEADER-2':'value2'};                 
+                  
+               oboe.doPost({
+                  url: 'http://example.com/oboez', 
+                  body:'my_data',
+                  headers: headers
+               })
+               
+               expect(wire).toHaveBeenCalledLike(              
+                  'POST',
+                  'http://example.com/oboez',
+                  'my_data',
+                   headers
+               )   
+            })
+            it('doPost with plain arguments', function(){   
+                                   
+               oboe.doPost('http://example.com/oboez', 'my_data')
+               
+               expect(wire).toHaveBeenCalledLike(              
+                  'POST',
+                  'http://example.com/oboez',
+                  'my_data'
+               )   
+            })            
+         })                     
       });
       
       describe('put', function(){   
@@ -127,6 +205,30 @@ describe("public api", function(){
                'my_data'
             )   
          })
+         
+         describe('deprecated form', function(){
+            it('can doPut with object', function(){
+                  
+               oboe.doPut({url:'http://example.com/oboez', body:'my_data'})
+               
+               expect(wire).toHaveBeenCalledLike(
+                  'PUT',
+                  'http://example.com/oboez',
+                  'my_data'
+               )   
+            })         
+         
+            it('can doPut with plain arguments', function(){
+                  
+               oboe.doPut('http://example.com/oboez', 'my_data')
+               
+               expect(wire).toHaveBeenCalledLike(
+                  'PUT',
+                  'http://example.com/oboez',
+                  'my_data'
+               )   
+            })            
+         })
       });
 
       describe('patch', function(){
@@ -140,6 +242,30 @@ describe("public api", function(){
                'http://example.com/oboez',
                'my_data'
             )
+         })
+         
+         describe('deprecated form', function(){
+            it('can doPatch with object', function(){
+                  
+               oboe.doPatch({url:'http://example.com/oboez', body:'my_data'})
+               
+               expect(wire).toHaveBeenCalledLike(
+                  'PATCH',
+                  'http://example.com/oboez',
+                  'my_data'
+               )   
+            })         
+         
+            it('can doPatch with plain arguments', function(){
+                  
+               oboe.doPatch('http://example.com/oboez', 'my_data')
+               
+               expect(wire).toHaveBeenCalledLike(
+                  'PATCH',
+                  'http://example.com/oboez',
+                  'my_data'
+               )   
+            })            
          })
       })
       

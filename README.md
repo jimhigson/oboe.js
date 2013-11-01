@@ -484,7 +484,19 @@ oboe({
    method: String  // defaults to GET
    body: Object|String,
    headers:{ key: value, ... }
-})         
+})
+
+// DEPRECATED: These forms will be removed for oboe v2.0.0:
+oboe.doGet(    String url )          
+oboe.doGet(    {url:String, headers:{...}} )
+oboe.doDelete( String url )       
+oboe.doDelete( {url:String, headers:{...}} )
+oboe.doPost(   String url, body )   
+oboe.doPost(   {url:String, headers:{...}, body:Object|String} )
+oboe.doPut(    String url, body )    
+oboe.doPut(    {url:String, headers:{...}, body:Object|String} )     
+oboe.doPatch(  String url, body )  
+oboe.doPatch(  {url:String, headers:{...}, body:Object|String} )
 ```
 
 If a body is given as an object it will be serialised using JSON.stringify
