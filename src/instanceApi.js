@@ -4,8 +4,7 @@ function instanceApi(emit, on, un){
        rootNode, responseHeaders,
        addDoneListener = partialComplete(
                               addNodeOrPathListenerApi, 
-                              NODE_FOUND, 
-                              '!');
+                              'node', '!');
 
    // when the root node is found grab a reference to it for later      
    on(ROOT_FOUND, function(root) {
@@ -16,11 +15,13 @@ function instanceApi(emit, on, un){
       responseHeaders = headers;
    });                              
 
-   function addPathOrNodeCallback( eventId, pattern, callback ) {
+   function addPathOrNodeCallback( type, pattern, callback ) {
    
-      var matchesJsonPath = jsonPathCompiler( pattern );
-    
-      on( eventId, function handler( ascent ){ 
+      var matchesJsonPath = jsonPathCompiler( pattern ),
+                
+          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type];
+          
+      on( underlyingEvent, function handler( ascent ){ 
  
          var maybeMatchingMapping = matchesJsonPath( ascent );
      
@@ -42,7 +43,7 @@ function instanceApi(emit, on, un){
 
             if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
             
-               un(eventId, handler);
+               un(underlyingEvent, handler);
             }
          }
       });   
@@ -124,8 +125,8 @@ function instanceApi(emit, on, un){
    function addListener( eventId, listener ){
          
       switch(eventId) {
-         case NODE_FOUND:
-         case PATH_FOUND:
+         case 'node':
+         case 'path':
             apply(arguments, addNodeOrPathListenerApi);
             break;
             
@@ -148,8 +149,8 @@ function instanceApi(emit, on, un){
    return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
-      node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND),      
+      node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
+      path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(on, HTTP_START),
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),

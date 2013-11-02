@@ -2,21 +2,24 @@
  * This file declares some constants to use as names for event types.
  */
 
-var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature 
-    // in the public API via .on('node', ...) or .on('path', ...)
-    // so these events are strings
-    NODE_FOUND    = 'node',  
-    PATH_FOUND    = 'path',   
-         
-    // these events are never exported so are kept as 
-    // the smallest possible representation, numbers:
+var // the events which are never exported are kept as 
+    // the smallest possible representation, in numbers:
     _S = 0,
-    FAIL_EVENT   = 'fail',    
+
+    // fired whenever a node is found in the JSON:
+    NODE_FOUND    = _S++,
+    // fired whenever a path is found in the JSON:      
+    PATH_FOUND    = _S++,   
+    
+    NODE_MATCHED  = 'node',
+    PATH_MATCHED  = 'path',
+         
+    FAIL_EVENT    = 'fail',    
     ROOT_FOUND    = _S++,    
-    HTTP_START = 'start',
-    STREAM_DATA = _S++,
-    STREAM_END = _S++,
-    ABORTING = _S++;
+    HTTP_START    = 'start',
+    STREAM_DATA   = _S++,
+    STREAM_END    = _S++,
+    ABORTING      = _S++;
     
 function errorReport(statusCode, body, error) {
    try{
