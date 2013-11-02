@@ -229,9 +229,9 @@ describe('instance api',function(){
             
    });
    
-   describe('handles errors in callbacks', function(){
+   describe('when errors occur in callbacks', function(){
    
-      it('emits error event if node callback throws an error', function() {
+      it('is protected from error in node callback', function() {
          var e = "an error";  
          var callback = jasmine.createSpy().andThrow(e);
          var ascent = anAscentMatching('a_pattern');      
@@ -242,10 +242,11 @@ describe('instance api',function(){
             
          emit( NODE_FOUND, ascent)
          
+         expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
       });
       
-      it('emits error event if node callback added via shortcut form throws an error', function() {
+      it('is protected from error in node callback added via shortcut', function() {
          var e = "an error";  
          var callback = jasmine.createSpy().andThrow(e);
          var ascent = anAscentMatching('a_pattern');      
@@ -255,11 +256,12 @@ describe('instance api',function(){
          }).not.toThrow(); 
             
          emit( NODE_FOUND, ascent)
-         
+
+         expect(callback).toHaveBeenCalled()         
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
       });   
       
-      it('emits error event if path callback throws an error', function() {
+      it('is protected from error in path callback', function() {
          var e = "an error";  
          var callback = jasmine.createSpy().andThrow(e);
          var ascent = anAscentMatching('a_pattern');            
@@ -270,10 +272,11 @@ describe('instance api',function(){
             
          emit( PATH_FOUND, ascent)
          
+         expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))   
       });   
    
-      it('emits error event if start callback throws an error', function() {
+      it('is protected from error in start callback', function() {
          var e = "an error";   
          var callback = jasmine.createSpy().andThrow(e);
          var ascent = anAscentMatching('a_pattern');            
@@ -282,16 +285,39 @@ describe('instance api',function(){
             api.on('start', callback);
          }).not.toThrow();        
             
-         emit( HTTP_START, ascent)
+         emit( HTTP_START)
          
+         expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))   
       });   
       
-      it('emits error event if done callback throws an error', function() {
+      it('is protected from error in done callback', function() {
+         var e = "an error";   
+         var callback = jasmine.createSpy().andThrow(e);
+         var ascent = anAscentMatching('!');            
+   
+         expect(function(){   
+            api.done( callback);
+         }).not.toThrow();        
+            
+         emit( NODE_FOUND, ascent)
+         
+         expect(callback).toHaveBeenCalled()
+         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))      
       });
    });
    
-   it('calls done callback on end of document', function() {   
+   it('calls done callback on end of JSON', function() {
+      var callback = jasmine.createSpy(),
+          rootAscent = anAscentMatching('!');
+   
+      api.on('done', callback); 
+   
+      expect(callback).not.toHaveBeenCalled()
+       
+      emit( NODE_FOUND, rootAscent)
+      
+      expect(callback).toHaveBeenCalled()      
    });
       
    it('emits ABORTING when .abort() is called', function() {
