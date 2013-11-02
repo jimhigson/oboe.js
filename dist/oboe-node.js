@@ -1468,7 +1468,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
  */
  
  
-function instanceController(  emit, on, un, 
+function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
    on(STREAM_DATA,         
@@ -1510,9 +1510,7 @@ function instanceController(  emit, on, un,
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
-   };
-   
-   return new instanceApi(emit, on, un, jsonPathCompiler);
+   };   
 }
 /**
  * This file sits just behind the API which is used to attain a new
@@ -1528,11 +1526,13 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
-   return instanceController( 
-               eventBus.emit, eventBus.on, eventBus.un, 
+   instanceController( 
+               eventBus.emit, eventBus.on, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.emit) 
    );
+      
+   return new instanceApi(eventBus.emit, eventBus.on, eventBus.un, jsonPathCompiler);
 }
 
 // export public API

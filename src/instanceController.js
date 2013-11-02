@@ -5,7 +5,7 @@
  */
  
  
-function instanceController(  emit, on, un, 
+function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
    on(STREAM_DATA,         
@@ -47,7 +47,5 @@ function instanceController(  emit, on, un,
       
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
-   };
-   
-   return new instanceApi(emit, on, un, jsonPathCompiler);
+   };   
 }

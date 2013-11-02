@@ -12,9 +12,11 @@ function wire (httpMethodName, contentSource, body, headers){
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
-   return instanceController( 
-               eventBus.emit, eventBus.on, eventBus.un, 
+   instanceController( 
+               eventBus.emit, eventBus.on, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.emit) 
    );
+      
+   return new instanceApi(eventBus.emit, eventBus.on, eventBus.un, jsonPathCompiler);
 }
