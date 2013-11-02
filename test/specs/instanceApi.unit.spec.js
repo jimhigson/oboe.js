@@ -214,23 +214,41 @@ describe('instance api',function(){
    });
    
    it('emits error event if node callback throws an error', function() {
-      var e = "an error";   
+      var e = "an error";  
       var callback = jasmine.createSpy().andThrow(e);
       var ascent = anAscentMatching('a_pattern');      
-   
-      api.on('node', 'a_pattern', callback); 
+
+      expect(function(){   
+         api.on('node', 'a_pattern', callback);
+      }).not.toThrow();           
          
       emit( NODE_FOUND, ascent)
       
       expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
    });
    
+   it('emits error event if node callback added via shortcut form throws an error', function() {
+      var e = "an error";  
+      var callback = jasmine.createSpy().andThrow(e);
+      var ascent = anAscentMatching('a_pattern');      
+   
+      expect(function(){
+         api.on('node', {'a_pattern': callback});
+      }).not.toThrow(); 
+         
+      emit( NODE_FOUND, ascent)
+      
+      expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
+   });   
+   
    it('emits error event if path callback throws an error', function() {
       var e = "an error";  
       var callback = jasmine.createSpy().andThrow(e);
       var ascent = anAscentMatching('a_pattern');            
-   
-      api.on('path', 'a_pattern', callback); 
+
+      expect(function(){   
+         api.on('path', 'a_pattern', callback);
+      }).not.toThrow();          
          
       emit( PATH_FOUND, ascent)
       
@@ -241,8 +259,10 @@ describe('instance api',function(){
       var e = "an error";   
       var callback = jasmine.createSpy().andThrow(e);
       var ascent = anAscentMatching('a_pattern');            
-   
-      api.on('start', callback); 
+
+      expect(function(){   
+         api.on('start', callback);
+      }).not.toThrow();        
          
       emit( HTTP_START, ascent)
       
