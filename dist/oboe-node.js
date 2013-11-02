@@ -127,14 +127,14 @@ function varArgs(fn){
          
    return function(){
    
-      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
+      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
       
           argumentsToFunction = Array.prototype.slice.call(arguments);
           
-      // remove the last n element from the array and append it onto the end of
+      // remove the last n elements from the array and append it onto the end of
       // itself as a sub-array
       argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments)
+         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
       );   
       
       return fn.apply( this, argumentsToFunction );
@@ -1272,71 +1272,23 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
-/**
- * This file implements a light-touch central controller for an instance 
- * of Oboe which provides the methods used for interacting with the instance 
- * from the calling app.
- */
- 
- 
-function instanceController(  emit, on, un, 
-                              clarinetParser, contentBuilderHandlers) {
-  
-   var oboeApi, rootNode, responseHeaders,
+function instanceApi(emit, on, un){
+
+   var oboeApi,
+       rootNode, responseHeaders,
        addDoneListener = partialComplete(
                               addNodeOrPathListenerApi, 
                               NODE_FOUND, 
                               '!');
 
-   // when the root node is found grap a reference to it for later      
+   // when the root node is found grab a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });
    
    on(HTTP_START, function(_statusCode, headers) {
       responseHeaders = headers;
-   });
-                              
-   on(STREAM_DATA,         
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            
-            clarinetParser.write(nextDrip);            
-         } catch(e) { 
-            /* we don't have to do anything here because we always assign
-               a .onerror to clarinet which will have already been called 
-               by the time this exception is thrown. */                
-         }
-      }
-   );
-   
-   /* At the end of the http content close the clarinet parser.
-      This will provide an error if the total content provided was not 
-      valid json, ie if not all arrays, objects and Strings closed properly */
-   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
-   
-
-   /* If we abort this Oboe's request stop listening to the clarinet parser. 
-      This prevents more tokens being found after we abort in the case where 
-      we aborted during processing of an already filled buffer. */
-   on( ABORTING, function() {
-      clarinetListenerAdaptor(clarinetParser, {});
-   });   
-
-   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
-  
-   // react to errors by putting them on the event bus
-   clarinetParser.onerror = function(e) {          
-      emit(
-         FAIL_EVENT, 
-         errorReport(undefined, undefined, e)
-      );
-      
-      // note: don't close clarinet here because if it was not expecting
-      // end of the json it will throw an error
-   };
+   });                              
 
    function addPathOrNodeCallback( eventId, pattern, callback ) {
    
@@ -1375,7 +1327,7 @@ function instanceController(  emit, on, un,
          We're now calling back to outside of oboe where the Lisp-style 
          lists that we are using internally will not be recognised 
          so convert to standard arrays. 
-  
+   
          Also, reverse the order because it is more common to list paths 
          "root to leaf" than "leaf to root" 
       */
@@ -1398,7 +1350,7 @@ function instanceController(  emit, on, un,
       
       return keep;          
    }
-
+   
    function protectedCallback( callback ) {
       return function() {
          try{      
@@ -1411,7 +1363,7 @@ function instanceController(  emit, on, un,
       }   
    }
    
-
+   
    /**
     * Add several listeners at a time, from a map
     */
@@ -1426,7 +1378,7 @@ function instanceController(  emit, on, un,
     * implementation behind .onPath() and .onNode()
     */       
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
- 
+   
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeCallback( 
             eventId, 
@@ -1483,7 +1435,61 @@ function instanceController(  emit, on, un,
       root  :  function rootNodeFunctor() {
                   return rootNode;
                }
+   };   
+}   
+   
+/**
+ * This file implements a light-touch central controller for an instance 
+ * of Oboe which provides the methods used for interacting with the instance 
+ * from the calling app.
+ */
+ 
+ 
+function instanceController(  emit, on, un, 
+                              clarinetParser, contentBuilderHandlers) {
+                                
+   on(STREAM_DATA,         
+      function (nextDrip) {
+         // callback for when a bit more data arrives from the streaming XHR         
+          
+         try {
+            
+            clarinetParser.write(nextDrip);            
+         } catch(e) { 
+            /* we don't have to do anything here because we always assign
+               a .onerror to clarinet which will have already been called 
+               by the time this exception is thrown. */                
+         }
+      }
+   );
+   
+   /* At the end of the http content close the clarinet parser.
+      This will provide an error if the total content provided was not 
+      valid json, ie if not all arrays, objects and Strings closed properly */
+   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
+   
+
+   /* If we abort this Oboe's request stop listening to the clarinet parser. 
+      This prevents more tokens being found after we abort in the case where 
+      we aborted during processing of an already filled buffer. */
+   on( ABORTING, function() {
+      clarinetListenerAdaptor(clarinetParser, {});
+   });   
+
+   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
+  
+   // react to errors by putting them on the event bus
+   clarinetParser.onerror = function(e) {          
+      emit(
+         FAIL_EVENT, 
+         errorReport(undefined, undefined, e)
+      );
+      
+      // note: don't close clarinet here because if it was not expecting
+      // end of the json it will throw an error
    };
+   
+   return new instanceApi(emit, on, un);
 }
 /**
  * This file sits just behind the API which is used to attain a new
