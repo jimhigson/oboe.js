@@ -1,4 +1,4 @@
-function instanceApi(emit, on, un){
+function instanceApi(emit, on, un, jsonPathCompiler){
 
    var oboeApi,
        addDoneListener = partialComplete(
@@ -106,7 +106,7 @@ function instanceApi(emit, on, un){
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
       
-      return this; // chaining
+      return oboeApi; // chaining
    }
       
    /**

@@ -49,5 +49,5 @@ function instanceController(  emit, on, un,
       // end of the json it will throw an error
    };
    
-   return new instanceApi(emit, on, un);
+   return new instanceApi(emit, on, un, jsonPathCompiler);
 }
