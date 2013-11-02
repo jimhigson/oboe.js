@@ -5,6 +5,7 @@ libpeerconnection.log
 *.backup
 .DS_Store
 writing
+dissertation
 src
 examples
 build
