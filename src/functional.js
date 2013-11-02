@@ -22,7 +22,6 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
       }); 
    }),
 
-
 /**
  * Compose zero or more functions:
  * 
@@ -165,3 +164,13 @@ function lazyIntersection(fn1, fn2) {
    };   
 }
 
+/**
+ * A function which does nothing
+ */
+function noop(){}
+
+function functor(val){
+   return function(){
+      return val;
+   }
+}

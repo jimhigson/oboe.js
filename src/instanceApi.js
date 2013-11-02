@@ -1,20 +1,10 @@
 function instanceApi(emit, on, un){
 
    var oboeApi,
-       rootNode, responseHeaders,
        addDoneListener = partialComplete(
                               addNodeOrPathListenerApi, 
                               'node', '!');
-
-   // when the root node is found grab a reference to it for later      
-   on(ROOT_FOUND, function(root) {
-      rootNode = root;   
-   });
-   
-   on(HTTP_START, function(_statusCode, headers) {
-      responseHeaders = headers;
-   });                              
-
+                              
    function addPathOrNodeCallback( type, pattern, callback ) {
    
       var matchesJsonPath = jsonPathCompiler( pattern ),
@@ -142,10 +132,26 @@ function instanceApi(emit, on, un){
       return this; // chaining
    }   
    
+   // some interface methods are only filled in after we recieve
+   // values and are noops before that:          
+   on(ROOT_FOUND, function(root) {
+      oboeApi.root = functor(root);   
+   });
+   
+   on(HTTP_START, function(_statusCode, headers) {
+      oboeApi.header = 
+         function(name) {
+            return name ? headers[name] 
+                        : headers
+                        ;
+         }
+   });
+   
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
-    */
+    */       
+    
    return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
@@ -154,14 +160,8 @@ function instanceApi(emit, on, un){
       start :  partialComplete(on, HTTP_START),
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
-      header:  function(name) {
-                  return name ? responseHeaders && responseHeaders[name] 
-                              : responseHeaders
-                              ;
-               },
-      root  :  function rootNodeFunctor() {
-                  return rootNode;
-               }
+      header:  noop,
+      root  :  noop
    };   
 }   
    
