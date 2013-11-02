@@ -2811,14 +2811,14 @@ function varArgs(fn){
          
    return function(){
    
-      var numberOfVaraibleArguments = arguments.length - numberOfFixedArguments,
+      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
       
           argumentsToFunction = Array.prototype.slice.call(arguments);
           
-      // remove the last n element from the array and append it onto the end of
+      // remove the last n elements from the array and append it onto the end of
       // itself as a sub-array
       argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVaraibleArguments)
+         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
       );   
       
       return fn.apply( this, argumentsToFunction );
@@ -3070,6 +3070,20 @@ function incrementalContentBuilder( emit ) {
 
 \pagebreak
 
+instanceApi.js {#header_instanceApi}
+---
+
+\label{src_instanceApi}
+
+~~~~ {.javascript}
+
+~~~~
+
+
+
+
+\pagebreak
+
 instanceController.js {#header_instanceController}
 ---
 
@@ -3092,7 +3106,7 @@ function instanceController(  emit, on, un,
                               NODE_FOUND, 
                               '!');
 
-   // when the root node is found grap a reference to it for later      
+   // when the root node is found grab a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });

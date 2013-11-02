@@ -1,32 +1,14 @@
 #!/bin/sh
 
-
-
-./scripts/gen_source_appendix
-
-pandoc proposal.md -o main/proposal.html
-
-echo made proposal html
-
 pandoc proposal.md -o main/proposal.pdf
 
 echo made proposal pdf
 
+./scripts/gen_source_appendix
+
 ./scripts/all_markdown > main/main.md
 
 echo made main md 
-
-./scripts/all_markdown | pandoc -s -c buttondown.css -f markdown+autolink_bare_uris --toc --section-divs --default-image-extension=png --number-sections --bibliography=bibliography.json --output=main/main.html
-
-echo made main html
-
-rm main/images/*.png
-cp images/*.png main/images
-
-# step down print-res images to a more sensible size for html files:
-sips -Z 512 main/images/*.png
-
-echo copied and scaled down png images for main html
 
 ./scripts/all_markdown | pandoc -f markdown+autolink_bare_uris --smart --toc --default-image-extension=png --number-sections --bibliography=bibliography.json --template=scripts/mainOboeTemplate --to latex --output=main/main.tex
 

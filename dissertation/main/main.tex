@@ -3038,14 +3038,14 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
          
    \KeywordTok{return} \KeywordTok{function}\NormalTok{()\{}
    
-      \KeywordTok{var} \NormalTok{numberOfVaraibleArguments = }\OtherTok{arguments}\NormalTok{.}\FunctionTok{length} \NormalTok{- numberOfFixedArguments,}
+      \KeywordTok{var} \NormalTok{numberOfVariableArguments = }\OtherTok{arguments}\NormalTok{.}\FunctionTok{length} \NormalTok{- numberOfFixedArguments,}
       
           \NormalTok{argumentsToFunction = }\OtherTok{Array}\NormalTok{.}\OtherTok{prototype}\NormalTok{.}\OtherTok{slice}\NormalTok{.}\FunctionTok{call}\NormalTok{(arguments);}
           
-      \CommentTok{// remove the last n element from the array and append it onto the end of}
+      \CommentTok{// remove the last n elements from the array and append it onto the end of}
       \CommentTok{// itself as a sub-array}
       \OtherTok{argumentsToFunction}\NormalTok{.}\FunctionTok{push}\NormalTok{( }
-         \OtherTok{argumentsToFunction}\NormalTok{.}\FunctionTok{splice}\NormalTok{(numberOfFixedArguments, numberOfVaraibleArguments)}
+         \OtherTok{argumentsToFunction}\NormalTok{.}\FunctionTok{splice}\NormalTok{(numberOfFixedArguments, numberOfVariableArguments)}
       \NormalTok{);   }
       
       \KeywordTok{return} \OtherTok{fn}\NormalTok{.}\FunctionTok{apply}\NormalTok{( }\KeywordTok{this}\NormalTok{, argumentsToFunction );}
@@ -3292,6 +3292,18 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
 
 \pagebreak
 
+\subsection{instanceApi.js}\label{headerux5finstanceApi}
+
+\label{src_instanceApi}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\end{Highlighting}
+\end{Shaded}
+
+\pagebreak
+
 \subsection{instanceController.js}\label{headerux5finstanceController}
 
 \label{src_instanceController}
@@ -3314,7 +3326,7 @@ listing}\label{appendix-ii-oboe.js-source-code-listing}
                               \NormalTok{NODE_FOUND, }
                               \StringTok{'!'}\NormalTok{);}
 
-   \CommentTok{// when the root node is found grap a reference to it for later      }
+   \CommentTok{// when the root node is found grab a reference to it for later      }
    \FunctionTok{on}\NormalTok{(ROOT_FOUND, }\KeywordTok{function}\NormalTok{(root) \{}
       \NormalTok{rootNode = root;   }
    \NormalTok{\});}
