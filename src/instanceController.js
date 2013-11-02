@@ -14,7 +14,7 @@ function instanceController(  emit, on, un,
                               NODE_FOUND, 
                               '!');
 
-   // when the root node is found grap a reference to it for later      
+   // when the root node is found grab a reference to it for later      
    on(ROOT_FOUND, function(root) {
       rootNode = root;   
    });
