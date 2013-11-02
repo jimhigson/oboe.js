@@ -31,7 +31,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            if( !notifyCallback(callback, nodeOf(maybeMatchingMapping), ascent) ) {
             
                un(underlyingEvent, handler);
             }
@@ -39,7 +39,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
       });   
    }   
    
-   function notifyCallback(callback, matchingMapping, ascent) {
+   function notifyCallback(callback, node, ascent) {
       /* 
          We're now calling back to outside of oboe where the Lisp-style 
          lists that we are using internally will not be recognised 
@@ -61,13 +61,13 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          keep = false;
       };           
       
-      callback( nodeOf(matchingMapping), path, ancestors );         
+      callback( node, path, ancestors );         
             
       delete oboeApi.forget;
       
       return keep;          
    }
-   
+      
    function protectedCallback( callback ) {
       return function() {
          try{      
