@@ -79,8 +79,16 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          }      
       }   
    }
-   
-   
+
+   /** 
+    * a version of on which first wraps the callback with
+    * protection against errors being thrown
+    */
+   function safeOn( eventName, callback ){
+      on(eventName, protectedCallback(callback));
+      return oboeApi;
+   }
+      
    /**
     * Add several listeners at a time, from a map
     */
@@ -136,13 +144,12 @@ function instanceApi(emit, on, un, jsonPathCompiler){
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
     */       
-    
    return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
-      start :  partialComplete(on, HTTP_START),
+      start :  partialComplete(safeOn, HTTP_START),
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
       header:  noop,

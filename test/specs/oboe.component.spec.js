@@ -1,21 +1,6 @@
 describe("oboe component (sXHR stubbed)", function(){
 
-  
-   it('has chainable methods that don\'t explode',  function() {
-      // test that nothing forgot to return 'this':
-
-      expect(function(){      
-         function fn(){}
-         
-         oboe('http://example.com/oboez')
-            .path('*', fn).node('*', fn).fail(fn).path('*', fn)
-            .path({'*':fn}).node({'*': fn}).path({'*':fn})
-            .on('path','*', fn).on('node','*', fn).fail(fn).on('path','*', fn)
-            .on('path',{'*':fn}).on('node',{'*': fn}).on('path',{'*':fn});            
-            
-      }).not.toThrow();
-   })
-   
+     
 /*
    a more jasmine-y version of the next test might look like this:
     

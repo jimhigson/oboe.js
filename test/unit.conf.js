@@ -21,6 +21,7 @@ module.exports = function(config) {
       ,  'src/parseResponseHeaders.browser.js'      
       ,  'src/streamingHttp.browser.js'
       ,  'src/jsonPathSyntax.js'
+      ,  'src/ascent.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'
       ,  'src/pubSub.js' 

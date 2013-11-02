@@ -9,9 +9,6 @@
  */
 
 
-var keyOf = attr('key');
-var nodeOf = attr('node');
-
 
 /** 
  * A special value to use in the path list to represent the path 'to' a root 
@@ -95,15 +92,6 @@ function incrementalContentBuilder( emit ) {
       nodeOf( head( ancestorBranches))[key] = node;
    }
 
-   /**
-    * Get a new key->node mapping
-    * 
-    * @param {String|Number} key
-    * @param {Object|Array|String|Number|null} node a value found in the json
-    */
-   function namedNode(key, node) {
-      return {key:key, node:node};
-   }
      
    /**
     * For when we find a new key in the json.
