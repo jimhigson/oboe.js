@@ -278,8 +278,7 @@ describe('instance api',function(){
    
       it('is protected from error in start callback', function() {
          var e = "an error";   
-         var callback = jasmine.createSpy().andThrow(e);
-         var ascent = anAscentMatching('a_pattern');            
+         var callback = jasmine.createSpy().andThrow(e);            
    
          expect(function(){   
             api.on('start', callback);
