@@ -320,7 +320,7 @@ module.exports = function (grunt) {
       'uglify',
       'copy:browserDist'   
    ]);
-   
+         
    grunt.registerTask('browser-build-test',      [
       'karma:single-dev', 
       'karma:single-browser-http',
@@ -328,15 +328,20 @@ module.exports = function (grunt) {
       'karma:single-concat',                                         
       'karma:single-minified',     
       'karma:single-amd'   
-   ]);   
+   ]);
+   
+   grunt.registerTask('build',      [
+      'browser-build',
+      'node-build'      
+   ]);      
    
    // build and run just the integration tests.
    grunt.registerTask('build-integration-test',      [
-      'browser-build',
-      'node-build',   
+      'build',   
       'start-stream-source',
       'karma:single-concat',
-      'jasmine_node_oboe'
+      'jasmine_node_oboe',
+      'dist-sizes'
    ]);
    
    grunt.registerTask('default',      [
