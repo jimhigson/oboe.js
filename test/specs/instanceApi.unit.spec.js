@@ -65,7 +65,7 @@ describe('instance api',function(){
  
    describe('header method', function(){
  
-      it('returns undefined not available', function() {
+      it('returns undefined if not available', function() {
             
          expect( api.header() ).toBeUndefined();         
       });
@@ -94,6 +94,23 @@ describe('instance api',function(){
          
          expect( api.header('x-remainingBathtubs') ).toBeUndefined();   
       });
+   });
+   
+   describe('root method', function(){
+      
+      it('returns undefined if not available', function() {
+            
+         expect( api.root() ).toBeUndefined();         
+      });
+      
+      it('can provide object once available', function() {
+   
+         var root = {I:'am', the:'root'};
+         
+         emit( ROOT_FOUND,  root);
+         
+         expect( api.root() ).toEqual(root);   
+      });      
    });      
  
    describe('node and path callbacks', function(){
