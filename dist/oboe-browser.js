@@ -24,7 +24,6 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
       }); 
    }),
 
-
 /**
  * Compose zero or more functions:
  * 
@@ -167,7 +166,16 @@ function lazyIntersection(fn1, fn2) {
    };   
 }
 
+/**
+ * A function which does nothing
+ */
+function noop(){}
 
+function functor(val){
+   return function(){
+      return val;
+   }
+}
 /**
  * This file defines some loosely associated syntactic sugar for 
  * Javascript programming 
@@ -1183,6 +1191,21 @@ var jsonPathSyntax = (function() {
    }; 
 
 }());
+/**
+ * Get a new key->node mapping
+ * 
+ * @param {String|Number} key
+ * @param {Object|Array|String|Number|null} node a value found in the json
+ */
+function namedNode(key, node) {
+   return {key:key, node:node};
+}
+
+/** get the key of a namedNode */
+var keyOf = attr('key');
+
+/** get the node from a namedNode */
+var nodeOf = attr('node');
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
@@ -1193,9 +1216,6 @@ var jsonPathSyntax = (function() {
  * between calls.
  */
 
-
-var keyOf = attr('key');
-var nodeOf = attr('node');
 
 
 /** 
@@ -1280,15 +1300,6 @@ function incrementalContentBuilder( emit ) {
       nodeOf( head( ancestorBranches))[key] = node;
    }
 
-   /**
-    * Get a new key->node mapping
-    * 
-    * @param {String|Number} key
-    * @param {Object|Array|String|Number|null} node a value found in the json
-    */
-   function namedNode(key, node) {
-      return {key:key, node:node};
-   }
      
    /**
     * For when we find a new key in the json.
@@ -1790,21 +1801,24 @@ function pubSub(){
  * This file declares some constants to use as names for event types.
  */
 
-var // NODE_FOUND, PATH_FOUND and ERROR_EVENT feature 
-    // in the public API via .on('node', ...) or .on('path', ...)
-    // so these events are strings
-    NODE_FOUND    = 'node',  
-    PATH_FOUND    = 'path',   
-         
-    // these events are never exported so are kept as 
-    // the smallest possible representation, numbers:
+var // the events which are never exported are kept as 
+    // the smallest possible representation, in numbers:
     _S = 0,
-    FAIL_EVENT   = 'fail',    
+
+    // fired whenever a node is found in the JSON:
+    NODE_FOUND    = _S++,
+    // fired whenever a path is found in the JSON:      
+    PATH_FOUND    = _S++,   
+    
+    NODE_MATCHED  = 'node',
+    PATH_MATCHED  = 'path',
+         
+    FAIL_EVENT    = 'fail',    
     ROOT_FOUND    = _S++,    
-    HTTP_START = 'start',
-    STREAM_DATA = _S++,
-    STREAM_END = _S++,
-    ABORTING = _S++;
+    HTTP_START    = 'start',
+    STREAM_DATA   = _S++,
+    STREAM_END    = _S++,
+    ABORTING      = _S++;
     
 function errorReport(statusCode, body, error) {
    try{
@@ -1818,31 +1832,25 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
-function instanceApi(emit, on, un){
+function instanceApi(emit, on, un, jsonPathCompiler){
 
    var oboeApi,
-       rootNode, responseHeaders,
        addDoneListener = partialComplete(
                               addNodeOrPathListenerApi, 
-                              NODE_FOUND, 
-                              '!');
-
-   // when the root node is found grab a reference to it for later      
-   on(ROOT_FOUND, function(root) {
-      rootNode = root;   
-   });
+                              'node', '!');
+                              
+   function addPathOrNodeCallback( type, pattern, callback ) {
    
-   on(HTTP_START, function(_statusCode, headers) {
-      responseHeaders = headers;
-   });                              
-
-   function addPathOrNodeCallback( eventId, pattern, callback ) {
-   
-      var matchesJsonPath = jsonPathCompiler( pattern );
-    
-      on( eventId, function handler( ascent ){ 
+      var 
+          compiledJsonPath = jsonPathCompiler( pattern ),
+                
+          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
+          
+          safeCallback = protectedCallback(callback);               
+          
+      on( underlyingEvent, function handler( ascent ){ 
  
-         var maybeMatchingMapping = matchesJsonPath( ascent );
+         var maybeMatchingMapping = compiledJsonPath( ascent );
      
          /* Possible values for maybeMatchingMapping are now:
 
@@ -1860,15 +1868,15 @@ function instanceApi(emit, on, un){
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
             
-               un(eventId, handler);
+               un(underlyingEvent, handler);
             }
          }
       });   
    }   
    
-   function notifyCallback(callback, matchingMapping, ascent) {
+   function notifyCallback(callback, node, ascent) {
       /* 
          We're now calling back to outside of oboe where the Lisp-style 
          lists that we are using internally will not be recognised 
@@ -1890,13 +1898,13 @@ function instanceApi(emit, on, un){
          keep = false;
       };           
       
-      callback( nodeOf(matchingMapping), path, ancestors );         
+      callback( node, path, ancestors );         
             
       delete oboeApi.forget;
       
       return keep;          
    }
-   
+      
    function protectedCallback( callback ) {
       return function() {
          try{      
@@ -1908,8 +1916,16 @@ function instanceApi(emit, on, un){
          }      
       }   
    }
-   
-   
+
+   /** 
+    * a version of on which first wraps the callback with
+    * protection against errors being thrown
+    */
+   function safeOn( eventName, callback ){
+      on(eventName, protectedCallback(callback));
+      return oboeApi;
+   }
+      
    /**
     * Add several listeners at a time, from a map
     */
@@ -1929,58 +1945,53 @@ function instanceApi(emit, on, un){
          addPathOrNodeCallback( 
             eventId, 
             jsonPathOrListenerMap,
-            protectedCallback(callback)
+            callback
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
       
-      return this; // chaining
+      return oboeApi; // chaining
    }
       
    /**
     * implementation behind oboe().on()
     */       
-   function addListener( eventId, listener ){
-         
-      switch(eventId) {
-         case NODE_FOUND:
-         case PATH_FOUND:
-            apply(arguments, addNodeOrPathListenerApi);
-            break;
-            
-         case 'done':
-            addDoneListener(listener);         
-            break;
-            
-         default:
-            // for cases: 'fail', 'start'
-            on(eventId, listener);
-      }                     
-                                               
-      return this; // chaining
-   }   
+   var addListener = varArgs(function( eventId, parameters ){
+
+      return apply(parameters, oboeApi[eventId]);
+   });   
    
+   // some interface methods are only filled in after we recieve
+   // values and are noops before that:          
+   on(ROOT_FOUND, function(root) {
+      oboeApi.root = functor(root);   
+   });
+   
+   on(HTTP_START, function(_statusCode, headers) {
+      oboeApi.header = 
+         function(name) {
+            return name ? headers[name] 
+                        : headers
+                        ;
+         }
+   });
+      
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
-    */
+    */       
    return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
-      node  :  partialComplete(addNodeOrPathListenerApi, NODE_FOUND),
-      path  :  partialComplete(addNodeOrPathListenerApi, PATH_FOUND),      
-      start :  partialComplete(on, HTTP_START),
+      node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
+      path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
+      start :  partialComplete(safeOn, HTTP_START),
+      // fail doesn't use safeOn because that could lead to non-terminating loops
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
-      header:  function(name) {
-                  return name ? responseHeaders && responseHeaders[name] 
-                              : responseHeaders
-                              ;
-               },
-      root  :  function rootNodeFunctor() {
-                  return rootNode;
-               }
+      header:  noop,
+      root  :  noop
    };   
 }   
    
@@ -2035,7 +2046,7 @@ function instanceController(  emit, on, un,
       // end of the json it will throw an error
    };
    
-   return new instanceApi(emit, on, un);
+   return new instanceApi(emit, on, un, jsonPathCompiler);
 }
 /**
  * This file sits just behind the API which is used to attain a new

@@ -220,7 +220,7 @@ describe('instance api',function(){
 
       expect(function(){   
          api.on('node', 'a_pattern', callback);
-      }).not.toThrow();           
+      }).not.toThrow();
          
       emit( NODE_FOUND, ascent)
       

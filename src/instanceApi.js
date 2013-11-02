@@ -7,9 +7,12 @@ function instanceApi(emit, on, un, jsonPathCompiler){
                               
    function addPathOrNodeCallback( type, pattern, callback ) {
    
-      var compiledJsonPath = jsonPathCompiler( pattern ),
+      var 
+          compiledJsonPath = jsonPathCompiler( pattern ),
                 
-          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type];
+          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
+          
+          safeCallback = protectedCallback(callback);               
           
       on( underlyingEvent, function handler( ascent ){ 
  
@@ -31,7 +34,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            if( !notifyCallback(callback, nodeOf(maybeMatchingMapping), ascent) ) {
+            if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
             
                un(underlyingEvent, handler);
             }
@@ -108,7 +111,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          addPathOrNodeCallback( 
             eventId, 
             jsonPathOrListenerMap,
-            protectedCallback(callback)
+            callback
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
@@ -139,7 +142,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
                         ;
          }
    });
-   
+      
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
@@ -150,6 +153,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(safeOn, HTTP_START),
+      // fail doesn't use safeOn because that could lead to non-terminating loops
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
       header:  noop,
