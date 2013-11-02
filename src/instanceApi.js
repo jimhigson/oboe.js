@@ -7,13 +7,13 @@ function instanceApi(emit, on, un){
                               
    function addPathOrNodeCallback( type, pattern, callback ) {
    
-      var matchesJsonPath = jsonPathCompiler( pattern ),
+      var compiledJsonPath = jsonPathCompiler( pattern ),
                 
           underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type];
           
       on( underlyingEvent, function handler( ascent ){ 
  
-         var maybeMatchingMapping = matchesJsonPath( ascent );
+         var maybeMatchingMapping = compiledJsonPath( ascent );
      
          /* Possible values for maybeMatchingMapping are now:
 
@@ -112,25 +112,10 @@ function instanceApi(emit, on, un){
    /**
     * implementation behind oboe().on()
     */       
-   function addListener( eventId, listener ){
-         
-      switch(eventId) {
-         case 'node':
-         case 'path':
-            apply(arguments, addNodeOrPathListenerApi);
-            break;
-            
-         case 'done':
-            addDoneListener(listener);         
-            break;
-            
-         default:
-            // for cases: 'fail', 'start'
-            on(eventId, listener);
-      }                     
-                                               
-      return this; // chaining
-   }   
+   var addListener = varArgs(function( eventId, parameters ){
+
+      return apply(parameters, oboeApi[eventId]);
+   });   
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
