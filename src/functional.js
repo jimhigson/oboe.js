@@ -128,7 +128,7 @@ function varArgs(fn){
       
           argumentsToFunction = Array.prototype.slice.call(arguments);
           
-      // remove the last n element from the array and append it onto the end of
+      // remove the last n elements from the array and append it onto the end of
       // itself as a sub-array
       argumentsToFunction.push( 
          argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
