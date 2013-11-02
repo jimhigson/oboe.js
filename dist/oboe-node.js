@@ -645,6 +645,21 @@ var jsonPathSyntax = (function() {
    }; 
 
 }());
+/**
+ * Get a new key->node mapping
+ * 
+ * @param {String|Number} key
+ * @param {Object|Array|String|Number|null} node a value found in the json
+ */
+function namedNode(key, node) {
+   return {key:key, node:node};
+}
+
+/** get the key of a namedNode */
+var keyOf = attr('key');
+
+/** get the node from a namedNode */
+var nodeOf = attr('node');
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
@@ -655,9 +670,6 @@ var jsonPathSyntax = (function() {
  * between calls.
  */
 
-
-var keyOf = attr('key');
-var nodeOf = attr('node');
 
 
 /** 
@@ -742,15 +754,6 @@ function incrementalContentBuilder( emit ) {
       nodeOf( head( ancestorBranches))[key] = node;
    }
 
-   /**
-    * Get a new key->node mapping
-    * 
-    * @param {String|Number} key
-    * @param {Object|Array|String|Number|null} node a value found in the json
-    */
-   function namedNode(key, node) {
-      return {key:key, node:node};
-   }
      
    /**
     * For when we find a new key in the json.
@@ -1283,7 +1286,7 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
-function instanceApi(emit, on, un){
+function instanceApi(emit, on, un, jsonPathCompiler){
 
    var oboeApi,
        addDoneListener = partialComplete(
@@ -1292,9 +1295,12 @@ function instanceApi(emit, on, un){
                               
    function addPathOrNodeCallback( type, pattern, callback ) {
    
-      var compiledJsonPath = jsonPathCompiler( pattern ),
+      var 
+          compiledJsonPath = jsonPathCompiler( pattern ),
                 
-          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type];
+          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
+          
+          safeCallback = protectedCallback(callback);               
           
       on( underlyingEvent, function handler( ascent ){ 
  
@@ -1316,7 +1322,7 @@ function instanceApi(emit, on, un){
          */
          if( maybeMatchingMapping !== false ) {                                 
 
-            if( !notifyCallback(callback, maybeMatchingMapping, ascent) ) {
+            if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
             
                un(underlyingEvent, handler);
             }
@@ -1324,7 +1330,7 @@ function instanceApi(emit, on, un){
       });   
    }   
    
-   function notifyCallback(callback, matchingMapping, ascent) {
+   function notifyCallback(callback, node, ascent) {
       /* 
          We're now calling back to outside of oboe where the Lisp-style 
          lists that we are using internally will not be recognised 
@@ -1346,13 +1352,13 @@ function instanceApi(emit, on, un){
          keep = false;
       };           
       
-      callback( nodeOf(matchingMapping), path, ancestors );         
+      callback( node, path, ancestors );         
             
       delete oboeApi.forget;
       
       return keep;          
    }
-   
+      
    function protectedCallback( callback ) {
       return function() {
          try{      
@@ -1364,8 +1370,16 @@ function instanceApi(emit, on, un){
          }      
       }   
    }
-   
-   
+
+   /** 
+    * a version of on which first wraps the callback with
+    * protection against errors being thrown
+    */
+   function safeOn( eventName, callback ){
+      on(eventName, protectedCallback(callback));
+      return oboeApi;
+   }
+      
    /**
     * Add several listeners at a time, from a map
     */
@@ -1385,13 +1399,13 @@ function instanceApi(emit, on, un){
          addPathOrNodeCallback( 
             eventId, 
             jsonPathOrListenerMap,
-            protectedCallback(callback)
+            callback
          );
       } else {
          addListenersMap(eventId, jsonPathOrListenerMap);
       }
       
-      return this; // chaining
+      return oboeApi; // chaining
    }
       
    /**
@@ -1416,18 +1430,18 @@ function instanceApi(emit, on, un){
                         ;
          }
    });
-   
+      
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
     */       
-    
    return oboeApi = {
       on    :  addListener,   
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
-      start :  partialComplete(on, HTTP_START),
+      start :  partialComplete(safeOn, HTTP_START),
+      // fail doesn't use safeOn because that could lead to non-terminating loops
       fail  :  partialComplete(on, FAIL_EVENT),
       abort :  partialComplete(emit, ABORTING),
       header:  noop,
@@ -1486,7 +1500,7 @@ function instanceController(  emit, on, un,
       // end of the json it will throw an error
    };
    
-   return new instanceApi(emit, on, un);
+   return new instanceApi(emit, on, un, jsonPathCompiler);
 }
 /**
  * This file sits just behind the API which is used to attain a new
