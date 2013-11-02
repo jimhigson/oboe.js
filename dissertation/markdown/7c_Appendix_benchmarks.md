@@ -1,2 +1,0 @@
-Appendix iii: Benchmarking
-==========================
