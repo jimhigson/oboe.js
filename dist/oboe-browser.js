@@ -882,7 +882,7 @@ else env = window;
     return parser;
   }
 
-})(typeof exports === "undefined" ? clarinet = {} : exports);
+})(clarinet = {});
 
 
 /** 
