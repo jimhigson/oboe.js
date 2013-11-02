@@ -197,7 +197,7 @@ module.exports = function (grunt) {
    ,  exec:{
          // these might not go too well on Windows :-) - get Cygwin.
          reportMinifiedSize:{
-            command: "echo Minified size to Browser is `wc -c < dist/oboe-browser.min.js` bytes" 
+            command: "echo minified size is `wc -c < dist/oboe-browser.min.js` bytes" 
          },
          reportMinifiedAndGzippedSize:{
             command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes - max 5120"
@@ -295,7 +295,6 @@ module.exports = function (grunt) {
    ]);
    
    grunt.registerTask('dist-sizes',   [
-      'exec:reportMinifiedSize',
       'exec:reportMinifiedAndGzippedSize'
    ]);
             
