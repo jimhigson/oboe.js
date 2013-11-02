@@ -1413,7 +1413,19 @@ function instanceApi(emit, on, un, jsonPathCompiler){
     */       
    var addListener = varArgs(function( eventId, parameters ){
 
-      return apply(parameters, oboeApi[eventId]);
+      if( oboeApi[eventId] ) {
+      
+         // event has some special handling:
+         apply(parameters, oboeApi[eventId]);
+      } else {
+      
+         // the even has no special handling, add it direclty to
+         // the event bus:         
+         var listener = parameters[0]; 
+         on(eventId, listener);
+      }
+      
+      return oboeApi;
    });   
    
    // some interface methods are only filled in after we recieve

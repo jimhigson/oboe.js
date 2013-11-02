@@ -306,6 +306,20 @@ describe('instance api',function(){
       });
    });
    
+   it('adds as standard event if unknown event type is listened to', function() {
+      var spy1 = jasmine.createSpy();
+      var spy2 = jasmine.createSpy();
+      
+      expect(function(){         
+         api
+            .on('xyzzy', spy1)
+            .on('end_of_universe', spy2);
+      }).not.toThrow();
+      
+      expect( on ).toHaveBeenCalledWith('xyzzy', spy1);
+      expect( on ).toHaveBeenCalledWith('end_of_universe', spy2);
+   });   
+   
    it('calls done callback on end of JSON', function() {
       var callback = jasmine.createSpy(),
           rootAscent = anAscentMatching('!');
