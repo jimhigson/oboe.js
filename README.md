@@ -14,7 +14,7 @@ http.
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
-	- [Simple download](#a-simple-download)
+	- [A Simple download](#a-simple-download)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
 	- [Hanging up when we have what we need](#hanging-up-when-we-have-what-we-need)
 	- [Detecting strings, numbers](#detecting-strings-numbers)
