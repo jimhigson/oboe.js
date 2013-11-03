@@ -486,7 +486,16 @@ describe("oboe integration (real http)", function() {
       runs( function() {
          expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
       })
-   })            
+   })
+
+   if( !isNode ) {
+      // only worry about this in the browser
+      
+      it( 'hasn\'t put clarinet in the global namespace', function(){
+      
+         expect( window.clarinet ).toBeUndefined();
+      });
+   }            
 
    function someSecondsToPass(waitSecs) {
 
