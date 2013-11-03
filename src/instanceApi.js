@@ -14,7 +14,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
           
           safeCallback = protectedCallback(callback);               
           
-      on( underlyingEvent, function handler( ascent ){ 
+      on( underlyingEvent, function( ascent ){ 
  
          var maybeMatchingMapping = compiledJsonPath( ascent );
      
@@ -36,10 +36,10 @@ function instanceApi(emit, on, un, jsonPathCompiler){
 
             if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
             
-               un(underlyingEvent, handler);
+               un(underlyingEvent, callback);
             }
          }
-      });   
+      }, callback);   
    }   
    
    function notifyCallback(callback, node, ascent) {
