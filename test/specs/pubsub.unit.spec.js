@@ -197,27 +197,41 @@ describe('pub sub', function(){
       expect(listenerA.calls.length).toBe(1);
       expect(listenerA2.calls.length).toBe(2);     
    })
-   
-   it('allows a cleanup function to be called when a listener is removed', function(){
-      var events = pubSub(),
-          cleanup = jasmine.createSpy('cleanup');
-      
-      events.on('eventA', noop,  'toBeRemoved', cleanup);
-            
-      events.un('eventA', 'toBeRemoved');      
 
-      expect(cleanup).toHaveBeenCalled();     
+   it('does not fire removeListener if nothing is removed', function(){
+      var events = pubSub(),   
+          removeListenerListener = jasmine.createSpy('rll');
+   
+      events.on('removeListener', removeListenerListener);
+      
+      events.on('foo', noop);
+      events.un('foo', 'wrong_item');
+      
+      expect(removeListenerListener).not.toHaveBeenCalled();         
+   });
+   
+   it('fires removeListener when a listener is removed', function(){
+      var events = pubSub(),   
+          removeListenerListener = jasmine.createSpy('rll');
+   
+      events.on('removeListener', removeListenerListener);
+      
+      events.on('foo', noop);
+      events.un('foo', noop);
+      
+      expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, noop);     
    })
    
    it('allows a cleanup function to be called when a listener is removed by specifying callback', function(){
-      var events = pubSub(),
-          cleanup = jasmine.createSpy('cleanup');
+      var events = pubSub(),   
+          removeListenerListener = jasmine.createSpy('rll');
+   
+      events.on('removeListener', removeListenerListener);
       
-      events.on('eventA', noop,  null, cleanup);
-            
-      events.un('eventA', noop);      
-
-      expect(cleanup).toHaveBeenCalled();     
+      events.on('foo', noop, 'a');
+      events.un('foo', 'a');
+      
+      expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, 'a');     
    })               
    
    it('handles numberic event codes', function(){

@@ -24,8 +24,8 @@ describe('instance api',function(){
          
          return compiled;
       }
-      
-      api = instanceApi(emit, on, un, jsonPathCompiler);      
+
+      api = instanceApi(bus, jsonPathCompiler);
    });
       
    function anAscentMatching(pattern) {

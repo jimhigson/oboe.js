@@ -9,20 +9,29 @@ function pubSub(){
                              
    return {
 
-      on:function( eventId, listener, idToken, cleanupOnRemove ) {
+      /**
+       * 
+       * @param eventName
+       * @param listener
+       * @param listenerId
+       * @param {Function} cleanupOnRemove if this listener is later 
+       *    removed, a function to call just prior to its removal
+       */
+      on:function( eventName, listener, listenerId, cleanupOnRemove ) {
          
          var tuple = {
             listener: listener
-         ,  id:       idToken || listener
+         ,  id:       listenerId || listener // when no id is given use the
+                                             // listener function as the id
          ,  clean:    cleanupOnRemove  || noop
          };
          
-         listeners[eventId] = cons( tuple, listeners[eventId] );
+         listeners[eventName] = cons( tuple, listeners[eventName] );
 
          return this; // chaining
       },
      
-      emit:varArgs(function ( eventId, parameters ) {
+      emit:varArgs(function ( eventName, parameters ) {
          
          function emitInner(tuple) {                  
             tuple.listener.apply(null, parameters);               
@@ -30,21 +39,32 @@ function pubSub(){
                                                                               
          applyEach( 
             emitInner, 
-            listeners[eventId]
+            listeners[eventName]
          );
       }),
       
-      un: function( eventId, idToken ) {
+      un: function( eventName, listenerId ) {
+             
+         var removed;             
               
-         listeners[eventId] = without(
-            listeners[eventId], 
+         listeners[eventName] = without(
+            listeners[eventName], 
             function(tuple){
-               return tuple.id == idToken;
+               return tuple.id == listenerId;
             },
             function(tuple){
-               tuple.clean();
+               removed = tuple;
             }
-         );         
+         );    
+         
+         if( removed ) {
+            this.emit('removeListener', eventName, removed.listener, removed.id);
+         }     
+      },
+      
+      listeners: function( eventName ){
+      
+         return listeners[eventName];
       }           
    };
 }

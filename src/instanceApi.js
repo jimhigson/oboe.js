@@ -1,46 +1,77 @@
-function instanceApi(emit, on, un, jsonPathCompiler){
+
+function instanceApi(bus, jsonPathCompiler){
 
    var oboeApi,
        addDoneListener = partialComplete(
-                              addNodeOrPathListenerApi, 
+           addNodeOrPathListenerApi, 
                               'node', '!');
-                              
-   function addPathOrNodeCallback( type, pattern, callback ) {
    
-      var 
-          compiledJsonPath = jsonPathCompiler( pattern ),
-                
-          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
-          
-          safeCallback = protectedCallback(callback);               
-          
-      on( underlyingEvent, function( ascent ){ 
- 
-         var maybeMatchingMapping = compiledJsonPath( ascent );
-     
+   
+   function startMatchingPattern(matchEventName, predicateEventName, pattern) {
+
+      var compiledJsonPath = jsonPathCompiler( pattern );
+
+      bus.on(predicateEventName, function (ascent) {
+
+         var maybeMatchingMapping = compiledJsonPath(ascent);
+
          /* Possible values for maybeMatchingMapping are now:
 
-            false: 
-               we did not match 
-  
-            an object/array/string/number/null: 
-               we matched and have the node that matched.
-               Because nulls are valid json values this can be null.
-  
-            undefined: 
-               we matched but don't have the matching node yet.
-               ie, we know there is an upcoming node that matches but we 
-               can't say anything else about it. 
-         */
-         if( maybeMatchingMapping !== false ) {                                 
+          false: 
+          we did not match 
 
-            if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
-            
-               un(underlyingEvent, callback);
-            }
+          an object/array/string/number/null: 
+          we matched and have the node that matched.
+          Because nulls are valid json values this can be null.
+
+          undefined: 
+          we matched but don't have the matching node yet.
+          ie, we know there is an upcoming node that matches but we 
+          can't say anything else about it. 
+          */
+         if (maybeMatchingMapping !== false) {
+
+            bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
          }
-      }, callback);   
+      }, pattern);
+   }                   
+                              
+   function addPathOrNodeListener( type, pattern, callback ) {
+   
+      var predicateEventName = {node:NODE_FOUND, path:PATH_FOUND}[type],
+          matchEventName = type + ':' + pattern,          
+          
+          safeCallback = protectedCallback(callback);
+          
+      if (!bus.listeners(matchEventName)) {          
+         startMatchingPattern(matchEventName, predicateEventName, pattern);
+      }
+      
+      bus.on( matchEventName, function(node, ascent) {
+      
+            if( !notifyCallback(safeCallback, node, ascent) ) {         
+               bus.un(matchEventName, callback);
+            }         
+         
+         }, callback)
+      
+         // if the match even listener is later removed, clean up by removing
+         // the underlying listener if nothing else is using that pattern:
+         .on('removeListener', function(eventName, listenerId){
+         
+            if( eventName == matchEventName && listenerId == callback ) {
+               // if there wasn't another listener as well as this one, remove
+               // the listener above against the underlying pattern      
+               if( bus.listeners( matchEventName )) {
+                  bus.un( predicateEventName, pattern );
+               }
+            }
+         });   
    }   
+   
+   function removePathOrNodeListener( type, pattern, callback ) {
+      bus.un(type + ':' + pattern, callback)
+   }
    
    function notifyCallback(callback, node, ascent) {
       /* 
@@ -78,7 +109,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
+            bus.emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -88,7 +119,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
     * protection against errors being thrown
     */
    function safeOn( eventName, callback ){
-      on(eventName, protectedCallback(callback));
+      bus.on(eventName, protectedCallback(callback));
       return oboeApi;
    }
       
@@ -98,7 +129,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addPathOrNodeCallback(eventId, pattern, listenerMap[pattern]);
+         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -108,7 +139,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeCallback( 
+         addPathOrNodeListener( 
             eventId, 
             jsonPathOrListenerMap,
             callback
@@ -134,7 +165,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
-         on(eventId, listener);
+         bus.on(eventId, listener);
       }
       
       return oboeApi;
@@ -142,11 +173,11 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
-   on(ROOT_FOUND, function(root) {
+   bus.on(ROOT_FOUND, function(root) {
       oboeApi.root = functor(root);   
    });
    
-   on(HTTP_START, function(_statusCode, headers) {
+   bus.on(HTTP_START, function(_statusCode, headers) {
       oboeApi.header = 
          function(name) {
             return name ? headers[name] 
@@ -166,8 +197,8 @@ function instanceApi(emit, on, un, jsonPathCompiler){
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(safeOn, HTTP_START),
       // fail doesn't use safeOn because that could lead to non-terminating loops
-      fail  :  partialComplete(on, FAIL_EVENT),
-      abort :  partialComplete(emit, ABORTING),
+      fail  :  partialComplete(bus.on, FAIL_EVENT),
+      abort :  partialComplete(bus.emit, ABORTING),
       header:  noop,
       root  :  noop
    };   

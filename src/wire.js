@@ -18,5 +18,5 @@ function wire (httpMethodName, contentSource, body, headers){
                incrementalContentBuilder(eventBus.emit) 
    );
       
-   return new instanceApi(eventBus.emit, eventBus.on, eventBus.un, jsonPathCompiler);
+   return new instanceApi(eventBus, jsonPathCompiler);
 }

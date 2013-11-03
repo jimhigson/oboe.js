@@ -335,15 +335,19 @@ function foldR(fn, startValue, list) {
  * Return a list like the one given but with the first instance equal 
  * to item removed 
  */
-function without(list, item) {
+function without(list, test, removedFn) {
  
-  return list  
-            ?  ( head(list) == item 
-                     ? tail(list) 
-                     : cons(head(list), without(tail(list), item))
-               ) 
-            : emptyList
-            ;
+   return withoutInner(list, removedFn || noop);
+ 
+   function withoutInner(subList, removedFn) {
+      return subList  
+         ?  ( test(head(subList)) 
+                  ? (removedFn(head(subList)), tail(subList)) 
+                  : cons(head(subList), withoutInner(tail(subList), removedFn))
+            )
+         : emptyList
+         ;
+   }               
 }
 
 /** 
@@ -353,7 +357,7 @@ function without(list, item) {
 function all(fn, list) {
    
    return !list || 
-          fn(head(list)) && all(fn, tail(list));
+          ( fn(head(list)) && all(fn, tail(list)) );
 }
 
 /**
@@ -363,12 +367,12 @@ function all(fn, list) {
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(args, list) {
+function applyEach(fn, list) {
 
    if( list ) {  
-      apply(args, head(list))
+      fn(head(list))
       
-      applyEach(args, tail(list));
+      applyEach(fn, tail(list));
    }
 }
 
@@ -1219,9 +1223,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 
 });
 
-/**
- * Isn't this the cutest little pub-sub you've ever seen?
- * 
+/** 
  * Over time this should be refactored towards a Node-like
  *    EventEmitter so that under Node an actual EE acn be used.
  *    http://nodejs.org/api/events.html
@@ -1232,23 +1234,42 @@ function pubSub(){
                              
    return {
 
-      on:function( eventId, fn ) {
+      on:function( eventId, listener, idToken, cleanupOnRemove ) {
          
-         listeners[eventId] = cons(fn, listeners[eventId]);
+         var tuple = {
+            listener: listener
+         ,  id:       idToken || listener
+         ,  clean:    cleanupOnRemove  || noop
+         };
+         
+         listeners[eventId] = cons( tuple, listeners[eventId] );
 
          return this; // chaining
-      }, 
-    
+      },
+     
       emit:varArgs(function ( eventId, parameters ) {
-                                             
+         
+         function emitInner(tuple) {                  
+            tuple.listener.apply(null, parameters);               
+         }                    
+                                                                              
          applyEach( 
-            parameters, 
+            emitInner, 
             listeners[eventId]
          );
       }),
       
-      un: function( eventId, handler ) {
-         listeners[eventId] = without(listeners[eventId], handler);
+      un: function( eventId, idToken ) {
+              
+         listeners[eventId] = without(
+            listeners[eventId], 
+            function(tuple){
+               return tuple.id == idToken;
+            },
+            function(tuple){
+               tuple.clean();
+            }
+         );         
       }           
    };
 }
@@ -1420,7 +1441,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          apply(parameters, oboeApi[eventId]);
       } else {
       
-         // the even has no special handling, add it direclty to
+         // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
          on(eventId, listener);
