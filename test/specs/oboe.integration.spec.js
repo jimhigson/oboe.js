@@ -417,6 +417,8 @@ describe("oboe integration (real http)", function() {
       }, 'the request to fail', ASYNC_TEST_TIMEOUT)
    })   
    
+   /*
+   This isn't reliable enough, too many false negatives for a ci
    it('emits error on unreachable url', function () {
      
       var stubCallback = jasmine.createSpy('error callback');
@@ -432,6 +434,7 @@ describe("oboe integration (real http)", function() {
          expect(stubCallback).toHaveBeenGivenAnyError();       
       });
    })
+   */
    
    it('emits error if callback throws a string', function () {
 
