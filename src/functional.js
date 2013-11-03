@@ -119,21 +119,32 @@ function apply(args, fn) {
  */
 function varArgs(fn){
 
-   var numberOfFixedArguments = fn.length -1;
-         
+   var numberOfFixedArguments = fn.length -1,
+       slice = Array.prototype.slice,
+       
+       // we know how many arguments fn will always take, so create a
+       // fixed-size array to hold exactly that many:
+       argsHolder = Array(fn.length);
+                
    return function(){
-   
-      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
+                      
+      var argumentsToFunction = slice.call(arguments);
       
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
+      var numberOfVariableArguments = argumentsToFunction.length - numberOfFixedArguments,
+          i;
+
+      for (i = 0; i < numberOfFixedArguments; i++) {
+         argsHolder[i] = argumentsToFunction[i];         
+      }
+
       // remove the last n elements from the array and append it onto the end of
       // itself as a sub-array
-      argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
-      );   
-      
-      return fn.apply( this, argumentsToFunction );
+      var variableArgs = argsHolder[i] = Array(numberOfVariableArguments);
+      for (i = 0; i < numberOfVariableArguments; i++) {
+         variableArgs[i] = argumentsToFunction[numberOfFixedArguments + i];
+      } 
+             
+      return fn.apply( this, argsHolder);      
    }       
 }
 
