@@ -146,7 +146,7 @@ describe('streaming xhr integration (real http)', function() {
    
    it('can make a put request',  function() {
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+      var payload = {'thisWill':'bePut','andShould':'be','echoed':'back'};
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
@@ -168,12 +168,11 @@ describe('streaming xhr integration (real http)', function() {
    }) 
 
    if( !internetExplorer ) {
-      // IE seems to have problems with PATCH requests. Nothing I can do to
-      // make it work :-(
+      // IE's XHR seems to have problems with PATCH requests :-(
    
       it('can make a patch request',  function() {
       
-         var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+         var payload = {'thisWill':'bePatched','andShould':'be','echoed':'back'};
       
          // in practice, since we're running on an internal network and this is a small file,
          // we'll probably only get one callback         
@@ -188,8 +187,8 @@ describe('streaming xhr integration (real http)', function() {
          waitForRequestToComplete();            
    
          runs(function(){
-            expect(contentReceived).toParseTo(payload)
-            expect(emit).toHaveGivenStreamEventsInCorrectOrder()            
+            expect(contentReceived).toParseTo(payload);
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder();            
          });
         
       })
@@ -288,6 +287,16 @@ describe('streaming xhr integration (real http)', function() {
       numberOfProgressCallbacks = 0;
       dripsReceived = [];
       requestCompleteListener = jasmine.createSpy();
+      
+      function prettyPrintEvent(event){
+
+         switch(event) {
+            case     HTTP_START:  return 'start';
+            case     STREAM_DATA: return 'data';
+            case     STREAM_END:  return 'end';
+            default: return 'unknown(' + event + ')' 
+         }                                    
+      }
             
       this.addMatchers({
          toHaveGivenStreamEventsInCorrectOrder: function(){
@@ -299,15 +308,10 @@ describe('streaming xhr integration (real http)', function() {
             });
             
             this.message = function(){
-               return 'events not in correct order. We have: [' +
-                        eventsOrder.map(function(event){
-                           switch(event) {
-                              case HTTP_START: return 'start';
-                              case STREAM_DATA: return 'data';
-                              case STREAM_END: return 'end';
-                           }                           
-                        }) 
-                           .join(', ') + ']';
+               return 'events not in correct order. We have: ' +
+                        JSON.stringify(
+                           eventsOrder.map(prettyPrintEvent)
+                        )                          
             };
             
             return   eventsOrder[0] === HTTP_START
@@ -317,24 +321,35 @@ describe('streaming xhr integration (real http)', function() {
       
          toParseTo:function( expectedObj ){
             
+            var actual = this.actual;
             var normalisedActual;
-            
+                       
+            if( !actual ) {
+               this.message = function(){
+                  return 'no content has been received';
+               }
+               return false;
+            }                       
+                       
             try{
-               normalisedActual = JSON.stringify( JSON.parse(this.actual) );
+               normalisedActual = JSON.stringify( JSON.parse(actual) );
             }catch(e){
             
                this.message = function(){
-                  return "Expected to be able to parse the found content as json " + this.actual;                  
+                
+                  return "Expected to be able to parse the found " +
+                      "content as json '" + actual + "' but it " +
+                      "could not be parsed";                  
                }
                
-               return false;            
+               return false;          
             }   
             
             this.message = function(){
                return "The found json parsed but did not match " + JSON.stringify(expectedObj) + 
                         " because found " + this.actual; 
             }
-            
+                        
             return (normalisedActual === JSON.stringify(expectedObj));
          }
       });
