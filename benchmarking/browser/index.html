@@ -27,7 +27,8 @@
       // how long to wait at start to give browser a chance to optimise scripts   
       var initialWait = 3000;
       var numberOfRuns = 20; // results seem to get more reliable at about 20 runs            
-      var testName = 'ten big downloads';        
+      var testName = 'ten big downloads';
+      var profile = true;        
       
       // we start with a simple download so that the actual downloading can be
       // taken out of the tests
@@ -52,7 +53,7 @@
                
          window.setTimeout( function() {
          
-            console.profile(testName);
+            profile && console.profile(testName);
             console.time(testName);
                
             perform(numberOfRuns);
@@ -71,10 +72,12 @@
                   nodeCount++;                   
                })
                .done(function(){
-                  console.log('Done.', nodeCount, 'were found', times);
+                  if( nodeCount != 100 ) {
+                     throw "wrong number of matches";
+                  }
                    
                   if( times == 0 ) {
-                     console.profileEnd(testName);            
+                     profile && console.profileEnd(testName);            
                      console.timeEnd(testName);
                   } else {
                      perform(times-1);
