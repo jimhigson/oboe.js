@@ -262,10 +262,8 @@ module.exports = function (grunt) {
          streamSource.stop();
       }
          
-      grunt.log.ok('let\'s get a streaming server started');
       streamSource = require('./test/streamsource.js');
       streamSource.start(STREAM_SOURCE_PORT, grunt);
-      grunt.log.ok('we started it, but does it work?', streamSource);  
    });
 
    grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
