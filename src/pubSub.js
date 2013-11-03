@@ -19,9 +19,9 @@ function pubSub(){
       }, 
     
       emit:varArgs(function ( eventId, parameters ) {
-               
-         each( 
-            partialComplete( apply, parameters ), 
+                                             
+         applyEach( 
+            parameters, 
             listeners[eventId]
          );
       }),

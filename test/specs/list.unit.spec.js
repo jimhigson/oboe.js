@@ -137,20 +137,25 @@ describe("Lists", function(){
       expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
    });
    
-   it('may apply a function with side effects to each item of a list', function(){
+   it('may apply a list of functions with side effects', function(){
    
-      var callback = jasmine.createSpy();
+      var callback1 = jasmine.createSpy(),
+          callback2 = jasmine.createSpy(),
+          callback3 = jasmine.createSpy();
     
-      each( callback, list('a','b','c','d','e','f','g') );
+      applyEach( [1,2,3], list(callback1, callback2, callback3) );
       
-      expect(callback).toHaveBeenCalledWith('a');
-      expect(callback).toHaveBeenCalledWith('b');
-      expect(callback).toHaveBeenCalledWith('c');
-      expect(callback).toHaveBeenCalledWith('d');
-      expect(callback).toHaveBeenCalledWith('e');
-      expect(callback).toHaveBeenCalledWith('f');
-      expect(callback).toHaveBeenCalledWith('g');   
+      expect(callback1).toHaveBeenCalledWith(1, 2, 3);
+      expect(callback2).toHaveBeenCalledWith(1, 2, 3);
+      expect(callback3).toHaveBeenCalledWith(1, 2, 3);   
    });
+   
+   it('may apply a list of zero functions with side effects', function(){
+   
+      expect(function(){
+         applyEach( [1,2,3], list() );
+      }).not.toThrow();         
+   });   
    
    beforeEach(function(){
       this.addMatchers({
