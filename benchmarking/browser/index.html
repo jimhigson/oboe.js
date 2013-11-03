@@ -4,39 +4,85 @@
    <meta charset="utf-8">
    <title>Tiny benchmark for running browser profiler against Oboe</title>
     
-   <script type="text/javascript" src="../../dist/oboe-browser.js" ></script>
+   <script type="text/javascript" src='../../src/functional.js'                  ></script>
+   <script type="text/javascript" src='../../src/util.js'                        ></script>
+   <script type="text/javascript" src='../../src/lists.js'                       ></script>
+   <script type="text/javascript" src='../../src/libs/clarinet.js'               ></script>
+   <script type="text/javascript" src='../../src/clarinetListenerAdaptor.js'     ></script>
+   <script type="text/javascript" src='../../src/parseResponseHeaders.browser.js'></script>
+   <script type="text/javascript" src='../../src/streamingHttp.browser.js'       ></script>
+   <script type="text/javascript" src='../../src/jsonPathSyntax.js'              ></script>
+   <script type="text/javascript" src='../../src/ascent.js'                      ></script>
+   <script type="text/javascript" src='../../src/incrementalContentBuilder.js'   ></script>
+   <script type="text/javascript" src='../../src/jsonPath.js'                    ></script>
+   <script type="text/javascript" src='../../src/pubSub.js'                      ></script>
+   <script type="text/javascript" src='../../src/events.js'                      ></script>
+   <script type="text/javascript" src='../../src/instanceApi.js'                 ></script>
+   <script type="text/javascript" src='../../src/instanceController.js'          ></script>
+   <script type="text/javascript" src='../../src/wire.js'                        ></script>
+   <script type="text/javascript" src='../../src/publicApi.js'                   ></script>
    
    <script type="text/javascript">
-            
-      console.profile('oboe');
-      console.time('oboe');
+         
+      // how long to wait at start to give browser a chance to optimise scripts   
+      var initialWait = 3000;
+      var numberOfRuns = 10;            
+      var testName = 'ten big downloads';        
       
-      function perform(times){
-         // this doesn't give very reliable results because it relies on 
-         // actual AJAXing
+      // we start with a simple download so that the actual downloading can be
+      // taken out of the tests
+      oboe('../../test/json/oneHundredRecords.json')
+         .done(function(jsonObj){
+         
+            runTest( JSON.stringify(jsonObj) );         
+          });
+          
+      function runTest(content) {
       
-         var nodeCount = 0;      
-      
-         oboe('../../test/json/oneHundredRecords.json')
-            .node('!.$result..{age name company}', function(obj){
-            
-               // let's do something to stop smart engines compiling this bit away
-               nodeCount++;                   
-            })
-            .done(function(){
-               console.log('Done.', nodeCount, 'were found', times);
+         // fake the streaming transport to always return the same thing:
+         window.streamingHttp = function fakeStream(emit, on /* ... ignored ... */){
+            window.setTimeout(function(){
+               emit(HTTP_START, 200, {});
+               emit(STREAM_DATA, content);
+               emit(STREAM_END);
+            }, 0);
+         };
+         
+         console.log('will start testing in', initialWait, '...');
                
-               if( times == 0 ) {
-                  console.profileEnd('oboe');            
-                  console.timeEnd('oboe');
-               } else {
-                  perform(times-1);
-               }            
-            });
-      }
-
-      // wait before starting to give browser a chance to optimise scripts:      
-      window.setTimeout( perform.bind(null,10), 3000 );
+         window.setTimeout( function() {
+         
+            console.profile(testName);
+            console.time(testName);
+               
+            perform(numberOfRuns);
+         }, initialWait );         
+      
+         function perform(times){
+             // this doesn't give very reliable results because it relies on 
+             // actual AJAXing which can of course be variable
+          
+            var nodeCount = 0;
+          
+            oboe('any_url')
+               .node('!.$result..{age name company}', function(obj){
+                
+                  // let's do something to stop smart engines compiling this bit away
+                  nodeCount++;                   
+               })
+               .done(function(){
+                  console.log('Done.', nodeCount, 'were found', times);
+                   
+                  if( times == 0 ) {
+                     console.profileEnd(testName);            
+                     console.timeEnd(testName);
+                  } else {
+                     perform(times-1);
+                  }            
+               });
+          }
+          
+      }                    
       
    </script> 
 </head>
