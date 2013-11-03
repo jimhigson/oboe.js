@@ -1,11 +1,16 @@
-/* This is a slightly hacked-up version of clarinet with some
+/* 
+   This is a slightly hacked-up version of clarinet with the
    Node.js specific features removed.
+   
+   For the original go here:
+      https://github.com/dscape/clarinet
  */
 
-;(function (clarinet) {
-  // non node-js needs to set clarinet debug on root
-  var env
-    , fastlist = Array
+var clarinet = (function () {
+
+  var clarinet = {}
+    , env
+    , fastlist = Array    
     ;
 
 if(typeof process === 'object' && process.env) env = process.env;
@@ -493,4 +498,5 @@ else env = window;
     return parser;
   }
 
-})(clarinet = {});
+  return clarinet;
+})();
