@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Tiny benchmark for running browser profiler against Oboe</title>
+    
+   <script type="text/javascript" src="../../dist/oboe-browser.js" ></script>
+   
+   <script type="text/javascript">
+            
+      console.profile('oboe');
+      console.time('oboe');
+      
+      function perform(times){
+         // this doesn't give very reliable results because it relies on 
+         // actual AJAXing
+      
+         var nodeCount = 0;      
+      
+         oboe('../../test/json/oneHundredRecords.json')
+            .node('!.$result..{age name company}', function(obj){
+            
+               // let's do something to stop smart engines compiling this bit away
+               nodeCount++;                   
+            })
+            .done(function(){
+               console.log('Done.', nodeCount, 'were found', times);
+               
+               if( times == 0 ) {
+                  console.profileEnd('oboe');            
+                  console.timeEnd('oboe');
+               } else {
+                  perform(times-1);
+               }            
+            });
+      }
+
+      // wait before starting to give browser a chance to optimise scripts:      
+      window.setTimeout( perform.bind(null,10), 3000 );
+      
+   </script> 
+</head>
+
+<body id="home">
+
+</body>
+</html>
