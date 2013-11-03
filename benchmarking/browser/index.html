@@ -40,14 +40,6 @@
           
       function runTest(content) {
       
-         // fake the streaming transport to always return the same thing:
-         window.streamingHttp = function fakeStream(emit, on /* ... ignored ... */){
-            window.setTimeout(function(){
-               emit(HTTP_START, 200, {});
-               emit(STREAM_DATA, content);
-               emit(STREAM_END);
-            }, 0);
-         };
          
          console.log('will start testing in', initialWait, '...');
                
@@ -64,6 +56,15 @@
              // actual AJAXing which can of course be variable
           
             var nodeCount = 0;
+
+            var emitFn;
+                        
+            // fake the streaming transport to not fetch anything. While we are
+            // here we might as well use this to grab a reference to the event
+            // bus:
+            window.streamingHttp = function fakeStream(emit, on /* ... ignored ... */){
+               emitFn = emit;            
+            };            
           
             oboe('any_url')
                .node('!.$result..{age name company}', function(obj){
@@ -83,7 +84,12 @@
                      perform(times-1);
                   }            
                });
-          }
+               
+            // oboe is wired up, let's start faking the content:                     
+            emitFn(HTTP_START, 200, {});
+            emitFn(STREAM_DATA, content);
+            emitFn(STREAM_END);               
+         }
           
       }                    
       
