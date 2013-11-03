@@ -52,28 +52,45 @@ describe("Lists", function(){
    
    describe('without', function(){
    
+      function equalTo(val){
+         return function(candidate){
+            return candidate == val;
+         }
+      }
+   
+   
       it("can remove from the middle of a list", function() {
          var naturals = list(1, 2, 3);
                
-         expect( without(naturals, 2) ).toEqual( list(1, 3) );
+         expect( without(naturals, equalTo(2)) ).toEqual( list(1, 3) );
       });
       
       it("can remove from the end of a list", function() {
          var naturals = list(1, 2, 3);
                
-         expect( without(naturals, 3) ).toEqual( list(1, 2) );
+         expect( without(naturals, equalTo(3)) ).toEqual( list(1, 2) );
       });
       
       it("can not remove", function() {
          var naturals = list(1, 2, 3);
                
-         expect( without(naturals, 4) ).toEqual( list(1, 2, 3) );
+         expect( without(naturals, equalTo(4)) ).toEqual( list(1, 2, 3) );
       });
       
       it("works with the empty list", function() {
                
-         expect( without(emptyList, 4) ).toEqual( emptyList );
+         expect( without(emptyList, equalTo(4)) ).toEqual( emptyList );
       });
+      
+      it("can give removed item to a callback", function() {
+         var callback = jasmine.createSpy();
+         var naturals = list(1, 2, 3);
+         
+         without(naturals, equalTo(2), callback)               
+         expect( callback ).toHaveBeenCalledWith( 2 );
+      });      
+      
+      
    });
       
    it("can convert non empty list to an array", function(){
@@ -137,17 +154,19 @@ describe("Lists", function(){
       expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
    });
    
-   it('may apply a list of functions with side effects', function(){
+   it('may apply a function with side effects to each item of a list', function(){
    
-      var callback1 = jasmine.createSpy(),
-          callback2 = jasmine.createSpy(),
-          callback3 = jasmine.createSpy();
+      var callback = jasmine.createSpy();
     
-      applyEach( [1,2,3], list(callback1, callback2, callback3) );
-      
-      expect(callback1).toHaveBeenCalledWith(1, 2, 3);
-      expect(callback2).toHaveBeenCalledWith(1, 2, 3);
-      expect(callback3).toHaveBeenCalledWith(1, 2, 3);   
+      applyEach( callback, list('a','b','c','d','e','f','g') );
+
+      expect(callback).toHaveBeenCalledWith('a');
+      expect(callback).toHaveBeenCalledWith('b');
+      expect(callback).toHaveBeenCalledWith('c');
+      expect(callback).toHaveBeenCalledWith('d');
+      expect(callback).toHaveBeenCalledWith('e');
+      expect(callback).toHaveBeenCalledWith('f');
+      expect(callback).toHaveBeenCalledWith('g');   
    });
    
    it('may apply a list of zero functions with side effects', function(){

@@ -106,15 +106,19 @@ function foldR(fn, startValue, list) {
  * Return a list like the one given but with the first instance equal 
  * to item removed 
  */
-function without(list, item) {
+function without(list, test, removedFn) {
  
-  return list  
-            ?  ( head(list) == item 
-                     ? tail(list) 
-                     : cons(head(list), without(tail(list), item))
-               ) 
-            : emptyList
-            ;
+   return withoutInner(list, removedFn || noop);
+ 
+   function withoutInner(subList, removedFn) {
+      return subList  
+         ?  ( test(head(subList)) 
+                  ? (removedFn(head(subList)), tail(subList)) 
+                  : cons(head(subList), withoutInner(tail(subList), removedFn))
+            )
+         : emptyList
+         ;
+   }               
 }
 
 /** 
@@ -124,7 +128,7 @@ function without(list, item) {
 function all(fn, list) {
    
    return !list || 
-          fn(head(list)) && all(fn, tail(list));
+          ( fn(head(list)) && all(fn, tail(list)) );
 }
 
 /**
@@ -134,12 +138,12 @@ function all(fn, list) {
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(args, list) {
+function applyEach(fn, list) {
 
    if( list ) {  
-      apply(args, head(list))
+      fn(head(list))
       
-      applyEach(args, tail(list));
+      applyEach(fn, tail(list));
    }
 }
 
