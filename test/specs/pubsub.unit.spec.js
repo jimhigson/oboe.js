@@ -145,7 +145,80 @@ describe('pub sub', function(){
 
       expect(listenerA.calls.length).toBe(1);
       expect(listenerA2.calls.length).toBe(2);      
-   });   
+   });
+   
+   it('allows an event to be removed by an id', function(){
+      var events = pubSub(),
+          listenerFoo         = jasmine.createSpy('listenerFoo'),
+          listenerBar         = jasmine.createSpy('listenerBar'),
+          listenerUnrelated   = jasmine.createSpy('listenerUnrelated');
+      
+      events.on('eventA', listenerFoo,  'FOO_ID');
+      events.on('eventA', listenerBar, 'BAR_ID');
+      events.on('eventB', listenerUnrelated);
+      
+      events.emit('eventA');
+      events.emit('eventB');
+      
+      expect(listenerFoo.calls.length).toBe(1);      
+      
+      events.un('eventA', 'FOO_ID');      
+
+      events.emit('eventA');
+
+      expect(listenerFoo.calls.length).toBe(1);
+      expect(listenerBar.calls.length).toBe(2);
+      
+      events.un('eventA', 'BAR_ID');
+      events.emit('eventA');          
+           
+      expect(listenerBar.calls.length).toBe(2);       
+   })
+   
+   it('allows an event to be removed by an id', function(){
+      var events = pubSub(),
+          listenerA  = jasmine.createSpy('listenerA'),
+          listenerA2 = jasmine.createSpy('listenerA2'),
+          listenerB  = jasmine.createSpy('listenerB');
+      
+      events.on('eventA', listenerA,  'id1');
+      events.on('eventA', listenerA2, 'id2');
+      events.on('eventB', listenerB);
+      
+      events.emit('eventA');
+      events.emit('eventB');
+      
+      expect(listenerA.calls.length).toBe(1);      
+      
+      events.un('eventA', 'id1');      
+
+      events.emit('eventA');
+
+      expect(listenerA.calls.length).toBe(1);
+      expect(listenerA2.calls.length).toBe(2);     
+   })
+   
+   it('allows a cleanup function to be called when a listener is removed', function(){
+      var events = pubSub(),
+          cleanup = jasmine.createSpy('cleanup');
+      
+      events.on('eventA', noop,  'toBeRemoved', cleanup);
+            
+      events.un('eventA', 'toBeRemoved');      
+
+      expect(cleanup).toHaveBeenCalled();     
+   })
+   
+   it('allows a cleanup function to be called when a listener is removed by specifying callback', function(){
+      var events = pubSub(),
+          cleanup = jasmine.createSpy('cleanup');
+      
+      events.on('eventA', noop,  null, cleanup);
+            
+      events.un('eventA', noop);      
+
+      expect(cleanup).toHaveBeenCalled();     
+   })               
    
    it('handles numberic event codes', function(){
    
