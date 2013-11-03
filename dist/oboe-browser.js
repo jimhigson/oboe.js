@@ -356,17 +356,18 @@ function all(fn, list) {
 }
 
 /**
- * Apply a function to every item in a list
+ * Call every function in a list of functions
  * 
  * This doesn't make any sense if we're doing pure functional because 
- * it doesn't return anything. Hence, this is only really useful if fn 
- * has side-effects. 
+ * it doesn't return anything. Hence, this is only really useful if the
+ * functions being called have side-effects. 
  */
-function each(fn, list) {
+function applyEach(args, list) {
 
-   if( list ){  
-      fn(head(list));
-      each(fn, tail(list));
+   if( list ) {  
+      apply(args, head(list))
+      
+      applyEach(args, tail(list));
    }
 }
 
@@ -387,14 +388,19 @@ function reverseList(list){
 
    return reverseInner(list, emptyList);
 }
-/* This is a slightly hacked-up version of clarinet with some
+/* 
+   This is a slightly hacked-up version of clarinet with the
    Node.js specific features removed.
+   
+   For the original go here:
+      https://github.com/dscape/clarinet
  */
 
-;(function (clarinet) {
-  // non node-js needs to set clarinet debug on root
-  var env
-    , fastlist = Array
+var clarinet = (function () {
+
+  var clarinet = {}
+    , env
+    , fastlist = Array    
     ;
 
 if(typeof process === 'object' && process.env) env = process.env;
@@ -882,7 +888,8 @@ else env = window;
     return parser;
   }
 
-})(clarinet = {});
+  return clarinet;
+})();
 
 
 /** 
@@ -1785,9 +1792,9 @@ function pubSub(){
       }, 
     
       emit:varArgs(function ( eventId, parameters ) {
-               
-         each( 
-            partialComplete( apply, parameters ), 
+                                             
+         applyEach( 
+            parameters, 
             listeners[eventId]
          );
       }),
