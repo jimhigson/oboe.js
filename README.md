@@ -14,6 +14,7 @@ http.
 
 - [Use cases](#use-cases)
 - [Examples](#examples)
+	- [Simple download](#a-simple-download)
 	- [Using objects from the JSON stream](#using-objects-from-the-json-stream)
 	- [Hanging up when we have what we need](#hanging-up-when-we-have-what-we-need)
 	- [Detecting strings, numbers](#detecting-strings-numbers)
@@ -60,6 +61,22 @@ a neat way to route different parts of a json response to different parts of his
 
 # Examples
 
+## A simple download
+
+It isn't really what Oboe is for but you can use it as a simple AJAX library.
+This might be good to drop it into an existing application then refactor
+some more to make it progressive. 
+
+oboe('/myapp/things.json')
+   .done( function(things) {
+   
+      // we got it
+   })
+   .fail(function() {
+   
+      // we don't got it
+   });
+
 ## Using objects from the JSON stream
 
 Say we have a resource called things.json that we need to fetch over AJAX:
@@ -70,8 +87,7 @@ Say we have a resource called things.json that we need to fetch over AJAX:
       {"name":"apple",        "colour":"red"},
       {"name":"nuts",         "colour":"brown"}
    ],
-   "nonFoods": [
-      {"name":"brick",        "colour":"red"},
+   "badThings": [
       {"name":"poison",       "colour":"pink"},
       {"name":"broken_glass", "colour":"green"}
    ]
@@ -90,6 +106,10 @@ oboe('/myapp/things.json')
        
       console.log( foodThing.name + ' is ' + foodThing.colour );
    })
+   .node('badThings.*', function( badThing ){
+          
+      console.log( 'Danger! stay away from ' + badThings.name );
+   })   
    .done( function(things){
       console.log( 'there are ' + things.foods.length + ' things you can eat ' +
                    'and ' + things.nonFoods.length + ' that you shouldn\'t.' ); 
