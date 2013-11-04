@@ -28,6 +28,8 @@ function pubSub(){
          
          listeners[eventName] = cons( tuple, listeners[eventName] );
 
+         this.emit('newListener', eventName, listener, tuple.id);
+
          return this; // chaining
       },
      

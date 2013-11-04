@@ -23,6 +23,38 @@ describe('pub sub', function(){
       expect(listener).toHaveBeenCalled();
    });
    
+   it('is able to notify a subscribed function without a single event object', function(){
+   
+      var events = pubSub(),
+          listener = jasmine.createSpy('listener');      
+
+      events.on('somethingHappening', listener);
+      
+      events.emit('somethingHappening', 'somethingFunky');
+      
+      expect(listener).toHaveBeenCalledWith('somethingFunky');
+   });   
+   
+   it('notifies of new listeners when added with an id', function() {
+      var events = pubSub(),
+          listenerListener = jasmine.createSpy('listenerListener');      
+
+      events.on('newListener', listenerListener);
+      events.on('foo', noop, 'id1');
+            
+      expect(listenerListener).toHaveBeenCalledWith('foo', noop, 'id1');   
+   });
+   
+   it('notifies of new listeners when added without an id', function() {
+      var events = pubSub(),
+          listenerListener = jasmine.createSpy('listenerListener');      
+
+      events.on('newListener', listenerListener);
+      events.on('foo', noop);
+            
+      expect(listenerListener).toHaveBeenCalledWith('foo', noop, noop);   
+   });   
+   
    it('can pass through multiple parameters', function(){
    
       var events = pubSub(),
@@ -198,21 +230,23 @@ describe('pub sub', function(){
       expect(listenerA2.calls.length).toBe(2);     
    })
 
-   it('does not fire removeListener if nothing is removed', function(){
+   it('does not fire removeListener if nothing is removed', function() {
+      
       var events = pubSub(),   
-          removeListenerListener = jasmine.createSpy('rll');
-   
+          removeListenerListener = jasmine.createSpy('removeListenerListener'),
+          fooListener = jasmine.createSpy('fooListener');
+      
       events.on('removeListener', removeListenerListener);
-      
-      events.on('foo', noop);
+
+      events.on('foo', fooListener);
       events.un('foo', 'wrong_item');
-      
+       
       expect(removeListenerListener).not.toHaveBeenCalled();         
    });
    
    it('fires removeListener when a listener is removed', function(){
       var events = pubSub(),   
-          removeListenerListener = jasmine.createSpy('rll');
+          removeListenerListener = jasmine.createSpy('removeListenerListener');
    
       events.on('removeListener', removeListenerListener);
       
@@ -222,9 +256,10 @@ describe('pub sub', function(){
       expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, noop);     
    })
    
-   it('allows a cleanup function to be called when a listener is removed by specifying callback', function(){
+   it('allows a cleanup function to be called when a listener is removed ' +
+      'by specifying callback', function() {
       var events = pubSub(),   
-          removeListenerListener = jasmine.createSpy('rll');
+          removeListenerListener = jasmine.createSpy('removeListenerListener');
    
       events.on('removeListener', removeListenerListener);
       
