@@ -1972,7 +1972,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          apply(parameters, oboeApi[eventId]);
       } else {
       
-         // the even has no special handling, add it direclty to
+         // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
          on(eventId, listener);

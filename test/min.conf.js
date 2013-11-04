@@ -12,6 +12,7 @@ module.exports = function(config) {
       ,  'test/libs/es5-sham.js'        
       ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
+      ,  'test/libs/platform.js'
       ,  'test/libs/*.js'
       ,  'dist/oboe-browser.min.js'
       

@@ -1,6 +1,7 @@
 /* Tests the streaming xhr without stubbing anything. Really just a test that 
 *  we've got the interface of the in-browser XHR object pinned down  */
 
+
 describe('streaming xhr integration (real http)', function() {
    "use strict";
  
@@ -167,44 +168,43 @@ describe('streaming xhr integration (real http)', function() {
      
    }) 
 
-   if( !internetExplorer ) {
-      // IE's XHR seems to have problems with PATCH requests :-(
+  
+   it('can make a patch request',  function() {
    
-      it('can make a patch request',  function() {
-      
-         var payload = {'thisWill':'bePatched','andShould':'be','echoed':'back'};
-      
-         // in practice, since we're running on an internal network and this is a small file,
-         // we'll probably only get one callback         
-         streamingHttp(
-            emit, on,
-            httpTransport(),         
-            'PATCH',
-             '/testServer/echoBackBody',
-             payload       
-         );
-         
-         waitForRequestToComplete();            
+      var payload = {'thisWill':'bePatched','andShould':'be','echoed':'back'};
    
-         runs(function(){
-            if( contentReceived == '' ) {
-               console.warn( 'this user agent seems not to support giving content' 
-                             + ' back for of PATCH requests.'
-                             + ' This happens on PhantomJS and IE < 9');
-            } else {         
-               expect(contentReceived).toParseTo(payload);
-               expect(emit).toHaveGivenStreamEventsInCorrectOrder();
-            }            
-         });
-        
-      })
-   }   
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingHttp(
+         emit, on,
+         httpTransport(),         
+         'PATCH',
+          '/testServer/echoBackBody',
+          payload       
+      );
+      
+      waitForRequestToComplete();            
+
+      runs(function(){
+         if( contentReceived == '' &&
+             (Platform.internetExplorer || Platform.isPhantom) ) {
+            console.warn( 'this user agent seems not to support giving content' 
+                          + ' back for of PATCH requests.'
+                          + ' This happens on PhantomJS and IE < 9');
+         } else {         
+            expect(contentReceived).toParseTo(payload);
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder();
+         }            
+      });
+     
+   })
+   
           
    // this test is only activated for non-IE browsers and IE 10 or newer.
    // old and rubbish browsers buffer the xhr response meaning that this 
    // will never pass. But for good browsers it is good to have an integration
    // test to confirm that we're getting it right.           
-   if( !internetExplorer || internetExplorer >= 10 ) {          
+   if( !Platform.internetExplorer || Platform.internetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function() {
                               
          streamingHttp(                           
@@ -243,10 +243,13 @@ describe('streaming xhr integration (real http)', function() {
          runs(function(){
             // some platforms can't help but not work here so warn but don't
             // fail the test:
-            if( numberOfProgressCallbacks == 1 ) {
+            if( numberOfProgressCallbacks == 1 && 
+                  (Platform.isInternetExplorer || Platform.isPhantom) ) {
                console.warn('This user agent seems to give gzipped responses' +
                    'as a single event, not progressively. This happens on ' +
                    'PhantomJS and IE < 9');
+            } else {
+               expect(numberOfProgressCallbacks).toBeGreaterThan(1);
             }
          
             expect(emit).toHaveGivenStreamEventsInCorrectOrder();
