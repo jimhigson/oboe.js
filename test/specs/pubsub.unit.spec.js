@@ -45,6 +45,15 @@ describe('pub sub', function(){
       expect(listenerListener).toHaveBeenCalledWith('foo', noop, 'id1');   
    });
    
+   it('doesn\'t notify a newListener listener of its own addition', function() {
+      var events = pubSub(),
+          listenerListener = jasmine.createSpy('listenerListener');      
+
+      events.on('newListener', listenerListener);
+            
+      expect(listenerListener).not.toHaveBeenCalled();   
+   });   
+   
    it('notifies of new listeners when added without an id', function() {
       var events = pubSub(),
           listenerListener = jasmine.createSpy('listenerListener');      

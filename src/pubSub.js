@@ -6,6 +6,18 @@
 function pubSub(){
 
    var listeners = {};
+
+   var emit = varArgs(function ( eventName, parameters ) {
+            
+      function emitInner(tuple) {                  
+         tuple.listener.apply(null, parameters);               
+      }                    
+                                                                           
+      applyEach( 
+         emitInner, 
+         listeners[eventName]
+      );
+   });
                              
    return {
 
@@ -25,25 +37,15 @@ function pubSub(){
                                              // listener function as the id
          ,  clean:    cleanupOnRemove  || noop
          };
+
+         emit('newListener', eventName, listener, tuple.id);
          
          listeners[eventName] = cons( tuple, listeners[eventName] );
-
-         this.emit('newListener', eventName, listener, tuple.id);
 
          return this; // chaining
       },
      
-      emit:varArgs(function ( eventName, parameters ) {
-         
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
-         applyEach( 
-            emitInner, 
-            listeners[eventName]
-         );
-      }),
+      emit:emit,
       
       un: function( eventName, listenerId ) {
              
@@ -60,13 +62,13 @@ function pubSub(){
          );    
          
          if( removed ) {
-            this.emit('removeListener', eventName, removed.listener, removed.id);
+            emit('removeListener', eventName, removed.listener, removed.id);
          }     
       },
       
       listeners: function( eventName ){
       
          return listeners[eventName];
-      }           
+      }     
    };
 }
