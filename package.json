@@ -5,7 +5,7 @@
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
   "scripts": {
-    "test": "node ./node_modules/grunt-cli/bin/grunt node",
+    "test": "node ./node_modules/grunt-cli/bin/grunt headless-mode default",
     "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
     "test-run": "node ./node_modules/grunt-cli/bin/grunt test-run",
     "browser-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
