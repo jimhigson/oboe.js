@@ -14,7 +14,7 @@ describe("Lists", function(){
       expect(head(tail(tail(listCBA)))).toBe('a');
    });
 
-   if( !internetExplorer || internetExplorer >= 9 ) {
+   if( !Platform.internetExplorer || Platform.internetExplorer >= 9 ) {
 
       it("freezes lists on supporting browsers", function() {   
                   
@@ -22,6 +22,8 @@ describe("Lists", function(){
          expect( listBA ).toBeFrozen();         
          expect( listCBA ).toBeFrozen();                     
       })
+   } else {
+      console.warn('platform does not support object freezing');
    }
    
    it("can convert to an array", function() {
