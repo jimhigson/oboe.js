@@ -1,5 +1,5 @@
 
-function instanceApi(bus, jsonPathCompiler){
+function instanceApi(bus){
 
    var oboeApi,
        addDoneListener = partialComplete(
@@ -7,101 +7,51 @@ function instanceApi(bus, jsonPathCompiler){
                               'node', '!');
    
    
-   function startMatchingPattern(matchEventName, predicateEventName, pattern) {
-
-      var compiledJsonPath = jsonPathCompiler( pattern );
-
-      bus.on(predicateEventName, function (ascent) {
-
-         var maybeMatchingMapping = compiledJsonPath(ascent);
-
-         /* Possible values for maybeMatchingMapping are now:
-
-          false: 
-          we did not match 
-
-          an object/array/string/number/null: 
-          we matched and have the node that matched.
-          Because nulls are valid json values this can be null.
-
-          undefined: 
-          we matched but don't have the matching node yet.
-          ie, we know there is an upcoming node that matches but we 
-          can't say anything else about it. 
-          */
-         if (maybeMatchingMapping !== false) {
-
-            bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
-         }
-      }, pattern);
-   }                   
-                              
-   function addPathOrNodeListener( type, pattern, callback ) {
+   function addPathOrNodeListener( publicApiName, pattern, callback ) {
    
-      var predicateEventName = {node:NODE_FOUND, path:PATH_FOUND}[type],
-          matchEventName = type + ':' + pattern,          
+      var matchEventName = publicApiName + ':' + pattern,          
           
           safeCallback = protectedCallback(callback);
-          
-      if (!bus.listeners(matchEventName)) {          
-         startMatchingPattern(matchEventName, predicateEventName, pattern);
-      }
-      
+                              
       bus.on( matchEventName, function(node, ascent) {
       
-            if( !notifyCallback(safeCallback, node, ascent) ) {         
-               bus.un(matchEventName, callback);
-            }         
-         
-         }, callback)
+         /* 
+            We're now calling back to outside of oboe where the Lisp-style 
+            lists that we are using internally will not be recognised 
+            so convert to standard arrays. 
       
-         // if the match even listener is later removed, clean up by removing
-         // the underlying listener if nothing else is using that pattern:
-         .on('removeListener', function(eventName, listenerId){
+            Also, reverse the order because it is more common to list paths 
+            "root to leaf" than "leaf to root" 
+         */
+         var descent     = reverseList(ascent),
          
-            if( eventName == matchEventName && listenerId == callback ) {
-               // if there wasn't another listener as well as this one, remove
-               // the listener above against the underlying pattern      
-               if( bus.listeners( matchEventName )) {
-                  bus.un( predicateEventName, pattern );
-               }
-            }
-         });   
+             // To make a path, strip off the last item which is the special
+             // ROOT_PATH token for the 'path' to the root node
+             path       = listAsArray(tail(map(keyOf,descent))),
+             ancestors  = listAsArray(map(nodeOf, descent)),
+             keep       = true;
+             
+         oboeApi.forget = function(){
+            keep = false;
+         };           
+         
+         safeCallback( node, path, ancestors );         
+               
+         delete oboeApi.forget;
+         
+         if(! keep ) {          
+            bus.un(matchEventName, callback);
+         }
+                  
+      
+      }, callback)
+
    }   
    
-   function removePathOrNodeListener( type, pattern, callback ) {
-      bus.un(type + ':' + pattern, callback)
+   function removePathOrNodeListener( publicApiName, pattern, callback ) {
+      bus.un(publicApiName + ':' + pattern, callback)
    }
-   
-   function notifyCallback(callback, node, ascent) {
-      /* 
-         We're now calling back to outside of oboe where the Lisp-style 
-         lists that we are using internally will not be recognised 
-         so convert to standard arrays. 
-   
-         Also, reverse the order because it is more common to list paths 
-         "root to leaf" than "leaf to root" 
-      */
-            
-      var descent     = reverseList(ascent),
-      
-          // To make a path, strip off the last item which is the special
-          // ROOT_PATH token for the 'path' to the root node
-          path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)),
-          keep       = true;
-          
-      oboeApi.forget = function(){
-         keep = false;
-      };           
-      
-      callback( node, path, ancestors );         
-            
-      delete oboeApi.forget;
-      
-      return keep;          
-   }
-      
+         
    function protectedCallback( callback ) {
       return function() {
          try{      

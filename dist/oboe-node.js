@@ -172,6 +172,8 @@ function lazyIntersection(fn1, fn2) {
  */
 function noop(){}
 
+function always(){return true}
+
 function functor(val){
    return function(){
       return val;
@@ -211,8 +213,6 @@ var attr = partialComplete(partialComplete, pluck),
 function defined( value ) {
    return value !== undefined;
 }
-
-function always(){return true}
 
 /**
  * Returns true if object o has a key named like every property in 
@@ -392,6 +392,13 @@ function reverseList(list){
    }
 
    return reverseInner(list, emptyList);
+}
+
+function first(test, list) {
+   return   list &&
+               (test(head(list)) 
+                  ? head(list) 
+                  : first(test,tail(list))); 
 }
 
 /** 
@@ -1231,46 +1238,80 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 function pubSub(){
 
    var listeners = {};
-                             
+
+   function hasId(id){
+      return function(tuple) {
+         return tuple.id == id;      
+      };  
+   }
+
+   var emit = varArgs(function ( eventName, parameters ) {
+            
+      function emitInner(tuple) {                  
+         tuple.listener.apply(null, parameters);               
+      }                    
+                                                                           
+      applyEach( 
+         emitInner, 
+         listeners[eventName]
+      );
+   });
+              
    return {
 
-      on:function( eventId, listener, idToken, cleanupOnRemove ) {
+      /**
+       * 
+       * @param eventName
+       * @param listener
+       * @param listenerId
+       * @param {Function} cleanupOnRemove if this listener is later 
+       *    removed, a function to call just prior to its removal
+       */
+      on:function( eventName, listener, listenerId, cleanupOnRemove ) {
          
          var tuple = {
             listener: listener
-         ,  id:       idToken || listener
+         ,  id:       listenerId || listener // when no id is given use the
+                                             // listener function as the id
          ,  clean:    cleanupOnRemove  || noop
          };
+
+         emit('newListener', eventName, listener, tuple.id);
          
-         listeners[eventId] = cons( tuple, listeners[eventId] );
+         listeners[eventName] = cons( tuple, listeners[eventName] );
 
          return this; // chaining
       },
      
-      emit:varArgs(function ( eventId, parameters ) {
-         
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
-         applyEach( 
-            emitInner, 
-            listeners[eventId]
-         );
-      }),
+      emit:emit,
       
-      un: function( eventId, idToken ) {
+      un: function( eventName, listenerId ) {
+             
+         var removed;             
               
-         listeners[eventId] = without(
-            listeners[eventId], 
+         listeners[eventName] = without(
+            listeners[eventName],
+            hasId(listenerId),
             function(tuple){
-               return tuple.id == idToken;
-            },
-            function(tuple){
-               tuple.clean();
+               removed = tuple;
             }
-         );         
-      }           
+         );    
+         
+         if( removed ) {
+            emit('removeListener', eventName, removed.listener, removed.id);
+         }     
+      },
+      
+      listeners: function( eventName ){
+      
+         return listeners[eventName];
+      },
+      
+      hasListener: function(eventName, listenerId){
+         var test = listenerId? hasId(listenerId) : always;
+      
+         return defined(first( test, listeners[eventName]));
+      }
    };
 }
 /**
@@ -1279,7 +1320,7 @@ function pubSub(){
 
 var // the events which are never exported are kept as 
     // the smallest possible representation, in numbers:
-    _S = 0,
+    _S = 1,
 
     // fired whenever a node is found in the JSON:
     NODE_FOUND    = _S++,
@@ -1308,79 +1349,121 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
-function instanceApi(emit, on, un, jsonPathCompiler){
+function patternAdapter(bus, jsonPathCompiler) {
 
-   var oboeApi,
-       addDoneListener = partialComplete(
-                              addNodeOrPathListenerApi, 
-                              'node', '!');
-                              
-   function addPathOrNodeCallback( type, pattern, callback ) {
+   function addUnderlyingListener( matchEventName, predicateEventName, pattern ){
+
+      var compiledJsonPath = jsonPathCompiler( pattern );
    
-      var 
-          compiledJsonPath = jsonPathCompiler( pattern ),
-                
-          underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
-          
-          safeCallback = protectedCallback(callback);               
-          
-      on( underlyingEvent, function handler( ascent ){ 
- 
-         var maybeMatchingMapping = compiledJsonPath( ascent );
-     
+      bus.on(predicateEventName, function (ascent) {
+
+         var maybeMatchingMapping = compiledJsonPath(ascent);
+
          /* Possible values for maybeMatchingMapping are now:
 
-            false: 
-               we did not match 
-  
-            an object/array/string/number/null: 
-               we matched and have the node that matched.
-               Because nulls are valid json values this can be null.
-  
-            undefined: 
-               we matched but don't have the matching node yet.
-               ie, we know there is an upcoming node that matches but we 
-               can't say anything else about it. 
-         */
-         if( maybeMatchingMapping !== false ) {                                 
+          false: 
+          we did not match 
 
-            if( !notifyCallback(safeCallback, nodeOf(maybeMatchingMapping), ascent) ) {
-            
-               un(underlyingEvent, handler);
+          an object/array/string/number/null: 
+          we matched and have the node that matched.
+          Because nulls are valid json values this can be null.
+
+          undefined:
+          we matched but don't have the matching node yet.
+          ie, we know there is an upcoming node that matches but we 
+          can't say anything else about it. 
+          */
+         if (maybeMatchingMapping !== false) {
+             
+            bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
+         }
+      }, matchEventName);
+   
+   
+      bus.on('removeListener', function(removedEventName){
+   
+         // if the match even listener is later removed, clean up by removing
+         // the underlying listener if nothing else is using that pattern:
+      
+         if( removedEventName == matchEventName ) {
+         
+            if( !bus.listeners( removedEventName )) {
+               bus.un( predicateEventName, matchEventName );
             }
          }
       });   
+   }
+
+   bus.on('newListener', function(matchEventName){
+
+      var match = /(\w+):(.*)/.exec(matchEventName),
+          predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
+                    
+      if( predicateEventName && !bus.hasListener(predicateEventName, matchEventName) ) {  
+               
+         addUnderlyingListener(
+            matchEventName,
+            predicateEventName, 
+            match[2]
+         );
+      }    
+   })
+
+}
+
+function instanceApi(bus){
+
+   var oboeApi,
+       addDoneListener = partialComplete(
+           addNodeOrPathListenerApi, 
+                              'node', '!');
+   
+   
+   function addPathOrNodeListener( publicApiName, pattern, callback ) {
+   
+      var matchEventName = publicApiName + ':' + pattern,          
+          
+          safeCallback = protectedCallback(callback);
+                              
+      bus.on( matchEventName, function(node, ascent) {
+      
+         /* 
+            We're now calling back to outside of oboe where the Lisp-style 
+            lists that we are using internally will not be recognised 
+            so convert to standard arrays. 
+      
+            Also, reverse the order because it is more common to list paths 
+            "root to leaf" than "leaf to root" 
+         */
+         var descent     = reverseList(ascent),
+         
+             // To make a path, strip off the last item which is the special
+             // ROOT_PATH token for the 'path' to the root node
+             path       = listAsArray(tail(map(keyOf,descent))),
+             ancestors  = listAsArray(map(nodeOf, descent)),
+             keep       = true;
+             
+         oboeApi.forget = function(){
+            keep = false;
+         };           
+         
+         safeCallback( node, path, ancestors );         
+               
+         delete oboeApi.forget;
+         
+         if(! keep ) {          
+            bus.un(matchEventName, callback);
+         }
+                  
+      
+      }, callback)
+
    }   
    
-   function notifyCallback(callback, node, ascent) {
-      /* 
-         We're now calling back to outside of oboe where the Lisp-style 
-         lists that we are using internally will not be recognised 
-         so convert to standard arrays. 
-   
-         Also, reverse the order because it is more common to list paths 
-         "root to leaf" than "leaf to root" 
-      */
-            
-      var descent     = reverseList(ascent),
-      
-          // To make a path, strip off the last item which is the special
-          // ROOT_PATH token for the 'path' to the root node
-          path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)),
-          keep       = true;
-          
-      oboeApi.forget = function(){
-         keep = false;
-      };           
-      
-      callback( node, path, ancestors );         
-            
-      delete oboeApi.forget;
-      
-      return keep;          
+   function removePathOrNodeListener( publicApiName, pattern, callback ) {
+      bus.un(publicApiName + ':' + pattern, callback)
    }
-      
+         
    function protectedCallback( callback ) {
       return function() {
          try{      
@@ -1388,7 +1471,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            emit(FAIL_EVENT, errorReport(undefined, undefined, e));
+            bus.emit(FAIL_EVENT, errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -1398,7 +1481,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
     * protection against errors being thrown
     */
    function safeOn( eventName, callback ){
-      on(eventName, protectedCallback(callback));
+      bus.on(eventName, protectedCallback(callback));
       return oboeApi;
    }
       
@@ -1408,7 +1491,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addPathOrNodeCallback(eventId, pattern, listenerMap[pattern]);
+         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
       }
    }    
       
@@ -1418,7 +1501,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeCallback( 
+         addPathOrNodeListener( 
             eventId, 
             jsonPathOrListenerMap,
             callback
@@ -1444,7 +1527,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
-         on(eventId, listener);
+         bus.on(eventId, listener);
       }
       
       return oboeApi;
@@ -1452,11 +1535,11 @@ function instanceApi(emit, on, un, jsonPathCompiler){
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
-   on(ROOT_FOUND, function(root) {
+   bus.on(ROOT_FOUND, function(root) {
       oboeApi.root = functor(root);   
    });
    
-   on(HTTP_START, function(_statusCode, headers) {
+   bus.on(HTTP_START, function(_statusCode, headers) {
       oboeApi.header = 
          function(name) {
             return name ? headers[name] 
@@ -1476,8 +1559,8 @@ function instanceApi(emit, on, un, jsonPathCompiler){
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(safeOn, HTTP_START),
       // fail doesn't use safeOn because that could lead to non-terminating loops
-      fail  :  partialComplete(on, FAIL_EVENT),
-      abort :  partialComplete(emit, ABORTING),
+      fail  :  partialComplete(bus.on, FAIL_EVENT),
+      abort :  partialComplete(bus.emit, ABORTING),
       header:  noop,
       root  :  noop
    };   
@@ -1554,7 +1637,9 @@ function wire (httpMethodName, contentSource, body, headers){
                incrementalContentBuilder(eventBus.emit) 
    );
       
-   return new instanceApi(eventBus.emit, eventBus.on, eventBus.un, jsonPathCompiler);
+   patternAdapter(eventBus, jsonPathCompiler);      
+      
+   return new instanceApi(eventBus);
 }
 
 // export public API

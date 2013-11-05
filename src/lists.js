@@ -164,3 +164,10 @@ function reverseList(list){
 
    return reverseInner(list, emptyList);
 }
+
+function first(test, list) {
+   return   list &&
+               (test(head(list)) 
+                  ? head(list) 
+                  : first(test,tail(list))); 
+}

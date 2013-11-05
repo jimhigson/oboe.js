@@ -169,6 +169,8 @@ function lazyIntersection(fn1, fn2) {
  */
 function noop(){}
 
+function always(){return true}
+
 function functor(val){
    return function(){
       return val;

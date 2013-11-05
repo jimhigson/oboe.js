@@ -33,8 +33,6 @@ function defined( value ) {
    return value !== undefined;
 }
 
-function always(){return true}
-
 /**
  * Returns true if object o has a key named like every property in 
  * the properties array. Will give false if any are missing, or if o 

@@ -7,6 +7,12 @@ function pubSub(){
 
    var listeners = {};
 
+   function hasId(id){
+      return function(tuple) {
+         return tuple.id == id;      
+      };  
+   }
+
    var emit = varArgs(function ( eventName, parameters ) {
             
       function emitInner(tuple) {                  
@@ -18,7 +24,7 @@ function pubSub(){
          listeners[eventName]
       );
    });
-                             
+              
    return {
 
       /**
@@ -52,10 +58,8 @@ function pubSub(){
          var removed;             
               
          listeners[eventName] = without(
-            listeners[eventName], 
-            function(tuple){
-               return tuple.id == listenerId;
-            },
+            listeners[eventName],
+            hasId(listenerId),
             function(tuple){
                removed = tuple;
             }
@@ -69,6 +73,12 @@ function pubSub(){
       listeners: function( eventName ){
       
          return listeners[eventName];
-      }     
+      },
+      
+      hasListener: function(eventName, listenerId){
+         var test = listenerId? hasId(listenerId) : always;
+      
+         return defined(first( test, listeners[eventName]));
+      }
    };
 }

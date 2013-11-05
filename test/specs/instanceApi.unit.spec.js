@@ -13,7 +13,7 @@ describe('instance api',function(){
       un = spyOn( bus, 'un' ).andCallThrough();
             
       function jsonPathCompiler(pattern){
-      
+
          function compiled ( ascent ){         
             if( matches[pattern] === ascent ) {
                return head(ascent);
@@ -25,7 +25,11 @@ describe('instance api',function(){
          return compiled;
       }
 
-      api = instanceApi(bus, jsonPathCompiler);
+      api = instanceApi(bus);
+      
+      // For now, tie the patternAdapter into the bus. Split tests up
+      // once this works:      
+      patternAdapter(bus, jsonPathCompiler);
    });
       
    function anAscentMatching(pattern) {
@@ -62,9 +66,9 @@ describe('instance api',function(){
             .on('start',fn);   
       }).not.toThrow();
    })
- 
+
    describe('header method', function(){
- 
+
       it('returns undefined if not available', function() {
             
          expect( api.header() ).toBeUndefined();         
@@ -116,7 +120,7 @@ describe('instance api',function(){
    describe('node and path callbacks', function(){
       it('calls node callback on matching node', function() {
       
-         var callback = jasmine.createSpy(),
+         var callback = jasmine.createSpy('node callback'),
              ascent = anAscentMatching('a_pattern');
       
          api.on('node', 'a_pattern', callback); 
@@ -124,7 +128,7 @@ describe('instance api',function(){
          expect(callback).not.toHaveBeenCalled()
           
          emit( NODE_FOUND, ascent)
-         
+
          expect(callback).toHaveBeenCalled()      
       });
       

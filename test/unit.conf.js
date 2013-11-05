@@ -26,6 +26,7 @@ module.exports = function(config) {
       ,  'src/jsonPath.js'
       ,  'src/pubSub.js' 
       ,  'src/events.js'
+      ,  'src/patternAdapter.js'      
       ,  'src/instanceApi.js'           
       ,  'src/instanceController.js'
       ,  'src/wire.js'

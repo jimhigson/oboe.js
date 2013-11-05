@@ -171,6 +171,8 @@ function lazyIntersection(fn1, fn2) {
  */
 function noop(){}
 
+function always(){return true}
+
 function functor(val){
    return function(){
       return val;
@@ -210,8 +212,6 @@ var attr = partialComplete(partialComplete, pluck),
 function defined( value ) {
    return value !== undefined;
 }
-
-function always(){return true}
 
 /**
  * Returns true if object o has a key named like every property in 
@@ -391,6 +391,13 @@ function reverseList(list){
    }
 
    return reverseInner(list, emptyList);
+}
+
+function first(test, list) {
+   return   list &&
+               (test(head(list)) 
+                  ? head(list) 
+                  : first(test,tail(list))); 
 }
 /* 
    This is a slightly hacked-up version of clarinet with the
@@ -1783,7 +1790,25 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 function pubSub(){
 
    var listeners = {};
-                             
+
+   function hasId(id){
+      return function(tuple) {
+         return tuple.id == id;      
+      };  
+   }
+
+   var emit = varArgs(function ( eventName, parameters ) {
+            
+      function emitInner(tuple) {                  
+         tuple.listener.apply(null, parameters);               
+      }                    
+                                                                           
+      applyEach( 
+         emitInner, 
+         listeners[eventName]
+      );
+   });
+              
    return {
 
       /**
@@ -1802,47 +1827,43 @@ function pubSub(){
                                              // listener function as the id
          ,  clean:    cleanupOnRemove  || noop
          };
+
+         emit('newListener', eventName, listener, tuple.id);
          
          listeners[eventName] = cons( tuple, listeners[eventName] );
 
          return this; // chaining
       },
      
-      emit:varArgs(function ( eventName, parameters ) {
-         
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
-         applyEach( 
-            emitInner, 
-            listeners[eventName]
-         );
-      }),
+      emit:emit,
       
       un: function( eventName, listenerId ) {
              
          var removed;             
               
          listeners[eventName] = without(
-            listeners[eventName], 
-            function(tuple){
-               return tuple.id == listenerId;
-            },
+            listeners[eventName],
+            hasId(listenerId),
             function(tuple){
                removed = tuple;
             }
          );    
          
          if( removed ) {
-            this.emit('removeListener', eventName, removed.listener, removed.id);
+            emit('removeListener', eventName, removed.listener, removed.id);
          }     
       },
       
       listeners: function( eventName ){
       
          return listeners[eventName];
-      }           
+      },
+      
+      hasListener: function(eventName, listenerId){
+         var test = listenerId? hasId(listenerId) : always;
+      
+         return defined(first( test, listeners[eventName]));
+      }
    };
 }
 /**
@@ -1851,7 +1872,7 @@ function pubSub(){
 
 var // the events which are never exported are kept as 
     // the smallest possible representation, in numbers:
-    _S = 0,
+    _S = 1,
 
     // fired whenever a node is found in the JSON:
     NODE_FOUND    = _S++,
@@ -1880,19 +1901,12 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
+function patternAdapter(bus, jsonPathCompiler) {
 
-function instanceApi(bus, jsonPathCompiler){
-
-   var oboeApi,
-       addDoneListener = partialComplete(
-           addNodeOrPathListenerApi, 
-                              'node', '!');
-   
-   
-   function startMatchingPattern(matchEventName, predicateEventName, pattern) {
+   function addUnderlyingListener( matchEventName, predicateEventName, pattern ){
 
       var compiledJsonPath = jsonPathCompiler( pattern );
-
+   
       bus.on(predicateEventName, function (ascent) {
 
          var maybeMatchingMapping = compiledJsonPath(ascent);
@@ -1906,84 +1920,102 @@ function instanceApi(bus, jsonPathCompiler){
           we matched and have the node that matched.
           Because nulls are valid json values this can be null.
 
-          undefined: 
+          undefined:
           we matched but don't have the matching node yet.
           ie, we know there is an upcoming node that matches but we 
           can't say anything else about it. 
           */
          if (maybeMatchingMapping !== false) {
-
+             
             bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
          }
-      }, pattern);
-   }                   
-                              
-   function addPathOrNodeListener( type, pattern, callback ) {
+      }, matchEventName);
    
-      var predicateEventName = {node:NODE_FOUND, path:PATH_FOUND}[type],
-          matchEventName = type + ':' + pattern,          
-          
-          safeCallback = protectedCallback(callback);
-          
-      if (!bus.listeners(matchEventName)) {          
-         startMatchingPattern(matchEventName, predicateEventName, pattern);
-      }
-      
-      bus.on( matchEventName, function(node, ascent) {
-      
-            if( !notifyCallback(safeCallback, node, ascent) ) {         
-               bus.un(matchEventName, callback);
-            }         
-         
-         }, callback)
-      
+   
+      bus.on('removeListener', function(removedEventName){
+   
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
-         .on('removeListener', function(eventName, listenerId){
+      
+         if( removedEventName == matchEventName ) {
          
-            if( eventName == matchEventName && listenerId == callback ) {
-               // if there wasn't another listener as well as this one, remove
-               // the listener above against the underlying pattern      
-               if( bus.listeners( matchEventName )) {
-                  bus.un( predicateEventName, pattern );
-               }
+            if( !bus.listeners( removedEventName )) {
+               bus.un( predicateEventName, matchEventName );
             }
-         });   
+         }
+      });   
+   }
+
+   bus.on('newListener', function(matchEventName){
+
+      var match = /(\w+):(.*)/.exec(matchEventName),
+          predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
+                    
+      if( predicateEventName && !bus.hasListener(predicateEventName, matchEventName) ) {  
+               
+         addUnderlyingListener(
+            matchEventName,
+            predicateEventName, 
+            match[2]
+         );
+      }    
+   })
+
+}
+
+function instanceApi(bus){
+
+   var oboeApi,
+       addDoneListener = partialComplete(
+           addNodeOrPathListenerApi, 
+                              'node', '!');
+   
+   
+   function addPathOrNodeListener( publicApiName, pattern, callback ) {
+   
+      var matchEventName = publicApiName + ':' + pattern,          
+          
+          safeCallback = protectedCallback(callback);
+                              
+      bus.on( matchEventName, function(node, ascent) {
+      
+         /* 
+            We're now calling back to outside of oboe where the Lisp-style 
+            lists that we are using internally will not be recognised 
+            so convert to standard arrays. 
+      
+            Also, reverse the order because it is more common to list paths 
+            "root to leaf" than "leaf to root" 
+         */
+         var descent     = reverseList(ascent),
+         
+             // To make a path, strip off the last item which is the special
+             // ROOT_PATH token for the 'path' to the root node
+             path       = listAsArray(tail(map(keyOf,descent))),
+             ancestors  = listAsArray(map(nodeOf, descent)),
+             keep       = true;
+             
+         oboeApi.forget = function(){
+            keep = false;
+         };           
+         
+         safeCallback( node, path, ancestors );         
+               
+         delete oboeApi.forget;
+         
+         if(! keep ) {          
+            bus.un(matchEventName, callback);
+         }
+                  
+      
+      }, callback)
+
    }   
    
-   function removePathOrNodeListener( type, pattern, callback ) {
-      bus.un(type + ':' + pattern, callback)
+   function removePathOrNodeListener( publicApiName, pattern, callback ) {
+      bus.un(publicApiName + ':' + pattern, callback)
    }
-   
-   function notifyCallback(callback, node, ascent) {
-      /* 
-         We're now calling back to outside of oboe where the Lisp-style 
-         lists that we are using internally will not be recognised 
-         so convert to standard arrays. 
-   
-         Also, reverse the order because it is more common to list paths 
-         "root to leaf" than "leaf to root" 
-      */
-            
-      var descent     = reverseList(ascent),
-      
-          // To make a path, strip off the last item which is the special
-          // ROOT_PATH token for the 'path' to the root node
-          path       = listAsArray(tail(map(keyOf,descent))),
-          ancestors  = listAsArray(map(nodeOf, descent)),
-          keep       = true;
-          
-      oboeApi.forget = function(){
-         keep = false;
-      };           
-      
-      callback( node, path, ancestors );         
-            
-      delete oboeApi.forget;
-      
-      return keep;          
-   }
-      
+         
    function protectedCallback( callback ) {
       return function() {
          try{      
@@ -2157,7 +2189,9 @@ function wire (httpMethodName, contentSource, body, headers){
                incrementalContentBuilder(eventBus.emit) 
    );
       
-   return new instanceApi(eventBus, jsonPathCompiler);
+   patternAdapter(eventBus, jsonPathCompiler);      
+      
+   return new instanceApi(eventBus);
 }
 
 // export public API
