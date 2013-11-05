@@ -4,7 +4,7 @@
 
 var // the events which are never exported are kept as 
     // the smallest possible representation, in numbers:
-    _S = 0,
+    _S = 1,
 
     // fired whenever a node is found in the JSON:
     NODE_FOUND    = _S++,
