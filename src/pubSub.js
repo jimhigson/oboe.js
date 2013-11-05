@@ -72,7 +72,7 @@ function pubSub(){
       
       listeners: function( eventName ){
       
-         return listeners[eventName];
+         return listAsArray(map(attr('listener'), listeners[eventName]));
       },
       
       hasListener: function(eventName, listenerId){
