@@ -1,43 +1,20 @@
 
 describe('instance api',function(){
  
-   var emit, on, un, api, matches;
+   var emit, on, un, api;
  
    beforeEach(function(){
       var bus = pubSub();
-      
-      matches = {};
-     
+           
       emit = spyOn( bus, 'emit' ).andCallThrough();
       on = spyOn( bus, 'on' ).andCallThrough();
       un = spyOn( bus, 'un' ).andCallThrough();
             
-      function jsonPathCompiler(pattern){
-
-         function compiled ( ascent ){         
-            if( matches[pattern] === ascent ) {
-               return head(ascent);
-            } else {
-               return false;
-            }
-         }
-         
-         return compiled;
-      }
-
-      api = instanceApi(bus);
-      
-      // For now, tie the patternAdapter into the bus. Split tests up
-      // once this works:      
-      patternAdapter(bus, jsonPathCompiler);
+      api = instanceApi(bus);      
    });
       
-   function anAscentMatching(pattern) {
-      var ascent = list(namedNode('node', {}));
-
-      matches[pattern] = ascent;  
-
-      return ascent;
+   function anAscent(){
+      return list(namedNode(ROOT_PATH, {}) );
    }
  
    it('has chainable methods that don\'t explode',  function() {
@@ -118,53 +95,38 @@ describe('instance api',function(){
    });      
  
    describe('node and path callbacks', function(){
-      it('calls node callback on matching node', function() {
+   
+      it('calls node callback when notified of matching node', function() {
       
-         var callback = jasmine.createSpy('node callback'),
-             ascent = anAscentMatching('a_pattern');
+         var callback = jasmine.createSpy('node callback');
       
          api.on('node', 'a_pattern', callback); 
       
          expect(callback).not.toHaveBeenCalled()
           
-         emit( NODE_FOUND, ascent)
+         emit( 'node:a_pattern', {}, list(namedNode(ROOT_PATH, {}) ) );
 
-         expect(callback).toHaveBeenCalled()      
+         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
       });
+
+      it('calls path callback when notified of matching path', function() {
       
-      it('calls path callback on matching path', function() {
-      
-         var callback = jasmine.createSpy(),
-             ascent = anAscentMatching('a_pattern');
+         var callback = jasmine.createSpy('path callback');
       
          api.on('path', 'a_pattern', callback); 
       
          expect(callback).not.toHaveBeenCalled()
-         
-         emit( PATH_FOUND, ascent)
-         
-         expect(callback).toHaveBeenCalled()      
+          
+         emit( 'path:a_pattern', undefined, list(namedNode(ROOT_PATH, undefined) ) );
+
+         expect(callback).toHaveBeenCalledWith( undefined, [], [undefined] );      
       });
-      
-      it('does not call node callback on non-matching node', function() {
-      
-         var callback = jasmine.createSpy(),
-             ascent = anAscentMatching('a_pattern');
-      
-         api.on('node', 'a_different_pattern', callback); 
-            
-         emit( NODE_FOUND, ascent)
          
-         expect(callback).not.toHaveBeenCalled()      
-      });   
-      
-    
       it('allows short-cut node matching', function() {
       
          var callback1 = jasmine.createSpy(),
              callback2 = jasmine.createSpy(),
-             ascent1 = anAscentMatching('pattern1'),
-             ascent2 = anAscentMatching('pattern2');
+             ascent2 = ascentFrom({ l1:       {l2:      {l3:'leaf'}}});
              
          api.on('node', {
             pattern1: callback1, 
@@ -174,77 +136,60 @@ describe('instance api',function(){
          expect(callback1).not.toHaveBeenCalled()
          expect(callback2).not.toHaveBeenCalled()
          
-         emit( NODE_FOUND, ascent1)
+         emit( 'node:pattern1', {}, anAscent())
          
          expect(callback1).toHaveBeenCalled()
          expect(callback2).not.toHaveBeenCalled()
          
-         emit( NODE_FOUND, ascent2)
+         emit( 'node:pattern2', {}, anAscent())
          
          expect(callback2).toHaveBeenCalled()            
       });
-   
+      
       it('doesn\'t call node callback on path found', function() {
       
-         var callback = jasmine.createSpy(),
-             ascent = anAscentMatching('a_pattern');
+         var callback = jasmine.createSpy('node callback');
       
          api.on('node', 'a_pattern', callback); 
-            
-         emit( PATH_FOUND, ascent)
-         
-         expect(callback).not.toHaveBeenCalled()      
+      
+         expect(callback).not.toHaveBeenCalled()
+          
+         emit( 'path:a_pattern', {}, list(namedNode(ROOT_PATH, {}) ) );
+
+         expect(callback).not.toHaveBeenCalled();      
       });   
-      
-      it('calls node callback again on second match', function() {
-      
-         var callback = jasmine.createSpy(),
-             ascent = anAscentMatching('a_pattern');
-      
-         api.on('node', 'a_pattern', callback); 
-            
-         emit( NODE_FOUND, ascent)
-         
-         expect(callback.call.length).toBe(1)      
-         
-         emit( NODE_FOUND, ascent)
-         
-         expect(callback.calls.length).toBe(2)
-      });   
-      
-         
+                    
       it('doesn\'t call again after forget called from inside callback', function() {
       
          var callback = jasmine.createSpy().andCallFake(function(){
             this.forget();
          }),
-             ascent = anAscentMatching('a_pattern');
+             ascent = list(namedNode('node', {}));
       
          api.on('node', 'a_pattern', callback);      
                      
-         emit( NODE_FOUND, ascent)
+         emit( 'node:a_pattern', {}, ascent);
          
          expect(callback.call.length).toBe(1)      
          
-         emit( NODE_FOUND, ascent)
+         emit( 'node:a_pattern', {}, ascent);
          
          expect(callback.calls.length).toBe(1)   
-      });   
-            
+      });           
    });
-   
+
+
    describe('when errors occur in callbacks', function(){
-   
+
       it('is protected from error in node callback', function() {
          var e = "an error";  
          var callback = jasmine.createSpy().andThrow(e);
-         var ascent = anAscentMatching('a_pattern');      
-   
+         
          expect(function(){   
             api.on('node', 'a_pattern', callback);
          }).not.toThrow();
             
-         emit( NODE_FOUND, ascent)
+         emit( 'node:a_pattern', {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
@@ -253,13 +198,12 @@ describe('instance api',function(){
       it('is protected from error in node callback added via shortcut', function() {
          var e = "an error";  
          var callback = jasmine.createSpy().andThrow(e);
-         var ascent = anAscentMatching('a_pattern');      
-      
+     
          expect(function(){
             api.on('node', {'a_pattern': callback});
          }).not.toThrow(); 
             
-         emit( NODE_FOUND, ascent)
+         emit( 'node:a_pattern', {}, anAscent())
 
          expect(callback).toHaveBeenCalled()         
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
@@ -267,14 +211,13 @@ describe('instance api',function(){
       
       it('is protected from error in path callback', function() {
          var e = "an error";  
-         var callback = jasmine.createSpy().andThrow(e);
-         var ascent = anAscentMatching('a_pattern');            
+         var callback = jasmine.createSpy().andThrow(e);            
    
          expect(function(){   
             api.on('path', 'a_pattern', callback);
          }).not.toThrow();          
             
-         emit( PATH_FOUND, ascent)
+         emit( 'path:a_pattern', {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))   
@@ -297,13 +240,12 @@ describe('instance api',function(){
       it('is protected from error in done callback', function() {
          var e = "an error";   
          var callback = jasmine.createSpy().andThrow(e);
-         var ascent = anAscentMatching('!');            
-   
+               
          expect(function(){   
             api.done( callback);
          }).not.toThrow();        
             
-         emit( NODE_FOUND, ascent)
+         emit( 'node:!', {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
          expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))      
@@ -325,14 +267,13 @@ describe('instance api',function(){
    });   
    
    it('calls done callback on end of JSON', function() {
-      var callback = jasmine.createSpy(),
-          rootAscent = anAscentMatching('!');
+      var callback = jasmine.createSpy();
    
       api.on('done', callback); 
    
       expect(callback).not.toHaveBeenCalled()
        
-      emit( NODE_FOUND, rootAscent)
+      emit( 'node:!', {}, anAscent())
       
       expect(callback).toHaveBeenCalled()      
    });
