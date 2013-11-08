@@ -26,7 +26,7 @@
          
       // how long to wait at start to give browser a chance to optimise scripts   
       var initialWait = 3000;
-      var numberOfRuns = 20; // results seem to get more reliable at about 20 runs            
+      var numberOfRuns = 40;            
       var testName = numberOfRuns + ' big downloads';
       var profile = true;        
       
@@ -71,18 +71,25 @@
              // this doesn't give very reliable results because it relies on 
              // actual AJAXing which can of course be variable
           
-            var nodeCount = 0;
+            var idTotal = 0,
+                ageTotal = 0,
+                nodeCount = 0;
 
             var emitFn;
                                   
             oboe('any_url')
                .node('!.$result..{age name company}', function(obj){
                 
-                  // let's do something to stop smart engines compiling this bit away
-                  nodeCount++;                   
+                  nodeCount++;
+                  idTotal += obj.id;                   
                })
+               .node('age', function(age){
+
+                  nodeCount++;                                 
+                  ageTotal += age;       
+               })               
                .done(function(){
-                  if( nodeCount != 100 ) {
+                  if( nodeCount != 200 ) {
                      throw "wrong number of matches";
                   }
                    
