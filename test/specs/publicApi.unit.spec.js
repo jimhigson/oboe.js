@@ -38,7 +38,7 @@ describe("public api", function(){
             )      
                
          })
-            
+                     
          it('works via options object', function(){   
               
             oboe({url: 'http://example.com/oboez'})
@@ -48,6 +48,49 @@ describe("public api", function(){
                'http://example.com/oboez'
             )   
          })
+         
+         it('can disable caching', function(){   
+            var time = sinon.useFakeTimers(123);              
+                                         
+            oboe({url: 'http://example.com/oboez', cached:false})
+            
+            expect(wire).toHaveBeenCalledLike(              
+               'GET',
+               'http://example.com/oboez?_=123'
+            ) 
+            
+            time.restore();  
+         })
+         
+         it('can explicitly not disable caching', function(){   
+              
+            var time = sinon.useFakeTimers(123);              
+              
+            oboe({url: 'http://example.com/oboez', cached:true})
+            
+            expect(wire).toHaveBeenCalledLike(              
+               'GET',
+               'http://example.com/oboez'
+            )
+            
+            time.restore();              
+         })         
+         
+         it('can disable caching if url already has query param', function(){   
+
+            var time = sinon.useFakeTimers(123);
+              
+            spyOn(Date, 'now').andReturn(123);              
+              
+            oboe({url: 'http://example.com/oboez?foo=bar', cached:false})
+            
+            expect(wire).toHaveBeenCalledLike(              
+               'GET',
+               'http://example.com/oboez?foo=bar&_=123'
+            )
+            
+            time.restore();               
+         })                  
          
          it('propogates headers', function(){
 
