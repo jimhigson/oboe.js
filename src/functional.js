@@ -1,4 +1,5 @@
 /** 
+/** 
  * Partially complete a function.
  * 
  * Eg: 
@@ -43,8 +44,12 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
         
          return foldR(next, startParams, fnsList)[0];
       });
-   }),
+   });
 
+function attr(key) {
+   return new Function('o', 'return o["' + key + '"]' );
+}
+        
 /**
  * Call a list of functions with the same args until one returns a 
  * truthy result. Similar to the || operator.
