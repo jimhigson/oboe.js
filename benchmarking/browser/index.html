@@ -42,7 +42,7 @@
       
          var lastCreatedXhr;
       
-         console.log('faking the xhr');
+         console.log('faking the xhr...');
       
          // stub out the XHR
          function FakeXHR(){
@@ -70,7 +70,6 @@
          function perform(times){
              // this doesn't give very reliable results because it relies on 
              // actual AJAXing which can of course be variable
-            console.log('running the test', times);
           
             var nodeCount = 0;
 
