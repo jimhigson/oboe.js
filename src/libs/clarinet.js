@@ -151,7 +151,6 @@ else env = window;
     };
 
   function emit(parser, event, data) {
-    if(clarinet.INFO) console.log('-- emit', event, data);
     if (parser[event]) parser[event](data);
   }
 
@@ -208,7 +207,7 @@ else env = window;
       "Cannot write after close. Assign an onready handler.");
     if (chunk === null) return end(parser);
     var i = 0, c = chunk[0], p = parser.p;
-    if (clarinet.DEBUG) console.log('write -> [' + chunk + ']');
+
     while (c) {
       p = c;
       parser.c = c = chunk.charAt(i++);
@@ -221,7 +220,6 @@ else env = window;
 
       if(!c) break;
 
-      if (clarinet.DEBUG) console.log(i,c,clarinet.STATE[parser.state]);
       parser.position ++;
       if (c === "\n") {
         parser.line ++;
@@ -325,8 +323,7 @@ else env = window;
             ;
           STRING_BIGLOOP: while (true) {
             if (clarinet.DEBUG)
-              console.log(i,c,clarinet.STATE[parser.state]
-                         ,slashed);
+
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {
               parser.unicodeS += c;
