@@ -127,23 +127,14 @@ function varArgs(fn){
        argsHolder = Array(fn.length);
                 
    return function(){
-                      
-      var argumentsToFunction = slice.call(arguments);
-      
-      var numberOfVariableArguments = argumentsToFunction.length - numberOfFixedArguments,
-          i;
-
-      for (i = 0; i < numberOfFixedArguments; i++) {
-         argsHolder[i] = argumentsToFunction[i];         
+                            
+      for (var i = 0; i < numberOfFixedArguments; i++) {
+         argsHolder[i] = arguments[i];         
       }
 
-      // remove the last n elements from the array and append it onto the end of
-      // itself as a sub-array
-      var variableArgs = argsHolder[i] = Array(numberOfVariableArguments);
-      for (i = 0; i < numberOfVariableArguments; i++) {
-         variableArgs[i] = argumentsToFunction[numberOfFixedArguments + i];
-      } 
-             
+      argsHolder[numberOfFixedArguments] = 
+         slice.call(arguments, numberOfFixedArguments, arguments.length);
+                                
       return fn.apply( this, argsHolder);      
    }       
 }
