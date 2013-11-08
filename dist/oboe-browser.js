@@ -2157,8 +2157,8 @@ function apiMethod(defaultHttpMethod, arg1, arg2) {
    }
    
    function url(baseUrl, cached) {
-      
-      if( defined(cached) && !cached ) {
+     
+      if( cached === false ) {
            
          if( baseUrl.indexOf('?') == -1 ) {
             baseUrl += '?';
