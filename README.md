@@ -517,7 +517,7 @@ oboe.doPost(   String url, Object|String body )
 oboe.doPut(    String url, Object|String body )
 oboe.doPatch(  String url, Object|String body )              
 
-oboe.doGet(    {url:String, headers:{ key: value, ... }} )       
+oboe.doGet(    {url:String, headers:{ key: value, ... }}, cached:Boolean )       
 oboe.doDelete( {url:String, headers:{ key: value, ... }} )   
 oboe.doPost(   {url:String, headers:{ key: value, ... }, body:Object|String} )
 oboe.doPut(    {url:String, headers:{ key: value, ... }, body:Object|String} )       
@@ -526,6 +526,9 @@ oboe.doPatch(  {url:String, headers:{ key: value, ... }, body:Object|String} )
 
 If the body is given as an object it will be serialised using JSON.stringify.
 Method, body and headers arguments are all optional.
+
+If the cached option is set to false caching will be avoided by
+appending "_={timestamp}" to the URL's query string.
 
 The above are supported under Browsers or Node.js. Under Node you can also
 give Oboe a [ReadableStream](http://nodejs.org/api/stream.html#stream_class_stream_readable):
