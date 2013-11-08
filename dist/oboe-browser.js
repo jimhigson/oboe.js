@@ -460,7 +460,7 @@ else env = window;
     , S           = 0
     ;
 
-  clarinet.STATE =
+  S =
     { BEGIN                             : S++
     , VALUE                             : S++ // general stuff
     , OPEN_OBJECT                       : S++ // {
@@ -487,10 +487,10 @@ else env = window;
     , NUMBER_DIGIT                      : S++ // [0-9]
     };
 
-  for (var s_ in clarinet.STATE) clarinet.STATE[clarinet.STATE[s_]] = s_;
+  //for (var s_ in clarinet.STATE) clarinet.STATE[clarinet.STATE[s_]] = s_;
 
   // switcharoo
-  S = clarinet.STATE;
+  //S = clarinet.STATE;
 
   if (!Object.create) {
     Object.create = function (o) {

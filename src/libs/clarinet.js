@@ -35,40 +35,35 @@ else env = window;
     ];
 
   var buffers     = [ "textNode", "numberNode" ]
-    , S           = 0
+    , STATE           = 0
     ;
 
-  clarinet.STATE =
-    { BEGIN                             : S++
-    , VALUE                             : S++ // general stuff
-    , OPEN_OBJECT                       : S++ // {
-    , CLOSE_OBJECT                      : S++ // }
-    , OPEN_ARRAY                        : S++ // [
-    , CLOSE_ARRAY                       : S++ // ]
-    , TEXT_ESCAPE                       : S++ // \ stuff
-    , STRING                            : S++ // ""
-    , BACKSLASH                         : S++
-    , END                               : S++ // No more stack
-    , OPEN_KEY                          : S++ // , "a"
-    , CLOSE_KEY                         : S++ // :
-    , TRUE                              : S++ // r
-    , TRUE2                             : S++ // u
-    , TRUE3                             : S++ // e
-    , FALSE                             : S++ // a
-    , FALSE2                            : S++ // l
-    , FALSE3                            : S++ // s
-    , FALSE4                            : S++ // e
-    , NULL                              : S++ // u
-    , NULL2                             : S++ // l
-    , NULL3                             : S++ // l
-    , NUMBER_DECIMAL_POINT              : S++ // .
-    , NUMBER_DIGIT                      : S++ // [0-9]
+  STATE =
+    { BEGIN                             : STATE++
+    , VALUE                             : STATE++ // general stuff
+    , OPEN_OBJECT                       : STATE++ // {
+    , CLOSE_OBJECT                      : STATE++ // }
+    , OPEN_ARRAY                        : STATE++ // [
+    , CLOSE_ARRAY                       : STATE++ // ]
+    , TEXT_ESCAPE                       : STATE++ // \ stuff
+    , STRING                            : STATE++ // ""
+    , BACKSLASH                         : STATE++
+    , END                               : STATE++ // No more stack
+    , OPEN_KEY                          : STATE++ // , "a"
+    , CLOSE_KEY                         : STATE++ // :
+    , TRUE                              : STATE++ // r
+    , TRUE2                             : STATE++ // u
+    , TRUE3                             : STATE++ // e
+    , FALSE                             : STATE++ // a
+    , FALSE2                            : STATE++ // l
+    , FALSE3                            : STATE++ // s
+    , FALSE4                            : STATE++ // e
+    , NULL                              : STATE++ // u
+    , NULL2                             : STATE++ // l
+    , NULL3                             : STATE++ // l
+    , NUMBER_DECIMAL_POINT              : STATE++ // .
+    , NUMBER_DIGIT                      : STATE++ // [0-9]
     };
-
-  for (var s_ in clarinet.STATE) clarinet.STATE[clarinet.STATE[s_]] = s_;
-
-  // switcharoo
-  S = clarinet.STATE;
 
   if (!Object.create) {
     Object.create = function (o) {
@@ -132,7 +127,7 @@ else env = window;
     parser.opt      = opt || {};
     parser.closed   = parser.closedRoot = parser.sawRoot = false;
     parser.tag      = parser.error = null;
-    parser.state    = S.BEGIN;
+    parser.state    = STATE.BEGIN;
     parser.stack    = new fastlist();
     // mostly just for error reporting
     parser.position = parser.column = 0;
@@ -191,7 +186,7 @@ else env = window;
   }
 
   function end(parser) {
-    if (parser.state !== S.VALUE) error(parser, "Unexpected end");
+    if (parser.state !== STATE.VALUE) error(parser, "Unexpected end");
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
@@ -227,95 +222,95 @@ else env = window;
       } else parser.column ++;
       switch (parser.state) {
 
-        case S.BEGIN:
-          if (c === "{") parser.state = S.OPEN_OBJECT;
-          else if (c === "[") parser.state = S.OPEN_ARRAY;
+        case STATE.BEGIN:
+          if (c === "{") parser.state = STATE.OPEN_OBJECT;
+          else if (c === "[") parser.state = STATE.OPEN_ARRAY;
           else if (c !== '\r' && c !== '\n' && c !== ' ' && c !== '\t')
             error(parser, "Non-whitespace before {[.");
         continue;
 
-        case S.OPEN_KEY:
-        case S.OPEN_OBJECT:
+        case STATE.OPEN_KEY:
+        case STATE.OPEN_OBJECT:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          if(parser.state === S.OPEN_KEY) parser.stack.push(S.CLOSE_KEY);
+          if(parser.state === STATE.OPEN_KEY) parser.stack.push(STATE.CLOSE_KEY);
           else {
             if(c === '}') {
               emit(parser, 'onopenobject');
               emit(parser, 'oncloseobject');
-              parser.state = parser.stack.pop() || S.VALUE;
+              parser.state = parser.stack.pop() || STATE.VALUE;
               continue;
-            } else  parser.stack.push(S.CLOSE_OBJECT);
+            } else  parser.stack.push(STATE.CLOSE_OBJECT);
           }
-          if(c === '"') parser.state = S.STRING;
+          if(c === '"') parser.state = STATE.STRING;
           else error(parser, "Malformed object key should start with \"");
         continue;
 
-        case S.CLOSE_KEY:
-        case S.CLOSE_OBJECT:
+        case STATE.CLOSE_KEY:
+        case STATE.CLOSE_OBJECT:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          var event = (parser.state === S.CLOSE_KEY) ? 'key' : 'object';
+          var event = (parser.state === STATE.CLOSE_KEY) ? 'key' : 'object';
           if(c===':') {
-            if(parser.state === S.CLOSE_OBJECT) {
-              parser.stack.push(S.CLOSE_OBJECT);
+            if(parser.state === STATE.CLOSE_OBJECT) {
+              parser.stack.push(STATE.CLOSE_OBJECT);
               closeValue(parser, 'onopenobject');
             } else closeValue(parser, 'onkey');
-            parser.state  = S.VALUE;
+            parser.state  = STATE.VALUE;
           } else if (c==='}') {
             emitNode(parser, 'oncloseobject');
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           } else if(c===',') {
-            if(parser.state === S.CLOSE_OBJECT)
-              parser.stack.push(S.CLOSE_OBJECT);
+            if(parser.state === STATE.CLOSE_OBJECT)
+              parser.stack.push(STATE.CLOSE_OBJECT);
             closeValue(parser);
-            parser.state  = S.OPEN_KEY;
+            parser.state  = STATE.OPEN_KEY;
           } else error(parser, 'Bad object');
         continue;
 
-        case S.OPEN_ARRAY: // after an array there always a value
-        case S.VALUE:
+        case STATE.OPEN_ARRAY: // after an array there always a value
+        case STATE.VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          if(parser.state===S.OPEN_ARRAY) {
+          if(parser.state===STATE.OPEN_ARRAY) {
             emit(parser, 'onopenarray');
-            parser.state = S.VALUE;
+            parser.state = STATE.VALUE;
             if(c === ']') {
               emit(parser, 'onclosearray');
-              parser.state = parser.stack.pop() || S.VALUE;
+              parser.state = parser.stack.pop() || STATE.VALUE;
               continue;
             } else {
-              parser.stack.push(S.CLOSE_ARRAY);
+              parser.stack.push(STATE.CLOSE_ARRAY);
             }
           }
-               if(c === '"') parser.state = S.STRING;
-          else if(c === '{') parser.state = S.OPEN_OBJECT;
-          else if(c === '[') parser.state = S.OPEN_ARRAY;
-          else if(c === 't') parser.state = S.TRUE;
-          else if(c === 'f') parser.state = S.FALSE;
-          else if(c === 'n') parser.state = S.NULL;
+               if(c === '"') parser.state = STATE.STRING;
+          else if(c === '{') parser.state = STATE.OPEN_OBJECT;
+          else if(c === '[') parser.state = STATE.OPEN_ARRAY;
+          else if(c === 't') parser.state = STATE.TRUE;
+          else if(c === 'f') parser.state = STATE.FALSE;
+          else if(c === 'n') parser.state = STATE.NULL;
           else if(c === '-') { // keep and continue
             parser.numberNode += c;
           } else if(c==='0') {
             parser.numberNode += c;
-            parser.state = S.NUMBER_DIGIT;
+            parser.state = STATE.NUMBER_DIGIT;
           } else if('123456789'.indexOf(c) !== -1) {
             parser.numberNode += c;
-            parser.state = S.NUMBER_DIGIT;
+            parser.state = STATE.NUMBER_DIGIT;
           } else               error(parser, "Bad value");
         continue;
 
-        case S.CLOSE_ARRAY:
+        case STATE.CLOSE_ARRAY:
           if(c===',') {
-            parser.stack.push(S.CLOSE_ARRAY);
+            parser.stack.push(STATE.CLOSE_ARRAY);
             closeValue(parser, 'onvalue');
-            parser.state  = S.VALUE;
+            parser.state  = STATE.VALUE;
           } else if (c===']') {
             emitNode(parser, 'onclosearray');
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
               continue;
           else error(parser, 'Bad array');
         continue;
 
-        case S.STRING:
+        case STATE.STRING:
           // thanks thejh, this is an about 50% performance improvement.
           var starti              = i-1
             , slashed = parser.slashed
@@ -340,7 +335,7 @@ else env = window;
               if (!c) break STRING_BIGLOOP;
             }
             if (c === '"' && !slashed) {
-              parser.state = parser.stack.pop() || S.VALUE;
+              parser.state = parser.stack.pop() || STATE.VALUE;
               parser.textNode += chunk.substring(starti, i-1);
               if(!parser.textNode) {
                  emit(parser, "onvalue", "");
@@ -391,80 +386,80 @@ else env = window;
           parser.unicodeI = unicodeI;
         continue;
 
-        case S.TRUE:
+        case STATE.TRUE:
           if (c==='')  continue; // strange buffers
-          if (c==='r') parser.state = S.TRUE2;
+          if (c==='r') parser.state = STATE.TRUE2;
           else error(parser, 'Invalid true started with t'+ c);
         continue;
 
-        case S.TRUE2:
+        case STATE.TRUE2:
           if (c==='')  continue;
-          if (c==='u') parser.state = S.TRUE3;
+          if (c==='u') parser.state = STATE.TRUE3;
           else error(parser, 'Invalid true started with tr'+ c);
         continue;
 
-        case S.TRUE3:
+        case STATE.TRUE3:
           if (c==='') continue;
           if(c==='e') {
             emit(parser, "onvalue", true);
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           } else error(parser, 'Invalid true started with tru'+ c);
         continue;
 
-        case S.FALSE:
+        case STATE.FALSE:
           if (c==='')  continue;
-          if (c==='a') parser.state = S.FALSE2;
+          if (c==='a') parser.state = STATE.FALSE2;
           else error(parser, 'Invalid false started with f'+ c);
         continue;
 
-        case S.FALSE2:
+        case STATE.FALSE2:
           if (c==='')  continue;
-          if (c==='l') parser.state = S.FALSE3;
+          if (c==='l') parser.state = STATE.FALSE3;
           else error(parser, 'Invalid false started with fa'+ c);
         continue;
 
-        case S.FALSE3:
+        case STATE.FALSE3:
           if (c==='')  continue;
-          if (c==='s') parser.state = S.FALSE4;
+          if (c==='s') parser.state = STATE.FALSE4;
           else error(parser, 'Invalid false started with fal'+ c);
         continue;
 
-        case S.FALSE4:
+        case STATE.FALSE4:
           if (c==='')  continue;
           if (c==='e') {
             emit(parser, "onvalue", false);
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           } else error(parser, 'Invalid false started with fals'+ c);
         continue;
 
-        case S.NULL:
+        case STATE.NULL:
           if (c==='')  continue;
-          if (c==='u') parser.state = S.NULL2;
+          if (c==='u') parser.state = STATE.NULL2;
           else error(parser, 'Invalid null started with n'+ c);
         continue;
 
-        case S.NULL2:
+        case STATE.NULL2:
           if (c==='')  continue;
-          if (c==='l') parser.state = S.NULL3;
+          if (c==='l') parser.state = STATE.NULL3;
           else error(parser, 'Invalid null started with nu'+ c);
         continue;
 
-        case S.NULL3:
+        case STATE.NULL3:
           if (c==='') continue;
           if(c==='l') {
             emit(parser, "onvalue", null);
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           } else error(parser, 'Invalid null started with nul'+ c);
         continue;
 
-        case S.NUMBER_DECIMAL_POINT:
+        case STATE.NUMBER_DECIMAL_POINT:
           if(c==='.') {
             parser.numberNode += c;
-            parser.state       = S.NUMBER_DIGIT;
+            parser.state       = STATE.NUMBER_DIGIT;
           } else error(parser, 'Leading zero not followed by .');
         continue;
 
-        case S.NUMBER_DIGIT:
+        case STATE.NUMBER_DIGIT:
           if('0123456789'.indexOf(c) !== -1) parser.numberNode += c;
           else if (c==='.') {
             if(parser.numberNode.indexOf('.')!==-1)
@@ -482,7 +477,7 @@ else env = window;
           } else {
             closeNumber(parser);
             i--; // go back one
-            parser.state = parser.stack.pop() || S.VALUE;
+            parser.state = parser.stack.pop() || STATE.VALUE;
           }
         continue;
 
