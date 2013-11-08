@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
 
-   var AUTO_START_BROWSERS = ['Chrome', 'Firefox', 'Safari'];
+   var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
 
    var STREAM_SOURCE_PORT = 4567;
 
@@ -140,29 +140,29 @@ module.exports = function (grunt) {
          }
       ,
          'single-dev': {
-            browsers: AUTO_START_BROWSERS,
+            browsers: autoStartBrowsers,
             configFile: 'test/unit.conf.js'
          }
       ,
          'single-concat': {
-            browsers: AUTO_START_BROWSERS,
+            browsers: autoStartBrowsers,
             configFile: 'test/concat.conf.js'      
          }  
       ,  
          'single-minified': {
-            browsers: AUTO_START_BROWSERS,
+            browsers: autoStartBrowsers,
             configFile: 'test/min.conf.js'
          }
          
       ,  
          'single-amd': {
-            browsers: AUTO_START_BROWSERS,
+            browsers: autoStartBrowsers,
             configFile: 'test/amd.conf.js'
          }         
          
       ,  
          'single-browser-http': {
-            browsers: AUTO_START_BROWSERS,
+            browsers: autoStartBrowsers,
             configFile: 'test/http.conf.js'
          }         
          
@@ -262,10 +262,8 @@ module.exports = function (grunt) {
          streamSource.stop();
       }
          
-      grunt.log.ok('let\'s get a streaming server started');
       streamSource = require('./test/streamsource.js');
       streamSource.start(STREAM_SOURCE_PORT, grunt);
-      grunt.log.ok('we started it, but does it work?', streamSource);  
    });
 
    grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
@@ -285,6 +283,15 @@ module.exports = function (grunt) {
          
       });
    });   
+
+   // change the auto-starting browsers so that future tests will use
+   // phantomjs instead of actual browsers. Can do: 
+   //    grunt headless-mode default
+   // to run without any actual browsers
+   grunt.registerTask('headless-mode', function(){
+      autoStartBrowsers.length = 0;
+      autoStartBrowsers.push('PhantomJS');
+   })
       
    grunt.registerTask('test-start-server',   [
       'karma:persist'

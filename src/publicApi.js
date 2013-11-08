@@ -4,7 +4,7 @@ function apiMethod(defaultHttpMethod, arg1, arg2) {
    if (arg1.url) {
 
       // method signature is:
-      //    oboe({method:m, url:u, body:b, complete:c, headers:{...}})
+      //    oboe({method:m, url:u, body:b, headers:{...}})
 
       return wire(
          (arg1.method || defaultHttpMethod),

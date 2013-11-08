@@ -1423,7 +1423,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
          apply(parameters, oboeApi[eventId]);
       } else {
       
-         // the even has no special handling, add it direclty to
+         // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
          on(eventId, listener);
@@ -1545,7 +1545,7 @@ function apiMethod(defaultHttpMethod, arg1, arg2) {
    if (arg1.url) {
 
       // method signature is:
-      //    oboe({method:m, url:u, body:b, complete:c, headers:{...}})
+      //    oboe({method:m, url:u, body:b, headers:{...}})
 
       return wire(
          (arg1.method || defaultHttpMethod),

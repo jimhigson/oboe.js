@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jimhigson/oboe.js.png?branch=master)](https://travis-ci.org/jimhigson/oboe.js)
+
 **Oboe.js** helps web applications respond quicker by wrapping http's request-response model
 with a progressively streamed interface.
 It glues a transport that sits 
@@ -64,9 +66,10 @@ a neat way to route different parts of a json response to different parts of his
 ## A simple download
 
 It isn't really what Oboe is for but you can use it as a simple AJAX library.
-This might be good to drop it into an existing application then refactor
-some more to make it progressive. 
+This might be good to drop it into an existing application so you can refactor
+later to make it progressive.
 
+``` js
 oboe('/myapp/things.json')
    .done( function(things) {
    
@@ -76,6 +79,7 @@ oboe('/myapp/things.json')
    
       // we don't got it
    });
+```
 
 ## Using objects from the JSON stream
 

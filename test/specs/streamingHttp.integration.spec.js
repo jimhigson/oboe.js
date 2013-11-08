@@ -1,6 +1,7 @@
 /* Tests the streaming xhr without stubbing anything. Really just a test that 
 *  we've got the interface of the in-browser XHR object pinned down  */
 
+
 describe('streaming xhr integration (real http)', function() {
    "use strict";
  
@@ -146,7 +147,7 @@ describe('streaming xhr integration (real http)', function() {
    
    it('can make a put request',  function() {
    
-      var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
+      var payload = {'thisWill':'bePut','andShould':'be','echoed':'back'};
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
@@ -167,39 +168,43 @@ describe('streaming xhr integration (real http)', function() {
      
    }) 
 
-   if( !internetExplorer ) {
-      // IE seems to have problems with PATCH requests. Nothing I can do to
-      // make it work :-(
+  
+   it('can make a patch request',  function() {
    
-      it('can make a patch request',  function() {
-      
-         var payload = {'thisWill':'bePosted','andShould':'be','echoed':'back'};
-      
-         // in practice, since we're running on an internal network and this is a small file,
-         // we'll probably only get one callback         
-         streamingHttp(
-            emit, on,
-            httpTransport(),         
-            'PATCH',
-             '/testServer/echoBackBody',
-             payload       
-         );
-         
-         waitForRequestToComplete();            
+      var payload = {'thisWill':'bePatched','andShould':'be','echoed':'back'};
    
-         runs(function(){
-            expect(contentReceived).toParseTo(payload)
-            expect(emit).toHaveGivenStreamEventsInCorrectOrder()            
-         });
-        
-      })
-   }   
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      streamingHttp(
+         emit, on,
+         httpTransport(),         
+         'PATCH',
+          '/testServer/echoBackBody',
+          payload       
+      );
+      
+      waitForRequestToComplete();            
+
+      runs(function(){
+         if( contentReceived == '' &&
+             (Platform.internetExplorer || Platform.isPhantom) ) {
+            console.warn( 'this user agent seems not to support giving content' 
+                          + ' back for of PATCH requests.'
+                          + ' This happens on PhantomJS and IE < 9');
+         } else {         
+            expect(contentReceived).toParseTo(payload);
+            expect(emit).toHaveGivenStreamEventsInCorrectOrder();
+         }            
+      });
+     
+   })
+   
           
    // this test is only activated for non-IE browsers and IE 10 or newer.
    // old and rubbish browsers buffer the xhr response meaning that this 
    // will never pass. But for good browsers it is good to have an integration
    // test to confirm that we're getting it right.           
-   if( !internetExplorer || internetExplorer >= 10 ) {          
+   if( !Platform.internetExplorer || Platform.internetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function() {
                               
          streamingHttp(                           
@@ -236,7 +241,17 @@ describe('streaming xhr integration (real http)', function() {
          waitForRequestToComplete();      
    
          runs(function(){
-            expect(numberOfProgressCallbacks).toBeGreaterThan(1);
+            // some platforms can't help but not work here so warn but don't
+            // fail the test:
+            if( numberOfProgressCallbacks == 1 && 
+                  (Platform.isInternetExplorer || Platform.isPhantom) ) {
+               console.warn('This user agent seems to give gzipped responses' +
+                   'as a single event, not progressively. This happens on ' +
+                   'PhantomJS and IE < 9');
+            } else {
+               expect(numberOfProgressCallbacks).toBeGreaterThan(1);
+            }
+         
             expect(emit).toHaveGivenStreamEventsInCorrectOrder();
          });      
       })      
@@ -288,6 +303,16 @@ describe('streaming xhr integration (real http)', function() {
       numberOfProgressCallbacks = 0;
       dripsReceived = [];
       requestCompleteListener = jasmine.createSpy();
+      
+      function prettyPrintEvent(event){
+
+         switch(event) {
+            case     HTTP_START:  return 'start';
+            case     STREAM_DATA: return 'data';
+            case     STREAM_END:  return 'end';
+            default: return 'unknown(' + event + ')' 
+         }                                    
+      }
             
       this.addMatchers({
          toHaveGivenStreamEventsInCorrectOrder: function(){
@@ -299,15 +324,10 @@ describe('streaming xhr integration (real http)', function() {
             });
             
             this.message = function(){
-               return 'events not in correct order. We have: [' +
-                        eventsOrder.map(function(event){
-                           switch(event) {
-                              case HTTP_START: return 'start';
-                              case STREAM_DATA: return 'data';
-                              case STREAM_END: return 'end';
-                           }                           
-                        }) 
-                           .join(', ') + ']';
+               return 'events not in correct order. We have: ' +
+                        JSON.stringify(
+                           eventsOrder.map(prettyPrintEvent)
+                        )                          
             };
             
             return   eventsOrder[0] === HTTP_START
@@ -317,24 +337,35 @@ describe('streaming xhr integration (real http)', function() {
       
          toParseTo:function( expectedObj ){
             
+            var actual = this.actual;
             var normalisedActual;
-            
+                       
+            if( !actual ) {
+               this.message = function(){
+                  return 'no content has been received';
+               }
+               return false;
+            }                       
+                       
             try{
-               normalisedActual = JSON.stringify( JSON.parse(this.actual) );
+               normalisedActual = JSON.stringify( JSON.parse(actual) );
             }catch(e){
             
                this.message = function(){
-                  return "Expected to be able to parse the found content as json " + this.actual;                  
+                
+                  return "Expected to be able to parse the found " +
+                      "content as json '" + actual + "' but it " +
+                      "could not be parsed";                  
                }
                
-               return false;            
+               return false;          
             }   
             
             this.message = function(){
                return "The found json parsed but did not match " + JSON.stringify(expectedObj) + 
                         " because found " + this.actual; 
             }
-            
+                        
             return (normalisedActual === JSON.stringify(expectedObj));
          }
       });
