@@ -18,11 +18,23 @@ var clarinet = require("clarinet");
  *    pirateGreeting("Guybrush Threepwood"); 
  *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
-var partialComplete = varArgs(function( fn, boundArgs ) {
+var partialComplete = varArgs(function( fn, args ) {
+
+      // this isn't the shortest way to write this but it does
+      // avoid creating a new array each time to pass to fn.apply,
+      // otherwise could just call boundArgs.concat(callArgs)       
+
+      var numBoundArgs = args.length;
 
       return varArgs(function( callArgs ) {
-               
-         return fn.apply(this, boundArgs.concat(callArgs));
+         
+         for (var i = 0; i < callArgs.length; i++) {
+            args[numBoundArgs + i] = callArgs[i];
+         }
+         
+         args.length = numBoundArgs + callArgs.length;         
+                     
+         return fn.apply(this, args);
       }); 
    }),
 
