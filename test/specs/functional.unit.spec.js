@@ -106,6 +106,12 @@ describe("functional", function() {
       
          expect( getLength("hello") ).toBe( 5 );
       });      
+      
+      it('can get a numbered array element out', function() {
+         var getLength = attr(0);
+      
+         expect( getLength(['a','b','c']) ).toBe( 'a' );
+      });            
    })
    
 });
