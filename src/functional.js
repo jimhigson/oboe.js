@@ -123,7 +123,8 @@ function varArgs(fn){
        slice = Array.prototype.slice,
        
        // we know how many arguments fn will always take, so create a
-       // fixed-size array to hold exactly that many:
+       // fixed-size array to hold that many, to be re-used to
+       // avoid creating a new array:
        argsHolder = Array(fn.length);
                 
    return function(){
