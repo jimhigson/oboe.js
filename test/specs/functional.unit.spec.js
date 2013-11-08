@@ -91,8 +91,36 @@ describe("functional", function() {
          
          expect( id(2) ).toBe(2);      
       });
+
+
+      describe('compose2', function() {
+         // optimised version of compose that takes exactly two arguments
+
+         it('executes composed functions right-to-left', function(){
+            
+            var composed = compose2(dub, inc);  // composed(x) = dub(inc(x))
+            
+            expect(composed(2)).toBe( 6 ); // if this gives 5 the order is wrong      
+         });
+         
+         it('may have an outermost function taking more than one argument', function() {
+      
+            var composed = compose2(inc, div);  // composed(x, y) = x/y +1
+      
+            expect( composed( 10, 2 ) ).toBe(6); // 10/2 +1 = 5+1 = 6     
+         });      
+         
+         it('can compose head to take an item off a list and then use it', function() {
+            var list = cons( {a:1}, emptyList );
+      
+            expect( compose2(attr('a'), head)( list ) ).toBe(1);      
+         });
+                                    
+      })
        
    });
+   
+   
    
    describe('attr', function() {
       it('can get a value from an object at the named key', function() {

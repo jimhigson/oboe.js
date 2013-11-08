@@ -175,7 +175,7 @@ function incrementalContentBuilder( emit ) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose( nodeFinished, nodeFound ),
+      value: compose2( nodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.

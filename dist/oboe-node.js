@@ -36,18 +36,31 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
+      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
       function next(params, curFn) {  
          return [apply(params, curFn)];   
       }
-      
+            
       return varArgs(function(startParams){
         
          return foldR(next, startParams, fnsList)[0];
       });
    });
+
+/**
+ * A more optimised version of compose that takes exactly two functions
+ * @param f1
+ * @param f2
+ */
+function compose2(f1, f2){
+   return function(){
+      return f1(f2.apply(this,arguments));
+   }
+}
+
 
 function attr(key) {
    return new Function('o', 'return o["' + key + '"]' );
@@ -142,7 +155,7 @@ function varArgs(fn){
       }
 
       argsHolder[numberOfFixedArguments] = 
-         slice.call(arguments, numberOfFixedArguments, arguments.length);
+         slice.call(arguments, numberOfFixedArguments);
                                 
       return fn.apply( this, argsHolder);      
    }       
@@ -335,6 +348,20 @@ function foldR(fn, startValue, list) {
             : startValue
             ;
 }
+
+/**
+ * foldR implementation. Reduce a list down to a single value.
+ * 
+ * @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR1(fn, list) {
+      
+   return tail(list) 
+            ? fn(foldR1(fn, tail(list)), head(list))
+            : head(list)
+            ;
+}
+
 
 /**
  * Return a list like the one given but with the first instance equal 
@@ -843,7 +870,7 @@ function incrementalContentBuilder( emit ) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose( nodeFinished, nodeFound ),
+      value: compose2( nodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.
@@ -875,7 +902,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
 
-   var headKey = compose(keyOf, head);
+   var headKey  = compose2(keyOf, head),
+       headNode = compose2(nodeOf, head);
                    
    /**
     * Create an evaluator function for a named path node, expressed in the
@@ -915,10 +943,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                                     arrayAsList(fieldListStr.split(/\W+/))
                                  ),
                                  
-          isMatch =  compose( 
+          isMatch =  compose2( 
                         hasAllrequiredFields, 
-                        nodeOf, 
-                        head
+                        headNode
                      );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -978,7 +1005,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                /* We are not at the root of the ascent yet.
                   Move to the next level of the ascent by handing only 
                   the tail to the previous expression */ 
-               compose(previousExpr, tail) 
+               compose2(previousExpr, tail) 
       );
                                                                                                                
    }   
@@ -1477,20 +1504,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
 function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   on(STREAM_DATA,         
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            
-            clarinetParser.write(nextDrip);            
-         } catch(e) { 
-            /* we don't have to do anything here because we always assign
-               a .onerror to clarinet which will have already been called 
-               by the time this exception is thrown. */                
-         }
-      }
-   );
+   on(STREAM_DATA, clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 

@@ -33,18 +33,31 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
+      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
       function next(params, curFn) {  
          return [apply(params, curFn)];   
       }
-      
+            
       return varArgs(function(startParams){
         
          return foldR(next, startParams, fnsList)[0];
       });
    });
+
+/**
+ * A more optimised version of compose that takes exactly two functions
+ * @param f1
+ * @param f2
+ */
+function compose2(f1, f2){
+   return function(){
+      return f1(f2.apply(this,arguments));
+   }
+}
+
 
 function attr(key) {
    return new Function('o', 'return o["' + key + '"]' );
@@ -139,7 +152,7 @@ function varArgs(fn){
       }
 
       argsHolder[numberOfFixedArguments] = 
-         slice.call(arguments, numberOfFixedArguments, arguments.length);
+         slice.call(arguments, numberOfFixedArguments);
                                 
       return fn.apply( this, argsHolder);      
    }       
