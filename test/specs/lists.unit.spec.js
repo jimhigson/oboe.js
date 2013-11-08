@@ -142,6 +142,28 @@ describe("Lists", function(){
       });
    });
    
+   describe('foldR1', function(){
+   
+      it("can fold list where order doesnt matter", function(){
+         function add(n, m){ return n+m }
+         
+         var sum = foldR1(add, list(1,2,3,4));
+         
+         expect( sum ).toEqual( 1 + 2 + 3 + 4 );   
+      });
+      
+   
+      it("can fold list in the correct order", function(){
+         function functionString(param, fnName){ return fnName + '(' + param + ')' }
+         
+         var functionStringResult = foldR1(functionString, list('a', 'b', 'c'));
+         
+         // if order were wrong, might give c(b(a))
+                  
+         expect( functionStringResult ).toEqual( 'a(b(c))' );   
+      });
+   });   
+   
    it('may apply a list of functions with side effects', function(){
    
       var callback1 = jasmine.createSpy(),

@@ -22,7 +22,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
 
-   var headKey = compose(keyOf, head);
+   var headKey  = compose2(keyOf, head),
+       headNode = compose2(nodeOf, head);
                    
    /**
     * Create an evaluator function for a named path node, expressed in the
@@ -62,10 +63,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                                     arrayAsList(fieldListStr.split(/\W+/))
                                  ),
                                  
-          isMatch =  compose( 
+          isMatch =  compose2( 
                         hasAllrequiredFields, 
-                        nodeOf, 
-                        head
+                        headNode
                      );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -125,7 +125,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                /* We are not at the root of the ascent yet.
                   Move to the next level of the ascent by handing only 
                   the tail to the previous expression */ 
-               compose(previousExpr, tail) 
+               compose2(previousExpr, tail) 
       );
                                                                                                                
    }   

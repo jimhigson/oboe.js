@@ -46,6 +46,18 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
       });
    });
 
+/**
+ * A more optimised version of compose that takes exactly two functions
+ * @param f1
+ * @param f2
+ */
+function compose2(f1, f2){
+   return function(){
+      return f1(f2.apply(this,arguments));
+   }
+}
+
+
 function attr(key) {
    return new Function('o', 'return o["' + key + '"]' );
 }
