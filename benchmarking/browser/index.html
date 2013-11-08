@@ -37,9 +37,25 @@
          
             runTest( JSON.stringify(jsonObj) );         
           });
-          
+                              
       function runTest(content) {
       
+         var lastCreatedXhr;
+      
+         console.log('faking the xhr');
+      
+         // stub out the XHR
+         function FakeXHR(){
+            lastCreatedXhr = this;            
+         }
+         FakeXHR.prototype.getAllResponseHeaders = function() {
+            return "";
+         }
+         FakeXHR.prototype.open =
+         FakeXHR.prototype.setRequestHeader = 
+         FakeXHR.prototype.send = 
+            function() {}
+         window.XMLHttpRequest = FakeXHR;                           
          
          console.log('will start testing in', initialWait, '...');
                
@@ -54,18 +70,12 @@
          function perform(times){
              // this doesn't give very reliable results because it relies on 
              // actual AJAXing which can of course be variable
+            console.log('running the test', times);
           
             var nodeCount = 0;
 
             var emitFn;
-                        
-            // fake the streaming transport to not fetch anything. While we are
-            // here we might as well use this to grab a reference to the event
-            // bus:
-            window.streamingHttp = function fakeStream(emit, on /* ... ignored ... */){
-               emitFn = emit;            
-            };            
-          
+                                  
             oboe('any_url')
                .node('!.$result..{age name company}', function(obj){
                 
@@ -83,14 +93,19 @@
                   } else {
                      perform(times-1);
                   }            
+               }).fail(function(e){
+                  console.log(e);
                });
                
-            // oboe is wired up, let's start faking the content:                     
-            emitFn(HTTP_START, 200, {});
-            emitFn(STREAM_DATA, content);
-            emitFn(STREAM_END);               
+            // oboe is wired up, let's start faking the content:
+            lastCreatedXhr.readyState = 2;
+            lastCreatedXhr.onreadystatechange();
+            
+            lastCreatedXhr.responseText = content;                          
+            lastCreatedXhr.status = 200;
+            lastCreatedXhr.readyState = 4;
+            lastCreatedXhr.onreadystatechange();               
          }
-          
       }                    
       
    </script> 
