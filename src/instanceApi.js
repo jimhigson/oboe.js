@@ -4,7 +4,7 @@ function instanceApi(bus){
    var oboeApi,
        addDoneListener = partialComplete(
            addNodeOrPathListenerApi, 
-                              'node', '!');
+           'node', '!');
    
    
    function addPathOrNodeListener( publicApiName, pattern, callback ) {
