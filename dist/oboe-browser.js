@@ -121,21 +121,24 @@ function apply(args, fn) {
  */
 function varArgs(fn){
 
-   var numberOfFixedArguments = fn.length -1;
-         
+   var numberOfFixedArguments = fn.length -1,
+       slice = Array.prototype.slice,
+       
+       // we know how many arguments fn will always take, so create a
+       // fixed-size array to hold that many, to be re-used to
+       // avoid creating a new array:
+       argsHolder = Array(fn.length);
+                
    return function(){
-   
-      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
-      
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
-      // remove the last n elements from the array and append it onto the end of
-      // itself as a sub-array
-      argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
-      );   
-      
-      return fn.apply( this, argumentsToFunction );
+                            
+      for (var i = 0; i < numberOfFixedArguments; i++) {
+         argsHolder[i] = arguments[i];         
+      }
+
+      argsHolder[numberOfFixedArguments] = 
+         slice.call(arguments, numberOfFixedArguments, arguments.length);
+                                
+      return fn.apply( this, argsHolder);      
    }       
 }
 
@@ -356,17 +359,18 @@ function all(fn, list) {
 }
 
 /**
- * Apply a function to every item in a list
+ * Call every function in a list of functions
  * 
  * This doesn't make any sense if we're doing pure functional because 
- * it doesn't return anything. Hence, this is only really useful if fn 
- * has side-effects. 
+ * it doesn't return anything. Hence, this is only really useful if the
+ * functions being called have side-effects. 
  */
-function each(fn, list) {
+function applyEach(args, list) {
 
-   if( list ){  
-      fn(head(list));
-      each(fn, tail(list));
+   if( list ) {  
+      apply(args, head(list))
+      
+      applyEach(args, tail(list));
    }
 }
 
@@ -387,14 +391,19 @@ function reverseList(list){
 
    return reverseInner(list, emptyList);
 }
-/* This is a slightly hacked-up version of clarinet with some
+/* 
+   This is a slightly hacked-up version of clarinet with the
    Node.js specific features removed.
+   
+   For the original go here:
+      https://github.com/dscape/clarinet
  */
 
-;(function (clarinet) {
-  // non node-js needs to set clarinet debug on root
-  var env
-    , fastlist = Array
+var clarinet = (function () {
+
+  var clarinet = {}
+    , env
+    , fastlist = Array    
     ;
 
 if(typeof process === 'object' && process.env) env = process.env;
@@ -535,7 +544,6 @@ else env = window;
     };
 
   function emit(parser, event, data) {
-    if(clarinet.INFO) console.log('-- emit', event, data);
     if (parser[event]) parser[event](data);
   }
 
@@ -592,7 +600,7 @@ else env = window;
       "Cannot write after close. Assign an onready handler.");
     if (chunk === null) return end(parser);
     var i = 0, c = chunk[0], p = parser.p;
-    if (clarinet.DEBUG) console.log('write -> [' + chunk + ']');
+
     while (c) {
       p = c;
       parser.c = c = chunk.charAt(i++);
@@ -605,7 +613,6 @@ else env = window;
 
       if(!c) break;
 
-      if (clarinet.DEBUG) console.log(i,c,clarinet.STATE[parser.state]);
       parser.position ++;
       if (c === "\n") {
         parser.line ++;
@@ -709,8 +716,7 @@ else env = window;
             ;
           STRING_BIGLOOP: while (true) {
             if (clarinet.DEBUG)
-              console.log(i,c,clarinet.STATE[parser.state]
-                         ,slashed);
+
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {
               parser.unicodeS += c;
@@ -882,7 +888,8 @@ else env = window;
     return parser;
   }
 
-})(clarinet = {});
+  return clarinet;
+})();
 
 
 /** 
@@ -1785,9 +1792,9 @@ function pubSub(){
       }, 
     
       emit:varArgs(function ( eventId, parameters ) {
-               
-         each( 
-            partialComplete( apply, parameters ), 
+                                             
+         applyEach( 
+            parameters, 
             listeners[eventId]
          );
       }),
