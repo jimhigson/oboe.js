@@ -26,6 +26,7 @@
          
       // how long to wait at start to give browser a chance to optimise scripts   
       var initialWait = 3000;
+      var progressAtOnce = 1024; // fire progress with this many bytes      
       var numberOfRuns = 40;            
       var testName = numberOfRuns + ' big downloads';
       var profile = true;        
@@ -53,6 +54,7 @@
          }
          FakeXHR.prototype.open =
          FakeXHR.prototype.setRequestHeader = 
+         FakeXHR.prototype.onprogress = 
          FakeXHR.prototype.send = 
             function() {}
          window.XMLHttpRequest = FakeXHR;                           
@@ -107,6 +109,12 @@
             lastCreatedXhr.readyState = 2;
             lastCreatedXhr.onreadystatechange();
             
+            // pass content in a drip at a time
+            for( var ptr = 0; ptr < content.length; ptr += progressAtOnce ) {
+               lastCreatedXhr.responseText = content.substr(0, ptr);
+               lastCreatedXhr.onprogress();   
+            }
+                        
             lastCreatedXhr.responseText = content;                          
             lastCreatedXhr.status = 200;
             lastCreatedXhr.readyState = 4;
