@@ -1,7 +1,7 @@
 {
   "name": "oboe",
   "title": "Oboe.js",
-  "version": "1.8.3",
+  "version": "1.8.6",
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
   "scripts": {

@@ -103,6 +103,20 @@ function foldR(fn, startValue, list) {
 }
 
 /**
+ * foldR implementation. Reduce a list down to a single value.
+ * 
+ * @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR1(fn, list) {
+      
+   return tail(list) 
+            ? fn(foldR1(fn, tail(list)), head(list))
+            : head(list)
+            ;
+}
+
+
+/**
  * Return a list like the one given but with the first instance equal 
  * to item removed 
  */

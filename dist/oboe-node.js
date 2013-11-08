@@ -2,6 +2,7 @@
 module.exports = (function  () {
 var clarinet = require("clarinet");
 /** 
+/** 
  * Partially complete a function.
  * 
  * Eg: 
@@ -17,11 +18,23 @@ var clarinet = require("clarinet");
  *    pirateGreeting("Guybrush Threepwood"); 
  *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
-var partialComplete = varArgs(function( fn, boundArgs ) {
+var partialComplete = varArgs(function( fn, args ) {
+
+      // this isn't the shortest way to write this but it does
+      // avoid creating a new array each time to pass to fn.apply,
+      // otherwise could just call boundArgs.concat(callArgs)       
+
+      var numBoundArgs = args.length;
 
       return varArgs(function( callArgs ) {
-               
-         return fn.apply(this, boundArgs.concat(callArgs));
+         
+         for (var i = 0; i < callArgs.length; i++) {
+            args[numBoundArgs + i] = callArgs[i];
+         }
+         
+         args.length = numBoundArgs + callArgs.length;         
+                     
+         return fn.apply(this, args);
       }); 
    }),
 
@@ -35,19 +48,36 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
+      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
       function next(params, curFn) {  
          return [apply(params, curFn)];   
       }
-      
+            
       return varArgs(function(startParams){
         
          return foldR(next, startParams, fnsList)[0];
       });
-   }),
+   });
 
+/**
+ * A more optimised version of compose that takes exactly two functions
+ * @param f1
+ * @param f2
+ */
+function compose2(f1, f2){
+   return function(){
+      return f1(f2.apply(this,arguments));
+   }
+}
+
+
+function attr(key) {
+   return new Function('o', 'return o["' + key + '"]' );
+}
+        
 /**
  * Call a list of functions with the same args until one returns a 
  * truthy result. Similar to the || operator.
@@ -122,21 +152,42 @@ function apply(args, fn) {
  */
 function varArgs(fn){
 
-   var numberOfFixedArguments = fn.length -1;
+   var numberOfFixedArguments = fn.length -1,
+       slice = Array.prototype.slice;          
          
-   return function(){
+                   
+   if( numberOfFixedArguments == 0 ) {
+      // an optimised case for when there are no fixed args:   
    
-      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
+      return function(){
+         return fn.call(this, slice.call(arguments));
+      }
       
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
-      // remove the last n elements from the array and append it onto the end of
-      // itself as a sub-array
-      argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
-      );   
-      
-      return fn.apply( this, argumentsToFunction );
+   } else if( numberOfFixedArguments == 1 ) {
+      // an optimised case for when there are is one fixed args:
+   
+      return function(){
+         return fn.call(this, arguments[0], slice.call(arguments, 1));
+      }
+   }
+   
+   // general case   
+
+   // we know how many arguments fn will always take. Create a
+   // fixed-size array to hold that many, to be re-used on
+   // every call to the returned function
+   var argsHolder = Array(fn.length);   
+                             
+   return function(){
+                            
+      for (var i = 0; i < numberOfFixedArguments; i++) {
+         argsHolder[i] = arguments[i];         
+      }
+
+      argsHolder[numberOfFixedArguments] = 
+         slice.call(arguments, numberOfFixedArguments);
+                                
+      return fn.apply( this, argsHolder);      
    }       
 }
 
@@ -179,6 +230,7 @@ function functor(val){
       return val;
    }
 }
+
 /**
  * This file defines some loosely associated syntactic sugar for 
  * Javascript programming 
@@ -191,12 +243,8 @@ function functor(val){
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
 }
-function pluck(key, object){
-   return object[key];
-}
 
-var attr = partialComplete(partialComplete, pluck),
-    len = attr('length'),    
+var len = attr('length'),    
     isString = partialComplete(isOfType, String);
 
 /** 
@@ -330,6 +378,20 @@ function foldR(fn, startValue, list) {
             : startValue
             ;
 }
+
+/**
+ * foldR implementation. Reduce a list down to a single value.
+ * 
+ * @pram {Function} fn     (rightEval, curVal) -> result 
+ */
+function foldR1(fn, list) {
+      
+   return tail(list) 
+            ? fn(foldR1(fn, tail(list)), head(list))
+            : head(list)
+            ;
+}
+
 
 /**
  * Return a list like the one given but with the first instance equal 
@@ -849,7 +911,7 @@ function incrementalContentBuilder( emit ) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose( nodeFinished, nodeFound ),
+      value: compose2( nodeFinished, nodeFound ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.
@@ -881,7 +943,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
    var NAME_INDEX = 2;
    var FIELD_LIST_INDEX = 3;
 
-   var headKey = compose(keyOf, head);
+   var headKey  = compose2(keyOf, head),
+       headNode = compose2(nodeOf, head);
                    
    /**
     * Create an evaluator function for a named path node, expressed in the
@@ -921,10 +984,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                                     arrayAsList(fieldListStr.split(/\W+/))
                                  ),
                                  
-          isMatch =  compose( 
+          isMatch =  compose2( 
                         hasAllrequiredFields, 
-                        nodeOf, 
-                        head
+                        headNode
                      );
 
       return lazyIntersection(isMatch, previousExpr);
@@ -984,7 +1046,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
                /* We are not at the root of the ascent yet.
                   Move to the next level of the ascent by handing only 
                   the tail to the previous expression */ 
-               compose(previousExpr, tail) 
+               compose2(previousExpr, tail) 
       );
                                                                                                                
    }   
@@ -1576,20 +1638,7 @@ function instanceApi(bus){
 function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   on(STREAM_DATA,         
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            
-            clarinetParser.write(nextDrip);            
-         } catch(e) { 
-            /* we don't have to do anything here because we always assign
-               a .onerror to clarinet which will have already been called 
-               by the time this exception is thrown. */                
-         }
-      }
-   );
+   on(STREAM_DATA, clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
@@ -1648,7 +1697,7 @@ function oboe(arg1, arg2) {
    if (arg1.url) {
 
       // method signature is:
-      //    oboe({method:m, url:u, body:b, complete:c, headers:{...}})
+      //    oboe({method:m, url:u, body:b, headers:{...}})
 
       return wire(
          (arg1.method || 'GET'),
@@ -1668,5 +1717,6 @@ function oboe(arg1, arg2) {
       );
    }
 }
+
 
 ;return oboe;})();

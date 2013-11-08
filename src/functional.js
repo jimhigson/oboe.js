@@ -1,4 +1,5 @@
 /** 
+/** 
  * Partially complete a function.
  * 
  * Eg: 
@@ -14,11 +15,23 @@
  *    pirateGreeting("Guybrush Threepwood"); 
  *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
-var partialComplete = varArgs(function( fn, boundArgs ) {
+var partialComplete = varArgs(function( fn, args ) {
+
+      // this isn't the shortest way to write this but it does
+      // avoid creating a new array each time to pass to fn.apply,
+      // otherwise could just call boundArgs.concat(callArgs)       
+
+      var numBoundArgs = args.length;
 
       return varArgs(function( callArgs ) {
-               
-         return fn.apply(this, boundArgs.concat(callArgs));
+         
+         for (var i = 0; i < callArgs.length; i++) {
+            args[numBoundArgs + i] = callArgs[i];
+         }
+         
+         args.length = numBoundArgs + callArgs.length;         
+                     
+         return fn.apply(this, args);
       }); 
    }),
 
@@ -32,19 +45,36 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
+      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
       function next(params, curFn) {  
          return [apply(params, curFn)];   
       }
-      
+            
       return varArgs(function(startParams){
         
          return foldR(next, startParams, fnsList)[0];
       });
-   }),
+   });
 
+/**
+ * A more optimised version of compose that takes exactly two functions
+ * @param f1
+ * @param f2
+ */
+function compose2(f1, f2){
+   return function(){
+      return f1(f2.apply(this,arguments));
+   }
+}
+
+
+function attr(key) {
+   return new Function('o', 'return o["' + key + '"]' );
+}
+        
 /**
  * Call a list of functions with the same args until one returns a 
  * truthy result. Similar to the || operator.
@@ -119,21 +149,42 @@ function apply(args, fn) {
  */
 function varArgs(fn){
 
-   var numberOfFixedArguments = fn.length -1;
+   var numberOfFixedArguments = fn.length -1,
+       slice = Array.prototype.slice;          
          
-   return function(){
+                   
+   if( numberOfFixedArguments == 0 ) {
+      // an optimised case for when there are no fixed args:   
    
-      var numberOfVariableArguments = arguments.length - numberOfFixedArguments,
+      return function(){
+         return fn.call(this, slice.call(arguments));
+      }
       
-          argumentsToFunction = Array.prototype.slice.call(arguments);
-          
-      // remove the last n elements from the array and append it onto the end of
-      // itself as a sub-array
-      argumentsToFunction.push( 
-         argumentsToFunction.splice(numberOfFixedArguments, numberOfVariableArguments)
-      );   
-      
-      return fn.apply( this, argumentsToFunction );
+   } else if( numberOfFixedArguments == 1 ) {
+      // an optimised case for when there are is one fixed args:
+   
+      return function(){
+         return fn.call(this, arguments[0], slice.call(arguments, 1));
+      }
+   }
+   
+   // general case   
+
+   // we know how many arguments fn will always take. Create a
+   // fixed-size array to hold that many, to be re-used on
+   // every call to the returned function
+   var argsHolder = Array(fn.length);   
+                             
+   return function(){
+                            
+      for (var i = 0; i < numberOfFixedArguments; i++) {
+         argsHolder[i] = arguments[i];         
+      }
+
+      argsHolder[numberOfFixedArguments] = 
+         slice.call(arguments, numberOfFixedArguments);
+                                
+      return fn.apply( this, argsHolder);      
    }       
 }
 

@@ -130,31 +130,56 @@ describe("Lists", function(){
       expect( all(isLessThanOrEqualToTen,   l )).toBe(true);   
    });
    
-   it("can fold list where order doesnt matter", function(){
-      function add(n, m){ return n+m }
+   describe('foldR', function(){
+   
+      it("can fold list where order doesnt matter", function(){
+         function add(n, m){ return n+m }
+         
+         var sum = foldR(add, 0, list(1,2,3,4));
+         
+         expect( sum ).toEqual( 1 + 2 + 3 + 4 );   
+      });
       
-      var sum = foldR(add, 0, list(1,2,3,4));
-      
-      expect( sum ).toEqual( 1 + 2 + 3 + 4 );   
+      it("can fold list where start value matters", function(){
+         function divide(n, m){ return n / m }
+         
+         var result = foldR(divide, 100, list(2, 2));
+                
+         expect( result ).toBe( 25 );  //   (100/2) / 2  = 25   
+      });
+   
+      it("can fold list in the correct order", function(){
+         function functionString(param, fnName){ return fnName + '(' + param + ')' }
+         
+         var functionStringResult = foldR(functionString, 'x', list('a', 'b', 'c'));
+         
+         // if order were wrong, might give c(b(a(x)))
+                  
+         expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
+      });
    });
    
-   it("can fold list where start value matters", function(){
-      function divide(n, m){ return n / m }
+   describe('foldR1', function(){
+   
+      it("can fold list where order doesnt matter", function(){
+         function add(n, m){ return n+m }
+         
+         var sum = foldR1(add, list(1,2,3,4));
+         
+         expect( sum ).toEqual( 1 + 2 + 3 + 4 );   
+      });
       
-      var result = foldR(divide, 100, list(2, 2));
-             
-      expect( result ).toBe( 25 );  //   (100/2) / 2  = 25   
-   });
-
-   it("can fold list in the correct order", function(){
-      function functionString(param, fnName){ return fnName + '(' + param + ')' }
-      
-      var functionStringResult = foldR(functionString, 'x', list('a', 'b', 'c'));
-      
-      // if order were wrong, might give c(b(a(x)))
-               
-      expect( functionStringResult ).toEqual( 'a(b(c(x)))' );   
-   });
+   
+      it("can fold list in the correct order", function(){
+         function functionString(param, fnName){ return fnName + '(' + param + ')' }
+         
+         var functionStringResult = foldR1(functionString, list('a', 'b', 'c'));
+         
+         // if order were wrong, might give c(b(a))
+                  
+         expect( functionStringResult ).toEqual( 'a(b(c))' );   
+      });
+   });   
    
    it('may apply a function with side effects to each item of a list', function(){
    

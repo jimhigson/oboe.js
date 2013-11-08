@@ -25,9 +25,10 @@
    <script type="text/javascript">
          
       // how long to wait at start to give browser a chance to optimise scripts   
-      var initialWait = 3000;
-      var numberOfRuns = 20; // results seem to get more reliable at about 20 runs            
-      var testName = 'ten big downloads';
+      var initialWait = 500;
+      var progressAtOnce = 1024; // fire progress with this many bytes      
+      var numberOfRuns = 40;            
+      var testName = numberOfRuns + ' big downloads';
       var profile = true;        
       
       // we start with a simple download so that the actual downloading can be
@@ -37,9 +38,26 @@
          
             runTest( JSON.stringify(jsonObj) );         
           });
-          
+                              
       function runTest(content) {
       
+         var lastCreatedXhr;
+      
+         console.log('faking the xhr...');
+      
+         // stub out the XHR
+         function FakeXHR(){
+            lastCreatedXhr = this;            
+         }
+         FakeXHR.prototype.getAllResponseHeaders = function() {
+            return "";
+         }
+         FakeXHR.prototype.open =
+         FakeXHR.prototype.setRequestHeader = 
+         FakeXHR.prototype.onprogress = 
+         FakeXHR.prototype.send = 
+            function() {}
+         window.XMLHttpRequest = FakeXHR;                           
          
          console.log('will start testing in', initialWait, '...');
                
@@ -55,25 +73,25 @@
              // this doesn't give very reliable results because it relies on 
              // actual AJAXing which can of course be variable
           
-            var nodeCount = 0;
+            var idTotal = 0,
+                ageTotal = 0,
+                nodeCount = 0;
 
             var emitFn;
-                        
-            // fake the streaming transport to not fetch anything. While we are
-            // here we might as well use this to grab a reference to the event
-            // bus:
-            window.streamingHttp = function fakeStream(emit, on /* ... ignored ... */){
-               emitFn = emit;            
-            };            
-          
+                                  
             oboe('any_url')
                .node('!.$result..{age name company}', function(obj){
                 
-                  // let's do something to stop smart engines compiling this bit away
-                  nodeCount++;                   
+                  nodeCount++;
+                  idTotal += obj.id;                   
                })
+               .path('age', function(age){
+
+                  nodeCount++;                                 
+                  ageTotal += age;       
+               })               
                .done(function(){
-                  if( nodeCount != 100 ) {
+                  if( nodeCount != 200 ) {
                      throw "wrong number of matches";
                   }
                    
@@ -83,14 +101,25 @@
                   } else {
                      perform(times-1);
                   }            
+               }).fail(function(e){
+                  console.log(e);
                });
                
-            // oboe is wired up, let's start faking the content:                     
-            emitFn(HTTP_START, 200, {});
-            emitFn(STREAM_DATA, content);
-            emitFn(STREAM_END);               
+            // oboe is wired up, let's start faking the content:
+            lastCreatedXhr.readyState = 2;
+            lastCreatedXhr.onreadystatechange();
+            
+            // pass content in a drip at a time
+            for( var ptr = 0; ptr < content.length; ptr += progressAtOnce ) {
+               lastCreatedXhr.responseText = content.substr(0, ptr);
+               lastCreatedXhr.onprogress();   
+            }
+                        
+            lastCreatedXhr.responseText = content;                          
+            lastCreatedXhr.status = 200;
+            lastCreatedXhr.readyState = 4;
+            lastCreatedXhr.onreadystatechange();               
          }
-          
       }                    
       
    </script> 

@@ -10,12 +10,8 @@
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
 }
-function pluck(key, object){
-   return object[key];
-}
 
-var attr = partialComplete(partialComplete, pluck),
-    len = attr('length'),    
+var len = attr('length'),    
     isString = partialComplete(isOfType, String);
 
 /** 
