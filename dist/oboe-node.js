@@ -2,6 +2,7 @@
 module.exports = (function  () {
 var clarinet = require("clarinet");
 /** 
+/** 
  * Partially complete a function.
  * 
  * Eg: 
@@ -46,8 +47,12 @@ var partialComplete = varArgs(function( fn, boundArgs ) {
         
          return foldR(next, startParams, fnsList)[0];
       });
-   }),
+   });
 
+function attr(key) {
+   return new Function('o', 'return o["' + key + '"]' );
+}
+        
 /**
  * Call a list of functions with the same args until one returns a 
  * truthy result. Similar to the || operator.
@@ -180,6 +185,7 @@ function functor(val){
       return val;
    }
 }
+
 /**
  * This file defines some loosely associated syntactic sugar for 
  * Javascript programming 
@@ -192,12 +198,8 @@ function functor(val){
 function isOfType(T, maybeSomething){
    return maybeSomething && maybeSomething.constructor === T;
 }
-function pluck(key, object){
-   return object[key];
-}
 
-var attr = partialComplete(partialComplete, pluck),
-    len = attr('length'),    
+var len = attr('length'),    
     isString = partialComplete(isOfType, String);
 
 /** 
