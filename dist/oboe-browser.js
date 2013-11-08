@@ -466,10 +466,7 @@ else env = window;
   var CLOSE_OBJECT                      = _n++; // }
   var OPEN_ARRAY                        = _n++; // [
   var CLOSE_ARRAY                       = _n++; // ]
-  var TEXT_ESCAPE                       = _n++; // \ stuff
   var STRING                            = _n++; // ""
-  var BACKSLASH                         = _n++;
-  var END                               = _n++; // No more stack
   var OPEN_KEY                          = _n++; // , "a"
   var CLOSE_KEY                         = _n++; // :
   var TRUE                              = _n++; // r
@@ -617,7 +614,13 @@ else env = window;
 
   function write (chunk) {
     var parser = this;
-    if (this.error) throw this.error;
+    
+    // this used to throw the error but inside Oboe we will have already
+    // gotten the error when it was emitted. The important thing is to
+    // not continue with the parse.
+    if (this.error)
+      return;
+      
     if (parser.closed) return error(parser,
       "Cannot write after close. Assign an onready handler.");
     if (chunk === null) return end(parser);
@@ -2046,20 +2049,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
 function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   on(STREAM_DATA,         
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            
-            clarinetParser.write(nextDrip);            
-         } catch(e) { 
-            /* we don't have to do anything here because we always assign
-               a .onerror to clarinet which will have already been called 
-               by the time this exception is thrown. */                
-         }
-      }
-   );
+   on(STREAM_DATA, clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 

@@ -1504,20 +1504,7 @@ function instanceApi(emit, on, un, jsonPathCompiler){
 function instanceController(  emit, on, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   on(STREAM_DATA,         
-      function (nextDrip) {
-         // callback for when a bit more data arrives from the streaming XHR         
-          
-         try {
-            
-            clarinetParser.write(nextDrip);            
-         } catch(e) { 
-            /* we don't have to do anything here because we always assign
-               a .onerror to clarinet which will have already been called 
-               by the time this exception is thrown. */                
-         }
-      }
-   );
+   on(STREAM_DATA, clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 

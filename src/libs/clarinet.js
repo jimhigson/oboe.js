@@ -192,7 +192,13 @@ else env = window;
 
   function write (chunk) {
     var parser = this;
-    if (this.error) throw this.error;
+    
+    // this used to throw the error but inside Oboe we will have already
+    // gotten the error when it was emitted. The important thing is to
+    // not continue with the parse.
+    if (this.error)
+      return;
+      
     if (parser.closed) return error(parser,
       "Cannot write after close. Assign an onready handler.");
     if (chunk === null) return end(parser);
