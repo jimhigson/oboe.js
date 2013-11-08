@@ -94,4 +94,18 @@ describe("functional", function() {
        
    });
    
+   describe('attr', function() {
+      it('can get a value from an object at the named key', function() {
+         var getA = attr('A');
+      
+         expect( getA({A:'B'}) ).toBe( 'B' );
+      });
+      
+      it('can get the length of a string', function() {
+         var getLength = attr('length');
+      
+         expect( getLength("hello") ).toBe( 5 );
+      });      
+   })
+   
 });
