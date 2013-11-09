@@ -5,10 +5,9 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    ,  path:oboeBus(PATH_FOUND)
    };
 
-   function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
+   function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
 
-      var compiledJsonPath = jsonPathCompiler( pattern ),
-          fullEvent = oboeBus(fullEventName);
+      var fullEvent = oboeBus(fullEventName);
    
       predicateEvent.on( function (ascent) {
 
@@ -50,16 +49,19 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
    oboeBus('newListener').on( function(fullEventName){
 
-      var match = /(node|path):(.*)/.exec(fullEventName),
-          predicateEvent = match && predicateEventMap[match[1]];
+      var match = /(node|path):(.*)/.exec(fullEventName);
+      
+      if( match ) {
+         var predicateEvent = predicateEventMap[match[1]];
                     
-      if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
-               
-         addUnderlyingListener(
-            fullEventName,
-            predicateEvent, 
-            match[2]
-         );
+         if( !predicateEvent.hasListener( fullEventName) ) {  
+                  
+            addUnderlyingListener(
+               fullEventName,
+               predicateEvent, 
+               jsonPathCompiler( match[2] )
+            );
+         }
       }    
    })
 
