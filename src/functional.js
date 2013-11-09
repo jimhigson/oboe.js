@@ -66,7 +66,7 @@ var partialComplete = varArgs(function( fn, args ) {
  */
 function compose2(f1, f2){
    return function(){
-      return f1(f2.apply(this,arguments));
+      return f1.call(this,f2.apply(this,arguments));
    }
 }
 

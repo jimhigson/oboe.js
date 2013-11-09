@@ -63,15 +63,6 @@ function instanceApi(oboeBus){
          }      
       }   
    }
-
-   /** 
-    * a version of on which first wraps the callback with
-    * protection against errors being thrown
-    */
-   function safeOn( eventName, callback ){
-      oboeBus(eventName).on( protectedCallback(callback));
-      return oboeApi;
-   }
       
    /**
     * Add several listeners at a time, from a map
@@ -145,7 +136,7 @@ function instanceApi(oboeBus){
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
-      start :  partialComplete(safeOn, HTTP_START),
+      start :  compose2( oboeBus(HTTP_START).on, protectedCallback ),
       // fail doesn't use safeOn because that could lead to non-terminating loops
       fail  :  oboeBus(FAIL_EVENT).on,
       abort :  oboeBus(ABORTING).emit,

@@ -115,6 +115,19 @@ describe("functional", function() {
       
             expect( compose2(attr('a'), head)( list ) ).toBe(1);      
          });
+         
+         it('passes scope to both functions', function() {
+      
+            var expectedScope = {};
+      
+            function f(){
+               expect(this).toBe(expectedScope);
+            }
+      
+            var composed = compose2(f, f);  // composed(x, y) = x/y +1
+      
+            composed.apply(expectedScope);     
+         });         
                                     
       })
        
