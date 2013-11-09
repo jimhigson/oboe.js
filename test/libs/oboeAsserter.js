@@ -89,12 +89,12 @@ function givenAnOboeInstance(jsonFileName) {
 
          // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
          // progress callback and give the string to that.
-         var eventBusNotify = streamingHttp.firstCall.args[0];
+         var eventBus = streamingHttp.firstCall.args[0];
          
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
-            eventBusNotify(STREAM_DATA, json.charAt(i)); 
+            eventBus(STREAM_DATA).emit( json.charAt(i) ); 
          }                  
 
          return this;
@@ -104,9 +104,9 @@ function givenAnOboeInstance(jsonFileName) {
 
          // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
          // done callback
-         var eventBusNotify = streamingHttp.firstCall.args[0];
+         var eventBus = streamingHttp.firstCall.args[0];
          
-         eventBusNotify(STREAM_END);                  
+         eventBus(STREAM_END).emit();                  
 
          return this;         
       };
