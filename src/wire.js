@@ -6,19 +6,19 @@
 
 function wire (httpMethodName, contentSource, body, headers){
 
-   var eventBus = pubSub();
+   var oboeBus = pubSub();
                
-   streamingHttp( eventBus,
+   streamingHttp( oboeBus,
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
    instanceController( 
-               eventBus, 
+               oboeBus, 
                clarinet.parser(), 
-               incrementalContentBuilder(eventBus) 
+               incrementalContentBuilder(oboeBus) 
    );
       
-   patternAdapter(eventBus, jsonPathCompiler);      
+   patternAdapter(oboeBus, jsonPathCompiler);      
       
-   return new instanceApi(eventBus);
+   return new instanceApi(oboeBus);
 }

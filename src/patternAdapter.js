@@ -1,14 +1,14 @@
-function patternAdapter(bus, jsonPathCompiler) {
+function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
-      node:bus(NODE_FOUND)
-   ,  path:bus(PATH_FOUND)
+      node:oboeBus(NODE_FOUND)
+   ,  path:oboeBus(PATH_FOUND)
    };
 
    function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
 
       var compiledJsonPath = jsonPathCompiler( pattern ),
-          fullEvent = bus(fullEventName);
+          fullEvent = oboeBus(fullEventName);
    
       predicateEvent.on( function (ascent) {
 
@@ -34,21 +34,21 @@ function patternAdapter(bus, jsonPathCompiler) {
          }
       }, fullEventName);
    
-      bus('removeListener').on( function(removedEventName){
+      oboeBus('removeListener').on( function(removedEventName){
 
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
       
          if( removedEventName == fullEventName ) {
          
-            if( !bus(removedEventName).listeners(  )) {
+            if( !oboeBus(removedEventName).listeners(  )) {
                predicateEvent.un( fullEventName );
             }
          }
       });   
    }
 
-   bus('newListener').on( function(fullEventName){
+   oboeBus('newListener').on( function(fullEventName){
 
       var match = /(\w+):(.*)/.exec(fullEventName),
           predicateEvent = match && predicateEventMap[match[1]];

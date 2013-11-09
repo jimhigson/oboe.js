@@ -30,11 +30,11 @@ var ROOT_PATH = {};
  * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( eventBus ) {
+function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeFound = eventBus(NODE_FOUND).emit,
-       emitRootFound = eventBus(ROOT_FOUND).emit,
-       emitPathFound = eventBus(PATH_FOUND).emit;
+   var emitNodeFound = oboeBus(NODE_FOUND).emit,
+       emitRootFound = oboeBus(ROOT_FOUND).emit,
+       emitPathFound = oboeBus(PATH_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    

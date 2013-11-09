@@ -1005,8 +1005,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} emit a function to pass events to when something happens
- * @param {Function} on a function to use to subscribe to events
+ * @param {Function} oboeBus an event bus local to this Oboe instance
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          but for tests a stub can be provided instead.
@@ -1016,13 +1015,13 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(emit, on, xhr, method, url, data, headers) {
+function streamingHttp(oboeBus, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
-   on( ABORTING, function(){
+   oboeBus( ABORTING ).on( function(){
   
       // if we keep the onreadystatechange while aborting the XHR gives 
       // a callback like a successful call so first remove this listener
@@ -1060,7 +1059,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         emit( STREAM_DATA, newText );
+         oboeBus( STREAM_DATA ).emit( newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -1077,8 +1076,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
                
          case 2:       
          
-            emit(
-               HTTP_START, 
+            oboeBus( HTTP_START ).emit( 
                xhr.status,
                parseResponseHeaders(xhr.getAllResponseHeaders()) );
             return;
@@ -1096,16 +1094,16 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
                // progress event for each part of the response
                handleProgress();
                
-               emit( STREAM_END );
+               oboeBus(STREAM_END).emit();
             } else {
             
-               emit( 
-                  FAIL_EVENT, 
-                  errorReport(
-                     xhr.status, 
-                     xhr.responseText
-                  )
-               );
+               oboeBus(FAIL_EVENT)
+                  .emit( 
+                     errorReport(
+                        xhr.status, 
+                        xhr.responseText
+                     )
+                  );
             }
       }
    };
@@ -1128,14 +1126,13 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, FAIL_EVENT, 
-             errorReport(undefined, undefined, e)
-         )
+         function(){
+            oboeBus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
+         }
       ,  0
       );
    }            
 }
-
 var jsonPathSyntax = (function() {
  
    var
@@ -1298,8 +1295,11 @@ var ROOT_PATH = {};
  * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( emit ) {
+function incrementalContentBuilder( oboeBus ) {
 
+   var emitNodeFound = oboeBus(NODE_FOUND).emit,
+       emitRootFound = oboeBus(ROOT_FOUND).emit,
+       emitPathFound = oboeBus(PATH_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -1326,8 +1326,8 @@ function incrementalContentBuilder( emit ) {
    function nodeFound( ascent, newDeepestNode ) {
       
       if( !ascent ) {
-         // we discovered the root node,
-         emit( ROOT_FOUND, newDeepestNode);
+         // we discovered the root node,         
+         emitRootFound( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -1386,8 +1386,8 @@ function incrementalContentBuilder( emit ) {
                                             maybeNewDeepestNode), 
                                  ascent
                               );
-     
-      emit( PATH_FOUND, ascentWithNewPath);
+
+      emitPathFound( ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -1398,7 +1398,7 @@ function incrementalContentBuilder( emit ) {
     */
    function nodeFinished( ascent ) {
 
-      emit( NODE_FOUND, ascent);
+      emitNodeFound( ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);
@@ -1825,88 +1825,111 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 });
 
 /** 
- * Over time this should be refactored towards a Node-like
- *    EventEmitter so that under Node an actual EE acn be used.
- *    http://nodejs.org/api/events.html
+ * A pub/sub which is responsible for a single event type
+ * 
+ * @param {String} eventType                   the name of the events managed by this singleEventPubSub
+ * @param {singleEventPubSub} [newListener]    place to notify of new listeners
+ * @param {singleEventPubSub} [removeListener] place to notify of when listeners are removed
  */
-function pubSub(){
+function singleEventPubSub(eventType, newListener, removeListener){
 
-   var listeners = {};
+   var listeners;
 
    function hasId(id){
       return function(tuple) {
          return tuple.id == id;      
       };  
    }
-
-   var emit = varArgs(function ( eventName, parameters ) {
-            
-      function emitInner(tuple) {                  
-         tuple.listener.apply(null, parameters);               
-      }                    
-                                                                           
-      applyEach( 
-         emitInner, 
-         listeners[eventName]
-      );
-   });
               
    return {
 
       /**
-       * 
-       * @param eventName
        * @param listener
        * @param listenerId
        * @param {Function} cleanupOnRemove if this listener is later 
        *    removed, a function to call just prior to its removal
        */
-      on:function( eventName, listener, listenerId, cleanupOnRemove ) {
+      on:function( listener, listenerId ) {
          
          var tuple = {
             listener: listener
          ,  id:       listenerId || listener // when no id is given use the
                                              // listener function as the id
-         ,  clean:    cleanupOnRemove  || noop
          };
 
-         emit('newListener', eventName, listener, tuple.id);
+         if( newListener ) {
+            newListener.emit(eventType, listener, tuple.id);
+         }
          
-         listeners[eventName] = cons( tuple, listeners[eventName] );
+         listeners = cons( tuple, listeners );
 
          return this; // chaining
       },
      
-      emit:emit,
+      emit:varArgs(function ( parameters ) {
+                  
+         function emitInner(tuple) {                  
+            tuple.listener.apply(null, parameters);               
+         }                    
+                                                                              
+         applyEach( 
+            emitInner, 
+            listeners
+         );
+      }),
       
-      un: function( eventName, listenerId ) {
+      un: function( listenerId ) {
              
          var removed;             
               
-         listeners[eventName] = without(
-            listeners[eventName],
+         listeners = without(
+            listeners,
             hasId(listenerId),
             function(tuple){
                removed = tuple;
             }
          );    
          
-         if( removed ) {
-            emit('removeListener', eventName, removed.listener, removed.id);
-         }     
+         if( removeListener && removed ) {
+            removeListener.emit(eventType, removed.listener, removed.id);
+         }
       },
       
-      listeners: function( eventName ){
+      listeners: function(){
          // differs from Node EventEmitter: returns list, not array
-         return map(attr('listener'), listeners[eventName]);
+         return map(attr('listener'), listeners);
       },
       
-      hasListener: function(eventName, listenerId){
+      hasListener: function(listenerId){
          var test = listenerId? hasId(listenerId) : always;
       
-         return defined(first( test, listeners[eventName]));
+         return defined(first( test, listeners));
       }
    };
+}
+/** 
+ * Over time this should be refactored towards a Node-like
+ *    EventEmitter so that under Node an actual EE acn be used.
+ *    http://nodejs.org/api/events.html
+ */
+function pubSub(){
+
+   var singles = {},
+       newListener = newSingle('newListener'),
+       removeListener = newSingle('removeListener'); 
+      
+   function newSingle(eventName) {
+      return singles[eventName] = singleEventPubSub(eventName, newListener, removeListener);   
+   }      
+
+   return function( eventName ){   
+      if( !singles[eventName] ) {
+         return newSingle( eventName );
+      }
+      
+      return singles[eventName];   
+   };
+   
 }
 /**
  * This file declares some constants to use as names for event types.
@@ -1943,13 +1966,19 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
-function patternAdapter(bus, jsonPathCompiler) {
+function patternAdapter(oboeBus, jsonPathCompiler) {
 
-   function addUnderlyingListener( matchEventName, predicateEventName, pattern ){
+   var predicateEventMap = {
+      node:oboeBus(NODE_FOUND)
+   ,  path:oboeBus(PATH_FOUND)
+   };
 
-      var compiledJsonPath = jsonPathCompiler( pattern );
+   function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
+
+      var compiledJsonPath = jsonPathCompiler( pattern ),
+          fullEvent = oboeBus(fullEventName);
    
-      bus.on(predicateEventName, function (ascent) {
+      predicateEvent.on( function (ascent) {
 
          var maybeMatchingMapping = compiledJsonPath(ascent);
 
@@ -1968,36 +1997,35 @@ function patternAdapter(bus, jsonPathCompiler) {
           can't say anything else about it. 
           */
          if (maybeMatchingMapping !== false) {
-             
-            bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
+
+            fullEvent.emit(nodeOf(maybeMatchingMapping), ascent);
          }
-      }, matchEventName);
+      }, fullEventName);
    
-   
-      bus.on('removeListener', function(removedEventName){
-   
+      oboeBus('removeListener').on( function(removedEventName){
+
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
       
-         if( removedEventName == matchEventName ) {
+         if( removedEventName == fullEventName ) {
          
-            if( !bus.listeners( removedEventName )) {
-               bus.un( predicateEventName, matchEventName );
+            if( !oboeBus(removedEventName).listeners(  )) {
+               predicateEvent.un( fullEventName );
             }
          }
       });   
    }
 
-   bus.on('newListener', function(matchEventName){
+   oboeBus('newListener').on( function(fullEventName){
 
-      var match = /(\w+):(.*)/.exec(matchEventName),
-          predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
+      var match = /(\w+):(.*)/.exec(fullEventName),
+          predicateEvent = match && predicateEventMap[match[1]];
                     
-      if( predicateEventName && !bus.hasListener(predicateEventName, matchEventName) ) {  
+      if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
                
          addUnderlyingListener(
-            matchEventName,
-            predicateEventName, 
+            fullEventName,
+            predicateEvent, 
             match[2]
          );
       }    
@@ -2005,7 +2033,7 @@ function patternAdapter(bus, jsonPathCompiler) {
 
 }
 
-function instanceApi(bus){
+function instanceApi(oboeBus){
 
    var oboeApi,
        addDoneListener = partialComplete(
@@ -2019,7 +2047,7 @@ function instanceApi(bus){
           
           safeCallback = protectedCallback(callback);
                               
-      bus.on( matchEventName, function(node, ascent) {
+      oboeBus(matchEventName).on(  function(node, ascent) {
       
          /* 
             We're now calling back to outside of oboe where the Lisp-style 
@@ -2046,7 +2074,7 @@ function instanceApi(bus){
          delete oboeApi.forget;
          
          if(! keep ) {          
-            bus.un(matchEventName, callback);
+            oboeBus(matchEventName).un( callback);
          }
                   
       
@@ -2055,7 +2083,7 @@ function instanceApi(bus){
    }   
    
    function removePathOrNodeListener( publicApiName, pattern, callback ) {
-      bus.un(publicApiName + ':' + pattern, callback)
+      oboeBus(publicApiName + ':' + pattern).un(callback)
    }
          
    function protectedCallback( callback ) {
@@ -2065,7 +2093,7 @@ function instanceApi(bus){
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            bus.emit(FAIL_EVENT, errorReport(undefined, undefined, e));
+            oboeBus(FAIL_EVENT).emit( errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -2075,7 +2103,7 @@ function instanceApi(bus){
     * protection against errors being thrown
     */
    function safeOn( eventName, callback ){
-      bus.on(eventName, protectedCallback(callback));
+      oboeBus(eventName).on( protectedCallback(callback));
       return oboeApi;
    }
       
@@ -2121,7 +2149,7 @@ function instanceApi(bus){
          // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
-         bus.on(eventId, listener);
+         oboeBus(eventId).on( listener);
       }
       
       return oboeApi;
@@ -2129,11 +2157,11 @@ function instanceApi(bus){
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
-   bus.on(ROOT_FOUND, function(root) {
+   oboeBus(ROOT_FOUND).on( function(root) {
       oboeApi.root = functor(root);   
    });
    
-   bus.on(HTTP_START, function(_statusCode, headers) {
+   oboeBus(HTTP_START).on( function(_statusCode, headers) {
       oboeApi.header = 
          function(name) {
             return name ? headers[name] 
@@ -2153,8 +2181,8 @@ function instanceApi(bus){
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(safeOn, HTTP_START),
       // fail doesn't use safeOn because that could lead to non-terminating loops
-      fail  :  partialComplete(bus.on, FAIL_EVENT),
-      abort :  partialComplete(bus.emit, ABORTING),
+      fail  :  oboeBus(FAIL_EVENT).on,
+      abort :  oboeBus(ABORTING).emit,
       header:  noop,
       root  :  noop
    };   
@@ -2167,21 +2195,21 @@ function instanceApi(bus){
  */
  
  
-function instanceController(  emit, on, 
+function instanceController(  oboeBus, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   on(STREAM_DATA, clarinetParser.write.bind(clarinetParser));      
+   oboeBus(STREAM_DATA).on( clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   on(STREAM_END, clarinetParser.close.bind(clarinetParser));
+   oboeBus(STREAM_END).on( clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 
       This prevents more tokens being found after we abort in the case where 
       we aborted during processing of an already filled buffer. */
-   on( ABORTING, function() {
+   oboeBus(ABORTING).on( function() {
       clarinetListenerAdaptor(clarinetParser, {});
    });   
 
@@ -2189,8 +2217,7 @@ function instanceController(  emit, on,
   
    // react to errors by putting them on the event bus
    clarinetParser.onerror = function(e) {          
-      emit(
-         FAIL_EVENT, 
+      oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
       );
       
@@ -2206,21 +2233,21 @@ function instanceController(  emit, on,
 
 function wire (httpMethodName, contentSource, body, headers){
 
-   var eventBus = pubSub();
+   var oboeBus = pubSub();
                
-   streamingHttp( eventBus.emit, eventBus.on,
+   streamingHttp( oboeBus,
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
    instanceController( 
-               eventBus.emit, eventBus.on, 
+               oboeBus, 
                clarinet.parser(), 
-               incrementalContentBuilder(eventBus.emit) 
+               incrementalContentBuilder(oboeBus) 
    );
       
-   patternAdapter(eventBus, jsonPathCompiler);      
+   patternAdapter(oboeBus, jsonPathCompiler);      
       
-   return new instanceApi(eventBus);
+   return new instanceApi(oboeBus);
 }
 
 // export public API

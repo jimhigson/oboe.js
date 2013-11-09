@@ -10,8 +10,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} emit a function to pass events to when something happens
- * @param {Function} on a function to use to subscribe to events
+ * @param {Function} oboeBus an event bus local to this Oboe instance
  * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          and therefore be Node's http
@@ -22,19 +21,20 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(emit, on, http, method, contentSource, data, headers) {
+function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
+   "use strict";
 
    function readStreamToEventBus(readableStream) {
          
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
                                              
-         emit( STREAM_DATA, chunk.toString() );
+         oboeBus(STREAM_DATA).emit( chunk.toString() );
       });
       
       readableStream.on('end', function() {
                
-         emit( STREAM_END );
+         oboeBus( STREAM_END ).emit();
       });
    }
    
@@ -71,7 +71,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
          var statusCode = res.statusCode,
              sucessful = String(statusCode)[0] == 2;
                                                    
-         emit(HTTP_START, res.statusCode, res.headers);                                
+         oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
                                 
          if( sucessful ) {          
                
@@ -79,8 +79,7 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
             
          } else {
             readStreamToEnd(res, function(errorBody){
-               emit( 
-                  FAIL_EVENT, 
+               oboeBus(FAIL_EVENT).emit( 
                   errorReport( statusCode, errorBody )
                );
             });
@@ -88,13 +87,12 @@ function streamingHttp(emit, on, http, method, contentSource, data, headers) {
       });
       
       req.on('error', function(e) {
-         emit( 
-            FAIL_EVENT, 
+         oboeBus(FAIL_EVENT).emit( 
             errorReport(undefined, undefined, e )
          );
       });
       
-      on( ABORTING, function(){              
+      oboeBus(ABORTING).on( function(){              
          req.abort();
       });
          

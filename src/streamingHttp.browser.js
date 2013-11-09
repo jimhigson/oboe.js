@@ -10,8 +10,7 @@ function httpTransport(){
  * content is given in a single call. For newer ones several events
  * should be raised, allowing progressive interpretation of the response.
  *      
- * @param {Function} emit a function to pass events to when something happens
- * @param {Function} on a function to use to subscribe to events
+ * @param {Function} oboeBus an event bus local to this Oboe instance
  * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          but for tests a stub can be provided instead.
@@ -21,13 +20,13 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(bus, xhr, method, url, data, headers) {
+function streamingHttp(oboeBus, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
-   bus( ABORTING ).on( function(){
+   oboeBus( ABORTING ).on( function(){
   
       // if we keep the onreadystatechange while aborting the XHR gives 
       // a callback like a successful call so first remove this listener
@@ -65,7 +64,7 @@ function streamingHttp(bus, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         bus( STREAM_DATA ).emit( newText );
+         oboeBus( STREAM_DATA ).emit( newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -82,7 +81,7 @@ function streamingHttp(bus, xhr, method, url, data, headers) {
                
          case 2:       
          
-            bus( HTTP_START ).emit( 
+            oboeBus( HTTP_START ).emit( 
                xhr.status,
                parseResponseHeaders(xhr.getAllResponseHeaders()) );
             return;
@@ -100,10 +99,10 @@ function streamingHttp(bus, xhr, method, url, data, headers) {
                // progress event for each part of the response
                handleProgress();
                
-               bus(STREAM_END).emit();
+               oboeBus(STREAM_END).emit();
             } else {
             
-               bus(FAIL_EVENT)
+               oboeBus(FAIL_EVENT)
                   .emit( 
                      errorReport(
                         xhr.status, 
@@ -133,7 +132,7 @@ function streamingHttp(bus, xhr, method, url, data, headers) {
       // firing to the next JS frame.  
       window.setTimeout(
          function(){
-            bus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
+            oboeBus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
          }
       ,  0
       );
