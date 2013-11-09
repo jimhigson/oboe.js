@@ -50,7 +50,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
    oboeBus('newListener').on( function(fullEventName){
 
-      var match = /(\w+):(.*)/.exec(fullEventName),
+      var match = /(node|path):(.*)/.exec(fullEventName),
           predicateEvent = match && predicateEventMap[match[1]];
                     
       if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
