@@ -18,10 +18,10 @@ function singleEventPubSub(eventType, newListener, removeListener){
    return {
 
       /**
-       * @param listener
-       * @param listenerId
-       * @param {Function} cleanupOnRemove if this listener is later 
-       *    removed, a function to call just prior to its removal
+       * @param {Function} listener
+       * @param {*} listenerId 
+       *    an id that this listener can later by removed by. 
+       *    Can be of any type, to be compared to other ids using ==
        */
       on:function( listener, listenerId ) {
          
