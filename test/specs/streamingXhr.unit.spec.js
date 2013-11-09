@@ -7,7 +7,7 @@ describe("streamingHttp", function(){
       it('gives xhr null when body is undefined', function(){
          var eventBus = pubSub(), xhr = xhrStub();
       
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', undefined);
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', undefined);
          
          expect( xhr.send ).toHaveBeenCalledWith(null);
       })
@@ -15,7 +15,7 @@ describe("streamingHttp", function(){
       it('gives xhr null when body is null', function(){
          var eventBus = pubSub(), xhr = xhrStub();
       
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', null);
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', null);
          
          expect( xhr.send ).toHaveBeenCalledWith(null);
       })      
@@ -23,7 +23,7 @@ describe("streamingHttp", function(){
       it('give xhr string request body', function(){
          var eventBus = pubSub(), xhr = xhrStub();      
       
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', 'my_data');
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', 'my_data');
          
          expect( xhr.send ).toHaveBeenCalledWith('my_data');
       })
@@ -32,7 +32,7 @@ describe("streamingHttp", function(){
          var eventBus = pubSub(), xhr = xhrStub();   
          var payload = {a:'A', b:'B'};
          
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', payload);
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', payload);
          
          expect( xhr.send ).toHaveBeenCalledWith(JSON.stringify( payload ) );      
       });
@@ -44,7 +44,7 @@ describe("streamingHttp", function(){
             'X-HOOPINESS':'hoopy'
          };           
            
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', undefined, headers);
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', undefined, headers);
          
          expect( xhr.setRequestHeader ).toHaveBeenCalledWith( 'X-FROODINESS', 'frood' );      
          expect( xhr.setRequestHeader ).toHaveBeenCalledWith( 'X-HOOPINESS', 'hoopy' );      
@@ -53,9 +53,9 @@ describe("streamingHttp", function(){
       it('should be able to abort an xhr once started', function(){
          var eventBus = pubSub(), xhr = xhrStub();
                
-         streamingHttp(eventBus.emit, eventBus.on, xhr, 'GET', 'http://example.com', 'my_data');
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', 'my_data');
          
-         eventBus.emit(ABORTING);
+         eventBus(ABORTING).emit();
                   
          expect( xhr.abort ).toHaveBeenCalled();                  
       });

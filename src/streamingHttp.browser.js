@@ -21,13 +21,13 @@ function httpTransport(){
  *                        Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(emit, on, xhr, method, url, data, headers) {
+function streamingHttp(bus, xhr, method, url, data, headers) {
         
    var numberOfCharsAlreadyGivenToCallback = 0;
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
-   on( ABORTING, function(){
+   bus( ABORTING ).on( function(){
   
       // if we keep the onreadystatechange while aborting the XHR gives 
       // a callback like a successful call so first remove this listener
@@ -65,7 +65,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         emit( STREAM_DATA, newText );
+         bus( STREAM_DATA ).emit( newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -82,8 +82,7 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
                
          case 2:       
          
-            emit(
-               HTTP_START, 
+            bus( HTTP_START ).emit( 
                xhr.status,
                parseResponseHeaders(xhr.getAllResponseHeaders()) );
             return;
@@ -101,16 +100,16 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
                // progress event for each part of the response
                handleProgress();
                
-               emit( STREAM_END );
+               bus(STREAM_END).emit();
             } else {
             
-               emit( 
-                  FAIL_EVENT, 
-                  errorReport(
-                     xhr.status, 
-                     xhr.responseText
-                  )
-               );
+               bus(FAIL_EVENT)
+                  .emit( 
+                     errorReport(
+                        xhr.status, 
+                        xhr.responseText
+                     )
+                  );
             }
       }
    };
@@ -133,9 +132,9 @@ function streamingHttp(emit, on, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         partialComplete(emit, FAIL_EVENT, 
-             errorReport(undefined, undefined, e)
-         )
+         function(){
+            bus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
+         }
       ,  0
       );
    }            
