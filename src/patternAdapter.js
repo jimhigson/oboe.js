@@ -24,7 +24,7 @@ function patternAdapter(bus, jsonPathCompiler) {
           */
          if (maybeMatchingMapping !== false) {
              
-            bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
+            bus(matchEventName).emit(nodeOf(maybeMatchingMapping), ascent);
          }
       }, matchEventName);
    
@@ -36,8 +36,8 @@ function patternAdapter(bus, jsonPathCompiler) {
       
          if( removedEventName == matchEventName ) {
          
-            if( !bus.listeners( removedEventName )) {
-               bus.un( predicateEventName, matchEventName );
+            if( !bus(removedEventName).listeners(  )) {
+               bus( predicateEventName ).un( matchEventName );
             }
          }
       });   
@@ -48,7 +48,7 @@ function patternAdapter(bus, jsonPathCompiler) {
       var match = /(\w+):(.*)/.exec(matchEventName),
           predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
                     
-      if( predicateEventName && !bus.hasListener(predicateEventName, matchEventName) ) {  
+      if( predicateEventName && !bus( predicateEventName ).hasListener( matchEventName) ) {  
                
          addUnderlyingListener(
             matchEventName,

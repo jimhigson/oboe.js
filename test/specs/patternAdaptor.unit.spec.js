@@ -2,98 +2,91 @@ describe('patternAdapter', function() {
   
    it('compiles the correct pattern when patterns are listened to', function(){
    
-      bus.emit('newListener', 'node:test_pattern');
+      bus('newListener').emit( 'node:test_pattern');
             
       expect( jsonPathCompiler ).toHaveBeenCalledWith('test_pattern');
    })
 
    it('listens for node events when node:pattern is added', function(){
          
-      bus.emit('newListener', 'node:test_pattern');
+      bus('newListener').emit( 'node:test_pattern');
       
-      expect(bus.on)
-         .toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  jasmine.any(Function)
+      expect(bus(NODE_FOUND).on)
+         .toHaveBeenCalledWith(            
+            jasmine.any(Function)
          ,  'node:test_pattern'
          )
    })
    
    it('stops listening for node events when node:pattern is removed again', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.un('node:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('node:test_pattern').un( noop);
       
-      expect(bus.un)
+      expect(bus(NODE_FOUND).un)
          .toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  'node:test_pattern'
+            'node:test_pattern'
          )
    })
    
    it('doesn\'t stop listening is there are still other node:pattern listeners', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.on('node:test_pattern', noop);
-      bus.un('node:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('node:test_pattern').on( noop);
+      bus('node:test_pattern').un( noop);
       
-      expect(bus.un)
-         .not.toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  'node:test_pattern'
+      expect(bus(NODE_FOUND).un)
+         .not.toHaveBeenCalledWith(            
+            'node:test_pattern'
          )
    })
    
    it('doesn\'t stop listening if a different pattern is unsubscribed from', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.on('node:other_test_pattern', noop);
-      bus.un('node:other_test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('node:other_test_pattern').on( noop);
+      bus('node:other_test_pattern').un( noop);
       
-      expect(bus.un)
-         .not.toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  'node:test_pattern'
+      expect(bus(NODE_FOUND).un)
+         .not.toHaveBeenCalledWith(           
+            'node:test_pattern'
          )
    })
    
    it('doesn\'t stop listening if wrong event type is unsubscribed', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.on('path:test_pattern', noop);
-      bus.un('path:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('path:test_pattern').on( noop);
+      bus('path:test_pattern').un( noop);
       
-      expect(bus.un)
-         .not.toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  'node:test_pattern'
+      expect(bus(NODE_FOUND).un)
+         .not.toHaveBeenCalledWith(            
+            'node:test_pattern'
          )
    })
    
    it('only listens once to NODE_FOUND when same pattern is added twice', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.on('node:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('node:test_pattern').on( noop);
       
-      expect( listAsArray( bus.listeners(NODE_FOUND) ).length ).toBe(1);
+      expect( listAsArray( bus(NODE_FOUND).listeners ).length ).toBe(1);
    })
    
    it('listens to NODE_FOUND and PATH_FOUND when given node: and path: listeners', function(){
          
-      bus.on('node:test_pattern', noop);
-      bus.on('path:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
+      bus('path:test_pattern').on( noop);
       
-      expect(bus.on)
-         .toHaveBeenCalledWith(
-            NODE_FOUND
-         ,  jasmine.any(Function)
+      expect(bus(NODE_FOUND).on)
+         .toHaveBeenCalledWith(            
+            jasmine.any(Function)
          ,  'node:test_pattern'
          )
          
-      expect(bus.on)
-         .toHaveBeenCalledWith(
-            PATH_FOUND
-         ,  jasmine.any(Function)
+      expect(bus(PATH_FOUND).on)
+         .toHaveBeenCalledWith(            
+            jasmine.any(Function)
          ,  'path:test_pattern'
          )         
    })                     
@@ -102,14 +95,13 @@ describe('patternAdapter', function() {
       
       var ascent = anAscentMatching('test_pattern');
    
-      bus.on('node:test_pattern', noop);
+      bus('node:test_pattern').on( noop);
 
-      bus.emit(NODE_FOUND, ascent);
+      bus(NODE_FOUND).emit( ascent);
       
-      expect( bus.emit )
+      expect( bus('node:test_pattern').emit )
          .toHaveBeenCalledWith( 
-            'node:test_pattern'
-         ,  nodeOf( head( ascent ) )
+            nodeOf( head( ascent ) )
          ,  ascent 
          );
    })   
@@ -122,13 +114,22 @@ describe('patternAdapter', function() {
 
    beforeEach(function(){
    
-      bus = pubSub()
+      var realPubSub = pubSub();
    
       matches = {};
    
-      spyOn( bus, 'emit' ).andCallThrough();
-      spyOn( bus, 'on' ).andCallThrough();
-      spyOn( bus, 'un' ).andCallThrough();
+      bus = function( eventName ) {
+   
+         var single = realPubSub(eventName);
+   
+         if( !single.emit.isSpy ) {   
+            spyOn( single, 'emit' ).andCallThrough();
+            spyOn( single, 'on'   ).andCallThrough();
+            spyOn( single, 'un'   ).andCallThrough();
+         }
+         
+         return single;
+      }
      
       jsonPathCompiler = jasmine.createSpy('jsonPathCompiler').andCallFake( 
          function (pattern){
