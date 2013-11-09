@@ -318,7 +318,6 @@ else env = window;
             , unicodeI = parser.unicodeI
             ;
           STRING_BIGLOOP: while (true) {
-            if (clarinet.DEBUG)
 
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {

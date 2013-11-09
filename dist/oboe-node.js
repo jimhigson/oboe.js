@@ -1310,7 +1310,7 @@ function pubSub(){
       }),
       
       un: function( eventId, handler ) {
-         listeners[eventId] = without(listeners[eventId], handler);                  
+         listeners[eventId] = without(listeners[eventId], handler);
       }           
    };
 }

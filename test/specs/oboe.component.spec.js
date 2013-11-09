@@ -201,7 +201,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   it('can detect nodes with quoted unusual chars in the name',  function() {
+   it('can detect nodes with quoted unusual ascii chars in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!["£@$%^"]')
@@ -210,7 +210,33 @@ describe("oboe component (sXHR stubbed)", function(){
             matched("s"),
             foundOneMatch
          );
-   })            
+   })
+   
+   it('can detect nodes with non-ascii keys',  function() {
+
+      //pinyin: Wǒ tǎoyàn IE liúlǎn qì!
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!["我讨厌IE浏览器！"]')
+         .whenGivenInput({"我讨厌IE浏览器！":"indeed!"}) // ridiculous JSON!
+         .thenTheInstance(
+            matched("indeed!"),
+            foundOneMatch
+         );
+   })
+   
+   it('can detect nodes with non-ascii keys and values',  function() {
+
+      // hope you have a good unicode font!
+
+      givenAnOboeInstance()
+         .andWeAreListeningForNodes('!["☂"]')
+         .whenGivenInput({"☂":"☁"}) // ridiculous JSON!
+         .thenTheInstance(
+            matched("☁"),
+            foundOneMatch
+         );
+   })                  
    
    it('notifies of path before given the json value for a property',  function() {
 
