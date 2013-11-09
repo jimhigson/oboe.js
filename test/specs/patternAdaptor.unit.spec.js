@@ -145,22 +145,9 @@ describe('patternAdapter', function() {
 
    beforeEach(function(){
    
-      var realPubSub = pubSub();
-   
       matches = {};
    
-      bus = function( eventName ) {
-   
-         var single = realPubSub(eventName);
-   
-         if( !single.emit.isSpy ) {   
-            spyOn( single, 'emit' ).andCallThrough();
-            spyOn( single, 'on'   ).andCallThrough();
-            spyOn( single, 'un'   ).andCallThrough();
-         }
-         
-         return single;
-      }
+      bus = spiedPubSub();
      
       jsonPathCompiler = jasmine.createSpy('jsonPathCompiler').andCallFake( 
          function (pattern){
