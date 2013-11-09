@@ -7,7 +7,13 @@
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
-   var listeners;
+   /** we are optimised for emitting events over firing them.
+    *  hence, as well as the tuple list which stores event ids and listeners,
+    *  there is also a listener list which can be iterated more quickly
+    *  when we are emitting
+    */
+   var listenerTupleList,
+       listenerList;
 
    function hasId(id){
       return function(tuple) {
@@ -35,48 +41,48 @@ function singleEventPubSub(eventType, newListener, removeListener){
             newListener.emit(eventType, listener, tuple.id);
          }
          
-         listeners = cons( tuple, listeners );
+         listenerTupleList = cons( tuple,    listenerTupleList );
+         listenerList      = cons( listener, listenerList      );
 
          return this; // chaining
       },
      
-      emit:function () {      
-         var parameters = arguments;
-                                                                                                                              
-         applyEach( 
-            function (tuple) {                  
-               tuple.listener.apply(null, parameters);               
-            }, 
-            listeners
-         );
+      emit:function () {                                                                                           
+         applyEach( listenerList, arguments );
       },
       
       un: function( listenerId ) {
              
          var removed;             
               
-         listeners = without(
-            listeners,
+         listenerTupleList = without(
+            listenerTupleList,
             hasId(listenerId),
             function(tuple){
                removed = tuple;
             }
          );    
          
-         if( removeListener && removed ) {
-            removeListener.emit(eventType, removed.listener, removed.id);
+         if( removed ) {
+            listenerList = without( listenerList, function(listener){
+               return listener == removed.listener;
+            });
+         
+            if( removeListener ) {
+               removeListener.emit(eventType, removed.listener, removed.id);
+            }
          }
       },
       
       listeners: function(){
          // differs from Node EventEmitter: returns list, not array
-         return map(attr('listener'), listeners);
+         return listenerList;
       },
       
       hasListener: function(listenerId){
          var test = listenerId? hasId(listenerId) : always;
       
-         return defined(first( test, listeners));
+         return defined(first( test, listenerTupleList));
       }
    };
 }

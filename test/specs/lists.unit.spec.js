@@ -183,23 +183,24 @@ describe("Lists", function(){
    
    it('may apply a function with side effects to each item of a list', function(){
    
-      var callback = jasmine.createSpy();
+      var callback1 = jasmine.createSpy(),
+          callback2 = jasmine.createSpy(),
+          callback3 = jasmine.createSpy(),
+          callback4 = jasmine.createSpy(),
+          functions = list(callback1, callback2, callback3, callback4);
     
-      applyEach( callback, list('a','b','c','d','e','f','g') );
+      applyEach( functions, ['a','b','c','d'] );
 
-      expect(callback).toHaveBeenCalledWith('a');
-      expect(callback).toHaveBeenCalledWith('b');
-      expect(callback).toHaveBeenCalledWith('c');
-      expect(callback).toHaveBeenCalledWith('d');
-      expect(callback).toHaveBeenCalledWith('e');
-      expect(callback).toHaveBeenCalledWith('f');
-      expect(callback).toHaveBeenCalledWith('g');   
+      expect(callback1).toHaveBeenCalledWith('a','b','c','d');
+      expect(callback2).toHaveBeenCalledWith('a','b','c','d');
+      expect(callback3).toHaveBeenCalledWith('a','b','c','d');
+      expect(callback4).toHaveBeenCalledWith('a','b','c','d');   
    });
    
    it('may apply a list of zero functions with side effects', function(){
    
       expect(function(){
-         applyEach( [1,2,3], list() );
+         applyEach( list(), ['a','b','c','d'] );
       }).not.toThrow();         
    });   
    

@@ -423,18 +423,18 @@ function all(fn, list) {
 }
 
 /**
- * Call every function in a list of functions
+ * Call every function in a list of functions with the same arguments
  * 
  * This doesn't make any sense if we're doing pure functional because 
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(fn, list) {
+function applyEach(fnList, arguments) {
 
-   if( list ) {  
-      fn(head(list))
+   if( fnList ) {  
+      head(fnList).apply(null, arguments);
       
-      applyEach(fn, tail(list));
+      applyEach(tail(fnList), arguments);
    }
 }
 
@@ -1302,7 +1302,13 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
-   var listeners;
+   /** we are optimised for emitting events over firing them.
+    *  hence, as well as the tuple list which stores event ids and listeners,
+    *  there is also a listener list which can be iterated more quickly
+    *  when we are emitting
+    */
+   var listenerTupleList,
+       listenerList;
 
    function hasId(id){
       return function(tuple) {
@@ -1313,10 +1319,10 @@ function singleEventPubSub(eventType, newListener, removeListener){
    return {
 
       /**
-       * @param listener
-       * @param listenerId
-       * @param {Function} cleanupOnRemove if this listener is later 
-       *    removed, a function to call just prior to its removal
+       * @param {Function} listener
+       * @param {*} listenerId 
+       *    an id that this listener can later by removed by. 
+       *    Can be of any type, to be compared to other ids using ==
        */
       on:function( listener, listenerId ) {
          
@@ -1330,49 +1336,48 @@ function singleEventPubSub(eventType, newListener, removeListener){
             newListener.emit(eventType, listener, tuple.id);
          }
          
-         listeners = cons( tuple, listeners );
+         listenerTupleList = cons( tuple,    listenerTupleList );
+         listenerList      = cons( listener, listenerList      );
 
          return this; // chaining
       },
      
-      emit:varArgs(function ( parameters ) {
-                  
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
-         applyEach( 
-            emitInner, 
-            listeners
-         );
-      }),
+      emit:function () {                                                                                           
+         applyEach( listenerList, arguments );
+      },
       
       un: function( listenerId ) {
              
          var removed;             
               
-         listeners = without(
-            listeners,
+         listenerTupleList = without(
+            listenerTupleList,
             hasId(listenerId),
             function(tuple){
                removed = tuple;
             }
          );    
          
-         if( removeListener && removed ) {
-            removeListener.emit(eventType, removed.listener, removed.id);
+         if( removed ) {
+            listenerList = without( listenerList, function(listener){
+               return listener == removed.listener;
+            });
+         
+            if( removeListener ) {
+               removeListener.emit(eventType, removed.listener, removed.id);
+            }
          }
       },
       
       listeners: function(){
          // differs from Node EventEmitter: returns list, not array
-         return map(attr('listener'), listeners);
+         return listenerList;
       },
       
       hasListener: function(listenerId){
          var test = listenerId? hasId(listenerId) : always;
       
-         return defined(first( test, listeners));
+         return defined(first( test, listenerTupleList));
       }
    };
 }
@@ -1442,10 +1447,9 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    ,  path:oboeBus(PATH_FOUND)
    };
 
-   function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
+   function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
 
-      var compiledJsonPath = jsonPathCompiler( pattern ),
-          fullEvent = oboeBus(fullEventName);
+      var emitMatch = oboeBus(fullEventName).emit;
    
       predicateEvent.on( function (ascent) {
 
@@ -1467,7 +1471,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
           */
          if (maybeMatchingMapping !== false) {
 
-            fullEvent.emit(nodeOf(maybeMatchingMapping), ascent);
+            emitMatch(nodeOf(maybeMatchingMapping), ascent);
          }
       }, fullEventName);
    
@@ -1487,16 +1491,19 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
    oboeBus('newListener').on( function(fullEventName){
 
-      var match = /(\w+):(.*)/.exec(fullEventName),
-          predicateEvent = match && predicateEventMap[match[1]];
+      var match = /(node|path):(.*)/.exec(fullEventName);
+      
+      if( match ) {
+         var predicateEvent = predicateEventMap[match[1]];
                     
-      if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
-               
-         addUnderlyingListener(
-            fullEventName,
-            predicateEvent, 
-            match[2]
-         );
+         if( !predicateEvent.hasListener( fullEventName) ) {  
+                  
+            addUnderlyingListener(
+               fullEventName,
+               predicateEvent, 
+               jsonPathCompiler( match[2] )
+            );
+         }
       }    
    })
 

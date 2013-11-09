@@ -146,18 +146,18 @@ function all(fn, list) {
 }
 
 /**
- * Call every function in a list of functions
+ * Call every function in a list of functions with the same arguments
  * 
  * This doesn't make any sense if we're doing pure functional because 
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(fn, list) {
+function applyEach(fnList, arguments) {
 
-   if( list ) {  
-      fn(head(list))
+   if( fnList ) {  
+      head(fnList).apply(null, arguments);
       
-      applyEach(fn, tail(list));
+      applyEach(tail(fnList), arguments);
    }
 }
 

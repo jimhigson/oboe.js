@@ -1,5 +1,11 @@
 describe('single event pub sub', function(){
 
+   beforeEach(function(){
+      this.addMatchers({
+         toBeList: listMatcher
+      });
+   });
+
    it('is able to subscribe', function(){
    
       var events = singleEventPubSub('someEventName');
@@ -227,7 +233,7 @@ describe('single event pub sub', function(){
          
          events.on(noop);
          
-         expect( events.listeners('testEventType') ).toEqual(list(noop));               
+         expect( events.listeners('testEventType') ).toBeList(list(noop));               
       })
       
       it('can return listeners when second is added', function(){
@@ -236,7 +242,7 @@ describe('single event pub sub', function(){
          events.on(noop);
          events.on(noop);
          
-         expect( events.listeners('testEventType') ).toEqual(list(noop, noop));               
+         expect( events.listeners('testEventType') ).toBeList(list(noop, noop));               
       })
       
       it('can return listeners when one is removed', function(){
@@ -246,7 +252,7 @@ describe('single event pub sub', function(){
          events.on(noop);
          events.un(noop);
          
-         expect( events.listeners('testEventType') ).toEqual(list(noop));               
+         expect( events.listeners('testEventType') ).toBeList(list(noop));               
       })
       
       it('can return listeners when all are removed', function(){
