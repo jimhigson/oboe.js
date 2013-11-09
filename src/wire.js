@@ -8,12 +8,12 @@ function wire (httpMethodName, contentSource, body, headers){
 
    var eventBus = pubSub();
                
-   streamingHttp( eventBus.emit, eventBus.on,
+   streamingHttp( eventBus,
                   httpTransport(), 
                   httpMethodName, contentSource, body, headers );                              
      
    instanceController( 
-               eventBus.emit, eventBus.on, 
+               eventBus, 
                clarinet.parser(), 
                incrementalContentBuilder(eventBus.emit) 
    );

@@ -4,7 +4,7 @@ function patternAdapter(bus, jsonPathCompiler) {
 
       var compiledJsonPath = jsonPathCompiler( pattern );
    
-      bus.on(predicateEventName, function (ascent) {
+      bus(predicateEventName).on( function (ascent) {
 
          var maybeMatchingMapping = compiledJsonPath(ascent);
 
@@ -29,7 +29,7 @@ function patternAdapter(bus, jsonPathCompiler) {
       }, matchEventName);
    
    
-      bus.on('removeListener', function(removedEventName){
+      bus('removeListener').on( function(removedEventName){
    
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
@@ -43,7 +43,7 @@ function patternAdapter(bus, jsonPathCompiler) {
       });   
    }
 
-   bus.on('newListener', function(matchEventName){
+   bus('newListener').on( function(matchEventName){
 
       var match = /(\w+):(.*)/.exec(matchEventName),
           predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
