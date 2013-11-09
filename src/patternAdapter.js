@@ -34,7 +34,6 @@ function patternAdapter(bus, jsonPathCompiler) {
          }
       }, fullEventName);
    
-   
       bus('removeListener').on( function(removedEventName){
 
          // if the match even listener is later removed, clean up by removing
@@ -54,7 +53,7 @@ function patternAdapter(bus, jsonPathCompiler) {
       var match = /(\w+):(.*)/.exec(fullEventName),
           predicateEvent = match && predicateEventMap[match[1]];
                     
-      if( predicateEvent && !bus( predicateEvent ).hasListener( fullEventName) ) {  
+      if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
                
          addUnderlyingListener(
             fullEventName,

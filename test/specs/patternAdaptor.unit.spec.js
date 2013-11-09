@@ -7,7 +7,7 @@ describe('patternAdapter', function() {
       expect( jsonPathCompiler ).toHaveBeenCalledWith('test_pattern');
    })
 
-   it('listens for node events when node:pattern is added', function(){
+   it('listens for NODE_FOUND events when node:pattern is added', function(){
          
       bus('newListener').emit( 'node:test_pattern');
       
@@ -18,6 +18,14 @@ describe('patternAdapter', function() {
          )
    })
    
+   it('does not listen for NODE_FOUND events second time same node:pattern is added', function(){
+         
+      bus('newListener').emit( 'node:test_pattern');
+      bus('newListener').emit( 'node:test_pattern');
+      
+      expect(bus(NODE_FOUND).on.calls.length).toBe(1);
+   })
+           
    it('stops listening for node events when node:pattern is removed again', function(){
          
       bus('node:test_pattern').on( noop);
@@ -28,6 +36,29 @@ describe('patternAdapter', function() {
             'node:test_pattern'
          )
    })
+   
+   it('starts listening again for node events when node:pattern is added, removed and added again', function(){
+         
+      bus('node:test_pattern').on( noop);
+      
+      expect(bus(NODE_FOUND).on.calls.length).toBe(1);
+      
+      bus('node:test_pattern').on( noop);
+      
+      expect(bus(NODE_FOUND).on.calls.length).toBe(1);                  
+      
+      bus('node:test_pattern').un( noop);
+      
+      expect(bus(NODE_FOUND).un.calls.length).toBe(0);
+      
+      bus('node:test_pattern').un( noop);
+      
+      expect(bus(NODE_FOUND).un.calls.length).toBe(1);                  
+      
+      bus('node:test_pattern').on( noop);      
+      
+      expect(bus(NODE_FOUND).on.calls.length).toBe(2);
+   })   
    
    it('doesn\'t stop listening is there are still other node:pattern listeners', function(){
          
