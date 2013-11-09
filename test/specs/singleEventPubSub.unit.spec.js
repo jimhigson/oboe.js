@@ -2,355 +2,260 @@ describe('single event pub sub', function(){
 
    it('is able to subscribe', function(){
    
-      var events = pubSub();
+      var events = singleEventPubSub('someEventName');
       
       expect(function(){
-         events.on('somethingHappening', function(){});
+         events.on(function(){});
       }).not.toThrow();
-   
+
    });
    
    it('is able to notify a subscribed function without an event object', function(){
    
-      var events = pubSub(),
+      var events = singleEventPubSub('someEventName'),
           listener = jasmine.createSpy('listener');
-      
 
-      events.on('somethingHappening', listener);
+      events.on(listener);
       
-      events.emit('somethingHappening');
+      events.emit();
       
       expect(listener).toHaveBeenCalled();
    });
    
-   it('is able to notify a subscribed function without a single event object', function(){
+   it('is able to notify a subscribed function with a event parameter', function(){
    
-      var events = pubSub(),
+      var events = singleEventPubSub('someEventName'),
           listener = jasmine.createSpy('listener');      
 
-      events.on('somethingHappening', listener);
+      events.on(listener);
       
-      events.emit('somethingHappening', 'somethingFunky');
+      events.emit('somethingFunky');
       
       expect(listener).toHaveBeenCalledWith('somethingFunky');
    });   
-   
-   it('notifies of new listeners when added with an id', function() {
-      var events = pubSub(),
+
+   it('notifies of new listeners when added without an id', function() {
+      var newListener      = singleEventPubSub('newListener'), 
+          someEventName    = singleEventPubSub('someEventName', newListener),
           listenerListener = jasmine.createSpy('listenerListener');      
 
-      events.on('newListener', listenerListener);
-      events.on('foo', noop, 'id1');
+      newListener.on(listenerListener);
+      someEventName.on(noop);
             
-      expect(listenerListener).toHaveBeenCalledWith('foo', noop, 'id1');   
+      expect(listenerListener).toHaveBeenCalledWith('someEventName', noop, noop);
    });
    
-   it('doesn\'t notify a newListener listener of its own addition', function() {
-      var events = pubSub(),
+   it('notifies of new listeners when added with an id', function() {
+      var newListener      = singleEventPubSub('newListener'), 
+          someEventName    = singleEventPubSub('someEventName', newListener),
           listenerListener = jasmine.createSpy('listenerListener');      
 
-      events.on('newListener', listenerListener);
+      newListener.on(listenerListener);
+      someEventName.on(noop, 'id1');
             
-      expect(listenerListener).not.toHaveBeenCalled();   
-   });   
-   
-   it('notifies of new listeners when added without an id', function() {
-      var events = pubSub(),
-          listenerListener = jasmine.createSpy('listenerListener');      
+      expect(listenerListener).toHaveBeenCalledWith('someEventName', noop, 'id1');   
+   });
 
-      events.on('newListener', listenerListener);
-      events.on('foo', noop);
-            
-      expect(listenerListener).toHaveBeenCalledWith('foo', noop, noop);   
-   });   
-   
-   it('can pass through multiple parameters', function(){
-   
-      var events = pubSub(),
-          listener = jasmine.createSpy('listener');
-       
-      events.on('somethingHappening', listener);
-      
-      events.emit('somethingHappening', 'a', 'b', 'c');
-      
-      expect(listener).toHaveBeenCalledWith('a', 'b', 'c');
-   });   
-   
    it('notifies multiple listeners of the same event', function(){
    
-      var events = pubSub(),
+      var events = singleEventPubSub('someEventName'),
           listenerA = jasmine.createSpy('listenerA'),
           listenerA2 = jasmine.createSpy('listenerA2');
       
-      events.on('eventA', listenerA);
-      events.on('eventA', listenerA2);
+      events.on(listenerA);
+      events.on(listenerA2);
       
-      events.emit('eventA');
+      events.emit();
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerA2).toHaveBeenCalled();           
    });
+            
+   it('can pass through multiple parameters', function(){
+   
+      var events = singleEventPubSub('someEventName'),
+          listener = jasmine.createSpy('listener');
+       
+      events.on(listener);
+      
+      events.emit('a', 'b', 'c');
+      
+      expect(listener).toHaveBeenCalledWith('a', 'b', 'c');
+   });
+   
+   it('can pass multiple parameters to multiple listeners', function(){
+   
+      var events    = singleEventPubSub('someEventName'),
+          listener  = jasmine.createSpy('listener' ),
+          listener2 = jasmine.createSpy('listener2');
+       
+      events.on(listener );
+      events.on(listener2);
+      
+      events.emit('a', 'b', 'c');
+      
+      expect(listener ).toHaveBeenCalledWith('a', 'b', 'c');
+      expect(listener2).toHaveBeenCalledWith('a', 'b', 'c');
+   });      
    
    it('allows many listeners to be registered for an event', function(){
    
-      var events = pubSub(),
-          listenerA = jasmine.createSpy('listenerA'),
-          listenerB = jasmine.createSpy('listenerB');
-      
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
+      var events = singleEventPubSub('someEventName'),
+          listenerA = jasmine.createSpy('listenerA');
 
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-      
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
+      for (var i = 0; i < 10; i++) {
+         // listen ten times
+         events.on(listenerA);
+      }
 
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-      
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
-      events.on('popularEventA', listenerA);
-      
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-      events.on('popularEventB', listenerB);
-                       
-      events.emit('popularEventB');
-      events.emit('popularEventA');
-      events.emit('popularEventB');
-      events.emit('popularEventA');
-      
-      expect(listenerA.calls.length).toBe(18);
-      expect(listenerB.calls.length).toBe(18);           
+      for (var j = 0; j < 3; j++) {
+         // emit 3 times
+         events.emit();
+      }         
+                   
+      expect(listenerA.calls.length).toBe(30);           
    });   
    
    it('has a chainable on function', function(){
    
-      var events = pubSub(),
+      var events = singleEventPubSub('someEventName'),
           listenerA = jasmine.createSpy('listenerA'),
           listenerB = jasmine.createSpy('listenerB');
       
-      events.on('eventA', listenerA)
-            .on('eventA', listenerB)
-            .emit('eventA');
+      events.on(listenerA)
+            .on(listenerB)
+            .emit();
       
       expect(listenerA).toHaveBeenCalled();
       expect(listenerB).toHaveBeenCalled();           
    });      
-   
-   it('should notify of the correct event', function(){
-   
-      var events = pubSub(),
-          listenerA = jasmine.createSpy('listenerA'),
-          listenerB = jasmine.createSpy('listenerB');
       
-
-      events.on('eventA', listenerA);
-      events.on('eventB', listenerB);
-      
-      events.emit('eventA');
-      
-      expect(listenerA).toHaveBeenCalled();
-      expect(listenerB).not.toHaveBeenCalled();
-      
-      events.emit('eventB');
-      
-      expect(listenerB).toHaveBeenCalled();      
-   });
-   
    it('allows an event to be removed', function(){
    
-      var events = pubSub(),
-          listenerA  = jasmine.createSpy('listenerA'),
-          listenerA2 = jasmine.createSpy('listenerA2'),
-          listenerB  = jasmine.createSpy('listenerB');
+      var events = singleEventPubSub('someEventName'),
+          listener1 = jasmine.createSpy('listener1'),
+          listener2 = jasmine.createSpy('listener2');
       
-      events.on('eventA', listenerA);
-      events.on('eventA', listenerA2);
-      events.on('eventB', listenerB);
-      
-      events.emit('eventA');
-      events.emit('eventB');
-      
-      expect(listenerA.calls.length).toBe(1);      
-      
-      events.un('eventA', listenerA);      
+      events.on(listener1);
+      events.on(listener2);
 
-      events.emit('eventA');
+      events.emit();
+      
+      expect(listener1.calls.length).toBe(1);      
+      
+      events.un(listener1);      
 
-      expect(listenerA.calls.length).toBe(1);
-      expect(listenerA2.calls.length).toBe(2);      
+      events.emit();
+
+      expect(listener1.calls.length).toBe(1);
+      expect(listener2.calls.length).toBe(2);      
    });
    
    it('allows an event to be removed by an id', function(){
-      var events = pubSub(),
-          listenerFoo         = jasmine.createSpy('listenerFoo'),
-          listenerBar         = jasmine.createSpy('listenerBar'),
-          listenerUnrelated   = jasmine.createSpy('listenerUnrelated');
+      var events = singleEventPubSub('someEventName'),
+          listener1 = jasmine.createSpy('listener1'),
+          listener2 = jasmine.createSpy('listener2');
       
-      events.on('eventA', listenerFoo,  'FOO_ID');
-      events.on('eventA', listenerBar, 'BAR_ID');
-      events.on('eventB', listenerUnrelated);
-      
-      events.emit('eventA');
-      events.emit('eventB');
-      
-      expect(listenerFoo.calls.length).toBe(1);      
-      
-      events.un('eventA', 'FOO_ID');      
+      events.on(listener1, 'FOO_ID');
+      events.on(listener2, 'BAR_ID');
 
-      events.emit('eventA');
-
-      expect(listenerFoo.calls.length).toBe(1);
-      expect(listenerBar.calls.length).toBe(2);
+      events.emit();
       
-      events.un('eventA', 'BAR_ID');
-      events.emit('eventA');          
+      expect(listener1.calls.length).toBe(1);      
+      
+      events.un('FOO_ID');      
+
+      events.emit();
+
+      expect(listener1.calls.length).toBe(1);
+      expect(listener2.calls.length).toBe(2);
+
+      events.un('BAR_ID');
+      events.emit();          
            
-      expect(listenerBar.calls.length).toBe(2);       
+      expect(listener2.calls.length).toBe(2);       
    })
    
-   it('allows an event to be removed by an id', function(){
-      var events = pubSub(),
-          listenerA  = jasmine.createSpy('listenerA'),
-          listenerA2 = jasmine.createSpy('listenerA2'),
-          listenerB  = jasmine.createSpy('listenerB');
-      
-      events.on('eventA', listenerA,  'id1');
-      events.on('eventA', listenerA2, 'id2');
-      events.on('eventB', listenerB);
-      
-      events.emit('eventA');
-      events.emit('eventB');
-      
-      expect(listenerA.calls.length).toBe(1);      
-      
-      events.un('eventA', 'id1');      
-
-      events.emit('eventA');
-
-      expect(listenerA.calls.length).toBe(1);
-      expect(listenerA2.calls.length).toBe(2);     
-   })
-
    it('does not fire removeListener if nothing is removed', function() {
-      
-      var events = pubSub(),   
+      var newListener            = singleEventPubSub('newListener'),
+          removeListener         = singleEventPubSub('removeListener'),      
+          events                 = singleEventPubSub('someEventName', newListener, removeListener),   
           removeListenerListener = jasmine.createSpy('removeListenerListener'),
-          fooListener = jasmine.createSpy('fooListener');
+          fooListener            = jasmine.createSpy('fooListener');
       
-      events.on('removeListener', removeListenerListener);
+      removeListener.on(removeListenerListener);
 
-      events.on('foo', fooListener);
-      events.un('foo', 'wrong_item');
-       
+      events.on(fooListener);
+      events.un('wrong_item');
+                              
       expect(removeListenerListener).not.toHaveBeenCalled();         
    });
    
    it('fires removeListener when a listener is removed', function(){
-      var events = pubSub(),   
-          removeListenerListener = jasmine.createSpy('removeListenerListener');
-   
-      events.on('removeListener', removeListenerListener);
+      var newListener            = singleEventPubSub('newListener'),
+          removeListener         = singleEventPubSub('removeListener'),      
+          events                 = singleEventPubSub('someEventName', newListener, removeListener),   
+          removeListenerListener = jasmine.createSpy('removeListenerListener'),
+          fooListener            = jasmine.createSpy('fooListener');
       
-      events.on('foo', noop);
-      events.un('foo', noop);
-      
-      expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, noop);     
+      removeListener.on(removeListenerListener);
+
+      events.on(fooListener);
+      events.un(fooListener);
+                              
+      expect(removeListenerListener).toHaveBeenCalled();     
    })
    
-   it('allows a cleanup function to be called when a listener is removed ' +
-      'by specifying callback', function() {
-      var events = pubSub(),   
-          removeListenerListener = jasmine.createSpy('removeListenerListener');
+   it('does not crash if asked to emit without listeners', function(){
    
-      events.on('removeListener', removeListenerListener);
+      var events = singleEventPubSub('someEventName');
       
-      events.on('foo', noop, 'a');
-      events.un('foo', 'a');
-      
-      expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, 'a');     
-   })               
-   
-   it('handles numberic event codes', function(){
-   
-      var events = pubSub(),
-          listenerA = jasmine.createSpy('listenerA'),
-          listenerB = jasmine.createSpy('listenerB');
-      
-
-      events.on(1, listenerA);
-      events.on(2, listenerB);
-      
-      events.emit(1);
-      
-      expect(listenerA).toHaveBeenCalled();
-      expect(listenerB).not.toHaveBeenCalled();
-      
-      events.emit(2);
-      
-      expect(listenerB).toHaveBeenCalled();      
-   });   
-   
-   it('does not crash if asked to emit an event that has no listeners', function(){
-   
-      var events = pubSub();
-      
-      expect(function(){
-      
-         events.emit('unknown event');
-      
+      expect(function(){      
+         events.emit('unknown event');      
       }).not.toThrow();
-   
    });
    
    describe('listeners method', function(){
       it('can return listeners when there haven\'t been any', function(){
-         var events = pubSub();
+         var events = singleEventPubSub('someEventName');
          
          expect( events.listeners('testEventType') ).toBeFalsy();      
       })
       
       it('can return listeners when one has been added', function(){
-         var events = pubSub();
+         var events = singleEventPubSub('someEventName');
          
-         events.on('testEventType', noop);
+         events.on(noop);
          
          expect( events.listeners('testEventType') ).toEqual(list(noop));               
       })
       
       it('can return listeners when second is added', function(){
-         var events = pubSub();
+         var events = singleEventPubSub('someEventName');
          
-         events.on('testEventType', noop);
-         events.on('testEventType', noop);
+         events.on(noop);
+         events.on(noop);
          
          expect( events.listeners('testEventType') ).toEqual(list(noop, noop));               
       })
       
       it('can return listeners when one is removed', function(){
-         var events = pubSub();
+         var events = singleEventPubSub('someEventName');
          
-         events.on('testEventType', noop);
-         events.on('testEventType', noop);
-         events.un('testEventType', noop);
+         events.on(noop);
+         events.on(noop);
+         events.un(noop);
          
          expect( events.listeners('testEventType') ).toEqual(list(noop));               
       })
       
       it('can return listeners when all are removed', function(){
-         var events = pubSub();
+         var events = singleEventPubSub('someEventName');
          
-         events.on('testEventType', noop);
-         events.on('testEventType', noop);
-         events.un('testEventType', noop);
-         events.un('testEventType', noop);
+         events.on(noop);
+         events.on(noop);
+         events.un(noop);
+         events.un(noop);
          
          expect( events.listeners('testEventType') ).toBeFalsy();               
       })                        
