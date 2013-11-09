@@ -15,7 +15,7 @@ function wire (httpMethodName, contentSource, body, headers){
    instanceController( 
                eventBus, 
                clarinet.parser(), 
-               incrementalContentBuilder(eventBus.emit) 
+               incrementalContentBuilder(eventBus) 
    );
       
    patternAdapter(eventBus, jsonPathCompiler);      
