@@ -30,7 +30,7 @@ var clarinet = (function () {
     ];
 
   var buffers     = [ "textNode", "numberNode" ]
-    , _n           = 0
+    , _n          = 0
     ;
   
   var BEGIN                             = _n++;
@@ -53,7 +53,7 @@ var clarinet = (function () {
   var NULL2                             = _n++; // l
   var NULL3                             = _n++; // l
   var NUMBER_DECIMAL_POINT              = _n++; // .
-  var NUMBER_DIGIT                      = _n; // [0-9]
+  var NUMBER_DIGIT                      = _n;   // [0-9]
 
   if (!Object.create) {
     Object.create = function (o) {
