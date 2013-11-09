@@ -1,64 +1,61 @@
 /** 
- * Over time this should be refactored towards a Node-like
- *    EventEmitter so that under Node an actual EE acn be used.
- *    http://nodejs.org/api/events.html
+ * A pub/sub which is responsible for a single event type
+ * 
+ * @param {String} eventType                 the name of the events managed by this singleEventPubSub
+ * @param {singleEventPubSub} newListener    place to notify of new listeners
+ * @param {singleEventPubSub} removeListener place to notify of when listeners are removed
  */
-function singleEventPubSub(){
+function singleEventPubSub(eventType, newListener, removeListener){
 
-   var listeners = {};
+   var listeners;
 
    function hasId(id){
       return function(tuple) {
          return tuple.id == id;      
       };  
    }
-
-   var emit = varArgs(function ( eventName, parameters ) {
-            
-      function emitInner(tuple) {                  
-         tuple.listener.apply(null, parameters);               
-      }                    
-                                                                           
-      applyEach( 
-         emitInner, 
-         listeners[eventName]
-      );
-   });
               
    return {
 
       /**
-       * 
-       * @param eventName
        * @param listener
        * @param listenerId
        * @param {Function} cleanupOnRemove if this listener is later 
        *    removed, a function to call just prior to its removal
        */
-      on:function( eventName, listener, listenerId, cleanupOnRemove ) {
+      on:function( listener, listenerId ) {
          
          var tuple = {
             listener: listener
          ,  id:       listenerId || listener // when no id is given use the
                                              // listener function as the id
-         ,  clean:    cleanupOnRemove  || noop
          };
 
-         emit('newListener', eventName, listener, tuple.id);
+         newListener.emit(eventType, listener, tuple.id);
          
-         listeners[eventName] = cons( tuple, listeners[eventName] );
+         listeners = cons( tuple, listeners );
 
          return this; // chaining
       },
      
-      emit:emit,
+      emit:varArgs(function ( parameters ) {
+                  
+         function emitInner(tuple) {                  
+            tuple.listener.apply(null, parameters);               
+         }                    
+                                                                              
+         applyEach( 
+            emitInner, 
+            listeners
+         );
+      }),
       
-      un: function( eventName, listenerId ) {
+      un: function( listenerId ) {
              
          var removed;             
               
-         listeners[eventName] = without(
-            listeners[eventName],
+         listeners = without(
+            listeners,
             hasId(listenerId),
             function(tuple){
                removed = tuple;
@@ -66,19 +63,19 @@ function singleEventPubSub(){
          );    
          
          if( removed ) {
-            emit('removeListener', eventName, removed.listener, removed.id);
-         }     
+            removeListener.emit(eventType, removed.listener, removed.id);
+         }
       },
       
-      listeners: function( eventName ){
+      listeners: function(){
          // differs from Node EventEmitter: returns list, not array
-         return map(attr('listener'), listeners[eventName]);
+         return map(attr('listener'), listeners);
       },
       
-      hasListener: function(eventName, listenerId){
+      hasListener: function(listenerId){
          var test = listenerId? hasId(listenerId) : always;
       
-         return defined(first( test, listeners[eventName]));
+         return defined(first( test, listeners));
       }
    };
 }
