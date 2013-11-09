@@ -28,20 +28,16 @@ function pubSub(){
    return {
 
       /**
-       * 
        * @param eventName
        * @param listener
        * @param listenerId
-       * @param {Function} cleanupOnRemove if this listener is later 
-       *    removed, a function to call just prior to its removal
        */
-      on:function( eventName, listener, listenerId, cleanupOnRemove ) {
+      on:function( eventName, listener, listenerId ) {
          
          var tuple = {
             listener: listener
          ,  id:       listenerId || listener // when no id is given use the
                                              // listener function as the id
-         ,  clean:    cleanupOnRemove  || noop
          };
 
          emit('newListener', eventName, listener, tuple.id);
