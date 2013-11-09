@@ -24,6 +24,7 @@ module.exports = function(config) {
       ,  'src/ascent.js'
       ,  'src/incrementalContentBuilder.js'
       ,  'src/jsonPath.js'
+      ,  'src/singleEventPubSub.js' 
       ,  'src/pubSub.js' 
       ,  'src/events.js'
       ,  'src/patternAdapter.js'      
