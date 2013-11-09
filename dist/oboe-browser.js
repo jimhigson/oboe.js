@@ -1897,7 +1897,7 @@ function pubSub(){
       },
       
       listeners: function( eventName ){
-         // differes from Node EventEmitter: returns list, not array
+         // differs from Node EventEmitter: returns list, not array
          return map(attr('listener'), listeners[eventName]);
       },
       

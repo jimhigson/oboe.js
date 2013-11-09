@@ -1365,7 +1365,7 @@ function pubSub(){
       },
       
       listeners: function( eventName ){
-         // differes from Node EventEmitter: returns list, not array
+         // differs from Node EventEmitter: returns list, not array
          return map(attr('listener'), listeners[eventName]);
       },
       
@@ -1436,7 +1436,7 @@ function patternAdapter(bus, jsonPathCompiler) {
           can't say anything else about it. 
           */
          if (maybeMatchingMapping !== false) {
-              
+             
             bus.emit(matchEventName, nodeOf(maybeMatchingMapping), ascent);
          }
       }, matchEventName);
@@ -1446,12 +1446,10 @@ function patternAdapter(bus, jsonPathCompiler) {
    
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
-            
+      
          if( removedEventName == matchEventName ) {
-
          
             if( !bus.listeners( removedEventName )) {
-            
                bus.un( predicateEventName, matchEventName );
             }
          }
