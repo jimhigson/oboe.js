@@ -42,13 +42,11 @@ function singleEventPubSub(eventType, newListener, removeListener){
      
       emit:function () {      
          var parameters = arguments;
-                    
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
+                                                                                                                              
          applyEach( 
-            emitInner, 
+            function (tuple) {                  
+               tuple.listener.apply(null, parameters);               
+            }, 
             listeners
          );
       },
