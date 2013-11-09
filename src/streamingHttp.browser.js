@@ -102,13 +102,12 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
                oboeBus(STREAM_END).emit();
             } else {
             
-               oboeBus(FAIL_EVENT)
-                  .emit( 
-                     errorReport(
-                        xhr.status, 
-                        xhr.responseText
-                     )
-                  );
+               oboeBus(FAIL_EVENT).emit( 
+                  errorReport(
+                     xhr.status, 
+                     xhr.responseText
+                  )
+               );
             }
       }
    };
