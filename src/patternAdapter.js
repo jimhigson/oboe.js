@@ -1,10 +1,16 @@
 function patternAdapter(bus, jsonPathCompiler) {
 
-   function addUnderlyingListener( matchEventName, predicateEventName, pattern ){
+   var predicateEventMap = {
+      node:bus(NODE_FOUND)
+   ,  path:bus(PATH_FOUND)
+   };
 
-      var compiledJsonPath = jsonPathCompiler( pattern );
+   function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
+
+      var compiledJsonPath = jsonPathCompiler( pattern ),
+          fullEvent = bus(fullEventName);
    
-      bus(predicateEventName).on( function (ascent) {
+      predicateEvent.on( function (ascent) {
 
          var maybeMatchingMapping = compiledJsonPath(ascent);
 
@@ -23,36 +29,36 @@ function patternAdapter(bus, jsonPathCompiler) {
           can't say anything else about it. 
           */
          if (maybeMatchingMapping !== false) {
-             
-            bus(matchEventName).emit(nodeOf(maybeMatchingMapping), ascent);
+
+            fullEvent.emit(nodeOf(maybeMatchingMapping), ascent);
          }
-      }, matchEventName);
+      }, fullEventName);
    
    
       bus('removeListener').on( function(removedEventName){
-   
+
          // if the match even listener is later removed, clean up by removing
          // the underlying listener if nothing else is using that pattern:
       
-         if( removedEventName == matchEventName ) {
+         if( removedEventName == fullEventName ) {
          
             if( !bus(removedEventName).listeners(  )) {
-               bus( predicateEventName ).un( matchEventName );
+               predicateEvent.un( fullEventName );
             }
          }
       });   
    }
 
-   bus('newListener').on( function(matchEventName){
+   bus('newListener').on( function(fullEventName){
 
-      var match = /(\w+):(.*)/.exec(matchEventName),
-          predicateEventName = match && {node:NODE_FOUND, path:PATH_FOUND}[match[1]];
+      var match = /(\w+):(.*)/.exec(fullEventName),
+          predicateEvent = match && predicateEventMap[match[1]];
                     
-      if( predicateEventName && !bus( predicateEventName ).hasListener( matchEventName) ) {  
+      if( predicateEvent && !bus( predicateEvent ).hasListener( fullEventName) ) {  
                
          addUnderlyingListener(
-            matchEventName,
-            predicateEventName, 
+            fullEventName,
+            predicateEvent, 
             match[2]
          );
       }    
