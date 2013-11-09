@@ -7,7 +7,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
 
-      var fullEvent = oboeBus(fullEventName);
+      var emitMatch = oboeBus(fullEventName).emit;
    
       predicateEvent.on( function (ascent) {
 
@@ -29,7 +29,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
           */
          if (maybeMatchingMapping !== false) {
 
-            fullEvent.emit(nodeOf(maybeMatchingMapping), ascent);
+            emitMatch(nodeOf(maybeMatchingMapping), ascent);
          }
       }, fullEventName);
    
