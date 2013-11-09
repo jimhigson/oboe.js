@@ -1,10 +1,11 @@
 
 describe('instance api',function(){
- 
-   var emit, on, un, api;
+   "use strict";
+   
+   var bus, api;
  
    beforeEach(function(){
-      var bus = spiedPubSub();
+      bus = spiedPubSub();
             
       api = instanceApi(bus);      
    });
@@ -51,7 +52,7 @@ describe('instance api',function(){
    
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header() ).toEqual(headers);   
       });
@@ -59,7 +60,7 @@ describe('instance api',function(){
       it('can provide single header once available', function() {
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header('x-remainingRequests') ).toEqual(100);   
       });
@@ -67,7 +68,7 @@ describe('instance api',function(){
       it('gives undefined for non-existent single header', function() {
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header('x-remainingBathtubs') ).toBeUndefined();   
       });
@@ -84,7 +85,7 @@ describe('instance api',function(){
    
          var root = {I:'am', the:'root'};
          
-         emit( ROOT_FOUND,  root);
+         bus(ROOT_FOUND).emit( root);
          
          expect( api.root() ).toEqual(root);   
       });      
@@ -100,7 +101,7 @@ describe('instance api',function(){
       
          expect(callback).not.toHaveBeenCalled()
           
-         emit( 'node:a_pattern', {}, list(namedNode(ROOT_PATH, {}) ) );
+         bus('node:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
 
          expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
       });
@@ -113,7 +114,7 @@ describe('instance api',function(){
       
          expect(callback).not.toHaveBeenCalled()
           
-         emit( 'path:a_pattern', undefined, list(namedNode(ROOT_PATH, undefined) ) );
+         bus('path:a_pattern').emit( undefined, list(namedNode(ROOT_PATH, undefined) ) );
 
          expect(callback).toHaveBeenCalledWith( undefined, [], [undefined] );      
       });
@@ -132,12 +133,12 @@ describe('instance api',function(){
          expect(callback1).not.toHaveBeenCalled()
          expect(callback2).not.toHaveBeenCalled()
          
-         emit( 'node:pattern1', {}, anAscent())
+         bus('node:pattern1').emit( {}, anAscent())
          
          expect(callback1).toHaveBeenCalled()
          expect(callback2).not.toHaveBeenCalled()
          
-         emit( 'node:pattern2', {}, anAscent())
+         bus('node:pattern2').emit( {}, anAscent())
          
          expect(callback2).toHaveBeenCalled()            
       });
@@ -150,7 +151,7 @@ describe('instance api',function(){
       
          expect(callback).not.toHaveBeenCalled()
           
-         emit( 'path:a_pattern', {}, list(namedNode(ROOT_PATH, {}) ) );
+         bus('path:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
 
          expect(callback).not.toHaveBeenCalled();      
       });   
@@ -164,11 +165,11 @@ describe('instance api',function(){
       
          api.on('node', 'a_pattern', callback);      
                      
-         emit( 'node:a_pattern', {}, ascent);
+         bus('node:a_pattern').emit( {}, ascent);
          
          expect(callback.call.length).toBe(1)      
          
-         emit( 'node:a_pattern', {}, ascent);
+         bus('node:a_pattern').emit( {}, ascent);
          
          expect(callback.calls.length).toBe(1)   
       });           
@@ -185,10 +186,11 @@ describe('instance api',function(){
             api.on('node', 'a_pattern', callback);
          }).not.toThrow();
             
-         emit( 'node:a_pattern', {}, anAscent())
+         bus('node:a_pattern').emit( {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
-         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
+         expect(bus(FAIL_EVENT).emit)
+            .toHaveBeenCalledWith(errorReport(undefined, undefined, e))               
       });
       
       it('is protected from error in node callback added via shortcut', function() {
@@ -199,10 +201,11 @@ describe('instance api',function(){
             api.on('node', {'a_pattern': callback});
          }).not.toThrow(); 
             
-         emit( 'node:a_pattern', {}, anAscent())
+         bus('node:a_pattern').emit( {}, anAscent())
 
          expect(callback).toHaveBeenCalled()         
-         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))               
+         expect(bus(FAIL_EVENT).emit)
+            .toHaveBeenCalledWith(errorReport(undefined, undefined, e))               
       });   
       
       it('is protected from error in path callback', function() {
@@ -213,10 +216,11 @@ describe('instance api',function(){
             api.on('path', 'a_pattern', callback);
          }).not.toThrow();          
             
-         emit( 'path:a_pattern', {}, anAscent())
+         bus('path:a_pattern').emit( {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
-         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))   
+         expect(bus(FAIL_EVENT).emit)
+            .toHaveBeenCalledWith(errorReport(undefined, undefined, e))   
       });   
    
       it('is protected from error in start callback', function() {
@@ -227,10 +231,11 @@ describe('instance api',function(){
             api.on('start', callback);
          }).not.toThrow();        
             
-         emit( HTTP_START)
+         bus(HTTP_START).emit()
          
          expect(callback).toHaveBeenCalled()
-         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))   
+         expect(bus(FAIL_EVENT).emit)
+            .toHaveBeenCalledWith(errorReport(undefined, undefined, e))   
       });   
       
       it('is protected from error in done callback', function() {
@@ -241,10 +246,11 @@ describe('instance api',function(){
             api.done( callback);
          }).not.toThrow();        
             
-         emit( 'node:!', {}, anAscent())
+         bus( 'node:!').emit( {}, anAscent())
          
          expect(callback).toHaveBeenCalled()
-         expect(emit).toHaveBeenCalledWith(FAIL_EVENT, errorReport(undefined, undefined, e))      
+         expect(bus(FAIL_EVENT).emit)
+            .toHaveBeenCalledWith(errorReport(undefined, undefined, e))      
       });
    });
    
@@ -258,8 +264,11 @@ describe('instance api',function(){
             .on('end_of_universe', spy2);
       }).not.toThrow();
       
-      expect( on ).toHaveBeenCalledWith('xyzzy', spy1);
-      expect( on ).toHaveBeenCalledWith('end_of_universe', spy2);
+      expect( bus('xyzzy').on )
+         .toHaveBeenCalledWith(spy1);
+         
+      expect( bus('end_of_universe').on )
+         .toHaveBeenCalledWith(spy2);
    });   
    
    it('calls done callback on end of JSON', function() {
@@ -269,14 +278,14 @@ describe('instance api',function(){
    
       expect(callback).not.toHaveBeenCalled()
        
-      emit( 'node:!', {}, anAscent())
+      bus('node:!').emit( {}, anAscent())
       
       expect(callback).toHaveBeenCalled()      
    });
       
    it('emits ABORTING when .abort() is called', function() {
       api.abort();
-      expect(emit).toHaveBeenCalledWith(ABORTING);
+      expect(bus(ABORTING).emit).toHaveBeenCalled()
    });   
 
 });
