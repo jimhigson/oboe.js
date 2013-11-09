@@ -14,15 +14,15 @@ describe("Lists", function(){
       expect(head(tail(tail(listCBA)))).toBe('a');
    });
 
-   if( !Platform.internetExplorer || Platform.internetExplorer >= 9 ) {
+   if( !Platform.isInternetExplorer || Platform.isInternetExplorer >= 9 ) {
 
       it("freezes lists on supporting browsers", function() {   
-                  
+                 
          expect( listA ).toBeFrozen();         
          expect( listBA ).toBeFrozen();         
          expect( listCBA ).toBeFrozen();                     
       })
-   } else {
+   } else { 
       console.warn('platform does not support object freezing');
    }
    
