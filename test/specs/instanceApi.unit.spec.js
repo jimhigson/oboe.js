@@ -4,11 +4,7 @@ describe('instance api',function(){
    var emit, on, un, api;
  
    beforeEach(function(){
-      var bus = pubSub();
-           
-      emit = spyOn( bus, 'emit' ).andCallThrough();
-      on = spyOn( bus, 'on' ).andCallThrough();
-      un = spyOn( bus, 'un' ).andCallThrough();
+      var bus = spiedPubSub();
             
       api = instanceApi(bus);      
    });
