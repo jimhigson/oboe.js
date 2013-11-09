@@ -2132,7 +2132,7 @@ function apiMethod(defaultHttpMethod, arg1, arg2) {
 
       return wire(
          (arg1.method || defaultHttpMethod),
-         arg1.url,
+         url(arg1.url, arg1.cached),
          arg1.body,
          arg1.headers
       );
@@ -2146,6 +2146,21 @@ function apiMethod(defaultHttpMethod, arg1, arg2) {
          arg1, // url
          arg2  // body. Deprecated, use {url:u, body:b} instead
       );
+   }
+   
+   function url(baseUrl, cached) {
+     
+      if( cached === false ) {
+           
+         if( baseUrl.indexOf('?') == -1 ) {
+            baseUrl += '?';
+         } else {
+            baseUrl += '&';
+         }
+         
+         baseUrl += '_=' + new Date().getTime();
+      }
+      return baseUrl;
    }
 }
 
