@@ -462,8 +462,9 @@ function first(test, list) {
                   : first(test,tail(list))); 
 }
 /* 
-   This is a slightly hacked-up version of clarinet with the
-   Node.js specific features removed.
+   This is a slightly hacked-up browser only version of clarinet 
+   with some features removed to help keep Oboe under 
+   the 5k micro-library limit
    
    For the original go here:
       https://github.com/dscape/clarinet
@@ -472,18 +473,12 @@ function first(test, list) {
 var clarinet = (function () {
 
   var clarinet = {}
-    , env
     , fastlist = Array    
     ;
 
-if(typeof process === 'object' && process.env) env = process.env;
-else env = window;
-
-  clarinet.parser            = function (opt) { return new CParser(opt);};
+  clarinet.parser            = function () { return new CParser();};
   clarinet.CParser           = CParser;
   clarinet.MAX_BUFFER_LENGTH = 64 * 1024;
-  clarinet.DEBUG             = (env.CDEBUG==='debug');
-  clarinet.INFO              = (env.CDEBUG==='debug' || env.CDEBUG==='info');
   clarinet.EVENTS            =
     [ "value"
     , "string"
@@ -575,14 +570,13 @@ else env = window;
 
   var stringTokenPattern = /[\\"\n]/g;
 
-  function CParser (opt) {
-    if (!(this instanceof CParser)) return new CParser (opt);
+  function CParser () {
+    if (!(this instanceof CParser)) return new CParser ();
 
     var parser = this;
     clearBuffers(parser);
     parser.bufferCheckPosition = clarinet.MAX_BUFFER_LENGTH;
     parser.q        = parser.c = parser.p = "";
-    parser.opt      = opt || {};
     parser.closed   = parser.closedRoot = parser.sawRoot = false;
     parser.tag      = parser.error = null;
     parser.state    = BEGIN;
@@ -599,7 +593,6 @@ else env = window;
   CParser.prototype =
     { end    : function () { end(this); }
     , write  : write
-    , resume : function () { this.error = null; return this; }
     , close  : function () { return this.write(null); }
     };
 
@@ -613,7 +606,7 @@ else env = window;
   }
 
   function closeValue(parser, event) {
-    parser.textNode = textopts(parser.opt, parser.textNode);
+
     if (parser.textNode) {
       emit(parser, (event ? event : "onvalue"), parser.textNode);
     }
@@ -626,11 +619,6 @@ else env = window;
     parser.numberNode = "";
   }
 
-  function textopts (opt, text) {
-    if (opt.trim) text = text.trim();
-    if (opt.normalize) text = text.replace(/\s+/g, " ");
-    return text;
-  }
 
   function error (parser, er) {
     closeValue(parser);
@@ -649,7 +637,7 @@ else env = window;
     parser.c      = "";
     parser.closed = true;
     emit(parser, "onend");
-    CParser.call(parser, parser.opt);
+    CParser.call(parser);
     return parser;
   }
 
@@ -712,7 +700,7 @@ else env = window;
         case CLOSE_KEY:
         case CLOSE_OBJECT:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          var event = (parser.state === CLOSE_KEY) ? 'key' : 'object';
+
           if(c===':') {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
@@ -781,7 +769,6 @@ else env = window;
             , unicodeI = parser.unicodeI
             ;
           STRING_BIGLOOP: while (true) {
-            if (clarinet.DEBUG)
 
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {
@@ -2246,7 +2233,7 @@ function oboe(arg1, arg2) {
 
       return wire(
          (arg1.method || 'GET'),
-         arg1.url,
+         url(arg1.url, arg1.cached),
          arg1.body,
          arg1.headers
       );
@@ -2260,6 +2247,21 @@ function oboe(arg1, arg2) {
          arg1, // url
          arg2  // body. Deprecated, use {url:u, body:b} instead
       );
+   }
+   
+   function url(baseUrl, cached) {
+     
+      if( cached === false ) {
+           
+         if( baseUrl.indexOf('?') == -1 ) {
+            baseUrl += '?';
+         } else {
+            baseUrl += '&';
+         }
+         
+         baseUrl += '_=' + new Date().getTime();
+      }
+      return baseUrl;
    }
 }
 

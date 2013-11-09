@@ -187,7 +187,7 @@ describe('streaming xhr integration (real http)', function() {
 
       runs(function(){
          if( contentReceived == '' &&
-             (Platform.internetExplorer || Platform.isPhantom) ) {
+             (Platform.isInternetExplorer || Platform.isPhantom) ) {
             console.warn( 'this user agent seems not to support giving content' 
                           + ' back for of PATCH requests.'
                           + ' This happens on PhantomJS and IE < 9');
@@ -204,7 +204,7 @@ describe('streaming xhr integration (real http)', function() {
    // old and rubbish browsers buffer the xhr response meaning that this 
    // will never pass. But for good browsers it is good to have an integration
    // test to confirm that we're getting it right.           
-   if( !Platform.internetExplorer || Platform.internetExplorer >= 10 ) {          
+   if( !Platform.isInternetExplorer || Platform.isInternetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function() {
                               
          streamingHttp(                           
