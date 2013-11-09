@@ -1,17 +1,14 @@
 
 describe('instance api and pattern adaptor composed',function(){
+   "use strict";
  
-   var emit, on, un, api, matches;
+   var bus, api, matches;
  
    beforeEach(function(){
-      var bus = pubSub();
+      bus = spiedPubSub();
       
       matches = {};
-     
-      emit = spyOn( bus, 'emit' ).andCallThrough();
-      on = spyOn( bus, 'on' ).andCallThrough();
-      un = spyOn( bus, 'un' ).andCallThrough();
-            
+                 
       function jsonPathCompiler(pattern){
 
          function compiled ( ascent ){         
@@ -78,7 +75,7 @@ describe('instance api and pattern adaptor composed',function(){
    
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header() ).toEqual(headers);   
       });
@@ -86,7 +83,7 @@ describe('instance api and pattern adaptor composed',function(){
       it('can provide single header once available', function() {
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header('x-remainingRequests') ).toEqual(100);   
       });
@@ -94,7 +91,7 @@ describe('instance api and pattern adaptor composed',function(){
       it('gives undefined for non-existent single header', function() {
          var headers = {"x-remainingRequests": 100};
          
-         emit( HTTP_START, 200, headers );
+         bus(HTTP_START).emit( 200, headers );
          
          expect( api.header('x-remainingBathtubs') ).toBeUndefined();   
       });
@@ -111,7 +108,7 @@ describe('instance api and pattern adaptor composed',function(){
    
          var root = {I:'am', the:'root'};
          
-         emit( ROOT_FOUND,  root);
+         bus(ROOT_FOUND).emit(  root);
          
          expect( api.root() ).toEqual(root);   
       });      
@@ -127,7 +124,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          expect(callback).not.toHaveBeenCalled()
           
-         emit( NODE_FOUND, ascent)
+         bus(NODE_FOUND).emit( ascent)
 
          expect(callback).toHaveBeenCalled()      
       });
@@ -141,7 +138,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          expect(callback).not.toHaveBeenCalled()
          
-         emit( PATH_FOUND, ascent)
+         bus(PATH_FOUND).emit( ascent)
          
          expect(callback).toHaveBeenCalled()      
       });
@@ -153,7 +150,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          api.on('node', 'a_different_pattern', callback); 
             
-         emit( NODE_FOUND, ascent)
+         bus(NODE_FOUND).emit( ascent)
          
          expect(callback).not.toHaveBeenCalled()      
       });   
@@ -165,11 +162,11 @@ describe('instance api and pattern adaptor composed',function(){
       
          api.on('node', 'a_pattern', callback); 
             
-         emit( NODE_FOUND, ascent)
+         bus(NODE_FOUND).emit( ascent)
          
          expect(callback.call.length).toBe(1)      
          
-         emit( NODE_FOUND, ascent)
+         bus(NODE_FOUND).emit( ascent)
          
          expect(callback.calls.length).toBe(2)
       });   
