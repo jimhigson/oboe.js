@@ -2,14 +2,14 @@ describe('patternAdapter', function() {
   
    it('compiles the correct pattern when patterns are listened to', function(){
    
-      bus.on('node:test_pattern', noop);
+      bus.emit('newListener', 'node:test_pattern');
             
       expect( jsonPathCompiler ).toHaveBeenCalledWith('test_pattern');
    })
 
    it('listens for node events when node:pattern is added', function(){
          
-      bus.on('node:test_pattern', noop);
+      bus.emit('newListener', 'node:test_pattern');
       
       expect(bus.on)
          .toHaveBeenCalledWith(
