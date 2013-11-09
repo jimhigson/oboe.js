@@ -1310,7 +1310,7 @@ function pubSub(){
       }),
       
       un: function( eventId, handler ) {
-         listeners[eventId] = without(listeners[eventId], handler);
+         listeners[eventId] = without(listeners[eventId], handler);                  
       }           
    };
 }
@@ -1364,8 +1364,11 @@ function instanceApi(emit, on, un, jsonPathCompiler){
           underlyingEvent = {node:NODE_FOUND, path:PATH_FOUND}[type],
           
           safeCallback = protectedCallback(callback);               
-          
-      on( underlyingEvent, function handler( ascent ){ 
+      
+      // NB: DO NOT inline this function! IE8 gets terribly confused: the function
+      // that is added as a listener will be unequal (with ==) to the one that later
+      // needs to be removed
+      function handler( ascent ){ 
  
          var maybeMatchingMapping = compiledJsonPath( ascent );
      
@@ -1390,7 +1393,9 @@ function instanceApi(emit, on, un, jsonPathCompiler){
                un(underlyingEvent, handler);
             }
          }
-      });   
+      }          
+          
+      on( underlyingEvent, handler);
    }   
    
    function notifyCallback(callback, node, ascent) {
