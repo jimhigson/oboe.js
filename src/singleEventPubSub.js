@@ -1,9 +1,9 @@
 /** 
  * A pub/sub which is responsible for a single event type
  * 
- * @param {String} eventType                 the name of the events managed by this singleEventPubSub
- * @param {singleEventPubSub} newListener    place to notify of new listeners
- * @param {singleEventPubSub} removeListener place to notify of when listeners are removed
+ * @param {String} eventType                   the name of the events managed by this singleEventPubSub
+ * @param {singleEventPubSub} [newListener]    place to notify of new listeners
+ * @param {singleEventPubSub} [removeListener] place to notify of when listeners are removed
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
@@ -31,7 +31,9 @@ function singleEventPubSub(eventType, newListener, removeListener){
                                              // listener function as the id
          };
 
-         newListener.emit(eventType, listener, tuple.id);
+         if( newListener ) {
+            newListener.emit(eventType, listener, tuple.id);
+         }
          
          listeners = cons( tuple, listeners );
 
@@ -62,7 +64,7 @@ function singleEventPubSub(eventType, newListener, removeListener){
             }
          );    
          
-         if( removed ) {
+         if( removeListener && removed ) {
             removeListener.emit(eventType, removed.listener, removed.id);
          }
       },
