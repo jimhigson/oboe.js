@@ -27,8 +27,8 @@ describe('instance api and pattern adaptor composed',function(){
 
       api = instanceApi(bus);
       
-      // For now, tie the patternAdapter into the bus. Split tests up
-      // once this works:      
+      // For now, tie the patternAdapter into the bus. These tests are
+      // for the composition between patternAdaptor and instanceApi           
       patternAdapter(bus, jsonPathCompiler);
    });
       

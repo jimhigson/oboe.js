@@ -308,7 +308,53 @@ describe('pub sub', function(){
       
       }).not.toThrow();
    
-   });   
+   });
+   
+   describe('listeners method', function(){
+      it('can return listeners when there haven\'t been any', function(){
+         var events = pubSub();
+         
+         expect( events.listeners('testEventType') ).toBeFalsy();      
+      })
+      
+      it('can return listeners when one has been added', function(){
+         var events = pubSub();
+         
+         events.on('testEventType', noop);
+         
+         expect( events.listeners('testEventType') ).toEqual(list(noop));               
+      })
+      
+      it('can return listeners when second is added', function(){
+         var events = pubSub();
+         
+         events.on('testEventType', noop);
+         events.on('testEventType', noop);
+         
+         expect( events.listeners('testEventType') ).toEqual(list(noop, noop));               
+      })
+      
+      it('can return listeners when one is removed', function(){
+         var events = pubSub();
+         
+         events.on('testEventType', noop);
+         events.on('testEventType', noop);
+         events.un('testEventType', noop);
+         
+         expect( events.listeners('testEventType') ).toEqual(list(noop));               
+      })
+      
+      it('can return listeners when all are removed', function(){
+         var events = pubSub();
+         
+         events.on('testEventType', noop);
+         events.on('testEventType', noop);
+         events.un('testEventType', noop);
+         events.un('testEventType', noop);
+         
+         expect( events.listeners('testEventType') ).toBeFalsy();               
+      })                        
+   })
    
          
 });

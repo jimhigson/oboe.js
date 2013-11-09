@@ -71,8 +71,8 @@ function pubSub(){
       },
       
       listeners: function( eventName ){
-      
-         return listAsArray(map(attr('listener'), listeners[eventName]));
+         // differs from Node EventEmitter: returns list, not array
+         return map(attr('listener'), listeners[eventName]);
       },
       
       hasListener: function(eventName, listenerId){
