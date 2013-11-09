@@ -40,8 +40,9 @@ function singleEventPubSub(eventType, newListener, removeListener){
          return this; // chaining
       },
      
-      emit:varArgs(function ( parameters ) {
-                  
+      emit:function () {      
+         var parameters = arguments;
+                    
          function emitInner(tuple) {                  
             tuple.listener.apply(null, parameters);               
          }                    
@@ -50,7 +51,7 @@ function singleEventPubSub(eventType, newListener, removeListener){
             emitInner, 
             listeners
          );
-      }),
+      },
       
       un: function( listenerId ) {
              
