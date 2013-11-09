@@ -21,8 +21,10 @@ function httpTransport(){
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
-        
-   var numberOfCharsAlreadyGivenToCallback = 0;
+           
+   var emitStreamData = oboeBus( STREAM_DATA ).emit,
+       emitFail       = oboeBus(FAIL_EVENT).emit,
+       numberOfCharsAlreadyGivenToCallback = 0;      
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
@@ -64,7 +66,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         oboeBus( STREAM_DATA ).emit( newText );
+         emitStreamData( newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -101,13 +103,11 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
                
                oboeBus(STREAM_END).emit();
             } else {
-            
-               oboeBus(FAIL_EVENT).emit( 
-                  errorReport(
-                     xhr.status, 
-                     xhr.responseText
-                  )
-               );
+
+               emitFail( errorReport(
+                  xhr.status, 
+                  xhr.responseText
+               ));
             }
       }
    };
@@ -130,9 +130,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         function(){
-            oboeBus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
-         }
+         partialComplete(emitFail, errorReport(undefined, undefined, e))
       ,  0
       );
    }            

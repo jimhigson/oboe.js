@@ -1016,8 +1016,10 @@ function httpTransport(){
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
-        
-   var numberOfCharsAlreadyGivenToCallback = 0;
+           
+   var emitStreamData = oboeBus( STREAM_DATA ).emit,
+       emitFail       = oboeBus(FAIL_EVENT).emit,
+       numberOfCharsAlreadyGivenToCallback = 0;      
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
@@ -1059,7 +1061,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
          last progress. */
          
       if( newText ) {
-         oboeBus( STREAM_DATA ).emit( newText );
+         emitStreamData( newText );
       } 
 
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
@@ -1096,14 +1098,11 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
                
                oboeBus(STREAM_END).emit();
             } else {
-            
-               oboeBus(FAIL_EVENT)
-                  .emit( 
-                     errorReport(
-                        xhr.status, 
-                        xhr.responseText
-                     )
-                  );
+
+               emitFail( errorReport(
+                  xhr.status, 
+                  xhr.responseText
+               ));
             }
       }
    };
@@ -1126,9 +1125,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
       window.setTimeout(
-         function(){
-            oboeBus(FAIL_EVENT).emit(errorReport(undefined, undefined, e));
-         }
+         partialComplete(emitFail, errorReport(undefined, undefined, e))
       ,  0
       );
    }            
@@ -1844,10 +1841,10 @@ function singleEventPubSub(eventType, newListener, removeListener){
    return {
 
       /**
-       * @param listener
-       * @param listenerId
-       * @param {Function} cleanupOnRemove if this listener is later 
-       *    removed, a function to call just prior to its removal
+       * @param {Function} listener
+       * @param {*} listenerId 
+       *    an id that this listener can later by removed by. 
+       *    Can be of any type, to be compared to other ids using ==
        */
       on:function( listener, listenerId ) {
          
@@ -1866,17 +1863,16 @@ function singleEventPubSub(eventType, newListener, removeListener){
          return this; // chaining
       },
      
-      emit:varArgs(function ( parameters ) {
-                  
-         function emitInner(tuple) {                  
-            tuple.listener.apply(null, parameters);               
-         }                    
-                                                                              
+      emit:function () {      
+         var parameters = arguments;
+                                                                                                                              
          applyEach( 
-            emitInner, 
+            function (tuple) {                  
+               tuple.listener.apply(null, parameters);               
+            }, 
             listeners
          );
-      }),
+      },
       
       un: function( listenerId ) {
              
@@ -1973,10 +1969,9 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    ,  path:oboeBus(PATH_FOUND)
    };
 
-   function addUnderlyingListener( fullEventName, predicateEvent, pattern ){
+   function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
 
-      var compiledJsonPath = jsonPathCompiler( pattern ),
-          fullEvent = oboeBus(fullEventName);
+      var emitMatch = oboeBus(fullEventName).emit;
    
       predicateEvent.on( function (ascent) {
 
@@ -1998,7 +1993,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
           */
          if (maybeMatchingMapping !== false) {
 
-            fullEvent.emit(nodeOf(maybeMatchingMapping), ascent);
+            emitMatch(nodeOf(maybeMatchingMapping), ascent);
          }
       }, fullEventName);
    
@@ -2018,16 +2013,19 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
    oboeBus('newListener').on( function(fullEventName){
 
-      var match = /(\w+):(.*)/.exec(fullEventName),
-          predicateEvent = match && predicateEventMap[match[1]];
+      var match = /(node|path):(.*)/.exec(fullEventName);
+      
+      if( match ) {
+         var predicateEvent = predicateEventMap[match[1]];
                     
-      if( predicateEvent && !predicateEvent.hasListener( fullEventName) ) {  
-               
-         addUnderlyingListener(
-            fullEventName,
-            predicateEvent, 
-            match[2]
-         );
+         if( !predicateEvent.hasListener( fullEventName) ) {  
+                  
+            addUnderlyingListener(
+               fullEventName,
+               predicateEvent, 
+               jsonPathCompiler( match[2] )
+            );
+         }
       }    
    })
 
