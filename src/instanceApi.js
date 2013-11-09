@@ -13,7 +13,7 @@ function instanceApi(bus){
           
           safeCallback = protectedCallback(callback);
                               
-      bus.on( matchEventName, function(node, ascent) {
+      bus(matchEventName).on(  function(node, ascent) {
       
          /* 
             We're now calling back to outside of oboe where the Lisp-style 
@@ -40,7 +40,7 @@ function instanceApi(bus){
          delete oboeApi.forget;
          
          if(! keep ) {          
-            bus.un(matchEventName, callback);
+            bus(matchEventName).un( callback);
          }
                   
       
@@ -49,7 +49,7 @@ function instanceApi(bus){
    }   
    
    function removePathOrNodeListener( publicApiName, pattern, callback ) {
-      bus.un(publicApiName + ':' + pattern, callback)
+      bus(publicApiName + ':' + pattern).un(callback)
    }
          
    function protectedCallback( callback ) {
@@ -59,7 +59,7 @@ function instanceApi(bus){
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
-            bus.emit(FAIL_EVENT, errorReport(undefined, undefined, e));
+            bus(FAIL_EVENT).emit( errorReport(undefined, undefined, e));
          }      
       }   
    }
@@ -69,7 +69,7 @@ function instanceApi(bus){
     * protection against errors being thrown
     */
    function safeOn( eventName, callback ){
-      bus.on(eventName, protectedCallback(callback));
+      bus(eventName).on( protectedCallback(callback));
       return oboeApi;
    }
       
@@ -115,7 +115,7 @@ function instanceApi(bus){
          // the even has no special handling, add it directly to
          // the event bus:         
          var listener = parameters[0]; 
-         bus.on(eventId, listener);
+         bus(eventId).on( listener);
       }
       
       return oboeApi;
@@ -123,11 +123,11 @@ function instanceApi(bus){
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
-   bus.on(ROOT_FOUND, function(root) {
+   bus(ROOT_FOUND).on( function(root) {
       oboeApi.root = functor(root);   
    });
    
-   bus.on(HTTP_START, function(_statusCode, headers) {
+   bus(HTTP_START).on( function(_statusCode, headers) {
       oboeApi.header = 
          function(name) {
             return name ? headers[name] 
@@ -147,8 +147,8 @@ function instanceApi(bus){
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
       start :  partialComplete(safeOn, HTTP_START),
       // fail doesn't use safeOn because that could lead to non-terminating loops
-      fail  :  partialComplete(bus.on, FAIL_EVENT),
-      abort :  partialComplete(bus.emit, ABORTING),
+      fail  :  bus(FAIL_EVENT).on,
+      abort :  bus(ABORTING).emit,
       header:  noop,
       root  :  noop
    };   
