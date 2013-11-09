@@ -30,7 +30,7 @@ var ROOT_PATH = {};
  * Create a new set of handlers for clarinet's events, bound to the emit 
  * function given.  
  */ 
-function incrementalContentBuilder( emit ) {
+function incrementalContentBuilder( eventBus ) {
 
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
@@ -59,7 +59,7 @@ function incrementalContentBuilder( emit ) {
       
       if( !ascent ) {
          // we discovered the root node,
-         emit( ROOT_FOUND, newDeepestNode);
+         eventBus(ROOT_FOUND).emit(  newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -119,7 +119,7 @@ function incrementalContentBuilder( emit ) {
                                  ascent
                               );
      
-      emit( PATH_FOUND, ascentWithNewPath);
+      eventBus(PATH_FOUND).emit(  ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -130,7 +130,7 @@ function incrementalContentBuilder( emit ) {
     */
    function nodeFinished( ascent ) {
 
-      emit( NODE_FOUND, ascent);
+      eventBus(NODE_FOUND).emit(  ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);

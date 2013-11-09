@@ -4,13 +4,17 @@ describe("incremental content builder", function(){
      
       var eventBus = pubSub();
       
-      sinon.spy(eventBus, 'emit');
-      sinon.spy(eventBus, 'on');
+      sinon.spy(eventBus(NODE_FOUND), 'emit');
+      sinon.spy(eventBus(NODE_FOUND), 'on');
+      sinon.spy(eventBus(PATH_FOUND), 'emit');
+      sinon.spy(eventBus(PATH_FOUND), 'on');
+      sinon.spy(eventBus(ROOT_FOUND), 'emit');
+      sinon.spy(eventBus(ROOT_FOUND), 'on');            
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
       
-      var builderInstance = incrementalContentBuilder(eventBus.emit, eventBus.on, this._clarinetStub);
+      var builderInstance = incrementalContentBuilder(eventBus, this._clarinetStub);
       
       clarinetListenerAdaptor( this._clarinetStub, builderInstance);
    }
@@ -26,14 +30,7 @@ describe("incremental content builder", function(){
       
       return this;
    };
-   
-   IncrementalContentBuilderAsserter.prototype.receiveEventFromBus = function(/* args */){
      
-      this._eventBus.emit.apply(undefined, arguments);
-      return this;
-   };
-   
-
    describe('when root object opens', function() {
       
       var builder = aContentBuilder().receivingParserEvent('onopenobject'); 
@@ -51,7 +48,7 @@ describe("incremental content builder", function(){
 
       it('reports correct root', function () {
 
-         expect(builder).toHaveEmittedRootThatIsNow({})
+         expect(builder).toHaveEmittedRootWhichIsNow({})
 
       });
    })
@@ -76,7 +73,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow({flavour:undefined});
+         expect(builder).toHaveEmittedRootWhichIsNow({flavour:undefined});
       });
       
    })
@@ -100,7 +97,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow({flavour:undefined});
+         expect(builder).toHaveEmittedRootWhichIsNow({flavour:undefined});
       });      
       
    })   
@@ -124,7 +121,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
        
-         expect(builder).toHaveEmittedRootThatIsNow({flavour:'strawberry'});
+         expect(builder).toHaveEmittedRootWhichIsNow({flavour:'strawberry'});
       });   
          
    })
@@ -148,7 +145,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow({flavour:'strawberry'});      
+         expect(builder).toHaveEmittedRootWhichIsNow({flavour:'strawberry'});      
       });   
                      
    })
@@ -186,7 +183,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow({'alphabet':['a']});
+         expect(builder).toHaveEmittedRootWhichIsNow({'alphabet':['a']});
       });
 
    })
@@ -225,7 +222,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow({'alphabet':['a','b']});
+         expect(builder).toHaveEmittedRootWhichIsNow({'alphabet':['a','b']});
       });
 
    })
@@ -260,7 +257,7 @@ describe("incremental content builder", function(){
       
       it('reports correct root', function(){
       
-         expect(builder).toHaveEmittedRootThatIsNow(['a','b']);
+         expect(builder).toHaveEmittedRootWhichIsNow(['a','b']);
       });
 
    })      
@@ -275,17 +272,17 @@ describe("incremental content builder", function(){
    beforeEach(function(){
             
       this.addMatchers({
-         toHaveEmittedRootThatIsNow: function( expectedRootObj ) {
+         toHaveEmittedRootWhichIsNow: function( expectedRootObj ) {
             var asserter = this.actual;
-            var emit = asserter._eventBus.emit;
+            var emit = asserter._eventBus(ROOT_FOUND).emit;
 
-            return emit.calledWith(ROOT_FOUND, expectedRootObj);
+            return emit.calledWith(expectedRootObj);
          },
       
          toHaveEmitted: function( eventName, expectedAscent ){
    
             var asserter = this.actual;
-            var emit = asserter._eventBus.emit;
+            var emit = asserter._eventBus(eventName).emit;
             
             var ascentMatch = sinon.match(function ( foundAscent ) {
                      
@@ -344,9 +341,7 @@ describe("incremental content builder", function(){
                         emit.args.map( reportArgs ).join('\n                     \t')
             };
 
-
-
-            return emit.calledWithMatch( eventName, ascentMatch );
+            return emit.calledWithMatch( ascentMatch );
          }
                               
       });   
