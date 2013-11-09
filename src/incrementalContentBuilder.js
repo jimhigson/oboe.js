@@ -32,6 +32,9 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( eventBus ) {
 
+   var emitNodeFound = eventBus(NODE_FOUND).emit,
+       emitRootFound = eventBus(ROOT_FOUND).emit,
+       emitPathFound = eventBus(PATH_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -58,8 +61,8 @@ function incrementalContentBuilder( eventBus ) {
    function nodeFound( ascent, newDeepestNode ) {
       
       if( !ascent ) {
-         // we discovered the root node,
-         eventBus(ROOT_FOUND).emit(  newDeepestNode);
+         // we discovered the root node,         
+         emitRootFound( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -118,8 +121,8 @@ function incrementalContentBuilder( eventBus ) {
                                             maybeNewDeepestNode), 
                                  ascent
                               );
-     
-      eventBus(PATH_FOUND).emit(  ascentWithNewPath);
+
+      emitPathFound( ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -130,7 +133,7 @@ function incrementalContentBuilder( eventBus ) {
     */
    function nodeFinished( ascent ) {
 
-      eventBus(NODE_FOUND).emit(  ascent);
+      emitNodeFound( ascent);
                           
       // pop the complete node and its path off the list:                                    
       return tail( ascent);
