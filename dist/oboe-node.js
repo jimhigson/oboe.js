@@ -1308,13 +1308,28 @@ function singleEventPubSub(eventType, newListener, removeListener){
     *  when we are emitting
     */
    var listenerTupleList,
-       listenerList;
+       listenerList,
+       emitInner = noop;
 
    function hasId(id){
       return function(tuple) {
          return tuple.id == id;      
       };  
    }
+   
+   function emitterTo(listenerList){
+      if( !listenerList ) {
+         return noop;
+      }
+      
+      if( !tail( listenerList ) ){
+         return head(listenerList);
+      }
+      
+      return function(){
+         applyEach( listenerList, arguments );      
+      }      
+   } 
               
    return {
 
@@ -1339,11 +1354,13 @@ function singleEventPubSub(eventType, newListener, removeListener){
          listenerTupleList = cons( tuple,    listenerTupleList );
          listenerList      = cons( listener, listenerList      );
 
+         emitInner = emitterTo(listenerList);
+
          return this; // chaining
       },
      
       emit:function () {                                                                                           
-         applyEach( listenerList, arguments );
+         emitInner.apply( null, arguments );
       },
       
       un: function( listenerId ) {
@@ -1362,6 +1379,8 @@ function singleEventPubSub(eventType, newListener, removeListener){
             listenerList = without( listenerList, function(listener){
                return listener == removed.listener;
             });
+            
+            emitInner = emitterTo(listenerList);            
          
             if( removeListener ) {
                removeListener.emit(eventType, removed.listener, removed.id);
