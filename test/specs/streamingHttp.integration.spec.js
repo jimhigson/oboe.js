@@ -5,32 +5,52 @@
 describe('streaming xhr integration (real http)', function() {
    "use strict";
  
-   it('can ajax in a small known file',  function() {
+   var requiredEvents = [HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING];
+ 
+   it('completes',  function() {
      
       // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback         
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(requiredEvents)         
       streamingHttp(                         
-         emit, on,
+         oboeBus,
          httpTransport(),
          'GET', 
          '/testServer/static/json/smallestPossible.json',
          null // this is a GET, no data to send
       ); 
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);
+   })
+ 
+   it('can ajax in a small known file',  function() {
+     
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(requiredEvents)         
+      streamingHttp(                         
+         oboeBus,
+         httpTransport(),
+         'GET', 
+         '/testServer/static/json/smallestPossible.json',
+         null // this is a GET, no data to send
+      ); 
+      
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
-         expect(emit).toHaveGivenStreamEventsInCorrectOrder()
-         expect(contentReceived).toParseTo({}) 
+         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
+         expect(streamedContentPassedTo(oboeBus)).toParseTo({}) 
       });  
    })
    
    it('fires HTTP_START with status and headers',  function() {
      
       // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback         
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(requiredEvents)               
       streamingHttp(                         
-         emit, on,
+         oboeBus,
          httpTransport(),
          'GET', 
          '/testServer/echoBackHeadersAsHeaders',
@@ -38,12 +58,11 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
-         expect(emit)
+         expect(oboeBus(HTTP_START).emit)
             .toHaveBeenCalledWith(
-               HTTP_START,
                200,
                jasmine.objectContaining({specialheader:'specialValue'}
             )
@@ -55,8 +74,9 @@ describe('streaming xhr integration (real http)', function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(                         
-         emit, on,
+         oboeBus,
          httpTransport(),
          'GET', 
          '/testServer/echoBackHeadersAsHeaders',
@@ -64,10 +84,10 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
-         expect(emit).toHaveGivenStreamEventsInCorrectOrder()
+         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
       });            
    })      
             
@@ -75,23 +95,24 @@ describe('streaming xhr integration (real http)', function() {
    
   
       // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback         
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(requiredEvents)               
       streamingHttp(                         
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'GET', 
          '/testServer/static/json/twentyThousandRecords.json',
          null // this is a GET, no data to send      
       );
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
          var parsedResult;
       
          expect(function(){
 
-            parsedResult = JSON.parse(contentReceived);
+            parsedResult = JSON.parse(streamedContentPassedTo(oboeBus));
             
          }).not.toThrow();
 
@@ -105,20 +126,21 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(                       
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'GET', 
          '/testServer/tenSlowNumbers?withoutMissingAny',
           null // this is a GET, no data to send      
       );
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){ 
          // as per the name, should have ten numbers in that file:         
-         expect(contentReceived).toParseTo([0,1,2,3,4,5,6,7,8,9]);
-         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
+         expect(streamedContentPassedTo(oboeBus)).toParseTo([0,1,2,3,4,5,6,7,8,9]);
+         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()         
       });              
    }) 
    
@@ -128,19 +150,20 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(                        
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'POST',
          '/testServer/echoBackBody',
          payload       
       );
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
  
       runs(function(){
-         expect(contentReceived).toParseTo(payload);
-         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
+         expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
+         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()         
       });
      
    })
@@ -151,19 +174,20 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'PUT',
           '/testServer/echoBackBody',
           payload       
       );
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
-         expect(contentReceived).toParseTo(payload);
-         expect(emit).toHaveGivenStreamEventsInCorrectOrder()         
+         expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
+         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()         
       });
      
    }) 
@@ -175,25 +199,26 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'PATCH',
           '/testServer/echoBackBody',
           payload       
       );
       
-      waitForRequestToComplete();            
+      waitForStreamEndToBeFiredOn(oboeBus);            
 
       runs(function(){
-         if( contentReceived == '' &&
+         if( streamedContentPassedTo(oboeBus) == '' &&
              (Platform.isInternetExplorer || Platform.isPhantom) ) {
             console.warn( 'this user agent seems not to support giving content' 
                           + ' back for of PATCH requests.'
                           + ' This happens on PhantomJS and IE < 9');
          } else {         
-            expect(contentReceived).toParseTo(payload);
-            expect(emit).toHaveGivenStreamEventsInCorrectOrder();
+            expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
+            expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder();
          }            
       });
      
@@ -207,8 +232,9 @@ describe('streaming xhr integration (real http)', function() {
    if( !Platform.isInternetExplorer || Platform.isInternetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function() {
                               
+         var oboeBus = fakePubSub(requiredEvents)
          streamingHttp(                           
-            emit, on,
+            oboeBus,
             httpTransport(),            
             'GET',
 
@@ -216,21 +242,22 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitForRequestToComplete();      
+         waitForStreamEndToBeFiredOn(oboeBus);      
    
          runs(function(){
                                    
             // realistically, should have had 10 or 20, but this isn't deterministic so
             // 3 is enough to indicate the results didn't all arrive in one big blob.
-            expect(numberOfProgressCallbacks).toBeGreaterThan(3)
-            expect(emit).toHaveGivenStreamEventsInCorrectOrder()            
+            expect(oboeBus.callCount[STREAM_DATA]).toBeGreaterThan(3)
+            expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()            
          });      
       })
                      
       it('gives multiple callbacks when loading a gzipped streaming resource',  function() {
                               
+         var oboeBus = fakePubSub(requiredEvents)                              
          streamingHttp(                           
-            emit, on,
+            oboeBus,
             httpTransport(),            
             'GET',
  
@@ -238,21 +265,21 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitForRequestToComplete();      
+         waitForStreamEndToBeFiredOn(oboeBus);      
    
          runs(function(){
             // some platforms can't help but not work here so warn but don't
             // fail the test:
-            if( numberOfProgressCallbacks == 1 && 
+            if( oboeBus.callCount[STREAM_DATA] == 1 && 
                   (Platform.isInternetExplorer || Platform.isPhantom) ) {
                console.warn('This user agent seems to give gzipped responses' +
                    'as a single event, not progressively. This happens on ' +
                    'PhantomJS and IE < 9');
             } else {
-               expect(numberOfProgressCallbacks).toBeGreaterThan(1);
+               expect(oboeBus.callCount[STREAM_DATA]).toBeGreaterThan(1);
             }
          
-            expect(emit).toHaveGivenStreamEventsInCorrectOrder();
+            expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder();
          });      
       })      
    }
@@ -260,17 +287,22 @@ describe('streaming xhr integration (real http)', function() {
    it('does not call back with zero-length data',  function() {
                          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
+      var oboeBus = fakePubSub(requiredEvents)      
       streamingHttp(              
-         emit, on,
+         oboeBus,
          httpTransport(),         
          'GET', 
          '/testServer/static/json/oneHundredRecords.json',
          null // this is a GET: no data to send      
       );         
 
-      waitForRequestToComplete()
+      waitForStreamEndToBeFiredOn(oboeBus)
       
       runs(function(){
+      
+         var dripsReceived = oboeBus.eventTypesEmitted[STREAM_DATA].map(function( args ){
+            return args[0];
+         });
       
          expect(dripsReceived.length).toBeGreaterThan(0);
       
@@ -280,30 +312,24 @@ describe('streaming xhr integration (real http)', function() {
       
       })   
    })              
-
-
-   var requestCompleteListener,
-       contentReceived,
-       numberOfProgressCallbacks,
-       dripsReceived,
-       emit, on;
    
-   function waitForRequestToComplete(){
+   function waitForStreamEndToBeFiredOn(eventBus){
       waitsFor(function(){     
-         // did we emit with STREAM_END as the event name yet?
+                  
+         return !!eventBus(STREAM_END).emit.calls.length;
          
-         return emit.calls.some(function( call ){         
-            return call.args[0] == STREAM_END;         
-         });      
       }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);   
    }
    
+   function streamedContentPassedTo(eventBus){
+   
+      return eventBus.eventTypesEmitted[STREAM_DATA].map(function(args){
+         return args[0];
+      }).join('');      
+   }
+   
    beforeEach(function(){
-      contentReceived = '';      
-      numberOfProgressCallbacks = 0;
-      dripsReceived = [];
-      requestCompleteListener = jasmine.createSpy();
-      
+               
       function prettyPrintEvent(event){
 
          switch(event) {
@@ -316,27 +342,23 @@ describe('streaming xhr integration (real http)', function() {
             
       this.addMatchers({
          toHaveGivenStreamEventsInCorrectOrder: function(){
-         
-            var emitSpy = this.actual;
             
-            var eventsOrder = emitSpy.calls.map(function(call){
-               return call.args[0];
-            });
-            
+            var eventNames = this.actual.eventNames;
+                        
             this.message = function(){
                return 'events not in correct order. We have: ' +
                         JSON.stringify(
-                           eventsOrder.map(prettyPrintEvent)
+                           eventNames.map(prettyPrintEvent)
                         )                          
             };
             
-            return   eventsOrder[0] === HTTP_START
-                  && eventsOrder[1] === STREAM_DATA
-                  && eventsOrder[eventsOrder.length-1] === STREAM_END;
+            return   eventNames[0] === HTTP_START
+                  && eventNames[1] === STREAM_DATA
+                  && eventNames[eventNames.length-1] === STREAM_END;            
          },
       
          toParseTo:function( expectedObj ){
-            
+
             var actual = this.actual;
             var normalisedActual;
                        
@@ -370,17 +392,7 @@ describe('streaming xhr integration (real http)', function() {
          }
       });
       
-      on = jasmine.createSpy();
-      
-      emit = jasmine.createSpy().andCallFake(function( eventName, eventContent ){
-      
-         if( eventName == STREAM_DATA ) {
-            numberOfProgressCallbacks ++;
-            contentReceived += eventContent;
-            dripsReceived.push(eventContent);
-                     
-         }
-      });
+
       
    });
 

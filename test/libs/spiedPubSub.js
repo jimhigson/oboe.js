@@ -14,4 +14,50 @@ function spiedPubSub() {
       
       return single;
    }
-}   
+}
+
+function fakePubSub( eventNames ) {
+
+   var eventTypes = {};
+   var eventsEmitted = [];   
+   var eventNamesEmitted = [];
+   var eventTypesEmitted = {};
+   var callCount = {};      
+      
+   function record(eventName){
+      return function() {
+         eventsEmitted.push({
+            type: eventName, 
+            args: arguments
+         });
+         
+         eventNamesEmitted.push(eventName);
+         eventTypesEmitted[eventName].push(arguments);
+         callCount[eventName]++;
+      }
+   }      
+   
+   eventNames.forEach( function( eventName ){
+      eventTypes[eventName] = {
+         'emit':  jasmine.createSpy(eventName + '/emit')
+                     .andCallFake(record(eventName))
+      ,  'on':    jasmine.createSpy(eventName + '/on')
+      ,  'un':    jasmine.createSpy(eventName + '/un')
+      };
+      
+      eventTypesEmitted[eventName] = [];
+      callCount[eventName] = 0;      
+   });
+
+   function bus( eventName ) {
+           
+      return eventTypes[eventName];
+   }
+   
+   bus.events            = eventsEmitted;
+   bus.eventNames        = eventNamesEmitted;
+   bus.eventTypesEmitted = eventTypesEmitted;
+   bus.callCount         = callCount;
+   
+   return bus;
+}      
