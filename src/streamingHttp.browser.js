@@ -22,7 +22,7 @@ function httpTransport(){
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
            
-   var emitStreamData = oboeBus( STREAM_DATA ).emit,
+   var emitStreamData = oboeBus(STREAM_DATA).emit,
        emitFail       = oboeBus(FAIL_EVENT).emit,
        numberOfCharsAlreadyGivenToCallback = 0;      
 
