@@ -2,7 +2,7 @@ function spiedPubSub() {
 
    var realPubSub = pubSub();
 
-   return function( eventName ) {
+   function fakedPubSub( eventName ) {
         
       var single = realPubSub(eventName);
    
@@ -14,6 +14,10 @@ function spiedPubSub() {
       
       return single;
    }
+   
+   fakedPubSub.emit = realPubSub.emit;
+   
+   return fakedPubSub;
 }
 
 function fakePubSub( eventNames ) {

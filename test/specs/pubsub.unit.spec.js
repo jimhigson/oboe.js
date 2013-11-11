@@ -104,5 +104,16 @@ describe('pub sub', function(){
       
       expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, noop);     
    })
-         
+   
+   it('allows short-cut adding using .emit', function(){
+   
+      var events     = pubSub(),
+          callback   = jasmine.createSpy('something happening callback');
+      
+      events('somethingHappened').on(callback);
+      events.emit('somethingHappened', 'it was', 'definitely something');
+      
+      expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
+   });
+
 });

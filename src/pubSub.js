@@ -13,12 +13,19 @@ function pubSub(){
       return singles[eventName] = singleEventPubSub(eventName, newListener, removeListener);   
    }      
 
-   return function( eventName ){   
+   /** pubSub instances are functions */
+   function pubSubInstance( eventName ){   
       if( !singles[eventName] ) {
          return newSingle( eventName );
       }
       
       return singles[eventName];   
-   };
+   }
    
+   // convenience EventEmitter-style uncurried form
+   pubSubInstance.emit = varArgs(function(eventName, parameters){
+      apply( parameters, pubSubInstance( eventName ).emit);
+   });
+   
+   return pubSubInstance;
 }

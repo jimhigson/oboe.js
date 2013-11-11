@@ -162,15 +162,15 @@ function instanceApi(oboeBus){
                                        ;
                         }
    });
-   
-      
+         
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
     */       
    return oboeApi = {
       on             : addListener,
-      removeListener : removeListener,                
+      removeListener : removeListener,
+      emit           : oboeBus.emit,                
                 
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
       path           : partialComplete(addNodeOrPathListenerApi, 'path'),
