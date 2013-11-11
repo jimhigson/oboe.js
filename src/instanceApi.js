@@ -115,22 +115,30 @@ function instanceApi(oboeBus){
    return oboeApi = {
       on    :  varArgs(function( eventId, parameters ){
    
-                  if( /^(node|path)./.test(eventId) ) {
-                     var listener = parameters[0];                   
-                     addPathOrNodeListener(eventId, listener);                  
-                  } else if( oboeApi[eventId] ) {
-                  
-                     // event has some special handling:
-                     apply(parameters, oboeApi[eventId]);
-                     
+                  if( oboeApi[eventId] ) {
+
+                     // for events added as .on(event), if there is a 
+                     // special .event equivalent, pass through to that 
+                     apply(parameters, oboeApi[eventId]);                     
                   } else {
-                  
-                     // the event has no special handling, pass through 
-                     // directly to the event bus:
-                     var listener = parameters[0];          
-                     oboeBus(eventId).on( listener);
+
+                     // we have a standard Node.js EventEmitter 2-argument call.
+                     // The first parameter is the listener.
+                     var listener = parameters[0];
+
+                     if( /^(node|path):./.test(eventId) ) {
+                     
+                        // allow fully-qualified node/path listeners 
+                        // to be added                                             
+                        addPathOrNodeListener(eventId, listener);                  
+                     } else  {
+
+                        // the event has no special handling, pass through 
+                        // directly onto the event bus:          
+                        oboeBus(eventId).on( listener);
+                     }
                   }
-                  
+                     
                   return oboeApi; // chaining
                }),
          
