@@ -2139,17 +2139,17 @@ function instanceApi(oboeBus){
             return oboeApi; // chaining
        }),
  
-       removeListener = varArgs(function( eventId, parameters ){
+       removeListener = function( eventId, p2, p3 ){
              
             if( eventId == 'node' || eventId == 'path' ) {
       
                // allow removal of node and path 
-               removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
+               removePathOrNodeListener(eventId + ':' + p2, p3);          
             } else {
       
                // we have a standard Node.js EventEmitter 2-argument call.
                // The first parameter is the listener.
-               var listener = parameters[0];
+               var listener = p2;
 
                if( fullyQualifiedNamePattern.test(eventId) ) {
                
@@ -2165,7 +2165,7 @@ function instanceApi(oboeBus){
             }
                
             return oboeApi; // chaining      
-       });                               
+       };                               
    
    
    function addPathOrNodeListener( fullyQualifiedName, callback ) {
