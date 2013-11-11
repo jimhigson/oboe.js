@@ -108,7 +108,9 @@ function instanceApi(oboeBus){
                         }
    });
    
-   var   addListener = varArgs(function( eventId, parameters ){
+   var   fullyQualifiedNamePattern = /^(node|path):./,
+   
+         addListener = varArgs(function( eventId, parameters ){
                
                if( oboeApi[eventId] ) {
          
@@ -121,7 +123,7 @@ function instanceApi(oboeBus){
                   // The first parameter is the listener.
                   var listener = parameters[0];
          
-                  if( /^(node|path):./.test(eventId) ) {
+                  if( fullyQualifiedNamePattern.test(eventId) ) {
                   
                      // allow fully-qualified node/path listeners 
                      // to be added                                             
@@ -148,8 +150,8 @@ function instanceApi(oboeBus){
                   // we have a standard Node.js EventEmitter 2-argument call.
                   // The first parameter is the listener.
                   var listener = parameters[0];
-         
-                  if( /^(node|path):./.test(eventId) ) {
+
+                  if( fullyQualifiedNamePattern.test(eventId) ) {
                   
                      // allow fully-qualified node/path listeners 
                      // to be added                                             
