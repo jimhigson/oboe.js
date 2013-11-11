@@ -2045,13 +2045,11 @@ function instanceApi(oboeBus){
            'node', '!');
    
    
-   function addPathOrNodeListener( publicApiName, pattern, callback ) {
-   
-      var matchEventName = publicApiName + ':' + pattern,          
-          
-          safeCallback = protectedCallback(callback);
+   function addPathOrNodeListener( fullyQualifiedName, callback ) {
+      
+      var safeCallback = protectedCallback(callback);
                               
-      oboeBus(matchEventName).on(  function(node, ascent) {
+      oboeBus(fullyQualifiedName).on(  function(node, ascent) {
       
          /* 
             We're now calling back to outside of oboe where the Lisp-style 
@@ -2078,7 +2076,7 @@ function instanceApi(oboeBus){
          delete oboeApi.forget;
          
          if(! keep ) {          
-            oboeBus(matchEventName).un( callback);
+            oboeBus(fullyQualifiedName).un( callback);
          }
                   
       
@@ -2108,7 +2106,10 @@ function instanceApi(oboeBus){
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addPathOrNodeListener(eventId, pattern, listenerMap[pattern]);
+         addPathOrNodeListener(
+            eventId + ':' + pattern, 
+            listenerMap[pattern]
+         );
       }
    }    
       
@@ -2119,8 +2120,7 @@ function instanceApi(oboeBus){
    
       if( isString(jsonPathOrListenerMap) ) {
          addPathOrNodeListener( 
-            eventId, 
-            jsonPathOrListenerMap,
+            eventId + ':' + jsonPathOrListenerMap,
             callback
          );
       } else {
@@ -2130,25 +2130,6 @@ function instanceApi(oboeBus){
       return oboeApi; // chaining
    }
       
-   /**
-    * implementation behind oboe().on()
-    */       
-   var addListener = varArgs(function( eventId, parameters ){
-
-      if( oboeApi[eventId] ) {
-      
-         // event has some special handling:
-         apply(parameters, oboeApi[eventId]);
-      } else {
-      
-         // the even has no special handling, add it directly to
-         // the event bus:         
-         var listener = parameters[0]; 
-         oboeBus(eventId).on( listener);
-      }
-      
-      return oboeApi;
-   });   
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
@@ -2157,12 +2138,12 @@ function instanceApi(oboeBus){
    });
    
    oboeBus(HTTP_START).on( function(_statusCode, headers) {
-      oboeApi.header = 
-         function(name) {
-            return name ? headers[name] 
-                        : headers
-                        ;
-         }
+   
+      oboeApi.header =  function(name) {
+                           return name ? headers[name] 
+                                       : headers
+                                       ;
+                        }
    });
       
    /**
@@ -2170,7 +2151,35 @@ function instanceApi(oboeBus){
     * returned to the calling application
     */       
    return oboeApi = {
-      on    :  addListener,   
+      on    :  varArgs(function( eventId, parameters ){
+   
+                  if( oboeApi[eventId] ) {
+
+                     // for events added as .on(event), if there is a 
+                     // special .event equivalent, pass through to that 
+                     apply(parameters, oboeApi[eventId]);                     
+                  } else {
+
+                     // we have a standard Node.js EventEmitter 2-argument call.
+                     // The first parameter is the listener.
+                     var listener = parameters[0];
+
+                     if( /^(node|path):./.test(eventId) ) {
+                     
+                        // allow fully-qualified node/path listeners 
+                        // to be added                                             
+                        addPathOrNodeListener(eventId, listener);                  
+                     } else  {
+
+                        // the event has no special handling, pass through 
+                        // directly onto the event bus:          
+                        oboeBus(eventId).on( listener);
+                     }
+                  }
+                     
+                  return oboeApi; // chaining
+               }),
+         
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
       path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
@@ -2178,6 +2187,8 @@ function instanceApi(oboeBus){
       // fail doesn't use safeOn because that could lead to non-terminating loops
       fail  :  oboeBus(FAIL_EVENT).on,
       abort :  oboeBus(ABORTING).emit,
+      
+      // initially return nothing for header and root
       header:  noop,
       root  :  noop
    };   
