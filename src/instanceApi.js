@@ -152,6 +152,7 @@ function instanceApi(oboeBus){
     */       
    return oboeApi = {
       on             : addListener,
+      addListener    : addListener, 
       removeListener : removeListener,
       emit           : oboeBus.emit,                
                 

@@ -137,6 +137,22 @@ describe('instance api',function(){
          expect(callback).toHaveBeenCalledWith( node, path, ancestors );      
       });
       
+      it('allows adding using addListener method', function() {
+      
+         var callback = jasmine.createSpy('node callback'),
+             node = {},
+             path = [],
+             ancestors = [];         
+      
+         oboeInstance.addListener('node:a_pattern', callback) 
+      
+         expect(callback).not.toHaveBeenCalled()
+          
+         oboeBus('node:a_pattern').emit( node, path, ancestors );
+
+         expect(callback).toHaveBeenCalledWith( node, path, ancestors );      
+      });      
+      
       it('calls path callback added using 2-arg mode when notified of match to pattern', function() {
       
          var callback = jasmine.createSpy('path callback'),

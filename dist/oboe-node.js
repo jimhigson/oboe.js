@@ -1393,7 +1393,11 @@ function pubSub(){
        removeListener = newSingle('removeListener'); 
       
    function newSingle(eventName) {
-      return singles[eventName] = singleEventPubSub(eventName, newListener, removeListener);   
+      return singles[eventName] = singleEventPubSub(
+         eventName, 
+         newListener, 
+         removeListener
+      );   
    }      
 
    /** pubSub instances are functions */
@@ -1693,6 +1697,7 @@ function instanceApi(oboeBus){
     */       
    return oboeApi = {
       on             : addListener,
+      addListener    : addListener, 
       removeListener : removeListener,
       emit           : oboeBus.emit,                
                 
