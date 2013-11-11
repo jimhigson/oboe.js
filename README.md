@@ -664,8 +664,23 @@ If nothing has been received yet this will return undefined, otherwise it will g
 })
 ```
 
-Calling .forget() on the Oboe instance from inside a callback de-registers
-the currently executing callback.
+Calling .forget() on the Oboe instance from inside a node or path callback
+de-registers the currently executing callback.
+
+## .removeListener()
+
+```js
+.removeListener('node', String pattern, callback)
+.removeListener('node:{pattern}', String pattern, callback)
+
+.removeListener('start', callback)
+.removeListener('done', callback)
+.removeListener('fail', callback)
+```
+
+Remove a `node`, `path`, `start`, `done`, or `fail` listener. From inside
+the listener itself `.forget()` is usually more convenient but this
+works from anywhere.
 
 ## .abort()
 
