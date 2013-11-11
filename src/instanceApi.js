@@ -46,8 +46,8 @@ function instanceApi(oboeBus){
 
    }   
    
-   function removePathOrNodeListener( publicApiName, pattern, callback ) {
-      oboeBus(publicApiName + ':' + pattern).un(callback)
+   function removePathOrNodeListener( fullyQualifiedName, callback ) {
+      oboeBus(fullyQualifiedName).un(callback)
    }
          
    function protectedCallback( callback ) {
@@ -141,6 +141,34 @@ function instanceApi(oboeBus){
                      
                   return oboeApi; // chaining
                }),
+      removeListener: varArgs(function( eventId, parameters ){
+      
+                  if( eventId == 'node' || eventId == 'path' ) {
+         
+                     // for events added as .on(event), if there is a 
+                     // special .event equivalent, pass through to that 
+                     removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
+                  } else {
+         
+                     // we have a standard Node.js EventEmitter 2-argument call.
+                     // The first parameter is the listener.
+                     var listener = parameters[0];
+         
+                     if( /^(node|path):./.test(eventId) ) {
+                     
+                        // allow fully-qualified node/path listeners 
+                        // to be added                                             
+                        removePathOrNodeListener(eventId, listener);                  
+                     } else  {
+         
+                        // the event has no special handling, pass through 
+                        // directly onto the event bus:          
+                        oboeBus(eventId).un( listener);
+                     }
+                  }
+                     
+                  return oboeApi; // chaining      
+               }),                
          
       done  :  addDoneListener,       
       node  :  partialComplete(addNodeOrPathListenerApi, 'node'),

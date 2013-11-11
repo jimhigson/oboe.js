@@ -170,7 +170,101 @@ describe('instance api',function(){
          bus('node:a_pattern').emit( {}, ascent);
          
          expect(callback.calls.length).toBe(1)   
-      });           
+      });
+      
+      it('doesn\'t call node callback after callback is removed', function() {
+      
+         var callback = jasmine.createSpy(),
+             ascent = list(namedNode('node', {}));
+
+         api.on('node', 'a_pattern', callback);      
+         api.removeListener('node', 'a_pattern', callback);
+
+         bus('node:a_pattern').emit( {}, ascent);               
+
+         expect(callback).not.toHaveBeenCalled()   
+      });
+      
+      it('doesn\'t call node callback after callback is removed using 2-arg form', function() {
+      
+         var callback = jasmine.createSpy(),
+             ascent = list(namedNode('node', {}));
+
+         api.on('node', 'a_pattern', callback);      
+         api.removeListener('node:a_pattern', callback);
+
+         bus('node:a_pattern').emit( {}, ascent);               
+
+         expect(callback).not.toHaveBeenCalled()   
+      });      
+      
+      it('doesn\'t call path callback after callback is removed', function() {
+      
+         var callback = jasmine.createSpy(),
+             ascent = list(namedNode('path', {}));
+
+         api.on('path', 'a_pattern', callback);      
+         api.removeListener('path', 'a_pattern', callback);
+
+         bus('path:a_pattern').emit( {}, ascent);               
+
+         expect(callback).not.toHaveBeenCalled()   
+      });
+      
+      it('doesn\'t remove callback if wrong pattern is removed', function() {
+      
+         var callback = jasmine.createSpy(),
+             ascent = list(namedNode('node', {}));
+
+         api.on('node', 'a_pattern', callback);
+               
+         api.removeListener('node', 'wrong_pattern', callback);
+
+         bus('node:a_pattern').emit( {}, ascent);
+
+         expect(callback).toHaveBeenCalled()   
+      });
+      
+      it('doesn\'t remove callback if wrong callback is removed', function() {
+      
+         var callback = jasmine.createSpy(),
+             wrongCallback = jasmine.createSpy(),
+             ascent = list(namedNode('node', {}));
+
+         api.on('node', 'a_pattern', callback);
+               
+         api.removeListener('node', 'a_pattern', wrongCallback);
+
+         bus('node:a_pattern').emit( {}, ascent);
+
+         expect(callback).toHaveBeenCalled()   
+      });            
+      
+      it('allows nodes node to be removed in a different ' +
+         'style than they were added', function() {
+      
+         var 
+             callback1 = jasmine.createSpy(),
+             callback2 = jasmine.createSpy(),
+             callback3 = jasmine.createSpy(),
+             ascent = list(namedNode('node', {}));
+
+         api.node('pattern1', callback1);
+         api.on('node', 'pattern2', callback2);
+         api.on('node', {pattern3: callback3});
+                        
+         api.removeListener('node:pattern1', callback1);
+         api.removeListener('node:pattern2', callback2);
+         api.removeListener('node:pattern3', callback3);
+
+         bus('node:pattern1').emit( {}, ascent);          
+         bus('node:pattern2').emit( {}, ascent);          
+         bus('node:pattern3').emit( {}, ascent);          
+
+         expect(callback1).not.toHaveBeenCalled()   
+         expect(callback2).not.toHaveBeenCalled()   
+         expect(callback3).not.toHaveBeenCalled()   
+      });
    });
 
 
