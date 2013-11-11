@@ -1822,18 +1822,23 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 });
 
 /** 
- * A pub/sub which is responsible for a single event type
+ * A pub/sub which is responsible for a single event type. A 
+ * multi-event type event bus is created by pubSub by collecting
+ * several of these.
  * 
- * @param {String} eventType                   the name of the events managed by this singleEventPubSub
- * @param {singleEventPubSub} [newListener]    place to notify of new listeners
- * @param {singleEventPubSub} [removeListener] place to notify of when listeners are removed
+ * @param {String} eventType                   
+ *    the name of the events managed by this singleEventPubSub
+ * @param {singleEventPubSub} [newListener]    
+ *    place to notify of new listeners
+ * @param {singleEventPubSub} [removeListener] 
+ *    place to notify of when listeners are removed
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
    /** we are optimised for emitting events over firing them.
-    *  hence, as well as the tuple list which stores event ids and listeners,
-    *  there is also a listener list which can be iterated more quickly
-    *  when we are emitting
+    *  As well as the tuple list which stores event ids and
+    *  listeners there is a list with just the listeners which 
+    *  can be iterated more quickly when we are emitting
     */
    var listenerTupleList,
        listenerList;
@@ -1909,10 +1914,38 @@ function singleEventPubSub(eventType, newListener, removeListener){
       }
    };
 }
-/** 
- * Over time this should be refactored towards a Node-like
- *    EventEmitter so that under Node an actual EE acn be used.
- *    http://nodejs.org/api/events.html
+/**
+ * pubSub is a curried[1] interface for listening to and emitting
+ * events.
+ * 
+ * If we get a bus:
+ *    
+ *    var bus = pubSub();
+ * 
+ * We can listen to event 'foo' like:
+ * 
+ *    bus('foo').on(myCallback)
+ *    
+ * And emit event foo like:
+ * 
+ *    bus('foo').emit()
+ *    
+ * or, with a parameter:
+ * 
+ *    bus('foo').emit('bar')
+ *     
+ * Functions can be cached. Ie:
+ * 
+ *    var fooEmitter = bus('foo').emit
+ *    fooEmitter('bar');  // emit an event
+ *    fooEmitter('baz');  // emit another
+ *    
+ * There's also an uncurried[2] shortcut:
+ * 
+ *    bus.emit('foo', 'bar')
+ * 
+ * [1]: http://en.wikipedia.org/wiki/Curry_(programming_language)
+ * [2]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub(){
 
@@ -2139,7 +2172,7 @@ function instanceApi(oboeBus){
       
       var safeCallback = protectedCallback(callback);
                               
-      oboeBus(fullyQualifiedName).on(  function(node, path, ancestors) {
+      oboeBus(fullyQualifiedName).on( function(node, path, ancestors) {
       
          var keep       = true;
              

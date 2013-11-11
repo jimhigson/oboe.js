@@ -66,7 +66,7 @@ function instanceApi(oboeBus){
       
       var safeCallback = protectedCallback(callback);
                               
-      oboeBus(fullyQualifiedName).on(  function(node, path, ancestors) {
+      oboeBus(fullyQualifiedName).on( function(node, path, ancestors) {
       
          var keep       = true;
              

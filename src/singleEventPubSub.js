@@ -1,16 +1,21 @@
 /** 
- * A pub/sub which is responsible for a single event type
+ * A pub/sub which is responsible for a single event type. A 
+ * multi-event type event bus is created by pubSub by collecting
+ * several of these.
  * 
- * @param {String} eventType                   the name of the events managed by this singleEventPubSub
- * @param {singleEventPubSub} [newListener]    place to notify of new listeners
- * @param {singleEventPubSub} [removeListener] place to notify of when listeners are removed
+ * @param {String} eventType                   
+ *    the name of the events managed by this singleEventPubSub
+ * @param {singleEventPubSub} [newListener]    
+ *    place to notify of new listeners
+ * @param {singleEventPubSub} [removeListener] 
+ *    place to notify of when listeners are removed
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
    /** we are optimised for emitting events over firing them.
-    *  hence, as well as the tuple list which stores event ids and listeners,
-    *  there is also a listener list which can be iterated more quickly
-    *  when we are emitting
+    *  As well as the tuple list which stores event ids and
+    *  listeners there is a list with just the listeners which 
+    *  can be iterated more quickly when we are emitting
     */
    var listenerTupleList,
        listenerList;

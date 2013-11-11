@@ -1,7 +1,35 @@
-/** 
- * Over time this should be refactored towards a Node-like
- *    EventEmitter so that under Node an actual EE acn be used.
- *    http://nodejs.org/api/events.html
+/**
+ * pubSub is a curried[1] interface for listening to and emitting
+ * events.
+ * 
+ * If we get a bus:
+ *    
+ *    var bus = pubSub();
+ * 
+ * We can listen to event 'foo' like:
+ * 
+ *    bus('foo').on(myCallback)
+ *    
+ * And emit event foo like:
+ * 
+ *    bus('foo').emit()
+ *    
+ * or, with a parameter:
+ * 
+ *    bus('foo').emit('bar')
+ *     
+ * Functions can be cached. Ie:
+ * 
+ *    var fooEmitter = bus('foo').emit
+ *    fooEmitter('bar');  // emit an event
+ *    fooEmitter('baz');  // emit another
+ *    
+ * There's also an uncurried[2] shortcut:
+ * 
+ *    bus.emit('foo', 'bar')
+ * 
+ * [1]: http://en.wikipedia.org/wiki/Curry_(programming_language)
+ * [2]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub(){
 
@@ -10,7 +38,11 @@ function pubSub(){
        removeListener = newSingle('removeListener'); 
       
    function newSingle(eventName) {
-      return singles[eventName] = singleEventPubSub(eventName, newListener, removeListener);   
+      return singles[eventName] = singleEventPubSub(
+         eventName, 
+         newListener, 
+         removeListener
+      );   
    }      
 
    /** pubSub instances are functions */
