@@ -157,9 +157,9 @@ describe('instance api',function(){
       it('doesn\'t call again after forget called from inside callback', function() {
       
          var callback = jasmine.createSpy().andCallFake(function(){
-            this.forget();
-         }),
-             ascent = list(namedNode('node', {}));
+                           this.forget();
+                        }),
+             ascent =   list(namedNode('node', {}));
       
          api.on('node', 'a_pattern', callback);      
                      
