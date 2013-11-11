@@ -8,7 +8,7 @@ function instanceApi(oboeBus){
    
    
    function addPathOrNodeListener( fullyQualifiedName, callback ) {
-   
+      
       var safeCallback = protectedCallback(callback);
                               
       oboeBus(fullyQualifiedName).on(  function(node, ascent) {
@@ -115,19 +115,23 @@ function instanceApi(oboeBus){
    return oboeApi = {
       on    :  varArgs(function( eventId, parameters ){
    
-                  if( oboeApi[eventId] ) {
+                  if( /^(node|path)./.test(eventId) ) {
+                     var listener = parameters[0];                   
+                     addPathOrNodeListener(eventId, listener);                  
+                  } else if( oboeApi[eventId] ) {
                   
                      // event has some special handling:
                      apply(parameters, oboeApi[eventId]);
+                     
                   } else {
                   
                      // the event has no special handling, pass through 
-                     // directly to the event bus:         
-                     var listener = parameters[0]; 
+                     // directly to the event bus:
+                     var listener = parameters[0];          
                      oboeBus(eventId).on( listener);
                   }
                   
-                  return oboeApi;
+                  return oboeApi; // chaining
                }),
          
       done  :  addDoneListener,       

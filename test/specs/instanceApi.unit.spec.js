@@ -78,7 +78,7 @@ describe('instance api',function(){
 
          expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
       });
-
+      
       it('calls path callback when notified of matching path', function() {
       
          var callback = jasmine.createSpy('path callback');
@@ -95,8 +95,7 @@ describe('instance api',function(){
       it('allows short-cut node matching', function() {
       
          var callback1 = jasmine.createSpy(),
-             callback2 = jasmine.createSpy(),
-             ascent2 = ascentFrom({ l1:       {l2:      {l3:'leaf'}}});
+             callback2 = jasmine.createSpy();             
              
          api.on('node', {
             pattern1: callback1, 
@@ -115,6 +114,32 @@ describe('instance api',function(){
          
          expect(callback2).toHaveBeenCalled()            
       });
+      
+      it('calls node callback added using 2-arg mode when notified of match to pattern', function() {
+      
+         var callback = jasmine.createSpy('node callback');
+      
+         api.on('node:a_pattern', callback); 
+      
+         expect(callback).not.toHaveBeenCalled()
+          
+         bus('node:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
+
+         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
+      });
+      
+      it('calls path callback added using 2-arg mode when notified of match to pattern', function() {
+      
+         var callback = jasmine.createSpy('path callback');
+      
+         api.on('path:a_pattern', callback); 
+      
+         expect(callback).not.toHaveBeenCalled()
+          
+         bus('path:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
+
+         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
+      });      
       
       it('doesn\'t call node callback on path found', function() {
       
