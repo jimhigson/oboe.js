@@ -14,33 +14,6 @@ describe('instance api',function(){
       return list(namedNode(ROOT_PATH, {}) );
    }
  
-   it('has chainable methods that don\'t explode',  function() {
-      // test that nothing forgot to return 'this':
-
-      expect(function(){      
-         function fn(){}
-             
-         api
-            .path('*', fn)
-            .node('*', fn)
-            .fail(fn).path('*', fn)
-            .path({'*':fn})
-            .node({'*': fn})
-            .done(fn)
-            .path({'*':fn})
-            .start(fn)
-            .on('path','*', fn)
-            .on('node','*', fn)
-            .fail(fn)
-            .on('path','*', fn)
-            .on('path',{'*':fn})
-            .on('node',{'*': fn})
-            .on('path',{'*':fn})
-            .on('done',fn)
-            .on('start',fn);   
-      }).not.toThrow();
-   })
-
    describe('header method', function(){
 
       it('returns undefined if not available', function() {
