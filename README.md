@@ -553,6 +553,11 @@ When you make a request the returned Oboe instance exposes a few chainable metho
      String pattern, 
      Function callback(node, String[] path, Object[] ancestors)
 )
+
+// 2-argument style .on() which is compatible with Node.js EventEmitter#on
+.on( 'node:{pattern}',  
+     Function callback(node, String[] path, Object[] ancestors)
+)
 ```
 
 Listening for nodes registers an interest in JSON nodes which match the given pattern so 
@@ -568,7 +573,7 @@ The parameters to callback are:
    the location where the node was found
  * `ancestors` - an array of node's ancestors. `ancestors[ancestors.length-1]`
    is the parent object, `ancestors[ancestors.length-2]` is the grandparent 
-   and so on. 
+   and so on.
    
 ```js
 .path( String pattern, 
@@ -577,6 +582,11 @@ The parameters to callback are:
 
 .on( 'path', 
      String pattern, 
+     Function callback(thingFound, String[] path, Object[] ancestors)
+)
+
+// 2-argument style .on() which is compatible with Node.js EventEmitter#on
+.on( 'path:{pattern}',  
      Function callback(thingFound, String[] path, Object[] ancestors)
 )
 ```
