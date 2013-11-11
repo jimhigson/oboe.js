@@ -68,28 +68,34 @@ describe('instance api',function(){
    
       it('calls node callback when notified of matching node', function() {
       
-         var callback = jasmine.createSpy('node callback');
+         var callback = jasmine.createSpy('node callback'),
+             node = {},
+             path = [],
+             ancestors = [];
       
          oboeInstance.on('node', 'a_pattern', callback); 
       
          expect(callback).not.toHaveBeenCalled()
           
-         oboeBus('node:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
+         oboeBus('node:a_pattern').emit( node, path, ancestors );
 
-         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
+         expect(callback).toHaveBeenCalledWith( node, path, ancestors );
       });
       
       it('calls path callback when notified of matching path', function() {
       
-         var callback = jasmine.createSpy('path callback');
+         var callback = jasmine.createSpy('path callback'),
+             node = {},
+             path = [],
+             ancestors = [];
       
          oboeInstance.on('path', 'a_pattern', callback); 
       
          expect(callback).not.toHaveBeenCalled()
           
-         oboeBus('path:a_pattern').emit( undefined, list(namedNode(ROOT_PATH, undefined) ) );
+         oboeBus('path:a_pattern').emit( node, path, ancestors );
 
-         expect(callback).toHaveBeenCalledWith( undefined, [], [undefined] );      
+         expect(callback).toHaveBeenCalledWith( node, path, ancestors );      
       });
          
       it('allows short-cut node matching', function() {
@@ -117,28 +123,34 @@ describe('instance api',function(){
       
       it('calls node callback added using 2-arg mode when notified of match to pattern', function() {
       
-         var callback = jasmine.createSpy('node callback');
+         var callback = jasmine.createSpy('node callback'),
+             node = {},
+             path = [],
+             ancestors = [];         
       
-         oboeInstance.on('node:a_pattern', callback); 
+         oboeInstance.on('node:a_pattern', callback) 
       
          expect(callback).not.toHaveBeenCalled()
           
-         oboeBus('node:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
+         oboeBus('node:a_pattern').emit( node, path, ancestors );
 
-         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
+         expect(callback).toHaveBeenCalledWith( node, path, ancestors );      
       });
       
       it('calls path callback added using 2-arg mode when notified of match to pattern', function() {
       
-         var callback = jasmine.createSpy('path callback');
+         var callback = jasmine.createSpy('path callback'),
+             node = {},
+             path = [],
+             ancestors = [];         
       
          oboeInstance.on('path:a_pattern', callback); 
       
          expect(callback).not.toHaveBeenCalled()
           
-         oboeBus('path:a_pattern').emit( {}, list(namedNode(ROOT_PATH, {}) ) );
+         oboeBus('path:a_pattern').emit( node, path, ancestors );
 
-         expect(callback).toHaveBeenCalledWith( {}, [], [{}] );      
+         expect(callback).toHaveBeenCalledWith( node, path, ancestors );      
       });      
       
       it('doesn\'t call node callback on path found', function() {

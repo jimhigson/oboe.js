@@ -130,10 +130,28 @@ describe('patternAdapter', function() {
 
       bus(NODE_FOUND).emit( ascent);
       
+      expect( bus('node:test_pattern').emit ).toHaveBeenCalled();
+   })
+   
+   it('fires gives node:pattern the node, path ' +
+       'and ancestors from the given ascent', function(){
+      
+      var testJson = {animals:{mammals:{humans:'hi there!'}}},
+          ascent = anAscentMatching('test_pattern', testJson);
+         
+      bus('node:test_pattern').on(noop);
+
+      bus(NODE_FOUND).emit( ascent);
+      
       expect( bus('node:test_pattern').emit )
          .toHaveBeenCalledWith( 
-            nodeOf( head( ascent ) )
-         ,  ascent 
+            'hi there!', 
+            [  'animals', 'mammals', 'humans'],
+            [  testJson, 
+               testJson.animals, 
+               testJson.animals.mammals, 
+               testJson.animals.mammals.humans
+            ] 
          );
    })   
 
@@ -167,8 +185,14 @@ describe('patternAdapter', function() {
       patternAdapter(bus, jsonPathCompiler);      
    })   
    
-   function anAscentMatching(pattern) {
-      var ascent = list(namedNode('node', {}));
+   function anAscentMatching(pattern, json) {
+      var ascent
+   
+      if( json ) {
+         ascent = ascentFrom(json);               
+      } else {
+         ascent = list(namedNode('node', {}));
+      }
 
       matches[pattern] = ascent;  
 

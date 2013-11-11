@@ -66,23 +66,9 @@ function instanceApi(oboeBus){
       
       var safeCallback = protectedCallback(callback);
                               
-      oboeBus(fullyQualifiedName).on(  function(node, ascent) {
+      oboeBus(fullyQualifiedName).on(  function(node, path, ancestors) {
       
-         /* 
-            We're now calling back to outside of oboe where the Lisp-style 
-            lists that we are using internally will not be recognised 
-            so convert to standard arrays. 
-      
-            Also, reverse the order because it is more common to list paths 
-            "root to leaf" than "leaf to root" 
-         */
-         var descent     = reverseList(ascent),
-         
-             // To make a path, strip off the last item which is the special
-             // ROOT_PATH token for the 'path' to the root node
-             path       = listAsArray(tail(map(keyOf,descent))),
-             ancestors  = listAsArray(map(nodeOf, descent)),
-             keep       = true;
+         var keep       = true;
              
          oboeApi.forget = function(){
             keep = false;
@@ -95,10 +81,7 @@ function instanceApi(oboeBus){
          if(! keep ) {          
             oboeBus(fullyQualifiedName).un( callback);
          }
-                  
-      
       }, callback)
-
    }   
    
    function removePathOrNodeListener( fullyQualifiedName, callback ) {
