@@ -2,9 +2,6 @@
 function instanceApi(oboeBus){
 
    var oboeApi,
-       addDoneListener = partialComplete(
-                             addNodeOrPathListenerApi, 
-                             'node', '!'),
        fullyQualifiedNamePattern = /^(node|path):./,
           
        addListener = varArgs(function( eventId, parameters ){
@@ -174,10 +171,11 @@ function instanceApi(oboeBus){
    return oboeApi = {
       on             : addListener,
       removeListener : removeListener,                
-         
-      done           : addDoneListener,       
+                
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
-      path           : partialComplete(addNodeOrPathListenerApi, 'path'),      
+      path           : partialComplete(addNodeOrPathListenerApi, 'path'),
+      
+      done           : partialComplete(addNodeOrPathListenerApi, 'node', '!'),            
       start          : compose2( oboeBus(HTTP_START).on, protectedCallback ),
       
       // fail doesn't use protectedCallback because 
