@@ -2040,9 +2040,64 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 function instanceApi(oboeBus){
 
    var oboeApi,
-       addDoneListener = partialComplete(
-           addNodeOrPathListenerApi, 
-           'node', '!');
+       fullyQualifiedNamePattern = /^(node|path):./,
+          
+       addListener = varArgs(function( eventId, parameters ){
+             
+            if( oboeApi[eventId] ) {
+       
+               // for events added as .on(event), if there is a 
+               // special .event equivalent, pass through to that 
+               apply(parameters, oboeApi[eventId]);                     
+            } else {
+       
+               // we have a standard Node.js EventEmitter 2-argument call.
+               // The first parameter is the listener.
+               var listener = parameters[0];
+       
+               if( fullyQualifiedNamePattern.test(eventId) ) {
+                
+                  // allow fully-qualified node/path listeners 
+                  // to be added                                             
+                  addPathOrNodeListener(eventId, listener);                  
+               } else  {
+       
+                  // the event has no special handling, pass through 
+                  // directly onto the event bus:          
+                  oboeBus(eventId).on( listener);
+               }
+            }
+                
+            return oboeApi; // chaining
+       }),
+ 
+       removeListener = varArgs(function( eventId, parameters ){
+             
+            if( eventId == 'node' || eventId == 'path' ) {
+      
+               // allow removal of node and path 
+               removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
+            } else {
+      
+               // we have a standard Node.js EventEmitter 2-argument call.
+               // The first parameter is the listener.
+               var listener = parameters[0];
+
+               if( fullyQualifiedNamePattern.test(eventId) ) {
+               
+                  // allow fully-qualified node/path listeners 
+                  // to be added                                             
+                  removePathOrNodeListener(eventId, listener);                  
+               } else  {
+      
+                  // the event has no special handling, pass through 
+                  // directly onto the event bus:          
+                  oboeBus(eventId).un( listener);
+               }
+            }
+               
+            return oboeApi; // chaining      
+       });                               
    
    
    function addPathOrNodeListener( fullyQualifiedName, callback ) {
@@ -2146,64 +2201,6 @@ function instanceApi(oboeBus){
                         }
    });
    
-   var   fullyQualifiedNamePattern = /^(node|path):./,
-   
-         addListener = varArgs(function( eventId, parameters ){
-               
-               if( oboeApi[eventId] ) {
-         
-                  // for events added as .on(event), if there is a 
-                  // special .event equivalent, pass through to that 
-                  apply(parameters, oboeApi[eventId]);                     
-               } else {
-         
-                  // we have a standard Node.js EventEmitter 2-argument call.
-                  // The first parameter is the listener.
-                  var listener = parameters[0];
-         
-                  if( fullyQualifiedNamePattern.test(eventId) ) {
-                  
-                     // allow fully-qualified node/path listeners 
-                     // to be added                                             
-                     addPathOrNodeListener(eventId, listener);                  
-                  } else  {
-         
-                     // the event has no special handling, pass through 
-                     // directly onto the event bus:          
-                     oboeBus(eventId).on( listener);
-                  }
-               }
-                  
-               return oboeApi; // chaining
-            }),
-   
-         removeListener = varArgs(function( eventId, parameters ){
-               
-               if( eventId == 'node' || eventId == 'path' ) {
-         
-                  // allow removal of node and path 
-                  removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
-               } else {
-         
-                  // we have a standard Node.js EventEmitter 2-argument call.
-                  // The first parameter is the listener.
-                  var listener = parameters[0];
-
-                  if( fullyQualifiedNamePattern.test(eventId) ) {
-                  
-                     // allow fully-qualified node/path listeners 
-                     // to be added                                             
-                     removePathOrNodeListener(eventId, listener);                  
-                  } else  {
-         
-                     // the event has no special handling, pass through 
-                     // directly onto the event bus:          
-                     oboeBus(eventId).un( listener);
-                  }
-               }
-                  
-               return oboeApi; // chaining      
-            });  
       
    /**
     * Construct and return the public API of the Oboe instance to be 
@@ -2212,10 +2209,11 @@ function instanceApi(oboeBus){
    return oboeApi = {
       on             : addListener,
       removeListener : removeListener,                
-         
-      done           : addDoneListener,       
+                
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
-      path           : partialComplete(addNodeOrPathListenerApi, 'path'),      
+      path           : partialComplete(addNodeOrPathListenerApi, 'path'),
+      
+      done           : partialComplete(addNodeOrPathListenerApi, 'node', '!'),            
       start          : compose2( oboeBus(HTTP_START).on, protectedCallback ),
       
       // fail doesn't use protectedCallback because 
