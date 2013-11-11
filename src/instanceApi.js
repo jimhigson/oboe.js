@@ -107,80 +107,87 @@ function instanceApi(oboeBus){
                                        ;
                         }
    });
+   
+   var   addListener = varArgs(function( eventId, parameters ){
+               
+               if( oboeApi[eventId] ) {
+         
+                  // for events added as .on(event), if there is a 
+                  // special .event equivalent, pass through to that 
+                  apply(parameters, oboeApi[eventId]);                     
+               } else {
+         
+                  // we have a standard Node.js EventEmitter 2-argument call.
+                  // The first parameter is the listener.
+                  var listener = parameters[0];
+         
+                  if( /^(node|path):./.test(eventId) ) {
+                  
+                     // allow fully-qualified node/path listeners 
+                     // to be added                                             
+                     addPathOrNodeListener(eventId, listener);                  
+                  } else  {
+         
+                     // the event has no special handling, pass through 
+                     // directly onto the event bus:          
+                     oboeBus(eventId).on( listener);
+                  }
+               }
+                  
+               return oboeApi; // chaining
+            }),
+   
+         removeListener = varArgs(function( eventId, parameters ){
+               
+               if( eventId == 'node' || eventId == 'path' ) {
+         
+                  // allow removal of node and path 
+                  removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
+               } else {
+         
+                  // we have a standard Node.js EventEmitter 2-argument call.
+                  // The first parameter is the listener.
+                  var listener = parameters[0];
+         
+                  if( /^(node|path):./.test(eventId) ) {
+                  
+                     // allow fully-qualified node/path listeners 
+                     // to be added                                             
+                     removePathOrNodeListener(eventId, listener);                  
+                  } else  {
+         
+                     // the event has no special handling, pass through 
+                     // directly onto the event bus:          
+                     oboeBus(eventId).un( listener);
+                  }
+               }
+                  
+               return oboeApi; // chaining      
+            });  
       
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
     */       
    return oboeApi = {
-      on    :  varArgs(function( eventId, parameters ){
-   
-                  if( oboeApi[eventId] ) {
-
-                     // for events added as .on(event), if there is a 
-                     // special .event equivalent, pass through to that 
-                     apply(parameters, oboeApi[eventId]);                     
-                  } else {
-
-                     // we have a standard Node.js EventEmitter 2-argument call.
-                     // The first parameter is the listener.
-                     var listener = parameters[0];
-
-                     if( /^(node|path):./.test(eventId) ) {
-                     
-                        // allow fully-qualified node/path listeners 
-                        // to be added                                             
-                        addPathOrNodeListener(eventId, listener);                  
-                     } else  {
-
-                        // the event has no special handling, pass through 
-                        // directly onto the event bus:          
-                        oboeBus(eventId).on( listener);
-                     }
-                  }
-                     
-                  return oboeApi; // chaining
-               }),
-      removeListener: varArgs(function( eventId, parameters ){
+      on             : addListener,
+      removeListener : removeListener,                
+         
+      done           : addDoneListener,       
+      node           : partialComplete(addNodeOrPathListenerApi, 'node'),
+      path           : partialComplete(addNodeOrPathListenerApi, 'path'),      
+      start          : compose2( oboeBus(HTTP_START).on, protectedCallback ),
       
-                  if( eventId == 'node' || eventId == 'path' ) {
-         
-                     // for events added as .on(event), if there is a 
-                     // special .event equivalent, pass through to that 
-                     removePathOrNodeListener(eventId + ':' + parameters[0], parameters[1]);          
-                  } else {
-         
-                     // we have a standard Node.js EventEmitter 2-argument call.
-                     // The first parameter is the listener.
-                     var listener = parameters[0];
-         
-                     if( /^(node|path):./.test(eventId) ) {
-                     
-                        // allow fully-qualified node/path listeners 
-                        // to be added                                             
-                        removePathOrNodeListener(eventId, listener);                  
-                     } else  {
-         
-                        // the event has no special handling, pass through 
-                        // directly onto the event bus:          
-                        oboeBus(eventId).un( listener);
-                     }
-                  }
-                     
-                  return oboeApi; // chaining      
-               }),                
-         
-      done  :  addDoneListener,       
-      node  :  partialComplete(addNodeOrPathListenerApi, 'node'),
-      path  :  partialComplete(addNodeOrPathListenerApi, 'path'),      
-      start :  compose2( oboeBus(HTTP_START).on, protectedCallback ),
-      // fail doesn't use safeOn because that could lead to non-terminating loops
-      fail  :  oboeBus(FAIL_EVENT).on,
-      abort :  oboeBus(ABORTING).emit,
+      // fail doesn't use protectedCallback because 
+      // could lead to non-terminating loops
+      fail           : oboeBus(FAIL_EVENT).on,
+      
+      // public api calling abort fires the ABORTING event
+      abort          : oboeBus(ABORTING).emit,
       
       // initially return nothing for header and root
-      header:  noop,
-      root  :  noop
+      header         : noop,
+      root           : noop
    };   
-}   
+} 
    
