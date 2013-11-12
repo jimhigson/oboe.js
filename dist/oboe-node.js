@@ -1749,7 +1749,11 @@ function instanceApi(oboeBus){
    oboeBus(ROOT_FOUND).on( function(root) {
       oboeApi.root = functor(root);   
    });
-   
+
+   /**
+    * When content starts make the headers readable through the
+    * instance API
+    */
    oboeBus(HTTP_START).on( function(_statusCode, headers) {
    
       oboeApi.header =  function(name) {
@@ -1758,8 +1762,7 @@ function instanceApi(oboeBus){
                                        ;
                         }
    });
-                           
-                                                      
+                                                               
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
