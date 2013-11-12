@@ -2124,18 +2124,19 @@ function instanceApi(oboeBus){
        
                // we have a standard Node.js EventEmitter 2-argument call.
                // The first parameter is the listener.
-               var listener = parameters[0];
+               var event = oboeBus(eventId),
+                   listener = parameters[0];
        
                if( fullyQualifiedNamePattern.test(eventId) ) {
                 
                   // allow fully-qualified node/path listeners 
                   // to be added                                             
-                  addForgettableCallback(eventId, listener);                  
+                  addForgettableCallback(event, listener);                  
                } else  {
        
                   // the event has no special handling, pass through 
                   // directly onto the event bus:          
-                  oboeBus(eventId).on( listener);
+                  event.on( listener);
                }
             }
                 
@@ -2148,27 +2149,19 @@ function instanceApi(oboeBus){
             
                oboeBus.un(rootNodeFinishedPattern, p2);
                
-            } if( eventId == 'node' || eventId == 'path' ) {
+            } else if( eventId == 'node' || eventId == 'path' ) {
       
                // allow removal of node and path 
                oboeBus.un(eventId + ':' + p2, p3);          
             } else {
       
                // we have a standard Node.js EventEmitter 2-argument call.
-               // The first parameter is the listener.
+               // The second parameter is the listener. This may be a call
+               // to remove a fully-qualified node/path listener but requires
+               // no special handling
                var listener = p2;
 
-               if( fullyQualifiedNamePattern.test(eventId) ) {
-               
-                  // allow fully-qualified node/path listeners 
-                  // to be added                                             
-                  oboeBus.un(eventId, listener);                  
-               } else  {
-      
-                  // the event has no special handling, pass through 
-                  // directly onto the event bus:          
-                  oboeBus(eventId).un( listener);
-               }
+               oboeBus(eventId).un(listener);                  
             }
                
             return oboeApi; // chaining      
@@ -2191,10 +2184,10 @@ function instanceApi(oboeBus){
     * Add a callback where, if .forget() is called during the callback's
     * execution, the callback will be de-registered
     */
-   function addForgettableCallback(eventName, callback) {
+   function addForgettableCallback(event, callback) {
       var safeCallback = protectedCallback(callback);
    
-      oboeBus(eventName).on( function() {
+      event.on( function() {
       
          var discard = false;
              
@@ -2207,7 +2200,7 @@ function instanceApi(oboeBus){
          delete oboeApi.forget;
          
          if( discard ) {          
-            oboeBus(eventName).un(callback);
+            event.un(callback);
          }
       }, callback)   
    }  
@@ -2231,7 +2224,7 @@ function instanceApi(oboeBus){
    
       for( var pattern in listenerMap ) {
          addForgettableCallback(
-            eventId + ':' + pattern, 
+            oboeBus(eventId + ':' + pattern), 
             listenerMap[pattern]
          );
       }
@@ -2243,8 +2236,8 @@ function instanceApi(oboeBus){
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addForgettableCallback( 
-            eventId + ':' + jsonPathOrListenerMap,
+         addForgettableCallback(
+            oboeBus(eventId + ':' + jsonPathOrListenerMap),
             callback
          );
       } else {
