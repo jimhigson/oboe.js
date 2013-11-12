@@ -63,5 +63,13 @@ function fakePubSub( eventNames ) {
    bus.eventTypesEmitted = eventTypesEmitted;
    bus.callCount         = callCount;
    
+
+   ['emit', 'on'].forEach(function(methodName){
+   
+      bus[methodName] = varArgs(function(eventName, parameters){
+         apply( parameters, eventTypes[eventName][methodName]);
+      });   
+   })
+      
    return bus;
 }      

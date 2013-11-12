@@ -1648,10 +1648,31 @@ function instanceApi(oboeBus){
    
    
    function addPathOrNodeListener( fullyQualifiedName, callback ) {
-      
+                                    
+      addForgettableCallback(fullyQualifiedName, callback);                              
+   }
+                     
+   function removePathOrNodeListener( fullyQualifiedName, callback ) {
+      oboeBus(fullyQualifiedName).un(callback)
+   }
+
+   /** 
+    * Add a callback, wrapped in a try/catch so as to not break the
+    * execution of Oboe if an exception is thrown (fail events are 
+    * fired instead)
+    * 
+    * The callback is used as the listener id so that it can later be
+    * removed using .un(callback)
+    */
+   function addProtectedCallback(eventName, callback) {
+      oboeBus(eventName).on(protectedCallback(callback), callback);
+      return oboeApi;            
+   }
+   
+   function addForgettableCallback(eventName, callback) {
       var safeCallback = protectedCallback(callback);
-                              
-      oboeBus(fullyQualifiedName).on( function(node, path, ancestors) {
+   
+      oboeBus(eventName).on( function() {
       
          var discard = false;
              
@@ -1659,23 +1680,14 @@ function instanceApi(oboeBus){
             discard = true;
          };           
          
-         safeCallback( node, path, ancestors );         
+         apply( arguments, safeCallback );         
                
          delete oboeApi.forget;
          
          if( discard ) {          
-            oboeBus(fullyQualifiedName).un(callback);
+            oboeBus(eventName).un(callback);
          }
-      }, callback)
-   }   
-            
-   function removePathOrNodeListener( fullyQualifiedName, callback ) {
-      oboeBus(fullyQualifiedName).un(callback)
-   }
-   
-   function addProtectedCallback(eventName, callback) {
-      oboeBus(eventName).on(protectedCallback(callback), callback);
-      return oboeApi;            
+      }, callback)   
    }  
          
    function protectedCallback( callback ) {
