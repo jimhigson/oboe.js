@@ -2105,13 +2105,22 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    })
 
 }
-
+/** 
+ * The instance API is the thing that is returned when oboe() is called.
+ * it allows:
+ * 
+ *    - listeners for various events to be added and removed
+ *    - the http response header/headers to be read
+ */
 function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
        rootNodeFinishedEvent = oboeBus('node:!'),
-          
+
+       /**
+        * Add any kind of listener that the instance api exposes 
+        */          
        addListener = varArgs(function( eventId, parameters ){
              
             if( oboeApi[eventId] ) {
@@ -2143,6 +2152,9 @@ function instanceApi(oboeBus){
             return oboeApi; // chaining
        }),
  
+       /**
+        * Remove any kind of listener that the instance api exposes 
+        */ 
        removeListener = function( eventId, p2, p3 ){
              
             if( eventId == 'done' ) {
