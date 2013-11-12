@@ -48,11 +48,8 @@ function pubSub(){
 
    /** pubSub instances are functions */
    function pubSubInstance( eventName ){   
-      if( !singles[eventName] ) {
-         return newSingle( eventName );
-      }
       
-      return singles[eventName];   
+      return singles[eventName] || newSingle( eventName );   
    }
 
    // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
