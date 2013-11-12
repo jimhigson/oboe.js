@@ -79,7 +79,11 @@ function instanceApi(oboeBus){
       oboeBus(eventName).on(protectedCallback(callback), callback);
       return oboeApi;            
    }
-   
+
+   /**
+    * Add a callback where, if .forget() is called during the callback's
+    * execution, the callback will be de-registered
+    */
    function addForgettableCallback(eventName, callback) {
       var safeCallback = protectedCallback(callback);
    

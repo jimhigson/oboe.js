@@ -1582,7 +1582,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedPattern = 'node:!';
+       rootNodeFinishedPattern = 'node:!',
           
        addListener = varArgs(function( eventId, parameters ){
              
@@ -1618,12 +1618,12 @@ function instanceApi(oboeBus){
              
             if( eventId == 'done' ) {
             
-               removePathOrNodeListener(rootNodeFinishedPattern, p2);
+               oboeBus.un(rootNodeFinishedPattern, p2);
                
             } if( eventId == 'node' || eventId == 'path' ) {
       
                // allow removal of node and path 
-               removePathOrNodeListener(eventId + ':' + p2, p3);          
+               oboeBus.un(eventId + ':' + p2, p3);          
             } else {
       
                // we have a standard Node.js EventEmitter 2-argument call.
@@ -1634,7 +1634,7 @@ function instanceApi(oboeBus){
                
                   // allow fully-qualified node/path listeners 
                   // to be added                                             
-                  removePathOrNodeListener(eventId, listener);                  
+                  oboeBus.un(eventId, listener);                  
                } else  {
       
                   // the event has no special handling, pass through 
@@ -1646,10 +1646,6 @@ function instanceApi(oboeBus){
             return oboeApi; // chaining      
        };                               
                         
-   function removePathOrNodeListener( fullyQualifiedName, callback ) {
-      oboeBus.un(fullyQualifiedName, callback);
-   }
-
    /** 
     * Add a callback, wrapped in a try/catch so as to not break the
     * execution of Oboe if an exception is thrown (fail events are 
@@ -1662,7 +1658,11 @@ function instanceApi(oboeBus){
       oboeBus(eventName).on(protectedCallback(callback), callback);
       return oboeApi;            
    }
-   
+
+   /**
+    * Add a callback where, if .forget() is called during the callback's
+    * execution, the callback will be de-registered
+    */
    function addForgettableCallback(eventName, callback) {
       var safeCallback = protectedCallback(callback);
    
