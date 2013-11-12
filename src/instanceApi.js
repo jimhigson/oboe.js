@@ -111,6 +111,16 @@ function instanceApi(oboeBus){
          }      
       }   
    }
+
+   /**
+    * Return the fully qualified event for when a pattern matches
+    * either a node or a path
+    * 
+    * @param type {String} either 'node' or 'path'
+    */      
+   function fullyQualifiedPatternMatchEvent(type, pattern) {
+      return oboeBus(type + ':' + pattern);
+   }      
       
    /**
     * Add several listeners at a time, from a map
@@ -119,7 +129,7 @@ function instanceApi(oboeBus){
    
       for( var pattern in listenerMap ) {
          addForgettableCallback(
-            oboeBus(eventId + ':' + pattern), 
+            fullyQualifiedPatternMatchEvent(eventId, pattern), 
             listenerMap[pattern]
          );
       }
@@ -132,7 +142,7 @@ function instanceApi(oboeBus){
    
       if( isString(jsonPathOrListenerMap) ) {
          addForgettableCallback(
-            oboeBus(eventId + ':' + jsonPathOrListenerMap),
+            fullyQualifiedPatternMatchEvent(eventId, jsonPathOrListenerMap),
             callback
          );
       } else {
