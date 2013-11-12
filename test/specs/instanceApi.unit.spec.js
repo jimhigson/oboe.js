@@ -335,7 +335,7 @@ describe('instance api',function(){
      
    describe('done event', function(){
    
-      it('calls listener on end of JSON', function() {
+      it('calls listener on end of JSON when added using .on(done)', function() {
          var callback = jasmine.createSpy();
       
          oboeInstance.on('done', callback); 
@@ -346,6 +346,18 @@ describe('instance api',function(){
          
          expect(callback).toHaveBeenCalled()      
       });
+      
+      it('calls listener on end of JSON when added using .done', function() {
+         var callback = jasmine.createSpy();
+      
+         oboeInstance.done(callback); 
+      
+         expect(callback).not.toHaveBeenCalled()
+          
+         oboeBus('node:!').emit( {}, anAscent())
+         
+         expect(callback).toHaveBeenCalled()      
+      });      
       
       it('can be de-registered', function() {
          var callback = jasmine.createSpy();
