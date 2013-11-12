@@ -1915,7 +1915,7 @@ function singleEventPubSub(eventType, newListener, removeListener){
    };
 }
 /**
- * pubSub is a curried[1] interface for listening to and emitting
+ * pubSub is a curried interface for listening to and emitting
  * events.
  * 
  * If we get a bus:
@@ -1934,18 +1934,19 @@ function singleEventPubSub(eventType, newListener, removeListener){
  * 
  *    bus('foo').emit('bar')
  *     
- * Functions can be cached. Ie:
+ * All functions can be cached and don't need to be 
+ * bound. Ie:
  * 
  *    var fooEmitter = bus('foo').emit
  *    fooEmitter('bar');  // emit an event
  *    fooEmitter('baz');  // emit another
  *    
- * There's also an uncurried[2] shortcut:
+ * There's also an uncurried[1] shortcut for .emit and .on:
  * 
+ *    bus.on('foo', callback)
  *    bus.emit('foo', 'bar')
  * 
- * [1]: http://en.wikipedia.org/wiki/Curry_(programming_language)
- * [2]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
+ * [1]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub(){
 
@@ -1963,18 +1964,18 @@ function pubSub(){
 
    /** pubSub instances are functions */
    function pubSubInstance( eventName ){   
-      if( !singles[eventName] ) {
-         return newSingle( eventName );
-      }
       
-      return singles[eventName];   
+      return singles[eventName] || newSingle( eventName );   
    }
+
+   // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
+   ['emit', 'on'].forEach(function(methodName){
    
-   // convenience EventEmitter-style uncurried form
-   pubSubInstance.emit = varArgs(function(eventName, parameters){
-      apply( parameters, pubSubInstance( eventName ).emit);
-   });
-   
+      pubSubInstance[methodName] = varArgs(function(eventName, parameters){
+         apply( parameters, pubSubInstance( eventName )[methodName]);
+      });   
+   })
+         
    return pubSubInstance;
 }
 /**
@@ -2109,13 +2110,15 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
+       rootNodeFinishedPattern = 'node:!';
           
        addListener = varArgs(function( eventId, parameters ){
              
             if( oboeApi[eventId] ) {
        
-               // for events added as .on(event), if there is a 
-               // special .event equivalent, pass through to that 
+               // for events added as .on(event, callback), if there is a 
+               // .event() equivalent with special behaviour , pass through
+               // to that: 
                apply(parameters, oboeApi[eventId]);                     
             } else {
        
@@ -2141,7 +2144,11 @@ function instanceApi(oboeBus){
  
        removeListener = function( eventId, p2, p3 ){
              
-            if( eventId == 'node' || eventId == 'path' ) {
+            if( eventId == 'done' ) {
+            
+               removePathOrNodeListener(rootNodeFinishedPattern, p2);
+               
+            } if( eventId == 'node' || eventId == 'path' ) {
       
                // allow removal of node and path 
                removePathOrNodeListener(eventId + ':' + p2, p3);          
@@ -2174,25 +2181,30 @@ function instanceApi(oboeBus){
                               
       oboeBus(fullyQualifiedName).on( function(node, path, ancestors) {
       
-         var keep       = true;
+         var discard = false;
              
          oboeApi.forget = function(){
-            keep = false;
+            discard = true;
          };           
          
          safeCallback( node, path, ancestors );         
                
          delete oboeApi.forget;
          
-         if(! keep ) {          
-            oboeBus(fullyQualifiedName).un( callback);
+         if( discard ) {          
+            oboeBus(fullyQualifiedName).un(callback);
          }
       }, callback)
    }   
-   
+            
    function removePathOrNodeListener( fullyQualifiedName, callback ) {
       oboeBus(fullyQualifiedName).un(callback)
    }
+   
+   function addProtectedCallback(eventName, callback) {
+      oboeBus(eventName).on(protectedCallback(callback), callback);
+      return oboeApi;            
+   }  
          
    function protectedCallback( callback ) {
       return function() {
@@ -2251,7 +2263,8 @@ function instanceApi(oboeBus){
                                        ;
                         }
    });
-         
+                           
+                                                      
    /**
     * Construct and return the public API of the Oboe instance to be 
     * returned to the calling application
@@ -2265,8 +2278,8 @@ function instanceApi(oboeBus){
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
       path           : partialComplete(addNodeOrPathListenerApi, 'path'),
       
-      done           : partialComplete(addNodeOrPathListenerApi, 'node', '!'),            
-      start          : compose2( oboeBus(HTTP_START).on, protectedCallback ),
+      done           : partialComplete(addListener, rootNodeFinishedPattern),            
+      start          : partialComplete(addProtectedCallback, HTTP_START ),
       
       // fail doesn't use protectedCallback because 
       // could lead to non-terminating loops
@@ -2279,8 +2292,8 @@ function instanceApi(oboeBus){
       header         : noop,
       root           : noop
    };   
-} 
-   
+}
+    
 /**
  * This file implements a light-touch central controller for an instance 
  * of Oboe which provides the methods used for interacting with the instance 
