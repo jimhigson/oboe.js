@@ -2130,7 +2130,7 @@ function instanceApi(oboeBus){
                 
                   // allow fully-qualified node/path listeners 
                   // to be added                                             
-                  addPathOrNodeListener(eventId, listener);                  
+                  addForgettableCallback(eventId, listener);                  
                } else  {
        
                   // the event has no special handling, pass through 
@@ -2174,12 +2174,7 @@ function instanceApi(oboeBus){
             return oboeApi; // chaining      
        };                               
    
-   
-   function addPathOrNodeListener( fullyQualifiedName, callback ) {
-                                    
-      addForgettableCallback(fullyQualifiedName, callback);                              
-   }
-                     
+                        
    function removePathOrNodeListener( fullyQualifiedName, callback ) {
       oboeBus(fullyQualifiedName).un(callback)
    }
@@ -2236,7 +2231,7 @@ function instanceApi(oboeBus){
    function addListenersMap(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addPathOrNodeListener(
+         addForgettableCallback(
             eventId + ':' + pattern, 
             listenerMap[pattern]
          );
@@ -2249,7 +2244,7 @@ function instanceApi(oboeBus){
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
    
       if( isString(jsonPathOrListenerMap) ) {
-         addPathOrNodeListener( 
+         addForgettableCallback( 
             eventId + ':' + jsonPathOrListenerMap,
             callback
          );
