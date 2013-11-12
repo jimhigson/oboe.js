@@ -1441,7 +1441,7 @@ function pubSub(){
    }
 
    // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
-   ['emit', 'on'].forEach(function(methodName){
+   ['emit', 'on', 'un'].forEach(function(methodName){
    
       pubSubInstance[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, pubSubInstance( eventName )[methodName]);
@@ -1645,10 +1645,9 @@ function instanceApi(oboeBus){
                
             return oboeApi; // chaining      
        };                               
-   
                         
    function removePathOrNodeListener( fullyQualifiedName, callback ) {
-      oboeBus(fullyQualifiedName).un(callback)
+      oboeBus.un(fullyQualifiedName, callback);
    }
 
    /** 

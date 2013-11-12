@@ -16,6 +16,8 @@ function spiedPubSub() {
    }
    
    fakedPubSub.emit = realPubSub.emit;
+   fakedPubSub.on = realPubSub.on;
+   fakedPubSub.un = realPubSub.un;
    
    return fakedPubSub;
 }

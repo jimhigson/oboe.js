@@ -66,10 +66,9 @@ function instanceApi(oboeBus){
                
             return oboeApi; // chaining      
        };                               
-   
                         
    function removePathOrNodeListener( fullyQualifiedName, callback ) {
-      oboeBus(fullyQualifiedName).un(callback)
+      oboeBus.un(fullyQualifiedName, callback);
    }
 
    /** 

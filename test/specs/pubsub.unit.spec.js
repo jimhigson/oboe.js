@@ -105,26 +105,53 @@ describe('pub sub', function(){
       expect(removeListenerListener).toHaveBeenCalledWith('foo', noop, noop);     
    })
    
-   it('allows short-cut adding using .emit', function(){
+   describe('short-cut methods', function(){
    
-      var events     = pubSub(),
-          callback   = jasmine.createSpy('something happening callback');
+      it('has .emit', function(){
       
-      events('somethingHappened').on(callback);
-      events.emit('somethingHappened', 'it was', 'definitely something');
+         var events     = pubSub(),
+             callback   = jasmine.createSpy('something happening callback');
+         
+         events('somethingHappened').on(callback);
+         events.emit('somethingHappened', 'it was', 'definitely something');
+         
+         expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
+      });
       
-      expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
-   });
-   
-   it('allows short-cut listening using .on', function(){
-   
-      var events     = pubSub(),
-          callback   = jasmine.createSpy('something happening callback');
+      it('has .on', function(){
       
-      events.on('somethingHappened', callback);
-      events('somethingHappened').emit('it was', 'definitely something');
+         var events     = pubSub(),
+             callback   = jasmine.createSpy('something happening callback');
+         
+         events.on('somethingHappened', callback);
+         events('somethingHappened').emit('it was', 'definitely something');
+         
+         expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
+      });
       
-      expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
+      it('has .un', function(){
+      
+         var events     = pubSub(),
+             callback   = jasmine.createSpy('something happening callback');
+         
+         events('somethingHappened').on(callback);
+         events.un('somethingHappened', callback);
+         events('somethingHappened').emit('it was', 'definitely something');                  
+         
+         expect(callback).not.toHaveBeenCalled();
+      });
+      
+      it('has .un that works with listener id', function(){
+      
+         var events     = pubSub(),
+             callback   = jasmine.createSpy('something happening callback');
+         
+         events('somethingHappened').on(callback, 'id');
+         events.un('somethingHappened', 'id');
+         events('somethingHappened').emit('it was', 'definitely something');                  
+         
+         expect(callback).not.toHaveBeenCalled();
+      });            
    });   
 
 });
