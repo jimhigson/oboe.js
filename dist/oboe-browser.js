@@ -2110,7 +2110,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedPattern = 'node:!',
+       rootNodeFinishedEvent = oboeBus('node:!'),
           
        addListener = varArgs(function( eventId, parameters ){
              
@@ -2147,7 +2147,7 @@ function instanceApi(oboeBus){
              
             if( eventId == 'done' ) {
             
-               oboeBus.un(rootNodeFinishedPattern, p2);
+               rootNodeFinishedEvent.un(p2);
                
             } else if( eventId == 'node' || eventId == 'path' ) {
       
@@ -2177,7 +2177,7 @@ function instanceApi(oboeBus){
     */
    function addProtectedCallback(eventName, callback) {
       oboeBus(eventName).on(protectedCallback(callback), callback);
-      return oboeApi;            
+      return oboeApi; // chaining            
    }
 
    /**
@@ -2202,7 +2202,9 @@ function instanceApi(oboeBus){
          if( discard ) {          
             event.un(callback);
          }
-      }, callback)   
+      }, callback)
+      
+      return oboeApi; // chaining         
    }  
          
    function protectedCallback( callback ) {
@@ -2277,7 +2279,7 @@ function instanceApi(oboeBus){
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
       path           : partialComplete(addNodeOrPathListenerApi, 'path'),
       
-      done           : partialComplete(addListener, rootNodeFinishedPattern),            
+      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),            
       start          : partialComplete(addProtectedCallback, HTTP_START ),
       
       // fail doesn't use protectedCallback because 
