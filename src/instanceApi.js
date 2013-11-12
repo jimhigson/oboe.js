@@ -3,7 +3,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedPattern = 'node:!';
+       rootNodeFinishedPattern = 'node:!',
           
        addListener = varArgs(function( eventId, parameters ){
              
