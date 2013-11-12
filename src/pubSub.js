@@ -1,5 +1,5 @@
 /**
- * pubSub is a curried[1] interface for listening to and emitting
+ * pubSub is a curried interface for listening to and emitting
  * events.
  * 
  * If we get a bus:
@@ -18,18 +18,19 @@
  * 
  *    bus('foo').emit('bar')
  *     
- * Functions can be cached. Ie:
+ * All functions can be cached and don't need to be 
+ * bound. Ie:
  * 
  *    var fooEmitter = bus('foo').emit
  *    fooEmitter('bar');  // emit an event
  *    fooEmitter('baz');  // emit another
  *    
- * There's also an uncurried[2] shortcut:
+ * There's also an uncurried[1] shortcut for .emit and .on:
  * 
+ *    bus.on('foo', callback)
  *    bus.emit('foo', 'bar')
  * 
- * [1]: http://en.wikipedia.org/wiki/Curry_(programming_language)
- * [2]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
+ * [1]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub(){
 
@@ -53,11 +54,15 @@ function pubSub(){
       
       return singles[eventName];   
    }
+
+   // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
+   ['emit', 'on'].forEach(function(methodName){
    
-   // convenience EventEmitter-style uncurried form
-   pubSubInstance.emit = varArgs(function(eventName, parameters){
-      apply( parameters, pubSubInstance( eventName ).emit);
-   });
+      pubSubInstance[methodName] = varArgs(function(eventName, parameters){
+         apply( parameters, pubSubInstance( eventName )[methodName]);
+      });   
    
+   })
+         
    return pubSubInstance;
 }

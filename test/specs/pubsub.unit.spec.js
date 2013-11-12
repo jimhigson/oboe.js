@@ -115,5 +115,16 @@ describe('pub sub', function(){
       
       expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
    });
+   
+   it('allows short-cut listening using .on', function(){
+   
+      var events     = pubSub(),
+          callback   = jasmine.createSpy('something happening callback');
+      
+      events.on('somethingHappened', callback);
+      events('somethingHappened').emit('it was', 'definitely something');
+      
+      expect(callback).toHaveBeenCalledWith('it was', 'definitely something');
+   });   
 
 });
