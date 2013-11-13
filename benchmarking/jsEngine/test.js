@@ -89,3 +89,7 @@ function go(oboe){
       }
    }
 }
+
+if( typeof exports !== 'undefined' ) {
+   module.exports = go;
+}
