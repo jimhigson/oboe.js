@@ -10,10 +10,7 @@ var // the events which are never exported are kept as
     NODE_FOUND    = _S++,
     // fired whenever a path is found in the JSON:      
     PATH_FOUND    = _S++,   
-    
-    NODE_MATCHED  = 'node',
-    PATH_MATCHED  = 'path',
-         
+             
     FAIL_EVENT    = 'fail',    
     ROOT_FOUND    = _S++,    
     HTTP_START    = 'start',
