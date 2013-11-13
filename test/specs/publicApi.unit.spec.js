@@ -25,6 +25,13 @@ describe("public api", function(){
              'http://example.com/oboez'
          )      
       })
+      
+      it('can create a no-ajax instance', function(){   
+      
+         oboe()
+      
+         expect(wire).toHaveBeenCalledLike()      
+      })      
          
       describe('get', function(){
          

@@ -7,10 +7,17 @@
 function wire (httpMethodName, contentSource, body, headers){
 
    var oboeBus = pubSub();
-               
-   streamingHttp( oboeBus,
-                  httpTransport(), 
-                  httpMethodName, contentSource, body, headers );                              
+             
+   // Wire the input stream in if we are given a content source.
+   // This will usually be the case. If not, the instance created
+   // will have to be passed content from an external source.
+                   
+   if( contentSource ) {                
+   
+      streamingHttp( oboeBus,
+                     httpTransport(), 
+                     httpMethodName, contentSource, body, headers );
+   }                              
      
    instanceController( 
                oboeBus, 

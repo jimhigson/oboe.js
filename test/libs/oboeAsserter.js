@@ -86,27 +86,19 @@ function givenAnOboeInstance(jsonFileName) {
          if( typeof json != 'string' ) {
             json = JSON.stringify(json);
          }
-
-         // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
-         // progress callback and give the string to that.
-         var eventBus = streamingHttp.firstCall.args[0];
-         
+        
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
-            eventBus(STREAM_DATA).emit( json.charAt(i) ); 
-         }                  
+            oboeInstance.emit(STREAM_DATA, json.charAt(i) ); 
+         }
 
          return this;
       };
       
       this.whenInputFinishes = function() {
-
-         // NOTE: this will only work if streamingXhr has been stubbed. We look up what was passed to it as the
-         // done callback
-         var eventBus = streamingHttp.firstCall.args[0];
          
-         eventBus(STREAM_END).emit();                  
+         oboeInstance.emit(STREAM_END);                  
 
          return this;         
       };

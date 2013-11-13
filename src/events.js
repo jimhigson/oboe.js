@@ -14,7 +14,7 @@ var // the events which are never exported are kept as
     FAIL_EVENT    = 'fail',    
     ROOT_FOUND    = _S++,    
     HTTP_START    = 'start',
-    STREAM_DATA   = _S++,
+    STREAM_DATA   = 'content',
     STREAM_END    = _S++,
     ABORTING      = _S++;
     
