@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/jimhigson/oboe.js.png?branch=master)](https://travis-ci.org/jimhigson/oboe.js)
 
 **Oboe.js** helps web applications respond quicker by wrapping http's request-response model
 with a progressively streamed interface.
