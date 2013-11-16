@@ -25,7 +25,7 @@ function wire (httpMethodName, contentSource, body, headers){
                incrementalContentBuilder(oboeBus) 
    );
       
-   patternAdapter(oboeBus, jsonPathCompiler);      
+   patternAdapter(oboeBus, jsonPathCompiler);
       
    return new instanceApi(oboeBus);
 }

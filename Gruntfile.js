@@ -27,6 +27,27 @@ module.exports = function (grunt) {
    ,  'src/publicApi.js'
    ];
    
+   var OBOE_SHELL_SOURCE_FILES = [
+      'src/functional.js'                
+   ,  'src/util.js'                    
+   ,  'src/lists.js'                    
+   ,  'src/libs/clarinet.js'               
+   ,  'src/clarinetListenerAdaptor.js'
+   ,  'src/parseResponseHeaders.browser.js'
+   ,  'src/jsonPathSyntax.js'
+   ,  'src/ascent.js'            
+   ,  'src/incrementalContentBuilder.js'            
+   ,  'src/jsonPath.js'
+   ,  'src/singleEventPubSub.js'
+   ,  'src/pubSub.js'
+   ,  'src/events.js'
+   ,  'src/patternAdapter.js'   
+   ,  'src/instanceApi.js'   
+   ,  'src/instanceController.js'
+   ,  'src/wire.js'
+   ,  'src/publicApi.js'
+   ];   
+   
    var OBOE_NODE_SOURCE_FILES = [
       'src/functional.js'                
    ,  'src/util.js'                    
@@ -64,13 +85,17 @@ module.exports = function (grunt) {
             src: OBOE_BROWSER_SOURCE_FILES,
             dest: 'build/oboe-browser.concat.js'
          },
+         shell:{         
+            src: OBOE_SHELL_SOURCE_FILES,
+            dest: 'build/oboe-shell.concat.js'
+         },         
          node:{         
             src: OBOE_NODE_SOURCE_FILES,
             dest: 'build/oboe-node.concat.js'
          }         
       }
       
-   ,  wrap: {
+   ,  wrap: {      
          browserPackage: {
             src: 'build/oboe-browser.concat.js',
             dest: '.',
@@ -83,7 +108,6 @@ module.exports = function (grunt) {
                   // source code here
                 
             ,     '\n\n;' +          
-                                  
                   'if ( typeof define === "function" && define.amd ) {' +
                      'define( "oboe", [], function () { return oboe; } );' +
                   '} else {' +
@@ -92,6 +116,25 @@ module.exports = function (grunt) {
                '})(window, Object, Array, Error);'
             ]
          },
+         
+         // shell version is like browser except there is no window so there is
+         // a global oboe var instead
+         shellPackage: {
+            src: 'build/oboe-shell.concat.js',
+            dest: '.',
+            wrapper: [
+               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
+                   'for the unconcatenated source\n' +
+               // having a local undefined, window, Object etc allows slightly better minification:                    
+               'var oboe = (function  (Object, Array, Error, undefined ) {\n'
+               
+                  // source code here
+                
+            ,     '\n\n;' +          
+                  'return oboe' +
+               '})(Object, Array, Error);'
+            ]
+         },         
                   
          nodePackage: {
             src: 'build/oboe-node.concat.js',
@@ -103,9 +146,10 @@ module.exports = function (grunt) {
                'module.exports = (function  () {\n' + 
                   'var clarinet = require("clarinet");\n'
                   
-                              // source code here
+               // source code here
                                         
-            ,  '\n\n;return oboe;})();'
+            ,  '\n\n;' +
+               'return oboe;})();'
             ]
          }         
       }
@@ -185,6 +229,11 @@ module.exports = function (grunt) {
       }
       
    ,  copy: {
+         shellDist: {
+            files: [
+               {src: ['build/oboe-shell.concat.js'],   dest: 'dist/oboe-shell.js'}
+            ]
+         },   
          browserDist: {
             files: [
                {src: ['build/oboe-browser.min.js'],    dest: 'dist/oboe-browser.min.js'}
@@ -332,6 +381,12 @@ module.exports = function (grunt) {
       'uglify',
       'copy:browserDist'   
    ]);
+   
+   grunt.registerTask('shell-build',      [
+      'concat:shell', 
+      'wrap:shellPackage', 
+      'copy:shellDist'   
+   ]);   
          
    grunt.registerTask('browser-build-test',      [
       'karma:single-dev', 
@@ -344,7 +399,8 @@ module.exports = function (grunt) {
    
    grunt.registerTask('build',      [
       'browser-build',
-      'node-build'      
+      'node-build',
+      'shell-build'
    ]);      
    
    // build and run just the integration tests.
@@ -365,6 +421,8 @@ module.exports = function (grunt) {
       'browser-build-test',     
 
       'node-build-test',
+      
+      'shell-build',
       
       'dist-sizes'                                                            
    ]);
