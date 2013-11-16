@@ -471,9 +471,21 @@ or [oboe-browser.min.js](https://raw.github.com/jimhigson/oboe.js/master/dist/ob
 bower install oboe
 ```
 
-If AMD is detected Oboe will `define` itself, otherwise it adds itself to
-the global namespace. Either load it with require.js, [almond](https://github.com/jrburke/almond)
+If AMD is detected Oboe will `define` itself. Otherwise it adds `oboe` to
+the global namespace. Either load the module using require.js, [almond](https://github.com/jrburke/almond)
 etc or just use it directly.
+
+If using with Require some config is needed so Require knows to load a file
+named `oboe-browser.js` for the `oboe` module. Alternatively, you could rename
+`oboe-browser.js` to 'oboe.js'.
+
+``` javascript
+require.config({
+    paths: {
+        oboe: 'oboe-browser'
+    }
+});
+```
 
 For Node:
 
