@@ -1,5 +1,4 @@
 /** 
-/** 
  * Partially complete a function.
  * 
  * Eg: 
@@ -45,7 +44,6 @@ var partialComplete = varArgs(function( fn, args ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
-      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
