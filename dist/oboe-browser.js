@@ -1,6 +1,37 @@
-// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
+// This file is the concatenation of many js files. 
+// See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
-/** 
+/*
+
+Copyright (c) 2013, Jim Higson
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1.  Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+2.  Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
 /** 
  * Partially complete a function.
  * 
@@ -47,7 +78,6 @@ var partialComplete = varArgs(function( fn, args ) {
  *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
  */
    compose = varArgs(function(fns) {
-      // TODO: can this be written using foldr1 and compose2?
 
       var fnsList = arrayAsList(fns);
    
@@ -72,7 +102,19 @@ function compose2(f1, f2){
    }
 }
 
-
+/**
+ * Generic form for a function to get a property from an object
+ * 
+ *    var o = {
+ *       foo:'bar'
+ *    }
+ *    
+ *    var getFoo = attr('foo')
+ *    
+ *    fetFoo(o) // returns 'bar'
+ * 
+ * @param {String} key the property name
+ */
 function attr(key) {
    return new Function('o', 'return o["' + key + '"]' );
 }
@@ -222,8 +264,21 @@ function lazyIntersection(fn1, fn2) {
  */
 function noop(){}
 
+/**
+ * A function which is always happy
+ */
 function always(){return true}
 
+/**
+ * Create a function which always returns the same
+ * value
+ * 
+ * var return3 = functor(3);
+ * 
+ * return3() // gives 3
+ * return3() // still gives 3
+ * return3() // will always give 3
+ */
 function functor(val){
    return function(){
       return val;

@@ -6,7 +6,8 @@ module.exports = function (grunt) {
 
    // NB: source files are order sensitive
    var OBOE_BROWSER_SOURCE_FILES = [
-      'src/functional.js'                
+      'src/LICENCE.js'                
+   ,  'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
    ,  'src/libs/clarinet.js'               
@@ -75,8 +76,8 @@ module.exports = function (grunt) {
             src: 'build/oboe-browser.concat.js',
             dest: '.',
             wrapper: [
-               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
-                   'for the unconcatenated source\n' +
+               '// This file is the concatenation of many js files. \n' +
+               '// See https://github.com/jimhigson/oboe.js for the raw source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
                '(function  (window, Object, Array, Error, undefined ) {\n'
                
@@ -103,7 +104,7 @@ module.exports = function (grunt) {
                'module.exports = (function  () {\n' + 
                   'var clarinet = require("clarinet");\n'
                   
-                              // source code here
+                  // source code here
                                         
             ,  '\n\n;return oboe;})();'
             ]
