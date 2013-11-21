@@ -1,6 +1,8 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
+// v1.10.2-2-g5f426d0
+
 /*
 
 Copyright (c) 2013, Jim Higson
@@ -35,18 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** 
  * Partially complete a function.
  * 
- * Eg: 
- *    var add3 = partialComplete( function add(a,b){return a+b}, 3 );
- *    
- *    add3(4) // gives 7
- *    
- *    
- *    function wrap(left, right, cen){return left + " " + cen + " " + right;}
- *    
- *    var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );
- *    
- *    pirateGreeting("Guybrush Threepwood"); 
- *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
+ *  var add3 = partialComplete( function add(a,b){return a+b}, 3 );
+ *  
+ *  add3(4) // gives 7
+ *  
+ *  function wrap(left, right, cen){return left + " " + cen + " " + right;}
+ *  
+ *  var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );
+ *  
+ *  pirateGreeting("Guybrush Threepwood"); 
+ *  // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
 var partialComplete = varArgs(function( fn, args ) {
 

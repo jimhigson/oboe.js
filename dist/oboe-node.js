@@ -1,21 +1,21 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
+// v1.10.2-2-g5f426d0
+
 /** 
  * Partially complete a function.
  * 
- * Eg: 
- *    var add3 = partialComplete( function add(a,b){return a+b}, 3 );
- *    
- *    add3(4) // gives 7
- *    
- *    
- *    function wrap(left, right, cen){return left + " " + cen + " " + right;}
- *    
- *    var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );
- *    
- *    pirateGreeting("Guybrush Threepwood"); 
- *                         // gives "I'm Guybrush Threepwood, a mighty pirate!"
+ *  var add3 = partialComplete( function add(a,b){return a+b}, 3 );
+ *  
+ *  add3(4) // gives 7
+ *  
+ *  function wrap(left, right, cen){return left + " " + cen + " " + right;}
+ *  
+ *  var pirateGreeting = partialComplete( wrap , "I'm", ", a mighty pirate!" );
+ *  
+ *  pirateGreeting("Guybrush Threepwood"); 
+ *  // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
 var partialComplete = varArgs(function( fn, args ) {
 

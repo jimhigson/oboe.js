@@ -6,7 +6,8 @@ module.exports = function (grunt) {
 
    // NB: source files are order sensitive
    var OBOE_BROWSER_SOURCE_FILES = [
-      'src/LICENCE.js'                
+      'build/version.js'                
+   ,  'src/LICENCE.js'                
    ,  'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                    
@@ -29,7 +30,8 @@ module.exports = function (grunt) {
    ];
    
    var OBOE_NODE_SOURCE_FILES = [
-      'src/functional.js'                
+      'build/version.js'   
+   ,  'src/functional.js'                
    ,  'src/util.js'                    
    ,  'src/lists.js'                                   
    ,  'src/clarinetListenerAdaptor.js'
@@ -206,6 +208,9 @@ module.exports = function (grunt) {
          },
          reportMinifiedAndGzippedSize:{
             command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes - max 5120"
+         },
+         createGitVersionJs:{
+            command: "echo \"// `git describe`\" > build/version.js"
          }
       }
       
@@ -311,6 +316,7 @@ module.exports = function (grunt) {
    ]);
             
    grunt.registerTask('node-build',      [
+      'exec:createGitVersionJs',   
       'concat:node', 
       'wrap:nodePackage',
       'copy:nodeDist'
@@ -327,6 +333,7 @@ module.exports = function (grunt) {
    ]);   
 
    grunt.registerTask('browser-build',      [
+      'exec:createGitVersionJs',
       'concat:browser', 
       'concat:node', 
       'wrap:browserPackage', 
