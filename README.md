@@ -9,7 +9,6 @@ doesn't care which other libraries you need it to speak to.
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
 Or even if it never completes.
 
-Support for Node.js isn't battle hardened yet but seems fine.
 In Node [any stream can be read](#reading-from-any-stream-nodejs-only), not just
 http.
 
