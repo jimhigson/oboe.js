@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.10.2-2-g5f426d0
+// v1.10.3-3-gb270dc8
 
 /** 
  * Partially complete a function.

@@ -46,8 +46,6 @@ describe('streaming xhr integration (real http)', function() {
    
    it('fires HTTP_START with status and headers',  function() {
      
-      // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback
       var oboeBus = fakePubSub(requiredEvents)               
       streamingHttp(                         
          oboeBus,
@@ -64,11 +62,34 @@ describe('streaming xhr integration (real http)', function() {
          expect(oboeBus(HTTP_START).emit)
             .toHaveBeenCalledWith(
                200,
-               jasmine.objectContaining({specialheader:'specialValue'}
-            )
-         );          
+               headerObjectContaining('specialheader', 'specialValue')
+            );       
       });  
    })
+   
+   it('gives XHR header so server knows this is an xhr request',  function() {
+                 
+      var oboeBus = fakePubSub(requiredEvents)               
+      streamingHttp(                         
+         oboeBus,
+         httpTransport(),
+         'GET', 
+         '/testServer/echoBackHeadersAsHeaders'
+      ); 
+      
+      waitForStreamEndToBeFiredOn(oboeBus);            
+
+      runs(function(){
+         expect(oboeBus(HTTP_START).emit)
+            .toHaveBeenCalledWith(
+               200,
+               headerObjectContaining('X-Requested-With', 'XMLHttpRequest')
+            );  
+            
+         console.log(oboeBus(HTTP_START).emit.calls[0].args[1]);                   
+      });
+          
+   })   
    
    it('fires HTTP_START, STREAM_DATA and STREAM_END in correct order',  function() {
      
@@ -395,5 +416,17 @@ describe('streaming xhr integration (real http)', function() {
 
       
    });
+   
+   
+   function headerObjectContaining(key, val) {
+      // some browsers lowercase the header keys. Compare upper and lower
+      // case versions:
+   
+      return {
+         jasmineMatches: function(obj){
+            return obj[key] == val || obj[key.toLowerCase()] == val;
+         }
+      }
+   }   
 
 });

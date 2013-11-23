@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
-// v1.10.2-2-g5f426d0
+// v1.10.3-3-gb270dc8
 
 /*
 
@@ -1169,6 +1169,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');             
       
       xhr.send(validatedRequestBody(data));
       

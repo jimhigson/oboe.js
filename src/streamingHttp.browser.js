@@ -119,6 +119,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');             
       
       xhr.send(validatedRequestBody(data));
       
