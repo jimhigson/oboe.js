@@ -58,7 +58,7 @@ function pubSub(){
       pubSubInstance[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, pubSubInstance( eventName )[methodName]);
       });   
-   })
+   });
          
    return pubSubInstance;
 }
