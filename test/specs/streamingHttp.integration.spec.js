@@ -20,7 +20,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send
       ); 
       
-      waitForStreamEndToBeFiredOn(oboeBus);
+      waitUntil(STREAM_END).isFiredOn(oboeBus)
    })
  
    it('can ajax in a small known file',  function() {
@@ -36,7 +36,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send
       ); 
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
@@ -56,7 +56,7 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus(HTTP_START).emit)
@@ -77,7 +77,7 @@ describe('streaming xhr integration (real http)', function() {
          '/testServer/echoBackHeadersAsHeaders'
       ); 
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus(HTTP_START).emit)
@@ -105,16 +105,32 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
       });            
    })
 
-   it('fires FAIL_EVENT if connection is lost',  function() {
-   })      
-            
+   it('fires FAIL_EVENT if url does not exist', function () {
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      var oboeBus = fakePubSub(emittedEvents)
+      streamingHttp(
+         oboeBus,
+         httpTransport(),
+         'GET',
+         '/testServer/noSuchUrl',
+         null
+      );
+
+      waitUntil(FAIL_EVENT).isFiredOn(oboeBus);
+
+      runs(function () {
+         console.log('failed like it should!');
+      });
+   })
+
    it('can ajax in a very large file without missing any',  function() {
    
   
@@ -129,7 +145,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send      
       );
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          var parsedResult;
@@ -159,7 +175,7 @@ describe('streaming xhr integration (real http)', function() {
           null // this is a GET, no data to send      
       );
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){ 
          // as per the name, should have ten numbers in that file:         
@@ -183,7 +199,7 @@ describe('streaming xhr integration (real http)', function() {
          payload       
       );
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
  
       runs(function(){
          expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
@@ -207,7 +223,7 @@ describe('streaming xhr integration (real http)', function() {
           payload       
       );
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
@@ -232,7 +248,7 @@ describe('streaming xhr integration (real http)', function() {
           payload       
       );
       
-      waitForStreamEndToBeFiredOn(oboeBus);            
+      waitUntil(STREAM_END).isFiredOn(oboeBus);            
 
       runs(function(){
          if( streamedContentPassedTo(oboeBus) == '' &&
@@ -266,7 +282,7 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitForStreamEndToBeFiredOn(oboeBus);      
+         waitUntil(STREAM_END).isFiredOn(oboeBus);      
    
          runs(function(){
                                    
@@ -289,7 +305,7 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitForStreamEndToBeFiredOn(oboeBus);      
+         waitUntil(STREAM_END).isFiredOn(oboeBus);      
    
          runs(function(){
             // some platforms can't help but not work here so warn but don't
@@ -320,7 +336,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET: no data to send      
       );         
 
-      waitForStreamEndToBeFiredOn(oboeBus)
+      waitUntil(STREAM_END).isFiredOn(oboeBus)
       
       runs(function(){
       
@@ -335,16 +351,19 @@ describe('streaming xhr integration (real http)', function() {
          });
       
       })   
-   })              
-   
-   function waitForStreamEndToBeFiredOn(eventBus){
-      waitsFor(function(){     
-                  
-         return !!eventBus(STREAM_END).emit.calls.length;
-         
-      }, 'streaming xhr to complete', ASYNC_TEST_TIMEOUT);   
-   }
-   
+   })
+
+   function waitUntil(event) {
+      return {isFiredOn: function (eventBus){
+         waitsFor(function(){
+        
+            return !!eventBus(event).emit.calls.length;
+        
+            }, 'event ' + event + ' to be fired', ASYNC_TEST_TIMEOUT);
+         }
+      }
+   }    
+       
    function streamedContentPassedTo(eventBus){
    
       return eventBus.eventTypesEmitted[STREAM_DATA].map(function(args){
