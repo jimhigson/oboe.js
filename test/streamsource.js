@@ -170,6 +170,7 @@ function startServer( port, grunt ) {
       var express = require('express'),
           app = express();
 
+      app.get(    '/',                          function(req, res){ res.sendfile('test/streamsourceIndex.html') });
       app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);
