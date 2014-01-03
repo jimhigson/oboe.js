@@ -113,8 +113,7 @@ describe('streaming xhr integration (real http)', function() {
    })
 
    it('fires FAIL_EVENT if url does not exist', function () {
-      // in practice, since we're running on an internal network and this is a small file,
-      // we'll probably only get one callback         
+         
       var oboeBus = fakePubSub(emittedEvents)
       streamingHttp(
          oboeBus,
