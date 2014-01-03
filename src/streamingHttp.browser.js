@@ -112,6 +112,19 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       }
    };
 
+   // errors on the http-level, such as 404 are reported through 
+   // .onreadystatechange but connection errors, such as the network 
+   // going down throw error events.
+   // 
+   //  Spec:
+   //    http://www.w3.org/TR/XMLHttpRequest/#event-xhr-error
+   //
+   //  jQuery catching these:
+   //    https://github.com/jquery/jquery/blob/master/src/ajax/xhr.js#L110
+   xhr.onerror = function() {
+      emitFail( errorReport(0, '', Error('connection lost')) );
+   }; 
+
    try{
    
       xhr.open(method, url, true);

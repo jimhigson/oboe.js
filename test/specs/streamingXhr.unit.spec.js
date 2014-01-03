@@ -59,10 +59,21 @@ describe("streamingHttp", function(){
                   
          expect( xhr.abort ).toHaveBeenCalled();                  
       });
-      
+
+      it('puts FAIL_EVENT on the bus if xhr fires error event', function(){
+         var eventBus = pubSub(), xhr = xhrStub(), failHandler = jasmine.createSpy();
+         
+         eventBus(FAIL_EVENT).on(failHandler);
+
+         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', 'my_data');
+
+         xhr.onerror();
+
+         expect( failHandler ).toHaveBeenCalled();
+      });
       
       function xhrStub() {
-         return jasmine.createSpyObj('xhr', ['abort', 'open', 'setRequestHeader', 'send']);
+         return jasmine.createSpyObj('xhr', ['abort', 'open', 'setRequestHeader', 'send', 'onerror']);
       }
    });   
                
