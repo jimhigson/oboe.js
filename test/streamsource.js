@@ -164,13 +164,13 @@ function startServer( port, grunt ) {
          })).pipe(serverResponse);
          
        });
-   }   
-   
+   }
+    
    function makeApp() {
       var express = require('express'),
           app = express();
 
-      app.get(    '/echoBackBody',              function(req, res){ res.end("POST here, don't GET")});
+      app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);
       app.patch(  '/echoBackBody',              echoBackBody);
