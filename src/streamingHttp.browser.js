@@ -90,9 +90,9 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
             
          case 4:       
             // is this a 2xx http code?
-            var sucessful = String(xhr.status)[0] == 2;
+            var successful = String(xhr.status)[0] == 2;
             
-            if( sucessful ) {
+            if( successful ) {
                // In Chrome 29 (not 28) no onprogress is emitted when a response
                // is complete before the onload. We need to always do handleInput
                // in case we get the load but have not had a final progress event.
