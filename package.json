@@ -53,7 +53,7 @@
     "jasmine-node": "~1.11.0",
     "get-json": "0.0.1",
     "grunt-cli": "~0.1.9",
-    "express": "~3.4.3"
+    "express": "~3.4.7"
   },
   "dependencies": {
     "clarinet": "~0.7.2"
