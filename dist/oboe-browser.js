@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
-// v1.10.3-3-gb270dc8
+// v1.11.0-11-gdd70aab
 
 /*
 
@@ -1140,9 +1140,9 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
             
          case 4:       
             // is this a 2xx http code?
-            var sucessful = String(xhr.status)[0] == 2;
+            var successful = String(xhr.status)[0] == 2;
             
-            if( sucessful ) {
+            if( successful ) {
                // In Chrome 29 (not 28) no onprogress is emitted when a response
                // is complete before the onload. We need to always do handleInput
                // in case we get the load but have not had a final progress event.
@@ -1186,6 +1186,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       );
    }            
 }
+
 var jsonPathSyntax = (function() {
  
    var
@@ -2030,7 +2031,7 @@ function pubSub(){
       pubSubInstance[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, pubSubInstance( eventName )[methodName]);
       });   
-   })
+   });
          
    return pubSubInstance;
 }
@@ -2066,6 +2067,15 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
+/** 
+ *  The pattern adaptor listens for newListener and removeListener
+ *  events. When patterns are added or removed it compiles the JSONPath
+ *  and wires them up.
+ *  
+ *  When nodes and paths are found it emits the fully-qualified match 
+ *  events with parameters ready to ship to the outside world
+ */
+
 function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
@@ -2093,6 +2103,17 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
       );         
    }
 
+   /* 
+    * Set up the catching of events such as NODE_FOUND and PATH_FOUND and, if 
+    * matching the specified pattern, propagate to pattern-match events such as 
+    * oboeBus('node:!')
+    * 
+    * 
+    * 
+    * @param {Function} predicateEvent 
+    *          either oboeBus(NODE_FOUND) or oboeBus(PATH_FOUND).
+    * @param {Function} compiledJsonPath          
+    */
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
    
       var emitMatch = oboeBus(fullEventName).emit;
@@ -2124,11 +2145,11 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
             );
          }
       }, fullEventName);
-   
+     
       oboeBus('removeListener').on( function(removedEventName){
 
-         // if the match even listener is later removed, clean up by removing
-         // the underlying listener if nothing else is using that pattern:
+         // if the fully qualified match event listener is later removed, clean up 
+         // by removing the underlying listener if it was the last using that pattern:
       
          if( removedEventName == fullEventName ) {
          
@@ -2158,6 +2179,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    })
 
 }
+
 /** 
  * The instance API is the thing that is returned when oboe() is called.
  * it allows:

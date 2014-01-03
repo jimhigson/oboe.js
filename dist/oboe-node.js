@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.10.3-3-gb270dc8
+// v1.11.0-11-gdd70aab
 
 /** 
  * Partially complete a function.
@@ -1469,7 +1469,7 @@ function pubSub(){
       pubSubInstance[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, pubSubInstance( eventName )[methodName]);
       });   
-   })
+   });
          
    return pubSubInstance;
 }
@@ -1505,6 +1505,15 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
+/** 
+ *  The pattern adaptor listens for newListener and removeListener
+ *  events. When patterns are added or removed it compiles the JSONPath
+ *  and wires them up.
+ *  
+ *  When nodes and paths are found it emits the fully-qualified match 
+ *  events with parameters ready to ship to the outside world
+ */
+
 function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
@@ -1532,6 +1541,17 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
       );         
    }
 
+   /* 
+    * Set up the catching of events such as NODE_FOUND and PATH_FOUND and, if 
+    * matching the specified pattern, propagate to pattern-match events such as 
+    * oboeBus('node:!')
+    * 
+    * 
+    * 
+    * @param {Function} predicateEvent 
+    *          either oboeBus(NODE_FOUND) or oboeBus(PATH_FOUND).
+    * @param {Function} compiledJsonPath          
+    */
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
    
       var emitMatch = oboeBus(fullEventName).emit;
@@ -1563,11 +1583,11 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
             );
          }
       }, fullEventName);
-   
+     
       oboeBus('removeListener').on( function(removedEventName){
 
-         // if the match even listener is later removed, clean up by removing
-         // the underlying listener if nothing else is using that pattern:
+         // if the fully qualified match event listener is later removed, clean up 
+         // by removing the underlying listener if it was the last using that pattern:
       
          if( removedEventName == fullEventName ) {
          
@@ -1597,6 +1617,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    })
 
 }
+
 /** 
  * The instance API is the thing that is returned when oboe() is called.
  * it allows:
