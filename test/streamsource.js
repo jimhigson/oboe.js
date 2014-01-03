@@ -172,6 +172,7 @@ function startServer( port, grunt ) {
           app = express();
 
       app.get(    '/',                          function(req, res){ res.sendfile('test/streamsourceIndex.html') });
+      app.get(    '/oboe-browser.js',           function(req, res){ res.sendfile('dist/oboe-browser.js') });
       app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);
