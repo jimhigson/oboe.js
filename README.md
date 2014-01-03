@@ -1,4 +1,3 @@
-
 **Oboe.js** helps web applications respond quicker by wrapping http's request-response model
 with a progressively streamed interface.
 It glues a transport that sits 
@@ -742,33 +741,6 @@ Oboe's pattern matching is a variation on [JSONPath](https://code.google.com/p/j
 The pattern engine supports 
 [CSS-4 style node selection](http://www.w3.org/TR/2011/WD-selectors4-20110929/#subject)
 using the dollar (`$`) symbol. See also *[some example patterns](#more-patterns)*. 
-
-# Why I made this
-
-Early in 2013 I was working on complementing some Flash financial charts with a more modern 
-html5/[d3](http://d3js.org) based web application.
-The Flash app started by making http requests for a very large set of initial data. It took
-a long time to load but once it was started the client-side model was so completely primed that it wouldn't need to 
-request again unless the user scrolled **waaaay** into the past.
-
-People hate waiting on the web so *naturally* I want my html5 app to be **light and nimble** and 
-**load in the merest blink of an eye**. 
-Instead of starting with one huge request I set about making lots of smaller ones just-in-time
-as the user moves throughout the data.
-This gave a big improvement in load times but also some new challenges.
- 
-Firstly, with so many small requests there is an increased http overhead. Worse, not having a model full of data 
-early means the user is likely to need more quite soon. Over the mobile internet, *'quite soon'* might mean 
-*'when you no longer have a good connection'*.
-
-I made Oboe to break out of this big-small compromise. We requested relatively large data but 
-started rendering as soon as the first datum arrived. We have enough for a screenfull when the request is 
-about 10% complete. 10% into the download and the app is already fully interactive while the other 90%
-steams silently in the background.
-
-Sure, I could have implemented this using some kind of streaming framework ([socket.io](http://socket.io/), perhaps?) 
-but then we'd have to rewrite the server-side and the legacy charts would have no idea how to connect to the new server.
-It is nice to just have one, simple service for everything.
 
 # Getting the most from oboe
 
