@@ -29,40 +29,41 @@ function startServer( port, grunt ) {
          res.set(name, req.headers[name]);         
       }
       res.end('{"see":"headers", "for":"content"}');
-   }   
-   
-   function replyWithTenSlowNumbers(_req, res) {
-      sendJsonOkHeaders(res);
-   
-      var NUMBER_INTERVAL = 250;
-      var MAX_NUMBER = 9;
+   }
 
-      verboseLog( 
-         'slow number server: will write numbers 0 ..' + 
-         String(MAX_NUMBER).blue + 
-         ' out as a json array at a rate of one per', 
-         String(NUMBER_INTERVAL).blue + 'ms'
-      );
-   
-      res.write('[\n');
-   
-      var curNumber = 0;
-   
-      var inervalId = setInterval(function () {
-   
-         res.write(String(curNumber));
-   
-         if (curNumber == MAX_NUMBER) {
-   
-            res.end(']');
-            clearInterval(inervalId);
-            verboseLog('slow number server: finished writing out');
-         } else {
-            res.write(',\n');
-            curNumber++;
-         }  
-   
-      }, NUMBER_INTERVAL);
+   function replyWithNSlowNumbers(n) {
+      return function (_req, res) {
+         sendJsonOkHeaders(res);
+
+         var NUMBER_INTERVAL = 250;
+
+         verboseLog(
+            'slow number server: will write numbers 0 ..' +
+               String(n).blue +
+               ' out as a json array at a rate of one per',
+            String(NUMBER_INTERVAL).blue + 'ms'
+         );
+
+         res.write('[\n');
+
+         var curNumber = 0;
+
+         var inervalId = setInterval(function () {
+
+            res.write(String(curNumber));
+
+            if (curNumber == n) {
+
+               res.end(']');
+               clearInterval(inervalId);
+               verboseLog('slow number server: finished writing out');
+            } else {
+               res.write(',\n');
+               curNumber++;
+            }
+
+         }, NUMBER_INTERVAL);
+      };
    }
 
    function replyWithInvalidJson(req, res) {
@@ -178,7 +179,12 @@ function startServer( port, grunt ) {
       app.get(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
       app.get(    '/echoBackHeadersAsHeaders',  echoBackHeadersAsHeaders);      
       app.get(    '/static/json/:name.json',    replyWithStaticJson);
-      app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
+      app.get(    '/tenSlowNumbers',            replyWithNSlowNumbers(10));
+      app.get(    '/slowNumbers/:number',       
+                     function(req, res){
+                        var n = req.params.number;
+                        replyWithNSlowNumbers(n)(req, res);
+                     });
       app.get(    '/twoHundredItems',           twoHundredItems);
       app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
       app.get(    '/invalidJson',               replyWithInvalidJson);

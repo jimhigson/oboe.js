@@ -21,5 +21,19 @@
     <li><a href="/404json">404 with JSON response body</a></li>
 </ul>
 
+Also, these things with parameters:
+<ul>
+    <li><strong>/slowNumbers/{number}</strong> any number of streamed numbers in a JSON array
+        <ul>
+            <li><a href="/slowNumbers/5">5</a></li>
+            <li><a href="/slowNumbers/20">20</a></li>
+            <li><a href="/slowNumbers/100">100</a></li>
+            <li><a href="/slowNumbers/1000">1000</a> (expect a wait!)</li>
+        </ul>
+    </li>
+    
+    <li><strong>/static/json/{name}</strong> various static JSON files</li>
+</ul>
+
 </body>
 </html>
