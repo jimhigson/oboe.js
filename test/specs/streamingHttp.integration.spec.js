@@ -5,13 +5,13 @@
 describe('streaming xhr integration (real http)', function() {
    "use strict";
  
-   var requiredEvents = [HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING];
+   var emittedEvents = [HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING];
  
    it('completes',  function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback
-      var oboeBus = fakePubSub(requiredEvents)         
+      var oboeBus = fakePubSub(emittedEvents)         
       streamingHttp(                         
          oboeBus,
          httpTransport(),
@@ -27,7 +27,7 @@ describe('streaming xhr integration (real http)', function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback
-      var oboeBus = fakePubSub(requiredEvents)         
+      var oboeBus = fakePubSub(emittedEvents)         
       streamingHttp(                         
          oboeBus,
          httpTransport(),
@@ -46,7 +46,7 @@ describe('streaming xhr integration (real http)', function() {
    
    it('fires HTTP_START with status and headers',  function() {
      
-      var oboeBus = fakePubSub(requiredEvents)               
+      var oboeBus = fakePubSub(emittedEvents)               
       streamingHttp(                         
          oboeBus,
          httpTransport(),
@@ -69,7 +69,7 @@ describe('streaming xhr integration (real http)', function() {
    
    it('gives XHR header so server knows this is an xhr request',  function() {
                  
-      var oboeBus = fakePubSub(requiredEvents)               
+      var oboeBus = fakePubSub(emittedEvents)               
       streamingHttp(                         
          oboeBus,
          httpTransport(),
@@ -95,7 +95,7 @@ describe('streaming xhr integration (real http)', function() {
      
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(                         
          oboeBus,
          httpTransport(),
@@ -110,6 +110,9 @@ describe('streaming xhr integration (real http)', function() {
       runs(function(){
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
       });            
+   })
+
+   it('fires FAIL_EVENT if connection is lost',  function() {
    })      
             
    it('can ajax in a very large file without missing any',  function() {
@@ -117,7 +120,7 @@ describe('streaming xhr integration (real http)', function() {
   
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback
-      var oboeBus = fakePubSub(requiredEvents)               
+      var oboeBus = fakePubSub(emittedEvents)               
       streamingHttp(                         
          oboeBus,
          httpTransport(),         
@@ -147,7 +150,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(                       
          oboeBus,
          httpTransport(),         
@@ -171,7 +174,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(                        
          oboeBus,
          httpTransport(),         
@@ -195,7 +198,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(
          oboeBus,
          httpTransport(),         
@@ -220,7 +223,7 @@ describe('streaming xhr integration (real http)', function() {
    
       // in practice, since we're running on an internal network and this is a small file,
       // we'll probably only get one callback         
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(
          oboeBus,
          httpTransport(),         
@@ -253,7 +256,7 @@ describe('streaming xhr integration (real http)', function() {
    if( !Platform.isInternetExplorer || Platform.isInternetExplorer >= 10 ) {          
       it('gives multiple callbacks when loading a streaming resource',  function() {
                               
-         var oboeBus = fakePubSub(requiredEvents)
+         var oboeBus = fakePubSub(emittedEvents)
          streamingHttp(                           
             oboeBus,
             httpTransport(),            
@@ -276,7 +279,7 @@ describe('streaming xhr integration (real http)', function() {
                      
       it('gives multiple callbacks when loading a gzipped streaming resource',  function() {
                               
-         var oboeBus = fakePubSub(requiredEvents)                              
+         var oboeBus = fakePubSub(emittedEvents)                              
          streamingHttp(                           
             oboeBus,
             httpTransport(),            
@@ -305,10 +308,10 @@ describe('streaming xhr integration (real http)', function() {
       })      
    }
    
-   it('does not call back with zero-length data',  function() {
+   it('does not call back with zero-length bites',  function() {
                          
       // since this is a large file, even serving locally we're going to get multiple callbacks:       
-      var oboeBus = fakePubSub(requiredEvents)      
+      var oboeBus = fakePubSub(emittedEvents)      
       streamingHttp(              
          oboeBus,
          httpTransport(),         
