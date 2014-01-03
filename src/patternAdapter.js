@@ -1,3 +1,12 @@
+/** 
+ *  The pattern adaptor listens for newListener and removeListener
+ *  events. When patterns are added or removed it compiles the JSONPath
+ *  and wires them up.
+ *  
+ *  When nodes and paths are found it emits the fully-qualified match 
+ *  events with parameters ready to ship to the outside world
+ */
+
 function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
@@ -25,6 +34,17 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
       );         
    }
 
+   /* 
+    * Set up the catching of events such as NODE_FOUND and PATH_FOUND and, if 
+    * matching the specified pattern, propagate to pattern-match events such as 
+    * oboeBus('node:!')
+    * 
+    * 
+    * 
+    * @param {Function} predicateEvent 
+    *          either oboeBus(NODE_FOUND) or oboeBus(PATH_FOUND).
+    * @param {Function} compiledJsonPath          
+    */
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){
    
       var emitMatch = oboeBus(fullEventName).emit;
@@ -56,11 +76,11 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
             );
          }
       }, fullEventName);
-   
+     
       oboeBus('removeListener').on( function(removedEventName){
 
-         // if the match even listener is later removed, clean up by removing
-         // the underlying listener if nothing else is using that pattern:
+         // if the fully qualified match event listener is later removed, clean up 
+         // by removing the underlying listener if it was the last using that pattern:
       
          if( removedEventName == fullEventName ) {
          
