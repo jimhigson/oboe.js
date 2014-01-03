@@ -3,6 +3,17 @@
 <head>
     <meta charset="utf-8">
     <title>Little test server</title>
+    
+    <style type="text/css">
+        pre {
+            border: 1px black solid;
+            width: 40em;
+            float:left;
+        }
+        button{
+            float:left;
+        }
+    </style>
 </head>
 
 <body id="home">
@@ -41,7 +52,29 @@ Additionally, for interactive testing we provide...
     <li><a href="/oboe-browser.js">oboe-browser.js</a> current build oboe</li>
 </ul>
 
+<textarea cols="80" rows="25">    
+oboe({
+    method: "GET",
+    url: "/slowNumbers/100"
+})
+.node('!.*', function (number) {
+    console.log(number + ' returned');
+})
+.fail(function (error) {
+    console.log('error');
+});        
+</textarea>
+<button>Run</button>
+
 <script type="text/javascript" src="/oboe-browser.js" ></script>
-    
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+    $('button').click(function(){
+        eval( jQuery('textarea').text() );
+    });
+</script>
+
+
 </body>
 </html>
