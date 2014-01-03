@@ -32,7 +32,7 @@ function startServer( port, grunt ) {
    }   
    
    function replyWithTenSlowNumbers(_req, res) {
-      sendJsonHeaders(res);
+      sendJsonOkHeaders(res);
    
       var NUMBER_INTERVAL = 250;
       var MAX_NUMBER = 9;
@@ -64,7 +64,7 @@ function startServer( port, grunt ) {
    
       }, NUMBER_INTERVAL);
    }
-   
+
    function replyWithInvalidJson(req, res) {
       res.end('{{');      
    }
@@ -80,7 +80,7 @@ function startServer( port, grunt ) {
    }
    
    function replyWithStaticJson(req, res) {
-      sendJsonHeaders(res);
+      sendJsonOkHeaders(res);
       
       if( !req.url ) {
          throw new Error('no url given');
@@ -98,7 +98,7 @@ function startServer( port, grunt ) {
          
    }
    
-   function sendJsonHeaders(res) {
+   function sendJsonOkHeaders(res) {
 
       res.setHeader("Content-Type", JSON_MIME_TYPE);
       res.writeHead(200);
