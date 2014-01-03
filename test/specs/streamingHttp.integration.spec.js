@@ -126,9 +126,6 @@ describe('streaming xhr integration (real http)', function() {
 
       waitUntil(FAIL_EVENT).isFiredOn(oboeBus);
 
-      runs(function () {
-         console.log('failed like it should!');
-      });
    })
 
    it('can ajax in a very large file without missing any',  function() {
