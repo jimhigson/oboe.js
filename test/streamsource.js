@@ -32,16 +32,15 @@ function startServer( port, grunt ) {
    }
 
    var NUMBER_INTERVAL = 250;
-   
-   function writeNumberArraySlowly(howMany, res, doneCallback) {
 
+   function writeArraySlowly(res, howMany, item, doneCallback) {
       res.write('[\n');
 
       var curNumber = 0;
 
       var inervalId = setInterval(function () {
 
-         res.write(String(curNumber));
+         res.write(item(curNumber));
 
          if (curNumber == howMany) {
 
@@ -53,7 +52,12 @@ function startServer( port, grunt ) {
             curNumber++;
          }
 
-      }, NUMBER_INTERVAL);      
+      }, NUMBER_INTERVAL);
+   }
+   
+   function writeNumberArraySlowly(howMany, res, doneCallback) {
+
+      writeArraySlowly(res, howMany, String, doneCallback);
    }
    
    function replyWithNSlowNumbers(n) {
