@@ -31,11 +31,34 @@ function startServer( port, grunt ) {
       res.end('{"see":"headers", "for":"content"}');
    }
 
+   var NUMBER_INTERVAL = 250;
+   
+   function writeNumberArraySlowly(howMany, res, doneCallback) {
+
+      res.write('[\n');
+
+      var curNumber = 0;
+
+      var inervalId = setInterval(function () {
+
+         res.write(String(curNumber));
+
+         if (curNumber == howMany) {
+
+            res.write(']');
+            clearInterval(inervalId);
+            doneCallback();
+         } else {
+            res.write(',\n');
+            curNumber++;
+         }
+
+      }, NUMBER_INTERVAL);      
+   }
+   
    function replyWithNSlowNumbers(n) {
       return function (_req, res) {
          sendJsonOkHeaders(res);
-
-         var NUMBER_INTERVAL = 250;
 
          verboseLog(
             'slow number server: will write numbers 0 ..' +
@@ -44,25 +67,10 @@ function startServer( port, grunt ) {
             String(NUMBER_INTERVAL).blue + 'ms'
          );
 
-         res.write('[\n');
-
-         var curNumber = 0;
-
-         var inervalId = setInterval(function () {
-
-            res.write(String(curNumber));
-
-            if (curNumber == n) {
-
-               res.end(']');
-               clearInterval(inervalId);
-               verboseLog('slow number server: finished writing out');
-            } else {
-               res.write(',\n');
-               curNumber++;
-            }
-
-         }, NUMBER_INTERVAL);
+         writeNumberArraySlowly(n, res, function(){
+            res.end();
+            verboseLog('slow number server: finished writing out');
+         });
       };
    }
 
@@ -101,7 +109,7 @@ function startServer( port, grunt ) {
    
    function sendJsonOkHeaders(res) {
 
-      res.setHeader("Content-Type", JSON_MIME_TYPE);
+      res.setHeader("Content-Type", 'text/html');
       res.writeHead(200);
    }
    
@@ -181,7 +189,7 @@ function startServer( port, grunt ) {
       app.get(    '/echoBackHeadersAsHeaders',  echoBackHeadersAsHeaders);      
       app.get(    '/static/json/:name.json',    replyWithStaticJson);
       app.get(    '/tenSlowNumbers',            replyWithNSlowNumbers(10));
-      app.get(    '/slowNumbers/:number',       
+      app.get(    '/slowNumbers/:number',
                      function(req, res){
                         var n = req.params.number;
                         replyWithNSlowNumbers(n)(req, res);
