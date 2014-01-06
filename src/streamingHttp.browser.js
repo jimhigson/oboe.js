@@ -58,7 +58,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       var textSoFar = xhr.responseText,
           newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
       
-      
       /* Raise the event for new text.
       
          On older browsers, the new text is the whole response. 
@@ -72,6 +71,20 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       numberOfCharsAlreadyGivenToCallback = len(textSoFar);
    }
    
+   function fail(error) {
+      
+      // if there is a failure we might still have some useful input
+      // waiting in the buffers:
+      handleProgress();
+      
+      // notify of failure
+      emitFail( errorReport(xhr.status, xhr.responseText, error) );
+      
+      // if this failure came from .onerror we don't want to also
+      // get notification of the error from .onreadystatechange
+      xhr.onerror =
+      xhr.onreadystatechange = null;
+   }
    
    if('onprogress' in xhr){  // detect browser support for progressive delivery
       xhr.onprogress = handleProgress;
@@ -103,11 +116,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
                
                oboeBus(STREAM_END).emit();
             } else {
-
-               emitFail( errorReport(
-                  xhr.status, 
-                  xhr.responseText
-               ));
+               fail();
             }
       }
    };
@@ -122,7 +131,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
    //  jQuery catching these:
    //    https://github.com/jquery/jquery/blob/master/src/ajax/xhr.js#L110
    xhr.onerror = function() {
-      emitFail( errorReport(0, '', Error('connection lost')) );
+      fail();
    }; 
 
    try{
@@ -143,9 +152,8 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(
-         partialComplete(emitFail, errorReport(undefined, undefined, e))
-      ,  0
-      );
+      window.setTimeout( function(){
+         fail(e);
+      },  0);
    }            
 }
