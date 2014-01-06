@@ -32,6 +32,7 @@ function startServer( port, grunt ) {
    }
 
    function pauseInsideInnerArray( req, res ){
+      var DELAY = 5000;
       
       sendJsonOkHeaders(res);
       
@@ -39,13 +40,16 @@ function startServer( port, grunt ) {
       // use with client-side Oboe listening on '!.*'
       // and interrupt during the pause
       res.write('[\n[1,2,3],\n[4,5');
+      verboseLog('write out first half');
       
       setTimeout(function(){
          
          res.write(',6]\n]');
+         verboseLog('write out second half');
          res.end();
+         verboseLog('done');
          
-      }, 5000);
+      }, DELAY);
    }
    
    var NUMBER_INTERVAL = 250;
