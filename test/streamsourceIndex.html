@@ -29,6 +29,10 @@
     <li><a href="/twoHundredItems">A big one!</a></li>
     <li><a href="/gzippedTwoHundredItems">Big, gzipped JSON</a></li>
     <li><a href="/invalidJson">Invalid JSON</a></li>
+    <li>
+        <a href="/pauseInInnerArray">JSON that pauses inside an inner array</a>
+        to catch <a href="https://github.com/jimhigson/oboe.js/issues/27">issue #27</a>
+    </li>
     <li><a href="/404json">404 with JSON response body</a></li>
 </ul>
 
@@ -52,17 +56,17 @@ Additionally, for interactive testing we provide...
     <li><a href="/oboe-browser.js">oboe-browser.js</a> current build oboe</li>
 </ul>
 
-<textarea cols="80" rows="25">    
+<textarea cols="80" rows="25">
 oboe({
     method: "GET",
-    url: "/slowNumbers/100"
+    url: "/tenSlowNumbers"
 })
-.node('!.*', function (number) {
-    console.log(number + ' returned');
+.node('!.*', function (item) {
+    console.log(JSON.stringify(item) + ' returned');
 })
 .fail(function (error) {
     console.log('error');
-});        
+});
 </textarea>
 <button>Run</button>
 
@@ -71,7 +75,7 @@ oboe({
 
 <script type="text/javascript">
     $('button').click(function(){
-        eval( jQuery('textarea').text() );
+        eval( jQuery('textarea').val() );
     });
 </script>
 

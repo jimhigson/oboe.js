@@ -31,6 +31,23 @@ function startServer( port, grunt ) {
       res.end('{"see":"headers", "for":"content"}');
    }
 
+   function pauseInsideInnerArray( req, res ){
+      
+      sendJsonOkHeaders(res);
+      
+      // https://github.com/jimhigson/oboe.js/issues/27
+      // use with client-side Oboe listening on '!.*'
+      // and interrupt during the pause
+      res.write('[\n[1,2,3],\n[4,5');
+      
+      setTimeout(function(){
+         
+         res.write(',6]\n]');
+         res.end();
+         
+      }, 5000);
+   }
+   
    var NUMBER_INTERVAL = 250;
 
    function writeArraySlowly(res, howMany, item, doneCallback) {
@@ -113,7 +130,7 @@ function startServer( port, grunt ) {
    
    function sendJsonOkHeaders(res) {
 
-      res.setHeader("Content-Type", 'text/html');
+      res.setHeader("Content-Type", JSON_MIME_TYPE);
       res.writeHead(200);
    }
    
@@ -198,6 +215,7 @@ function startServer( port, grunt ) {
                         var n = req.params.number;
                         replyWithNSlowNumbers(n)(req, res);
                      });
+      app.get(    '/pauseInInnerArray',         pauseInsideInnerArray);
       app.get(    '/twoHundredItems',           twoHundredItems);
       app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
       app.get(    '/invalidJson',               replyWithInvalidJson);
