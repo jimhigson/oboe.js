@@ -59,13 +59,13 @@ Additionally, for interactive testing we provide...
 <textarea cols="80" rows="25">
 oboe({
     method: "GET",
-    url: "/tenSlowNumbers"
+    url: "/pauseInInnerArray"
 })
 .node('!.*', function (item) {
     console.log(JSON.stringify(item) + ' returned');
 })
 .fail(function (error) {
-    console.log('error');
+    console.log('error', error);
 });
 </textarea>
 <button>Run</button>
