@@ -535,7 +535,8 @@ oboe.doPut(    {url:String, headers:{ key: value, ... }, body:Object|String} )
 oboe.doPatch(  {url:String, headers:{ key: value, ... }, body:Object|String} )
 ```
 
-If the body is given as an object it will be serialised using JSON.stringify.
+If the body is given as an object it will be serialised using JSON.stringify and
+the `Content-Type` request header will be automatically set to `application/json`.
 Method, body and headers arguments are all optional.
 
 If the cached option is set to false caching will be avoided by
