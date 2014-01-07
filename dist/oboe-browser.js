@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
-// v1.11.0-11-gdd70aab
+// v1.11.1
 
 /*
 
@@ -527,9 +527,7 @@ function first(test, list) {
 
 var clarinet = (function () {
 
-  var clarinet = {}
-    , fastlist = Array    
-    ;
+  var clarinet = {};
 
   clarinet.parser            = function () { return new CParser();};
   clarinet.CParser           = CParser;
@@ -626,8 +624,6 @@ var clarinet = (function () {
   var stringTokenPattern = /[\\"\n]/g;
 
   function CParser () {
-    if (!(this instanceof CParser)) return new CParser ();
-
     var parser = this;
     clearBuffers(parser);
     parser.bufferCheckPosition = clarinet.MAX_BUFFER_LENGTH;
@@ -635,7 +631,7 @@ var clarinet = (function () {
     parser.closed   = parser.closedRoot = parser.sawRoot = false;
     parser.tag      = parser.error = null;
     parser.state    = BEGIN;
-    parser.stack    = new fastlist();
+    parser.stack    = [];
     // mostly just for error reporting
     parser.position = parser.column = 0;
     parser.line     = 1;
@@ -1024,6 +1020,7 @@ function clarinetListenerAdaptor(clarinetParser, handlers){
                                        };
    });
 }
+
 // based on gist https://gist.github.com/monsur/706839
 
 /**

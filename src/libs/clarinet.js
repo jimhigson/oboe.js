@@ -9,9 +9,7 @@
 
 var clarinet = (function () {
 
-  var clarinet = {}
-    , fastlist = Array    
-    ;
+  var clarinet = {};
 
   clarinet.parser            = function () { return new CParser();};
   clarinet.CParser           = CParser;
@@ -108,8 +106,6 @@ var clarinet = (function () {
   var stringTokenPattern = /[\\"\n]/g;
 
   function CParser () {
-    if (!(this instanceof CParser)) return new CParser ();
-
     var parser = this;
     clearBuffers(parser);
     parser.bufferCheckPosition = clarinet.MAX_BUFFER_LENGTH;
@@ -117,7 +113,7 @@ var clarinet = (function () {
     parser.closed   = parser.closedRoot = parser.sawRoot = false;
     parser.tag      = parser.error = null;
     parser.state    = BEGIN;
-    parser.stack    = new fastlist();
+    parser.stack    = [];
     // mostly just for error reporting
     parser.position = parser.column = 0;
     parser.line     = 1;
