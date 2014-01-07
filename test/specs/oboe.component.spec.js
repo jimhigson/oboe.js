@@ -1315,16 +1315,25 @@ describe("oboe component (sXHR stubbed)", function(){
             );
       })      
       it('detects error when stream halts early between children of root',  function() {
-
-         givenAnOboeInstance()
+         // currently failing: clarinet is not detecting the error
+         givenAnOboeInstance() 
             .andWeAreExpectingSomeErrors()
             .whenGivenInput('[[1,2,3],')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce
-               ,   wasPassedAnErrorObject
+               ,   wasPassedAnErrorObject 
             );
-      })      
+      })
+      it('uses a patched version of clarinet',  function() {
+         expect(function(){
+            var p = clarinet.parser();
+
+            p.write('[[1,2,3],');
+
+            p.close();
+         }).toThrow();
+      })
       it('detects error when stream halts early inside mid-tree node',  function() {
 
          givenAnOboeInstance()
