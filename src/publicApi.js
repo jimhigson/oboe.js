@@ -26,10 +26,11 @@ function oboe(arg1, arg2) {
       }
    } else {
       // wire up a no-AJAX Oboe. Will have to have content 
-      // fed in externally and fed in using .emit.
+      // fed in externally and using .emit.
       return wire();
    }
    
+   // support cache busting like jQuery.ajax({cache:false})
    function url(baseUrl, cached) {
      
       if( cached === false ) {
