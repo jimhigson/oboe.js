@@ -230,7 +230,44 @@
             expect(fullResponse).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
          });
       })
-   
+
+      it('gives content type as JSON when provided with an Object body', function () {
+
+         var done;
+
+         oboe({
+            method:'PUT',
+            url:url('echoBackHeadersAsBodyJson'),
+            body:{'potatoes':3, 'cabbages':4}
+            
+         }).done(function(json){
+            done = true;
+            var contentType = contextTypeFrom(json['content-type']);               
+            expect(contentType).toBe('application/json');
+         });
+
+         waitsFor(function (){ return !!done; }, 'the request to complete', ASYNC_TEST_TIMEOUT)
+      })
+
+      it('gives allows content type to be overridden when provided with an Object body', function () {
+
+          var done;
+         
+          oboe({
+             method:'PUT',
+             url:url('echoBackHeadersAsBodyJson'),
+             body:{'potatoes':3, 'cabbages':4},
+             headers:{'Content-Type':'application/vegetableDiffThing'}
+         
+          }).done(function(json){
+             done = true;
+             var contentType = contextTypeFrom(json['content-type']);   
+             expect(contentType).toBe('application/vegetableDiffThing');
+          });
+         
+          waitsFor(function (){ return !!done; }, 'the request to complete', ASYNC_TEST_TIMEOUT)
+      })
+      
       it('gives header to server side', function () {
    
          var countGotBack = 0;
@@ -535,7 +572,17 @@
       function doneCalled(){
          return !!fullResponse         
       }
-   
+
+      /**
+       * A context-type header can come back like:
+       *    'application/json'
+       *
+       * or like:
+       *    'application/json; charset=UTF-8'
+       */
+      function contextTypeFrom(header){
+         return header.split(';')[0];
+      }
    
       beforeEach(function () {
          aborted = false;

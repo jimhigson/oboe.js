@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.11.1
+// v1.11.1-4-g74d72a7
 
 /** 
  * Partially complete a function.
@@ -530,8 +530,8 @@ function httpTransport(){
  *          but for tests a stub may be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} contentSource the url to make a request to, or a stream to read from
- * @param {String|Object} data some content to be sent with the request.
- *                        Only valid if method is POST or PUT.
+ * @param {String|Null} data some content to be sent with the request.
+ *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
@@ -610,8 +610,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       });
          
       if( data ) {
-         var body = isString(data)? data: JSON.stringify(data);
-         req.write(body);
+         req.write(data);
       }
       
       req.end();         
@@ -1880,16 +1879,41 @@ function instanceController(  oboeBus,
 function wire (httpMethodName, contentSource, body, headers){
 
    var oboeBus = pubSub();
-             
+
+   headers = headers ? 
+                       // Shallow-clone the headers array. This allows it to be
+                       // modified without side effects to the caller. We don't
+                       // want to change objects that the user passes in.
+                       JSON.parse(JSON.stringify(headers)) 
+                     : {};
+   
+   if( body ) {
+      if( !isString(body) ) {
+         
+         // If the body is not a string, stringify it. This allows objects to
+         // be given which will be sent as JSON.
+         body = JSON.stringify(body);
+         
+         // Default Content-Type to JSON unless given otherwise.
+         headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+      }
+   } else {
+      body = null;
+   }
+   
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
    // will have to be passed content from an external source.
-                   
-   if( contentSource ) {                
-   
+  
+   if( contentSource ) {
+
       streamingHttp( oboeBus,
                      httpTransport(), 
-                     httpMethodName, contentSource, body, headers );
+                     httpMethodName,
+                     contentSource,
+                     body,
+                     headers 
+      );
    }                              
      
    instanceController( 
@@ -1931,10 +1955,11 @@ function oboe(arg1, arg2) {
       }
    } else {
       // wire up a no-AJAX Oboe. Will have to have content 
-      // fed in externally and fed in using .emit.
+      // fed in externally and using .emit.
       return wire();
    }
    
+   // support cache busting like jQuery.ajax({cache:false})
    function url(baseUrl, cached) {
      
       if( cached === false ) {

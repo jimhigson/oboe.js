@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
-(function  (window, Object, Array, Error, undefined ) {
-// v1.11.1-2-g8e74d97
+(function  (window, Object, Array, Error, JSON, undefined ) {
+// v1.11.1-4-g74d72a7
 
 /*
 
@@ -1063,8 +1063,8 @@ function httpTransport(){
  *          but for tests a stub can be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} url the url to make a request to
- * @param {String|Object} data some content to be sent with the request.
- *                        Only valid if method is POST or PUT.
+ * @param {String|Null} data some content to be sent with the request.
+ *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
@@ -1084,17 +1084,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
             
       xhr.abort();
    });
-
-   /** Given a value from the user to send as the request body, return in
-    *  a form that is suitable to sending over the wire. Returns either a 
-    *  string, or null.        
-    */
-   function validatedRequestBody( body ) {
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }      
 
    /** 
     * Handle input from the underlying xhr: either a state change,
@@ -1166,11 +1155,12 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');             
-      
-      xhr.send(validatedRequestBody(data));
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+      xhr.send(data);
       
    } catch( e ) {
+
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
       // event rather than as an exception. If we emitted now, the Oboe user
@@ -2438,16 +2428,41 @@ function instanceController(  oboeBus,
 function wire (httpMethodName, contentSource, body, headers){
 
    var oboeBus = pubSub();
-             
+
+   headers = headers ? 
+                       // Shallow-clone the headers array. This allows it to be
+                       // modified without side effects to the caller. We don't
+                       // want to change objects that the user passes in.
+                       JSON.parse(JSON.stringify(headers)) 
+                     : {};
+   
+   if( body ) {
+      if( !isString(body) ) {
+         
+         // If the body is not a string, stringify it. This allows objects to
+         // be given which will be sent as JSON.
+         body = JSON.stringify(body);
+         
+         // Default Content-Type to JSON unless given otherwise.
+         headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+      }
+   } else {
+      body = null;
+   }
+   
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
    // will have to be passed content from an external source.
-                   
-   if( contentSource ) {                
-   
+  
+   if( contentSource ) {
+
       streamingHttp( oboeBus,
                      httpTransport(), 
-                     httpMethodName, contentSource, body, headers );
+                     httpMethodName,
+                     contentSource,
+                     body,
+                     headers 
+      );
    }                              
      
    instanceController( 
@@ -2489,10 +2504,11 @@ function oboe(arg1, arg2) {
       }
    } else {
       // wire up a no-AJAX Oboe. Will have to have content 
-      // fed in externally and fed in using .emit.
+      // fed in externally and using .emit.
       return wire();
    }
    
+   // support cache busting like jQuery.ajax({cache:false})
    function url(baseUrl, cached) {
      
       if( cached === false ) {
@@ -2510,4 +2526,4 @@ function oboe(arg1, arg2) {
 }
 
 
-;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error);
+;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error, JSON);

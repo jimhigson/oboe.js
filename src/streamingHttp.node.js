@@ -17,8 +17,8 @@ function httpTransport(){
  *          but for tests a stub may be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} contentSource the url to make a request to, or a stream to read from
- * @param {String|Object} data some content to be sent with the request.
- *                        Only valid if method is POST or PUT.
+ * @param {String|Null} data some content to be sent with the request.
+ *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
@@ -97,8 +97,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       });
          
       if( data ) {
-         var body = isString(data)? data: JSON.stringify(data);
-         req.write(body);
+         req.write(data);
       }
       
       req.end();         

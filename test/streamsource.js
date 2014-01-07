@@ -175,6 +175,9 @@ function startServer( port, grunt ) {
       app.put(    '/echoBackBody',              echoBackBody);
       app.patch(  '/echoBackBody',              echoBackBody);
       app.get(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
+      app.post(   '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
+      app.put(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
+      app.patch(  '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
       app.get(    '/echoBackHeadersAsHeaders',  echoBackHeadersAsHeaders);      
       app.get(    '/static/json/:name.json',    replyWithStaticJson);
       app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);

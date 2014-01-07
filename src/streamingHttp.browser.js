@@ -16,8 +16,8 @@ function httpTransport(){
  *          but for tests a stub can be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
  * @param {String} url the url to make a request to
- * @param {String|Object} data some content to be sent with the request.
- *                        Only valid if method is POST or PUT.
+ * @param {String|Null} data some content to be sent with the request.
+ *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
@@ -37,17 +37,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
             
       xhr.abort();
    });
-
-   /** Given a value from the user to send as the request body, return in
-    *  a form that is suitable to sending over the wire. Returns either a 
-    *  string, or null.        
-    */
-   function validatedRequestBody( body ) {
-      if( !body )
-         return null;
-   
-      return isString(body)? body: JSON.stringify(body);
-   }      
 
    /** 
     * Handle input from the underlying xhr: either a state change,
@@ -119,11 +108,12 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');             
-      
-      xhr.send(validatedRequestBody(data));
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+      xhr.send(data);
       
    } catch( e ) {
+
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
       // event rather than as an exception. If we emitted now, the Oboe user

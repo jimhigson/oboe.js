@@ -3,14 +3,6 @@ describe("streamingHttp", function(){
    "use strict";
 
    describe("calls through to browser xhr", function(){
-                                                                                              
-      it('gives xhr null when body is undefined', function(){
-         var eventBus = pubSub(), xhr = xhrStub();
-      
-         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', undefined);
-         
-         expect( xhr.send ).toHaveBeenCalledWith(null);
-      })
       
       it('gives xhr null when body is null', function(){
          var eventBus = pubSub(), xhr = xhrStub();
@@ -27,16 +19,7 @@ describe("streamingHttp", function(){
          
          expect( xhr.send ).toHaveBeenCalledWith('my_data');
       })
-      
-      it('gives xhr a json encoded request body when given an object', function(){
-         var eventBus = pubSub(), xhr = xhrStub();   
-         var payload = {a:'A', b:'B'};
-         
-         streamingHttp(eventBus, xhr, 'GET', 'http://example.com', payload);
-         
-         expect( xhr.send ).toHaveBeenCalledWith(JSON.stringify( payload ) );      
-      });
-      
+
       it('gives xhr the request headers', function(){
          var eventBus = pubSub(), xhr = xhrStub();           
          var headers = {

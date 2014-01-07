@@ -192,7 +192,7 @@ describe('streaming xhr integration (real http)', function() {
          httpTransport(),         
          'POST',
          '/testServer/echoBackBody',
-         payload       
+         JSON.stringify(payload)       
       );
       
       waitUntil(STREAM_END).isFiredOn(oboeBus);            
@@ -215,8 +215,8 @@ describe('streaming xhr integration (real http)', function() {
          oboeBus,
          httpTransport(),         
          'PUT',
-          '/testServer/echoBackBody',
-          payload       
+         '/testServer/echoBackBody',
+         JSON.stringify(payload)       
       );
       
       waitUntil(STREAM_END).isFiredOn(oboeBus);            
@@ -240,8 +240,8 @@ describe('streaming xhr integration (real http)', function() {
          oboeBus,
          httpTransport(),         
          'PATCH',
-          '/testServer/echoBackBody',
-          payload       
+         '/testServer/echoBackBody',
+         JSON.stringify(payload)       
       );
       
       waitUntil(STREAM_END).isFiredOn(oboeBus);            
