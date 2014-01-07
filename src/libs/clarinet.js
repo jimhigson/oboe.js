@@ -9,23 +9,23 @@
 
 var clarinet = (function () {
 
-  var clarinet = {};
-
-  clarinet.parser            = function () { return new CParser();};
-  clarinet.CParser           = CParser;
-  clarinet.MAX_BUFFER_LENGTH = 64 * 1024;
-  clarinet.EVENTS            =
-    [ "value"
-    , "string"
-    , "key"
-    , "openobject"
-    , "closeobject"
-    , "openarray"
-    , "closearray"
-    , "error"
-    , "end"
-    , "ready"
-    ];
+  var clarinet = {
+     parser            : function () { return new CParser();},
+     CParser           : CParser,
+     MAX_BUFFER_LENGTH : 64 * 1024,
+     EVENTS            : [
+         "value"
+       , "string"
+       , "key"
+       , "openobject"
+       , "closeobject"
+       , "openarray"
+       , "closearray"
+       , "error"
+       , "end"
+       , "ready"
+       ]
+  };
 
   var buffers     = [ "textNode", "numberNode" ]
     , _n          = 0

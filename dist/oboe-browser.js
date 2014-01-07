@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, undefined ) {
-// v1.11.1
+// v1.11.1-2-g8e74d97
 
 /*
 
@@ -527,23 +527,23 @@ function first(test, list) {
 
 var clarinet = (function () {
 
-  var clarinet = {};
-
-  clarinet.parser            = function () { return new CParser();};
-  clarinet.CParser           = CParser;
-  clarinet.MAX_BUFFER_LENGTH = 64 * 1024;
-  clarinet.EVENTS            =
-    [ "value"
-    , "string"
-    , "key"
-    , "openobject"
-    , "closeobject"
-    , "openarray"
-    , "closearray"
-    , "error"
-    , "end"
-    , "ready"
-    ];
+  var clarinet = {
+     parser            : function () { return new CParser();},
+     CParser           : CParser,
+     MAX_BUFFER_LENGTH : 64 * 1024,
+     EVENTS            : [
+         "value"
+       , "string"
+       , "key"
+       , "openobject"
+       , "closeobject"
+       , "openarray"
+       , "closearray"
+       , "error"
+       , "end"
+       , "ready"
+       ]
+  };
 
   var buffers     = [ "textNode", "numberNode" ]
     , _n          = 0
