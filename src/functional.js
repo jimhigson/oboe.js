@@ -97,7 +97,7 @@ function attr(key) {
  *  
  * @returns the first return value that is given that is truthy.
  */
-   lazyUnion = varArgs(function(fns) {
+   var lazyUnion = varArgs(function(fns) {
 
       return varArgs(function(params){
    
