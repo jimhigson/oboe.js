@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.11.1-4-g74d72a7
+// v1.12.0-2-g96cf695
 
 /*
 
@@ -133,7 +133,7 @@ function attr(key) {
  *  
  * @returns the first return value that is given that is truthy.
  */
-   lazyUnion = varArgs(function(fns) {
+   var lazyUnion = varArgs(function(fns) {
 
       return varArgs(function(params){
    

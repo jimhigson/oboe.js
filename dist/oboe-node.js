@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.11.1-4-g74d72a7
+// v1.12.0-2-g96cf695
 
 /** 
  * Partially complete a function.
@@ -102,7 +102,7 @@ function attr(key) {
  *  
  * @returns the first return value that is given that is truthy.
  */
-   lazyUnion = varArgs(function(fns) {
+   var lazyUnion = varArgs(function(fns) {
 
       return varArgs(function(params){
    
