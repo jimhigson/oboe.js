@@ -493,20 +493,14 @@
 
       it('emits error with incomplete json', function () {
 
-         var stubCallback = jasmine.createSpy('error callback'),
-            callbackError = new Error('I am a bad callback');
+         var stubCallback = jasmine.createSpy('error callback');
 
          oboe(url('static/json/incomplete.json'))
             .fail(stubCallback);
 
          waitsFor(function () {
             return !!stubCallback.calls.length;
-         }, 'the request to fail', ASYNC_TEST_TIMEOUT)
-
-
-         runs( function() {
-            expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
-         })
+         }, 'the request to fail', ASYNC_TEST_TIMEOUT);
       })      
    
       if( !Platform.isNode ) {
