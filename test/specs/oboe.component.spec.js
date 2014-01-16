@@ -1291,8 +1291,8 @@ describe("oboe component (sXHR stubbed)", function(){
            .thenTheInstance
               (   calledCallbackOnce
               ,   wasPassedAnErrorObject
-              );
-      })   
+              ); 
+      })
       it('errors on malformed json',  function() {
      
          givenAnOboeInstance()
@@ -1302,7 +1302,40 @@ describe("oboe component (sXHR stubbed)", function(){
               (   calledCallbackOnce
               ,   wasPassedAnErrorObject
               );
-      })   
+      })
+      it('detects error when stream halts early between children of root',  function() {
+
+         givenAnOboeInstance()
+            .andWeAreExpectingSomeErrors()
+            .whenGivenInput('[[1,2,3],[4,5')
+            .whenInputFinishes()
+            .thenTheInstance
+            (   calledCallbackOnce
+               ,   wasPassedAnErrorObject
+            );
+      })      
+      it('detects error when stream halts early between children of root',  function() {
+         // currently failing: clarinet is not detecting the error
+         givenAnOboeInstance() 
+            .andWeAreExpectingSomeErrors()
+            .whenGivenInput('[[1,2,3],')
+            .whenInputFinishes()
+            .thenTheInstance
+            (   calledCallbackOnce
+               ,   wasPassedAnErrorObject 
+            );
+      })
+      it('detects error when stream halts early inside mid-tree node',  function() {
+
+         givenAnOboeInstance()
+            .andWeAreExpectingSomeErrors()
+            .whenGivenInput('[[1,2,3')
+            .whenInputFinishes()
+            .thenTheInstance
+            (   calledCallbackOnce
+            ,   wasPassedAnErrorObject
+            );
+      })      
       it('calls error listener if an error is thrown in the callback',  function() {
      
          givenAnOboeInstance()

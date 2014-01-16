@@ -56,6 +56,6 @@
     "express": "~3.4.3"
   },
   "dependencies": {
-    "clarinet": "~0.7.2"
+    "clarinet": "~0.8.0"
   }
 }

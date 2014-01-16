@@ -120,6 +120,7 @@ var clarinet = (function () {
     parser.slashed  = false;
     parser.unicodeI = 0;
     parser.unicodeS = null;
+    parser.depth    = 0;
     emit(parser, "onready");
   }
 
@@ -165,7 +166,9 @@ var clarinet = (function () {
   }
 
   function end(parser) {
-    if (parser.state !== VALUE) error(parser, "Unexpected end");
+    if (parser.state !== VALUE || parser.depth !== 0)
+      error(parser, "Unexpected end");
+
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
@@ -221,7 +224,9 @@ var clarinet = (function () {
           else {
             if(c === '}') {
               emit(parser, 'onopenobject');
+              this.depth++;
               emit(parser, 'oncloseobject');
+              this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
             } else  parser.stack.push(CLOSE_OBJECT);
@@ -238,11 +243,13 @@ var clarinet = (function () {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
               closeValue(parser, 'onopenobject');
+              this.depth++;
             } else closeValue(parser, 'onkey');
             parser.state  = VALUE;
           } else if (c==='}') {
             emitNode(parser, 'oncloseobject');
-            parser.state = parser.stack.pop() || VALUE;
+             this.depth--;
+             parser.state = parser.stack.pop() || VALUE;
           } else if(c===',') {
             if(parser.state === CLOSE_OBJECT)
               parser.stack.push(CLOSE_OBJECT);
@@ -256,9 +263,11 @@ var clarinet = (function () {
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
             emit(parser, 'onopenarray');
+            this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
               emit(parser, 'onclosearray');
+              this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
             } else {
@@ -289,6 +298,7 @@ var clarinet = (function () {
             parser.state  = VALUE;
           } else if (c===']') {
             emitNode(parser, 'onclosearray');
+            this.depth--;
             parser.state = parser.stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
               continue;
