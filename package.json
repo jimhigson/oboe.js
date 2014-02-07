@@ -57,5 +57,10 @@
   },
   "dependencies": {
     "clarinet": "~0.8.0"
+  },
+  "jam": {
+    "main": "dist/oboe-browser.js",
+    "include":["dist/oboe-browser.js", "LICENCE", "package.json", "README.md"],
+    "dependencies": {}
   }
 }
