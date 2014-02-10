@@ -1,7 +1,7 @@
 {
   "name": "oboe",
   "title": "Oboe.js",
-  "version": "1.12.2",
+  "version": "1.12.3",
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
   "scripts": {
@@ -60,8 +60,16 @@
   },
   "jam": {
     "main": "dist/oboe-browser.js",
-    "categories":["AJAX & Websockets", "Parsers & Compilers"],
-    "include":["dist/oboe-browser.js", "LICENCE", "package.json", "README.md"],
+    "categories": [
+      "AJAX & Websockets",
+      "Parsers & Compilers"
+    ],
+    "include": [
+      "dist/oboe-browser.js",
+      "LICENCE",
+      "package.json",
+      "README.md"
+    ],
     "dependencies": {}
   }
 }
