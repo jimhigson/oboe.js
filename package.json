@@ -60,10 +60,6 @@
   },
   "jam": {
     "main": "dist/oboe-browser.js",
-    "categories": [
-      "AJAX & Websockets",
-      "Parsers & Compilers"
-    ],
     "include": [
       "dist/oboe-browser.js",
       "LICENCE",
@@ -71,5 +67,9 @@
       "README.md"
     ],
     "dependencies": {}
-  }
+  },
+  "categories": [
+     "AJAX & Websockets",
+     "Parsers & Compilers"
+  ]
 }
