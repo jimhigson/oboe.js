@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.12.3-1-g3e82471
+// v1.12.3-5-gb692ce2
 
 /*
 
@@ -2149,11 +2149,11 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
       
          if( removedEventName == fullEventName ) {
          
-            if( !oboeBus(removedEventName).listeners(  )) {
+            if( !oboeBus(removedEventName).listeners().length ) {
                predicateEvent.un( fullEventName );
             }
-         }
-      });   
+         } 
+      });
    }
 
    oboeBus('newListener').on( function(fullEventName){
