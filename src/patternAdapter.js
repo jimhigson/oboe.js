@@ -84,7 +84,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
       
          if( removedEventName == fullEventName ) {
          
-            if( !oboeBus(removedEventName).listeners(  )) {
+            if( oboeBus(removedEventName).listeners().length == 0 ) {
                predicateEvent.un( fullEventName );
             }
          }
