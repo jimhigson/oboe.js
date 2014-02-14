@@ -2,7 +2,9 @@ describe('single event pub sub', function(){
 
    beforeEach(function(){
       this.addMatchers({
-         toBeList: listMatcher
+         toBeAnEmptyArray: function(){
+            return (this.actual instanceof Array) && (this.actual.length == 0)
+         }
       });
    });
 
@@ -225,7 +227,7 @@ describe('single event pub sub', function(){
       it('can return listeners when there haven\'t been any', function(){
          var events = singleEventPubSub('someEventName');
          
-         expect( events.listeners('testEventType') ).toBeFalsy();      
+         expect( events.listeners() ).toBeAnEmptyArray();
       })
       
       it('can return listeners when one has been added', function(){
@@ -233,7 +235,7 @@ describe('single event pub sub', function(){
          
          events.on(noop);
          
-         expect( events.listeners('testEventType') ).toBeList(list(noop));               
+         expect( events.listeners() ).toEqual([noop]);               
       })
       
       it('can return listeners when second is added', function(){
@@ -242,7 +244,7 @@ describe('single event pub sub', function(){
          events.on(noop);
          events.on(noop);
          
-         expect( events.listeners('testEventType') ).toBeList(list(noop, noop));               
+         expect( events.listeners() ).toEqual([noop, noop]);               
       })
       
       it('can return listeners when one is removed', function(){
@@ -252,7 +254,7 @@ describe('single event pub sub', function(){
          events.on(noop);
          events.un(noop);
          
-         expect( events.listeners('testEventType') ).toBeList(list(noop));               
+         expect( events.listeners() ).toEqual([noop]);               
       })
       
       it('can return listeners when all are removed', function(){
@@ -263,7 +265,7 @@ describe('single event pub sub', function(){
          events.un(noop);
          events.un(noop);
          
-         expect( events.listeners('testEventType') ).toBeFalsy();               
+         expect( events.listeners() ).toBeAnEmptyArray();
       })                        
    })
    

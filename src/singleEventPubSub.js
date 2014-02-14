@@ -17,8 +17,8 @@ function singleEventPubSub(eventType, newListener, removeListener){
     *  listeners there is a list with just the listeners which 
     *  can be iterated more quickly when we are emitting
     */
-   var listenerTupleList,
-       listenerList;
+   var listenerTupleList = [],
+       listenerList = [];
 
    function hasId(id){
       return function(tuple) {
@@ -45,36 +45,34 @@ function singleEventPubSub(eventType, newListener, removeListener){
          if( newListener ) {
             newListener.emit(eventType, listener, tuple.id);
          }
-         
-         listenerTupleList = cons( tuple,    listenerTupleList );
-         listenerList      = cons( listener, listenerList      );
+
+         listenerTupleList.push(tuple);
+         listenerList.push(listener);
 
          return this; // chaining
       },
      
-      emit:function () {                                                                                           
-         applyEach( listenerList, arguments );
+      emit:function () {
+         for (var i = 0, n=listenerList.length; i < n; i++) {
+            listenerList[i].apply(null, arguments);
+         }
       },
       
       un: function( listenerId ) {
              
-         var removed;             
-              
-         listenerTupleList = without(
-            listenerTupleList,
-            hasId(listenerId),
-            function(tuple){
-               removed = tuple;
-            }
-         );    
-         
-         if( removed ) {
-            listenerList = without( listenerList, function(listener){
-               return listener == removed.listener;
-            });
-         
-            if( removeListener ) {
-               removeListener.emit(eventType, removed.listener, removed.id);
+         for (var i = 0, n=listenerTupleList.length; i < n; i++) {
+            
+            if( listenerTupleList[i].id == listenerId ) {
+               // remove from both arrays:
+               var removed = listenerTupleList[i];
+               
+               listenerTupleList.splice(i, 1);
+               listenerList.splice(i, 1);
+  
+               if( removeListener ) {
+                  removeListener.emit(eventType, removed.listener, removed.id);
+               }
+               return;
             }
          }
       },
@@ -87,7 +85,7 @@ function singleEventPubSub(eventType, newListener, removeListener){
       hasListener: function(listenerId){
          var test = listenerId? hasId(listenerId) : always;
       
-         return defined(first( test, listenerTupleList));
+         return listenerTupleList.some(test);
       }
    };
 }
