@@ -66,10 +66,11 @@
       "package.json",
       "README.md"
     ],
-    "dependencies": {}
-  },
-  "categories": [
-    "AJAX & Websockets",
-    "Parsers & Compilers"
-  ]
+    "dependencies": {},
+    "categories": [
+       "AJAX & Websockets",
+       "Parsers & Compilers"
+    ]
+  }
+
 }
