@@ -1,6 +1,6 @@
 {
   "name": "oboe",
-  "version": "1.12.3",
+  "version": "1.12.4",
   "main": "dist/oboe-browser.js",
   "ignore": [
     "**/.*",
