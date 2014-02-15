@@ -4,13 +4,18 @@
 function cons(x, xs) {
    
    /* Internally lists are linked 2-element Javascript arrays.
-    
-      So that lists are all immutable we Object.freeze in newer 
-      Javascript runtimes.
-      
-      In older engines freeze should have been polyfilled as the 
-      identity function. */
-   return Object.freeze([x,xs]);
+          
+      Ideally the return here would be Object.freeze([x,xs])
+      so that bugs related to mutation are found fast.
+      However, cons is right on the critical path for
+      performance and this slows oboe-mark down by
+      ~25%. Under theoretical future JS engines that freeze more
+      efficiently (possibly even use immutability to
+      run faster) this should be considered for
+      restoration.
+   */
+   
+   return [x,xs];
 }
 
 /**

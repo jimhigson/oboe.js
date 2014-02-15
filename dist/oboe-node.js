@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.12.1-7-g08a2134
+// v1.12.3-1-g3e82471
 
 /** 
  * Partially complete a function.
@@ -304,13 +304,18 @@ function hasAllProperties(fieldList, o) {
 function cons(x, xs) {
    
    /* Internally lists are linked 2-element Javascript arrays.
-    
-      So that lists are all immutable we Object.freeze in newer 
-      Javascript runtimes.
-      
-      In older engines freeze should have been polyfilled as the 
-      identity function. */
-   return Object.freeze([x,xs]);
+          
+      Ideally the return here would be Object.freeze([x,xs])
+      so that bugs related to mutation are found fast.
+      However, cons is right on the critical path for
+      performance and this slows oboe-mark down by
+      ~25%. Under theoretical future JS engines that freeze more
+      efficiently (possibly even use immutability to
+      run faster) this should be considered for
+      restoration.
+   */
+   
+   return [x,xs];
 }
 
 /**
@@ -485,6 +490,7 @@ function first(test, list) {
                   ? head(list) 
                   : first(test,tail(list))); 
 }
+
 
 /** 
  * A bridge used to assign stateless functions to listen to clarinet.

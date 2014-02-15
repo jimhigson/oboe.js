@@ -14,6 +14,9 @@ describe("Lists", function(){
       expect(head(tail(tail(listCBA)))).toBe('a');
    });
 
+   /*
+   While desirable, freezing has been disabled because it 
+   runs too slowly on current JS engines.
    if( !Platform.isInternetExplorer || Platform.isInternetExplorer >= 9 ) {
 
       it("freezes lists on supporting browsers", function() {   
@@ -25,6 +28,7 @@ describe("Lists", function(){
    } else { 
       console.warn('platform does not support object freezing');
    }
+   */
    
    it("can convert to an array", function() {
    
