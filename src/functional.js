@@ -80,7 +80,7 @@ function compose2(f1, f2){
  * @param {String} key the property name
  */
 function attr(key) {
-   return new Function('o', 'return o["' + key + '"]' );
+   return function(o) { return o[key]; };
 }
         
 /**

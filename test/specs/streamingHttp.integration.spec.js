@@ -85,8 +85,6 @@ describe('streaming xhr integration (real http)', function() {
                200,
                headerObjectContaining('X-Requested-With', 'XMLHttpRequest')
             );  
-            
-         console.log(oboeBus(HTTP_START).emit.calls[0].args[1]);                   
       });
           
    })   
