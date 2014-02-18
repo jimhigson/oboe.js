@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.12.3-1-g3e82471
+// v1.12.4-2-g9096580
 
 /*
 
@@ -533,27 +533,10 @@ function first(test, list) {
 
 var clarinet = (function () {
 
-  var clarinet = {
-     parser            : function () { return new CParser();},
-     CParser           : CParser,
-     MAX_BUFFER_LENGTH : 64 * 1024,
-     EVENTS            : [
-         "value"
-       , "string"
-       , "key"
-       , "openobject"
-       , "closeobject"
-       , "openarray"
-       , "closearray"
-       , "error"
-       , "end"
-       , "ready"
-       ]
-  };
-
-  var buffers     = [ "textNode", "numberNode" ]
-    , _n          = 0
-    ;
+  var MAX_BUFFER_LENGTH = 64 * 1024
+  ,   buffers     = [ "textNode", "numberNode" ]
+  ,   _n          = 0
+  ,   stringTokenPattern = /[\\"\n]/g;
   
   var BEGIN                             = _n++;
   var VALUE                             = _n++; // general stuff
@@ -577,35 +560,12 @@ var clarinet = (function () {
   var NUMBER_DECIMAL_POINT              = _n++; // .
   var NUMBER_DIGIT                      = _n;   // [0-9]
 
-  if (!Object.create) {
-    Object.create = function (o) {
-      function f () { this["__proto__"] = o; }
-      f.prototype = o;
-      return new f;
-    };
-  }
-
-  if (!Object.getPrototypeOf) {
-    Object.getPrototypeOf = function (o) {
-      return o["__proto__"];
-    };
-  }
-
-  if (!Object.keys) {
-    Object.keys = function (o) {
-      var a = [];
-      for (var i in o) if (o.hasOwnProperty(i)) a.push(i);
-      return a;
-    };
-  }
-
   function checkBufferLength (parser) {
-    var maxAllowed = Math.max(clarinet.MAX_BUFFER_LENGTH, 10)
-      , maxActual = 0
+    var maxActual = 0
       ;
     for (var i = 0, l = buffers.length; i < l; i ++) {
       var len = parser[buffers[i]].length;
-      if (len > maxAllowed) {
+      if (len > MAX_BUFFER_LENGTH) {
         switch (buffers[i]) {
           case "text":
             closeText(parser);
@@ -617,7 +577,7 @@ var clarinet = (function () {
       }
       maxActual = Math.max(maxActual, len);
     }
-    parser.bufferCheckPosition = (clarinet.MAX_BUFFER_LENGTH - maxActual)
+    parser.bufferCheckPosition = (MAX_BUFFER_LENGTH - maxActual)
                                + parser.position;
   }
 
@@ -627,12 +587,11 @@ var clarinet = (function () {
     }
   }
 
-  var stringTokenPattern = /[\\"\n]/g;
 
   function CParser () {
     var parser = this;
     clearBuffers(parser);
-    parser.bufferCheckPosition = clarinet.MAX_BUFFER_LENGTH;
+    parser.bufferCheckPosition = MAX_BUFFER_LENGTH;
     parser.q        = parser.c = parser.p = "";
     parser.closed   = parser.closedRoot = parser.sawRoot = false;
     parser.tag      = parser.error = null;
@@ -680,9 +639,9 @@ var clarinet = (function () {
 
   function error (parser, er) {
     closeValue(parser);
-    er += "\nLine: "+parser.line+
-          "\nColumn: "+parser.column+
-          "\nChar: "+parser.c;
+    er += "\nLn: "+parser.line+
+          "\nCol: "+parser.column+
+          "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
     emit(parser, "onerror", er);
@@ -1008,7 +967,21 @@ var clarinet = (function () {
     return parser;
   }
 
-  return clarinet;
+  return {
+     parser            : function () { return new CParser();},
+     EVENTS            : [
+        "value"
+        , "string"
+        , "key"
+        , "openobject"
+        , "closeobject"
+        , "openarray"
+        , "closearray"
+        , "error"
+        , "end"
+        , "ready"
+     ]
+  };
 })();
 
 
