@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.12.3-1-g3e82471
+// v1.12.4-5-gf74d9f1
 
 /*
 
@@ -116,7 +116,7 @@ function compose2(f1, f2){
  * @param {String} key the property name
  */
 function attr(key) {
-   return new Function('o', 'return o["' + key + '"]' );
+   return function(o) { return o[key]; };
 }
         
 /**
