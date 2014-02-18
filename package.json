@@ -1,7 +1,7 @@
 {
   "name": "oboe",
   "title": "Oboe.js",
-  "version": "1.12.4",
+  "version": "1.13.0",
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
   "scripts": {
@@ -42,7 +42,7 @@
     "grunt-contrib-copy": "~0.4.1",
     "grunt-clear": "~0.2.1",
     "grunt-exec": "~0.4.2",
-    "karma-jasmine": "~0.1.5", 
+    "karma-jasmine": "~0.1.5",
     "karma-safari-launcher": "~0.1.1",
     "karma-firefox-launcher": "~0.1.0",
     "grunt-contrib-watch": "~0.5.1",
@@ -69,9 +69,8 @@
     ],
     "dependencies": {},
     "categories": [
-       "AJAX & Websockets",
-       "Parsers & Compilers"
+      "AJAX & Websockets",
+      "Parsers & Compilers"
     ]
   }
-
 }
