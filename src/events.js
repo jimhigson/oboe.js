@@ -7,16 +7,16 @@ var // the events which are never exported are kept as
     _S = 1,
 
     // fired whenever a node is found in the JSON:
-    NODE_FOUND    = _S++,
+    NODE_FOUND      = _S++,
     // fired whenever a path is found in the JSON:      
-    PATH_FOUND    = _S++,   
+    PATH_FOUND      = _S++,   
              
-    FAIL_EVENT    = 'fail',    
-    ROOT_FOUND    = _S++,    
-    HTTP_START    = 'start',
-    STREAM_DATA   = 'content',
-    STREAM_END    = _S++,
-    ABORTING      = _S++;
+    FAIL_EVENT      = 'fail',    
+    ROOT_PATH_FOUND = _S++,
+    HTTP_START      = 'start',
+    STREAM_DATA     = 'content',
+    STREAM_END      = _S++,
+    ABORTING        = _S++;
     
 function errorReport(statusCode, body, error) {
    try{

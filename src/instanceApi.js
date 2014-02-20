@@ -167,8 +167,8 @@ function instanceApi(oboeBus){
    
    // some interface methods are only filled in after we recieve
    // values and are noops before that:          
-   oboeBus(ROOT_FOUND).on( function(root) {
-      oboeApi.root = functor(root);   
+   oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
+      oboeApi.root = functor(rootNode);   
    });
 
    /**

@@ -108,7 +108,7 @@ describe('instance api and pattern adaptor composed',function(){
    
          var root = {I:'am', the:'root'};
          
-         bus(ROOT_FOUND).emit(  root);
+         bus(ROOT_PATH_FOUND).emit(  root);
          
          expect( api.root() ).toEqual(root);   
       });      

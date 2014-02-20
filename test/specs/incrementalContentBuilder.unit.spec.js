@@ -1,5 +1,5 @@
 describe("incremental content builder", function(){
-
+  
    function IncrementalContentBuilderAsserter(){
      
       var eventBus = pubSub();
@@ -8,8 +8,8 @@ describe("incremental content builder", function(){
       sinon.spy(eventBus(NODE_FOUND), 'on');
       sinon.spy(eventBus(PATH_FOUND), 'emit');
       sinon.spy(eventBus(PATH_FOUND), 'on');
-      sinon.spy(eventBus(ROOT_FOUND), 'emit');
-      sinon.spy(eventBus(ROOT_FOUND), 'on');            
+      sinon.spy(eventBus(ROOT_PATH_FOUND), 'emit');
+      sinon.spy(eventBus(ROOT_PATH_FOUND), 'on');            
       
       this._clarinetStub = {};
       this._eventBus = eventBus;
@@ -274,7 +274,7 @@ describe("incremental content builder", function(){
       this.addMatchers({
          toHaveEmittedRootWhichIsNow: function( expectedRootObj ) {
             var asserter = this.actual;
-            var emit = asserter._eventBus(ROOT_FOUND).emit;
+            var emit = asserter._eventBus(ROOT_PATH_FOUND).emit;
 
             return emit.calledWith(expectedRootObj);
          },

@@ -33,8 +33,8 @@ var ROOT_PATH = {};
 function incrementalContentBuilder( oboeBus ) {
 
    var emitNodeFound = oboeBus(NODE_FOUND).emit,
-       emitRootFound = oboeBus(ROOT_FOUND).emit,
-       emitPathFound = oboeBus(PATH_FOUND).emit;
+       emitPathFound = oboeBus(PATH_FOUND).emit,
+       emitRootPathFound = oboeBus(ROOT_PATH_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -58,11 +58,11 @@ function incrementalContentBuilder( oboeBus ) {
                ;
    }
                  
-   function nodeFound( ascent, newDeepestNode ) {
+   function nodeOpened( ascent, newDeepestNode ) {
       
       if( !ascent ) {
          // we discovered the root node,         
-         emitRootFound( newDeepestNode);
+         emitRootPathFound( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -131,7 +131,7 @@ function incrementalContentBuilder( oboeBus ) {
    /**
     * For when the current node ends
     */
-   function nodeFinished( ascent ) {
+   function nodeClosed( ascent ) {
 
       emitNodeFound( ascent);
                           
@@ -143,7 +143,7 @@ function incrementalContentBuilder( oboeBus ) {
 
       openobject : function (ascent, firstKey) {
 
-         var ascentAfterNodeFound = nodeFound(ascent, {});         
+         var ascentAfterNodeFound = nodeOpened(ascent, {});         
 
          /* It is a perculiarity of Clarinet that for non-empty objects it
             gives the first key with the openobject event instead of
@@ -168,7 +168,7 @@ function incrementalContentBuilder( oboeBus ) {
       },
     
       openarray: function (ascent) {
-         return nodeFound(ascent, []);
+         return nodeOpened(ascent, []);
       },
 
       // called by Clarinet when keys are found in objects               
@@ -178,11 +178,11 @@ function incrementalContentBuilder( oboeBus ) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose2( nodeFinished, nodeFound ),
+      value: compose2( nodeClosed, nodeOpened ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.
-      closeobject: nodeFinished,
-      closearray: nodeFinished
+      closeobject: nodeClosed,
+      closearray: nodeClosed
    };
 }

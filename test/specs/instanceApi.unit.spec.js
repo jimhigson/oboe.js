@@ -58,7 +58,7 @@ describe('instance api',function(){
    
          var root = {I:'am', the:'root'};
          
-         oboeBus(ROOT_FOUND).emit( root);
+         oboeBus(ROOT_PATH_FOUND).emit( root);
          
          expect( oboeInstance.root() ).toEqual(root);   
       });      
