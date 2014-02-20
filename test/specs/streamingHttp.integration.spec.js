@@ -20,7 +20,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send
       ); 
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus)
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus)
    })
  
    it('can ajax in a small known file',  function() {
@@ -36,7 +36,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send
       ); 
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
@@ -56,7 +56,7 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus(HTTP_START).emit)
@@ -77,7 +77,7 @@ describe('streaming xhr integration (real http)', function() {
          '/testServer/echoBackHeadersAsHeaders'
       ); 
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus(HTTP_START).emit)
@@ -103,7 +103,7 @@ describe('streaming xhr integration (real http)', function() {
          {'specialheader':'specialValue'}
       ); 
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
@@ -139,7 +139,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET, no data to send      
       );
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          var parsedResult;
@@ -168,8 +168,8 @@ describe('streaming xhr integration (real http)', function() {
          '/testServer/tenSlowNumbers?withoutMissingAny',
           null // this is a GET, no data to send      
       );
-      
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){ 
          // as per the name, should have ten numbers in that file:         
@@ -192,8 +192,8 @@ describe('streaming xhr integration (real http)', function() {
          '/testServer/echoBackBody',
          JSON.stringify(payload)       
       );
-      
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
  
       runs(function(){
          expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
@@ -216,8 +216,8 @@ describe('streaming xhr integration (real http)', function() {
          '/testServer/echoBackBody',
          JSON.stringify(payload)       
       );
-      
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);            
 
       runs(function(){
          expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
@@ -229,6 +229,11 @@ describe('streaming xhr integration (real http)', function() {
   
    it('can make a patch request',  function() {
    
+      if( Platform.isInternetExplorer ) {
+         console.warn('PATCH requests don\'t work well under IE. Skipping PATCH integration test');
+         return;
+      }
+      
       var payload = {'thisWill':'bePatched','andShould':'be','echoed':'back'};
    
       // in practice, since we're running on an internal network and this is a small file,
@@ -242,14 +247,14 @@ describe('streaming xhr integration (real http)', function() {
          JSON.stringify(payload)       
       );
       
-      waitUntil(STREAM_END).isFiredOn(oboeBus);            
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);
 
       runs(function(){
          if( streamedContentPassedTo(oboeBus) == '' &&
-             (Platform.isInternetExplorer || Platform.isPhantom) ) {
+             (Platform.isPhantom) ) {
             console.warn( 'this user agent seems not to support giving content' 
                           + ' back for of PATCH requests.'
-                          + ' This happens on PhantomJS and IE < 9');
+                          + ' This happens on PhantomJS');
          } else {         
             expect(streamedContentPassedTo(oboeBus)).toParseTo(payload);
             expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder();
@@ -276,7 +281,7 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitUntil(STREAM_END).isFiredOn(oboeBus);      
+         waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);      
    
          runs(function(){
                                    
@@ -299,7 +304,7 @@ describe('streaming xhr integration (real http)', function() {
              null // this is a get: no data to send         
          );                     
          
-         waitUntil(STREAM_END).isFiredOn(oboeBus);      
+         waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);      
    
          runs(function(){
             // some platforms can't help but not work here so warn but don't
@@ -330,7 +335,7 @@ describe('streaming xhr integration (real http)', function() {
          null // this is a GET: no data to send      
       );         
 
-      waitUntil(STREAM_END).isFiredOn(oboeBus)
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus)
       
       runs(function(){
       
@@ -347,13 +352,13 @@ describe('streaming xhr integration (real http)', function() {
       })   
    })
 
-   function waitUntil(event) {
+   function waitUntil(event, messageName) {
       return {isFiredOn: function (eventBus){
          waitsFor(function(){
         
             return !!eventBus(event).emit.calls.length;
         
-            }, 'event ' + event + ' to be fired', ASYNC_TEST_TIMEOUT);
+            }, 'event ' + event + (messageName?'('+messageName+')':'') + ' to be fired', ASYNC_TEST_TIMEOUT);
          }
       }
    }    
@@ -386,7 +391,7 @@ describe('streaming xhr integration (real http)', function() {
                return 'events not in correct order. We have: ' +
                         JSON.stringify(
                            eventNames.map(prettyPrintEvent)
-                        )                          
+                        ) + ' but should follow "start", "data"*, "end"'
             };
             
             return   eventNames[0] === HTTP_START

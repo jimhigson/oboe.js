@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.12.4-3-gfb78aa7
+// v1.13.0-2-g14fae32
 
 /** 
  * Partially complete a function.
@@ -1479,6 +1479,7 @@ function pubSub(){
          
    return pubSubInstance;
 }
+
 /**
  * This file declares some constants to use as names for event types.
  */

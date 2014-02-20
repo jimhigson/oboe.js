@@ -22,9 +22,12 @@ function httpTransport(){
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers) {
            
+   "use strict";
+   
    var emitStreamData = oboeBus(STREAM_DATA).emit,
        emitFail       = oboeBus(FAIL_EVENT).emit,
-       numberOfCharsAlreadyGivenToCallback = 0;      
+       numberOfCharsAlreadyGivenToCallback = 0,
+       stillToSendStartEvent = true;
 
    // When an ABORTING message is put on the event bus abort 
    // the ajax request         
@@ -65,19 +68,30 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
    if('onprogress' in xhr){  // detect browser support for progressive delivery
       xhr.onprogress = handleProgress;
    }
-   
+      
    xhr.onreadystatechange = function() {
+
+      function sendStartIfNotAlready() {
+         // Internet Explorer is very unreliable as to when xhr.status etc can
+         // be read so has to be protected with try/catch and tried again on 
+         // the next readyState if it fails
+         try{
+            stillToSendStartEvent && oboeBus( HTTP_START ).emit(
+               xhr.status,
+               parseResponseHeaders(xhr.getAllResponseHeaders()) );
+            stillToSendStartEvent = false;
+         } catch(e){/* do nothing, will try again on next readyState*/}
+      }
       
       switch( xhr.readyState ) {
                
-         case 2:       
-         
-            oboeBus( HTTP_START ).emit( 
-               xhr.status,
-               parseResponseHeaders(xhr.getAllResponseHeaders()) );
-            return;
+         case 2: // HEADERS_RECEIVED
+         case 3: // LOADING
+            return sendStartIfNotAlready();
             
-         case 4:       
+         case 4: // DONE
+            sendStartIfNotAlready(); // if xhr.status hasn't been available yet, it must be NOW, huh IE?
+            
             // is this a 2xx http code?
             var successful = String(xhr.status)[0] == 2;
             
