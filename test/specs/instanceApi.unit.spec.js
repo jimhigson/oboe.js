@@ -100,25 +100,25 @@ describe('instance api',function(){
          
       it('allows short-cut node matching', function() {
       
-         var callback1 = jasmine.createSpy(),
-             callback2 = jasmine.createSpy();             
+         var pattern1Callback = jasmine.createSpy('pattern 1 callback'),
+             pattern2Callback = jasmine.createSpy('pattern 2 callback');             
              
          oboeInstance.on('node', {
-            pattern1: callback1, 
-            pattern2: callback2
+            pattern1: pattern1Callback, 
+            pattern2: pattern2Callback
          }); 
       
-         expect(callback1).not.toHaveBeenCalled()
-         expect(callback2).not.toHaveBeenCalled()
+         expect(pattern1Callback).not.toHaveBeenCalled()
+         expect(pattern2Callback).not.toHaveBeenCalled()
          
          oboeBus('node:pattern1').emit( {}, anAscent())
          
-         expect(callback1).toHaveBeenCalled()
-         expect(callback2).not.toHaveBeenCalled()
+         expect(pattern1Callback).toHaveBeenCalled()
+         expect(pattern2Callback).not.toHaveBeenCalled()
          
          oboeBus('node:pattern2').emit( {}, anAscent())
          
-         expect(callback2).toHaveBeenCalled()            
+         expect(pattern2Callback).toHaveBeenCalled()            
       });
       
       it('calls node callback added using 2-arg mode when notified of match to pattern', function() {
@@ -184,97 +184,97 @@ describe('instance api',function(){
                     
       it('doesn\'t call again after forget called from inside callback', function() {
       
-         var callback = jasmine.createSpy().andCallFake(function(){
+         var nodeCallback = jasmine.createSpy('node callback').andCallFake(function(){
                            this.forget();
                         }),
              ascent =   list(namedNode('node', {}));
       
-         oboeInstance.on('node', 'a_pattern', callback);      
+         oboeInstance.on('node', 'a_pattern', nodeCallback);      
                      
          oboeBus('node:a_pattern').emit( {}, ascent);
          
-         expect(callback.call.length).toBe(1)      
+         expect(nodeCallback.call.length).toBe(1)      
          
          oboeBus('node:a_pattern').emit( {}, ascent);
          
-         expect(callback.calls.length).toBe(1)   
+         expect(nodeCallback.calls.length).toBe(1)   
       });
       
       it('doesn\'t call node callback after callback is removed', function() {
       
-         var callback = jasmine.createSpy(),
+         var nodeCallback = jasmine.createSpy('node callback'),
              ascent = list(namedNode('node', {}));
 
-         oboeInstance.on('node', 'a_pattern', callback);      
-         oboeInstance.removeListener('node', 'a_pattern', callback);
+         oboeInstance.on('node', 'a_pattern', nodeCallback);      
+         oboeInstance.removeListener('node', 'a_pattern', nodeCallback);
 
          oboeBus('node:a_pattern').emit( {}, ascent);               
 
-         expect(callback).not.toHaveBeenCalled()   
+         expect(nodeCallback).not.toHaveBeenCalled()   
       });
       
       it('doesn\'t call node callback after callback is removed using 2-arg form', function() {
       
-         var callback = jasmine.createSpy(),
+         var nodeCallback = jasmine.createSpy('node callback'),
              ascent = list(namedNode('node', {}));
 
-         oboeInstance.on('node', 'a_pattern', callback);      
-         oboeInstance.removeListener('node:a_pattern', callback);
+         oboeInstance.on('node', 'a_pattern', nodeCallback);      
+         oboeInstance.removeListener('node:a_pattern', nodeCallback);
 
          oboeBus('node:a_pattern').emit( {}, ascent);               
 
-         expect(callback).not.toHaveBeenCalled()   
+         expect(nodeCallback).not.toHaveBeenCalled()   
       });      
       
       it('doesn\'t call path callback after callback is removed', function() {
       
-         var callback = jasmine.createSpy(),
+         var pathCallback = jasmine.createSpy('path callback'),
              ascent = list(namedNode('path', {}));
 
-         oboeInstance.on('path', 'a_pattern', callback);      
-         oboeInstance.removeListener('path', 'a_pattern', callback);
+         oboeInstance.on('path', 'a_pattern', pathCallback);      
+         oboeInstance.removeListener('path', 'a_pattern', pathCallback);
 
          oboeBus('path:a_pattern').emit( {}, ascent);               
 
-         expect(callback).not.toHaveBeenCalled()   
+         expect(pathCallback).not.toHaveBeenCalled()   
       });
       
       it('doesn\'t remove callback if wrong pattern is removed', function() {
       
-         var callback = jasmine.createSpy(),
+         var nodeCallback = jasmine.createSpy('node callback'),
              ascent = list(namedNode('node', {}));
 
-         oboeInstance.on('node', 'a_pattern', callback);
+         oboeInstance.on('node', 'a_pattern', nodeCallback);
                
-         oboeInstance.removeListener('node', 'wrong_pattern', callback);
+         oboeInstance.removeListener('node', 'wrong_pattern', nodeCallback);
 
          oboeBus('node:a_pattern').emit( {}, ascent);
 
-         expect(callback).toHaveBeenCalled()   
+         expect(nodeCallback).toHaveBeenCalled()   
       });
       
       it('doesn\'t remove callback if wrong callback is removed', function() {
       
-         var callback = jasmine.createSpy(),
-             wrongCallback = jasmine.createSpy(),
+         var correctCallback = jasmine.createSpy('correct callback'),
+             wrongCallback = jasmine.createSpy('wrong callback'),
              ascent = list(namedNode('node', {}));
 
-         oboeInstance.on('node', 'a_pattern', callback);
+         oboeInstance.on('node', 'a_pattern', correctCallback);
                
          oboeInstance.removeListener('node', 'a_pattern', wrongCallback);
 
          oboeBus('node:a_pattern').emit( {}, ascent);
 
-         expect(callback).toHaveBeenCalled()   
+         expect(correctCallback).toHaveBeenCalled()   
       });            
       
       it('allows nodes node to be removed in a different ' +
          'style than they were added', function() {
       
          var 
-             callback1 = jasmine.createSpy(),
-             callback2 = jasmine.createSpy(),
-             callback3 = jasmine.createSpy(),
+             callback1 = jasmine.createSpy('callback 1'),
+             callback2 = jasmine.createSpy('callback 2'),
+             callback3 = jasmine.createSpy('callback 3'),
              ascent = list(namedNode('node', {}));
 
          oboeInstance.node('pattern1', callback1);
@@ -297,38 +297,38 @@ describe('instance api',function(){
    
    describe('start event', function() {
       it('notifies .on(start) listener when http response starts', function(){
-         var callback = jasmine.createSpy();
+         var startCallback = jasmine.createSpy('start callback');
       
-         oboeInstance.on('start', callback);
+         oboeInstance.on('start', startCallback);
          
-         expect(callback).not.toHaveBeenCalled()
+         expect(startCallback).not.toHaveBeenCalled()
                    
          oboeBus(HTTP_START).emit( 200, {a_header:'foo'} )
          
-         expect(callback).toHaveBeenCalledWith( 200, {a_header:'foo'} )
+         expect(startCallback).toHaveBeenCalledWith( 200, {a_header:'foo'} )
       });
       
       it('notifies .start listener when http response starts', function(){
-         var callback = jasmine.createSpy();
+         var startCallback = jasmine.createSpy('start callback');
       
-         oboeInstance.start(callback);
+         oboeInstance.start(startCallback);
          
-         expect(callback).not.toHaveBeenCalled()
+         expect(startCallback).not.toHaveBeenCalled()
                    
          oboeBus(HTTP_START).emit( 200, {a_header:'foo'} )
          
-         expect(callback).toHaveBeenCalledWith( 200, {a_header:'foo'} )
+         expect(startCallback).toHaveBeenCalledWith( 200, {a_header:'foo'} )
       });       
    
       it('can be de-registered', function() {
-         var callback = jasmine.createSpy();
+         var startCallback = jasmine.createSpy('start callback');
       
-         oboeInstance.on('start', callback);
-         oboeInstance.removeListener('start', callback);
+         oboeInstance.on('start', startCallback);
+         oboeInstance.removeListener('start', startCallback);
                    
          oboeBus(HTTP_START).emit( 200, {a_header:'foo'} )
          
-         expect(callback).not.toHaveBeenCalled()      
+         expect(startCallback).not.toHaveBeenCalled()      
       });
    });
    
@@ -336,38 +336,38 @@ describe('instance api',function(){
    describe('done event', function(){
    
       it('calls listener on end of JSON when added using .on(done)', function() {
-         var callback = jasmine.createSpy();
+         var doneCallback = jasmine.createSpy('done callback');
       
-         oboeInstance.on('done', callback); 
+         oboeInstance.on('done', doneCallback); 
       
-         expect(callback).not.toHaveBeenCalled()
+         expect(doneCallback).not.toHaveBeenCalled()
           
          oboeBus('node:!').emit( {}, anAscent())
          
-         expect(callback).toHaveBeenCalled()      
+         expect(doneCallback).toHaveBeenCalled()      
       });
       
       it('calls listener on end of JSON when added using .done', function() {
-         var callback = jasmine.createSpy();
+         var doneCallback = jasmine.createSpy('done callback');
       
-         oboeInstance.done(callback); 
+         oboeInstance.done(doneCallback); 
       
-         expect(callback).not.toHaveBeenCalled()
+         expect(doneCallback).not.toHaveBeenCalled()
           
          oboeBus('node:!').emit( {}, anAscent())
          
-         expect(callback).toHaveBeenCalled()      
+         expect(doneCallback).toHaveBeenCalled()      
       });      
       
       it('can be de-registered', function() {
-         var callback = jasmine.createSpy();
+         var doneCallback = jasmine.createSpy('done callback');
       
-         oboeInstance.on('done', callback); 
-         oboeInstance.removeListener('done', callback); 
+         oboeInstance.on('done', doneCallback); 
+         oboeInstance.removeListener('done', doneCallback); 
          
          oboeBus('node:!').emit( {}, anAscent())
          
-         expect(callback).not.toHaveBeenCalled()      
+         expect(doneCallback).not.toHaveBeenCalled()      
       });
    });
    
@@ -382,113 +382,113 @@ describe('instance api',function(){
       describe('calling fail listener', function() {
       
          it('notifies .on(fail) listener when something fails', function(){
-            var callback = jasmine.createSpy();
+            var failCallback = jasmine.createSpy('fail callback');
          
-            oboeInstance.on('fail', callback);
+            oboeInstance.on('fail', failCallback);
             
-            expect(callback).not.toHaveBeenCalled()
+            expect(failCallback).not.toHaveBeenCalled()
                       
             oboeBus(FAIL_EVENT).emit( 'something went wrong' )
             
-            expect(callback).toHaveBeenCalledWith( 'something went wrong' )
+            expect(failCallback).toHaveBeenCalledWith( 'something went wrong' )
          });
          
          it('notifies .fail listener when something fails', function(){
-            var callback = jasmine.createSpy();
+            var failCallback = jasmine.createSpy('fail callback');
          
-            oboeInstance.fail(callback);
+            oboeInstance.fail(failCallback);
             
-            expect(callback).not.toHaveBeenCalled()
+            expect(failCallback).not.toHaveBeenCalled()
                       
             oboeBus(FAIL_EVENT).emit( 'something went wrong' )
             
-            expect(callback).toHaveBeenCalledWith( 'something went wrong' )
+            expect(failCallback).toHaveBeenCalledWith( 'something went wrong' )
          });       
       
          it('can be de-registered', function() {
-            var callback = jasmine.createSpy();
+            var failCallback = jasmine.createSpy('fail callback');
          
-            oboeInstance.on('fail', callback);
-            oboeInstance.removeListener('fail', callback);
+            oboeInstance.on('fail', failCallback);
+            oboeInstance.removeListener('fail', failCallback);
                       
             oboeBus(FAIL_EVENT).emit( 'something went wrong' )
             
-            expect(callback).not.toHaveBeenCalled()      
+            expect(failCallback).not.toHaveBeenCalled()      
          });      
       });
 
 
       it('is protected from error in node callback', function() {
          var e = "an error";  
-         var callback = jasmine.createSpy().andThrow(e);
+         var nodeCallback = jasmine.createSpy('nodeCallback').andThrow(e);
          
          expect(function(){   
-            oboeInstance.on('node', 'a_pattern', callback);
+            oboeInstance.on('node', 'a_pattern', nodeCallback);
          }).not.toThrow();
             
          oboeBus('node:a_pattern').emit( {}, anAscent())
          
-         expect(callback).toHaveBeenCalled()
+         expect(nodeCallback).toHaveBeenCalled()
          expect(oboeBus(FAIL_EVENT).emit)
             .toHaveBeenCalledWith(errorReport(undefined, undefined, e))               
       });
       
       it('is protected from error in node callback added via shortcut', function() {
          var e = "an error";  
-         var callback = jasmine.createSpy().andThrow(e);
+         var nodeCallback = jasmine.createSpy('node callback').andThrow(e);
      
          expect(function(){
-            oboeInstance.on('node', {'a_pattern': callback});
+            oboeInstance.on('node', {'a_pattern': nodeCallback});
          }).not.toThrow(); 
             
          oboeBus('node:a_pattern').emit( {}, anAscent())
 
-         expect(callback).toHaveBeenCalled()         
+         expect(nodeCallback).toHaveBeenCalled()         
          expect(oboeBus(FAIL_EVENT).emit)
             .toHaveBeenCalledWith(errorReport(undefined, undefined, e))               
       });   
       
       it('is protected from error in path callback', function() {
          var e = "an error";  
-         var callback = jasmine.createSpy().andThrow(e);            
+         var pathCallback = jasmine.createSpy('path callback').andThrow(e);            
    
          expect(function(){   
-            oboeInstance.on('path', 'a_pattern', callback);
+            oboeInstance.on('path', 'a_pattern', pathCallback);
          }).not.toThrow();          
             
          oboeBus('path:a_pattern').emit( {}, anAscent())
          
-         expect(callback).toHaveBeenCalled()
+         expect(pathCallback).toHaveBeenCalled()
          expect(oboeBus(FAIL_EVENT).emit)
             .toHaveBeenCalledWith(errorReport(undefined, undefined, e))   
       });   
    
       it('is protected from error in start callback', function() {
          var e = "an error";   
-         var callback = jasmine.createSpy().andThrow(e);            
+         var startCallback = jasmine.createSpy('start callback').andThrow(e);            
    
          expect(function(){   
-            oboeInstance.on('start', callback);
+            oboeInstance.on('start', startCallback);
          }).not.toThrow();        
             
          oboeBus(HTTP_START).emit()
          
-         expect(callback).toHaveBeenCalled()
+         expect(startCallback).toHaveBeenCalled()
          expect(oboeBus(FAIL_EVENT).emit)
             .toHaveBeenCalledWith(errorReport(undefined, undefined, e))   
       });   
       
       it('is protected from error in done callback', function() {
          var e = "an error";   
-         var callback = jasmine.createSpy().andThrow(e);
+         var doneCallback = jasmine.createSpy('done callback').andThrow(e);
                
          expect(function(){   
-            oboeInstance.done( callback);
+            oboeInstance.done( doneCallback);
          }).not.toThrow();        
             
          oboeBus( 'node:!').emit( {}, anAscent())
          
-         expect(callback).toHaveBeenCalled()
+         expect(doneCallback).toHaveBeenCalled()
          expect(oboeBus(FAIL_EVENT).emit)
             .toHaveBeenCalledWith(errorReport(undefined, undefined, e))      
       });
@@ -498,8 +498,8 @@ describe('instance api',function(){
    describe('unknown event types', function() {
    
       it('can be added and fired', function() {
-         var spy1 = jasmine.createSpy();
-         var spy2 = jasmine.createSpy();
+         var spy1 = jasmine.createSpy('xyzzy callback');
+         var spy2 = jasmine.createSpy('end of universe callback');
          
          expect(function(){         
             oboeInstance
@@ -515,8 +515,8 @@ describe('instance api',function(){
       });
       
       it('is allows removal', function() {
-         var spy1 = jasmine.createSpy();
-         var spy2 = jasmine.createSpy();
+         var spy1 = jasmine.createSpy('xyzzy callback');
+         var spy2 = jasmine.createSpy('end of universe callback');
          
          oboeInstance
             .on('xyzzy', spy1)
