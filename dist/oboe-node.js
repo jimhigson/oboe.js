@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.13.0-6-g5fb9e18
+// v1.13.0-7-g1ec05c5
 
 /** 
  * Partially complete a function.
@@ -899,8 +899,8 @@ function incrementalContentBuilder( oboeBus ) {
 
       emitNodeClosed( ascent);
                           
-      // pop the complete node and its path off the list:
-      // can be written more compactly
+      // pop the complete node and its path off the list. If we have
+      // nothing left emit that the root closed
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
                  
