@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-5-gbdee7fc
+// v1.13.0-6-g5fb9e18
 
 /*
 
@@ -1445,15 +1445,9 @@ function incrementalContentBuilder( oboeBus ) {
 
       emitNodeClosed( ascent);
                           
-      // pop the complete node and its path off the list:
-      // can be written more compactly
-      var ancestors = tail( ascent);
-
-      if( !ancestors ) {
-         emitRootClosed(nodeOf(head(ascent)));
-      }
-
-      return ancestors;
+      // pop the complete node and its path off the list. If we have
+      // nothing left emit that the root closed
+      return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
                  
    return { 

@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.13.0-2-g14fae32
+// v1.13.0-6-g5fb9e18
 
 /** 
  * Partially complete a function.
@@ -795,9 +795,10 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeFound = oboeBus(NODE_FOUND).emit,
-       emitRootFound = oboeBus(ROOT_FOUND).emit,
-       emitPathFound = oboeBus(PATH_FOUND).emit;
+   var emitNodeOpened = oboeBus(PATH_FOUND).emit,
+       emitNodeClosed = oboeBus(NODE_FOUND).emit,
+       emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
+       emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -821,11 +822,11 @@ function incrementalContentBuilder( oboeBus ) {
                ;
    }
                  
-   function nodeFound( ascent, newDeepestNode ) {
+   function nodeOpened( ascent, newDeepestNode ) {
       
       if( !ascent ) {
          // we discovered the root node,         
-         emitRootFound( newDeepestNode);
+         emitRootOpened( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -885,7 +886,7 @@ function incrementalContentBuilder( oboeBus ) {
                                  ascent
                               );
 
-      emitPathFound( ascentWithNewPath);
+      emitNodeOpened( ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -894,19 +895,20 @@ function incrementalContentBuilder( oboeBus ) {
    /**
     * For when the current node ends
     */
-   function nodeFinished( ascent ) {
+   function nodeClosed( ascent ) {
 
-      emitNodeFound( ascent);
+      emitNodeClosed( ascent);
                           
-      // pop the complete node and its path off the list:                                    
-      return tail( ascent);
+      // pop the complete node and its path off the list:
+      // can be written more compactly
+      return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
                  
    return { 
 
       openobject : function (ascent, firstKey) {
 
-         var ascentAfterNodeFound = nodeFound(ascent, {});         
+         var ascentAfterNodeFound = nodeOpened(ascent, {});         
 
          /* It is a perculiarity of Clarinet that for non-empty objects it
             gives the first key with the openobject event instead of
@@ -931,7 +933,7 @@ function incrementalContentBuilder( oboeBus ) {
       },
     
       openarray: function (ascent) {
-         return nodeFound(ascent, []);
+         return nodeOpened(ascent, []);
       },
 
       // called by Clarinet when keys are found in objects               
@@ -941,14 +943,15 @@ function incrementalContentBuilder( oboeBus ) {
          Numbers, and null.
          Because these are always leaves in the JSON, we find and finish the 
          node in one step, expressed as functional composition: */
-      value: compose2( nodeFinished, nodeFound ),
+      value: compose2( nodeClosed, nodeOpened ),
       
       // we make no distinction in how we handle object and arrays closing.
       // For both, interpret as the end of the current node.
-      closeobject: nodeFinished,
-      closearray: nodeFinished
+      closeobject: nodeClosed,
+      closearray: nodeClosed
    };
 }
+
 /**
  * The jsonPath evaluator compiler used for Oboe.js. 
  * 
@@ -1489,16 +1492,17 @@ var // the events which are never exported are kept as
     _S = 1,
 
     // fired whenever a node is found in the JSON:
-    NODE_FOUND    = _S++,
+    NODE_FOUND      = _S++,
     // fired whenever a path is found in the JSON:      
-    PATH_FOUND    = _S++,   
+    PATH_FOUND      = _S++,   
              
-    FAIL_EVENT    = 'fail',    
-    ROOT_FOUND    = _S++,    
-    HTTP_START    = 'start',
-    STREAM_DATA   = 'content',
-    STREAM_END    = _S++,
-    ABORTING      = _S++;
+    FAIL_EVENT      = 'fail',    
+    ROOT_PATH_FOUND = _S++,
+    ROOT_NODE_FOUND = _S++,
+    HTTP_START      = 'start',
+    STREAM_DATA     = 'content',
+    STREAM_END      = _S++,
+    ABORTING        = _S++;
     
 function errorReport(statusCode, body, error) {
    try{
@@ -1512,6 +1516,7 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
+
 /** 
  *  The pattern adaptor listens for newListener and removeListener
  *  events. When patterns are added or removed it compiles the JSONPath
@@ -1636,7 +1641,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedEvent = oboeBus('node:!'),
+       rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
 
        /**
         * Add any kind of listener that the instance api exposes 
@@ -1792,10 +1797,10 @@ function instanceApi(oboeBus){
    }
       
    
-   // some interface methods are only filled in after we recieve
+   // some interface methods are only filled in after we receive
    // values and are noops before that:          
-   oboeBus(ROOT_FOUND).on( function(root) {
-      oboeApi.root = functor(root);   
+   oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
+      oboeApi.root = functor(rootNode);   
    });
 
    /**
@@ -1840,6 +1845,7 @@ function instanceApi(oboeBus){
    };   
 }
     
+
 /**
  * This file implements a light-touch central controller for an instance 
  * of Oboe which provides the methods used for interacting with the instance 
