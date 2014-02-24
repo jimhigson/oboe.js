@@ -6,14 +6,17 @@ var // the events which are never exported are kept as
     // the smallest possible representation, in numbers:
     _S = 1,
 
-    // fired whenever a node is found in the JSON:
-    NODE_FOUND      = _S++,
-    // fired whenever a path is found in the JSON:      
-    PATH_FOUND      = _S++,   
-             
-    FAIL_EVENT      = 'fail',    
-    ROOT_PATH_FOUND = _S++,
+    // fired whenever a new node starts in the JSON stream:
+    NODE_OPENED     = _S++,
+
+    // fired whenever a node closes in the JSON stream:
+    NODE_CLOSED     = _S++,
+                
+    FAIL_EVENT      = 'fail',
+   
     ROOT_NODE_FOUND = _S++,
+    ROOT_PATH_FOUND = _S++,
+   
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,

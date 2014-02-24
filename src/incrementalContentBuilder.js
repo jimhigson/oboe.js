@@ -32,8 +32,8 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeOpened = oboeBus(PATH_FOUND).emit,
-       emitNodeClosed = oboeBus(NODE_FOUND).emit,
+   var emitNodeOpened = oboeBus(NODE_OPENED).emit,
+       emitNodeClosed = oboeBus(NODE_CLOSED).emit,
        emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
        emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit;
 

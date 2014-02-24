@@ -10,8 +10,8 @@
 function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
-      node:oboeBus(NODE_FOUND)
-   ,  path:oboeBus(PATH_FOUND)
+      node:oboeBus(NODE_CLOSED)
+   ,  path:oboeBus(NODE_OPENED)
    };
      
    function emitMatchingNode(emitMatch, node, ascent) {
@@ -35,14 +35,14 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    }
 
    /* 
-    * Set up the catching of events such as NODE_FOUND and PATH_FOUND and, if 
+    * Set up the catching of events such as NODE_CLOSED and NODE_OPENED and, if 
     * matching the specified pattern, propagate to pattern-match events such as 
     * oboeBus('node:!')
     * 
     * 
     * 
     * @param {Function} predicateEvent 
-    *          either oboeBus(NODE_FOUND) or oboeBus(PATH_FOUND).
+    *          either oboeBus(NODE_CLOSED) or oboeBus(NODE_OPENED).
     * @param {Function} compiledJsonPath          
     */
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){

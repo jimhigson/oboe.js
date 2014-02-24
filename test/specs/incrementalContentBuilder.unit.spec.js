@@ -4,10 +4,10 @@ describe("incremental content builder", function(){
      
       var eventBus = pubSub();
       
-      sinon.spy(eventBus(NODE_FOUND), 'emit');
-      sinon.spy(eventBus(NODE_FOUND), 'on');
-      sinon.spy(eventBus(PATH_FOUND), 'emit');
-      sinon.spy(eventBus(PATH_FOUND), 'on');
+      sinon.spy(eventBus(NODE_CLOSED), 'emit');
+      sinon.spy(eventBus(NODE_CLOSED), 'on');
+      sinon.spy(eventBus(NODE_OPENED), 'emit');
+      sinon.spy(eventBus(NODE_OPENED), 'on');
       sinon.spy(eventBus(ROOT_PATH_FOUND), 'emit');
       sinon.spy(eventBus(ROOT_PATH_FOUND), 'on');            
       
@@ -38,7 +38,7 @@ describe("incremental content builder", function(){
       it('emits correct event', function(){
          expect( builder)
             .toHaveEmitted(         
-               PATH_FOUND
+               NODE_OPENED
             ,  anAscentContaining(  
                   {key:ROOT_PATH, node:{}}
                )
@@ -63,7 +63,7 @@ describe("incremental content builder", function(){
 
          expect( builder )
             .toHaveEmitted(
-                PATH_FOUND
+                NODE_OPENED
              ,  anAscentContaining(  
                    {key:ROOT_PATH, node:{flavour:undefined}}
                 ,  {key:'flavour', node:undefined}
@@ -87,7 +87,7 @@ describe("incremental content builder", function(){
       it('emits correct event', function(){
           
          expect(builder).toHaveEmitted(
-             PATH_FOUND
+             NODE_OPENED
           ,  anAscentContaining(  
                 {key:ROOT_PATH, node:{flavour:undefined}}
              ,  {key:'flavour', node:undefined}
@@ -111,7 +111,7 @@ describe("incremental content builder", function(){
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
-            NODE_FOUND
+            NODE_CLOSED
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
             ,  {key:'flavour', node:'strawberry'}
@@ -136,7 +136,7 @@ describe("incremental content builder", function(){
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
-            NODE_FOUND
+            NODE_CLOSED
          ,  anAscentContaining(  
                {key:ROOT_PATH, node:{flavour:'strawberry'}}
             )      
@@ -161,7 +161,7 @@ describe("incremental content builder", function(){
       it('emits path event with numeric paths', function(){
       
          expect(builder).toHaveEmitted(
-            PATH_FOUND
+            NODE_OPENED
             , anAscentContaining(
                   {key:ROOT_PATH,  node:{'alphabet':['a']}    }
                ,  {key:'alphabet', node:['a']                 }
@@ -172,7 +172,7 @@ describe("incremental content builder", function(){
       
       it('emitted node event', function(){
          expect(builder).toHaveEmitted(
-            NODE_FOUND
+            NODE_CLOSED
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a']} }
             ,  {key:'alphabet',     node:['a']              }
@@ -200,7 +200,7 @@ describe("incremental content builder", function(){
       it('emits events with numeric paths', function(){    
           
          expect(builder).toHaveEmitted(
-            PATH_FOUND
+            NODE_OPENED
             ,  anAscentContaining(
                {key:ROOT_PATH,  node:{'alphabet':['a','b']}   }
                , {key:'alphabet', node:['a','b']                }
@@ -211,7 +211,7 @@ describe("incremental content builder", function(){
       
       it('emitted node event', function(){
          expect(builder).toHaveEmitted(
-            NODE_FOUND
+            NODE_CLOSED
          ,  anAscentContaining(  
                {key:ROOT_PATH,      node:{'alphabet':['a', 'b']} }
             ,  {key:'alphabet',     node:['a','b']               }
@@ -237,7 +237,7 @@ describe("incremental content builder", function(){
       it('emits events with numeric paths', function(){    
           
          expect(builder).toHaveEmitted(
-            PATH_FOUND
+            NODE_OPENED
             ,  anAscentContaining(
                  {key:ROOT_PATH,  node:['a','b']                }
                , {key:1,          node:'b'                      }
@@ -247,7 +247,7 @@ describe("incremental content builder", function(){
       
       it('emitted node event', function(){
          expect(builder).toHaveEmitted(
-            NODE_FOUND
+            NODE_CLOSED
          ,  anAscentContaining(  
                {key:ROOT_PATH,    node:['a','b']                }
             ,  {key:1,            node:'b'                      }

@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.13.0-7-g1ec05c5
+// v1.13.0-8-gfc0aed9
 
 /** 
  * Partially complete a function.
@@ -795,8 +795,8 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeOpened = oboeBus(PATH_FOUND).emit,
-       emitNodeClosed = oboeBus(NODE_FOUND).emit,
+   var emitNodeOpened = oboeBus(NODE_OPENED).emit,
+       emitNodeClosed = oboeBus(NODE_CLOSED).emit,
        emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
        emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit;
 
@@ -1491,14 +1491,17 @@ var // the events which are never exported are kept as
     // the smallest possible representation, in numbers:
     _S = 1,
 
-    // fired whenever a node is found in the JSON:
-    NODE_FOUND      = _S++,
-    // fired whenever a path is found in the JSON:      
-    PATH_FOUND      = _S++,   
-             
-    FAIL_EVENT      = 'fail',    
-    ROOT_PATH_FOUND = _S++,
+    // fired whenever a new node starts in the JSON stream:
+    NODE_OPENED     = _S++,
+
+    // fired whenever a node closes in the JSON stream:
+    NODE_CLOSED     = _S++,
+                
+    FAIL_EVENT      = 'fail',
+   
     ROOT_NODE_FOUND = _S++,
+    ROOT_PATH_FOUND = _S++,
+   
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,
@@ -1529,8 +1532,8 @@ function errorReport(statusCode, body, error) {
 function patternAdapter(oboeBus, jsonPathCompiler) {
 
    var predicateEventMap = {
-      node:oboeBus(NODE_FOUND)
-   ,  path:oboeBus(PATH_FOUND)
+      node:oboeBus(NODE_CLOSED)
+   ,  path:oboeBus(NODE_OPENED)
    };
      
    function emitMatchingNode(emitMatch, node, ascent) {
@@ -1554,14 +1557,14 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    }
 
    /* 
-    * Set up the catching of events such as NODE_FOUND and PATH_FOUND and, if 
+    * Set up the catching of events such as NODE_CLOSED and NODE_OPENED and, if 
     * matching the specified pattern, propagate to pattern-match events such as 
     * oboeBus('node:!')
     * 
     * 
     * 
     * @param {Function} predicateEvent 
-    *          either oboeBus(NODE_FOUND) or oboeBus(PATH_FOUND).
+    *          either oboeBus(NODE_CLOSED) or oboeBus(NODE_OPENED).
     * @param {Function} compiledJsonPath          
     */
    function addUnderlyingListener( fullEventName, predicateEvent, compiledJsonPath ){

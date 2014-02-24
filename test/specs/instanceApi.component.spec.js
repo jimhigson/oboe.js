@@ -124,7 +124,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          expect(callback).not.toHaveBeenCalled()
           
-         bus(NODE_FOUND).emit( ascent)
+         bus(NODE_CLOSED).emit( ascent)
 
          expect(callback).toHaveBeenCalled()      
       });
@@ -138,7 +138,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          expect(callback).not.toHaveBeenCalled()
          
-         bus(PATH_FOUND).emit( ascent)
+         bus(NODE_OPENED).emit( ascent)
          
          expect(callback).toHaveBeenCalled()      
       });
@@ -150,7 +150,7 @@ describe('instance api and pattern adaptor composed',function(){
       
          api.on('node', 'a_different_pattern', callback); 
             
-         bus(NODE_FOUND).emit( ascent)
+         bus(NODE_CLOSED).emit( ascent)
          
          expect(callback).not.toHaveBeenCalled()      
       });   
@@ -162,11 +162,11 @@ describe('instance api and pattern adaptor composed',function(){
       
          api.on('node', 'a_pattern', callback); 
             
-         bus(NODE_FOUND).emit( ascent)
+         bus(NODE_CLOSED).emit( ascent)
          
          expect(callback.call.length).toBe(1)      
          
-         bus(NODE_FOUND).emit( ascent)
+         bus(NODE_CLOSED).emit( ascent)
          
          expect(callback.calls.length).toBe(2)
       });   

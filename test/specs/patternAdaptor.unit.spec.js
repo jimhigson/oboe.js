@@ -7,23 +7,23 @@ describe('patternAdapter', function() {
       expect( jsonPathCompiler ).toHaveBeenCalledWith('test_pattern');
    })
 
-   it('listens for NODE_FOUND events when node:pattern is added', function(){
+   it('listens for NODE_CLOSED events when node:pattern is added', function(){
          
       bus('newListener').emit( 'node:test_pattern');
       
-      expect(bus(NODE_FOUND).on)
+      expect(bus(NODE_CLOSED).on)
          .toHaveBeenCalledWith(            
             jasmine.any(Function)
          ,  'node:test_pattern'
          )
    })
    
-   it('does not listen for NODE_FOUND events second time same node:pattern is added', function(){
+   it('does not listen for NODE_CLOSED events second time same node:pattern is added', function(){
          
       bus('newListener').emit( 'node:test_pattern');
       bus('newListener').emit( 'node:test_pattern');
       
-      expect(bus(NODE_FOUND).on.calls.length).toBe(1);
+      expect(bus(NODE_CLOSED).on.calls.length).toBe(1);
    })
            
    it('stops listening for node events when node:pattern is removed again', function(){
@@ -31,7 +31,7 @@ describe('patternAdapter', function() {
       bus('node:test_pattern').on( noop);
       bus('node:test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un)
+      expect(bus(NODE_CLOSED).un)
          .toHaveBeenCalledWith(
             'node:test_pattern'
          )
@@ -41,23 +41,23 @@ describe('patternAdapter', function() {
          
       bus('node:test_pattern').on( noop);
       
-      expect(bus(NODE_FOUND).on.calls.length).toBe(1);
+      expect(bus(NODE_CLOSED).on.calls.length).toBe(1);
       
       bus('node:test_pattern').on( noop);
       
-      expect(bus(NODE_FOUND).on.calls.length).toBe(1);                  
+      expect(bus(NODE_CLOSED).on.calls.length).toBe(1);                  
       
       bus('node:test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un.calls.length).toBe(0);
+      expect(bus(NODE_CLOSED).un.calls.length).toBe(0);
       
       bus('node:test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un.calls.length).toBe(1);                  
+      expect(bus(NODE_CLOSED).un.calls.length).toBe(1);                  
       
       bus('node:test_pattern').on( noop);      
       
-      expect(bus(NODE_FOUND).on.calls.length).toBe(2);
+      expect(bus(NODE_CLOSED).on.calls.length).toBe(2);
    })   
    
    it('doesn\'t stop listening is there are still other node:pattern listeners', function(){
@@ -66,7 +66,7 @@ describe('patternAdapter', function() {
       bus('node:test_pattern').on( noop);
       bus('node:test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un)
+      expect(bus(NODE_CLOSED).un)
          .not.toHaveBeenCalledWith(            
             'node:test_pattern'
          )
@@ -78,7 +78,7 @@ describe('patternAdapter', function() {
       bus('node:other_test_pattern').on( noop);
       bus('node:other_test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un)
+      expect(bus(NODE_CLOSED).un)
          .not.toHaveBeenCalledWith(           
             'node:test_pattern'
          )
@@ -90,32 +90,32 @@ describe('patternAdapter', function() {
       bus('path:test_pattern').on( noop);
       bus('path:test_pattern').un( noop);
       
-      expect(bus(NODE_FOUND).un)
+      expect(bus(NODE_CLOSED).un)
          .not.toHaveBeenCalledWith(            
             'node:test_pattern'
          )
    })
    
-   it('only listens once to NODE_FOUND when same pattern is added twice', function(){
+   it('only listens once to NODE_CLOSED when same pattern is added twice', function(){
          
       bus('node:test_pattern').on( noop);
       bus('node:test_pattern').on( noop);
       
-      expect( listAsArray( bus(NODE_FOUND).listeners ).length ).toBe(1);
+      expect( listAsArray( bus(NODE_CLOSED).listeners ).length ).toBe(1);
    })
    
-   it('listens to NODE_FOUND and PATH_FOUND when given node: and path: listeners', function(){
+   it('listens to NODE_CLOSED and NODE_OPENED when given node: and path: listeners', function(){
          
       bus('node:test_pattern').on( noop);
       bus('path:test_pattern').on( noop);
       
-      expect(bus(NODE_FOUND).on)
+      expect(bus(NODE_CLOSED).on)
          .toHaveBeenCalledWith(            
             jasmine.any(Function)
          ,  'node:test_pattern'
          )
          
-      expect(bus(PATH_FOUND).on)
+      expect(bus(NODE_OPENED).on)
          .toHaveBeenCalledWith(            
             jasmine.any(Function)
          ,  'path:test_pattern'
@@ -128,7 +128,7 @@ describe('patternAdapter', function() {
    
       bus('node:test_pattern').on( noop);
 
-      bus(NODE_FOUND).emit( ascent);
+      bus(NODE_CLOSED).emit( ascent);
       
       expect( bus('node:test_pattern').emit ).toHaveBeenCalled();
    })
@@ -141,7 +141,7 @@ describe('patternAdapter', function() {
          
       bus('node:test_pattern').on(noop);
 
-      bus(NODE_FOUND).emit( ascent);
+      bus(NODE_CLOSED).emit( ascent);
       
       expect( bus('node:test_pattern').emit )
          .toHaveBeenCalledWith( 
