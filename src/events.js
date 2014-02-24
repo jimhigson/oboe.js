@@ -13,6 +13,7 @@ var // the events which are never exported are kept as
              
     FAIL_EVENT      = 'fail',    
     ROOT_PATH_FOUND = _S++,
+    ROOT_NODE_FOUND = _S++,
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,

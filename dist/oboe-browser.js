@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-3-g51bd533
+// v1.13.0-5-gbdee7fc
 
 /*
 
@@ -1341,9 +1341,10 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeFound = oboeBus(NODE_FOUND).emit,
-       emitPathFound = oboeBus(PATH_FOUND).emit,
-       emitRootPathFound = oboeBus(ROOT_PATH_FOUND).emit;
+   var emitNodeOpened = oboeBus(PATH_FOUND).emit,
+       emitNodeClosed = oboeBus(NODE_FOUND).emit,
+       emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
+       emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -1371,7 +1372,7 @@ function incrementalContentBuilder( oboeBus ) {
       
       if( !ascent ) {
          // we discovered the root node,         
-         emitRootPathFound( newDeepestNode);
+         emitRootOpened( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -1431,7 +1432,7 @@ function incrementalContentBuilder( oboeBus ) {
                                  ascent
                               );
 
-      emitPathFound( ascentWithNewPath);
+      emitNodeOpened( ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -1442,10 +1443,17 @@ function incrementalContentBuilder( oboeBus ) {
     */
    function nodeClosed( ascent ) {
 
-      emitNodeFound( ascent);
+      emitNodeClosed( ascent);
                           
-      // pop the complete node and its path off the list:                                    
-      return tail( ascent);
+      // pop the complete node and its path off the list:
+      // can be written more compactly
+      var ancestors = tail( ascent);
+
+      if( !ancestors ) {
+         emitRootClosed(nodeOf(head(ascent)));
+      }
+
+      return ancestors;
    }      
                  
    return { 
@@ -2042,6 +2050,7 @@ var // the events which are never exported are kept as
              
     FAIL_EVENT      = 'fail',    
     ROOT_PATH_FOUND = _S++,
+    ROOT_NODE_FOUND = _S++,
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,
@@ -2184,7 +2193,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedEvent = oboeBus('node:!'),
+       rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
 
        /**
         * Add any kind of listener that the instance api exposes 
@@ -2340,7 +2349,7 @@ function instanceApi(oboeBus){
    }
       
    
-   // some interface methods are only filled in after we recieve
+   // some interface methods are only filled in after we receive
    // values and are noops before that:          
    oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
       oboeApi.root = functor(rootNode);   

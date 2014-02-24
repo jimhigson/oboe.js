@@ -9,7 +9,7 @@ function instanceApi(oboeBus){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedEvent = oboeBus('node:!'),
+       rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
 
        /**
         * Add any kind of listener that the instance api exposes 
@@ -165,7 +165,7 @@ function instanceApi(oboeBus){
    }
       
    
-   // some interface methods are only filled in after we recieve
+   // some interface methods are only filled in after we receive
    // values and are noops before that:          
    oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
       oboeApi.root = functor(rootNode);   

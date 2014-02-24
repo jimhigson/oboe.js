@@ -342,7 +342,7 @@ describe('instance api',function(){
       
          expect(doneCallback).not.toHaveBeenCalled()
           
-         oboeBus('node:!').emit( {}, anAscent())
+         oboeBus(ROOT_NODE_FOUND).emit( {}, anAscent())
          
          expect(doneCallback).toHaveBeenCalled()      
       });
@@ -354,7 +354,7 @@ describe('instance api',function(){
       
          expect(doneCallback).not.toHaveBeenCalled()
           
-         oboeBus('node:!').emit( {}, anAscent())
+         oboeBus(ROOT_NODE_FOUND).emit( {}, anAscent())
          
          expect(doneCallback).toHaveBeenCalled()      
       });      
@@ -414,7 +414,7 @@ describe('instance api',function(){
             oboeBus(FAIL_EVENT).emit( 'something went wrong' )
             
             expect(failCallback).not.toHaveBeenCalled()      
-         });      
+         });
       });
 
 
@@ -486,7 +486,7 @@ describe('instance api',function(){
             oboeInstance.done( doneCallback);
          }).not.toThrow();        
             
-         oboeBus( 'node:!').emit( {}, anAscent())
+         oboeBus(ROOT_NODE_FOUND).emit( {}, anAscent())
          
          expect(doneCallback).toHaveBeenCalled()
          expect(oboeBus(FAIL_EVENT).emit)

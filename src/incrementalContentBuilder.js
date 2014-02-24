@@ -32,9 +32,10 @@ var ROOT_PATH = {};
  */ 
 function incrementalContentBuilder( oboeBus ) {
 
-   var emitNodeFound = oboeBus(NODE_FOUND).emit,
-       emitPathFound = oboeBus(PATH_FOUND).emit,
-       emitRootPathFound = oboeBus(ROOT_PATH_FOUND).emit;
+   var emitNodeOpened = oboeBus(PATH_FOUND).emit,
+       emitNodeClosed = oboeBus(NODE_FOUND).emit,
+       emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
+       emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit;
 
    function arrayIndicesAreKeys( possiblyInconsistentAscent, newDeepestNode) {
    
@@ -62,7 +63,7 @@ function incrementalContentBuilder( oboeBus ) {
       
       if( !ascent ) {
          // we discovered the root node,         
-         emitRootPathFound( newDeepestNode);
+         emitRootOpened( newDeepestNode);
                     
          return pathFound( ascent, ROOT_PATH, newDeepestNode);         
       }
@@ -122,7 +123,7 @@ function incrementalContentBuilder( oboeBus ) {
                                  ascent
                               );
 
-      emitPathFound( ascentWithNewPath);
+      emitNodeOpened( ascentWithNewPath);
  
       return ascentWithNewPath;
    }
@@ -133,10 +134,17 @@ function incrementalContentBuilder( oboeBus ) {
     */
    function nodeClosed( ascent ) {
 
-      emitNodeFound( ascent);
+      emitNodeClosed( ascent);
                           
-      // pop the complete node and its path off the list:                                    
-      return tail( ascent);
+      // pop the complete node and its path off the list:
+      // can be written more compactly
+      var ancestors = tail( ascent);
+
+      if( !ancestors ) {
+         emitRootClosed(nodeOf(head(ascent)));
+      }
+
+      return ancestors;
    }      
                  
    return { 
