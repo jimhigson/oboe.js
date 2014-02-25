@@ -124,7 +124,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       }
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-      console.log('setting withCredentials to ', withCredentials);
       xhr.withCredentials = withCredentials;
       
       xhr.send(data);
