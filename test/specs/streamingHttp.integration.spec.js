@@ -176,7 +176,31 @@ describe('streaming xhr integration (real http)', function() {
          expect(streamedContentPassedTo(oboeBus)).toParseTo([0,1,2,3,4,5,6,7,8,9]);
          expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()         
       });              
-   }) 
+   })
+
+   it('sends cookies by default',  function() {
+      
+      document.cookie = "token=123456; path=/";
+
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback         
+      var oboeBus = fakePubSub(emittedEvents)
+      streamingHttp(
+         oboeBus,
+         httpTransport(),
+         'GET',
+         '/testServer/echoBackHeadersAsBodyJson',
+         null
+      );
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);
+
+      runs(function(){
+         var parsedResult = JSON.parse(streamedContentPassedTo(oboeBus));
+         expect(parsedResult.cookie).toMatch('token=123456');
+      });
+
+   })   
    
    it('can make a post request',  function() {
    
