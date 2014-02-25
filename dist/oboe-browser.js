@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-12-g6423ff6
+// v1.13.0-13-g8238cad
 
 /*
 
@@ -2440,7 +2440,7 @@ function instanceController(  oboeBus,
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, contentSource, body, headers){
+function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
 
@@ -2476,7 +2476,8 @@ function wire (httpMethodName, contentSource, body, headers){
                      httpMethodName,
                      contentSource,
                      body,
-                     headers 
+                     headers,
+                     withCredentials
       );
    }                              
      

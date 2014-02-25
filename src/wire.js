@@ -4,7 +4,7 @@
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, contentSource, body, headers){
+function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
 
@@ -40,7 +40,8 @@ function wire (httpMethodName, contentSource, body, headers){
                      httpMethodName,
                      contentSource,
                      body,
-                     headers 
+                     headers,
+                     withCredentials
       );
    }                              
      

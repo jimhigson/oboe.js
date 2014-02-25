@@ -57,7 +57,41 @@
             });      
          })      
       
-      });   
+      });
+
+      (!Platform.isNode) && describe('running under a browser', function(){
+         it('does not send cookies cross-domain by default', function () {
+
+            document.cookie = "oboeIntegrationDontSend=123; path=/";
+            
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+            
+            runs(function(){
+               expect( req.root().cookie ).toBeUndefined();
+            })
+         });
+         
+         it('can send cookies cross-domain', function () {
+            document.cookie = "oboeIntegrationSend=123; path=/";            
+            
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson'),
+               withCredentials: true
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               console.log('the root is', req.root()); 
+               
+               expect( req.root().cookie ).toMatch('oboeIntegrationSend=123');
+            })
+         });
+      });
    
       it('gets all expected callbacks by time request finishes', function () {
    
