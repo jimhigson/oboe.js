@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-10-gf5d76a3
+// v1.13.0-12-g6423ff6
 
 /*
 
@@ -1160,7 +1160,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       }
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-      console.log('setting withCredentials to ', withCredentials);
       xhr.withCredentials = withCredentials;
       
       xhr.send(data);

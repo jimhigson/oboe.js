@@ -11,7 +11,8 @@ function oboe(arg1, arg2) {
             (arg1.method || 'GET'),
             url(arg1.url, arg1.cached),
             arg1.body,
-            arg1.headers
+            arg1.headers,
+            arg1.withCredentials
          );
       } else {
    

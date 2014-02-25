@@ -203,19 +203,6 @@ describe('streaming xhr integration (real http)', function() {
    })
 
    it('does not send cookies by default to cross-domain requests',  function() {
-
-      /* This URL is considered cross-domain because the port is different.
-         Normally Karma is providing a proxy to the service on :4567 at the
-         same port as the test runner so that cross-domain isn't needed.
-         Here we go directly to the test JSON service.
-         
-         This only works because the requested resource specifies
-         the Access-Control-Allow-Origin header in an OPTIONS preflight
-         request.  */
-      var location = window.location,
-          crossDomainUrl = location.protocol + '//' + 
-                           location.hostname + ':4567' +
-                           '/echoBackHeadersAsBodyJson';
       
       document.cookie = "deniedToken=123456; path=/";
 
@@ -226,7 +213,7 @@ describe('streaming xhr integration (real http)', function() {
          oboeBus,
          httpTransport(),
          'GET',
-         crossDomainUrl,
+         crossDomainUrl('/echoBackHeadersAsBodyJson'),
          null
       );
 
@@ -240,11 +227,6 @@ describe('streaming xhr integration (real http)', function() {
 
    it('sends cookies to cross-domain requests if withCredentials is true',  function() {
 
-      var location = window.location,
-          crossDomainUrl = location.protocol + '//' +
-                           location.hostname + ':4567' +
-                           '/echoBackHeadersAsBodyJson';
-
       document.cookie = "corsToken=123456; path=/";
 
       // in practice, since we're running on an internal network and this is a small file,
@@ -254,7 +236,7 @@ describe('streaming xhr integration (real http)', function() {
          oboeBus,
          httpTransport(),
          'GET',
-         crossDomainUrl,
+         crossDomainUrl('/echoBackHeadersAsBodyJson'),
          null, // data
          null, // headers
          true  // withCredentials

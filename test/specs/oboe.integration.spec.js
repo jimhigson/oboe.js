@@ -7,17 +7,14 @@
                   ?  require('../../dist/oboe-node.js') 
                   :  (window.oboe)
                   ;
+      
+      var testUrl = Platform.isNode
+            ?  require('../libs/testUrl.js')
+            :  (window.testUrl)
+            ;
                
       var ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
-      
-      function url( path ){
-         if( Platform.isNode ) {
-            return 'localhost:4567/' + path;
-         } else {
-            return '/testServer/' + path;
-         }
-      }            
-      
+
       Platform.isNode && describe('running under node', function(){
    
          var http = require('http'),
@@ -64,7 +61,7 @@
    
       it('gets all expected callbacks by time request finishes', function () {
    
-         oboe(url('tenSlowNumbers'))
+         oboe(testUrl('tenSlowNumbers'))
              .node('![*]', callbackSpy)
              .done(whenDoneFn);
    
@@ -89,10 +86,10 @@
            
       it('can make nested requests from arrays', function () {
    
-         oboe(url('tenSlowNumbers'))
+         oboe(testUrl('tenSlowNumbers'))
             .node('![*]', function(outerNumber){
             
-               oboe(url('tenSlowNumbers'))
+               oboe(testUrl('tenSlowNumbers'))
                   .node('![*]', function(innerNumber){               
                      callbackSpy();
                   });            
@@ -111,7 +108,7 @@
    
       it('continues to parse after a callback throws an exception', function () {
    
-         oboe(url('static/json/tenRecords.json'))
+         oboe(testUrl('static/json/tenRecords.json'))
             .node('{id name}', function(){
                               
                callbackSpy()
@@ -129,7 +126,7 @@
    
       it('can abort once some data has been found in streamed response', function () {
      
-         var req = oboe(url('tenSlowNumbers'))
+         var req = oboe(testUrl('tenSlowNumbers'))
                      .node('![5]', abortCallback);
    
          waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
@@ -155,7 +152,7 @@
             }
          });   
      
-         oboe(url('tenSlowNumbers'))
+         oboe(testUrl('tenSlowNumbers'))
             .node('![*]', nodeCallback)
             .done(whenDoneFn);
    
@@ -180,7 +177,7 @@
             }
          });   
      
-         oboe(url('tenSlowNumbers'))
+         oboe(testUrl('tenSlowNumbers'))
             .node('![*]', callback)
             .done(whenDoneFn);
    
@@ -202,7 +199,7 @@
          // we'll almost certainly read in the whole response as one onprogress it is on localhost
          // and the json is very small 
    
-         var req = oboe(url('static/json/firstTenNaturalNumbers.json'))
+         var req = oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
                      .node('![5]', abortCallback);
    
          waitsFor(theRequestToBeAborted, 'the request to be aborted', ASYNC_TEST_TIMEOUT);
@@ -221,7 +218,7 @@
    
       it('gives full json to callback when request finishes', function () {
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
              .done(whenDoneFn);
    
          waitsFor(doneCalled, 'the request to give full response', ASYNC_TEST_TIMEOUT)
@@ -237,7 +234,7 @@
 
          oboe({
             method:'PUT',
-            url:url('echoBackHeadersAsBodyJson'),
+            url:testUrl('echoBackHeadersAsBodyJson'),
             body:{'potatoes':3, 'cabbages':4}
             
          }).done(function(json){
@@ -255,7 +252,7 @@
          
           oboe({
              method:'PUT',
-             url:url('echoBackHeadersAsBodyJson'),
+             url:testUrl('echoBackHeadersAsBodyJson'),
              body:{'potatoes':3, 'cabbages':4},
              headers:{'Content-Type':'application/vegetableDiffThing'}
          
@@ -273,7 +270,7 @@
          var countGotBack = 0;
    
          oboe(
-             {  url:url('echoBackHeadersAsBodyJson'),
+             {  url:testUrl('echoBackHeadersAsBodyJson'),
                 headers:{'x-snarfu':'SNARF', 'x-foo':'BAR'}
              } 
      
@@ -298,7 +295,7 @@
          var done = false;
    
          oboe(
-             {  url:url('echoBackHeadersAsHeaders'),
+             {  url:testUrl('echoBackHeadersAsHeaders'),
                 headers:{'x-sso':'sso', 'x-sso2':'sso2'}
              } 
      
@@ -322,7 +319,7 @@
       it('gives undefined for headers before they are ready', function () {
    
          var o = oboe(
-             {  url:url('echoBackHeadersAsHeaders'),
+             {  url:testUrl('echoBackHeadersAsHeaders'),
                 headers:{'x-sso':'sso', 'x-sso2':'sso2'}
              } 
          )
@@ -336,7 +333,7 @@
          var called = 0;   
       
          oboe(      
-             {  url:url('echoBackHeadersAsHeaders'),
+             {  url:testUrl('echoBackHeadersAsHeaders'),
                 headers:{'x-a':'A', 'x-b':'B'}
              }   
          ).start(function(statusCode, headers){
@@ -361,7 +358,7 @@
    
          var countGotBack = 0;
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
             .on('node', '!.*', function () {
                countGotBack++;
             });
@@ -375,7 +372,7 @@
    
          var countGotBack = 0;
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
          
             .on('path', '!.*', function (number) { 
                countGotBack++;
@@ -388,7 +385,7 @@
       
       it('can listen for done nodejs style', function () {
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
          
             .on('done', whenDoneFn);
    
@@ -400,7 +397,7 @@
       
          oboe({
             method:'POST',
-            url: url('echoBackBody')
+            url: testUrl('echoBackBody')
          ,  body: {a:'A', b:'B', c:'C'}
          })
          .path('!', function(){ order.push(1) })      
@@ -425,7 +422,7 @@
    
          var stubCallback = jasmine.createSpy('error callback');
    
-         oboe(url('404json')) 
+         oboe(testUrl('404json')) 
             .fail(stubCallback);
    
          waitsFor(function () {
@@ -446,7 +443,7 @@
    
          var stubCallback = jasmine.createSpy('error callback');
    
-         oboe(url('doesNotExist'))
+         oboe(testUrl('doesNotExist'))
             .on('fail', stubCallback);
    
          waitsFor(function () {
@@ -477,7 +474,7 @@
    
          var stubCallback = jasmine.createSpy('error callback');
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))      
             .node('!.*', jasmine.createSpy().andThrow('I am a bad callback') )
             .fail(stubCallback);
             
@@ -495,7 +492,7 @@
          var stubCallback = jasmine.createSpy('error callback'),
              callbackError = new Error('I am a bad callback');
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))      
             .node('!.*', jasmine.createSpy().andThrow(callbackError) )
             .fail(stubCallback);
             
@@ -514,7 +511,7 @@
          var stubCallback = jasmine.createSpy('error callback'),
              callbackError = new Error('I am a bad callback');
    
-         oboe(url('static/json/firstTenNaturalNumbers.json'))      
+         oboe(testUrl('static/json/firstTenNaturalNumbers.json'))      
             .done(jasmine.createSpy().andThrow(callbackError) )
             .fail(stubCallback);
             
@@ -532,7 +529,7 @@
 
          var stubCallback = jasmine.createSpy('error callback');
 
-         oboe(url('static/json/incomplete.json'))
+         oboe(testUrl('static/json/incomplete.json'))
             .fail(stubCallback);
 
          waitsFor(function () {
