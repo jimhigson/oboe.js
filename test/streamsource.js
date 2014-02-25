@@ -168,8 +168,17 @@ function startServer( port, grunt ) {
     
    function makeApp() {
       var express = require('express'),
+          cors = require('cors'),
           app = express();
 
+      app.use(cors({
+         origin:function(origin, callback){
+            callback(null, true); // whitelist all domains
+         },
+         credentials: true // accept cookies from cross-domain requests
+      })); // enable cross-domain for all resources
+      app.use(app.router);
+      
       app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);

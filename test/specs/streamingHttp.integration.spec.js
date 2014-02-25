@@ -200,6 +200,73 @@ describe('streaming xhr integration (real http)', function() {
          expect(parsedResult.cookie).toMatch('token=123456');
       });
 
+   })
+
+   it('does not send cookies by default to cross-domain requests',  function() {
+
+      /* This URL is considered cross-domain because the port is different.
+         Normally Karma is providing a proxy to the service on :4567 at the
+         same port as the test runner so that cross-domain isn't needed.
+         Here we go directly to the test JSON service.
+         
+         This only works because the requested resource specifies
+         the Access-Control-Allow-Origin header in an OPTIONS preflight
+         request.  */
+      var location = window.location,
+          crossDomainUrl = location.protocol + '//' + 
+                           location.hostname + ':4567' +
+                           '/echoBackHeadersAsBodyJson';
+      
+      document.cookie = "deniedToken=123456; path=/";
+
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(emittedEvents)
+      streamingHttp(
+         oboeBus,
+         httpTransport(),
+         'GET',
+         crossDomainUrl,
+         null
+      );
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);
+
+      runs(function(){
+         var parsedResult = JSON.parse(streamedContentPassedTo(oboeBus));
+         expect(parsedResult.cookie).not.toMatch('deniedToken=123456');
+      });
+   })
+
+   it('sends cookies to cross-domain requests if withCredentials is true',  function() {
+
+      var location = window.location,
+          crossDomainUrl = location.protocol + '//' +
+                           location.hostname + ':4567' +
+                           '/echoBackHeadersAsBodyJson';
+
+      document.cookie = "corsToken=123456; path=/";
+
+      // in practice, since we're running on an internal network and this is a small file,
+      // we'll probably only get one callback
+      var oboeBus = fakePubSub(emittedEvents)
+      streamingHttp(
+         oboeBus,
+         httpTransport(),
+         'GET',
+         crossDomainUrl,
+         null, // data
+         null, // headers
+         true  // withCredentials
+      );
+
+      waitUntil(STREAM_END, 'the stream to end').isFiredOn(oboeBus);
+
+      runs(function(){
+         var parsedResult = JSON.parse(streamedContentPassedTo(oboeBus));
+         console.log(parsedResult);
+         expect(parsedResult.cookie).toMatch('corsToken=123456');
+      });
    })   
    
    it('can make a post request',  function() {

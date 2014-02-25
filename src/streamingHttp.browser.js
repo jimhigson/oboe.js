@@ -20,7 +20,7 @@ function httpTransport(){
  *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, xhr, method, url, data, headers) {
+function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials) {
            
    "use strict";
    
@@ -124,6 +124,9 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       }
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+      console.log('setting withCredentials to ', withCredentials);
+      xhr.withCredentials = withCredentials;
+      
       xhr.send(data);
       
    } catch( e ) {

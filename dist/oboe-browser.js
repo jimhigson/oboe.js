@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-8-gfc0aed9
+// v1.13.0-10-gf5d76a3
 
 /*
 
@@ -1056,7 +1056,7 @@ function httpTransport(){
  *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, xhr, method, url, data, headers) {
+function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials) {
            
    "use strict";
    
@@ -1160,6 +1160,9 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers) {
       }
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+      console.log('setting withCredentials to ', withCredentials);
+      xhr.withCredentials = withCredentials;
+      
       xhr.send(data);
       
    } catch( e ) {
@@ -2502,7 +2505,8 @@ function oboe(arg1, arg2) {
             (arg1.method || 'GET'),
             url(arg1.url, arg1.cached),
             arg1.body,
-            arg1.headers
+            arg1.headers,
+            arg1.withCredentials
          );
       } else {
    
