@@ -79,7 +79,7 @@ module.exports = function (grunt) {
             dest: '.',
             wrapper: [
                '// This file is the concatenation of many js files. \n' +
-               '// See https://github.com/jimhigson/oboe.js for the raw source\n' +
+               '// See http://github.com/jimhigson/oboe.js for the raw source\n' +
                // having a local undefined, window, Object etc allows slightly better minification:                    
                '(function  (window, Object, Array, Error, JSON, undefined ) {\n'
                
@@ -100,7 +100,7 @@ module.exports = function (grunt) {
             src: 'build/oboe-node.concat.js',
             dest: '.',
             wrapper: [
-               '// this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src ' +
+               '// this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js ' +
                    'for the unconcatenated source\n' +
                     
                'module.exports = (function  () {\n' + 
