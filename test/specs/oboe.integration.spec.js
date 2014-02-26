@@ -86,8 +86,6 @@
             waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
 
             runs(function(){
-               console.log('the root is', req.root()); 
-               
                expect( req.root().cookie ).toMatch('oboeIntegrationSend=123');
             })
          });
