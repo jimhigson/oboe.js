@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-7-gd124642
+// v1.14.0-8-g3015020
 
 /*
 
@@ -708,9 +708,9 @@ function clarinet() {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, SAX_OPENOBJECT);
+              emit(parser, SAX_OPEN_OBJECT);
               this.depth++;
-              emit(parser, SAX_CLOSEOBJECT);
+              emit(parser, SAX_CLOSE_OBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -727,12 +727,12 @@ function clarinet() {
           if(c===':') {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
-              closeValue(parser, SAX_OPENOBJECT);
+              closeValue(parser, SAX_OPEN_OBJECT);
               this.depth++;
             } else closeValue(parser, SAX_KEY);
             parser.state  = VALUE;
           } else if (c==='}') {
-            emitNode(parser, SAX_CLOSEOBJECT);
+            emitNode(parser, SAX_CLOSE_OBJECT);
              this.depth--;
              parser.state = parser.stack.pop() || VALUE;
           } else if(c===',') {
@@ -747,11 +747,11 @@ function clarinet() {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, SAX_OPENARRAY);
+            emit(parser, SAX_OPEN_ARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, SAX_CLOSEARRAY);
+              emit(parser, SAX_CLOSE_ARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -782,7 +782,7 @@ function clarinet() {
             closeValue(parser, SAX_VALUE);
             parser.state  = VALUE;
           } else if (c===']') {
-            emitNode(parser, SAX_CLOSEARRAY);
+            emitNode(parser, SAX_CLOSE_ARRAY);
             this.depth--;
             parser.state = parser.stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
@@ -1441,7 +1441,7 @@ function incrementalContentBuilder( oboeBus ) {
    }      
                  
    var contentBuilderHandlers = {};
-   contentBuilderHandlers[SAX_OPENOBJECT] = function (ascent, firstKey) {
+   contentBuilderHandlers[SAX_OPEN_OBJECT] = function (ascent, firstKey) {
 
       var ascentAfterNodeFound = nodeOpened(ascent, {});
 
@@ -1466,13 +1466,13 @@ function incrementalContentBuilder( oboeBus ) {
          ascentAfterNodeFound
          ;
    }; 
-   contentBuilderHandlers[SAX_OPENARRAY] = function (ascent) {
+   contentBuilderHandlers[SAX_OPEN_ARRAY] = function (ascent) {
       return nodeOpened(ascent, []);
    }; 
    contentBuilderHandlers[SAX_KEY] = pathFound; 
    contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
-   contentBuilderHandlers[SAX_CLOSEOBJECT] = nodeClosed;
-   contentBuilderHandlers[SAX_CLOSEARRAY] = nodeClosed; 
+   contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
+   contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
    return contentBuilderHandlers;
 }
 
@@ -2032,30 +2032,29 @@ var // the events which are never exported are kept as
     ABORTING        = _S++,
 
     // SAX events butchered from Clarinet
-    SAX_VALUE       = _S++,
-    SAX_STRING      = _S++,
-    SAX_KEY         = _S++,
-    SAX_OPENOBJECT  = _S++,
-    SAX_CLOSEOBJECT = _S++,
-    SAX_OPENARRAY   = _S++,
-    SAX_CLOSEARRAY  = _S++,
-    SAX_ERROR       = _S++,
-    SAX_END         = _S++,
-    SAX_READY       = _S++,
+    SAX_VALUE        = _S++,
+    SAX_STRING       = _S++,
+    SAX_KEY          = _S++,
+    SAX_OPEN_OBJECT  = _S++,
+    SAX_CLOSE_OBJECT = _S++,
+    SAX_OPEN_ARRAY   = _S++,
+    SAX_CLOSE_ARRAY  = _S++,
+    SAX_ERROR        = _S++,
+    SAX_END          = _S++,
+    SAX_READY        = _S++,
    
     SAX_EVENTS = [
          SAX_VALUE
     ,    SAX_STRING     
     ,    SAX_KEY        
-    ,    SAX_OPENOBJECT 
-    ,    SAX_CLOSEOBJECT
-    ,    SAX_OPENARRAY  
-    ,    SAX_CLOSEARRAY 
+    ,    SAX_OPEN_OBJECT 
+    ,    SAX_CLOSE_OBJECT
+    ,    SAX_OPEN_ARRAY  
+    ,    SAX_CLOSE_ARRAY 
     ,    SAX_ERROR      
     ,    SAX_END        
     ,    SAX_READY    
-    ];   
-   
+    ];
     
 function errorReport(statusCode, body, error) {
    try{

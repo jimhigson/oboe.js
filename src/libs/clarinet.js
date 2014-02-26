@@ -184,9 +184,9 @@ function clarinet() {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, SAX_OPENOBJECT);
+              emit(parser, SAX_OPEN_OBJECT);
               this.depth++;
-              emit(parser, SAX_CLOSEOBJECT);
+              emit(parser, SAX_CLOSE_OBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -203,12 +203,12 @@ function clarinet() {
           if(c===':') {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
-              closeValue(parser, SAX_OPENOBJECT);
+              closeValue(parser, SAX_OPEN_OBJECT);
               this.depth++;
             } else closeValue(parser, SAX_KEY);
             parser.state  = VALUE;
           } else if (c==='}') {
-            emitNode(parser, SAX_CLOSEOBJECT);
+            emitNode(parser, SAX_CLOSE_OBJECT);
              this.depth--;
              parser.state = parser.stack.pop() || VALUE;
           } else if(c===',') {
@@ -223,11 +223,11 @@ function clarinet() {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, SAX_OPENARRAY);
+            emit(parser, SAX_OPEN_ARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, SAX_CLOSEARRAY);
+              emit(parser, SAX_CLOSE_ARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -258,7 +258,7 @@ function clarinet() {
             closeValue(parser, SAX_VALUE);
             parser.state  = VALUE;
           } else if (c===']') {
-            emitNode(parser, SAX_CLOSEARRAY);
+            emitNode(parser, SAX_CLOSE_ARRAY);
             this.depth--;
             parser.state = parser.stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')

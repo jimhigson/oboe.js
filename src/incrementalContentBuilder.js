@@ -142,7 +142,7 @@ function incrementalContentBuilder( oboeBus ) {
    }      
                  
    var contentBuilderHandlers = {};
-   contentBuilderHandlers[SAX_OPENOBJECT] = function (ascent, firstKey) {
+   contentBuilderHandlers[SAX_OPEN_OBJECT] = function (ascent, firstKey) {
 
       var ascentAfterNodeFound = nodeOpened(ascent, {});
 
@@ -167,12 +167,12 @@ function incrementalContentBuilder( oboeBus ) {
          ascentAfterNodeFound
          ;
    }; 
-   contentBuilderHandlers[SAX_OPENARRAY] = function (ascent) {
+   contentBuilderHandlers[SAX_OPEN_ARRAY] = function (ascent) {
       return nodeOpened(ascent, []);
    }; 
    contentBuilderHandlers[SAX_KEY] = pathFound; 
    contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
-   contentBuilderHandlers[SAX_CLOSEOBJECT] = nodeClosed;
-   contentBuilderHandlers[SAX_CLOSEARRAY] = nodeClosed; 
+   contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
+   contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
    return contentBuilderHandlers;
 }
