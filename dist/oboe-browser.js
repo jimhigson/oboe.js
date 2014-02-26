@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
-// See https://github.com/jimhigson/oboe.js for the raw source
+// See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0
+// v1.14.0-5-g6f73ae9
 
 /*
 
@@ -967,9 +967,7 @@ var clarinet = (function () {
     return parser;
   }
 
-  return {
-     parser            : function () { return new CParser();}
-  };
+  return function () { return new CParser();}
 })();
 
 
@@ -2483,7 +2481,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
      
    instanceController( 
                oboeBus, 
-               clarinet.parser(), 
+               clarinet(), 
                incrementalContentBuilder(oboeBus) 
    );
       

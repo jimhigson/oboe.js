@@ -30,10 +30,12 @@ module.exports = function (grunt) {
    ];
    
    var OBOE_NODE_SOURCE_FILES = [
-      'build/version.js'   
+      'build/version.js'
+   ,  'src/LICENCE.js'
    ,  'src/functional.js'                
    ,  'src/util.js'                    
-   ,  'src/lists.js'                                   
+   ,  'src/lists.js'
+   ,  'src/libs/clarinet.js'
    ,  'src/clarinetListenerAdaptor.js'
    ,  'src/streamingHttp.node.js'
    ,  'src/jsonPathSyntax.js'
@@ -103,9 +105,7 @@ module.exports = function (grunt) {
                '// this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js ' +
                    'for the unconcatenated source\n' +
                     
-               'module.exports = (function  () {\n' + 
-                  'var clarinet = require("clarinet");\n'
-                  
+               'module.exports = (function  () {\n'
                   // source code here
                                         
             ,  '\n\n;return oboe;})();'

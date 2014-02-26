@@ -47,7 +47,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
      
    instanceController( 
                oboeBus, 
-               clarinet.parser(), 
+               clarinet(), 
                incrementalContentBuilder(oboeBus) 
    );
       

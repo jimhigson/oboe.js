@@ -57,9 +57,7 @@
     "express": "~3.4.3",
     "cors": "~2.1.1"
   },
-  "dependencies": {
-    "clarinet": "~0.8.0"
-  },
+  "dependencies": {},
   "jam": {
     "main": "dist/oboe-browser.js",
     "include": [

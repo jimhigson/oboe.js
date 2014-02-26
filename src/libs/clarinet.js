@@ -443,7 +443,5 @@ var clarinet = (function () {
     return parser;
   }
 
-  return {
-     parser: function () { return new CParser();}
-  };
+  return function () { return new CParser();}
 })();
