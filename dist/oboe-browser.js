@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-9-g8c899df
+// v1.14.0-11-g3f732c3
 
 /*
 
@@ -606,9 +606,9 @@ function clarinet(eventBus) {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(parser, SAX_READY);
-
-    eventBus(STREAM_DATA).on( write.bind(parser));
+    emit(SAX_READY);
+ 
+    eventBus(STREAM_DATA).on(write.bind(parser));
 
     /* At the end of the http content close the clarinet parser.
      This will provide an error if the total content provided was not 
@@ -616,26 +616,27 @@ function clarinet(eventBus) {
     eventBus(STREAM_END).on( write.bind(parser, null));
   }
 
-  function emit(parser, event, data) {
-    if (parser[event]) parser[event](data);
+  function emit(event, data) {
+    eventBus(event).emit(data);
+    //if (parser[event]) parser[event](data);
   }
 
   function emitNode(parser, event, data) {
     closeValue(parser);
-    emit(parser, event, data);
+    emit(event, data);
   }
 
   function closeValue(parser, event) {
 
     if (parser.textNode) {
-      emit(parser, (event ? event : SAX_VALUE), parser.textNode);
+      emit((event ? event : SAX_VALUE), parser.textNode);
     }
     parser.textNode = "";
   }
 
   function closeNumber(parser) {
     if (parser.numberNode)
-      emit(parser, SAX_VALUE, parseFloat(parser.numberNode));
+      emit(SAX_VALUE, parseFloat(parser.numberNode));
     parser.numberNode = "";
   }
 
@@ -647,7 +648,7 @@ function clarinet(eventBus) {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(parser, SAX_ERROR, er);
+    emit(SAX_ERROR, er);
     return parser;
   }
 
@@ -658,7 +659,7 @@ function clarinet(eventBus) {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(parser, SAX_END);
+    emit(SAX_END);
     CParser.call(parser);
     return parser;
   }
@@ -709,9 +710,9 @@ function clarinet(eventBus) {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, SAX_OPEN_OBJECT);
+              emit(SAX_OPEN_OBJECT);
               this.depth++;
-              emit(parser, SAX_CLOSE_OBJECT);
+              emit(SAX_CLOSE_OBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -748,11 +749,11 @@ function clarinet(eventBus) {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, SAX_OPEN_ARRAY);
+            emit(SAX_OPEN_ARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, SAX_CLOSE_ARRAY);
+              emit(SAX_CLOSE_ARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -818,7 +819,7 @@ function clarinet(eventBus) {
               parser.state = parser.stack.pop() || VALUE;
               parser.textNode += chunk.substring(starti, i-1);
               if(!parser.textNode) {
-                 emit(parser, SAX_VALUE, "");
+                 emit(SAX_VALUE, "");
               }
               break;
             }
@@ -881,7 +882,7 @@ function clarinet(eventBus) {
         case TRUE3:
           if (c==='') continue;
           if(c==='e') {
-            emit(parser, SAX_VALUE, true);
+            emit(SAX_VALUE, true);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid true started with tru'+ c);
         continue;
@@ -907,7 +908,7 @@ function clarinet(eventBus) {
         case FALSE4:
           if (c==='')  continue;
           if (c==='e') {
-            emit(parser, SAX_VALUE, false);
+            emit(SAX_VALUE, false);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid false started with fals'+ c);
         continue;
@@ -927,7 +928,7 @@ function clarinet(eventBus) {
         case NULL3:
           if (c==='') continue;
           if(c==='l') {
-            emit(parser, SAX_VALUE, null);
+            emit(SAX_VALUE, null);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid null started with nul'+ c);
         continue;
@@ -982,21 +983,31 @@ function clarinet(eventBus) {
  * 
  * This may also be used to clear all listeners by assigning zero handlers:
  * 
- *    clarinetListenerAdaptor( clarinet, {} )
+ *    ascentManager( clarinet, {} )
  */
-function clarinetListenerAdaptor(clarinetParser, handlers){
-    
-   var state;
+function ascentManager(oboeBus, handlers){
+   "use strict";
+   
+   var id = {},
+       state;
 
-   SAX_EVENTS.forEach(function(eventType){
- 
-      var handlerFunction = handlers[eventType];
+   function nextState(handler) {
+      return function(param){
+         state = handler( state, param);
+      }
+   }
+   
+   for( var i in handlers ) {
+
+      oboeBus(i).on(nextState(handlers[i]), id);
+   }
+
+   oboeBus(ABORTING).on(function(){
       
-      clarinetParser[eventType] = handlerFunction && 
-                                       function(param) {
-                                          state = handlerFunction( state, param);
-                                       };
-   });
+      for( var i in handlers ) {
+         oboeBus(i).un(id);
+      }
+   });   
 }
 
 // based on gist https://gist.github.com/monsur/706839
@@ -1304,7 +1315,7 @@ var nodeOf = attr('node');
  * to the low-level events from Clarinet and emits higher-level ones.
  *  
  * The building up is stateless so to track a JSON file
- * clarinetListenerAdaptor.js is required to store the ascent state
+ * ascentManager.js is required to store the ascent state
  * between calls.
  */
 
@@ -2407,34 +2418,19 @@ function instanceApi(oboeBus){
  
  
 function instanceController(  oboeBus, 
-                              clarinetParser, contentBuilderHandlers) {
+                              contentBuilderHandlers) {
                                 
-   //oboeBus(STREAM_DATA).on( clarinetParser.write.bind(clarinetParser));      
-   
-   /* At the end of the http content close the clarinet parser.
-      This will provide an error if the total content provided was not 
-      valid json, ie if not all arrays, objects and Strings closed properly */
-   //oboeBus(STREAM_END).on( clarinetParser.close.bind(clarinetParser));
-   
-
-   /* If we abort this Oboe's request stop listening to the clarinet parser. 
-      This prevents more tokens being found after we abort in the case where 
-      we aborted during processing of an already filled buffer. */
-   oboeBus(ABORTING).on( function() {
-      clarinetListenerAdaptor(clarinetParser, {});
-   });   
-
-   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
+   ascentManager(oboeBus, contentBuilderHandlers);
   
    // react to errors by putting them on the event bus
-   clarinetParser[SAX_ERROR] = function(e) {          
+   // TODO: stop this silliness!
+   oboeBus(SAX_ERROR).on( function(e) {          
       oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
       );
-      
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
-   };   
+   }); 
 }
 
 /**
@@ -2482,11 +2478,12 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
                      headers,
                      withCredentials
       );
-   }                              
-     
+   }
+
+   clarinet(oboeBus);
+   
    instanceController( 
                oboeBus, 
-               clarinet(oboeBus), 
                incrementalContentBuilder(oboeBus) 
    );
       

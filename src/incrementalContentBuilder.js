@@ -4,7 +4,7 @@
  * to the low-level events from Clarinet and emits higher-level ones.
  *  
  * The building up is stateless so to track a JSON file
- * clarinetListenerAdaptor.js is required to store the ascent state
+ * ascentManager.js is required to store the ascent state
  * between calls.
  */
 

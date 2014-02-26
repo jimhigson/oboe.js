@@ -6,24 +6,17 @@
  
  
 function instanceController(  oboeBus, 
-                              clarinetParser, contentBuilderHandlers) {
+                              contentBuilderHandlers) {
                                 
-   /* If we abort this Oboe's request stop listening to the clarinet parser. 
-      This prevents more tokens being found after we abort in the case where 
-      we aborted during processing of an already filled buffer. */
-   oboeBus(ABORTING).on( function() {
-      clarinetListenerAdaptor(clarinetParser, {});
-   });   
-
-   clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
+   ascentManager(oboeBus, contentBuilderHandlers);
   
    // react to errors by putting them on the event bus
-   clarinetParser[SAX_ERROR] = function(e) {          
+   // TODO: route more directly
+   oboeBus(SAX_ERROR).on( function(e) {          
       oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
       );
-      
       // note: don't close clarinet here because if it was not expecting
       // end of the json it will throw an error
-   };   
+   }); 
 }

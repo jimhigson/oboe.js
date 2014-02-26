@@ -82,9 +82,9 @@ function clarinet(eventBus) {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(parser, SAX_READY);
-
-    eventBus(STREAM_DATA).on( write.bind(parser));
+    emit(SAX_READY);
+ 
+    eventBus(STREAM_DATA).on(write.bind(parser));
 
     /* At the end of the http content close the clarinet parser.
      This will provide an error if the total content provided was not 
@@ -92,26 +92,26 @@ function clarinet(eventBus) {
     eventBus(STREAM_END).on( write.bind(parser, null));
   }
 
-  function emit(parser, event, data) {
-    if (parser[event]) parser[event](data);
+  function emit(event, data) {
+    eventBus(event).emit(data);
   }
 
   function emitNode(parser, event, data) {
     closeValue(parser);
-    emit(parser, event, data);
+    emit(event, data);
   }
 
   function closeValue(parser, event) {
 
     if (parser.textNode) {
-      emit(parser, (event ? event : SAX_VALUE), parser.textNode);
+      emit((event ? event : SAX_VALUE), parser.textNode);
     }
     parser.textNode = "";
   }
 
   function closeNumber(parser) {
     if (parser.numberNode)
-      emit(parser, SAX_VALUE, parseFloat(parser.numberNode));
+      emit(SAX_VALUE, parseFloat(parser.numberNode));
     parser.numberNode = "";
   }
 
@@ -123,7 +123,7 @@ function clarinet(eventBus) {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(parser, SAX_ERROR, er);
+    emit(SAX_ERROR, er);
     return parser;
   }
 
@@ -134,7 +134,7 @@ function clarinet(eventBus) {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(parser, SAX_END);
+    emit(SAX_END);
     CParser.call(parser);
     return parser;
   }
@@ -185,9 +185,9 @@ function clarinet(eventBus) {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, SAX_OPEN_OBJECT);
+              emit(SAX_OPEN_OBJECT);
               this.depth++;
-              emit(parser, SAX_CLOSE_OBJECT);
+              emit(SAX_CLOSE_OBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -224,11 +224,11 @@ function clarinet(eventBus) {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, SAX_OPEN_ARRAY);
+            emit(SAX_OPEN_ARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, SAX_CLOSE_ARRAY);
+              emit(SAX_CLOSE_ARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -294,7 +294,7 @@ function clarinet(eventBus) {
               parser.state = parser.stack.pop() || VALUE;
               parser.textNode += chunk.substring(starti, i-1);
               if(!parser.textNode) {
-                 emit(parser, SAX_VALUE, "");
+                 emit(SAX_VALUE, "");
               }
               break;
             }
@@ -357,7 +357,7 @@ function clarinet(eventBus) {
         case TRUE3:
           if (c==='') continue;
           if(c==='e') {
-            emit(parser, SAX_VALUE, true);
+            emit(SAX_VALUE, true);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid true started with tru'+ c);
         continue;
@@ -383,7 +383,7 @@ function clarinet(eventBus) {
         case FALSE4:
           if (c==='')  continue;
           if (c==='e') {
-            emit(parser, SAX_VALUE, false);
+            emit(SAX_VALUE, false);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid false started with fals'+ c);
         continue;
@@ -403,7 +403,7 @@ function clarinet(eventBus) {
         case NULL3:
           if (c==='') continue;
           if(c==='l') {
-            emit(parser, SAX_VALUE, null);
+            emit(SAX_VALUE, null);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid null started with nul'+ c);
         continue;

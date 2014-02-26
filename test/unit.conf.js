@@ -17,7 +17,7 @@ module.exports = function(config) {
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/*.js'
       ,  'src/libs/clarinet.js'
-      ,  'src/clarinetListenerAdaptor.js'
+      ,  'src/ascentManager.js'
       ,  'src/parseResponseHeaders.browser.js'      
       ,  'src/streamingHttp.browser.js'
       ,  'src/jsonPathSyntax.js'

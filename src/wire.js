@@ -43,11 +43,12 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
                      headers,
                      withCredentials
       );
-   }                              
-     
+   }
+
+   clarinet(oboeBus);
+   
    instanceController( 
                oboeBus, 
-               clarinet(oboeBus), 
                incrementalContentBuilder(oboeBus) 
    );
       
