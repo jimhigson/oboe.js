@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-14-g25be16a
+// v1.14.0-16-g2a7ac81
 
 /*
 
@@ -533,9 +533,9 @@ function first(test, list) {
  */
 
 function clarinet(eventBus) {
-
+  "use strict";
+   
   var MAX_BUFFER_LENGTH = 64 * 1024
-  ,   buffers     = [ "textNode", "numberNode" ]
   ,   _n          = 0
   ,   stringTokenPattern = /[\\"\n]/g;
   
@@ -561,287 +561,274 @@ function clarinet(eventBus) {
   var NUMBER_DECIMAL_POINT              = _n++; // .
   var NUMBER_DIGIT                      = _n;   // [0-9]
 
-  function checkBufferLength (parser) {
-    var maxActual = 0
-      ;
-    for (var i = 0, l = buffers.length; i < l; i ++) {
-      var len = parser[buffers[i]].length;
-      if (len > MAX_BUFFER_LENGTH) {
-        switch (buffers[i]) {
-          case "text":
-            closeText(parser);
-          break;
 
-          default:
-            error(parser, "Max buffer length exceeded: "+ buffers[i]);
-        }
-      }
-      maxActual = Math.max(maxActual, len);
+  // setup initial parser state
+  var bufferCheckPosition = MAX_BUFFER_LENGTH;
+  var c          = "";
+  var p          = "";
+  var closed     = false;
+  var error      = null;
+  var state      = BEGIN;
+  var stack      = [];
+  // mostly for error reporting
+  var position   = 0;
+  var column     = 0;
+  var line       = 1;
+  var slashed    = false;
+  var unicodeI   = 0;
+  var unicodeS   = null;
+  var depth      = 0;
+  var textNode   = "";
+  var numberNode = "";
+
+  function checkBufferLength () {
+     
+    var maxActual = 0;
+     
+    if (textNode.length > MAX_BUFFER_LENGTH) {
+      emitError("Max buffer length exceeded: textNode");
+      maxActual = Math.max(maxActual, textNode.length);
     }
-    parser.bufferCheckPosition = (MAX_BUFFER_LENGTH - maxActual)
-                               + parser.position;
-  }
-
-  function clearBuffers (parser) {
-    for (var i = 0, l = buffers.length; i < l; i ++) {
-      parser[buffers[i]] = "";
+    if (numberNode.length > MAX_BUFFER_LENGTH) {
+      emitError("Max buffer length exceeded: numberNode");
+      maxActual = Math.max(maxActual, numberNode.length);
     }
+     
+    bufferCheckPosition = (MAX_BUFFER_LENGTH - maxActual)
+                               + position;
   }
 
+  eventBus(STREAM_DATA).on(write);
 
-  function CParser () {
-    var parser = this;
-    clearBuffers(parser);
-    parser.bufferCheckPosition = MAX_BUFFER_LENGTH;
-    parser.q        = parser.c = parser.p = "";
-    parser.closed   = parser.closedRoot = parser.sawRoot = false;
-    parser.tag      = parser.error = null;
-    parser.state    = BEGIN;
-    parser.stack    = [];
-    // mostly just for error reporting
-    parser.position = parser.column = 0;
-    parser.line     = 1;
-    parser.slashed  = false;
-    parser.unicodeI = 0;
-    parser.unicodeS = null;
-    parser.depth    = 0;
- 
-    eventBus(STREAM_DATA).on(write.bind(parser));
+   /* At the end of the http content close the clarinet 
+    This will provide an error if the total content provided was not 
+    valid json, ie if not all arrays, objects and Strings closed properly */
+  eventBus(STREAM_END).on( write.bind(undefined, null));   
 
-    /* At the end of the http content close the clarinet parser.
-     This will provide an error if the total content provided was not 
-     valid json, ie if not all arrays, objects and Strings closed properly */
-    eventBus(STREAM_END).on( write.bind(parser, null));
-  }
 
   function emit(event, data) {
     eventBus(event).emit(data);
   }
 
-  function emitNode(parser, event, data) {
-    closeValue(parser);
+  function emitNode(event, data) {
+    closeValue();
     emit(event, data);
   }
 
-  function closeValue(parser, event) {
+  function closeValue(event) {
 
-    if (parser.textNode) {
-      emit((event ? event : SAX_VALUE), parser.textNode);
+    if (textNode) {
+      emit((event ? event : SAX_VALUE), textNode);
     }
-    parser.textNode = "";
+    textNode = "";
   }
 
-  function closeNumber(parser) {
-    if (parser.numberNode)
-      emit(SAX_VALUE, parseFloat(parser.numberNode));
-    parser.numberNode = "";
+  function closeNumber() {
+    if (numberNode)
+      emit(SAX_VALUE, parseFloat(numberNode));
+    numberNode = "";
   }
 
 
-  function error (parser, er) {
-    closeValue(parser);
-    er += "\nLn: "+parser.line+
-          "\nCol: "+parser.column+
-          "\nChr: "+parser.c;
+  function emitError (er) {
+    closeValue();
+    er += "\nLn: "+line+
+          "\nCol: "+column+
+          "\nChr: "+c;
     er = new Error(er);
-    parser.error = er;
+    error = er;
     emit(FAIL_EVENT, errorReport(undefined, undefined, er));
-    return parser;
   }
 
-  function end(parser) {
-    if (parser.state !== VALUE || parser.depth !== 0)
-      error(parser, "Unexpected end");
+  function end() {
+    if (state !== VALUE || depth !== 0)
+      emitError("Unexpected end");
 
-    closeValue(parser);
-    parser.c      = "";
-    parser.closed = true;
-    CParser.call(parser);
-    return parser;
+    closeValue();
+    c      = "";
+    closed = true;
+    //CParser.call(parser);
   }
 
   function write (chunk) {
-    var parser = this;
-    
+         
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.
-    if (this.error)
+    if (error)
       return;
       
-    if (parser.closed) return error(parser,
-      "Cannot write after close. Assign an onready handler.");
-    if (chunk === null) return end(parser);
-    var i = 0, c = chunk[0], p = parser.p;
+    if (closed) return emitError(
+       "Cannot write after close. Assign an onready handler.");
+    if (chunk === null) return end();
+    var i = 0, localc = chunk[0], localp = p;
 
-    while (c) {
-      p = c;
-      parser.c = c = chunk.charAt(i++);
+    while (localc) {
+      localp = localc;
+      c = localc = chunk.charAt(i++);
       // if chunk doesnt have next, like streaming char by char
       // this way we need to check if previous is really previous
       // if not we need to reset to what the parser says is the previous
       // from buffer
-      if(p !== c ) parser.p = p;
-      else p = parser.p;
+      if(localp !== localc ) p = localp;
+      else localp = p;
 
-      if(!c) break;
+      if(!localc) break;
 
-      parser.position ++;
-      if (c === "\n") {
-        parser.line ++;
-        parser.column = 0;
-      } else parser.column ++;
-      switch (parser.state) {
+      position ++;
+      if (localc === "\n") {
+        line ++;
+        column = 0;
+      } else column ++;
+      switch (state) {
 
         case BEGIN:
-          if (c === "{") parser.state = OPEN_OBJECT;
-          else if (c === "[") parser.state = OPEN_ARRAY;
-          else if (c !== '\r' && c !== '\n' && c !== ' ' && c !== '\t')
-            error(parser, "Non-whitespace before {[.");
+          if (localc === "{") state = OPEN_OBJECT;
+          else if (localc === "[") state = OPEN_ARRAY;
+          else if (localc !== '\r' && localc !== '\n' && localc !== ' ' && localc !== '\t')
+            emitError("Non-whitespace before {[.");
         continue;
 
         case OPEN_KEY:
         case OPEN_OBJECT:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
+          if (localc === '\r' || localc === '\n' || localc === ' ' || localc === '\t') continue;
+          if(state === OPEN_KEY) stack.push(CLOSE_KEY);
           else {
-            if(c === '}') {
+            if(localc === '}') {
               emit(SAX_OPEN_OBJECT);
-              this.depth++;
+              depth++;
               emit(SAX_CLOSE_OBJECT);
-              this.depth--;
-              parser.state = parser.stack.pop() || VALUE;
+              depth--;
+              state = stack.pop() || VALUE;
               continue;
-            } else  parser.stack.push(CLOSE_OBJECT);
+            } else  stack.push(CLOSE_OBJECT);
           }
-          if(c === '"') parser.state = STRING;
-          else error(parser, "Malformed object key should start with \"");
+          if(localc === '"') state = STRING;
+          else emitError("Malformed object key should start with \"");
         continue;
 
         case CLOSE_KEY:
         case CLOSE_OBJECT:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
+          if (localc === '\r' || localc === '\n' || localc === ' ' || localc === '\t') continue;
 
-          if(c===':') {
-            if(parser.state === CLOSE_OBJECT) {
-              parser.stack.push(CLOSE_OBJECT);
-              closeValue(parser, SAX_OPEN_OBJECT);
-              this.depth++;
-            } else closeValue(parser, SAX_KEY);
-            parser.state  = VALUE;
-          } else if (c==='}') {
-            emitNode(parser, SAX_CLOSE_OBJECT);
-             this.depth--;
-             parser.state = parser.stack.pop() || VALUE;
-          } else if(c===',') {
-            if(parser.state === CLOSE_OBJECT)
-              parser.stack.push(CLOSE_OBJECT);
-            closeValue(parser);
-            parser.state  = OPEN_KEY;
-          } else error(parser, 'Bad object');
+          if(localc===':') {
+            if(state === CLOSE_OBJECT) {
+              stack.push(CLOSE_OBJECT);
+              closeValue(SAX_OPEN_OBJECT);
+              depth++;
+            } else closeValue(SAX_KEY);
+            state  = VALUE;
+          } else if (localc==='}') {
+            emitNode(SAX_CLOSE_OBJECT);
+            depth--;
+            state = stack.pop() || VALUE;
+          } else if(localc===',') {
+            if(state === CLOSE_OBJECT)
+              stack.push(CLOSE_OBJECT);
+            closeValue();
+            state  = OPEN_KEY;
+          } else emitError('Bad object');
         continue;
 
         case OPEN_ARRAY: // after an array there always a value
         case VALUE:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
-          if(parser.state===OPEN_ARRAY) {
+          if (localc === '\r' || localc === '\n' || localc === ' ' || localc === '\t') continue;
+          if(state===OPEN_ARRAY) {
             emit(SAX_OPEN_ARRAY);
-            this.depth++;             
-            parser.state = VALUE;
-            if(c === ']') {
+            depth++;             
+            state = VALUE;
+            if(localc === ']') {
               emit(SAX_CLOSE_ARRAY);
-              this.depth--;
-              parser.state = parser.stack.pop() || VALUE;
+              depth--;
+              state = stack.pop() || VALUE;
               continue;
             } else {
-              parser.stack.push(CLOSE_ARRAY);
+              stack.push(CLOSE_ARRAY);
             }
           }
-               if(c === '"') parser.state = STRING;
-          else if(c === '{') parser.state = OPEN_OBJECT;
-          else if(c === '[') parser.state = OPEN_ARRAY;
-          else if(c === 't') parser.state = TRUE;
-          else if(c === 'f') parser.state = FALSE;
-          else if(c === 'n') parser.state = NULL;
-          else if(c === '-') { // keep and continue
-            parser.numberNode += c;
-          } else if(c==='0') {
-            parser.numberNode += c;
-            parser.state = NUMBER_DIGIT;
-          } else if('123456789'.indexOf(c) !== -1) {
-            parser.numberNode += c;
-            parser.state = NUMBER_DIGIT;
-          } else               error(parser, "Bad value");
+               if(localc === '"') state = STRING;
+          else if(localc === '{') state = OPEN_OBJECT;
+          else if(localc === '[') state = OPEN_ARRAY;
+          else if(localc === 't') state = TRUE;
+          else if(localc === 'f') state = FALSE;
+          else if(localc === 'n') state = NULL;
+          else if(localc === '-') { // keep and continue
+            numberNode += localc;
+          } else if(localc==='0') {
+            numberNode += localc;
+            state = NUMBER_DIGIT;
+          } else if('123456789'.indexOf(localc) !== -1) {
+            numberNode += localc;
+            state = NUMBER_DIGIT;
+          } else               emitError("Bad value");
         continue;
 
         case CLOSE_ARRAY:
-          if(c===',') {
-            parser.stack.push(CLOSE_ARRAY);
-            closeValue(parser, SAX_VALUE);
-            parser.state  = VALUE;
-          } else if (c===']') {
-            emitNode(parser, SAX_CLOSE_ARRAY);
-            this.depth--;
-            parser.state = parser.stack.pop() || VALUE;
-          } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
+          if(localc===',') {
+            stack.push(CLOSE_ARRAY);
+            closeValue(SAX_VALUE);
+            state  = VALUE;
+          } else if (localc===']') {
+            emitNode(SAX_CLOSE_ARRAY);
+            depth--;
+            state = stack.pop() || VALUE;
+          } else if (localc === '\r' || localc === '\n' || localc === ' ' || localc === '\t')
               continue;
-          else error(parser, 'Bad array');
+          else emitError('Bad array');
         continue;
 
         case STRING:
           // thanks thejh, this is an about 50% performance improvement.
-          var starti              = i-1
-            , slashed = parser.slashed
-            , unicodeI = parser.unicodeI
-            ;
+          var starti              = i-1;
+           
           STRING_BIGLOOP: while (true) {
 
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {
-              parser.unicodeS += c;
-              c = chunk.charAt(i++);
+              unicodeS += localc;
+              localc = chunk.charAt(i++);
               if (unicodeI === 4) {
                 // TODO this might be slow? well, probably not used too often anyway
-                parser.textNode += String.fromCharCode(parseInt(parser.unicodeS, 16));
+                textNode += String.fromCharCode(parseInt(unicodeS, 16));
                 unicodeI = 0;
                 starti = i-1;
               } else {
                 unicodeI++;
               }
               // we can just break here: no stuff we skipped that still has to be sliced out or so
-              if (!c) break STRING_BIGLOOP;
+              if (!localc) break STRING_BIGLOOP;
             }
-            if (c === '"' && !slashed) {
-              parser.state = parser.stack.pop() || VALUE;
-              parser.textNode += chunk.substring(starti, i-1);
-              if(!parser.textNode) {
+            if (localc === '"' && !slashed) {
+              state = stack.pop() || VALUE;
+              textNode += chunk.substring(starti, i-1);
+              if(!textNode) {
                  emit(SAX_VALUE, "");
               }
               break;
             }
-            if (c === '\\' && !slashed) {
+            if (localc === '\\' && !slashed) {
               slashed = true;
-              parser.textNode += chunk.substring(starti, i-1);
-              c = chunk.charAt(i++);
-              if (!c) break;
+              textNode += chunk.substring(starti, i-1);
+               localc = chunk.charAt(i++);
+              if (!localc) break;
             }
             if (slashed) {
               slashed = false;
-                   if (c === 'n') { parser.textNode += '\n'; }
-              else if (c === 'r') { parser.textNode += '\r'; }
-              else if (c === 't') { parser.textNode += '\t'; }
-              else if (c === 'f') { parser.textNode += '\f'; }
-              else if (c === 'b') { parser.textNode += '\b'; }
-              else if (c === 'u') {
+                   if (localc === 'n') { textNode += '\n'; }
+              else if (localc === 'r') { textNode += '\r'; }
+              else if (localc === 't') { textNode += '\t'; }
+              else if (localc === 'f') { textNode += '\f'; }
+              else if (localc === 'b') { textNode += '\b'; }
+              else if (localc === 'u') {
                 // \uxxxx. meh!
                 unicodeI = 1;
-                parser.unicodeS = '';
+                unicodeS = '';
               } else {
-                parser.textNode += c;
+                textNode += localc;
               }
-              c = chunk.charAt(i++);
+              localc = chunk.charAt(i++);
               starti = i-1;
-              if (!c) break;
+              if (!localc) break;
               else continue;
             }
 
@@ -849,125 +836,121 @@ function clarinet(eventBus) {
             var reResult = stringTokenPattern.exec(chunk);
             if (reResult === null) {
               i = chunk.length+1;
-              parser.textNode += chunk.substring(starti, i-1);
+              textNode += chunk.substring(starti, i-1);
               break;
             }
             i = reResult.index+1;
-            c = chunk.charAt(reResult.index);
-            if (!c) {
-              parser.textNode += chunk.substring(starti, i-1);
+            localc = chunk.charAt(reResult.index);
+            if (!localc) {
+              textNode += chunk.substring(starti, i-1);
               break;
             }
           }
-          parser.slashed = slashed;
-          parser.unicodeI = unicodeI;
         continue;
 
         case TRUE:
-          if (c==='')  continue; // strange buffers
-          if (c==='r') parser.state = TRUE2;
-          else error(parser, 'Invalid true started with t'+ c);
+          if (localc==='')  continue; // strange buffers
+          if (localc==='r') state = TRUE2;
+          else emitError( 'Invalid true started with t'+ localc);
         continue;
 
         case TRUE2:
-          if (c==='')  continue;
-          if (c==='u') parser.state = TRUE3;
-          else error(parser, 'Invalid true started with tr'+ c);
+          if (localc==='')  continue;
+          if (localc==='u') state = TRUE3;
+          else emitError('Invalid true started with tr'+ localc);
         continue;
 
         case TRUE3:
-          if (c==='') continue;
-          if(c==='e') {
+          if (localc==='') continue;
+          if(localc==='e') {
             emit(SAX_VALUE, true);
-            parser.state = parser.stack.pop() || VALUE;
-          } else error(parser, 'Invalid true started with tru'+ c);
+            state = stack.pop() || VALUE;
+          } else emitError('Invalid true started with tru'+ localc);
         continue;
 
         case FALSE:
-          if (c==='')  continue;
-          if (c==='a') parser.state = FALSE2;
-          else error(parser, 'Invalid false started with f'+ c);
+          if (localc==='')  continue;
+          if (localc==='a') state = FALSE2;
+          else emitError('Invalid false started with f'+ localc);
         continue;
 
         case FALSE2:
-          if (c==='')  continue;
-          if (c==='l') parser.state = FALSE3;
-          else error(parser, 'Invalid false started with fa'+ c);
+          if (localc==='')  continue;
+          if (localc==='l') state = FALSE3;
+          else emitError('Invalid false started with fa'+ localc);
         continue;
 
         case FALSE3:
-          if (c==='')  continue;
-          if (c==='s') parser.state = FALSE4;
-          else error(parser, 'Invalid false started with fal'+ c);
+          if (localc==='')  continue;
+          if (localc==='s') state = FALSE4;
+          else emitError('Invalid false started with fal'+ localc);
         continue;
 
         case FALSE4:
-          if (c==='')  continue;
-          if (c==='e') {
+          if (localc==='')  continue;
+          if (localc==='e') {
             emit(SAX_VALUE, false);
-            parser.state = parser.stack.pop() || VALUE;
-          } else error(parser, 'Invalid false started with fals'+ c);
+            state = stack.pop() || VALUE;
+          } else emitError('Invalid false started with fals'+ localc);
         continue;
 
         case NULL:
-          if (c==='')  continue;
-          if (c==='u') parser.state = NULL2;
-          else error(parser, 'Invalid null started with n'+ c);
+          if (localc==='')  continue;
+          if (localc==='u') state = NULL2;
+          else emitError('Invalid null started with n'+ localc);
         continue;
 
         case NULL2:
-          if (c==='')  continue;
-          if (c==='l') parser.state = NULL3;
-          else error(parser, 'Invalid null started with nu'+ c);
+          if (localc==='')  continue;
+          if (localc==='l') state = NULL3;
+          else emitError('Invalid null started with nu'+ localc);
         continue;
 
         case NULL3:
-          if (c==='') continue;
-          if(c==='l') {
+          if (localc==='') continue;
+          if(localc==='l') {
             emit(SAX_VALUE, null);
-            parser.state = parser.stack.pop() || VALUE;
-          } else error(parser, 'Invalid null started with nul'+ c);
+            state = stack.pop() || VALUE;
+          } else emitError('Invalid null started with nul'+ localc);
         continue;
 
         case NUMBER_DECIMAL_POINT:
-          if(c==='.') {
-            parser.numberNode += c;
-            parser.state       = NUMBER_DIGIT;
-          } else error(parser, 'Leading zero not followed by .');
+          if(localc==='.') {
+            numberNode += localc;
+            state       = NUMBER_DIGIT;
+          } else emitError('Leading zero not followed by .');
         continue;
 
         case NUMBER_DIGIT:
-          if('0123456789'.indexOf(c) !== -1) parser.numberNode += c;
-          else if (c==='.') {
-            if(parser.numberNode.indexOf('.')!==-1)
-              error(parser, 'Invalid number has two dots');
-            parser.numberNode += c;
-          } else if (c==='e' || c==='E') {
-            if(parser.numberNode.indexOf('e')!==-1 ||
-               parser.numberNode.indexOf('E')!==-1 )
-               error(parser, 'Invalid number has two exponential');
-            parser.numberNode += c;
-          } else if (c==="+" || c==="-") {
-            if(!(p==='e' || p==='E'))
-              error(parser, 'Invalid symbol in number');
-            parser.numberNode += c;
+          if('0123456789'.indexOf(localc) !== -1) numberNode += localc;
+          else if (localc==='.') {
+            if(numberNode.indexOf('.')!==-1)
+              emitError('Invalid number has two dots');
+            numberNode += localc;
+          } else if (localc==='e' || localc==='E') {
+            if(numberNode.indexOf('e')!==-1 ||
+               numberNode.indexOf('E')!==-1 )
+               emitError('Invalid number has two exponential');
+            numberNode += localc;
+          } else if (localc==="+" || localc==="-") {
+            if(!(localp==='e' || localp==='E'))
+              emitError('Invalid symbol in number');
+            numberNode += localc;
           } else {
-            closeNumber(parser);
+            closeNumber();
             i--; // go back one
-            parser.state = parser.stack.pop() || VALUE;
+            state = stack.pop() || VALUE;
           }
         continue;
 
         default:
-          error(parser, "Unknown state: " + parser.state);
+          emitError("Unknown state: " + state);
       }
     }
-    if (parser.position >= parser.bufferCheckPosition)
-      checkBufferLength(parser);
-    return parser;
+    if (position >= bufferCheckPosition)
+      checkBufferLength();
   }
 
-  return new CParser();
 }
 
 
@@ -1424,7 +1407,7 @@ function incrementalContentBuilder( oboeBus ) {
    }; 
    contentBuilderHandlers[SAX_KEY] = pathFound; 
    contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
-   contentBuilderHandlers[SAX_CLOSE_OBJECT] =
+   contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
    contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
    return contentBuilderHandlers;
 }
