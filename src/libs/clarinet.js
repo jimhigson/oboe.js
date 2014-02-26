@@ -82,7 +82,6 @@ function clarinet(eventBus) {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(SAX_READY);
  
     eventBus(STREAM_DATA).on(write.bind(parser));
 
@@ -134,7 +133,6 @@ function clarinet(eventBus) {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(SAX_END);
     CParser.call(parser);
     return parser;
   }

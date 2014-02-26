@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-13-g6d22adb
+// v1.14.0-14-g25be16a
 
 /*
 
@@ -605,7 +605,6 @@ function clarinet(eventBus) {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(SAX_READY);
  
     eventBus(STREAM_DATA).on(write.bind(parser));
 
@@ -657,7 +656,6 @@ function clarinet(eventBus) {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(SAX_END);
     CParser.call(parser);
     return parser;
   }
@@ -1426,7 +1424,7 @@ function incrementalContentBuilder( oboeBus ) {
    }; 
    contentBuilderHandlers[SAX_KEY] = pathFound; 
    contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
-   contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
+   contentBuilderHandlers[SAX_CLOSE_OBJECT] =
    contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
    return contentBuilderHandlers;
 }
@@ -1992,9 +1990,7 @@ var // the events which are never exported are kept as
     SAX_OPEN_OBJECT  = _S++,
     SAX_CLOSE_OBJECT = _S++,
     SAX_OPEN_ARRAY   = _S++,
-    SAX_CLOSE_ARRAY  = _S++,
-    SAX_END          = _S++,
-    SAX_READY        = _S++;
+    SAX_CLOSE_ARRAY  = _S++;
     
 function errorReport(statusCode, body, error) {
    try{
