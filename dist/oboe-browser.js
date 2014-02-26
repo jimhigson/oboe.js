@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-16-g2a7ac81
+// v1.14.0-17-g22222d7
 
 /*
 
@@ -537,50 +537,49 @@ function clarinet(eventBus) {
   "use strict";
    
   var MAX_BUFFER_LENGTH = 64 * 1024
-  ,   _n          = 0
-  ,   stringTokenPattern = /[\\"\n]/g;
+  ,   stringTokenPattern = /[\\"\n]/g
+  ,   _n = 0
   
-  var BEGIN                             = _n++;
-  var VALUE                             = _n++; // general stuff
-  var OPEN_OBJECT                       = _n++; // {
-  var CLOSE_OBJECT                      = _n++; // }
-  var OPEN_ARRAY                        = _n++; // [
-  var CLOSE_ARRAY                       = _n++; // ]
-  var STRING                            = _n++; // ""
-  var OPEN_KEY                          = _n++; // , "a"
-  var CLOSE_KEY                         = _n++; // :
-  var TRUE                              = _n++; // r
-  var TRUE2                             = _n++; // u
-  var TRUE3                             = _n++; // e
-  var FALSE                             = _n++; // a
-  var FALSE2                            = _n++; // l
-  var FALSE3                            = _n++; // s
-  var FALSE4                            = _n++; // e
-  var NULL                              = _n++; // u
-  var NULL2                             = _n++; // l
-  var NULL3                             = _n++; // l
-  var NUMBER_DECIMAL_POINT              = _n++; // .
-  var NUMBER_DIGIT                      = _n;   // [0-9]
+      // states
+  ,   BEGIN                = _n++
+  ,   VALUE                = _n++ // general stuff
+  ,   OPEN_OBJECT          = _n++ // {
+  ,   CLOSE_OBJECT         = _n++ // }
+  ,   OPEN_ARRAY           = _n++ // [
+  ,   CLOSE_ARRAY          = _n++ // ]
+  ,   STRING               = _n++ // ""
+  ,   OPEN_KEY             = _n++ // , "a"
+  ,   CLOSE_KEY            = _n++ // :
+  ,   TRUE                 = _n++ // r
+  ,   TRUE2                = _n++ // u
+  ,   TRUE3                = _n++ // e
+  ,   FALSE                = _n++ // a
+  ,   FALSE2               = _n++ // l
+  ,   FALSE3               = _n++ // s
+  ,   FALSE4               = _n++ // e
+  ,   NULL                 = _n++ // u
+  ,   NULL2                = _n++ // l
+  ,   NULL3                = _n++ // l
+  ,   NUMBER_DECIMAL_POINT = _n++ // .
+  ,   NUMBER_DIGIT         = _n   // [0-9]
 
-
-  // setup initial parser state
-  var bufferCheckPosition = MAX_BUFFER_LENGTH;
-  var c          = "";
-  var p          = "";
-  var closed     = false;
-  var error      = null;
-  var state      = BEGIN;
-  var stack      = [];
-  // mostly for error reporting
-  var position   = 0;
-  var column     = 0;
-  var line       = 1;
-  var slashed    = false;
-  var unicodeI   = 0;
-  var unicodeS   = null;
-  var depth      = 0;
-  var textNode   = "";
-  var numberNode = "";
+      // setup initial parser values
+  ,   bufferCheckPosition = MAX_BUFFER_LENGTH
+  ,   c                    = ""
+  ,   p                    = ""
+  ,   closed               = false
+  ,   error                = null
+  ,   state                = BEGIN
+  ,   stack                = []
+  ,   position             = 0
+  ,   column               = 0  //mostly for error reporting
+  ,   line                 = 1
+  ,   slashed              = false
+  ,   unicodeI             = 0
+  ,   unicodeS             = null
+  ,   depth                = 0
+  ,   textNode             = ""
+  ,   numberNode           = "";
 
   function checkBufferLength () {
      
@@ -632,6 +631,9 @@ function clarinet(eventBus) {
 
 
   function emitError (er) {
+     
+    console.log('erroring', er); 
+     
     closeValue();
     er += "\nLn: "+line+
           "\nCol: "+column+
@@ -704,8 +706,10 @@ function clarinet(eventBus) {
               continue;
             } else  stack.push(CLOSE_OBJECT);
           }
-          if(localc === '"') state = STRING;
-          else emitError("Malformed object key should start with \"");
+          if(localc === '"')
+             state = STRING;
+          else 
+             emitError("Malformed object key should start with \" " + localc);
         continue;
 
         case CLOSE_KEY:
