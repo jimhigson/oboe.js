@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-6-gcb73820
+// v1.14.0-7-gd124642
 
 /*
 
@@ -523,8 +523,10 @@ function first(test, list) {
 
 /* 
    This is a slightly hacked-up browser only version of clarinet 
-   with some features removed to help keep Oboe under 
-   the 5k micro-library limit
+   
+      *  some features removed to help keep browser Oboe under 
+         the 5k micro-library limit
+      *  plug directly into event bus
    
    For the original go here:
       https://github.com/dscape/clarinet
@@ -603,7 +605,7 @@ function clarinet() {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(parser, "onready");
+    emit(parser, SAX_READY);
   }
 
   CParser.prototype =
@@ -624,14 +626,14 @@ function clarinet() {
   function closeValue(parser, event) {
 
     if (parser.textNode) {
-      emit(parser, (event ? event : "onvalue"), parser.textNode);
+      emit(parser, (event ? event : SAX_VALUE), parser.textNode);
     }
     parser.textNode = "";
   }
 
   function closeNumber(parser) {
     if (parser.numberNode)
-      emit(parser, "onvalue", parseFloat(parser.numberNode));
+      emit(parser, SAX_VALUE, parseFloat(parser.numberNode));
     parser.numberNode = "";
   }
 
@@ -643,7 +645,7 @@ function clarinet() {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(parser, "onerror", er);
+    emit(parser, SAX_ERROR, er);
     return parser;
   }
 
@@ -654,7 +656,7 @@ function clarinet() {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(parser, "onend");
+    emit(parser, SAX_END);
     CParser.call(parser);
     return parser;
   }
@@ -705,9 +707,9 @@ function clarinet() {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, 'onopenobject');
+              emit(parser, SAX_OPENOBJECT);
               this.depth++;
-              emit(parser, 'oncloseobject');
+              emit(parser, SAX_CLOSEOBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -724,12 +726,12 @@ function clarinet() {
           if(c===':') {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
-              closeValue(parser, 'onopenobject');
+              closeValue(parser, SAX_OPENOBJECT);
               this.depth++;
-            } else closeValue(parser, 'onkey');
+            } else closeValue(parser, SAX_KEY);
             parser.state  = VALUE;
           } else if (c==='}') {
-            emitNode(parser, 'oncloseobject');
+            emitNode(parser, SAX_CLOSEOBJECT);
              this.depth--;
              parser.state = parser.stack.pop() || VALUE;
           } else if(c===',') {
@@ -744,11 +746,11 @@ function clarinet() {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, 'onopenarray');
+            emit(parser, SAX_OPENARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, 'onclosearray');
+              emit(parser, SAX_CLOSEARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -776,10 +778,10 @@ function clarinet() {
         case CLOSE_ARRAY:
           if(c===',') {
             parser.stack.push(CLOSE_ARRAY);
-            closeValue(parser, 'onvalue');
+            closeValue(parser, SAX_VALUE);
             parser.state  = VALUE;
           } else if (c===']') {
-            emitNode(parser, 'onclosearray');
+            emitNode(parser, SAX_CLOSEARRAY);
             this.depth--;
             parser.state = parser.stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
@@ -814,7 +816,7 @@ function clarinet() {
               parser.state = parser.stack.pop() || VALUE;
               parser.textNode += chunk.substring(starti, i-1);
               if(!parser.textNode) {
-                 emit(parser, "onvalue", "");
+                 emit(parser, SAX_VALUE, "");
               }
               break;
             }
@@ -877,7 +879,7 @@ function clarinet() {
         case TRUE3:
           if (c==='') continue;
           if(c==='e') {
-            emit(parser, "onvalue", true);
+            emit(parser, SAX_VALUE, true);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid true started with tru'+ c);
         continue;
@@ -903,7 +905,7 @@ function clarinet() {
         case FALSE4:
           if (c==='')  continue;
           if (c==='e') {
-            emit(parser, "onvalue", false);
+            emit(parser, SAX_VALUE, false);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid false started with fals'+ c);
         continue;
@@ -923,7 +925,7 @@ function clarinet() {
         case NULL3:
           if (c==='') continue;
           if(c==='l') {
-            emit(parser, "onvalue", null);
+            emit(parser, SAX_VALUE, null);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid null started with nul'+ c);
         continue;
@@ -982,25 +984,13 @@ function clarinet() {
  */
 function clarinetListenerAdaptor(clarinetParser, handlers){
     
-   var state,
-       SAX_EVENTS = [
-         "value"
-         , "string"
-         , "key"
-         , "openobject"
-         , "closeobject"
-         , "openarray"
-         , "closearray"
-         , "error"
-         , "end"
-         , "ready"
-      ];
+   var state;
 
-   SAX_EVENTS.forEach(function(eventName){
+   SAX_EVENTS.forEach(function(eventType){
  
-      var handlerFunction = handlers[eventName];
+      var handlerFunction = handlers[eventType];
       
-      clarinetParser['on'+eventName] = handlerFunction && 
+      clarinetParser[eventType] = handlerFunction && 
                                        function(param) {
                                           state = handlerFunction( state, param);
                                        };
@@ -1394,52 +1384,40 @@ function incrementalContentBuilder( oboeBus ) {
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
                  
-   return { 
+   var contentBuilderHandlers = {};
+   contentBuilderHandlers[SAX_OPENOBJECT] = function (ascent, firstKey) {
 
-      openobject : function (ascent, firstKey) {
+      var ascentAfterNodeFound = nodeOpened(ascent, {});
 
-         var ascentAfterNodeFound = nodeOpened(ascent, {});         
+      /* It is a peculiarity of Clarinet that for non-empty objects it
+       gives the first key with the openobject event instead of
+       in a subsequent key event.
 
-         /* It is a perculiarity of Clarinet that for non-empty objects it
-            gives the first key with the openobject event instead of
-            in a subsequent key event.
-                      
-            firstKey could be the empty string in a JSON object like 
-            {'':'foo'} which is technically valid.
-            
-            So can't check with !firstKey, have to see if has any 
-            defined value. */
-         return defined(firstKey)
-         ?          
-            /* We know the first key of the newly parsed object. Notify that 
-               path has been found but don't put firstKey permanently onto 
-               pathList yet because we haven't identified what is at that key 
-               yet. Give null as the value because we haven't seen that far 
-               into the json yet */
-            pathFound(ascentAfterNodeFound, firstKey)
+       firstKey could be the empty string in a JSON object like 
+       {'':'foo'} which is technically valid.
+
+       So can't check with !firstKey, have to see if has any 
+       defined value. */
+      return defined(firstKey)
+         ?
+         /* We know the first key of the newly parsed object. Notify that 
+          path has been found but don't put firstKey permanently onto 
+          pathList yet because we haven't identified what is at that key 
+          yet. Give null as the value because we haven't seen that far 
+          into the json yet */
+         pathFound(ascentAfterNodeFound, firstKey)
          :
-            ascentAfterNodeFound
+         ascentAfterNodeFound
          ;
-      },
-    
-      openarray: function (ascent) {
-         return nodeOpened(ascent, []);
-      },
-
-      // called by Clarinet when keys are found in objects               
-      key: pathFound,
-      
-      /* Emitted by Clarinet when primitive values are found, ie Strings,
-         Numbers, and null.
-         Because these are always leaves in the JSON, we find and finish the 
-         node in one step, expressed as functional composition: */
-      value: compose2( nodeClosed, nodeOpened ),
-      
-      // we make no distinction in how we handle object and arrays closing.
-      // For both, interpret as the end of the current node.
-      closeobject: nodeClosed,
-      closearray: nodeClosed
-   };
+   }; 
+   contentBuilderHandlers[SAX_OPENARRAY] = function (ascent) {
+      return nodeOpened(ascent, []);
+   }; 
+   contentBuilderHandlers[SAX_KEY] = pathFound; 
+   contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
+   contentBuilderHandlers[SAX_CLOSEOBJECT] = nodeClosed;
+   contentBuilderHandlers[SAX_CLOSEARRAY] = nodeClosed; 
+   return contentBuilderHandlers;
 }
 
 /**
@@ -1995,7 +1973,33 @@ var // the events which are never exported are kept as
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,
-    ABORTING        = _S++;
+    ABORTING        = _S++,
+
+    // SAX events butchered from Clarinet
+    SAX_VALUE       = _S++,
+    SAX_STRING      = _S++,
+    SAX_KEY         = _S++,
+    SAX_OPENOBJECT  = _S++,
+    SAX_CLOSEOBJECT = _S++,
+    SAX_OPENARRAY   = _S++,
+    SAX_CLOSEARRAY  = _S++,
+    SAX_ERROR       = _S++,
+    SAX_END         = _S++,
+    SAX_READY       = _S++,
+   
+    SAX_EVENTS = [
+         SAX_VALUE
+    ,    SAX_STRING     
+    ,    SAX_KEY        
+    ,    SAX_OPENOBJECT 
+    ,    SAX_CLOSEOBJECT
+    ,    SAX_OPENARRAY  
+    ,    SAX_CLOSEARRAY 
+    ,    SAX_ERROR      
+    ,    SAX_END        
+    ,    SAX_READY    
+    ];   
+   
     
 function errorReport(statusCode, body, error) {
    try{
@@ -2367,7 +2371,7 @@ function instanceController(  oboeBus,
    clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
   
    // react to errors by putting them on the event bus
-   clarinetParser.onerror = function(e) {          
+   clarinetParser[SAX_ERROR] = function(e) {          
       oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
       );
@@ -2376,6 +2380,7 @@ function instanceController(  oboeBus,
       // end of the json it will throw an error
    };   
 }
+
 /**
  * This file sits just behind the API which is used to attain a new
  * Oboe instance. It creates the new components that are required

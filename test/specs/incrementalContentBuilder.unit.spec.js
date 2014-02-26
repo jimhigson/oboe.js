@@ -33,7 +33,7 @@ describe("incremental content builder", function(){
      
    describe('when root object opens', function() {
       
-      var builder = aContentBuilder().receivingParserEvent('onopenobject'); 
+      var builder = aContentBuilder().receivingParserEvent(SAX_OPENOBJECT); 
       
       it('emits correct event', function(){
          expect( builder)
@@ -56,8 +56,8 @@ describe("incremental content builder", function(){
    describe('after key is found in root object', function(){
       // above test, plus some extra events from clarinet
       var builder = aContentBuilder()
-          .receivingParserEvent('onopenobject')
-          .receivingParserEvent('onkey', 'flavour');
+          .receivingParserEvent(SAX_OPENOBJECT)
+          .receivingParserEvent(SAX_KEY, 'flavour');
           
       it('emits correct event', function(){
 
@@ -82,7 +82,7 @@ describe("incremental content builder", function(){
       // above test, plus some extra events from clarinet
 
       var builder = aContentBuilder()
-          .receivingParserEvent('onopenobject', 'flavour');
+          .receivingParserEvent(SAX_OPENOBJECT, 'flavour');
           
       it('emits correct event', function(){
           
@@ -105,9 +105,9 @@ describe("incremental content builder", function(){
    describe('after value is found for that key', function() {
 
       var builder = aContentBuilder()
-                 .receivingParserEvent('onopenobject')
-                 .receivingParserEvent('onkey'    ,  'flavour')
-                 .receivingParserEvent('onvalue'  ,  'strawberry');
+                 .receivingParserEvent(SAX_OPENOBJECT)
+                 .receivingParserEvent(SAX_KEY    ,  'flavour')
+                 .receivingParserEvent(SAX_VALUE  ,  'strawberry');
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
@@ -129,10 +129,10 @@ describe("incremental content builder", function(){
    describe('emits node found after root object closes', function() {
 
       var builder = aContentBuilder()
-                 .receivingParserEvent('onopenobject')
-                 .receivingParserEvent('onkey', 'flavour')
-                 .receivingParserEvent('onvalue', 'strawberry')
-                 .receivingParserEvent('oncloseobject');
+                 .receivingParserEvent(SAX_OPENOBJECT)
+                 .receivingParserEvent(SAX_KEY, 'flavour')
+                 .receivingParserEvent(SAX_VALUE, 'strawberry')
+                 .receivingParserEvent(SAX_CLOSEOBJECT);
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
@@ -153,10 +153,10 @@ describe("incremental content builder", function(){
    describe('first array element', function() {
 
       var builder = aContentBuilder()
-          .receivingParserEvent('onopenobject')
-          .receivingParserEvent('onkey', 'alphabet')
-          .receivingParserEvent('onopenarray')
-          .receivingParserEvent('onvalue', 'a');
+          .receivingParserEvent(SAX_OPENOBJECT)
+          .receivingParserEvent(SAX_KEY, 'alphabet')
+          .receivingParserEvent(SAX_OPENARRAY)
+          .receivingParserEvent(SAX_VALUE, 'a');
           
       it('emits path event with numeric paths', function(){
       
@@ -191,11 +191,11 @@ describe("incremental content builder", function(){
    describe('second array element', function() {
 
       var builder = aContentBuilder()
-          .receivingParserEvent('onopenobject')
-          .receivingParserEvent('onkey', 'alphabet')
-          .receivingParserEvent('onopenarray')
-          .receivingParserEvent('onvalue', 'a')
-          .receivingParserEvent('onvalue', 'b');
+          .receivingParserEvent(SAX_OPENOBJECT)
+          .receivingParserEvent(SAX_KEY, 'alphabet')
+          .receivingParserEvent(SAX_OPENARRAY)
+          .receivingParserEvent(SAX_VALUE, 'a')
+          .receivingParserEvent(SAX_VALUE, 'b');
           
       it('emits events with numeric paths', function(){    
           
@@ -230,9 +230,9 @@ describe("incremental content builder", function(){
    describe('array at root', function() {
 
       var builder = aContentBuilder()
-          .receivingParserEvent('onopenarray')
-          .receivingParserEvent('onvalue', 'a')
-          .receivingParserEvent('onvalue', 'b');
+          .receivingParserEvent(SAX_OPENARRAY)
+          .receivingParserEvent(SAX_VALUE, 'a')
+          .receivingParserEvent(SAX_VALUE, 'b');
           
       it('emits events with numeric paths', function(){    
           

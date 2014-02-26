@@ -26,7 +26,7 @@ function instanceController(  oboeBus,
    clarinetListenerAdaptor(clarinetParser, contentBuilderHandlers);
   
    // react to errors by putting them on the event bus
-   clarinetParser.onerror = function(e) {          
+   clarinetParser[SAX_ERROR] = function(e) {          
       oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
       );

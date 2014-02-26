@@ -84,7 +84,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
    it('emits path to listener when root object starts',  function() {
 
-      // clarinet doesn't notify of matches to objects (onopenobject) until the
+      // clarinet doesn't notify of matches to objects (SAX_OPENOBJECT) until the
       // first key is found, that is why we don't just give '{' here as the partial
       // input.
 
@@ -99,14 +99,14 @@ describe("oboe component (sXHR stubbed)", function(){
    
    it('emits path to listener when root array starts',  function() {
 
-      // clarinet doesn't notify of matches to objects (onopenobject) until the
+      // clarinet doesn't notify of matches to objects (SAX_OPENOBJECT) until the
       // first key is found, that is why we don't just give '{' here as the partial
       // input.
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!')
          .whenGivenInput('[1') // the minimum string required for clarinet 
-                               // to emit onopenarray. Won't emit with '['.
+                               // to emit SAX_OPENARRAY. Won't emit with '['.
           .thenTheInstance(
             foundNMatches(1),
             matched([]).atRootOfJson()

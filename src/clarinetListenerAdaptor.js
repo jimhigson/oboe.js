@@ -11,25 +11,13 @@
  */
 function clarinetListenerAdaptor(clarinetParser, handlers){
     
-   var state,
-       SAX_EVENTS = [
-         "value"
-         , "string"
-         , "key"
-         , "openobject"
-         , "closeobject"
-         , "openarray"
-         , "closearray"
-         , "error"
-         , "end"
-         , "ready"
-      ];
+   var state;
 
-   SAX_EVENTS.forEach(function(eventName){
+   SAX_EVENTS.forEach(function(eventType){
  
-      var handlerFunction = handlers[eventName];
+      var handlerFunction = handlers[eventType];
       
-      clarinetParser['on'+eventName] = handlerFunction && 
+      clarinetParser[eventType] = handlerFunction && 
                                        function(param) {
                                           state = handlerFunction( state, param);
                                        };

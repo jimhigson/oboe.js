@@ -1,7 +1,9 @@
 /* 
    This is a slightly hacked-up browser only version of clarinet 
-   with some features removed to help keep Oboe under 
-   the 5k micro-library limit
+   
+      *  some features removed to help keep browser Oboe under 
+         the 5k micro-library limit
+      *  plug directly into event bus
    
    For the original go here:
       https://github.com/dscape/clarinet
@@ -80,7 +82,7 @@ function clarinet() {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(parser, "onready");
+    emit(parser, SAX_READY);
   }
 
   CParser.prototype =
@@ -101,14 +103,14 @@ function clarinet() {
   function closeValue(parser, event) {
 
     if (parser.textNode) {
-      emit(parser, (event ? event : "onvalue"), parser.textNode);
+      emit(parser, (event ? event : SAX_VALUE), parser.textNode);
     }
     parser.textNode = "";
   }
 
   function closeNumber(parser) {
     if (parser.numberNode)
-      emit(parser, "onvalue", parseFloat(parser.numberNode));
+      emit(parser, SAX_VALUE, parseFloat(parser.numberNode));
     parser.numberNode = "";
   }
 
@@ -120,7 +122,7 @@ function clarinet() {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(parser, "onerror", er);
+    emit(parser, SAX_ERROR, er);
     return parser;
   }
 
@@ -131,7 +133,7 @@ function clarinet() {
     closeValue(parser);
     parser.c      = "";
     parser.closed = true;
-    emit(parser, "onend");
+    emit(parser, SAX_END);
     CParser.call(parser);
     return parser;
   }
@@ -182,9 +184,9 @@ function clarinet() {
           if(parser.state === OPEN_KEY) parser.stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(parser, 'onopenobject');
+              emit(parser, SAX_OPENOBJECT);
               this.depth++;
-              emit(parser, 'oncloseobject');
+              emit(parser, SAX_CLOSEOBJECT);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -201,12 +203,12 @@ function clarinet() {
           if(c===':') {
             if(parser.state === CLOSE_OBJECT) {
               parser.stack.push(CLOSE_OBJECT);
-              closeValue(parser, 'onopenobject');
+              closeValue(parser, SAX_OPENOBJECT);
               this.depth++;
-            } else closeValue(parser, 'onkey');
+            } else closeValue(parser, SAX_KEY);
             parser.state  = VALUE;
           } else if (c==='}') {
-            emitNode(parser, 'oncloseobject');
+            emitNode(parser, SAX_CLOSEOBJECT);
              this.depth--;
              parser.state = parser.stack.pop() || VALUE;
           } else if(c===',') {
@@ -221,11 +223,11 @@ function clarinet() {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(parser.state===OPEN_ARRAY) {
-            emit(parser, 'onopenarray');
+            emit(parser, SAX_OPENARRAY);
             this.depth++;             
             parser.state = VALUE;
             if(c === ']') {
-              emit(parser, 'onclosearray');
+              emit(parser, SAX_CLOSEARRAY);
               this.depth--;
               parser.state = parser.stack.pop() || VALUE;
               continue;
@@ -253,10 +255,10 @@ function clarinet() {
         case CLOSE_ARRAY:
           if(c===',') {
             parser.stack.push(CLOSE_ARRAY);
-            closeValue(parser, 'onvalue');
+            closeValue(parser, SAX_VALUE);
             parser.state  = VALUE;
           } else if (c===']') {
-            emitNode(parser, 'onclosearray');
+            emitNode(parser, SAX_CLOSEARRAY);
             this.depth--;
             parser.state = parser.stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
@@ -291,7 +293,7 @@ function clarinet() {
               parser.state = parser.stack.pop() || VALUE;
               parser.textNode += chunk.substring(starti, i-1);
               if(!parser.textNode) {
-                 emit(parser, "onvalue", "");
+                 emit(parser, SAX_VALUE, "");
               }
               break;
             }
@@ -354,7 +356,7 @@ function clarinet() {
         case TRUE3:
           if (c==='') continue;
           if(c==='e') {
-            emit(parser, "onvalue", true);
+            emit(parser, SAX_VALUE, true);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid true started with tru'+ c);
         continue;
@@ -380,7 +382,7 @@ function clarinet() {
         case FALSE4:
           if (c==='')  continue;
           if (c==='e') {
-            emit(parser, "onvalue", false);
+            emit(parser, SAX_VALUE, false);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid false started with fals'+ c);
         continue;
@@ -400,7 +402,7 @@ function clarinet() {
         case NULL3:
           if (c==='') continue;
           if(c==='l') {
-            emit(parser, "onvalue", null);
+            emit(parser, SAX_VALUE, null);
             parser.state = parser.stack.pop() || VALUE;
           } else error(parser, 'Invalid null started with nul'+ c);
         continue;

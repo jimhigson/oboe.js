@@ -141,50 +141,38 @@ function incrementalContentBuilder( oboeBus ) {
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
                  
-   return { 
+   var contentBuilderHandlers = {};
+   contentBuilderHandlers[SAX_OPENOBJECT] = function (ascent, firstKey) {
 
-      openobject : function (ascent, firstKey) {
+      var ascentAfterNodeFound = nodeOpened(ascent, {});
 
-         var ascentAfterNodeFound = nodeOpened(ascent, {});         
+      /* It is a peculiarity of Clarinet that for non-empty objects it
+       gives the first key with the openobject event instead of
+       in a subsequent key event.
 
-         /* It is a perculiarity of Clarinet that for non-empty objects it
-            gives the first key with the openobject event instead of
-            in a subsequent key event.
-                      
-            firstKey could be the empty string in a JSON object like 
-            {'':'foo'} which is technically valid.
-            
-            So can't check with !firstKey, have to see if has any 
-            defined value. */
-         return defined(firstKey)
-         ?          
-            /* We know the first key of the newly parsed object. Notify that 
-               path has been found but don't put firstKey permanently onto 
-               pathList yet because we haven't identified what is at that key 
-               yet. Give null as the value because we haven't seen that far 
-               into the json yet */
-            pathFound(ascentAfterNodeFound, firstKey)
+       firstKey could be the empty string in a JSON object like 
+       {'':'foo'} which is technically valid.
+
+       So can't check with !firstKey, have to see if has any 
+       defined value. */
+      return defined(firstKey)
+         ?
+         /* We know the first key of the newly parsed object. Notify that 
+          path has been found but don't put firstKey permanently onto 
+          pathList yet because we haven't identified what is at that key 
+          yet. Give null as the value because we haven't seen that far 
+          into the json yet */
+         pathFound(ascentAfterNodeFound, firstKey)
          :
-            ascentAfterNodeFound
+         ascentAfterNodeFound
          ;
-      },
-    
-      openarray: function (ascent) {
-         return nodeOpened(ascent, []);
-      },
-
-      // called by Clarinet when keys are found in objects               
-      key: pathFound,
-      
-      /* Emitted by Clarinet when primitive values are found, ie Strings,
-         Numbers, and null.
-         Because these are always leaves in the JSON, we find and finish the 
-         node in one step, expressed as functional composition: */
-      value: compose2( nodeClosed, nodeOpened ),
-      
-      // we make no distinction in how we handle object and arrays closing.
-      // For both, interpret as the end of the current node.
-      closeobject: nodeClosed,
-      closearray: nodeClosed
-   };
+   }; 
+   contentBuilderHandlers[SAX_OPENARRAY] = function (ascent) {
+      return nodeOpened(ascent, []);
+   }; 
+   contentBuilderHandlers[SAX_KEY] = pathFound; 
+   contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
+   contentBuilderHandlers[SAX_CLOSEOBJECT] = nodeClosed;
+   contentBuilderHandlers[SAX_CLOSEARRAY] = nodeClosed; 
+   return contentBuilderHandlers;
 }

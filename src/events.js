@@ -20,7 +20,32 @@ var // the events which are never exported are kept as
     HTTP_START      = 'start',
     STREAM_DATA     = 'content',
     STREAM_END      = _S++,
-    ABORTING        = _S++;
+    ABORTING        = _S++,
+
+    // SAX events butchered from Clarinet
+    SAX_VALUE       = _S++,
+    SAX_STRING      = _S++,
+    SAX_KEY         = _S++,
+    SAX_OPENOBJECT  = _S++,
+    SAX_CLOSEOBJECT = _S++,
+    SAX_OPENARRAY   = _S++,
+    SAX_CLOSEARRAY  = _S++,
+    SAX_ERROR       = _S++,
+    SAX_END         = _S++,
+    SAX_READY       = _S++,
+   
+    SAX_EVENTS = [
+         SAX_VALUE
+    ,    SAX_STRING     
+    ,    SAX_KEY        
+    ,    SAX_OPENOBJECT 
+    ,    SAX_CLOSEOBJECT
+    ,    SAX_OPENARRAY  
+    ,    SAX_CLOSEARRAY 
+    ,    SAX_ERROR      
+    ,    SAX_END        
+    ,    SAX_READY    
+    ];
     
 function errorReport(statusCode, body, error) {
    try{
