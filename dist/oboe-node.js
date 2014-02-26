@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-22-gd427323
+// v1.14.0-23-g2f8ad01
 
 /*
 
@@ -674,9 +674,7 @@ function clarinet(eventBus) {
           else {
             if(c === '}') {
               emit(SAX_OPEN_OBJECT);
-              depth++;
               emit(SAX_CLOSE_OBJECT);
-              depth--;
               state = stack.pop() || VALUE;
               continue;
             } else  stack.push(CLOSE_OBJECT);
@@ -694,6 +692,7 @@ function clarinet(eventBus) {
           if(c===':') {
             if(state === CLOSE_OBJECT) {
               stack.push(CLOSE_OBJECT);
+              // TODO: make two events here
               closeValue(SAX_OPEN_OBJECT);
               depth++;
             } else closeValue(SAX_KEY);
