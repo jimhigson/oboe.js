@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-17-g22222d7
+// v1.14.0-19-g16be72b
 
 /*
 
@@ -644,9 +644,7 @@ function clarinet(eventBus) {
       emitError("Unexpected end");
 
     closeValue();
-    c      = "";
     closed = true;
-    //CParser.call(parser);
   }
 
   function write (chunk) {

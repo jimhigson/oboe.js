@@ -121,9 +121,7 @@ function clarinet(eventBus) {
       emitError("Unexpected end");
 
     closeValue();
-    c      = "";
     closed = true;
-    //CParser.call(parser);
   }
 
   function write (chunk) {

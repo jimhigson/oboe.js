@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-17-g22222d7
+// v1.14.0-19-g16be72b
 
 /*
 
@@ -631,9 +631,6 @@ function clarinet(eventBus) {
 
 
   function emitError (er) {
-     
-    console.log('erroring', er); 
-     
     closeValue();
     er += "\nLn: "+line+
           "\nCol: "+column+
@@ -648,9 +645,7 @@ function clarinet(eventBus) {
       emitError("Unexpected end");
 
     closeValue();
-    c      = "";
     closed = true;
-    //CParser.call(parser);
   }
 
   function write (chunk) {
