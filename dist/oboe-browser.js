@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-21-gcd50442
+// v1.14.0-22-gd427323
 
 /*
 
@@ -610,28 +610,16 @@ function clarinet(eventBus) {
     eventBus(event).emit(data);
   }
 
-  function emitNode(event, data) {
-    closeValue();
-    emit(event, data);
-  }
-
   function closeValue(event) {
 
     if (textNode) {
-      emit((event ? event : SAX_VALUE), textNode);
+      emit(event, textNode);
     }
     textNode = "";
   }
 
-  function closeNumber() {
-    if (numberNode)
-      emit(SAX_VALUE, parseFloat(numberNode));
-    numberNode = "";
-  }
-
-
   function emitError (er) {
-    closeValue();
+    closeValue(SAX_VALUE);
     er += "\nLn: "+line+
           "\nCol: "+column+
           "\nChr: "+c;
@@ -644,7 +632,7 @@ function clarinet(eventBus) {
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
 
-    closeValue();
+    closeValue(SAX_VALUE);
     closed = true;
   }
 
@@ -697,7 +685,7 @@ function clarinet(eventBus) {
           if(c === '"')
              state = STRING;
           else 
-             emitError("Malformed object key should start with \" " + c);
+             emitError("Malformed object key should start with \" ");
         continue;
 
         case CLOSE_KEY:
@@ -712,13 +700,14 @@ function clarinet(eventBus) {
             } else closeValue(SAX_KEY);
             state  = VALUE;
           } else if (c==='}') {
-            emitNode(SAX_CLOSE_OBJECT);
+            closeValue(SAX_VALUE);
+            emit(SAX_CLOSE_OBJECT);
             depth--;
             state = stack.pop() || VALUE;
           } else if(c===',') {
             if(state === CLOSE_OBJECT)
               stack.push(CLOSE_OBJECT);
-            closeValue();
+            closeValue(SAX_VALUE);
             state  = OPEN_KEY;
           } else emitError('Bad object');
         continue;
@@ -762,7 +751,8 @@ function clarinet(eventBus) {
             closeValue(SAX_VALUE);
             state  = VALUE;
           } else if (c===']') {
-            emitNode(SAX_CLOSE_ARRAY);
+            closeValue(SAX_VALUE);
+            emit(SAX_CLOSE_ARRAY);
             depth--;
             state = stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
@@ -930,8 +920,10 @@ function clarinet(eventBus) {
               emitError('Invalid symbol in number');
             numberNode += c;
           } else {
-            closeNumber();
-            i--; // go back one
+             if (numberNode)
+                emit(SAX_VALUE, parseFloat(numberNode));
+             numberNode = "";
+             i--; // go back one
             state = stack.pop() || VALUE;
           }
         continue;
