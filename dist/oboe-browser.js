@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-11-g3f732c3
+// v1.14.0-12-ge303477
 
 /*
 
@@ -618,7 +618,6 @@ function clarinet(eventBus) {
 
   function emit(event, data) {
     eventBus(event).emit(data);
-    //if (parser[event]) parser[event](data);
   }
 
   function emitNode(parser, event, data) {
@@ -2045,7 +2044,6 @@ var // the events which are never exported are kept as
 
     // SAX events butchered from Clarinet
     SAX_VALUE        = _S++,
-    SAX_STRING       = _S++,
     SAX_KEY          = _S++,
     SAX_OPEN_OBJECT  = _S++,
     SAX_CLOSE_OBJECT = _S++,
@@ -2053,20 +2051,7 @@ var // the events which are never exported are kept as
     SAX_CLOSE_ARRAY  = _S++,
     SAX_ERROR        = _S++,
     SAX_END          = _S++,
-    SAX_READY        = _S++,
-   
-    SAX_EVENTS = [
-         SAX_VALUE
-    ,    SAX_STRING     
-    ,    SAX_KEY        
-    ,    SAX_OPEN_OBJECT 
-    ,    SAX_CLOSE_OBJECT
-    ,    SAX_OPEN_ARRAY  
-    ,    SAX_CLOSE_ARRAY 
-    ,    SAX_ERROR      
-    ,    SAX_END        
-    ,    SAX_READY    
-    ];
+    SAX_READY        = _S++;
     
 function errorReport(statusCode, body, error) {
    try{
@@ -2423,7 +2408,7 @@ function instanceController(  oboeBus,
    ascentManager(oboeBus, contentBuilderHandlers);
   
    // react to errors by putting them on the event bus
-   // TODO: stop this silliness!
+   // TODO: route more directly
    oboeBus(SAX_ERROR).on( function(e) {          
       oboeBus(FAIL_EVENT).emit(          
          errorReport(undefined, undefined, e)
