@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-5-g6f73ae9
+// v1.14.0-6-gcb73820
 
 /*
 
@@ -531,7 +531,7 @@ function first(test, list) {
       https://github.com/dscape/clarinet
  */
 
-var clarinet = (function () {
+function clarinet() {
 
   var MAX_BUFFER_LENGTH = 64 * 1024
   ,   buffers     = [ "textNode", "numberNode" ]
@@ -967,8 +967,8 @@ var clarinet = (function () {
     return parser;
   }
 
-  return function () { return new CParser();}
-})();
+  return new CParser();
+}
 
 
 /** 

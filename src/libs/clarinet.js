@@ -7,7 +7,7 @@
       https://github.com/dscape/clarinet
  */
 
-var clarinet = (function () {
+function clarinet() {
 
   var MAX_BUFFER_LENGTH = 64 * 1024
   ,   buffers     = [ "textNode", "numberNode" ]
@@ -443,5 +443,5 @@ var clarinet = (function () {
     return parser;
   }
 
-  return function () { return new CParser();}
-})();
+  return new CParser();
+}
