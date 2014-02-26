@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See https://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.13.0-13-g8238cad
+// v1.14.0
 
 /*
 
@@ -968,19 +968,7 @@ var clarinet = (function () {
   }
 
   return {
-     parser            : function () { return new CParser();},
-     EVENTS            : [
-        "value"
-        , "string"
-        , "key"
-        , "openobject"
-        , "closeobject"
-        , "openarray"
-        , "closearray"
-        , "error"
-        , "end"
-        , "ready"
-     ]
+     parser            : function () { return new CParser();}
   };
 })();
 
@@ -997,9 +985,21 @@ var clarinet = (function () {
  */
 function clarinetListenerAdaptor(clarinetParser, handlers){
     
-   var state;
+   var state,
+       SAX_EVENTS = [
+         "value"
+         , "string"
+         , "key"
+         , "openobject"
+         , "closeobject"
+         , "openarray"
+         , "closearray"
+         , "error"
+         , "end"
+         , "ready"
+      ];
 
-   clarinet.EVENTS.forEach(function(eventName){
+   SAX_EVENTS.forEach(function(eventName){
  
       var handlerFunction = handlers[eventName];
       

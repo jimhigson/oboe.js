@@ -1,7 +1,7 @@
 // this file is the concatenation of several js files. See https://github.com/jimhigson/oboe-browser.js/tree/master/src for the unconcatenated source
 module.exports = (function  () {
 var clarinet = require("clarinet");
-// v1.13.0-12-g6423ff6
+// v1.14.0
 
 /** 
  * Partially complete a function.
@@ -504,9 +504,21 @@ function first(test, list) {
  */
 function clarinetListenerAdaptor(clarinetParser, handlers){
     
-   var state;
+   var state,
+       SAX_EVENTS = [
+         "value"
+         , "string"
+         , "key"
+         , "openobject"
+         , "closeobject"
+         , "openarray"
+         , "closearray"
+         , "error"
+         , "end"
+         , "ready"
+      ];
 
-   clarinet.EVENTS.forEach(function(eventName){
+   SAX_EVENTS.forEach(function(eventName){
  
       var handlerFunction = handlers[eventName];
       
@@ -1892,7 +1904,7 @@ function instanceController(  oboeBus,
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, contentSource, body, headers){
+function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
 
@@ -1928,7 +1940,8 @@ function wire (httpMethodName, contentSource, body, headers){
                      httpMethodName,
                      contentSource,
                      body,
-                     headers 
+                     headers,
+                     withCredentials
       );
    }                              
      

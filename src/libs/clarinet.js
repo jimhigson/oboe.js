@@ -444,18 +444,6 @@ var clarinet = (function () {
   }
 
   return {
-     parser            : function () { return new CParser();},
-     EVENTS            : [
-        "value"
-        , "string"
-        , "key"
-        , "openobject"
-        , "closeobject"
-        , "openarray"
-        , "closearray"
-        , "error"
-        , "end"
-        , "ready"
-     ]
+     parser: function () { return new CParser();}
   };
 })();
