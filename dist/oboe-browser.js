@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-12-ge303477
+// v1.14.0-13-g6d22adb
 
 /*
 
@@ -647,7 +647,7 @@ function clarinet(eventBus) {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(SAX_ERROR, er);
+    emit(FAIL_EVENT, errorReport(undefined, undefined, er));
     return parser;
   }
 
@@ -2049,7 +2049,6 @@ var // the events which are never exported are kept as
     SAX_CLOSE_OBJECT = _S++,
     SAX_OPEN_ARRAY   = _S++,
     SAX_CLOSE_ARRAY  = _S++,
-    SAX_ERROR        = _S++,
     SAX_END          = _S++,
     SAX_READY        = _S++;
     
@@ -2406,16 +2405,7 @@ function instanceController(  oboeBus,
                               contentBuilderHandlers) {
                                 
    ascentManager(oboeBus, contentBuilderHandlers);
-  
-   // react to errors by putting them on the event bus
-   // TODO: route more directly
-   oboeBus(SAX_ERROR).on( function(e) {          
-      oboeBus(FAIL_EVENT).emit(          
-         errorReport(undefined, undefined, e)
-      );
-      // note: don't close clarinet here because if it was not expecting
-      // end of the json it will throw an error
-   }); 
+   
 }
 
 /**

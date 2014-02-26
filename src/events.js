@@ -29,7 +29,6 @@ var // the events which are never exported are kept as
     SAX_CLOSE_OBJECT = _S++,
     SAX_OPEN_ARRAY   = _S++,
     SAX_CLOSE_ARRAY  = _S++,
-    SAX_ERROR        = _S++,
     SAX_END          = _S++,
     SAX_READY        = _S++;
     

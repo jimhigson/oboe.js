@@ -123,7 +123,7 @@ function clarinet(eventBus) {
           "\nChr: "+parser.c;
     er = new Error(er);
     parser.error = er;
-    emit(SAX_ERROR, er);
+    emit(FAIL_EVENT, errorReport(undefined, undefined, er));
     return parser;
   }
 
