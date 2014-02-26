@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-8-g3015020
+// v1.14.0-9-g8c899df
 
 /*
 
@@ -532,7 +532,7 @@ function first(test, list) {
       https://github.com/dscape/clarinet
  */
 
-function clarinet() {
+function clarinet(eventBus) {
 
   var MAX_BUFFER_LENGTH = 64 * 1024
   ,   buffers     = [ "textNode", "numberNode" ]
@@ -606,13 +606,14 @@ function clarinet() {
     parser.unicodeS = null;
     parser.depth    = 0;
     emit(parser, SAX_READY);
-  }
 
-  CParser.prototype =
-    { end    : function () { end(this); }
-    , write  : write
-    , close  : function () { return this.write(null); }
-    };
+    eventBus(STREAM_DATA).on( write.bind(parser));
+
+    /* At the end of the http content close the clarinet parser.
+     This will provide an error if the total content provided was not 
+     valid json, ie if not all arrays, objects and Strings closed properly */
+    eventBus(STREAM_END).on( write.bind(parser, null));
+  }
 
   function emit(parser, event, data) {
     if (parser[event]) parser[event](data);
@@ -2352,12 +2353,12 @@ function instanceApi(oboeBus){
 function instanceController(  oboeBus, 
                               clarinetParser, contentBuilderHandlers) {
                                 
-   oboeBus(STREAM_DATA).on( clarinetParser.write.bind(clarinetParser));      
+   //oboeBus(STREAM_DATA).on( clarinetParser.write.bind(clarinetParser));      
    
    /* At the end of the http content close the clarinet parser.
       This will provide an error if the total content provided was not 
       valid json, ie if not all arrays, objects and Strings closed properly */
-   oboeBus(STREAM_END).on( clarinetParser.close.bind(clarinetParser));
+   //oboeBus(STREAM_END).on( clarinetParser.close.bind(clarinetParser));
    
 
    /* If we abort this Oboe's request stop listening to the clarinet parser. 
@@ -2429,7 +2430,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
      
    instanceController( 
                oboeBus, 
-               clarinet(), 
+               clarinet(oboeBus), 
                incrementalContentBuilder(oboeBus) 
    );
       

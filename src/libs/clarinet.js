@@ -9,7 +9,7 @@
       https://github.com/dscape/clarinet
  */
 
-function clarinet() {
+function clarinet(eventBus) {
 
   var MAX_BUFFER_LENGTH = 64 * 1024
   ,   buffers     = [ "textNode", "numberNode" ]
@@ -82,14 +82,15 @@ function clarinet() {
     parser.unicodeI = 0;
     parser.unicodeS = null;
     parser.depth    = 0;
-    emit(parser, SAX_READY);
-  }
+    emit(parser¡ªª, SAX_READY);
 
-  CParser.prototype =
-    { end    : function () { end(this); }
-    , write  : write
-    , close  : function () { return this.write(null); }
-    };
+    eventBus(STREAM_DATA).on( write.bind(parser));
+
+    /* At the end of the http content close the clarinet parser.
+     This will provide an error if the total content provided was not 
+     valid json, ie if not all arrays, objects and Strings closed properly */
+    eventBus(STREAM_END).on( write.bind(parser, null));
+  }
 
   function emit(parser, event, data) {
     if (parser[event]) parser[event](data);
