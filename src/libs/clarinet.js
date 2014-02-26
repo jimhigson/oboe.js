@@ -79,7 +79,7 @@ function clarinet(eventBus) {
    /* At the end of the http content close the clarinet 
     This will provide an error if the total content provided was not 
     valid json, ie if not all arrays, objects and Strings closed properly */
-  eventBus(STREAM_END).on( write.bind(undefined, null));   
+  eventBus(STREAM_END).on(end);   
 
 
   function emit(event, data) {
@@ -132,9 +132,8 @@ function clarinet(eventBus) {
     if (error)
       return;
       
-    if (closed) return emitError(
-       "Cannot write after close. Assign an onready handler.");
-    if (chunk === null) return end();
+    if (closed) return emitError("Cannot write after close");
+
     var i = 0;
     c = chunk[0]; 
 
@@ -174,7 +173,7 @@ function clarinet(eventBus) {
           if(c === '"')
              state = STRING;
           else 
-             emitError("Malformed object key should start with \" " + c);
+             emitError("Malformed object key should start with \" ");
         continue;
 
         case CLOSE_KEY:

@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-20-g4948682
+// v1.14.0-21-gcd50442
 
 /*
 
@@ -603,7 +603,7 @@ function clarinet(eventBus) {
    /* At the end of the http content close the clarinet 
     This will provide an error if the total content provided was not 
     valid json, ie if not all arrays, objects and Strings closed properly */
-  eventBus(STREAM_END).on( write.bind(undefined, null));   
+  eventBus(STREAM_END).on(end);   
 
 
   function emit(event, data) {
@@ -656,9 +656,8 @@ function clarinet(eventBus) {
     if (error)
       return;
       
-    if (closed) return emitError(
-       "Cannot write after close. Assign an onready handler.");
-    if (chunk === null) return end();
+    if (closed) return emitError("Cannot write after close");
+
     var i = 0;
     c = chunk[0]; 
 
