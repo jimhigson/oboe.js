@@ -444,5 +444,5 @@ function clarinet(eventBus) {
     return parser;
   }
 
-  return new CParser();
+  new CParser();
 }
