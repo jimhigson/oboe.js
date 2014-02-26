@@ -5,8 +5,10 @@ function spiedPubSub() {
    function fakedPubSub( eventName ) {
         
       var single = realPubSub(eventName);
-   
-      if( !single.emit.isSpy ) {   
+
+      var alreadySpied = !!single.emit.isSpy;
+      
+      if( !alreadySpied ) {   
          spyOn( single, 'emit' ).andCallThrough();
          spyOn( single, 'on'   ).andCallThrough();
          spyOn( single, 'un'   ).andCallThrough();
@@ -75,3 +77,21 @@ function fakePubSub( eventNames ) {
       
    return bus;
 }      
+
+function eventBlackBox( pubsub, eventNames ) {
+   
+   var recording = [];
+   
+   eventNames.forEach(function(eventName){
+      pubsub(eventName).on(function(val, val2){
+         recording.push({
+            type: eventName, 
+            values: arguments,
+            val: val,
+            val2: val
+         });
+      });
+   });
+   
+   return recording;
+}
