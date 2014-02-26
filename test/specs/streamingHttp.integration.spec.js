@@ -246,7 +246,6 @@ describe('streaming xhr integration (real http)', function() {
 
       runs(function(){
          var parsedResult = JSON.parse(streamedContentPassedTo(oboeBus));
-         console.log(parsedResult);
          expect(parsedResult.cookie).toMatch('corsToken=123456');
       });
    })   
