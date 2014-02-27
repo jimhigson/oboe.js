@@ -22,7 +22,8 @@ var docs   =
     , zero_byte    :
       { text       : '{"foo": "\\u0000"}'
       , events     :
-        [ [SAX_OPEN_OBJECT  , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE       , "\u0000"]
         , [SAX_CLOSE_OBJECT , undefined]
         
@@ -32,7 +33,8 @@ var docs   =
     , empty_value  :
       { text       : '{"foo": ""}'
       , events     :
-        [ [SAX_OPEN_OBJECT  , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE       , ""]
         , [SAX_CLOSE_OBJECT , undefined]
         
@@ -42,7 +44,8 @@ var docs   =
     , three_byte_utf8 :
       { text          : '{"matzue": "松江", "asakusa": "浅草"}'
       , events        :
-        [ [SAX_OPEN_OBJECT  , "matzue"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "matzue"]
         , [SAX_VALUE       , "松江"]
         , [SAX_KEY         , "asakusa"]
         , [SAX_VALUE       , "浅草"]
@@ -54,7 +57,8 @@ var docs   =
     , four_byte_utf8 :
       { text          : '{ "U+10ABCD": "􊯍" }'
       , events        :
-        [ [SAX_OPEN_OBJECT  , "U+10ABCD"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "U+10ABCD"]
         , [SAX_VALUE       , "􊯍"]
         , [SAX_CLOSE_OBJECT , undefined]
         
@@ -93,7 +97,8 @@ var docs   =
     , foobar   :
       { text   : '{"foo": "bar"}'
       , events :
-        [ [SAX_OPEN_OBJECT  , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE       , "bar"]
         , [SAX_CLOSE_OBJECT , undefined]
         
@@ -103,7 +108,8 @@ var docs   =
     , as_is    :
       { text   : "{\"foo\": \"its \\\"as is\\\", \\\"yeah\", \"bar\": false}"
       , events :
-        [ [SAX_OPEN_OBJECT  , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE       , 'its "as is", "yeah']
         , [SAX_KEY         , "bar"]
         , [SAX_VALUE       , false]
@@ -163,8 +169,10 @@ var docs   =
     , nested   :
       { text   : '{"a":{"b":"c"}}'
       , events :
-        [ [SAX_OPEN_OBJECT  , "a"]
-        , [SAX_OPEN_OBJECT  , "b"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "a"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "b"]
         , [SAX_VALUE       , "c"]
         , [SAX_CLOSE_OBJECT , undefined]
         , [SAX_CLOSE_OBJECT , undefined]
@@ -175,7 +183,8 @@ var docs   =
     , nested_array  :
       { text        : '{"a":["b", "c"]}'
       , events      :
-          [ [SAX_OPEN_OBJECT  , "a"]
+          [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "a"]
           , [SAX_OPEN_ARRAY   , undefined]
           , [SAX_VALUE       , 'b']
           , [SAX_VALUE       , 'c']
@@ -203,7 +212,8 @@ var docs   =
     , two_keys  :
       { text    : '{"a": "b", "c": "d"}'
       , events  :
-        [ [SAX_OPEN_OBJECT  , "a"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "a"]
         , [SAX_VALUE       , "b"]
         , [SAX_KEY         , "c"]
         , [SAX_VALUE       , "d"]
@@ -215,7 +225,8 @@ var docs   =
     , key_true  :
       { text    : '{"foo": true, "bar": false, "baz": null}'
       , events  :
-        [ [SAX_OPEN_OBJECT  , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE       , true]
         , [SAX_KEY         , "bar"]
         , [SAX_VALUE       , false]
@@ -230,7 +241,8 @@ var docs   =
       { text               : 
         '{"foo": "bar and all\\\"", "bar": "its \\\"nice\\\""}'
       , events             :
-        [ [SAX_OPEN_OBJECT    , "foo"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "foo"]
         , [SAX_VALUE         , 'bar and all"']
         , [SAX_KEY           , "bar"]
         , [SAX_VALUE         , 'its "nice"']
@@ -263,7 +275,8 @@ var docs   =
                        ', "boolean, false": false' +
                        ', "null": null }'
        , events          :
-         [ [SAX_OPEN_OBJECT   , "boolean, true"]
+         [ [SAX_OPEN_OBJECT , undefined]
+         , [SAX_VALUE       , "boolean, true"]
          , [SAX_VALUE        , true]
          , [SAX_KEY          , "boolean, false"]
          , [SAX_VALUE        , false]
@@ -551,14 +564,16 @@ var docs   =
                    '"number": "212 555-1234" }, { "type" : "fax", ' + 
                    '"number": "646 555-4567" } ] }'
       , events   :
-        [ [SAX_OPEN_OBJECT   , "firstName"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "firstName"]
         , [SAX_VALUE        , "John"]
         , [SAX_KEY          , "lastName"]
         , [SAX_VALUE        , "Smith"]
         , [SAX_KEY          , "age"]
         , [SAX_VALUE        , 25]
         , [SAX_KEY          , "address"]
-        , [SAX_OPEN_OBJECT   , "streetAddress"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "streetAddress"]
         , [SAX_VALUE        , "21 2nd Street"]
         , [SAX_KEY          , "city"]
         , [SAX_VALUE        , "New York"]
@@ -569,12 +584,14 @@ var docs   =
         , [SAX_CLOSE_OBJECT  , undefined]
         , [SAX_KEY          , "phoneNumber"]
         , [SAX_OPEN_ARRAY    , undefined]
-        , [SAX_OPEN_OBJECT   , "type"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "type"]
         , [SAX_VALUE        , "home"]
         , [SAX_KEY          , "number"]
         , [SAX_VALUE        , "212 555-1234"]
         , [SAX_CLOSE_OBJECT  , undefined]
-        , [SAX_OPEN_OBJECT   , "type"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "type"]
         , [SAX_VALUE        , "fax"]
         , [SAX_KEY          , "number"]
         , [SAX_VALUE        , "646 555-4567"]
@@ -596,7 +613,8 @@ var docs   =
     , empty_array_comma :
       { text    : '{"a":[],"c": {}, "b": true}'
       , events  :
-        [ [SAX_OPEN_OBJECT  , "a"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "a"]
         , [SAX_OPEN_ARRAY   , undefined]
         , [SAX_CLOSE_ARRAY  , undefined]
         , [SAX_KEY         , "c"]
@@ -662,15 +680,20 @@ var docs   =
           '          }\r\n' +
           '      }\r\n')
       , events  :
-        [ [SAX_OPEN_OBJECT  , "glossary"]
-        , [SAX_OPEN_OBJECT  , "title"]
+        [ [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "glossary"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "title"]
         , [SAX_VALUE       , "example glossary"]
         , [SAX_KEY         , "GlossDiv"]
-        , [SAX_OPEN_OBJECT  , "title"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "title"]
         , [SAX_VALUE       , "S"]
         , [SAX_KEY         , "GlossList"]
-        , [SAX_OPEN_OBJECT  , "GlossEntry"]
-        , [SAX_OPEN_OBJECT  , "ID"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "GlossEntry"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "ID"]
         , [SAX_VALUE       , "SGML"]
         , [SAX_KEY         , "SortAs"]
         , [SAX_VALUE       , "SGML"]
@@ -681,7 +704,8 @@ var docs   =
         , [SAX_KEY         , "Abbrev"]
         , [SAX_VALUE       , 'ISO 8879:1986']
         , [SAX_KEY         , "GlossDef"]
-        , [SAX_OPEN_OBJECT  , "para"]
+        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE       , "para"]
         , [SAX_VALUE       , 'A meta-markup language, used to create markup languages such as DocBook.']
         , [SAX_KEY         , "GlossSeeAlso"]
         , [SAX_OPEN_ARRAY   , undefined]
