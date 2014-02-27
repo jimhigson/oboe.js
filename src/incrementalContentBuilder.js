@@ -49,7 +49,7 @@ function incrementalContentBuilder( oboeBus ) {
       
       return      isOfType( Array, parentNode)
                ?
-                  pathFound(  possiblyInconsistentAscent, 
+                  keyFound(  possiblyInconsistentAscent, 
                               len(parentNode), 
                               newDeepestNode
                   )
@@ -65,7 +65,7 @@ function incrementalContentBuilder( oboeBus ) {
          // we discovered the root node,         
          emitRootOpened( newDeepestNode);
                     
-         return pathFound( ascent, ROOT_PATH, newDeepestNode);         
+         return keyFound( ascent, ROOT_PATH, newDeepestNode);         
       }
 
       // we discovered a non-root node
@@ -108,7 +108,7 @@ function incrementalContentBuilder( oboeBus ) {
     *    usually this won't be known so can be undefined. Can't use null 
     *    to represent unknown because null is a valid value in JSON
     **/  
-   function pathFound(ascent, newDeepestName, maybeNewDeepestNode) {
+   function keyFound(ascent, newDeepestName, maybeNewDeepestNode) {
 
       if( ascent ) { // if not root
       
@@ -148,7 +148,7 @@ function incrementalContentBuilder( oboeBus ) {
    contentBuilderHandlers[SAX_OPEN_ARRAY] = function (ascent) {
       return nodeOpened(ascent, []);
    }; 
-   contentBuilderHandlers[SAX_KEY] = pathFound; 
+   contentBuilderHandlers[SAX_KEY] = keyFound; 
    contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
    contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
    contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
