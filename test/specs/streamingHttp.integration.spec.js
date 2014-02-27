@@ -444,16 +444,6 @@ describe('streaming xhr integration (real http)', function() {
    
    beforeEach(function(){
                
-      function prettyPrintEvent(event){
-
-         switch(event) {
-            case     HTTP_START:  return 'start';
-            case     STREAM_DATA: return 'data';
-            case     STREAM_END:  return 'end';
-            default: return 'unknown(' + event + ')' 
-         }                                    
-      }
-            
       this.addMatchers({
          toHaveGivenStreamEventsInCorrectOrder: function(){
             

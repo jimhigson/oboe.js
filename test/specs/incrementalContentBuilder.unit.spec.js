@@ -78,7 +78,8 @@ describe("incremental content builder", function(){
       // above test, plus some extra events from clarinet
 
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_OBJECT, 'flavour');
+          .receivingEvent(SAX_OPEN_OBJECT, undefined)
+          .receivingEvent(SAX_KEY,         'flavour');
           
       it('emits correct event', function(){
           

@@ -142,30 +142,8 @@ function incrementalContentBuilder( oboeBus ) {
    }      
                  
    var contentBuilderHandlers = {};
-   contentBuilderHandlers[SAX_OPEN_OBJECT] = function (ascent, firstKey) {
-
-      var ascentAfterNodeFound = nodeOpened(ascent, {});
-
-      /* It is a peculiarity of Clarinet that for non-empty objects it
-       gives the first key with the openobject event instead of
-       in a subsequent key event.
-
-       firstKey could be the empty string in a JSON object like 
-       {'':'foo'} which is technically valid.
-
-       So can't check with !firstKey, have to see if has any 
-       defined value. */
-      return defined(firstKey)
-         ?
-         /* We know the first key of the newly parsed object. Notify that 
-          path has been found but don't put firstKey permanently onto 
-          pathList yet because we haven't identified what is at that key 
-          yet. Give null as the value because we haven't seen that far 
-          into the json yet */
-         pathFound(ascentAfterNodeFound, firstKey)
-         :
-         ascentAfterNodeFound
-         ;
+   contentBuilderHandlers[SAX_OPEN_OBJECT] = function (ascent) {
+      return nodeOpened(ascent, {});
    }; 
    contentBuilderHandlers[SAX_OPEN_ARRAY] = function (ascent) {
       return nodeOpened(ascent, []);

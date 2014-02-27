@@ -14,12 +14,13 @@ function clarinet(eventBus) {
    
   var 
       // shortcut some events
-      emitSaxOpenObject = eventBus(SAX_OPEN_OBJECT),
-      emitSaxCloseObject = eventBus(SAX_CLOSE_OBJECT),
-      emitSaxOpenArray = eventBus(SAX_OPEN_ARRAY),
-      emitSaxCloseArray = eventBus(SAX_CLOSE_ARRAY),
-      emitSaxValue = eventBus(SAX_VALUE),
-      emitFail = eventBus(FAIL_EVENT),
+      emitSaxOpenObject    = eventBus(SAX_OPEN_OBJECT).emit,
+      emitSaxCloseObject   = eventBus(SAX_CLOSE_OBJECT).emit,
+      emitSaxOpenArray     = eventBus(SAX_OPEN_ARRAY).emit,
+      emitSaxCloseArray    = eventBus(SAX_CLOSE_ARRAY).emit,
+      emitSaxKey           = eventBus(SAX_KEY).emit,
+      emitSaxValue         = eventBus(SAX_VALUE).emit,
+      emitFail             = eventBus(FAIL_EVENT).emit,
               
       MAX_BUFFER_LENGTH = 64 * 1024
   ,   stringTokenPattern = /[\\"\n]/g
@@ -96,17 +97,12 @@ function clarinet(eventBus) {
     eventBus(event).emit(data);
   }
 
-  function closeValue(event) {
-
-    if (textNode) {
-      emit(event, textNode);
-    }
-    textNode = "";
-  }
-
   function emitError (er) {
-    closeValue(SAX_VALUE);
-    er += "\nLn: "+line+
+     if (textNode) {
+        emitSaxValue(textNode);
+     }
+     textNode = "";
+     er += "\nLn: "+line+
           "\nCol: "+column+
           "\nChr: "+c;
     er = new Error(er);
@@ -117,9 +113,12 @@ function clarinet(eventBus) {
   function end() {
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
-
-    closeValue(SAX_VALUE);
-    closed = true;
+ 
+     if (textNode) {
+        emitSaxValue(textNode);
+     }
+     textNode = "";
+     closed = true;
   }
 
   function write (chunk) {
@@ -179,21 +178,38 @@ function clarinet(eventBus) {
           if(c===':') {
             if(state === CLOSE_OBJECT) {
               stack.push(CLOSE_OBJECT);
-              // TODO: make two events here
-              closeValue(SAX_OPEN_OBJECT);
-              depth++;
-            } else closeValue(SAX_KEY);
-            state  = VALUE;
+
+               if (textNode) {
+                  // was previously (in upstream Clarinet) one event
+                  //  - object open came with the text of the first
+                  emitSaxOpenObject();
+                  emitSaxKey(textNode);
+               }
+               textNode = "";
+               depth++;
+            } else {
+               if (textNode) {
+                  emitSaxKey(textNode);
+               }
+               textNode = "";
+            }
+             state  = VALUE;
           } else if (c==='}') {
-            closeValue(SAX_VALUE);
-            emitSaxCloseObject();
+             if (textNode) {
+                emitSaxValue(textNode);
+             }
+             textNode = "";
+             emitSaxCloseObject();
             depth--;
             state = stack.pop() || VALUE;
           } else if(c===',') {
             if(state === CLOSE_OBJECT)
               stack.push(CLOSE_OBJECT);
-            closeValue(SAX_VALUE);
-            state  = OPEN_KEY;
+             if (textNode) {
+                emitSaxValue(textNode);
+             }
+             textNode = "";
+             state  = OPEN_KEY;
           } else emitError('Bad object');
         continue;
 
@@ -233,11 +249,17 @@ function clarinet(eventBus) {
         case CLOSE_ARRAY:
           if(c===',') {
             stack.push(CLOSE_ARRAY);
-            closeValue(SAX_VALUE);
-            state  = VALUE;
+             if (textNode) {
+                emitSaxValue(textNode);
+             }
+             textNode = "";
+             state  = VALUE;
           } else if (c===']') {
-            closeValue(SAX_VALUE);
-            emitSaxCloseArray();
+             if (textNode) {
+                emitSaxValue(textNode);
+             }
+             textNode = "";
+             emitSaxCloseArray();
             depth--;
             state = stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
