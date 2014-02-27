@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-28-g58c2e9e
+// v1.14.0-29-gb728b45
 
 /*
 
@@ -537,7 +537,7 @@ function clarinet(eventBus) {
   "use strict";
    
   var 
-      // shortcut some events
+      // shortcut some events on the bus
       emitSaxOpenObject    = eventBus(SAX_OPEN_OBJECT).emit,
       emitSaxCloseObject   = eventBus(SAX_CLOSE_OBJECT).emit,
       emitSaxOpenArray     = eventBus(SAX_OPEN_ARRAY).emit,
@@ -574,22 +574,23 @@ function clarinet(eventBus) {
   ,   NUMBER_DIGIT         = _n   // [0-9]
 
       // setup initial parser values
-  ,   bufferCheckPosition = MAX_BUFFER_LENGTH
-  ,   c                    = ""
-  ,   p                    = ""
+  ,   bufferCheckPosition  = MAX_BUFFER_LENGTH
+  ,   error                
+  ,   c                    
+  ,   p                    
+  ,   textNode             = ""
+  ,   numberNode           = ""     
+  ,   slashed              = false
   ,   closed               = false
-  ,   error                = null
   ,   state                = BEGIN
   ,   stack                = []
+  ,   unicodeS             = null
+  ,   unicodeI             = 0
+  ,   depth                = 0
   ,   position             = 0
   ,   column               = 0  //mostly for error reporting
   ,   line                 = 1
-  ,   slashed              = false
-  ,   unicodeI             = 0
-  ,   unicodeS             = null
-  ,   depth                = 0
-  ,   textNode             = ""
-  ,   numberNode           = "";
+  ;
 
   function checkBufferLength () {
      
@@ -615,23 +616,17 @@ function clarinet(eventBus) {
     valid json, ie if not all arrays, objects and Strings closed properly */
   eventBus(STREAM_END).on(end);   
 
-
-  function emit(event, data) {
-     // TODO: store refs to singles then inline
-    eventBus(event).emit(data);
-  }
-
   function emitError (er) {
      if (textNode) {
         emitSaxValue(textNode);
+        textNode = "";
      }
-     textNode = "";
-     er += "\nLn: "+line+
-          "\nCol: "+column+
-          "\nChr: "+c;
-    er = new Error(er);
-    error = er;
-    emitFail(errorReport(undefined, undefined, er));
+
+     error = Error(er + "\nLn: "+line+
+                        "\nCol: "+column+
+                        "\nChr: "+c);
+     
+     emitFail(errorReport(undefined, undefined, error));
   }
 
   function end() {
@@ -640,8 +635,9 @@ function clarinet(eventBus) {
  
      if (textNode) {
         emitSaxValue(textNode);
+        textNode = "";
      }
-     textNode = "";
+     
      closed = true;
   }
 
@@ -708,21 +704,21 @@ function clarinet(eventBus) {
                   //  - object open came with the text of the first
                   emitSaxOpenObject();
                   emitSaxKey(textNode);
+                  textNode = "";
                }
-               textNode = "";
                depth++;
             } else {
                if (textNode) {
                   emitSaxKey(textNode);
+                  textNode = "";
                }
-               textNode = "";
             }
              state  = VALUE;
           } else if (c==='}') {
              if (textNode) {
                 emitSaxValue(textNode);
+                textNode = "";
              }
-             textNode = "";
              emitSaxCloseObject();
             depth--;
             state = stack.pop() || VALUE;
@@ -731,8 +727,8 @@ function clarinet(eventBus) {
               stack.push(CLOSE_OBJECT);
              if (textNode) {
                 emitSaxValue(textNode);
+                textNode = "";
              }
-             textNode = "";
              state  = OPEN_KEY;
           } else emitError('Bad object');
         continue;
@@ -767,7 +763,8 @@ function clarinet(eventBus) {
           } else if('123456789'.indexOf(c) !== -1) {
             numberNode += c;
             state = NUMBER_DIGIT;
-          } else               emitError("Bad value");
+          } else               
+            emitError("Bad value");
         continue;
 
         case CLOSE_ARRAY:
@@ -775,20 +772,21 @@ function clarinet(eventBus) {
             stack.push(CLOSE_ARRAY);
              if (textNode) {
                 emitSaxValue(textNode);
+                textNode = "";
              }
-             textNode = "";
              state  = VALUE;
           } else if (c===']') {
              if (textNode) {
                 emitSaxValue(textNode);
+                textNode = "";
              }
-             textNode = "";
              emitSaxCloseArray();
             depth--;
             state = stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
               continue;
-          else emitError('Bad array');
+          else 
+             emitError('Bad array');
         continue;
 
         case STRING:
@@ -951,9 +949,10 @@ function clarinet(eventBus) {
               emitError('Invalid symbol in number');
             numberNode += c;
           } else {
-             if (numberNode)
+             if (numberNode) {
                 emitSaxValue(parseFloat(numberNode));
-             numberNode = "";
+                numberNode = "";
+             }
              i--; // go back one
             state = stack.pop() || VALUE;
           }
