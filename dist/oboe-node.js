@@ -1,6 +1,6 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
 module.exports = (function  () {
-// v1.14.0-29-gb728b45
+// v1.14.0-30-ga1372c6
 
 /*
 
@@ -948,11 +948,11 @@ function clarinet(eventBus) {
               emitError('Invalid symbol in number');
             numberNode += c;
           } else {
-             if (numberNode) {
-                emitSaxValue(parseFloat(numberNode));
-                numberNode = "";
-             }
-             i--; // go back one
+            if (numberNode) {
+              emitSaxValue(parseFloat(numberNode));
+              numberNode = "";
+            }
+            i--; // go back one
             state = stack.pop() || VALUE;
           }
         continue;
