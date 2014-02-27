@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.0-23-g2f8ad01
+// v1.14.0-24-g629b856
 
 /*
 
@@ -607,6 +607,7 @@ function clarinet(eventBus) {
 
 
   function emit(event, data) {
+     // TODO: store refs to singles then inline
     eventBus(event).emit(data);
   }
 
@@ -2357,20 +2358,6 @@ function instanceApi(oboeBus){
     
 
 /**
- * This file implements a light-touch central controller for an instance 
- * of Oboe which provides the methods used for interacting with the instance 
- * from the calling app.
- */
- 
- 
-function instanceController(  oboeBus, 
-                              contentBuilderHandlers) {
-                                
-   ascentManager(oboeBus, contentBuilderHandlers);
-   
-}
-
-/**
  * This file sits just behind the API which is used to attain a new
  * Oboe instance. It creates the new components that are required
  * and introduces them to each other.
@@ -2418,11 +2405,8 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    }
 
    clarinet(oboeBus);
-   
-   instanceController( 
-               oboeBus, 
-               incrementalContentBuilder(oboeBus) 
-   );
+
+   ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
       
    patternAdapter(oboeBus, jsonPathCompiler);      
       

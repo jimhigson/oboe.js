@@ -83,6 +83,7 @@ function clarinet(eventBus) {
 
 
   function emit(event, data) {
+     // TODO: store refs to singles then inline
     eventBus(event).emit(data);
   }
 

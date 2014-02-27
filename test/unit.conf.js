@@ -27,9 +27,8 @@ module.exports = function(config) {
       ,  'src/singleEventPubSub.js' 
       ,  'src/pubSub.js' 
       ,  'src/events.js'
-      ,  'src/patternAdapter.js'      
-      ,  'src/instanceApi.js'           
-      ,  'src/instanceController.js'
+      ,  'src/patternAdapter.js'
+      ,  'src/instanceApi.js'
       ,  'src/wire.js'
       ,  'src/publicApi.js'
         

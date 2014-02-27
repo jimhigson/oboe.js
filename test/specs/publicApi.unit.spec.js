@@ -2,9 +2,6 @@
 /*
    Tests that calling the public api gets through correctly to the writing
    correctly. streamingXhr is a stub so no actual calls are made. 
-   
-   Technically this tests some of instanceController.js as well as publicApi.js but the tests were
-   written before the logic was split into two.
  */
 
 describe("public api", function(){

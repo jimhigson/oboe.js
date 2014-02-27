@@ -24,7 +24,6 @@ module.exports = function (grunt) {
    ,  'src/events.js'
    ,  'src/patternAdapter.js'   
    ,  'src/instanceApi.js'   
-   ,  'src/instanceController.js'
    ,  'src/wire.js'
    ,  'src/publicApi.js'
    ];
@@ -47,7 +46,6 @@ module.exports = function (grunt) {
    ,  'src/events.js'
    ,  'src/patternAdapter.js'      
    ,  'src/instanceApi.js'   
-   ,  'src/instanceController.js'
    ,  'src/wire.js'
    ,  'src/publicApi.js'
    ];   

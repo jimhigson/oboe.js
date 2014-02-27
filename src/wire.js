@@ -46,11 +46,8 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    }
 
    clarinet(oboeBus);
-   
-   instanceController( 
-               oboeBus, 
-               incrementalContentBuilder(oboeBus) 
-   );
+
+   ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
       
    patternAdapter(oboeBus, jsonPathCompiler);      
       
