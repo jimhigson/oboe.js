@@ -12,7 +12,16 @@
 function clarinet(eventBus) {
   "use strict";
    
-  var MAX_BUFFER_LENGTH = 64 * 1024
+  var 
+      // shortcut some events
+      emitSaxOpenObject = eventBus(SAX_OPEN_OBJECT),
+      emitSaxCloseObject = eventBus(SAX_CLOSE_OBJECT),
+      emitSaxOpenArray = eventBus(SAX_OPEN_ARRAY),
+      emitSaxCloseArray = eventBus(SAX_CLOSE_ARRAY),
+      emitSaxValue = eventBus(SAX_VALUE),
+      emitFail = eventBus(FAIL_EVENT),
+              
+      MAX_BUFFER_LENGTH = 64 * 1024
   ,   stringTokenPattern = /[\\"\n]/g
   ,   _n = 0
   
@@ -102,7 +111,7 @@ function clarinet(eventBus) {
           "\nChr: "+c;
     er = new Error(er);
     error = er;
-    emit(FAIL_EVENT, errorReport(undefined, undefined, er));
+    emitFail(errorReport(undefined, undefined, er));
   }
 
   function end() {
@@ -151,8 +160,8 @@ function clarinet(eventBus) {
           if(state === OPEN_KEY) stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
-              emit(SAX_OPEN_OBJECT);
-              emit(SAX_CLOSE_OBJECT);
+              emitSaxOpenObject();
+              emitSaxCloseObject();
               state = stack.pop() || VALUE;
               continue;
             } else  stack.push(CLOSE_OBJECT);
@@ -177,7 +186,7 @@ function clarinet(eventBus) {
             state  = VALUE;
           } else if (c==='}') {
             closeValue(SAX_VALUE);
-            emit(SAX_CLOSE_OBJECT);
+            emitSaxCloseObject();
             depth--;
             state = stack.pop() || VALUE;
           } else if(c===',') {
@@ -192,11 +201,11 @@ function clarinet(eventBus) {
         case VALUE:
           if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
           if(state===OPEN_ARRAY) {
-            emit(SAX_OPEN_ARRAY);
+            emitSaxOpenArray();
             depth++;             
             state = VALUE;
             if(c === ']') {
-              emit(SAX_CLOSE_ARRAY);
+              emitSaxCloseArray();
               depth--;
               state = stack.pop() || VALUE;
               continue;
@@ -228,7 +237,7 @@ function clarinet(eventBus) {
             state  = VALUE;
           } else if (c===']') {
             closeValue(SAX_VALUE);
-            emit(SAX_CLOSE_ARRAY);
+            emitSaxCloseArray();
             depth--;
             state = stack.pop() || VALUE;
           } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
@@ -261,7 +270,7 @@ function clarinet(eventBus) {
               state = stack.pop() || VALUE;
               textNode += chunk.substring(starti, i-1);
               if(!textNode) {
-                 emit(SAX_VALUE, "");
+                 emitSaxValue("");
               }
               break;
             }
@@ -322,7 +331,7 @@ function clarinet(eventBus) {
         case TRUE3:
           if (c==='') continue;
           if(c==='e') {
-            emit(SAX_VALUE, true);
+            emitSaxValue(true);
             state = stack.pop() || VALUE;
           } else emitError('Invalid true started with tru'+ c);
         continue;
@@ -348,7 +357,7 @@ function clarinet(eventBus) {
         case FALSE4:
           if (c==='')  continue;
           if (c==='e') {
-            emit(SAX_VALUE, false);
+            emitSaxValue(false);
             state = stack.pop() || VALUE;
           } else emitError('Invalid false started with fals'+ c);
         continue;
@@ -368,7 +377,7 @@ function clarinet(eventBus) {
         case NULL3:
           if (c==='') continue;
           if(c==='l') {
-            emit(SAX_VALUE, null);
+            emitSaxValue(null);
             state = stack.pop() || VALUE;
           } else emitError('Invalid null started with nul'+ c);
         continue;
@@ -397,7 +406,7 @@ function clarinet(eventBus) {
             numberNode += c;
           } else {
              if (numberNode)
-                emit(SAX_VALUE, parseFloat(numberNode));
+                emitSaxValue(parseFloat(numberNode));
              numberNode = "";
              i--; // go back one
             state = stack.pop() || VALUE;
