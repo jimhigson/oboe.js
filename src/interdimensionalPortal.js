@@ -1,0 +1,80 @@
+/**
+ * @function
+ * 
+ * @param childFn
+ * @param parentThreadBus
+ * @param eventsToChild
+ * @param eventsFromChild
+ */
+var portal = (function(){
+   "use strict";
+
+   function forward(eventEmitter, eventNames, thread){
+      
+      console.log(
+         'setting up forwarding for', eventNames,
+         'to', thread);
+      
+      eventNames.forEach(function(eventName){
+         
+         eventEmitter.on(eventName, function(val){
+            console.log(
+               'need to forward an', eventName, 
+               'event with value', val,
+               'to other thread');
+            
+            var event = {name: eventName, value: val};
+            
+            if( thread ){
+               thread.postMessage(event);
+            }else{
+               postMessage(event);
+            }
+         });
+      });
+   }
+   
+   function receive(eventEmitter, thread){
+      console.log('setting up listening for messages from thread', thread);
+
+      function handle(event){
+         var data = event.data;
+         console.log('got message from other thread ' +
+            data +  
+            ' of type ' + data.name + ' with val ' + data.value);
+
+         eventEmitter.emit(data.name, data.value);
+      }
+      
+      if(thread){
+         thread.onmessage = handle;
+      } else {
+         onmessage = handle;
+      }
+   }
+
+   function codeForChildThread(childLibs, childServer, eventsFromChild) {
+      
+      return childLibs
+                  .concat(forward, receive)
+                  .map(String)
+                  .join('') +
+             'var bus=pubSub();' +
+             'forward(bus,' + JSON.stringify(eventsFromChild) + ');' +
+             'receive(bus);' + 
+             '(' + childServer.toString() + '(bus))';
+   }
+
+   return function (childLibs, childServer, parentThreadBus, eventsToChild, eventsFromChild){
+
+      var code = codeForChildThread(childLibs, childServer, eventsFromChild);
+     
+      // http://developer.mozilla.org/en-US/docs/Web/API/Blob
+      var blob = new Blob([code], {type:'text/javascript'}),
+          worker = new Worker(window.URL.createObjectURL(blob));
+         
+      forward(parentThreadBus, eventsToChild, worker);
+      receive(parentThreadBus, worker);
+   }
+
+}());

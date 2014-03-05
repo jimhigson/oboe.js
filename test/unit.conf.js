@@ -31,6 +31,7 @@ module.exports = function(config) {
       ,  'src/instanceApi.js'
       ,  'src/wire.js'
       ,  'src/publicApi.js'
+      ,  'src/interDimensionalPortal.js'
         
       ,  'test/specs/*.unit.spec.js'
       ,  'test/specs/*.component.spec.js'      
