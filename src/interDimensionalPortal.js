@@ -11,17 +11,15 @@ var portal = (function(){
 
    function forward(eventEmitter, eventNames, thread){
             
+      var dispatch = thread? thread.postMessage.bind(thread) : postMessage;
+      
       eventNames.forEach(function(eventName){
          
          eventEmitter.on(eventName, function(val){
             
             var event = {name: eventName, value: val};
-            
-            if( thread ){
-               thread.postMessage(event);
-            }else{
-               postMessage(event);
-            }
+
+            dispatch(event);
          });
       });
    }
