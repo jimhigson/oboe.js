@@ -42,7 +42,7 @@ var portal = (function(){
    }
 
    function codeForChildThread(childLibs, childServer, eventsFromChild) {
-      
+
       return childLibs
                   .concat(forward, receive)
                   .map(String)
@@ -50,7 +50,7 @@ var portal = (function(){
              'var bus=pubSub();' +
              'forward(bus,' + JSON.stringify(eventsFromChild) + ');' +
              'receive(bus);' + 
-             '(' + childServer.toString() + '(bus))';
+             '(' + String(childServer) + '(bus))';
    }
 
    return function (childLibs, childServer, parentThreadBus, eventsToChild, eventsFromChild){
