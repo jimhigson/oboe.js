@@ -1,4 +1,4 @@
-describe('interDimensionalPortal', function(){
+describe('interDimensionalPortal unit', function(){
 
    var environment = [
       function head(o){return o[0]},
@@ -11,7 +11,7 @@ describe('interDimensionalPortal', function(){
       pubSub
    ];
    
-   it('can be used as a calc server using Oboe.js internal environment', function(){
+   it('can be used for a calc server using elements from Oboe.js internal environment', function(){
       
       function childServer( eventEmitter ) {
 
@@ -30,7 +30,7 @@ describe('interDimensionalPortal', function(){
       var bus = pubSub(),
           done = sinon.stub();
 
-      portal(environment, childServer, bus, ['start-calculation'], ['calculation-done'] );
+      interDimensionalPortal(environment, childServer, bus, ['start-calculation'], ['calculation-done'] );
 
       bus.emit('start-calculation', 39);
       bus.on('calculation-done', done);
