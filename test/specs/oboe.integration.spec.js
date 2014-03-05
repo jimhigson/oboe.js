@@ -130,7 +130,7 @@
    
          waitsFor(
             function () {
-               return !!(callbackSpy.calls.length == 100);
+               return callbackSpy.calls.length == 100;
             },
             '100 callbacks', 
             30 * 1000 // makes a lot of requests so give it a while to complete
@@ -150,7 +150,7 @@
    
          waitsFor(
             function () {
-               return !!(callbackSpy.calls.length == 10);
+               return callbackSpy.calls.length == 10;
             },
             '100 callbacks'
          );
