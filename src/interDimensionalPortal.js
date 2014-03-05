@@ -16,10 +16,8 @@ var portal = (function(){
       eventNames.forEach(function(eventName){
          
          eventEmitter.on(eventName, function(val){
-            
-            var event = {name: eventName, value: val};
 
-            dispatch(event);
+            dispatch({name: eventName, value: val});
          });
       });
    }
