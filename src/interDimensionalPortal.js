@@ -6,7 +6,7 @@
  * @param eventsToChild
  * @param eventsFromChild
  */
-var portal = (function(){
+var interDimensionalPortal = (function(){
    "use strict";
 
    function forward(eventEmitter, eventNames, thread){
