@@ -10,18 +10,10 @@ var portal = (function(){
    "use strict";
 
    function forward(eventEmitter, eventNames, thread){
-      
-      console.log(
-         'setting up forwarding for', eventNames,
-         'to', thread);
-      
+            
       eventNames.forEach(function(eventName){
          
          eventEmitter.on(eventName, function(val){
-            console.log(
-               'need to forward an', eventName, 
-               'event with value', val,
-               'to other thread');
             
             var event = {name: eventName, value: val};
             
@@ -35,13 +27,9 @@ var portal = (function(){
    }
    
    function receive(eventEmitter, thread){
-      console.log('setting up listening for messages from thread', thread);
 
       function handle(event){
          var data = event.data;
-         console.log('got message from other thread ' +
-            data +  
-            ' of type ' + data.name + ' with val ' + data.value);
 
          eventEmitter.emit(data.name, data.value);
       }
