@@ -15,9 +15,9 @@ var portal = (function(){
       
       eventNames.forEach(function(eventName){
          
-         eventEmitter.on(eventName, function(val){
+         eventEmitter.on(eventName, function(value){
 
-            dispatch({name: eventName, value: val});
+            dispatch([eventName, value]);
          });
       });
    }
@@ -27,7 +27,7 @@ var portal = (function(){
       function handle(event){
          var data = event.data;
 
-         eventEmitter.emit(data.name, data.value);
+         eventEmitter.emit(data[0], data[1]);
       }
       
       if(thread){
