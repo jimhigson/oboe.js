@@ -7,9 +7,11 @@ function oboe(arg1, arg2) {
          // method signature is:
          //    oboe({method:m, url:u, body:b, headers:{...}})
    
-         return wire(
-            (arg1.method || 'GET'),
-            url(arg1.url, arg1.cached),
+         return applyDefaults(
+            wire,
+            arg1.url,
+            arg1.method,
+            arg1.cached,
             arg1.body,
             arg1.headers,
             arg1.withCredentials
@@ -19,31 +21,14 @@ function oboe(arg1, arg2) {
          //  simple version for GETs. Signature is:
          //    oboe( url )            
          //                                
-         return wire(
-            'GET',
-            arg1, // url
-            arg2  // body. Deprecated, use {url:u, body:b} instead
+         return applyDefaults(
+            wire,
+            arg1 // url
          );
       }
    } else {
       // wire up a no-AJAX Oboe. Will have to have content 
       // fed in externally and using .emit.
       return wire();
-   }
-   
-   // support cache busting like jQuery.ajax({cache:false})
-   function url(baseUrl, cached) {
-     
-      if( cached === false ) {
-           
-         if( baseUrl.indexOf('?') == -1 ) {
-            baseUrl += '?';
-         } else {
-            baseUrl += '&';
-         }
-         
-         baseUrl += '_=' + new Date().getTime();
-      }
-      return baseUrl;
    }
 }
