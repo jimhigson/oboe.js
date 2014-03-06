@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.1
+// v1.14.1-5-g66c8324
 
 /*
 
@@ -488,12 +488,12 @@ function all(fn, list) {
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(fnList, arguments) {
+function applyEach(fnList, args) {
 
    if( fnList ) {  
-      head(fnList).apply(null, arguments);
+      head(fnList).apply(null, args);
       
-      applyEach(tail(fnList), arguments);
+      applyEach(tail(fnList), args);
    }
 }
 
