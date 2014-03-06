@@ -157,12 +157,12 @@ function all(fn, list) {
  * it doesn't return anything. Hence, this is only really useful if the
  * functions being called have side-effects. 
  */
-function applyEach(fnList, arguments) {
+function applyEach(fnList, args) {
 
    if( fnList ) {  
-      head(fnList).apply(null, arguments);
+      head(fnList).apply(null, args);
       
-      applyEach(tail(fnList), arguments);
+      applyEach(tail(fnList), args);
    }
 }
 
