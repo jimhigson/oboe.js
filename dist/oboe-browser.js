@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.2
+// v1.14.2-16-g804ed9c
 
 /*
 
@@ -2374,6 +2374,18 @@ function instanceApi(oboeBus){
 function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
+   
+   /*
+   interDimensionalPortal(
+      env,
+      function(){
+         oboe.wireAsParserThread();
+      },
+      [httpMethodName, contentSource, body, headers, withCredentials],
+      oboeBus,
+      [],  // events to underlying
+      []   // events from underlying
+   );*/
    
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created

@@ -8,6 +8,18 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
    
+   /*
+   interDimensionalPortal(
+      env,
+      function(){
+         oboe.wireAsParserThread();
+      },
+      [httpMethodName, contentSource, body, headers, withCredentials],
+      oboeBus,
+      [],  // events to underlying
+      []   // events from underlying
+   );*/
+   
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
    // will have to be passed content from an external source.

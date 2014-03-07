@@ -37,7 +37,7 @@ var interDimensionalPortal = (function(){
       }
    }
 
-   function codeForChildThread(childLibs, childServer, eventsFromChild) {
+   function codeForChildThread(childLibs, childServer, childServerParams, eventsFromChild) {
 
       return childLibs
                   .concat(forward, receive).map(String)
@@ -45,12 +45,12 @@ var interDimensionalPortal = (function(){
                      'var bus=pubSub();',
                      'forward(bus,' + JSON.stringify(eventsFromChild) + ');',
                      'receive(bus);',
-                     '(' + String(childServer) + '(bus))');
+                     '(' + String(childServer) + '(bus,' + JSON.stringify(childServerParams) + '))');
    }
 
-   return function (childLibs, childServer, parentThreadBus, eventsToChild, eventsFromChild){
+   return function (childLibs, childServer, childServerParams, parentThreadBus, eventsToChild, eventsFromChild){
 
-      var code = codeForChildThread(childLibs, childServer, eventsFromChild),
+      var code = codeForChildThread(childLibs, childServer, childServerParams, eventsFromChild),
           // http://developer.mozilla.org/en-US/docs/Web/API/Blob
           blob = new Blob(code, {type:'text/javascript'}),
           worker = new Worker(window.URL.createObjectURL(blob));
