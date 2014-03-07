@@ -1,7 +1,10 @@
-// This file is the concatenation of many js files. 
+// This file is the concatenation of many js files.
 // See http://github.com/jimhigson/oboe.js for the raw source
-(function _oboeWrapper(window, Object, Array, Error, JSON, undefined ) {
-// v1.14.2-20-g0548143
+
+// having a local undefined, window, Object etc allows slightly better minification:                    
+(function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
+
+   // v1.14.2-23-g171d991
 
 /*
 
@@ -2588,4 +2591,9 @@ function oboe(arg1, arg2) {
 }
 
 
-;if ( typeof define === "function" && define.amd ) {define( "oboe", [], function () { return oboe; } );} else {window.oboe = oboe;}})(window, Object, Array, Error, JSON);
+   if ( typeof define === "function" && define.amd ) {
+      define( "oboe", [], function () { return oboe; } );
+   } else {
+      window.oboe = oboe;
+   }
+})(window, Object, Array, Error, JSON);

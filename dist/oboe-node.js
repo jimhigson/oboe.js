@@ -1,9 +1,9 @@
 // this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js
 // for the unconcatenated source
 
-module.exports = (function  () {
+module.exports = (function _oboeWrapper () {
    
-   // v1.14.2-3-g51649e7
+   // v1.14.2-23-g171d991
 
 /*
 
@@ -2313,32 +2313,142 @@ function instanceApi(oboeBus){
     
 
 /**
+ * @function
+ * 
+ * @param childFn
+ * @param parentThreadBus
+ * @param eventsToChild
+ * @param eventsFromChild
+ */
+var interDimensionalPortal = (function(){
+   "use strict";
+
+   function forward(eventEmitter, eventNames, thread){
+            
+      var dispatch = thread? thread.postMessage.bind(thread) : postMessage;
+      
+      eventNames.forEach(function(eventName){
+         
+         eventEmitter.on(eventName, function(value){
+
+            dispatch([eventName, value]);
+         });
+      });
+   }
+   
+   function receive(eventEmitter, thread){
+
+      function handle(event){
+         var data = event.data;
+
+         eventEmitter.emit(data[0], data[1]);
+      }
+      
+      if(thread){
+         thread.onmessage = handle;
+      } else {
+         onmessage = handle;
+      }
+   }
+   
+   function waitForStart( startFn ){
+      
+      // Wait for the one-off initialisation message. This handler will be overwritten
+      // shortly when the initialisation message arrives 
+      onmessage = function( initialisationMessage ){
+         var childSideBus = pubSub();
+         var config = initialisationMessage.data;
+         
+         forward(childSideBus, config[0]);
+         receive(childSideBus);
+         
+         config[1].unshift(childSideBus);
+         startFn.apply(null, config[1]);
+      }
+   }
+
+   function codeForChildThread(childLibs, childServer) {
+
+      return childLibs
+         // we need stringified functions for all libs, plus forward and receive
+         .concat(forward, receive).map(String)
+         // and we'll need the worker to wait for the start signal:
+         .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
+   }
+
+   return function (parentSideBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
+
+      var worker = new Worker(
+                        window.URL.createObjectURL(
+                           new Blob(
+                              codeForChildThread(childLibs, childServer)
+                           ,  {type:'text/javascript'}
+                           )
+                        )
+      );
+         
+      worker.postMessage([eventsFromChild, childServerArgs]);
+      
+      forward(parentSideBus, eventsToChild, worker);
+      receive(parentSideBus, worker);
+   }
+
+}());
+
+/**
  * This file sits just behind the API which is used to attain a new
  * Oboe instance. It creates the new components that are required
  * and introduces them to each other.
  */
 
+function wireToFetch(oboeBus, httpMethodName, contentSource, body, headers, withCredentials){
+   
+   if( contentSource ) {
+
+      streamingHttp(
+         oboeBus,
+         httpTransport(),
+         httpMethodName,
+         contentSource,
+         body,
+         headers,
+         withCredentials
+      );
+   }
+
+   clarinet(oboeBus);   
+}
+
 function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
    
+   interDimensionalPortal(
+      oboeBus,
+      
+      [_oboeWrapper], // puts oboe in global namespace of child thread
+      
+      function( childBus, httpMethodName, contentSource, body, headers, withCredentials ){
+         oboe.wire.wireToFetch(childBus, httpMethodName, contentSource, body, headers, withCredentials)
+      },
+      
+      [  httpMethodName, contentSource, body, headers, withCredentials],
+      
+      [  ABORTING],  // events to underlying
+      
+      [  SAX_VALUE
+      ,  SAX_KEY
+      ,  SAX_OPEN_OBJECT
+      ,  SAX_CLOSE_OBJECT
+      ,  SAX_OPEN_ARRAY
+      ,  SAX_CLOSE_ARRAY
+      ,  FAIL_EVENT
+      ]    // events from underlying
+   );
+   
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
    // will have to be passed content from an external source.
-  
-   if( contentSource ) {
-
-      streamingHttp( oboeBus,
-                     httpTransport(), 
-                     httpMethodName,
-                     contentSource,
-                     body,
-                     headers,
-                     withCredentials
-      );
-   }
-
-   clarinet(oboeBus);
 
    ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
       
