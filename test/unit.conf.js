@@ -30,6 +30,7 @@ module.exports = function(config) {
       ,  'src/patternAdapter.js'
       ,  'src/instanceApi.js'
       ,  'src/wire.js'
+      ,  'src/defaults.js'
       ,  'src/publicApi.js'
         
       ,  'test/specs/*.unit.spec.js'

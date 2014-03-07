@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.1-5-g66c8324
+// v1.14.2
 
 /*
 
@@ -2374,27 +2374,6 @@ function instanceApi(oboeBus){
 function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
-
-   headers = headers ? 
-                       // Shallow-clone the headers array. This allows it to be
-                       // modified without side effects to the caller. We don't
-                       // want to change objects that the user passes in.
-                       JSON.parse(JSON.stringify(headers)) 
-                     : {};
-   
-   if( body ) {
-      if( !isString(body) ) {
-         
-         // If the body is not a string, stringify it. This allows objects to
-         // be given which will be sent as JSON.
-         body = JSON.stringify(body);
-         
-         // Default Content-Type to JSON unless given otherwise.
-         headers['Content-Type'] = headers['Content-Type'] || 'application/json';
-      }
-   } else {
-      body = null;
-   }
    
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
@@ -2421,6 +2400,48 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    return new instanceApi(oboeBus);
 }
 
+function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){
+
+   headers = headers ?
+      // Shallow-clone the headers array. This allows it to be
+      // modified without side effects to the caller. We don't
+      // want to change objects that the user passes in.
+      JSON.parse(JSON.stringify(headers))
+      : {};
+
+   if( body ) {
+      if( !isString(body) ) {
+
+         // If the body is not a string, stringify it. This allows objects to
+         // be given which will be sent as JSON.
+         body = JSON.stringify(body);
+
+         // Default Content-Type to JSON unless given otherwise.
+         headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+      }
+   } else {
+      body = null;
+   }
+
+   // support cache busting like jQuery.ajax({cache:false})
+   function modifiedUrl(baseUrl, cached) {
+
+      if( cached === false ) {
+
+         if( baseUrl.indexOf('?') == -1 ) {
+            baseUrl += '?';
+         } else {
+            baseUrl += '&';
+         }
+
+         baseUrl += '_=' + new Date().getTime();
+      }
+      return baseUrl;
+   }
+
+   return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials || false );
+}
+
 // export public API
 function oboe(arg1, arg2) {
 
@@ -2430,44 +2451,29 @@ function oboe(arg1, arg2) {
          // method signature is:
          //    oboe({method:m, url:u, body:b, headers:{...}})
    
-         return wire(
-            (arg1.method || 'GET'),
-            url(arg1.url, arg1.cached),
+         return applyDefaults(
+            wire,
+            arg1.url,
+            arg1.method,
             arg1.body,
             arg1.headers,
-            arg1.withCredentials
+            arg1.withCredentials,
+            arg1.cached
          );
       } else {
    
          //  simple version for GETs. Signature is:
          //    oboe( url )            
          //                                
-         return wire(
-            'GET',
-            arg1, // url
-            arg2  // body. Deprecated, use {url:u, body:b} instead
+         return applyDefaults(
+            wire,
+            arg1 // url
          );
       }
    } else {
       // wire up a no-AJAX Oboe. Will have to have content 
       // fed in externally and using .emit.
       return wire();
-   }
-   
-   // support cache busting like jQuery.ajax({cache:false})
-   function url(baseUrl, cached) {
-     
-      if( cached === false ) {
-           
-         if( baseUrl.indexOf('?') == -1 ) {
-            baseUrl += '?';
-         } else {
-            baseUrl += '&';
-         }
-         
-         baseUrl += '_=' + new Date().getTime();
-      }
-      return baseUrl;
    }
 }
 
