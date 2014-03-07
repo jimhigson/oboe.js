@@ -1,6 +1,9 @@
-// this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js for the unconcatenated source
+// this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js
+// for the unconcatenated source
+
 module.exports = (function  () {
-// v1.14.2
+   
+   // v1.14.2-3-g51649e7
 
 /*
 
@@ -2422,4 +2425,5 @@ function oboe(arg1, arg2) {
 }
 
 
-;return oboe;})();
+   return oboe;
+})();

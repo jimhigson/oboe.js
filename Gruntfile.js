@@ -60,6 +60,14 @@ module.exports = function (grunt) {
       'test/libs/*.js'
    ];
      
+   // load the wrapper file for packaging source targeted at either
+   // browser or node
+   function wrapper(target){
+      return require('fs')
+         .readFileSync('src/wrapper.' + target + '.js', 'utf8')
+         .split('// ---contents--- //');
+   }
+   
    grunt.initConfig({
 
       pkg:grunt.file.readJSON("package.json")
@@ -81,37 +89,13 @@ module.exports = function (grunt) {
          browserPackage: {
             src: 'build/oboe-browser.concat.js',
             dest: '.',
-            wrapper: [
-               '// This file is the concatenation of many js files. \n' +
-               '// See http://github.com/jimhigson/oboe.js for the raw source\n' +
-               // having a local undefined, window, Object etc allows slightly better minification:                    
-               '(function _oboeWrapper(window, Object, Array, Error, JSON, undefined ) {\n'
-               
-                  // source code here
-                
-            ,     '\n\n;' +          
-                                  
-                  'if ( typeof define === "function" && define.amd ) {' +
-                     'define( "oboe", [], function () { return oboe; } );' +
-                  '} else {' +
-                     'window.oboe = oboe;' +
-                  '}' +
-               '})(window, Object, Array, Error, JSON);'
-            ]
+            wrapper: wrapper('browser')
          },
                   
          nodePackage: {
             src: 'build/oboe-node.concat.js',
             dest: '.',
-            wrapper: [
-               '// this file is the concatenation of several js files. See http://github.com/jimhigson/oboe.js ' +
-                   'for the unconcatenated source\n' +
-                    
-               'module.exports = (function _oboeWrapper () {\n'
-                  // source code here
-                                        
-            ,  '\n\n;return oboe;})();'
-            ]
+            wrapper: wrapper('node')
          }         
       }
       
