@@ -10,6 +10,7 @@ describe("public api", function(){
    describe("propagates through to wiring function", function(){
   
       beforeEach(function() {
+         spyOn(window, 'applyDefaults');      
          spyOn(window, 'wire');      
       });
 
@@ -17,9 +18,9 @@ describe("public api", function(){
       
          oboe('http://example.com/oboez')
       
-         expect(wire).toHaveBeenCalledLike(
-             'GET',
-             'http://example.com/oboez'
+         expect(applyDefaults).toHaveBeenCalledLike(
+            wire,
+            'http://example.com/oboez'
          )      
       })
       
@@ -30,15 +31,15 @@ describe("public api", function(){
          expect(wire).toHaveBeenCalledLike()      
       })      
          
-      describe('get', function(){
+      describe('GET', function(){
          
          it('works via arguments', function(){   
          
             oboe('http://example.com/oboez')
          
-            expect(wire).toHaveBeenCalledLike(
-                'GET',
-                'http://example.com/oboez'
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
+               'http://example.com/oboez'
             )      
                
          })
@@ -47,54 +48,36 @@ describe("public api", function(){
               
             oboe({url: 'http://example.com/oboez'})
             
-            expect(wire).toHaveBeenCalledLike(              
-               'GET',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez'
             )   
          })
          
          it('can disable caching', function(){   
-            var time = sinon.useFakeTimers(123);              
+              
                                          
             oboe({url: 'http://example.com/oboez', cached:false})
             
-            expect(wire).toHaveBeenCalledLike(              
-               'GET',
-               'http://example.com/oboez?_=123'
-            ) 
-            
-            time.restore();  
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
+               'http://example.com/oboez',
+               undefined, undefined, undefined, undefined,
+               false
+            )
          })
          
          it('can explicitly not disable caching', function(){   
               
-            var time = sinon.useFakeTimers(123);              
-              
             oboe({url: 'http://example.com/oboez', cached:true})
             
-            expect(wire).toHaveBeenCalledLike(              
-               'GET',
-               'http://example.com/oboez'
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
+               'http://example.com/oboez',
+               undefined, undefined, undefined, undefined,
+               true
             )
-            
-            time.restore();              
          })         
-         
-         it('can disable caching if url already has query param', function(){   
-
-            var time = sinon.useFakeTimers(123);
-              
-            spyOn(Date, 'now').andReturn(123);              
-              
-            oboe({url: 'http://example.com/oboez?foo=bar', cached:false})
-            
-            expect(wire).toHaveBeenCalledLike(              
-               'GET',
-               'http://example.com/oboez?foo=bar&_=123'
-            )
-            
-            time.restore();               
-         })                  
          
          it('propogates headers', function(){
 
@@ -104,9 +87,10 @@ describe("public api", function(){
                   method:'GET', 
                   headers:headers})
             
-            expect(wire).toHaveBeenCalledLike(              
-               'GET',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez',
+               'GET',
                undefined,
                headers
             )   
@@ -122,9 +106,10 @@ describe("public api", function(){
             oboe({url: 'http://example.com/oboez',
                   method: 'DELETE'})
             
-            expect(wire).toHaveBeenCalledLike(
-               'DELETE',
-               'http://example.com/oboez'
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
+               'http://example.com/oboez',
+               'DELETE'
             )   
          })   
          
@@ -141,9 +126,10 @@ describe("public api", function(){
                      body:[1,2,3,4,5]
             })
             
-            expect(wire).toHaveBeenCalledLike(
-               'POST',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez',
+               'POST',
                [1,2,3,4,5]
             )   
          })   
@@ -155,9 +141,10 @@ describe("public api", function(){
                      body:'my_data'
             })
             
-            expect(wire).toHaveBeenCalledLike(
-               'POST',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez',
+               'POST',
                'my_data'
             )   
          })   
@@ -172,9 +159,10 @@ describe("public api", function(){
                      url:'http://example.com/oboez', 
                      'body':'my_data'})
             
-            expect(wire).toHaveBeenCalledLike(
-               'PUT',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez',
+               'PUT',
                'my_data'
             )   
          })
@@ -188,9 +176,10 @@ describe("public api", function(){
                   body:'my_data',
                   method:'PATCH'});
 
-            expect(wire).toHaveBeenCalledLike(
-               'PATCH',
+            expect(applyDefaults).toHaveBeenCalledLike(
+               wire,
                'http://example.com/oboez',
+               'PATCH',
                'my_data'
             )
          })
@@ -201,47 +190,7 @@ describe("public api", function(){
    
    this.beforeEach(function(){
    
-      this.addMatchers({
-         /* Under Jasmine's toHaveBeenCalledLike, subject(foo, undefined)
-            is considered different from subject(foo). This is slightly
-            looser and considers those equal.  
-          */
-         toHaveBeenCalledLike:function(/*expectedArgs*/){
-            var expectedArgs = Array.prototype.slice.apply(arguments);
-            var actualCalls = this.actual.calls;
-            
-            var equals = this.env.equals_.bind(this.env);
-            
-            this.message = function() {
-               var invertedMessage = "Expected spy " + this.actual.identity + " not to have been called like " + jasmine.pp(expectedArgs) + " but it was.";
-               var positiveMessage = "";
-               if (this.actual.callCount === 0) {
-                  positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but it was never called.";
-               } else {
-                  positiveMessage = "Expected spy " + this.actual.identity + " to have been called like " + jasmine.pp(expectedArgs) + " but actual calls were " + jasmine.pp(this.actual.argsForCall).replace(/^\[ | \]$/g, '')
-               }
-               return [positiveMessage, invertedMessage];
-            };            
-                        
-            return actualCalls.some(function( actualCall ){
-            
-               var actualArgs = actualCall.args;
-
-               // check for one too many arguments given. But this is ok
-               // if the extra arg is undefined.               
-               if( actualArgs[expectedArgs.length] != undefined ) {
-
-                  return false;
-               }
-               
-               return expectedArgs.every(function( expectedArg, index ){
-                  
-                  return equals( actualArgs[index], expectedArg );                  
-               });
-            
-            });
-         }
-      });
+      this.addMatchers(calledLikeMatcher);
    })   
       
 });

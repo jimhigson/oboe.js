@@ -1,4 +1,4 @@
-function applyDefaults( passthrough, url, httpMethodName, cached, body, headers, withCredentials ){
+function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){
 
    headers = headers ?
       // Shallow-clone the headers array. This allows it to be
@@ -37,5 +37,5 @@ function applyDefaults( passthrough, url, httpMethodName, cached, body, headers,
       return baseUrl;
    }
 
-   return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials );
+   return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials || false );
 }

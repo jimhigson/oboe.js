@@ -11,10 +11,10 @@ function oboe(arg1, arg2) {
             wire,
             arg1.url,
             arg1.method,
-            arg1.cached,
             arg1.body,
             arg1.headers,
-            arg1.withCredentials
+            arg1.withCredentials,
+            arg1.cached
          );
       } else {
    

@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.1-2-g99d85af
+// v1.14.1-3-g0547513
 
 /*
 
@@ -2400,7 +2400,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    return new instanceApi(oboeBus);
 }
 
-function applyDefaults( passthrough, url, httpMethodName, cached, body, headers, withCredentials ){
+function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){
 
    headers = headers ?
       // Shallow-clone the headers array. This allows it to be
@@ -2439,7 +2439,7 @@ function applyDefaults( passthrough, url, httpMethodName, cached, body, headers,
       return baseUrl;
    }
 
-   return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials );
+   return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials || false );
 }
 
 // export public API
@@ -2455,10 +2455,10 @@ function oboe(arg1, arg2) {
             wire,
             arg1.url,
             arg1.method,
-            arg1.cached,
             arg1.body,
             arg1.headers,
-            arg1.withCredentials
+            arg1.withCredentials,
+            arg1.cached
          );
       } else {
    
