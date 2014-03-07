@@ -42,13 +42,13 @@ var interDimensionalPortal = (function(){
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
       onmessage = function( initialisationMessage ){
-         var bus = pubSub();
+         var childSideBus = pubSub();
          var config = initialisationMessage.data;
          
-         forward(bus, config[0]);
-         receive(bus);
+         forward(childSideBus, config[0]);
+         receive(childSideBus);
          
-         config[1].unshift(bus);
+         config[1].unshift(childSideBus);
          startFn.apply(null, config[1]);
       }
    }
@@ -62,7 +62,7 @@ var interDimensionalPortal = (function(){
          .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
    }
 
-   return function (parentThreadBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
+   return function (parentSideBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
 
       var worker = new Worker(
                         window.URL.createObjectURL(
@@ -75,8 +75,8 @@ var interDimensionalPortal = (function(){
          
       worker.postMessage([eventsFromChild, childServerArgs]);
       
-      forward(parentThreadBus, eventsToChild, worker);
-      receive(parentThreadBus, worker);
+      forward(parentSideBus, eventsToChild, worker);
+      receive(parentSideBus, worker);
    }
 
 }());
