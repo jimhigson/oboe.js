@@ -10,23 +10,24 @@ describe('interDimensionalPortal unit', function(){
       singleEventPubSub, 
       pubSub
    ];
+
+   function fibServer( eventEmitter ) {
+
+      function fib(n) {
+         return n < 2 ? n : fib(n - 1) + fib(n - 2);
+      }
+
+      eventEmitter.on('start-calculation', function(n){
+
+         var answer = fib(n); // takes ~1s to calculate by recursion
+
+         eventEmitter.emit('calculation-done', {n:n, 'fib(n)': answer});
+      });
+   }
+   
    
    it('can be used for a calc server using elements from Oboe.js internal environment', function(){
       
-      function fibServer( eventEmitter, serverParams ) {
-
-         function fib(n) {
-            return n < 2 ? n : fib(n - 1) + fib(n - 2);
-         }
-
-         eventEmitter.on('start-calculation', function(n){
-
-            var answer = fib(n); // takes ~1s to calculate by recursion
-
-            eventEmitter.emit('calculation-done', {n:n, 'fib(n)': answer});
-         });
-      }
-
       var bus = pubSub(),
           done = sinon.stub();
 
@@ -44,20 +45,6 @@ describe('interDimensionalPortal unit', function(){
    });
 
    it('can field multiple events', function(){
-
-      function fibServer( eventEmitter, serverParams ) {
-
-         function fib(n) {
-            return n < 2 ? n : fib(n - 1) + fib(n - 2);
-         }
-
-         eventEmitter.on('start-calculation', function(n){
-
-            var answer = fib(n); // takes ~1s to calculate by recursion
-
-            eventEmitter.emit('calculation-done', {n:n, 'fib(n)': answer});
-         });
-      }
 
       var bus = pubSub(),
           results = {};
