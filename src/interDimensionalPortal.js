@@ -62,7 +62,7 @@ var interDimensionalPortal = (function(){
          .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
    }
 
-   return function (childLibs, childServer, childServerArgs, parentThreadBus, eventsToChild, eventsFromChild){
+   return function (parentThreadBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
 
       var worker = new Worker(
                         window.URL.createObjectURL(

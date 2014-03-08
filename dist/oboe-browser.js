@@ -1,7 +1,7 @@
 // This file is the concatenation of many js files. 
 // See http://github.com/jimhigson/oboe.js for the raw source
 (function  (window, Object, Array, Error, JSON, undefined ) {
-// v1.14.2-17-gaada51d
+// v1.14.2-18-g1ef68fb
 
 /*
 
@@ -2429,7 +2429,7 @@ var interDimensionalPortal = (function(){
          .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
    }
 
-   return function (childLibs, childServer, childServerArgs, parentThreadBus, eventsToChild, eventsFromChild){
+   return function (parentThreadBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
 
       var worker = new Worker(
                         window.URL.createObjectURL(
