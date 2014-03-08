@@ -36,7 +36,7 @@ describe('interDimensionalPortal unit', function(){
       bus.emit('start-calculation', 39);
       bus.on('calculation-done', done);
 
-      waitsFor(function(){return done.called}, 'calculation to come back', 3000);
+      waitsFor(function(){return done.called}, 'calculation to come back', 5000);
 
       runs( function(){
          var resultGiven = done.firstCall.args[0];
@@ -55,22 +55,22 @@ describe('interDimensionalPortal unit', function(){
 
       interDimensionalPortal(bus, environment, fibServer, [], ['start-calculation'], ['calculation-done'] );
 
-      bus.emit('start-calculation', 37);
-      bus.emit('start-calculation', 38);
-      bus.emit('start-calculation', 39);
+      bus.emit('start-calculation', 12);
+      bus.emit('start-calculation', 13);
+      bus.emit('start-calculation', 14);
       bus.on('calculation-done', done);
 
       function gotAll(){
-         return results[37] && results[38] && results[39]
+         return results[12] && results[13] && results[14]
       }
       
-      waitsFor(gotAll, 'all calculations to come back', 5000);
+      waitsFor(gotAll, 'all calculations to come back', 3000);
 
       runs( function(){
          expect(results).toEqual({
-            '37':24157817,
-            '38':39088169,
-            '39':63245986
+            '12':144,
+            '13':233,
+            '14':377
          });
       })
    });   
