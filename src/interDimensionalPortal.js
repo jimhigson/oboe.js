@@ -36,25 +36,45 @@ var interDimensionalPortal = (function(){
          onmessage = handle;
       }
    }
-
-   function codeForChildThread(childLibs, childServer, childServerParams, eventsFromChild) {
-
-      return childLibs
-                  .concat(forward, receive).map(String)
-                  .concat(
-                     'var bus=pubSub();',
-                     'forward(bus,' + JSON.stringify(eventsFromChild) + ');',
-                     'receive(bus);',
-                     '(' + String(childServer) + '(bus,' + JSON.stringify(childServerParams) + '))');
+   
+   function waitForStart( startFn ){
+      
+      // Wait for the one-off initialisation message. This handler will be overwritten
+      // shortly when the initialisation message arrives 
+      onmessage = function( initialisationMessage ){
+         var bus = pubSub();
+         var config = initialisationMessage.data;
+         
+         forward(bus, config[0]);
+         receive(bus);
+         
+         config[1].unshift(bus);
+         startFn.apply(null, config[1]);
+      }
    }
 
-   return function (childLibs, childServer, childServerParams, parentThreadBus, eventsToChild, eventsFromChild){
+   function codeForChildThread(childLibs, childServer) {
 
-      var code = codeForChildThread(childLibs, childServer, childServerParams, eventsFromChild),
-          // http://developer.mozilla.org/en-US/docs/Web/API/Blob
-          blob = new Blob(code, {type:'text/javascript'}),
-          worker = new Worker(window.URL.createObjectURL(blob));
+      return childLibs
+         // we need stringified functions for all libs, plus forward and receive
+         .concat(forward, receive).map(String)
+         // and we'll need the worker to wait for the start signal:
+         .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
+   }
+
+   return function (childLibs, childServer, childServerArgs, parentThreadBus, eventsToChild, eventsFromChild){
+
+      var worker = new Worker(
+                        window.URL.createObjectURL(
+                           new Blob(
+                              codeForChildThread(childLibs, childServer)
+                           ,  {type:'text/javascript'}
+                           )
+                        )
+      );
          
+      worker.postMessage([eventsFromChild, childServerArgs]);
+      
       forward(parentThreadBus, eventsToChild, worker);
       receive(parentThreadBus, worker);
    }
