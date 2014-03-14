@@ -6,6 +6,8 @@
 
 function wireToFetch(oboeBus, httpMethodName, contentSource, body, headers, withCredentials){
    
+   console.log('inside worker thread');
+   
    if( contentSource ) {
 
       streamingHttp(
@@ -26,17 +28,22 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
    
+   console.log('wiring will invoke the portal');
+   
    interDimensionalPortal(
       oboeBus,
       
-      [_oboeWrapper], // puts oboe in global namespace of child thread
+      [],
       
-      function( childBus, httpMethodName, contentSource, body, headers, withCredentials ){
-         oboe.wire.wireToFetch(childBus, httpMethodName, contentSource, body, headers, withCredentials)
+      function(){
       },
       
-      [  httpMethodName, contentSource, body, headers, withCredentials],
-      
+      [],
+      //[  httpMethodName, contentSource, body, headers, withCredentials],
+
+      [],
+      []
+/*      
       [  ABORTING],  // events to underlying
       
       [  SAX_VALUE
@@ -46,7 +53,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       ,  SAX_OPEN_ARRAY
       ,  SAX_CLOSE_ARRAY
       ,  FAIL_EVENT
-      ]    // events from underlying
+      ]    // events from underlying*/
    );
    
    // Wire the input stream in if we are given a content source.

@@ -32,7 +32,7 @@ function givenAnOboeInstance(jsonFileName) {
        
       oboeInstance = oboe( jsonFileName 
                          ).done(requestComplete);      
-                              
+
       oboeInstance.fail(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.
          // Fail the test on getting an error:
@@ -103,21 +103,25 @@ function givenAnOboeInstance(jsonFileName) {
          return this;         
       };
 
-      function noop(){}
-      
       /**
        * Assert any number of conditions were met on the spied callback
        */
       this.thenTheInstance = function( /* ... functions ... */ ){
       
-         if( givenErrors.length > 0 ) {
-            throw new Error('error found during previous stages\n' + givenErrors[0].stack);
-         }      
-      
-         for (var i = 0; i < arguments.length; i++) {
-            var assertion = arguments[i];
-            assertion.testAgainst(spiedCallback, oboeInstance, completeJson);
+         var functions = arguments;
+         
+         function testIfCorrectNow() {
+            if( givenErrors.length > 0 ) {
+               throw new Error('error found during previous stages\n' + givenErrors[0].stack);
+            }
+
+            for (var i = 0; i < functions.length; i++) {
+               var assertion = functions[i];
+               assertion.testAgainst(spiedCallback, oboeInstance, completeJson);
+            }
          }
+
+         testIfCorrectNow();
 
          return this;
       };

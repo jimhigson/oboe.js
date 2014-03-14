@@ -32,3 +32,9 @@ function oboe(arg1, arg2) {
       return wire();
    }
 }
+
+// add methods to be called to set up as a worker thread:
+oboe._wire = {
+   wireToFetch:wireToFetch
+}
+

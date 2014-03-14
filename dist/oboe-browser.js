@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-23-g171d991
+   // v1.14.2-25-gdc0e8a4
 
 /*
 
@@ -2409,9 +2409,12 @@ var interDimensionalPortal = (function(){
    
    function waitForStart( startFn ){
       
+      console.log('worker waiting for first message');
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
       onmessage = function( initialisationMessage ){
+         console.log('worker got first message');
+         
          var childSideBus = pubSub();
          var config = initialisationMessage.data;
          
@@ -2443,13 +2446,17 @@ var interDimensionalPortal = (function(){
                         )
       );
          
+      console.log('created worker');
       worker.postMessage([eventsFromChild, childServerArgs]);
+      console.log('sent first messge to worker');
       
       forward(parentSideBus, eventsToChild, worker);
       receive(parentSideBus, worker);
    }
 
 }());
+
+var WORKER_ENV = [_oboeWrapper];
 
 /**
  * This file sits just behind the API which is used to attain a new
@@ -2458,6 +2465,8 @@ var interDimensionalPortal = (function(){
  */
 
 function wireToFetch(oboeBus, httpMethodName, contentSource, body, headers, withCredentials){
+   
+   console.log('inside worker thread');
    
    if( contentSource ) {
 
@@ -2479,17 +2488,22 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
    
+   console.log('wiring will invoke the portal');
+   
    interDimensionalPortal(
       oboeBus,
       
-      [_oboeWrapper], // puts oboe in global namespace of child thread
+      [],
       
-      function( childBus, httpMethodName, contentSource, body, headers, withCredentials ){
-         oboe.wire.wireToFetch(childBus, httpMethodName, contentSource, body, headers, withCredentials)
+      function(){
       },
       
-      [  httpMethodName, contentSource, body, headers, withCredentials],
-      
+      [],
+      //[  httpMethodName, contentSource, body, headers, withCredentials],
+
+      [],
+      []
+/*      
       [  ABORTING],  // events to underlying
       
       [  SAX_VALUE
@@ -2499,7 +2513,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       ,  SAX_OPEN_ARRAY
       ,  SAX_CLOSE_ARRAY
       ,  FAIL_EVENT
-      ]    // events from underlying
+      ]    // events from underlying*/
    );
    
    // Wire the input stream in if we are given a content source.
@@ -2589,6 +2603,12 @@ function oboe(arg1, arg2) {
       return wire();
    }
 }
+
+// add methods to be called to set up as a worker thread:
+oboe._wire = {
+   wireToFetch:wireToFetch
+}
+
 
 
    if ( typeof define === "function" && define.amd ) {

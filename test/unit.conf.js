@@ -29,6 +29,7 @@ module.exports = function(config) {
       ,  'src/events.js'
       ,  'src/patternAdapter.js'
       ,  'src/instanceApi.js'
+      ,  'src/workerEnv.raw.js'
       ,  'src/wire.js'
       ,  'src/defaults.js'
       ,  'src/publicApi.js'
