@@ -11,18 +11,33 @@ describe('interDimensionalPortal unit', function(){
       pubSub
    ];
 
-   function fibServer( eventEmitter ) {
+   function calcServer( eventEmitter ) {
 
       function fib(n) {
          return n < 2 ? n : fib(n - 1) + fib(n - 2);
       }
 
-      eventEmitter.on('start-calculation', function(n){
+      function fact(n) {
+         return n < 2 ? 1 : n * fact(n-1);
+      }      
 
-         var answer = fib(n); // takes ~1s to calculate by recursion
+      eventEmitter.on('start-fib', function(n){
 
-         eventEmitter.emit('calculation-done', {n:n, 'fib(n)': answer});
+         eventEmitter.emit('fib-started', {n:n});
+         
+         var answer = fib(n); // takes ~1s to calculate by recursion for n = 39 on a 2012 Macbook Air
+
+         eventEmitter.emit('fib-done', {n:n, 'fib(n)': answer});
       });
+
+      eventEmitter.on('start-factoral', function(n){
+
+         eventEmitter.emit('factoral-started', {n:n});
+
+         var answer = fact(n);
+
+         eventEmitter.emit('factoral-done', {n:n, 'n!': answer});
+      });      
    }
    
    
@@ -31,10 +46,10 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
           done = sinon.stub();
 
-      interDimensionalPortal(bus, environment, fibServer, [], ['start-calculation'], ['calculation-done'] );
+      interDimensionalPortal(bus, environment, calcServer, [], ['start-fib'], ['fib-done'] );
 
-      bus.emit('start-calculation', 39);
-      bus.on('calculation-done', done);
+      bus.emit('start-fib', 39);
+      bus.on('fib-done', done);
 
       waitsFor(function(){return done.called}, 'calculation to come back', 5000);
 
@@ -44,7 +59,7 @@ describe('interDimensionalPortal unit', function(){
       })
    });
 
-   it('can field multiple events', function(){
+   it('can field multiple events of same type', function(){
 
       var bus = pubSub(),
           results = {};
@@ -53,12 +68,12 @@ describe('interDimensionalPortal unit', function(){
          results[result.n] = result['fib(n)'];
       }
 
-      interDimensionalPortal(bus, environment, fibServer, [], ['start-calculation'], ['calculation-done'] );
+      interDimensionalPortal(bus, environment, calcServer, [], ['start-fib'], ['fib-done'] );
 
-      bus.emit('start-calculation', 12);
-      bus.emit('start-calculation', 13);
-      bus.emit('start-calculation', 14);
-      bus.on('calculation-done', done);
+      bus.emit('start-fib', 12);
+      bus.emit('start-fib', 13);
+      bus.emit('start-fib', 14);
+      bus.on('fib-done', done);
 
       function gotAll(){
          return results[12] && results[13] && results[14]
@@ -73,27 +88,91 @@ describe('interDimensionalPortal unit', function(){
             '14':377
          });
       })
+   });
+
+   it('can field events of different types in both directions', function(){
+
+      var bus = pubSub(),
+         attemptedFib = {},
+         fibResults = {},
+         attemptedFact = {},
+         factResults = {};
+            
+
+      interDimensionalPortal(bus, environment, calcServer, [],
+         ['start-fib', 'start-factoral'],
+         ['fib-started', 'factoral-started', 'fib-done', 'factoral-done']
+      );
+
+      bus.on('fib-started', function (result){
+         attemptedFib[result.n] = true;
+      });
+      bus.on('fib-done', function (result){
+         fibResults[result.n] = result['fib(n)'];
+      });
+      bus.on('factoral-started', function (result){
+         attemptedFact[result.n] = true;
+      });
+      bus.on('factoral-done', function (result){
+         factResults[result.n] = result['n!'];
+      });
+      
+      bus.emit('start-fib', 12);
+      bus.emit('start-fib', 13);
+      bus.emit('start-fib', 14);
+      bus.emit('start-factoral', 5);
+      bus.emit('start-factoral', 6);
+
+      function gotAll(){
+         return attemptedFib[12] && attemptedFib[13] && attemptedFib[14] 
+             && fibResults[12] && fibResults[13] && fibResults[14]
+             && attemptedFact[5] && attemptedFact[6]
+             && factResults[5] && factResults[6]
+      }
+
+      waitsFor(gotAll, 'all calculations to come back', 3000);
+
+      runs( function(){
+         expect(attemptedFib).toEqual({
+            '12':true,
+            '13':true,
+            '14':true
+         });         
+         expect(fibResults).toEqual({
+            '12':144,
+            '13':233,
+            '14':377
+         });
+         expect(attemptedFact).toEqual({
+            '5':true,
+            '6':true
+         });
+         expect(factResults).toEqual({
+            '5':120,
+            '6':720
+         });
+      })
    });   
 
    it('can pass startup parameters to child thread', function(){
 
       function additionServer( eventEmitter, startNumber ) {
 
-         eventEmitter.on('start-calculation', function(n){
+         eventEmitter.on('start-fib', function(n){
 
             var answer = startNumber + n; // takes ~1s to calculate by recursion
 
-            eventEmitter.emit('calculation-done', answer)
+            eventEmitter.emit('fib-done', answer)
          });
       }
 
       var bus = pubSub(),
           done = sinon.stub();
 
-      interDimensionalPortal(bus, environment, additionServer, [4], ['start-calculation'], ['calculation-done'] );
+      interDimensionalPortal(bus, environment, additionServer, [4], ['start-fib'], ['fib-done'] );
 
-      bus.emit('start-calculation', 2);
-      bus.on('calculation-done', done);
+      bus.emit('start-fib', 2);
+      bus.on('fib-done', done);
 
       waitsFor(function(){return done.called}, 'calculation to come back', 3000);
 
