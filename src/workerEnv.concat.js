@@ -1,1 +1,4 @@
-var WORKER_ENV = [_oboeWrapper];
+
+function workerEnv(){
+   return [_oboeWrapper];
+}

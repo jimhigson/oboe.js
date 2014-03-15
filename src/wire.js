@@ -13,7 +13,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    interDimensionalPortal(
       oboeBus,
 
-      WORKER_ENV,
+      workerEnv(),
       
       function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
          console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
