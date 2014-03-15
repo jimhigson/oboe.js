@@ -17,6 +17,9 @@ var interDimensionalPortal = (function(){
          
          eventEmitter.on(eventName, function(value){
 
+            console.log(
+               (thread ? 'parent' : 'child') +
+               ' forwarding via portal "' + eventName + '" = ' + JSON.stringify(value));
             dispatch([eventName, value]);
          });
       });
@@ -27,6 +30,10 @@ var interDimensionalPortal = (function(){
       function handle(event){
          var data = event.data;
 
+         console.log( 
+            (thread ? 'parent' : 'child') +
+            ' received via portal "' + data[0] + '" = ' + JSON.stringify(data[1])
+         );
          eventEmitter.emit(data[0], data[1]);
       }
       

@@ -42,11 +42,19 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       //TODO: could use arguments array?
       [ httpMethodName, contentSource, body, headers, withCredentials],
 
-      [],
-      []
-/*      
-      [  ABORTING],  // events to underlying
+      // events to inform the worker of.
       
+      [
+         // the fetcher/parser needs to know if the request is aborted:
+         ABORTING 
+         
+         // Although unconventional, data can be fed in through the oboe instance. Hence,
+         // it needs to be able to send this data to the parser.
+      ,  STREAM_DATA
+      ,  STREAM_END
+      ],
+      
+      // events to get back from the worker
       [  SAX_VALUE
       ,  SAX_KEY
       ,  SAX_OPEN_OBJECT
@@ -54,7 +62,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       ,  SAX_OPEN_ARRAY
       ,  SAX_CLOSE_ARRAY
       ,  FAIL_EVENT
-      ]    // events from underlying*/
+      ]
    );
    
    // Wire the input stream in if we are given a content source.
