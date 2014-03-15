@@ -120,8 +120,20 @@ function givenAnOboeInstance(jsonFileName) {
                assertion.testAgainst(spiedCallback, oboeInstance, completeJson);
             }
          }
+         
+         function isPassingYet(){
+            try {
+               testIfCorrectNow()
+            } catch(e){
+               return false;
+            }
+            return true;
+         }
 
-         testIfCorrectNow();
+         waitsFor(isPassingYet, 'instance to meet the condition(s)', 500);
+         runs(function(){
+            testIfCorrectNow();
+         });
 
          return this;
       };

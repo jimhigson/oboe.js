@@ -42,11 +42,11 @@ describe("oboe component (sXHR stubbed)", function(){
          .andWeAreListeningForNodes('!', function(n){
             console.log('instance got node', n);
          })
-         .whenGivenInput('{}');
-         /*.thenTheInstance(
+         .whenGivenInput('{}')
+         .thenTheInstance(
             matched({}).atRootOfJson(),
             foundOneMatch
-         );*/
+         );
       
       waitsFor(function(){return false}, 'pointless delay', 1000);
    }) 
