@@ -1,5 +1,19 @@
-
-
+/**
+ * Take a function like this:
+ * 
+ *    function(){
+ *       doFoo();
+ *       doBar();
+ *    }
+ *    
+ * return a string like this:
+ *
+ *       doFoo();
+ *       doBar();
+ *       
+ * @param {Function} f
+ * @returns {String}
+ */
 function defunctionise(f){
 
    return String(f)
