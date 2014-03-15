@@ -48,11 +48,14 @@ var interDimensionalPortal = (function(){
    
    function waitForStart( startFn ){
       
-      console.log('worker waiting for first message');
+      console.log('worker waiting for setup message');
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
       onmessage = function( initialisationMessage ){
-         console.log('worker: got first message');
+         console.log(
+            'worker: got setup message with config ' + 
+            JSON.stringify(initialisationMessage.data[1])
+         );
          
          var childSideBus = pubSub();
          var config = initialisationMessage.data;
