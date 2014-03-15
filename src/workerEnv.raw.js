@@ -1,8 +1,13 @@
 
+// Tests can reassign this function. Whatever value is in here
+// will be written into the environment for worker threads
+// and should be used to create stubs in their environment
+window.setupStubsInWorkerThread = function(){
+};
 
 function workerEnv(){
 
-   function importAll(base){
+   function importAll(base, setupStub){
 
       console.log('child thread: importing scripts from domain ' + base + ' ...');
 
@@ -30,6 +35,10 @@ function workerEnv(){
       ,  base + '/src/interDimensionalPortal.js'
       );
 
+      if(setupStub) {
+         setupStub();
+      }
+
       console.log('...importing scripts done');
    }
 
@@ -51,10 +60,15 @@ function workerEnv(){
     *    })( p1, p2, p3 )
     *
     */
-   function stringifyFunctionForWorker(f, base){
+   var stringifyFunctionForWorker = varArgs(function(f, args){
+      function literalise(item){
+         return JSON.stringify(item) || item;
+      }
+      
+      var argsString = args.map(literalise).join(',');
 
-      return '(' + String(f) + '("' + base + '"));';
-   }
+      return '(' + String(f) + '(' + argsString + '));';
+   });
 
    // The worker thread won't be able to see which domain the parent was on
    // so we add it in hardcoded into its code, see?
@@ -62,7 +76,7 @@ function workerEnv(){
    var location = window.location,
    // the path '/base' is where Karma serves the js under test
       base = location.protocol + location.host + '/base',
-      loader = stringifyFunctionForWorker(importAll, base);
+      loader = stringifyFunctionForWorker(importAll, base, window.setupStubsInWorkerThread);
 
    return [loader];
 }

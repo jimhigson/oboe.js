@@ -108,7 +108,7 @@ function givenAnOboeInstance(jsonFileName) {
        */
       this.thenTheInstance = function( /* ... functions ... */ ){
       
-         var functions = arguments;
+         var functions = Array.prototype.slice.apply(arguments);
          
          function testIfCorrectNow() {
             if( givenErrors.length > 0 ) {
@@ -123,7 +123,7 @@ function givenAnOboeInstance(jsonFileName) {
          
          function isPassingYet(){
             try {
-               testIfCorrectNow()
+               testIfCorrectNow();
             } catch(e){
                return false;
             }
@@ -132,7 +132,9 @@ function givenAnOboeInstance(jsonFileName) {
 
          waitsFor(isPassingYet, 'instance to meet the condition(s)', 500);
          runs(function(){
+            console.log('will now test if it is correctly meeting the condition...');
             testIfCorrectNow();
+            console.log('...and it is!');
          });
 
          return this;

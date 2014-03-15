@@ -81,6 +81,10 @@ var interDimensionalPortal = (function(){
 
    return function (parentSideBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
 
+      // TODO: it always creates the exact same Blob. Seems kinda wasteful.
+      // TODO: REUSE BLOBS - requires exposing 'portal program maker' and 'portal starter'
+      // TODO: functions as two interface parts 
+      
       var worker = new Worker(
                         window.URL.createObjectURL(
                            new Blob(
@@ -90,9 +94,9 @@ var interDimensionalPortal = (function(){
                         )
       );
          
-      console.log('created worker');
+      console.log('created blob and worker');
       worker.postMessage([eventsFromChild, childServerArgs]);
-      console.log('sent first messge to worker');
+      console.log('sent first message to worker');
       
       forward(parentSideBus, eventsToChild, worker);
       receive(parentSideBus, worker);
