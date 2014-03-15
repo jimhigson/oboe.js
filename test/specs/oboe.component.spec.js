@@ -39,7 +39,9 @@ describe("oboe component (sXHR stubbed)", function(){
       console.log('---component test starting...---');
      
       var instance = givenAnOboeInstance()
-         .andWeAreListeningForNodes('!')
+         .andWeAreListeningForNodes('!', function(n){
+            console.log('instance got node', n);
+         })
          .whenGivenInput('{}');
          /*.thenTheInstance(
             matched({}).atRootOfJson(),

@@ -32,14 +32,15 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    
    interDimensionalPortal(
       oboeBus,
+
+      WORKER_ENV,
       
-      [],
-      
-      function(){
+      function(bus, httpMethodName, contentSource, body, headers, withCredentials){
+         console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
       },
       
-      [],
-      //[  httpMethodName, contentSource, body, headers, withCredentials],
+      //TODO: could use arguments array?
+      [ httpMethodName, contentSource, body, headers, withCredentials],
 
       [],
       []

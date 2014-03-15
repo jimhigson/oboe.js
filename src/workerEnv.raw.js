@@ -7,14 +7,7 @@ function defunctionise(f){
       .replace(/\s*}\s*$/, '');
 }
 
-var WORKER_ENV = [
-   defunctionise(function(){
-       
-      //importScripts('http://localhost:9876/base/dist/oboe-browser.js')
-   })
-];
 
-/*
 var WORKER_ENV = [
    defunctionise(function(){
 
@@ -51,4 +44,3 @@ var WORKER_ENV = [
       console.log('...importing scripts done');
    })
 ];
-*/

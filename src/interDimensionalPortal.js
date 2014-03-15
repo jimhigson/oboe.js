@@ -43,7 +43,7 @@ var interDimensionalPortal = (function(){
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
       onmessage = function( initialisationMessage ){
-         console.log('worker got first message');
+         console.log('worker: got first message');
          
          var childSideBus = pubSub();
          var config = initialisationMessage.data;
@@ -53,6 +53,8 @@ var interDimensionalPortal = (function(){
          
          config[1].unshift(childSideBus);
          startFn.apply(null, config[1]);
+
+         console.log('worker: ready for events');
       }
    }
 
