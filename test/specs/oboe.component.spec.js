@@ -36,7 +36,7 @@ describe("oboe component (sXHR stubbed)", function(){
    
    it('handles empty object detected with bang',  function() {
 
-      console.log('---component test starting...---');
+      console.log('\n__________________component test starting__________________');
      
       var instance = givenAnOboeInstance()
          .andWeAreListeningForNodes('!', function(n){

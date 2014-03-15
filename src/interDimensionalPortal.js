@@ -19,7 +19,8 @@ var interDimensionalPortal = (function(){
 
             console.log(
                (thread ? 'parent' : 'child') +
-               ' forwarding via portal "' + eventName + '" = ' + JSON.stringify(value));
+               ' forwarding via portal "' + eventName + '"' +
+                  (value ? '" = ' + JSON.stringify(value) : ' (no value)'));
             dispatch([eventName, value]);
          });
       });
@@ -32,7 +33,8 @@ var interDimensionalPortal = (function(){
 
          console.log( 
             (thread ? 'parent' : 'child') +
-            ' received via portal "' + data[0] + '" = ' + JSON.stringify(data[1])
+            ' received via portal "' + data[0] + '"' + 
+               (data[1] ? '" = ' + JSON.stringify(data[1]) : ' (no value)')
          );
          eventEmitter.emit(data[0], data[1]);
       }

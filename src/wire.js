@@ -4,26 +4,6 @@
  * and introduces them to each other.
  */
 
-function wireToFetch(oboeBus, httpMethodName, contentSource, body, headers, withCredentials){
-   
-   console.log('inside worker thread');
-   
-   if( contentSource ) {
-
-      streamingHttp(
-         oboeBus,
-         httpTransport(),
-         httpMethodName,
-         contentSource,
-         body,
-         headers,
-         withCredentials
-      );
-   }
-
-   clarinet(oboeBus);   
-}
-
 function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
    var oboeBus = pubSub();
@@ -35,8 +15,22 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
       WORKER_ENV,
       
-      function(bus, httpMethodName, contentSource, body, headers, withCredentials){
+      function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
          console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
+
+         if( contentSource ) {
+            streamingHttp(
+               childThreadBus,
+               httpTransport(),
+               httpMethodName,
+               contentSource,
+               body,
+               headers,
+               withCredentials
+            );
+         }
+
+         clarinet(childThreadBus);
       },
       
       //TODO: could use arguments array?
