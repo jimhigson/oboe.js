@@ -11,7 +11,7 @@ var interDimensionalPortal = (function(){
 
    function forward(eventEmitter, eventNames, thread){
 
-      var target = thread || this;
+      var target = (thread || this);
 
       eventNames.forEach(function(eventName){
 
