@@ -41,7 +41,7 @@ describe('interDimensionalPortal unit', function(){
    }
    
    
-   it('can be used for a calc server using elements from Oboe.js internal environment', function(){
+   it('can be used for a calc server', function(){
       
       var bus = pubSub(),
           done = sinon.stub();
@@ -59,7 +59,7 @@ describe('interDimensionalPortal unit', function(){
       })
    });
 
-   it('can field multiple events of same type', function(){
+   it('can send serveral events of same type', function(){
 
       var bus = pubSub(),
           results = {};
@@ -90,7 +90,7 @@ describe('interDimensionalPortal unit', function(){
       })
    });
 
-   it('can field events of different types in both directions', function(){
+   it('can send events of multiple types in both directions', function(){
 
       var bus = pubSub(),
          attemptedFib = {},
@@ -184,7 +184,7 @@ describe('interDimensionalPortal unit', function(){
 
    it('can accept multiple arguments', function(){
 
-      function sillyStringServer( eventEmitter, start, end ) {
+      function multipleArgumentSillyStringServer( eventEmitter, start, end ) {
 
          eventEmitter.on('start', function(input){
 
@@ -195,7 +195,7 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
          done = sinon.stub();
 
-      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, 'Hello ', '!');
+      interDimensionalPortal(environment, multipleArgumentSillyStringServer, ['start'], ['done'] )(bus, 'Hello ', '!');
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
@@ -210,7 +210,7 @@ describe('interDimensionalPortal unit', function(){
    
    it('can accept non-scalar arguments', function(){
 
-      function sillyStringServer( eventEmitter, config ) {
+      function nonScalarSillyStringServer( eventEmitter, config ) {
 
          eventEmitter.on('start', function(input){
 
@@ -221,7 +221,7 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
          done = sinon.stub();
 
-      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, {start:'Hello ', end:'!'});
+      interDimensionalPortal(environment, nonScalarSillyStringServer, ['start'], ['done'] )(bus, {start:'Hello ', end:'!'});
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
