@@ -31,8 +31,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
          clarinet(childThreadBus);
       },
            
-      [
-         // the fetcher/parser needs to know if the request is aborted:
+      [  // the fetcher/parser needs to know if the request is aborted:
          ABORTING 
          
          // Although unconventional, data can be fed in through the oboe instance. Hence,
