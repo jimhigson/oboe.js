@@ -23,12 +23,12 @@ var // the events which are never exported are kept as
     ABORTING        = _S++,
 
     // SAX events butchered from Clarinet
-    SAX_VALUE        = _S++,
-    SAX_KEY          = _S++,
-    SAX_OPEN_OBJECT  = _S++,
-    SAX_CLOSE_OBJECT = _S++,
-    SAX_OPEN_ARRAY   = _S++,
-    SAX_CLOSE_ARRAY  = _S++;
+    SAX_VALUE        = 'SAX_VALUE',
+    SAX_KEY          = 'SAX_KEY',
+    SAX_OPEN_OBJECT  = 'SAX_OPEN_OBJECT',
+    SAX_CLOSE_OBJECT = 'SAX_CLOSE_OBJECT',
+    SAX_OPEN_ARRAY   = 'SAX_OPEN_ARRAY',
+    SAX_CLOSE_ARRAY  = 'SAX_CLOSE_ARRAY';
     
 function errorReport(statusCode, body, error) {
    try{

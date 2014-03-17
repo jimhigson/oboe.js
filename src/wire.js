@@ -10,7 +10,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    
    console.log('wiring will invoke the portal');
    
-   interDimensionalPortal(
+   var clientProgram = interDimensionalPortal(
       oboeBus,
 
       workerEnv(),
@@ -32,12 +32,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
          clarinet(childThreadBus);
       },
-      
-      //TODO: could use arguments array?
-      [ httpMethodName, contentSource, body, headers, withCredentials],
-
-      // events to inform the worker of.
-      
+           
       [
          // the fetcher/parser needs to know if the request is aborted:
          ABORTING 
@@ -58,6 +53,8 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       ,  FAIL_EVENT
       ]
    );
+
+   clientProgram([ httpMethodName, contentSource, body, headers, withCredentials]);
    
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created

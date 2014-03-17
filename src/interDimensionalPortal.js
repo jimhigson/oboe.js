@@ -79,27 +79,35 @@ var interDimensionalPortal = (function(){
          .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
    }
 
-   return function (parentSideBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
+   return function (parentSideBus, childLibs, childServer, eventsToChild, eventsFromChild){
 
       // TODO: it always creates the exact same Blob. Seems kinda wasteful.
       // TODO: REUSE BLOBS - requires exposing 'portal program maker' and 'portal starter'
       // TODO: functions as two interface parts 
-      
-      var worker = new Worker(
-                        window.URL.createObjectURL(
-                           new Blob(
-                              codeForChildThread(childLibs, childServer)
-                           ,  {type:'text/javascript'}
-                           )
-                        )
+      // TODO: OR! Give a function which, when called, creates a new server (woot)
+      // TODO:    PROBLEM? In tests, server code changes a bit for stubbing
+
+      var blobUrl = window.URL.createObjectURL(
+         new Blob(
+            codeForChildThread(childLibs, childServer)
+            ,  {type:'text/javascript'}
+         )
       );
-         
-      console.log('created blob and worker');
-      worker.postMessage([eventsFromChild, childServerArgs]);
-      console.log('sent first message to worker');
       
-      forward(parentSideBus, eventsToChild, worker);
-      receive(parentSideBus, worker);
+      return function(childServerArgs){
+      
+         var worker = new Worker(blobUrl);
+            
+         console.log('created blob and worker');
+         worker.postMessage([
+            eventsFromChild
+         ,  (childServerArgs || [])
+         ]);
+         console.log('sent first message to worker');
+         
+         forward(parentSideBus, eventsToChild, worker);
+         receive(parentSideBus, worker);
+      }
    }
 
 }());
