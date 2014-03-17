@@ -46,7 +46,7 @@ var interDimensionalPortal = (function(){
       }
    }
    
-   function waitForStart( startFn ){
+   function waitForStart( startFn, eventsTypesToForwardToParent ){
 
       var childSideBus = pubSub();
       
@@ -55,15 +55,14 @@ var interDimensionalPortal = (function(){
       // shortly when the initialisation message arrives 
       onmessage = function( initialisationMessage ){
 
-         var eventsToSendToParent = initialisationMessage.data[0];
-         var startFnParameters = initialisationMessage.data[1];
+         var startFnParameters = initialisationMessage.data;
 
          console.log(
             'worker: got setup message with config ' +
                JSON.stringify(startFnParameters)
          );
 
-         forward(childSideBus, eventsToSendToParent);
+         forward(childSideBus, eventsTypesToForwardToParent);
          receive(childSideBus);
 
          startFnParameters.unshift(childSideBus);
@@ -73,7 +72,7 @@ var interDimensionalPortal = (function(){
       }
    }
 
-   function codeForChildThread(childLibs, childServer) {
+   function codeForChildThread(childLibs, childServer, eventsTypesChildProduces) {
 
       return childLibs
          // we need stringified functions for all libs, plus forward and receive
@@ -81,16 +80,16 @@ var interDimensionalPortal = (function(){
          // and we'll need the worker to wait for the start signal:
          .concat(
             '(' + String(waitForStart) + ')' +
-            '(' + String(childServer) + ')'
+            '(' + String(childServer) + ',' + JSON.stringify(eventsTypesChildProduces) + ')'
          );
    }
 
-   return function (childLibs, childServer, eventsToChild, eventsFromChild){
+   return function (childLibs, childServer, eventsTypesChildConsumes, eventsTypesChildProduces){
 
       var blobUrl = window.URL.createObjectURL(
          new Blob(
-            codeForChildThread(childLibs, childServer)
-            ,  {type:'text/javascript'}
+            codeForChildThread(childLibs, childServer, eventsTypesChildProduces)
+         ,  {type:'text/javascript'}
          )
       );
       
@@ -99,13 +98,10 @@ var interDimensionalPortal = (function(){
          var worker = new Worker(blobUrl);
             
          console.log('created blob and worker');
-         worker.postMessage([
-            eventsFromChild
-         ,  childServerArgs
-         ]);
+         worker.postMessage(childServerArgs);
          console.log('sent first message to worker');
          
-         forward(parentSideBus, eventsToChild, worker);
+         forward(parentSideBus, eventsTypesChildConsumes, worker);
          receive(parentSideBus, worker);
       });
    }
