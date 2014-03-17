@@ -94,7 +94,7 @@ var interDimensionalPortal = (function(){
          )
       );
       
-      return function(parentSideBus, childServerArgs){
+      return varArgs( function(parentSideBus, childServerArgs){
       
          var worker = new Worker(blobUrl);
             
@@ -107,7 +107,7 @@ var interDimensionalPortal = (function(){
          
          forward(parentSideBus, eventsToChild, worker);
          receive(parentSideBus, worker);
-      };
+      });
    }
 
 }());

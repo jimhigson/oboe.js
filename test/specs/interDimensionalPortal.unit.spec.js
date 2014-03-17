@@ -169,7 +169,7 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
           done = sinon.stub();
 
-      interDimensionalPortal(environment, additionServer, ['start-fib'], ['fib-done'] )(bus, [4]);
+      interDimensionalPortal(environment, additionServer, ['start-fib'], ['fib-done'] )(bus, 4);
 
       bus.emit('start-fib', 2);
       bus.on('fib-done', done);
@@ -195,7 +195,7 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
          done = sinon.stub();
 
-      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, ['Hello ', '!']);
+      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, 'Hello ', '!');
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
@@ -221,7 +221,7 @@ describe('interDimensionalPortal unit', function(){
       var bus = pubSub(),
          done = sinon.stub();
 
-      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, [{start:'Hello ', end:'!'}]);
+      interDimensionalPortal(environment, sillyStringServer, ['start'], ['done'] )(bus, {start:'Hello ', end:'!'});
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
