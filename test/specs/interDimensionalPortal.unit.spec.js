@@ -43,10 +43,11 @@ describe('interDimensionalPortal unit', function(){
    
    it('can be used for a calc server', function(){
       
-      var bus = pubSub(),
+      var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
+          bus = pubSub(),
           done = sinon.stub();
 
-      interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done'] )(bus);
+      childProgram(bus);
 
       bus.emit('start-fib', 39);
       bus.on('fib-done', done);
@@ -59,26 +60,25 @@ describe('interDimensionalPortal unit', function(){
       })
    });
 
-   it('can send serveral events of same type', function(){
+   it('can send several events of same type', function(){
 
-      var bus = pubSub(),
+      var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
+          bus = pubSub(),
           results = {};
+
+      childProgram(bus);
       
-      function done(result){ 
-         results[result.n] = result['fib(n)'];
-      }
-
-      interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done'] )(bus);
-
       bus.emit('start-fib', 12);
       bus.emit('start-fib', 13);
       bus.emit('start-fib', 14);
-      bus.on('fib-done', done);
+      bus.on('fib-done', function done(result){
+         results[result.n] = result['fib(n)'];
+      });
 
       function gotAll(){
          return results[12] && results[13] && results[14]
       }
-      
+
       waitsFor(gotAll, 'all calculations to come back', 3000);
 
       runs( function(){
@@ -92,17 +92,16 @@ describe('interDimensionalPortal unit', function(){
 
    it('can send events of multiple types in both directions', function(){
 
-      var bus = pubSub(),
+      var childProgram = interDimensionalPortal(
+            environment, calcServer,
+            ['start-fib', 'start-factoral'],
+            ['fib-started', 'factoral-started', 'fib-done', 'factoral-done']
+         ),
+         bus = pubSub(),
          attemptedFib = {},
          fibResults = {},
          attemptedFact = {},
          factResults = {};
-            
-
-      interDimensionalPortal(environment, calcServer,
-         ['start-fib', 'start-factoral'],
-         ['fib-started', 'factoral-started', 'fib-done', 'factoral-done']
-      )(bus);
 
       bus.on('fib-started', function (result){
          attemptedFib[result.n] = true;
@@ -116,6 +115,8 @@ describe('interDimensionalPortal unit', function(){
       bus.on('factoral-done', function (result){
          factResults[result.n] = result['n!'];
       });
+
+      childProgram(bus);
       
       bus.emit('start-fib', 12);
       bus.emit('start-fib', 13);
@@ -154,32 +155,37 @@ describe('interDimensionalPortal unit', function(){
       })
    });   
 
-   it('can pass startup parameters to child thread', function(){
+   describe('parametrised program', function(){
 
-      function additionServer( eventEmitter, startNumber ) {
+      function additionServer( eventEmitter, a ) {
 
-         eventEmitter.on('start-fib', function(n){
+         eventEmitter.on('start-fib', function(b){
 
-            var answer = startNumber + n; // takes ~1s to calculate by recursion
+            var answer = a + b; // takes ~1s to calculate by recursion
 
-            eventEmitter.emit('fib-done', answer)
+            eventEmitter.emit('fib-done', {a:a, b:b, 'a+b':answer});
          });
       }
 
-      var bus = pubSub(),
-          done = sinon.stub();
-
-      interDimensionalPortal(environment, additionServer, ['start-fib'], ['fib-done'] )(bus, 4);
-
-      bus.emit('start-fib', 2);
-      bus.on('fib-done', done);
-
-      waitsFor(function(){return done.called}, 'calculation to come back', 3000);
-
-      runs( function(){
-         var resultGiven = done.firstCall.args[0];
-         expect(resultGiven).toBe(6); // 4 + 2 = 6 
-      })
+      var childProgram = interDimensionalPortal(environment, additionServer, ['start-fib'], ['fib-done']);      
+      
+      it('can pass startup parameters to child thread', function(){
+   
+         var bus = pubSub(),
+             done = sinon.stub();
+   
+         childProgram(bus, 4);
+   
+         bus.emit('start-fib', 2);
+         bus.on('fib-done', done);
+   
+         waitsFor(function(){return done.called}, 'calculation to come back', 3000);
+   
+         runs( function(){
+            var resultGiven = done.firstCall.args[0];
+            expect(resultGiven).toEqual({a:4, b:2, 'a+b':6}); 
+         })
+      });
    });
 
    it('can accept multiple arguments', function(){
@@ -192,10 +198,11 @@ describe('interDimensionalPortal unit', function(){
          });
       }
 
-      var bus = pubSub(),
-         done = sinon.stub();
+      var childProgram = interDimensionalPortal(environment, multipleArgumentSillyStringServer, ['start'], ['done']),
+          bus = pubSub(),
+          done = sinon.stub();
 
-      interDimensionalPortal(environment, multipleArgumentSillyStringServer, ['start'], ['done'] )(bus, 'Hello ', '!');
+      childProgram(bus, 'Hello ', '!');
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
@@ -218,10 +225,11 @@ describe('interDimensionalPortal unit', function(){
          });
       }
 
-      var bus = pubSub(),
-         done = sinon.stub();
+      var childProgram = interDimensionalPortal(environment, nonScalarSillyStringServer, ['start'], ['done']),
+          bus = pubSub(),
+          done = sinon.stub();
 
-      interDimensionalPortal(environment, nonScalarSillyStringServer, ['start'], ['done'] )(bus, {start:'Hello ', end:'!'});
+      childProgram(bus, {start:'Hello ', end:'!'});
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
