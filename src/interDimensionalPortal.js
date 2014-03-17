@@ -59,12 +59,14 @@ var interDimensionalPortal = (function(){
          
          var childSideBus = pubSub();
          var config = initialisationMessage.data;
+         var eventsToSendToParent = config[0];
+         var startFnParameters = config[1];
          
-         forward(childSideBus, config[0]);
+         forward(childSideBus, eventsToSendToParent);
          receive(childSideBus);
-         
-         config[1].unshift(childSideBus);
-         startFn.apply(null, config[1]);
+
+         startFnParameters.unshift(childSideBus);
+         startFn.apply(null, startFnParameters);
 
          console.log('worker: ready for events');
       }
