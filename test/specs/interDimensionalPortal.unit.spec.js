@@ -225,7 +225,8 @@ describe('interDimensionalPortal unit', function(){
          add8Bus.on('add-done', add8Results);
 
          function gotResultsBack(){
-            return (add8Results.callCount > 0) && (add8Results.callCount > 0); 
+            return (add4Results.callCount > 0) && 
+                   (add8Results.callCount > 0);
          }
          
          waitsFor(gotResultsBack, 'calculation to come back', 3000);
