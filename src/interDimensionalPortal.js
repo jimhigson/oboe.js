@@ -83,7 +83,7 @@ var interDimensionalPortal = (function(){
 
    return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
-      var blobUrl = window.URL.createObjectURL(
+      var blobUrl = URL.createObjectURL(
          new Blob(
             codeForChildThread(childLibs, childServer, eventTypesChildProduces)
          ,  {type:'text/javascript'}
