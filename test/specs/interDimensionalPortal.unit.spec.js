@@ -157,7 +157,7 @@ describe('interDimensionalPortal unit', function(){
 
    describe('parametrised program', function(){
 
-      function additionServer( eventEmitter, a ) {
+      function additionEngine( eventEmitter, a ) {
 
          eventEmitter.on('do-add', function(b){
 
@@ -167,7 +167,7 @@ describe('interDimensionalPortal unit', function(){
          });
       }
 
-      var childProgram = interDimensionalPortal(environment, additionServer, ['do-add'], ['add-done']);
+      var childProgram = interDimensionalPortal(environment, additionEngine, ['do-add'], ['add-done']);
       
       it('can pass startup parameters to child thread', function(){
    
@@ -186,9 +186,26 @@ describe('interDimensionalPortal unit', function(){
          })
       });
 
-      it('can start two instances of the same child program', function(){
-         
-         
+      it('can start two instances of the same child program with the same event bus', function(){
+
+         var bus = pubSub(),
+             done = jasmine.createSpy();
+
+         childProgram(bus, 4);
+         childProgram(bus, 8);
+
+         bus.emit('do-add', 2);
+         bus.emit('do-add', 3);
+         bus.on('add-done', done);
+
+         waitsFor(function(){return done.callCount == 4}, 'calculation to come back', 3000);
+
+         runs( function(){
+            expect(done).toHaveBeenCalledWith({a:4, b:2, 'a+b':6});
+            expect(done).toHaveBeenCalledWith({a:4, b:3, 'a+b':7});
+            expect(done).toHaveBeenCalledWith({a:8, b:2, 'a+b':10});
+            expect(done).toHaveBeenCalledWith({a:8, b:3, 'a+b':11});
+         })
       });
    });
 
