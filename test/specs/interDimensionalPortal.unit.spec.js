@@ -207,6 +207,34 @@ describe('interDimensionalPortal unit', function(){
             expect(done).toHaveBeenCalledWith({a:8, b:3, 'a+b':11});
          })
       });
+
+      it('can start two instances of the same child program with different event buses', function(){
+
+         var add4Bus = pubSub(),
+             add8Bus = pubSub(),
+             add4Results = jasmine.createSpy('add four program result listener'),
+             add8Results = jasmine.createSpy('add eight program result listener');
+
+         childProgram(add4Bus, 4);
+         childProgram(add8Bus, 8);
+
+         add4Bus.emit('do-add', 2);
+         add8Bus.emit('do-add', 3);
+         
+         add4Bus.on('add-done', add4Results);
+         add8Bus.on('add-done', add8Results);
+
+         function gotResultsBack(){
+            return (add8Results.callCount > 0) && (add8Results.callCount > 0); 
+         }
+         
+         waitsFor(gotResultsBack, 'calculation to come back', 3000);
+
+         runs( function(){
+            expect(add4Results).toHaveBeenCalledWith({a:4, b:2, 'a+b':6});
+            expect(add8Results).toHaveBeenCalledWith({a:8, b:3, 'a+b':11});
+         })
+      });      
    });
 
    it('can accept multiple arguments', function(){
