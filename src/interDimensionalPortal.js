@@ -79,7 +79,7 @@ var interDimensionalPortal = (function(){
          .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
    }
 
-   return function (parentSideBus, childLibs, childServer, eventsToChild, eventsFromChild){
+   return function (childLibs, childServer, eventsToChild, eventsFromChild){
 
       // TODO: it always creates the exact same Blob. Seems kinda wasteful.
       // TODO: REUSE BLOBS - requires exposing 'portal program maker' and 'portal starter'
@@ -94,7 +94,7 @@ var interDimensionalPortal = (function(){
          )
       );
       
-      return function(childServerArgs){
+      return function(parentSideBus, childServerArgs){
       
          var worker = new Worker(blobUrl);
             
@@ -107,7 +107,7 @@ var interDimensionalPortal = (function(){
          
          forward(parentSideBus, eventsToChild, worker);
          receive(parentSideBus, worker);
-      }
+      };
    }
 
 }());

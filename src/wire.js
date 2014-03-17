@@ -11,8 +11,6 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
    console.log('wiring will invoke the portal');
    
    var clientProgram = interDimensionalPortal(
-      oboeBus,
-
       workerEnv(),
       
       function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
@@ -54,7 +52,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       ]
    );
 
-   clientProgram([ httpMethodName, contentSource, body, headers, withCredentials]);
+   clientProgram(oboeBus, [ httpMethodName, contentSource, body, headers, withCredentials]);
    
    // Wire the input stream in if we are given a content source.
    // This will usually be the case. If not, the instance created
