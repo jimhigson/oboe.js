@@ -11,7 +11,7 @@ var interDimensionalPortal = (function(){
 
    function forward(eventEmitter, eventNames, thread){
 
-      var target = (thread || this);
+      var destination = (thread || this);
 
       eventNames.forEach(function(eventName){
 
@@ -22,7 +22,7 @@ var interDimensionalPortal = (function(){
                ' forwarding via portal "' + eventName + '"' +
                   (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
 
-            target.postMessage([eventName, value]);
+            destination.postMessage([eventName, value]);
          });
       });
    }
