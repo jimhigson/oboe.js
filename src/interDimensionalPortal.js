@@ -81,12 +81,6 @@ var interDimensionalPortal = (function(){
 
    return function (childLibs, childServer, eventsToChild, eventsFromChild){
 
-      // TODO: it always creates the exact same Blob. Seems kinda wasteful.
-      // TODO: REUSE BLOBS - requires exposing 'portal program maker' and 'portal starter'
-      // TODO: functions as two interface parts 
-      // TODO: OR! Give a function which, when called, creates a new server (woot)
-      // TODO:    PROBLEM? In tests, server code changes a bit for stubbing
-
       var blobUrl = window.URL.createObjectURL(
          new Blob(
             codeForChildThread(childLibs, childServer)
