@@ -159,32 +159,36 @@ describe('interDimensionalPortal unit', function(){
 
       function additionServer( eventEmitter, a ) {
 
-         eventEmitter.on('start-fib', function(b){
+         eventEmitter.on('do-add', function(b){
 
             var answer = a + b; // takes ~1s to calculate by recursion
 
-            eventEmitter.emit('fib-done', {a:a, b:b, 'a+b':answer});
+            eventEmitter.emit('add-done', {a:a, b:b, 'a+b':answer});
          });
       }
 
-      var childProgram = interDimensionalPortal(environment, additionServer, ['start-fib'], ['fib-done']);      
+      var childProgram = interDimensionalPortal(environment, additionServer, ['do-add'], ['add-done']);
       
       it('can pass startup parameters to child thread', function(){
    
          var bus = pubSub(),
-             done = sinon.stub();
+             done = jasmine.createSpy();
    
          childProgram(bus, 4);
    
-         bus.emit('start-fib', 2);
-         bus.on('fib-done', done);
+         bus.emit('do-add', 2);
+         bus.on('add-done', done);
    
-         waitsFor(function(){return done.called}, 'calculation to come back', 3000);
+         waitsFor(function(){return done.callCount > 0}, 'calculation to come back', 3000);
    
          runs( function(){
-            var resultGiven = done.firstCall.args[0];
-            expect(resultGiven).toEqual({a:4, b:2, 'a+b':6}); 
+            expect(done).toHaveBeenCalledWith({a:4, b:2, 'a+b':6}); 
          })
+      });
+
+      it('can start two instances of the same child program', function(){
+         
+         
       });
    });
 
