@@ -10,18 +10,19 @@ var interDimensionalPortal = (function(){
    "use strict";
 
    function forward(eventEmitter, eventNames, thread){
-            
-      var dispatch = thread? thread.postMessage.bind(thread) : postMessage;
-      
+
+      var target = thread || this;
+
       eventNames.forEach(function(eventName){
-         
+
          eventEmitter.on(eventName, function(value){
 
             console.log(
                (thread ? 'parent' : 'child') +
                ' forwarding via portal "' + eventName + '"' +
                   (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
-            dispatch([eventName, value]);
+
+            target.postMessage([eventName, value]);
          });
       });
    }
@@ -39,11 +40,7 @@ var interDimensionalPortal = (function(){
          eventEmitter.emit(data[0], data[1]);
       }
       
-      if(thread){
-         thread.onmessage = handle;
-      } else {
-         onmessage = handle;
-      }
+      (thread||this).onmessage = handle;
    }
    
    function waitForStart( startFn, eventsTypesToForwardToParent ){
@@ -53,7 +50,7 @@ var interDimensionalPortal = (function(){
       console.log('worker waiting for setup message');
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
-      onmessage = function( initialisationMessage ){
+      this.onmessage = function( initialisationMessage ){
 
          var startFnParameters = initialisationMessage.data;
 
