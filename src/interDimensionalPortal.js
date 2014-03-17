@@ -79,7 +79,10 @@ var interDimensionalPortal = (function(){
          // we need stringified functions for all libs, plus forward and receive
          .concat(forward, receive).map(String)
          // and we'll need the worker to wait for the start signal:
-         .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
+         .concat(
+            '(' + String(waitForStart) + ')' +
+            '(' + String(childServer) + ')'
+         );
    }
 
    return function (childLibs, childServer, eventsToChild, eventsFromChild){
