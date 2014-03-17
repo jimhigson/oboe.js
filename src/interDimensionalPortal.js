@@ -95,7 +95,7 @@ var interDimensionalPortal = (function(){
          console.log('created blob and worker');
          worker.postMessage([
             eventsFromChild
-         ,  (childServerArgs || [])
+         ,  childServerArgs
          ]);
          console.log('sent first message to worker');
          
