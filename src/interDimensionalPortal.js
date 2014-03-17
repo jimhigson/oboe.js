@@ -72,7 +72,7 @@ var interDimensionalPortal = (function(){
       }
    }
 
-   function codeForChildThread(childLibs, childServer, eventsTypesChildProduces) {
+   function codeForChildThread(childLibs, childServer, eventTypesChildProduces) {
 
       return childLibs
          // we need stringified functions for all libs, plus forward and receive
@@ -80,28 +80,27 @@ var interDimensionalPortal = (function(){
          // and we'll need the worker to wait for the start signal:
          .concat(
             '(' + String(waitForStart) + ')' +
-            '(' + String(childServer) + ',' + JSON.stringify(eventsTypesChildProduces) + ')'
+            '(' + String(childServer) + ',' + JSON.stringify(eventTypesChildProduces) + ')'
          );
    }
 
-   return function (childLibs, childServer, eventsTypesChildConsumes, eventsTypesChildProduces){
+   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
       var blobUrl = window.URL.createObjectURL(
          new Blob(
-            codeForChildThread(childLibs, childServer, eventsTypesChildProduces)
+            codeForChildThread(childLibs, childServer, eventTypesChildProduces)
          ,  {type:'text/javascript'}
          )
       );
       
       return varArgs( function(parentSideBus, childServerArgs){
-      
          var worker = new Worker(blobUrl);
             
          console.log('created blob and worker');
          worker.postMessage(childServerArgs);
          console.log('sent first message to worker');
          
-         forward(parentSideBus, eventsTypesChildConsumes, worker);
+         forward(parentSideBus, eventTypesChildConsumes, worker);
          receive(parentSideBus, worker);
       });
    }
