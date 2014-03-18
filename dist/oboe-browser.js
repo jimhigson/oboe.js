@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-25-gdc0e8a4
+   // v1.14.2-68-g450ab0b
 
 /*
 
@@ -578,7 +578,7 @@ function clarinet(eventBus) {
 
       // setup initial parser values
   ,   bufferCheckPosition  = MAX_BUFFER_LENGTH
-  ,   error                
+  ,   latestError                
   ,   c                    
   ,   p                    
   ,   textNode             = ""
@@ -619,17 +619,17 @@ function clarinet(eventBus) {
     valid json, ie if not all arrays, objects and Strings closed properly */
   eventBus(STREAM_END).on(end);   
 
-  function emitError (er) {
+  function emitError (errorString) {
      if (textNode) {
         emitSaxValue(textNode);
         textNode = "";
      }
 
-     error = Error(er + "\nLn: "+line+
-                        "\nCol: "+column+
-                        "\nChr: "+c);
+     latestError = Error(errorString + "\nLn: "+line+
+                                       "\nCol: "+column+
+                                       "\nChr: "+c);
      
-     emitFail(errorReport(undefined, undefined, error));
+     emitFail(errorReport(undefined, undefined, latestError));
   }
 
   function end() {
@@ -649,7 +649,7 @@ function clarinet(eventBus) {
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.
-    if (error)
+    if (latestError)
       return;
       
     if (closed) return emitError("Cannot write after close");
@@ -2019,12 +2019,12 @@ var // the events which are never exported are kept as
     ABORTING        = _S++,
 
     // SAX events butchered from Clarinet
-    SAX_VALUE        = _S++,
-    SAX_KEY          = _S++,
-    SAX_OPEN_OBJECT  = _S++,
-    SAX_CLOSE_OBJECT = _S++,
-    SAX_OPEN_ARRAY   = _S++,
-    SAX_CLOSE_ARRAY  = _S++;
+    SAX_VALUE        = 'SAX_VALUE',
+    SAX_KEY          = 'SAX_KEY',
+    SAX_OPEN_OBJECT  = 'SAX_OPEN_OBJECT',
+    SAX_CLOSE_OBJECT = 'SAX_CLOSE_OBJECT',
+    SAX_OPEN_ARRAY   = 'SAX_OPEN_ARRAY',
+    SAX_CLOSE_ARRAY  = 'SAX_CLOSE_ARRAY';
     
 function errorReport(statusCode, body, error) {
    try{
@@ -2380,14 +2380,19 @@ var interDimensionalPortal = (function(){
    "use strict";
 
    function forward(eventEmitter, eventNames, thread){
-            
-      var dispatch = thread? thread.postMessage.bind(thread) : postMessage;
-      
+
+      var destination = (thread || this);
+
       eventNames.forEach(function(eventName){
-         
+
          eventEmitter.on(eventName, function(value){
 
-            dispatch([eventName, value]);
+            console.log(
+               (thread ? 'parent' : 'child') +
+               ' forwarding via portal "' + eventName + '"' +
+                  (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
+
+            destination.postMessage([eventName, value]);
          });
       });
    }
@@ -2397,135 +2402,148 @@ var interDimensionalPortal = (function(){
       function handle(event){
          var data = event.data;
 
+         console.log( 
+            (thread ? 'parent' : 'child') +
+            ' received via portal "' + data[0] + '"' + 
+               (data[1] ? ' = ' + JSON.stringify(data[1]) : ' (no value)')
+         );
          eventEmitter.emit(data[0], data[1]);
       }
       
-      if(thread){
-         thread.onmessage = handle;
-      } else {
-         onmessage = handle;
-      }
+      (thread||this).onmessage = handle;
    }
    
-   function waitForStart( startFn ){
+   function waitForStart( startFn, eventsTypesToForwardToParent ){
+
+      var childSideBus = pubSub();
       
-      console.log('worker waiting for first message');
+      console.log('worker waiting for setup message');
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
-      onmessage = function( initialisationMessage ){
-         console.log('worker got first message');
-         
-         var childSideBus = pubSub();
-         var config = initialisationMessage.data;
-         
-         forward(childSideBus, config[0]);
+      this.onmessage = function( initialisationMessage ){
+
+         var startFnParameters = initialisationMessage.data;
+
+         console.log(
+            'worker: got setup message with config ' +
+               JSON.stringify(startFnParameters)
+         );
+
+         forward(childSideBus, eventsTypesToForwardToParent);
          receive(childSideBus);
-         
-         config[1].unshift(childSideBus);
-         startFn.apply(null, config[1]);
+
+         startFnParameters.unshift(childSideBus);
+         startFn.apply(null, startFnParameters);
+
+         console.log('worker: ready for events');
       }
    }
 
-   function codeForChildThread(childLibs, childServer) {
+   function codeForChildThread(childLibs, childServer, eventTypesChildProduces) {
 
       return childLibs
          // we need stringified functions for all libs, plus forward and receive
          .concat(forward, receive).map(String)
          // and we'll need the worker to wait for the start signal:
-         .concat('(' + String(waitForStart) + ')' + '(' + String(childServer) + ')');
+         .concat(
+            '(' + String(waitForStart) + ')' +
+            '(' + String(childServer) + ',' + JSON.stringify(eventTypesChildProduces) + ')'
+         );
    }
 
-   return function (parentSideBus, childLibs, childServer, childServerArgs, eventsToChild, eventsFromChild){
+   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
-      var worker = new Worker(
-                        window.URL.createObjectURL(
-                           new Blob(
-                              codeForChildThread(childLibs, childServer)
-                           ,  {type:'text/javascript'}
-                           )
-                        )
+      var blobUrl = URL.createObjectURL(
+         new Blob(
+            codeForChildThread(childLibs, childServer, eventTypesChildProduces)
+         ,  {type:'text/javascript'}
+         )
       );
-         
-      console.log('created worker');
-      worker.postMessage([eventsFromChild, childServerArgs]);
-      console.log('sent first messge to worker');
       
-      forward(parentSideBus, eventsToChild, worker);
-      receive(parentSideBus, worker);
+      return varArgs( function(parentSideBus, childServerArgs){
+         var worker = new Worker(blobUrl);
+            
+         console.log('created blob and worker');
+         worker.postMessage(childServerArgs);
+         console.log('sent first message to worker');
+         
+         forward(parentSideBus, eventTypesChildConsumes, worker);
+         receive(parentSideBus, worker);
+      });
    }
 
 }());
 
-var WORKER_ENV = [_oboeWrapper];
+
+function workerEnv(){
+   return [_oboeWrapper];
+}
 
 /**
  * This file sits just behind the API which is used to attain a new
  * Oboe instance. It creates the new components that are required
  * and introduces them to each other.
  */
-
-function wireToFetch(oboeBus, httpMethodName, contentSource, body, headers, withCredentials){
+var wire = (function(){
    
-   console.log('inside worker thread');
-   
-   if( contentSource ) {
+   // NOTE: this is compiled even inside worker threads
+   var fetchAndParseChildProgram = interDimensionalPortal(
+      workerEnv(),
 
-      streamingHttp(
-         oboeBus,
-         httpTransport(),
-         httpMethodName,
-         contentSource,
-         body,
-         headers,
-         withCredentials
-      );
-   }
+      function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
+         console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
 
-   clarinet(oboeBus);   
-}
+         if( contentSource ) {
+            streamingHttp(
+               childThreadBus,
+               httpTransport(),
+               httpMethodName,
+               contentSource,
+               body,
+               headers,
+               withCredentials
+            );
+         }
 
-function wire (httpMethodName, contentSource, body, headers, withCredentials){
-
-   var oboeBus = pubSub();
-   
-   console.log('wiring will invoke the portal');
-   
-   interDimensionalPortal(
-      oboeBus,
-      
-      [],
-      
-      function(){
+         clarinet(childThreadBus);
       },
-      
-      [],
-      //[  httpMethodName, contentSource, body, headers, withCredentials],
 
-      [],
-      []
-/*      
-      [  ABORTING],  // events to underlying
-      
-      [  SAX_VALUE
-      ,  SAX_KEY
-      ,  SAX_OPEN_OBJECT
-      ,  SAX_CLOSE_OBJECT
-      ,  SAX_OPEN_ARRAY
-      ,  SAX_CLOSE_ARRAY
+      [  // the fetcher/parser needs to know if the request is aborted:
+         ABORTING
+
+         // Although unconventional, data can be fed in through the oboe instance. Hence,
+         // it needs to be able to send this data to the parser.
+      ,  STREAM_DATA       , STREAM_END
+      ],
+ 
+      // events to get back from the worker
+      [  SAX_KEY           , SAX_VALUE
+      ,  SAX_OPEN_OBJECT   , SAX_CLOSE_OBJECT
+      ,  SAX_OPEN_ARRAY    , SAX_CLOSE_ARRAY
       ,  FAIL_EVENT
-      ]    // events from underlying*/
+      ]
    );
    
-   // Wire the input stream in if we are given a content source.
-   // This will usually be the case. If not, the instance created
-   // will have to be passed content from an external source.
-
-   ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
+   return function (httpMethodName, contentSource, body, headers, withCredentials){
+   
+      var oboeBus = pubSub();
       
-   patternAdapter(oboeBus, jsonPathCompiler);      
+      console.log('wiring will invoke the portal');
+         
+      fetchAndParseChildProgram(oboeBus, httpMethodName, contentSource, body, headers, withCredentials);
       
-   return new instanceApi(oboeBus);
-}
+      // Wire the input stream in if we are given a content source.
+      // This will usually be the case. If not, the instance created
+      // will have to be passed content from an external source.
+   
+      ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
+         
+      patternAdapter(oboeBus, jsonPathCompiler);      
+         
+      return new instanceApi(oboeBus);
+   };
+   
+}());
 
 function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){
 
@@ -2603,12 +2621,6 @@ function oboe(arg1, arg2) {
       return wire();
    }
 }
-
-// add methods to be called to set up as a worker thread:
-oboe._wire = {
-   wireToFetch:wireToFetch
-}
-
 
 
    if ( typeof define === "function" && define.amd ) {
