@@ -6,7 +6,7 @@
 
  */
 
-function givenAnOboeInstance(jsonFileName) {
+function givenAnOboeInstance(jsonUrl) {
 
    function OboeAsserter() {
 
@@ -21,16 +21,18 @@ function givenAnOboeInstance(jsonFileName) {
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
           
-          
-      jsonFileName = jsonFileName || 'invalid://xhr_should_be_stubbed.org/if/not/thats/bad';
-       
+                 
       function requestComplete(completeJsonFromJsonCompleteCall){
          completeJson = completeJsonFromJsonCompleteCall;
                  
          asserter.isComplete = true;
       } 
        
-      oboeInstance = oboe( jsonFileName 
+      /* note that jsonUrl can be undefined, in which case it is a sourceless
+         oboe instance that needs the input to be fed into it from an external
+         source
+       */
+      oboeInstance = oboe( jsonUrl 
                          ).done(requestComplete);      
 
       oboeInstance.fail(function(e) {

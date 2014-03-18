@@ -1,13 +1,7 @@
 
-// Tests can reassign this function. Whatever value is in here
-// will be written into the environment for worker threads
-// and should be used to create stubs in their environment
-window.setupStubsInWorkerThread = function(){
-};
-
 function workerEnv(){
 
-   function importAll(base, setupStub){
+   function importAll(base){
 
       console.log('child thread: importing scripts from domain ' + base + ' ...');
 
@@ -34,10 +28,6 @@ function workerEnv(){
       ,  base + '/src/publicApi.js'
       ,  base + '/src/interDimensionalPortal.js'
       );
-
-      if(setupStub) {
-         setupStub();
-      }
 
       console.log('...importing scripts done');
    }
@@ -76,7 +66,7 @@ function workerEnv(){
    var location = window.location,
    // the path '/base' is where Karma serves the js under test
       base = location.protocol + location.host + '/base',
-      loader = stringifyFunctionForWorker(importAll, base, window.setupStubsInWorkerThread);
+      loader = stringifyFunctionForWorker(importAll, base);
 
    return [loader];
 }

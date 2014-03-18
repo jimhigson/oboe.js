@@ -1383,32 +1383,6 @@ describe("oboe component (sXHR stubbed)", function(){
             );
       })      
    });
-   
-   
-   beforeEach(function() {
-      sinon.stub(window, 'streamingHttp')
-         .returns(sinon.stub());
-
-      // in the worker environment we want to stub 
-      // streaming http too (it should have sinon loaded)
-      window.setupStubsInWorkerThread = function(){
-         console.log('stubbing out in the worker thread');
-         
-         // we should be called in global scope so this
-         // equals the global object (but not window since
-         // we're not in a webpage)
-         sinon.stub(this, 'streamingHttp')
-            .returns(sinon.stub());
-      };
-      
-   })
-   
-   afterEach(function() {
-      window.streamingHttp.restore();
-
-      // put back to a noop:
-      window.setupStubsInWorkerThread = function(){};
-   })   
 
 });
 
