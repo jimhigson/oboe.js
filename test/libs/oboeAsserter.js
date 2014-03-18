@@ -162,7 +162,7 @@ function givenAnOboeInstance(jsonUrl) {
             function clone(original){
                // Note: window.eval being used here instead of JSON.parse because
                // eval can handle 'undefined' in the string but JSON.parse cannot.
-               // This isn't wholy ideal since this means we're relying on JSON.
+               // This isn't wholly ideal since this means we're relying on JSON.
                // stringify to create invalid JSON. But at least there are no
                // security concerns with this being a test. 
                return window.eval( '(' + JSON.stringify( original ) + ')' );
