@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.2-3-g51649e7
+   // v1.14.2-6-g47a8119
 
 /*
 
@@ -577,7 +577,7 @@ function clarinet(eventBus) {
 
       // setup initial parser values
   ,   bufferCheckPosition  = MAX_BUFFER_LENGTH
-  ,   error                
+  ,   latestError                
   ,   c                    
   ,   p                    
   ,   textNode             = ""
@@ -618,17 +618,17 @@ function clarinet(eventBus) {
     valid json, ie if not all arrays, objects and Strings closed properly */
   eventBus(STREAM_END).on(end);   
 
-  function emitError (er) {
+  function emitError (errorString) {
      if (textNode) {
         emitSaxValue(textNode);
         textNode = "";
      }
 
-     error = Error(er + "\nLn: "+line+
-                        "\nCol: "+column+
-                        "\nChr: "+c);
+     latestError = Error(errorString + "\nLn: "+line+
+                                       "\nCol: "+column+
+                                       "\nChr: "+c);
      
-     emitFail(errorReport(undefined, undefined, error));
+     emitFail(errorReport(undefined, undefined, latestError));
   }
 
   function end() {
@@ -648,7 +648,7 @@ function clarinet(eventBus) {
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.
-    if (error)
+    if (latestError)
       return;
       
     if (closed) return emitError("Cannot write after close");

@@ -117,6 +117,10 @@ function clarinet(eventBus) {
      closed = true;
   }
 
+  function whitespace(c){
+     return c == '\r' || c == '\n' || c == ' ' || c == '\t';
+  }
+   
   function write (chunk) {
          
     // this used to throw the error but inside Oboe we will have already
@@ -145,13 +149,13 @@ function clarinet(eventBus) {
         case BEGIN:
           if (c === "{") state = OPEN_OBJECT;
           else if (c === "[") state = OPEN_ARRAY;
-          else if (c !== '\r' && c !== '\n' && c !== ' ' && c !== '\t')
+          else if (!whitespace(c))
             emitError("Non-whitespace before {[.");
         continue;
 
         case OPEN_KEY:
         case OPEN_OBJECT:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
+          if (whitespace(c)) continue;
           if(state === OPEN_KEY) stack.push(CLOSE_KEY);
           else {
             if(c === '}') {
@@ -169,7 +173,7 @@ function clarinet(eventBus) {
 
         case CLOSE_KEY:
         case CLOSE_OBJECT:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
+          if (whitespace(c)) continue;
 
           if(c===':') {
             if(state === CLOSE_OBJECT) {
@@ -211,7 +215,7 @@ function clarinet(eventBus) {
 
         case OPEN_ARRAY: // after an array there always a value
         case VALUE:
-          if (c === '\r' || c === '\n' || c === ' ' || c === '\t') continue;
+          if (whitespace(c)) continue;
           if(state===OPEN_ARRAY) {
             emitSaxOpenArray();
             depth++;             
@@ -259,7 +263,7 @@ function clarinet(eventBus) {
              emitSaxCloseArray();
             depth--;
             state = stack.pop() || VALUE;
-          } else if (c === '\r' || c === '\n' || c === ' ' || c === '\t')
+          } else if (whitespace(c))
               continue;
           else 
              emitError('Bad array');
