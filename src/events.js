@@ -29,16 +29,5 @@ var // the events which are never exported are kept as
     SAX_CLOSE_OBJECT = 'SAX_CLOSE_OBJECT',
     SAX_OPEN_ARRAY   = 'SAX_OPEN_ARRAY',
     SAX_CLOSE_ARRAY  = 'SAX_CLOSE_ARRAY';
-    
-function errorReport(statusCode, body, error) {
-   try{
-      var jsonBody = JSON.parse(body);
-   }catch(e){}
 
-   return {
-      statusCode:statusCode,
-      body:body,
-      jsonBody:jsonBody,
-      thrown:error
-   };
-}    
+

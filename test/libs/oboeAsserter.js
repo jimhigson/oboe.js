@@ -127,6 +127,7 @@ function givenAnOboeInstance(jsonUrl) {
             try {
                testIfCorrectNow();
             } catch(e){
+               //console.log('not passing yet: ' + e.message); 
                return false;
             }
             return true;
@@ -182,11 +183,20 @@ function givenAnOboeInstance(jsonUrl) {
 
 var wasPassedAnErrorObject = {
    testAgainst: function failIfNotPassedAnError(callback, oboeInstance) {
-   
-      if( !callback.args[0][0] instanceof Error ) {
-         throw new Error("Callback should have been given an error but was given" + callback.constructor.name);
-      }
       
+      var argument = callback.args[0][0];
+      
+      // very loose duck-type detection. The reason is that key/value pairs with undefined
+      // as the value aren't represented at all in JSON so they don't make it through the
+      // portal
+      if(   !argument.hasOwnProperty('body') && 
+            !argument.hasOwnProperty('statusCode') && 
+            !argument.hasOwnProperty('message') ){
+         
+         throw new Error('wanted an object but no body, statusCode, nor message property in ' + 
+                         argument + JSON.stringify(argument) );
+      }
+
    }
 };
 

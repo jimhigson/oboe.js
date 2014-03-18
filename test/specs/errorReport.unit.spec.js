@@ -36,9 +36,9 @@ describe("error report", function() {
    it('should store thrown thing', function(){
       var thrown = new Error('something bad happened');
       
-      var report = errorReport(404, '', thrown);          
+      var report = errorReport(404, '', thrown);
    
-      expect(report.thrown).toBe(thrown);      
+      expect(report.message).toBe('something bad happened');
    });         
    
 });

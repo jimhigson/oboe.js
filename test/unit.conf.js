@@ -27,6 +27,7 @@ module.exports = function(config) {
       ,  'src/singleEventPubSub.js' 
       ,  'src/pubSub.js' 
       ,  'src/events.js'
+      ,  'src/errorReport.js'
       ,  'src/patternAdapter.js'
       ,  'src/instanceApi.js'
       ,  'src/workerEnv.raw.js'

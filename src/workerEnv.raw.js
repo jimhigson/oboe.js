@@ -21,6 +21,7 @@ function workerEnv(){
       ,  base + '/src/singleEventPubSub.js'
       ,  base + '/src/pubSub.js'
       ,  base + '/src/events.js'
+      ,  base + '/src/errorReport.js'
       ,  base + '/src/patternAdapter.js'
       ,  base + '/src/instanceApi.js'
          

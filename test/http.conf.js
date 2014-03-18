@@ -15,6 +15,7 @@ module.exports = function(config) {
       ,  'test/libs/*.js'
 
       ,  'src/events.js'
+      ,  'src/errorReport.js'
       ,  'src/functional.js'                  
       ,  'src/util.js'
       ,  'src/parseResponseHeaders.browser.js'           

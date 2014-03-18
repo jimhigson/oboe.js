@@ -1337,7 +1337,7 @@ describe("oboe component (sXHR stubbed)", function(){
    })
  
 
-   xdescribe('error cases', function() {
+   describe('error cases', function() {
       it('notifies of error given unquoted string keys',  function() {
      
          givenAnOboeInstance()
