@@ -20,10 +20,7 @@ function givenAnOboeInstance(jsonFileName) {
           completeJson, // assigned in the requestCompleteCallback
 
           spiedCallback; //erk: only one callback stub per Asserter right now :-s
-          
-          
-      jsonFileName = jsonFileName || 'invalid://xhr_should_be_stubbed.org/if/not/thats/bad';
-       
+
       function requestComplete(completeJsonFromJsonCompleteCall){
          completeJson = completeJsonFromJsonCompleteCall;
                  
@@ -90,7 +87,7 @@ function givenAnOboeInstance(jsonFileName) {
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
-            oboeInstance.emit(STREAM_DATA, json.charAt(i) ); 
+            oboeInstance.emit('data', json.charAt(i) ); 
          }
 
          return this;
@@ -98,13 +95,11 @@ function givenAnOboeInstance(jsonFileName) {
       
       this.whenInputFinishes = function() {
          
-         oboeInstance.emit(STREAM_END);                  
+         oboeInstance.emit('end');
 
          return this;         
       };
 
-      function noop(){}
-      
       /**
        * Assert any number of conditions were met on the spied callback
        */

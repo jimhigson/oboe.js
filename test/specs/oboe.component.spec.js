@@ -1,4 +1,4 @@
-describe("oboe component (sXHR stubbed)", function(){
+describe("oboe component (no http, content fed in externally)", function(){
 
      
 /*
@@ -1380,15 +1380,5 @@ describe("oboe component (sXHR stubbed)", function(){
       })      
    });
    
-   
-   beforeEach(function() {
-      sinon.stub(window, 'streamingHttp')
-         .returns(sinon.stub());
-   })
-   
-   afterEach(function() {
-      window.streamingHttp.restore();   
-   })   
-
 });
 
