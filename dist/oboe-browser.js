@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-6-g47a8119
+   // v1.14.2-7-ga3e758d
 
 /*
 
@@ -853,7 +853,7 @@ function clarinet(eventBus) {
 
             stringTokenPattern.lastIndex = i;
             var reResult = stringTokenPattern.exec(chunk);
-            if (reResult === null) {
+            if (!reResult) {
               i = chunk.length+1;
               textNode += chunk.substring(starti, i-1);
               break;
@@ -868,19 +868,19 @@ function clarinet(eventBus) {
         continue;
 
         case TRUE:
-          if (c==='')  continue; // strange buffers
+          if (!c)  continue; // strange buffers
           if (c==='r') state = TRUE2;
           else emitError( 'Invalid true started with t'+ c);
         continue;
 
         case TRUE2:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='u') state = TRUE3;
           else emitError('Invalid true started with tr'+ c);
         continue;
 
         case TRUE3:
-          if (c==='') continue;
+          if (!c) continue;
           if(c==='e') {
             emitSaxValue(true);
             state = stack.pop() || VALUE;
@@ -888,25 +888,25 @@ function clarinet(eventBus) {
         continue;
 
         case FALSE:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='a') state = FALSE2;
           else emitError('Invalid false started with f'+ c);
         continue;
 
         case FALSE2:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='l') state = FALSE3;
           else emitError('Invalid false started with fa'+ c);
         continue;
 
         case FALSE3:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='s') state = FALSE4;
           else emitError('Invalid false started with fal'+ c);
         continue;
 
         case FALSE4:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='e') {
             emitSaxValue(false);
             state = stack.pop() || VALUE;
@@ -914,19 +914,19 @@ function clarinet(eventBus) {
         continue;
 
         case NULL:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='u') state = NULL2;
           else emitError('Invalid null started with n'+ c);
         continue;
 
         case NULL2:
-          if (c==='')  continue;
+          if (!c)  continue;
           if (c==='l') state = NULL3;
           else emitError('Invalid null started with nu'+ c);
         continue;
 
         case NULL3:
-          if (c==='') continue;
+          if (!c) continue;
           if(c==='l') {
             emitSaxValue(null);
             state = stack.pop() || VALUE;
