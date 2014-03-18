@@ -1,4 +1,4 @@
-describe("oboe component (sXHR stubbed)", function(){
+describe("oboe component (input from external source)", function(){
 
      
 /*
