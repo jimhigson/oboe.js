@@ -1,4 +1,4 @@
-describe("oboe component (input from external source)", function(){
+describe("oboe component (no http, content fed in externally)", function(){
 
      
 /*
@@ -35,9 +35,7 @@ describe("oboe component (input from external source)", function(){
    })*/
    
    it('handles empty object detected with bang',  function() {
-
-      console.log('\n__________________component test starting__________________');
-     
+    
       var instance = givenAnOboeInstance()
          .andWeAreListeningForNodes('!', function(n){
             console.log('instance got node', n);
@@ -1434,6 +1432,16 @@ describe("oboe component (input from external source)", function(){
             );
       })      
    });
+   
+   
+   beforeEach(function() {
+      sinon.stub(window, 'streamingHttp')
+         .returns(sinon.stub());
+   })
+   
+   afterEach(function() {
+      window.streamingHttp.restore();   
+   })   
 
 });
 

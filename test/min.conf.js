@@ -16,6 +16,7 @@ module.exports = function(config) {
       ,  'test/libs/*.js'
       ,  'dist/oboe-browser.min.js'
       
+      ,  'test/specs/oboe.component.spec.js'
       ,  'test/specs/oboe.integration.spec.js'
       ,  'test/specs/oboe.performance.spec.js'
       ],

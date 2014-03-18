@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-77-g39f4c35
+   // v1.14.2-78-gab8346c
 
 /*
 
@@ -2018,8 +2018,8 @@ var // the events which are never exported are kept as
     ROOT_PATH_FOUND = _S++,
    
     HTTP_START      = 'start',
-    STREAM_DATA     = 'content',
-    STREAM_END      = _S++,
+    STREAM_DATA     = 'data',
+    STREAM_END      = 'end',
     ABORTING        = _S++,
 
     // SAX events butchered from Clarinet

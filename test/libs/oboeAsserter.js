@@ -34,7 +34,7 @@ function givenAnOboeInstance(jsonUrl) {
        */
       oboeInstance = oboe( jsonUrl 
                          ).done(requestComplete);      
-
+                              
       oboeInstance.fail(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.
          // Fail the test on getting an error:
@@ -92,15 +92,20 @@ function givenAnOboeInstance(jsonUrl) {
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
-            oboeInstance.emit(STREAM_DATA, json.charAt(i) ); 
+            // use 'data', not type-safe STREAM_DATA var because
+            // we might be running without the vars from
+            // src/events.js in scope
+            oboeInstance.emit('data', json.charAt(i) ); 
          }
 
          return this;
       };
       
       this.whenInputFinishes = function() {
-         
-         oboeInstance.emit(STREAM_END);                  
+         // use 'end', not type-safe STREAM_END var because
+         // we might be running without the vars from
+         // src/events.js in scope         
+         oboeInstance.emit('end');
 
          return this;         
       };
