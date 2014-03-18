@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-71-gb65ee95
+   // v1.14.2-77-g39f4c35
 
 /*
 
@@ -2029,7 +2029,14 @@ var // the events which are never exported are kept as
     SAX_CLOSE_OBJECT = 'SAX_CLOSE_OBJECT',
     SAX_OPEN_ARRAY   = 'SAX_OPEN_ARRAY',
     SAX_CLOSE_ARRAY  = 'SAX_CLOSE_ARRAY';
-    
+
+
+
+/**
+ * Create an object to represent an error case. Note that this object cannot
+ * have a reference to an actual Error instance. The reason for this is that
+ * Error instances cannot be serialised for passing between threads.
+ */
 function errorReport(statusCode, body, error) {
    try{
       var jsonBody = JSON.parse(body);
@@ -2039,9 +2046,9 @@ function errorReport(statusCode, body, error) {
       statusCode:statusCode,
       body:body,
       jsonBody:jsonBody,
-      thrown:error
+      message:(error && error.message)
    };
-}    
+}
 
 /** 
  *  The pattern adaptor listens for newListener and removeListener
