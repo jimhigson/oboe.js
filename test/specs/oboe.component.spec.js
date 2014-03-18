@@ -348,87 +348,135 @@ describe("oboe component (sXHR stubbed)", function(){
          .thenTheInstance(foundNoMatches);
    })      
 
-   xdescribe('progressive output', function(){
+   describe('progressive output', function(){
    
-      it('gives notification of multiple properties of an object without waiting for entire object',  function() {
+      describe('giving notification of multiple properties of an object without waiting for entire object',  function(){
    
-         givenAnOboeInstance()
-            .andWeAreListeningForNodes('!.*')
-            .whenGivenInput('{"a":')
-            .thenTheInstance(
-                foundNoMatches
-             )
-            .whenGivenInput('"A",')
-            .thenTheInstance(
-                matched('A').atPath(['a'])
-            ,   foundOneMatch
-            )
-            .whenGivenInput('"b":"B"}')
-            .thenTheInstance(
-                matched('B').atPath(['b'])
-            ,   foundNMatches(2)
-            );
+         it( 'gives no notification on seeing just the key', function(){ 
+            givenAnOboeInstance()
+               .andWeAreListeningForNodes('!.*')
+               .whenGivenInput('{"a":')
+               .thenTheInstance(
+                   foundNoMatches
+               )
+         });
+
+         it( 'gives one notification on seeing just the first value', function(){
+            givenAnOboeInstance()
+               .andWeAreListeningForNodes('!.*')
+               .whenGivenInput('{"a":"A",')
+               .thenTheInstance(
+                   matched('A').atPath(['a'])
+               ,   foundOneMatch
+               )
+         });
+
+         it( 'gives another notification on seeing just the second key/value', function(){
+            givenAnOboeInstance()
+               .andWeAreListeningForNodes('!.*')
+               .whenGivenInput('{"a":"A","b":"B"}')
+               .thenTheInstance(
+                   matched('B').atPath(['b'])
+               ,   foundNMatches(2)
+               );
+         });
       })
       
-      it('can get root json as json object is built up',  function() {
+      describe('giving root progressively as root json object is built up',  function() {
    
-         givenAnOboeInstance()
-            .whenGivenInput('{"a":')
-            .thenTheInstance(
-               hasRootJson({a:undefined})
-             )
-            .whenGivenInput('"A",')
-            .thenTheInstance(
-                hasRootJson({a:'A'})
-            )
-            .whenGivenInput('"b":')
-            .thenTheInstance(
-               hasRootJson({a:'A', b:undefined})
-            )
-            .whenGivenInput('"B"}')
-            .thenTheInstance(
-               hasRootJson({a:'A', b:'B'})         
-            )
-            .whenInputFinishes()
-            .thenTheInstance(         
-               gaveFinalCallbackWithRootJson({a:'A', b:'B'})
-            );
+         it('can supply root after seeing first key with undefined value', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('{"a":')
+               .thenTheInstance(
+                  hasRootJson({a:undefined})
+               );
+         });
+
+         it('can supply root after seeing first key/value with defined value', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('{"a":"A",')
+               .thenTheInstance(
+                  hasRootJson({a:'A'})
+               )
+         });
+         
+         it('gives second key with undefined value', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('{"a":"A","b":')
+               .thenTheInstance(
+                  hasRootJson({a:'A', b:undefined})
+               )
+         });
+
+         it('gives second key with defined value', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('{"a":"A","b":"B"}')
+               .thenTheInstance(
+                  hasRootJson({a:'A', b:'B'})
+               )
+         });
+
+         it('gives final callback when done', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('{"a":"A","b":"B"}')
+               .whenInputFinishes()
+               .thenTheInstance(
+                  gaveFinalCallbackWithRootJson({a:'A', b:'B'})
+               );
+         });
       })   
       
-      it('can notify progressively as root json array is built up',  function() {
+      describe('giving root progressively as root json array is built up',  function() {
    
          // let's feed it the array [11,22] in drips of one or two chars at a time:
-   
-         givenAnOboeInstance()
-            .whenGivenInput('[')
-            .thenTheInstance(
-               // I would like this to be [] but clarinet doesn't emit array found until it has seen
-               // the first element
-               hasRootJson(undefined)
-            )
-            .whenGivenInput('1')
-            .thenTheInstance(
-                // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
-                // so nothing can be added to the root json
-                hasRootJson([])
-            )
-            .whenGivenInput('1,')
-            .thenTheInstance(
-               hasRootJson([11])
-            )
-            .whenGivenInput('2')
-            .thenTheInstance(
-               hasRootJson([11])
-            )
-            .whenGivenInput('2]')
-            .thenTheInstance(
-               hasRootJson([11,22])         
-            )
-            .whenInputFinishes()
-            .thenTheInstance(         
-               gaveFinalCallbackWithRootJson([11,22])
-            );
-      })      
+         it('has nothing on array open', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[')
+               .thenTheInstance(
+                  // I would like this to be [] but clarinet doesn't emit array found until it has seen
+                  // the first element
+                  hasRootJson(undefined)
+               )
+         });
+         it('has empty array soon afterwards', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[1')
+               .thenTheInstance(
+                  // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
+                  // so nothing can be added to the root json
+                  hasRootJson([])
+               )
+         });
+         it('has the first element on seeing the comma', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[11,')
+               .thenTheInstance(
+                  hasRootJson([11])
+               )
+         });
+         it('has no more on seeing the start of the next element', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[11,2')
+               .thenTheInstance(
+                  hasRootJson([11])
+               )            
+         });
+         it('has everything when the array closes', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[11,22]')
+               .thenTheInstance(
+                  hasRootJson([11,22])
+               )            
+         });
+         it('notified correctly of the final root', function(){
+            givenAnOboeInstance()
+               .whenGivenInput('[11,22]')
+               .whenInputFinishes()               
+               .thenTheInstance(
+                  gaveFinalCallbackWithRootJson([11,22])
+               )
+         });
+      })
    });
 
    it('notifies of named child of root',  function() {

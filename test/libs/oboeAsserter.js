@@ -131,15 +131,24 @@ function givenAnOboeInstance(jsonUrl) {
             }
             return true;
          }
-
-         waitsFor(isPassingYet, 'instance to meet the condition(s)', 500);
+         
+         waitsFor(isPassingYet, 'instance to meet the condition(s)', 1000);
          runs(function(){
             console.log('will now test if it is correctly meeting the condition...');
             testIfCorrectNow();
-            console.log('...and it is!');
          });
 
          return this;
+      };
+
+      // to be used after .thenTheInstance - runs the given function only
+      // once the last stage is successful.
+      this.onceSatisfied = function( nextStep ){
+         var asserter = this;
+         
+         runs(function(){
+            nextStep(asserter);
+         });
       };
       
       /** sinon stub is only really used to record arguments given.
@@ -204,8 +213,16 @@ function hasRootJson(expected){
    return {
       testAgainst:
       function(callback, oboeInstance) {
-      
-         expect(oboeInstance.root()).toEqual(expected);
+         var found = oboeInstance.root();
+
+         // since this is a matcher, we can't ues expect().toEqual()
+         // because then the test would fail on the first non-match
+         // under jasmine. Using stringify is slightly brittle and 
+         // if this breaks we need to work out how to plug into Jasmine's
+         // inner equals(a,b) function
+         if( JSON.stringify(found) != JSON.stringify(expected) ) {
+            throw new Error('root JSON not matching');
+         }
       }
    }
 }
@@ -215,8 +232,10 @@ function hasRootJson(expected){
 function gaveFinalCallbackWithRootJson(expected) {
    return {
       testAgainst:
-         function(callback, oboeInstance, completeJson) { 
-            expect(completeJson).toEqual(expected);         
+         function(callback, oboeInstance, completeJson) {
+            if( JSON.stringify(completeJson) != JSON.stringify(expected) ) {
+               throw new Error('final root JSON not matching');
+            }         
          }
    }
 }
