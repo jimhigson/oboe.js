@@ -393,7 +393,7 @@ function matched(obj) {
             
             if(!callbackStub.calledWithMatch(obj, sinon.match.any, grandparentMatcher)) {
                throw new Error( "was not called with the object" + JSON.stringify(obj) + 
-                        " and garndparent object " +  JSON.stringify(expectedGrandparent) +
+                        " and grandparent object " +  JSON.stringify(expectedGrandparent) +
                         "all calls were with:" +
                         reportArgumentsToCallback(callbackStub.args));
             }            
