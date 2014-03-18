@@ -49,7 +49,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    }) 
    
-   xit('handles empty object detected with bang when explicitly selected',  function() {
+   it('handles empty object detected with bang when explicitly selected',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$!')
@@ -61,7 +61,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
    })   
    
-   xit('gives the oboe instance as context',  function() {
+   it('gives the oboe instance as context',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -70,7 +70,7 @@ describe("oboe component (sXHR stubbed)", function(){
    })
    
 
-   xit('find only emits when has whole object',  function() {
+   it('find only emits when has whole object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
@@ -86,7 +86,7 @@ describe("oboe component (sXHR stubbed)", function(){
 
    })
 
-   xit('emits path to listener when root object starts',  function() {
+   it('emits path to listener when root object starts',  function() {
 
       // clarinet doesn't notify of matches to objects (SAX_OPEN_OBJECT) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -101,7 +101,7 @@ describe("oboe component (sXHR stubbed)", function(){
           );
    })
    
-   xit('emits path to listener when root array starts',  function() {
+   it('emits path to listener when root array starts',  function() {
 
       // clarinet doesn't notify of matches to objects (SAX_OPEN_OBJECT) until the
       // first key is found, that is why we don't just give '{' here as the partial
@@ -118,7 +118,7 @@ describe("oboe component (sXHR stubbed)", function(){
    })
    
      
-   xit('emits empty object node detected with single star',  function() {
+   it('emits empty object node detected with single star',  function() {
       // *
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
@@ -129,7 +129,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('doesnt detect spurious path off empty object',  function() {
+   it('doesnt detect spurious path off empty object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.foo.*')
@@ -139,7 +139,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })   
 
-   xit('handles empty object detected with double dot',  function() {
+   it('handles empty object detected with double dot',  function() {
       // *
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
@@ -150,7 +150,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
 
-   xit('notifies of strings when listened to',  function() {
+   it('notifies of strings when listened to',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.string')
@@ -161,7 +161,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with hyphen in the name',  function() {
+   it('can detect nodes with hyphen in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.a-string')
@@ -172,7 +172,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with underscore in the name',  function() {
+   it('can detect nodes with underscore in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.a_string')
@@ -183,7 +183,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with quoted hyphen in the name',  function() {
+   it('can detect nodes with quoted hyphen in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!["a-string"]')
@@ -194,7 +194,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })   
    
-   xit('can detect nodes with quoted underscore in the name',  function() {
+   it('can detect nodes with quoted underscore in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!["a_string"]')
@@ -205,7 +205,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with quoted unusual ascii chars in the name',  function() {
+   it('can detect nodes with quoted unusual ascii chars in the name',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!["£@$%^"]')
@@ -216,7 +216,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with non-ascii keys',  function() {
+   it('can detect nodes with non-ascii keys',  function() {
 
       //pinyin: Wǒ tǎoyàn IE liúlǎn qì!
 
@@ -229,7 +229,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('can detect nodes with non-ascii keys and values',  function() {
+   it('can detect nodes with non-ascii keys and values',  function() {
 
       // hope you have a good unicode font!
 
@@ -242,7 +242,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })                  
    
-   xit('notifies of path before given the json value for a property',  function() {
+   it('notifies of path before given the json value for a property',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.string')
@@ -252,7 +252,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
 
-   xit('notifies of second property name with incomplete json',  function() {
+   it('notifies of second property name with incomplete json',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.pencils')
@@ -265,7 +265,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('is able to notify of null',  function() {
+   it('is able to notify of null',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.pencils')
@@ -278,7 +278,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('is able to notify of boolean true',  function() {
+   it('is able to notify of boolean true',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.pencils')
@@ -291,7 +291,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('is able to notify of boolean false',  function() {
+   it('is able to notify of boolean false',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.pens')
@@ -304,7 +304,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })         
 
-   xit('notifies of multiple children of root',  function() {
+   it('notifies of multiple children of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.*')
@@ -317,7 +317,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })
    
-   xit('notifies of multiple children of root when selecting the root',  function() {
+   it('notifies of multiple children of root when selecting the root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$!.*')
@@ -332,7 +332,7 @@ describe("oboe component (sXHR stubbed)", function(){
          );
    })   
    
-   xit('does not notify spuriously of descendant of roots when key is actually in another object',  function() {
+   it('does not notify spuriously of descendant of roots when key is actually in another object',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.a')
@@ -340,7 +340,7 @@ describe("oboe component (sXHR stubbed)", function(){
          .thenTheInstance(foundNoMatches);
    })
    
-   xit('does not notify spuriously of found child of root when ndoe is not child of root',  function() {
+   it('does not notify spuriously of found child of root when ndoe is not child of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.a')
@@ -348,87 +348,90 @@ describe("oboe component (sXHR stubbed)", function(){
          .thenTheInstance(foundNoMatches);
    })      
 
-   xit('notifies of multiple properties of an object without waiting for entire object',  function() {
-
-      givenAnOboeInstance()
-         .andWeAreListeningForNodes('!.*')
-         .whenGivenInput('{"a":')
-         .thenTheInstance(
-             foundNoMatches
-          )
-         .whenGivenInput('"A",')
-         .thenTheInstance(
-             matched('A').atPath(['a'])
-         ,   foundOneMatch
-         )
-         .whenGivenInput('"b":"B"}')
-         .thenTheInstance(
-             matched('B').atPath(['b'])
-         ,   foundNMatches(2)
-         );
-   })
+   xdescribe('progressive output', function(){
    
-   xit('can get root json as json object is built up',  function() {
-
-      givenAnOboeInstance()
-         .whenGivenInput('{"a":')
-         .thenTheInstance(
-            hasRootJson({a:undefined})
-          )
-         .whenGivenInput('"A",')
-         .thenTheInstance(
-             hasRootJson({a:'A'})
-         )
-         .whenGivenInput('"b":')
-         .thenTheInstance(
-            hasRootJson({a:'A', b:undefined})
-         )
-         .whenGivenInput('"B"}')
-         .thenTheInstance(
-            hasRootJson({a:'A', b:'B'})         
-         )
-         .whenInputFinishes()
-         .thenTheInstance(         
-            gaveFinalCallbackWithRootJson({a:'A', b:'B'})
-         );
-   })   
+      it('gives notification of multiple properties of an object without waiting for entire object',  function() {
    
-   xit('can notify progressively as root json array is built up',  function() {
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*')
+            .whenGivenInput('{"a":')
+            .thenTheInstance(
+                foundNoMatches
+             )
+            .whenGivenInput('"A",')
+            .thenTheInstance(
+                matched('A').atPath(['a'])
+            ,   foundOneMatch
+            )
+            .whenGivenInput('"b":"B"}')
+            .thenTheInstance(
+                matched('B').atPath(['b'])
+            ,   foundNMatches(2)
+            );
+      })
+      
+      it('can get root json as json object is built up',  function() {
+   
+         givenAnOboeInstance()
+            .whenGivenInput('{"a":')
+            .thenTheInstance(
+               hasRootJson({a:undefined})
+             )
+            .whenGivenInput('"A",')
+            .thenTheInstance(
+                hasRootJson({a:'A'})
+            )
+            .whenGivenInput('"b":')
+            .thenTheInstance(
+               hasRootJson({a:'A', b:undefined})
+            )
+            .whenGivenInput('"B"}')
+            .thenTheInstance(
+               hasRootJson({a:'A', b:'B'})         
+            )
+            .whenInputFinishes()
+            .thenTheInstance(         
+               gaveFinalCallbackWithRootJson({a:'A', b:'B'})
+            );
+      })   
+      
+      it('can notify progressively as root json array is built up',  function() {
+   
+         // let's feed it the array [11,22] in drips of one or two chars at a time:
+   
+         givenAnOboeInstance()
+            .whenGivenInput('[')
+            .thenTheInstance(
+               // I would like this to be [] but clarinet doesn't emit array found until it has seen
+               // the first element
+               hasRootJson(undefined)
+            )
+            .whenGivenInput('1')
+            .thenTheInstance(
+                // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
+                // so nothing can be added to the root json
+                hasRootJson([])
+            )
+            .whenGivenInput('1,')
+            .thenTheInstance(
+               hasRootJson([11])
+            )
+            .whenGivenInput('2')
+            .thenTheInstance(
+               hasRootJson([11])
+            )
+            .whenGivenInput('2]')
+            .thenTheInstance(
+               hasRootJson([11,22])         
+            )
+            .whenInputFinishes()
+            .thenTheInstance(         
+               gaveFinalCallbackWithRootJson([11,22])
+            );
+      })      
+   });
 
-      // let's feed it the array [11,22] in drips of one or two chars at a time:
-
-      givenAnOboeInstance()
-         .whenGivenInput('[')
-         .thenTheInstance(
-            // I would like this to be [] but clarinet doesn't emit array found until it has seen
-            // the first element
-            hasRootJson(undefined)
-         )
-         .whenGivenInput('1')
-         .thenTheInstance(
-             // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
-             // so nothing can be added to the root json
-             hasRootJson([])
-         )
-         .whenGivenInput('1,')
-         .thenTheInstance(
-            hasRootJson([11])
-         )
-         .whenGivenInput('2')
-         .thenTheInstance(
-            hasRootJson([11])
-         )
-         .whenGivenInput('2]')
-         .thenTheInstance(
-            hasRootJson([11,22])         
-         )
-         .whenInputFinishes()
-         .thenTheInstance(         
-            gaveFinalCallbackWithRootJson([11,22])
-         );
-   })      
-
-   xit('notifies of named child of root',  function() {
+   it('notifies of named child of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.b')
@@ -438,7 +441,7 @@ describe("oboe component (sXHR stubbed)", function(){
          ,   foundOneMatch
          );
    })
-   xit('notifies of array elements',  function() {
+   it('notifies of array elements',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.testArray.*')
@@ -450,7 +453,7 @@ describe("oboe component (sXHR stubbed)", function(){
          ,   foundNMatches(3)
          );
    })
-   xit('notifies of path match when array starts',  function() {
+   it('notifies of path match when array starts',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.testArray')
@@ -463,7 +466,7 @@ describe("oboe component (sXHR stubbed)", function(){
                                 // value in json
          );
    })
-   xit('notifies of path match when second array starts',  function() {
+   it('notifies of path match when second array starts',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.array2')
@@ -476,7 +479,7 @@ describe("oboe component (sXHR stubbed)", function(){
                                // value in json
          );
    })   
-   xit('notifies of paths inside arrays',  function() {
+   it('notifies of paths inside arrays',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('![*]')
@@ -487,7 +490,7 @@ describe("oboe component (sXHR stubbed)", function(){
    })   
    
    describe('correctly give index inside arrays', function(){   
-      xit('when finding objects in array',  function() {
+      it('when finding objects in array',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
@@ -496,7 +499,7 @@ describe("oboe component (sXHR stubbed)", function(){
                foundNMatches(1)
             );
       })      
-      xit('when finding arrays inside array',  function() {
+      it('when finding arrays inside array',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
@@ -505,7 +508,7 @@ describe("oboe component (sXHR stubbed)", function(){
                foundNMatches(1)
             );
       })   
-      xit('when finding arrays inside arrays etc',  function() {
+      it('when finding arrays inside arrays etc',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2][2]')
@@ -522,7 +525,7 @@ describe("oboe component (sXHR stubbed)", function(){
                foundNMatches(1)
             );
       })   
-      xit('when finding strings inside array',  function() {
+      it('when finding strings inside array',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
@@ -531,7 +534,7 @@ describe("oboe component (sXHR stubbed)", function(){
                foundNMatches(1)
             );
       })   
-      xit('when finding numbers inside array',  function() {
+      it('when finding numbers inside array',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
@@ -540,7 +543,7 @@ describe("oboe component (sXHR stubbed)", function(){
                foundNMatches(1)
             );
       })         
-      xit('when finding nulls inside array',  function() {
+      it('when finding nulls inside array',  function() {
    
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
@@ -551,7 +554,7 @@ describe("oboe component (sXHR stubbed)", function(){
       })      
    })
    
-   xit('notifies of paths inside objects',  function() {
+   it('notifies of paths inside objects',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('![*]')
