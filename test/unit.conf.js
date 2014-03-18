@@ -30,10 +30,10 @@ module.exports = function(config) {
       ,  'src/patternAdapter.js'
       ,  'src/instanceApi.js'
       ,  'src/workerEnv.raw.js'
-      ,  'src/wire.js'
       ,  'src/defaults.js'
       ,  'src/publicApi.js'
       ,  'src/interDimensionalPortal.js'
+      ,  'src/wire.js'
         
       ,  'test/specs/*.unit.spec.js'
       ,  'test/specs/*.component.spec.js'      

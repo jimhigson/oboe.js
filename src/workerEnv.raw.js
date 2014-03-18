@@ -4,7 +4,7 @@ function workerEnv(){
    function importAll(base){
 
       console.log('child thread: importing scripts from domain ' + base + ' ...');
-
+     
       importScripts(
          base + '/test/libs/sinon.js'
       ,  base + '/src/functional.js'
@@ -23,7 +23,11 @@ function workerEnv(){
       ,  base + '/src/events.js'
       ,  base + '/src/patternAdapter.js'
       ,  base + '/src/instanceApi.js'
-      ,  base + '/src/wire.js'
+         
+      // TODO: not bringing in wire.js to avoid infinite re-declaration
+      // - this will need some equivalent
+      // in workerEnv.concat.js!
+         
       ,  base + '/src/defaults.js'
       ,  base + '/src/publicApi.js'
       ,  base + '/src/interDimensionalPortal.js'
