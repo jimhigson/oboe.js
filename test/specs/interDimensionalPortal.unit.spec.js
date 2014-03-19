@@ -46,9 +46,8 @@ describe('interDimensionalPortal unit', function(){
          
          var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
              bus = pubSub(),
-             done = sinon.stub();
-   
-         childProgram(bus);
+             done = sinon.stub(),
+             worker = childProgram(bus);
    
          bus.emit('start-fib', 39);
          bus.on('fib-done', done);
@@ -58,6 +57,7 @@ describe('interDimensionalPortal unit', function(){
          runs( function(){
             var resultGiven = done.firstCall.args[0];
             expect(resultGiven).toEqual({n:39, 'fib(n)':63245986}); // trust me on this one
+            worker.terminate();
          })
       });
    
@@ -65,9 +65,8 @@ describe('interDimensionalPortal unit', function(){
    
          var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
              bus = pubSub(),
-             results = {};
-   
-         childProgram(bus);
+             results = {},
+             worker = childProgram(bus);
          
          bus.emit('start-fib', 12);
          bus.emit('start-fib', 13);
@@ -88,6 +87,7 @@ describe('interDimensionalPortal unit', function(){
                '13':233,
                '14':377
             });
+            worker.terminate();
          })
       });
    
@@ -102,7 +102,8 @@ describe('interDimensionalPortal unit', function(){
             attemptedFib = {},
             fibResults = {},
             attemptedFact = {},
-            factResults = {};
+            factResults = {},
+            worker = childProgram(bus);
    
          bus.on('fib-started', function (result){
             attemptedFib[result.n] = true;
@@ -117,7 +118,6 @@ describe('interDimensionalPortal unit', function(){
             factResults[result.n] = result['n!'];
          });
    
-         childProgram(bus);
          
          bus.emit('start-fib', 12);
          bus.emit('start-fib', 13);
@@ -153,6 +153,8 @@ describe('interDimensionalPortal unit', function(){
                '5':120,
                '6':720
             });
+            
+            worker.terminate();
          })
       });
    });
@@ -174,9 +176,8 @@ describe('interDimensionalPortal unit', function(){
       it('can pass startup parameters to child thread', function(){
    
          var bus = pubSub(),
-             done = jasmine.createSpy();
-   
-         childProgram(bus, 4);
+             done = jasmine.createSpy(),
+             worker = childProgram(bus, 4);
    
          bus.emit('do-add', 2);
          bus.on('add-done', done);
@@ -184,17 +185,17 @@ describe('interDimensionalPortal unit', function(){
          waitsFor(function(){return done.callCount > 0}, 'calculation to come back', 3000);
    
          runs( function(){
-            expect(done).toHaveBeenCalledWith({a:4, b:2, 'a+b':6}); 
+            expect(done).toHaveBeenCalledWith({a:4, b:2, 'a+b':6});
+            worker.terminate();
          })
       });
 
       it('can start two instances of the same child program with the same event bus', function(){
 
          var bus = pubSub(),
-             done = jasmine.createSpy();
-
-         childProgram(bus, 4);
-         childProgram(bus, 8);
+             done = jasmine.createSpy(),
+             worker4 = childProgram(bus, 4),
+             worker8 = childProgram(bus, 8);
 
          bus.emit('do-add', 2);
          bus.emit('do-add', 3);
@@ -207,6 +208,8 @@ describe('interDimensionalPortal unit', function(){
             expect(done).toHaveBeenCalledWith({a:4, b:3, 'a+b':7});
             expect(done).toHaveBeenCalledWith({a:8, b:2, 'a+b':10});
             expect(done).toHaveBeenCalledWith({a:8, b:3, 'a+b':11});
+            worker4.terminate();
+            worker8.terminate();
          })
       });
 
@@ -215,10 +218,9 @@ describe('interDimensionalPortal unit', function(){
          var add4Bus = pubSub(),
              add8Bus = pubSub(),
              add4Results = jasmine.createSpy('add four program result listener'),
-             add8Results = jasmine.createSpy('add eight program result listener');
-
-         childProgram(add4Bus, 4);
-         childProgram(add8Bus, 8);
+             add8Results = jasmine.createSpy('add eight program result listener'),
+             worker4 = childProgram(add4Bus, 4),
+             worker8 = childProgram(add8Bus, 8);
 
          add4Bus.emit('do-add', 2);
          add8Bus.emit('do-add', 3);
@@ -236,6 +238,8 @@ describe('interDimensionalPortal unit', function(){
          runs( function(){
             expect(add4Results).toHaveBeenCalledWith({a:4, b:2, 'a+b':6});
             expect(add8Results).toHaveBeenCalledWith({a:8, b:3, 'a+b':11});
+            worker4.terminate();
+            worker8.terminate();
          })
       });      
    });
@@ -252,9 +256,8 @@ describe('interDimensionalPortal unit', function(){
 
       var childProgram = interDimensionalPortal(environment, multipleArgumentSillyStringServer, ['start'], ['done']),
           bus = pubSub(),
-          done = sinon.stub();
-
-      childProgram(bus, 'Hello ', '!');
+          done = sinon.stub(),
+          worker = childProgram(bus, 'Hello ', '!');
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
@@ -264,6 +267,7 @@ describe('interDimensionalPortal unit', function(){
       runs( function(){
          var resultGiven = done.firstCall.args[0];
          expect(resultGiven).toBe('Hello Robby!');
+         worker.terminate();
       })
    });
    
@@ -279,9 +283,8 @@ describe('interDimensionalPortal unit', function(){
 
       var childProgram = interDimensionalPortal(environment, nonScalarSillyStringServer, ['start'], ['done']),
           bus = pubSub(),
-          done = sinon.stub();
-
-      childProgram(bus, {start:'Hello ', end:'!'});
+          done = sinon.stub(),
+          worker = childProgram(bus, {start:'Hello ', end:'!'});
 
       bus.emit('start', 'Robby');
       bus.on('done', done);
@@ -290,7 +293,8 @@ describe('interDimensionalPortal unit', function(){
 
       runs( function(){
          var resultGiven = done.firstCall.args[0];
-         expect(resultGiven).toBe('Hello Robby!'); 
+         expect(resultGiven).toBe('Hello Robby!');
+         worker.terminate();
       })
    });
    
@@ -307,9 +311,8 @@ describe('interDimensionalPortal unit', function(){
       it( 'works for an object', function(){
 
          var bus = pubSub(),
-             done = sinon.stub();
-
-         childProgram(bus);
+             done = sinon.stub(),
+             worker = childProgram(bus);
 
          bus.emit('in', {"a-string":"s"});
          bus.on('out', done);
@@ -318,6 +321,7 @@ describe('interDimensionalPortal unit', function(){
          runs( function(){
             var resultGiven = done.firstCall.args[0];
             expect(resultGiven).toEqual({"a-string":"s"});
+            worker.terminate();
          })
 
       });      
@@ -325,9 +329,8 @@ describe('interDimensionalPortal unit', function(){
       it( 'works for JSON string with hyphen', function(){
       
          var bus = pubSub(),
-             done = sinon.stub();
-   
-         childProgram(bus);
+             done = sinon.stub(),
+             worker = childProgram(bus);
          
          bus.emit('in', '{"a-string":"s"}');
          bus.on('out', done);
@@ -336,15 +339,15 @@ describe('interDimensionalPortal unit', function(){
          runs( function(){
             var resultGiven = done.firstCall.args[0];
             expect(resultGiven).toBe('{"a-string":"s"}');
+            worker.terminate();
          })
       });
 
       it( 'works for a number', function(){
 
          var bus = pubSub(),
-             done = sinon.stub();
-
-         childProgram(bus);
+             done = sinon.stub(),
+             worker = childProgram(bus);
 
          bus.emit('in', 101);
          bus.on('out', done);
@@ -353,6 +356,7 @@ describe('interDimensionalPortal unit', function(){
          runs( function(){
             var resultGiven = done.firstCall.args[0];
             expect(resultGiven).toEqual(101);
+            worker.terminate();
          })
 
       });      
@@ -372,7 +376,7 @@ describe('interDimensionalPortal unit', function(){
       it( 'does not error if server ended itself', function(){
 
          var bus = pubSub(),
-            done = sinon.stub();
+             done = sinon.stub();
 
          childProgram(bus);
 
@@ -405,9 +409,8 @@ describe('interDimensionalPortal unit', function(){
       it( 'does not error if server was terminated externally', function(){
 
          var bus = pubSub(),
-            done = sinon.stub();
-
-         var worker = childProgram(bus);
+             done = sinon.stub(),
+             worker = childProgram(bus);
 
          bus.emit('die');
          bus.on('goodbye', done);
