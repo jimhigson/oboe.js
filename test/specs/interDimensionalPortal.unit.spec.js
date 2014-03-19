@@ -302,11 +302,12 @@ describe('interDimensionalPortal unit', function(){
          });
       }
 
+      var childProgram = interDimensionalPortal(environment, echoServer, ['in'], ['out']);
+
       it( 'works for an object', function(){
 
-         var childProgram = interDimensionalPortal(environment, echoServer, ['in'], ['out']),
-            bus = pubSub(),
-            done = sinon.stub();
+         var bus = pubSub(),
+             done = sinon.stub();
 
          childProgram(bus);
 
@@ -323,8 +324,7 @@ describe('interDimensionalPortal unit', function(){
       
       it( 'works for JSON string with hyphen', function(){
       
-         var childProgram = interDimensionalPortal(environment, echoServer, ['in'], ['out']),
-             bus = pubSub(),
+         var bus = pubSub(),
              done = sinon.stub();
    
          childProgram(bus);
@@ -341,9 +341,8 @@ describe('interDimensionalPortal unit', function(){
 
       it( 'works for a number', function(){
 
-         var childProgram = interDimensionalPortal(environment, echoServer, ['in'], ['out']),
-            bus = pubSub(),
-            done = sinon.stub();
+         var bus = pubSub(),
+             done = sinon.stub();
 
          childProgram(bus);
 
@@ -358,5 +357,78 @@ describe('interDimensionalPortal unit', function(){
 
       });      
    });
+
+   describe('server termination', function(){
+      
+      function easilyUpsetServer(bus){
+         bus.on('die', function(){
+            bus.emit('goodbye', 'cruel world');
+            close();
+         });
+      }
+
+      var childProgram = interDimensionalPortal(environment, easilyUpsetServer, ['die'], ['goodbye']);
+
+      it( 'does not error if server ended itself', function(){
+
+         var bus = pubSub(),
+            done = sinon.stub();
+
+         childProgram(bus);
+
+         bus.emit('die');
+         bus.on('goodbye', done);
+
+         waitsFor(function(){return done.called}, 'echo to come back', 3000);
+         runs( function(){
+            var resultGiven = done.firstCall.args[0];
+            expect(resultGiven).toEqual('cruel world');
+         });
+         waits(100); // give it time to really die
+         runs( function(){
+
+            /* since this is a pub-sub design, if the client is no longer available
+               to listen to our messages, we shouldn't see an error when we publish them
+               - it is no different from a single-thread pubsub model : we're quite
+               ok with publishing a message to nobody if nobody is listening
+             */
+
+            expect( function(){
+               // asking to die but already dead
+               bus.emit('die')
+            }).not.toThrow();
+
+         });
+
+      });
+
+      it( 'does not error if server was terminated externally', function(){
+
+         var bus = pubSub(),
+            done = sinon.stub();
+
+         var worker = childProgram(bus);
+
+         bus.emit('die');
+         bus.on('goodbye', done);
+
+         worker.terminate();
+         waits(100); // give it time to really die
+         runs( function(){
+
+            /* since this is a pub-sub design, if the client is no longer available
+             to listen to our messages, we shouldn't see an error when we publish them
+             - it is no different from a single-thread pubsub model : we're quite
+             ok with publishing a message to nobody if nobody is listening
+             */
+
+            expect( function(){
+               // asking to die but already dead
+               bus.emit('die')
+            }).not.toThrow();
+
+         });
+      });
+   })
 
 });
