@@ -137,7 +137,9 @@ describe("oboe component (no http, content fed in externally)", function(){
    })   
 
    it('handles empty object detected with double dot',  function() {
-      // *
+      
+      // This one fails quite often when running in threads. WHY???
+      
       givenAnOboeInstance()
          .andWeAreListeningForNodes('*')
          .whenGivenInput('{}')

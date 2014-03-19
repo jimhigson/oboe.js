@@ -14,14 +14,12 @@ var interDimensionalPortal = (function(){
 
          eventEmitter.on(eventName, function(value){
 
-            /*
             if(typeof console != 'undefined'){
                console.log(
                   (thread ? 'parent' : 'child') +
                   ' forwarding via portal "' + eventName + '"' +
                      (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
             }
-            */
 
             if( thread ){
                thread.postMessage([eventName, value]);
@@ -107,9 +105,11 @@ var interDimensionalPortal = (function(){
       );
       
       return varArgs( function(parentSideBus, childServerArgs){
+         
+         console.log('-----------creating new worker---------');
+         
          var worker = new Worker(blobUrl);
             
-         //console.log('created blob and worker');
          worker.postMessage(childServerArgs);
          //console.log('sent first message to worker');
          

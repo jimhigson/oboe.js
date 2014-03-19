@@ -25,6 +25,11 @@ var wire = (function(){
          }
 
          clarinet(childThreadBus);
+
+         childThreadBus(STREAM_END).on(function(){
+            //https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers#Terminating_a_worker
+            close();
+         });
       },
 
       [  // the fetcher/parser needs to know if the request is aborted:
@@ -34,9 +39,10 @@ var wire = (function(){
          // it needs to be able to send this data to the parser.
       ,  STREAM_DATA       , STREAM_END
       ],
- 
+
       // events to get back from the worker
-      [  SAX_KEY           , SAX_VALUE
+      [  'parsing'
+      ,  SAX_KEY           , SAX_VALUE
       ,  SAX_OPEN_OBJECT   , SAX_CLOSE_OBJECT
       ,  SAX_OPEN_ARRAY    , SAX_CLOSE_ARRAY
       ,  FAIL_EVENT

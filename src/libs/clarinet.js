@@ -123,6 +123,8 @@ function clarinet(eventBus) {
    
   function write (chunk) {
          
+    eventBus('parsing').emit(chunk);  
+     
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.

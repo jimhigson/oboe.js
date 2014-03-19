@@ -20,7 +20,7 @@ var // the events which are never exported are kept as
     HTTP_START      = 'start',
     STREAM_DATA     = 'data',
     STREAM_END      = 'end',
-    ABORTING        = _S++,
+    ABORTING        = 'aborting',
 
     // SAX events butchered from Clarinet
     SAX_VALUE        = 'SAX_VALUE',
