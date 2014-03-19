@@ -77,21 +77,45 @@ function givenAnOboeInstance(jsonFileName) {
       this.andWeAbortTheRequest = function() {    
          oboeInstance.abort();
          return this;
-      };      
-      
-      this.whenGivenInput = function(json) {
-         if( typeof json != 'string' ) {
-            json = JSON.stringify(json);
+      };
+
+      this.whenGivenInput = function(input) {
+         var jsonSerialisedInput;
+
+         if (typeof input == 'string') {
+            jsonSerialisedInput = input;
+         } else {
+            jsonSerialisedInput = JSON.stringify(input);
          }
-        
-         // giving the content one char at a time makes debugging easier when
-         // wanting to know how much has been written into the stream.
-         for( var i = 0; i< json.length; i++) {
-            oboeInstance.emit('data', json.charAt(i) ); 
+
+         if( !jsonSerialisedInput || jsonSerialisedInput.length == 0 ) {
+            throw new Error('Faulty test - input not valid:' + input);
          }
+
+         oboeInstance.emit('data', jsonSerialisedInput );
 
          return this;
       };
+
+      this.whenGivenInputOneCharAtATime = function(input) {
+         var jsonSerialisedInput;
+
+         if (typeof input == 'string') {
+            jsonSerialisedInput = input;
+         } else {
+            jsonSerialisedInput = JSON.stringify(input);
+         }
+
+         if( !jsonSerialisedInput || jsonSerialisedInput.length == 0 ) {
+            throw new Error('Faulty test - input not valid:' + input);
+         }
+
+         for( var i = 0; i< jsonSerialisedInput.length; i++) {
+            oboeInstance.emit('data', jsonSerialisedInput.charAt(i) );
+         }
+
+         return this;
+      };      
       
       this.whenInputFinishes = function() {
          
