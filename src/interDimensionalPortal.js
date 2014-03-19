@@ -21,11 +21,18 @@ var interDimensionalPortal = (function(){
                      (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
             }
 
-            if( thread ){
-               thread.postMessage([eventName, value]);
-            } else {
-               postMessage([eventName, value]);
-            }
+               if( thread ){
+                  try{
+                     thread.postMessage([eventName, value]);
+                  } catch(e) {
+                     throw new Error(  'Could not forward' + eventName + 'to thread' + thread +
+                                       'with value' + value + ':' + e.message );
+                  }
+               } else {
+                  // this should never fail because there should always be a parent
+                  // thread - it shouldn't be able to die
+                  postMessage([eventName, value]);
+               }
          });
       });
    }
@@ -115,6 +122,8 @@ var interDimensionalPortal = (function(){
          
          forward(parentSideBus, eventTypesChildConsumes, worker);
          receive(parentSideBus, worker);
+         
+         return worker;
       });
    }
 
