@@ -71,7 +71,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!')
-         .whenGivenInput('{')
+         .whenGivenInputPart('{')
           .thenTheInstance(
             foundNoMatches
           )
@@ -91,7 +91,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!')
-         .whenGivenInput('{"foo":')
+         .whenGivenInputPart('{"foo":')
           .thenTheInstance(
             foundNMatches(1),
             matched({}).atRootOfJson()
@@ -106,7 +106,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!')
-         .whenGivenInput('[1') // the minimum string required for clarinet 
+         .whenGivenInputPart('[1') // the minimum string required for clarinet 
                                // to emit SAX_OPEN_ARRAY. Won't emit with '['.
           .thenTheInstance(
             foundNMatches(1),
@@ -245,7 +245,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.string')
-         .whenGivenInput('{"string":')
+         .whenGivenInputPart('{"string":')
          .thenTheInstance(
             foundOneMatch
          );
@@ -255,7 +255,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.pencils')
-         .whenGivenInput('{"pens":4, "pencils":')
+         .whenGivenInputPart('{"pens":4, "pencils":')
          .thenTheInstance(
             // undefined because the parser hasn't been given the value yet.
             // can't be null because that is an allowed value
@@ -354,7 +354,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          it( 'gives no notification on seeing just the key', function(){ 
             givenAnOboeInstance()
                .andWeAreListeningForNodes('!.*')
-               .whenGivenInput('{"a":')
+               .whenGivenInputPart('{"a":')
                .thenTheInstance(
                    foundNoMatches
                )
@@ -363,7 +363,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          it( 'gives one notification on seeing just the first value', function(){
             givenAnOboeInstance()
                .andWeAreListeningForNodes('!.*')
-               .whenGivenInput('{"a":"A",')
+               .whenGivenInputPart('{"a":"A",')
                .thenTheInstance(
                    matched('A').atPath(['a'])
                ,   foundOneMatch
@@ -385,7 +385,7 @@ describe("oboe component (no http, content fed in externally)", function(){
    
          it('can supply root after seeing first key with undefined value', function(){
             givenAnOboeInstance()
-               .whenGivenInput('{"a":')
+               .whenGivenInputPart('{"a":')
                .thenTheInstance(
                   hasRootJson({a:undefined})
                );
@@ -393,7 +393,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
          it('can supply root after seeing first key/value with defined value', function(){
             givenAnOboeInstance()
-               .whenGivenInput('{"a":"A",')
+               .whenGivenInputPart('{"a":"A",')
                .thenTheInstance(
                   hasRootJson({a:'A'})
                )
@@ -401,7 +401,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          
          it('gives second key with undefined value', function(){
             givenAnOboeInstance()
-               .whenGivenInput('{"a":"A","b":')
+               .whenGivenInputPart('{"a":"A","b":')
                .thenTheInstance(
                   hasRootJson({a:'A', b:undefined})
                )
@@ -430,7 +430,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          // let's feed it the array [11,22] in drips of one or two chars at a time:
          it('has nothing on array open', function(){
             givenAnOboeInstance()
-               .whenGivenInput('[')
+               .whenGivenInputPart('[')
                .thenTheInstance(
                   // I would like this to be [] but clarinet doesn't emit array found until it has seen
                   // the first element
@@ -439,7 +439,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          });
          it('has empty array soon afterwards', function(){
             givenAnOboeInstance()
-               .whenGivenInput('[1')
+               .whenGivenInputPart('[1')
                .thenTheInstance(
                   // since we haven't seen a comma yet, the 1 could be the start of a multi-digit number
                   // so nothing can be added to the root json
@@ -448,14 +448,14 @@ describe("oboe component (no http, content fed in externally)", function(){
          });
          it('has the first element on seeing the comma', function(){
             givenAnOboeInstance()
-               .whenGivenInput('[11,')
+               .whenGivenInputPart('[11,')
                .thenTheInstance(
                   hasRootJson([11])
                )
          });
          it('has no more on seeing the start of the next element', function(){
             givenAnOboeInstance()
-               .whenGivenInput('[11,2')
+               .whenGivenInputPart('[11,2')
                .thenTheInstance(
                   hasRootJson([11])
                )            
@@ -504,7 +504,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.testArray')
-         .whenGivenInput('{"testArray":["a"')
+         .whenGivenInputPart('{"testArray":["a"')
          .thenTheInstance(
              foundNMatches(1)
          ,   matched(undefined) // when path is matched, it is not known yet
@@ -517,7 +517,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!.array2')
-         .whenGivenInput('{"array1":["a","b"], "array2":["a"')
+         .whenGivenInputPart('{"array1":["a","b"], "array2":["a"')
          .thenTheInstance(
             foundNMatches(1)
          ,  matched(undefined) // when path is matched, it is not known yet
@@ -831,7 +831,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             matched([0,1,2,3,4,5])
          ,  foundOneMatch
          );
-   })  
+   })
 
    describe('json arrays give correct parent and grandparent', function(){
       it('gives parent and grandparent for every item of an array',  function() {
@@ -1347,7 +1347,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          it('fed in as a lump',  function() {
             givenAnOboeInstance()
                .andWeAreExpectingSomeErrors()
-               .whenGivenInput(invalidJson)
+               .whenGivenInputPart(invalidJson)
                .thenTheInstance
                (   calledCallbackOnce
                   ,   wasPassedAnErrorObject
@@ -1372,7 +1372,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
             givenAnOboeInstance()
               .andWeAreExpectingSomeErrors()
-              .whenGivenInput(malformedJson) 
+              .whenGivenInputPart(malformedJson) 
               .thenTheInstance
                  (   calledCallbackOnce
                  ,   wasPassedAnErrorObject
@@ -1394,7 +1394,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
          givenAnOboeInstance()
             .andWeAreExpectingSomeErrors()
-            .whenGivenInput('[[1,2,3],[4,5')
+            .whenGivenInputPart('[[1,2,3],[4,5')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce
@@ -1416,7 +1416,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          // currently failing: clarinet is not detecting the error
          givenAnOboeInstance() 
             .andWeAreExpectingSomeErrors()
-            .whenGivenInput('[[1,2,3],')
+            .whenGivenInputPart('[[1,2,3],')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce
@@ -1427,7 +1427,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
          givenAnOboeInstance()
             .andWeAreExpectingSomeErrors()
-            .whenGivenInput('[[1,2,3')
+            .whenGivenInputPart('[[1,2,3')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce
@@ -1439,7 +1439,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          givenAnOboeInstance()
            .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
            .andWeAreExpectingSomeErrors()
-           .whenGivenInput('{}') // valid json, should provide callback
+           .whenGivenInputPart('{}') // valid json, should provide callback
            .thenTheInstance
               (   calledCallbackOnce
               ,   wasPassedAnErrorObject
@@ -1455,7 +1455,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          
             givenAnOboeInstance()
                .andWeAreListeningForPaths('*')
-               .whenGivenInput('[1')
+               .whenGivenInputPart('[1')
                .andWeAbortTheRequest();
              
          }).not.toThrow();                                  

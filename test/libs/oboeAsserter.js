@@ -84,7 +84,7 @@ function givenAnOboeInstance(jsonUrl) {
          return this;
       };
 
-      this.whenGivenInput = function(input) {
+      this._whenGivenInput = function(input, close) {
          var jsonSerialisedInput;
 
          if (typeof input == 'string') {
@@ -98,9 +98,20 @@ function givenAnOboeInstance(jsonUrl) {
          }
 
          oboeInstance.emit('data', jsonSerialisedInput );
+         
+         if( close ) {
+            oboeInstance.emit('end');
+         }
 
          return this;
       };
+      
+      this.whenGivenInput = function(input) {
+         return this._whenGivenInput(input, true);
+      };
+      this.whenGivenInputPart = function(input) {
+         return this._whenGivenInput(input, false);
+      };      
 
       this.whenGivenInputOneCharAtATime = function(input) {
          var jsonSerialisedInput;
@@ -312,13 +323,13 @@ function wasGivenTheOboeAsContext() {
 }
 
 function lastOf(array){
-   return array[array.length-1];
+   return array && array[array.length-1];
 }
 function penultimateOf(array){
-   return array[array.length-2];
+   return array && array[array.length-2];
 }
 function prepenultimateOf(array){
-   return array[array.length-3];
+   return array && array[array.length-3];
 }
 
 /**
