@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-10-gf95b038
+   // v1.14.2-13-gc97c46b
 
 /*
 
@@ -677,7 +677,7 @@ function clarinet(eventBus) {
           if (c === "{") state = OPEN_OBJECT;
           else if (c === "[") state = OPEN_ARRAY;
           else if (!whitespace(c))
-            emitError("Non-whitespace before {[.");
+            return emitError("Non-whitespace before {[.");
         continue;
 
         case OPEN_KEY:
@@ -694,8 +694,8 @@ function clarinet(eventBus) {
           }
           if(c === '"')
              state = STRING;
-          else 
-             emitError("Malformed object key should start with \" ");
+          else
+             return emitError("Malformed object key should start with \" ");
         continue;
 
         case CLOSE_KEY:
@@ -737,7 +737,8 @@ function clarinet(eventBus) {
                 textNode = "";
              }
              state  = OPEN_KEY;
-          } else emitError('Bad object');
+          } else 
+             return emitError('Bad object');
         continue;
 
         case OPEN_ARRAY: // after an array there always a value
@@ -771,7 +772,7 @@ function clarinet(eventBus) {
             numberNode += c;
             state = NUMBER_DIGIT;
           } else               
-            emitError("Bad value");
+            return emitError("Bad value");
         continue;
 
         case CLOSE_ARRAY:
@@ -793,7 +794,7 @@ function clarinet(eventBus) {
           } else if (whitespace(c))
               continue;
           else 
-             emitError('Bad array');
+             return emitError('Bad array');
         continue;
 
         case STRING:
@@ -870,13 +871,15 @@ function clarinet(eventBus) {
         case TRUE:
           if (!c)  continue; // strange buffers
           if (c==='r') state = TRUE2;
-          else emitError( 'Invalid true started with t'+ c);
+          else
+             return emitError( 'Invalid true started with t'+ c);
         continue;
 
         case TRUE2:
           if (!c)  continue;
           if (c==='u') state = TRUE3;
-          else emitError('Invalid true started with tr'+ c);
+          else
+             return emitError('Invalid true started with tr'+ c);
         continue;
 
         case TRUE3:
@@ -884,25 +887,29 @@ function clarinet(eventBus) {
           if(c==='e') {
             emitSaxValue(true);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid true started with tru'+ c);
+          } else
+             return emitError('Invalid true started with tru'+ c);
         continue;
 
         case FALSE:
           if (!c)  continue;
           if (c==='a') state = FALSE2;
-          else emitError('Invalid false started with f'+ c);
+          else
+             return emitError('Invalid false started with f'+ c);
         continue;
 
         case FALSE2:
           if (!c)  continue;
           if (c==='l') state = FALSE3;
-          else emitError('Invalid false started with fa'+ c);
+          else
+             return emitError('Invalid false started with fa'+ c);
         continue;
 
         case FALSE3:
           if (!c)  continue;
           if (c==='s') state = FALSE4;
-          else emitError('Invalid false started with fal'+ c);
+          else
+             return emitError('Invalid false started with fal'+ c);
         continue;
 
         case FALSE4:
@@ -910,19 +917,22 @@ function clarinet(eventBus) {
           if (c==='e') {
             emitSaxValue(false);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid false started with fals'+ c);
+          } else
+             return emitError('Invalid false started with fals'+ c);
         continue;
 
         case NULL:
           if (!c)  continue;
           if (c==='u') state = NULL2;
-          else emitError('Invalid null started with n'+ c);
+          else
+             return emitError('Invalid null started with n'+ c);
         continue;
 
         case NULL2:
           if (!c)  continue;
           if (c==='l') state = NULL3;
-          else emitError('Invalid null started with nu'+ c);
+          else
+             return emitError('Invalid null started with nu'+ c);
         continue;
 
         case NULL3:
@@ -930,30 +940,32 @@ function clarinet(eventBus) {
           if(c==='l') {
             emitSaxValue(null);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid null started with nul'+ c);
+          } else 
+             return emitError('Invalid null started with nul'+ c);
         continue;
 
         case NUMBER_DECIMAL_POINT:
           if(c==='.') {
             numberNode += c;
             state       = NUMBER_DIGIT;
-          } else emitError('Leading zero not followed by .');
+          } else 
+             return emitError('Leading zero not followed by .');
         continue;
 
         case NUMBER_DIGIT:
           if('0123456789'.indexOf(c) !== -1) numberNode += c;
           else if (c==='.') {
             if(numberNode.indexOf('.')!==-1)
-              emitError('Invalid number has two dots');
+               return emitError('Invalid number has two dots');
             numberNode += c;
           } else if (c==='e' || c==='E') {
             if(numberNode.indexOf('e')!==-1 ||
                numberNode.indexOf('E')!==-1 )
-               emitError('Invalid number has two exponential');
+               return emitError('Invalid number has two exponential');
             numberNode += c;
           } else if (c==="+" || c==="-") {
             if(!(p==='e' || p==='E'))
-              emitError('Invalid symbol in number');
+               return emitError('Invalid symbol in number');
             numberNode += c;
           } else {
             if (numberNode) {
@@ -966,13 +978,12 @@ function clarinet(eventBus) {
         continue;
 
         default:
-          emitError("Unknown state: " + state);
+          return emitError("Unknown state: " + state);
       }
     }
     if (position >= bufferCheckPosition)
       checkBufferLength();
   }
-
 }
 
 
