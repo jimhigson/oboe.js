@@ -28,6 +28,7 @@ var wire = (function(){
 
          childThreadBus(STREAM_END).on(function(){
             //https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers#Terminating_a_worker
+            childThreadBus.emit('closing', 'after stream_end event, will close down the thread');
             close();
          });
       },
@@ -41,7 +42,7 @@ var wire = (function(){
       ],
 
       // events to get back from the worker
-      [  'parsing'
+      [  'parsing', 'closing'
       ,  SAX_KEY           , SAX_VALUE
       ,  SAX_OPEN_OBJECT   , SAX_CLOSE_OBJECT
       ,  SAX_OPEN_ARRAY    , SAX_CLOSE_ARRAY
