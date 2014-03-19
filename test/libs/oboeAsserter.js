@@ -137,10 +137,13 @@ function givenAnOboeInstance(jsonUrl) {
             }
             return true;
          }
-         
-         waitsFor(isPassingYet, 'instance to meet the condition(s)', 1000);
+
+         /* unfortunately some browsers (Firefox!) perform quite slowly and need
+            more time. This has to be set to let the slow ones pass */
+         var WAITING_TIME = 2000;
+         waitsFor(isPassingYet, 'instance to meet the condition(s)', WAITING_TIME);
          runs(function(){
-            console.log('will now test if it is correctly meeting the condition...');
+            //console.log('will now test if it is correctly meeting the condition...');
             testIfCorrectNow();
          });
 

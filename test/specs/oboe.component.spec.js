@@ -1,6 +1,5 @@
 describe("oboe component (no http, content fed in externally)", function(){
 
-     
 /*
    a more jasmine-y version of the next test might look like this:
     
@@ -1433,15 +1432,5 @@ describe("oboe component (no http, content fed in externally)", function(){
       })      
    });
    
-   
-   beforeEach(function() {
-      sinon.stub(window, 'streamingHttp')
-         .returns(sinon.stub());
-   })
-   
-   afterEach(function() {
-      window.streamingHttp.restore();   
-   })   
-
 });
 

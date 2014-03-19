@@ -7,22 +7,27 @@
  * @param eventsFromChild
  */
 var interDimensionalPortal = (function(){
-   "use strict";
 
    function forward(eventEmitter, eventNames, thread){
-
-      var destination = (thread || this);
 
       eventNames.forEach(function(eventName){
 
          eventEmitter.on(eventName, function(value){
 
-            console.log(
-               (thread ? 'parent' : 'child') +
-               ' forwarding via portal "' + eventName + '"' +
-                  (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
+            /*
+            if(typeof console != 'undefined'){
+               console.log(
+                  (thread ? 'parent' : 'child') +
+                  ' forwarding via portal "' + eventName + '"' +
+                     (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
+            }
+            */
 
-            destination.postMessage([eventName, value]);
+            if( thread ){
+               thread.postMessage([eventName, value]);
+            } else {
+               postMessage([eventName, value]);
+            }
          });
       });
    }
@@ -32,32 +37,43 @@ var interDimensionalPortal = (function(){
       function handle(event){
          var data = event.data;
 
-         console.log( 
-            (thread ? 'parent' : 'child') +
-            ' received via portal "' + data[0] + '"' + 
-               (data[1] ? ' = ' + JSON.stringify(data[1]) : ' (no value)')
-         );
+         if(typeof console != 'undefined'){
+            console.log( 
+               (thread ? 'parent' : 'child') +
+               ' received via portal "' + data[0] + '"' + 
+                  (data[1] ? ' = ' + JSON.stringify(data[1]) : ' (no value)')
+            );
+         }
+
          eventEmitter.emit(data[0], data[1]);
       }
       
-      (thread||this).onmessage = handle;
+      // NB: Firefox doesn't like (thread||this).onmessage = handle;
+      //     because this is not defined.
+      if( thread ){
+         thread.onmessage = handle;
+      } else {
+         onmessage = handle;         
+      }
+      
    }
    
    function waitForStart( startFn, eventsTypesToForwardToParent ){
 
       var childSideBus = pubSub();
       
-      console.log('worker waiting for setup message');
+      //console.log('worker waiting for setup message');
+      
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
-      this.onmessage = function( initialisationMessage ){
+      onmessage = function( initialisationMessage ){
 
          var startFnParameters = initialisationMessage.data;
 
-         console.log(
+         /*console.log(
             'worker: got setup message with config ' +
                JSON.stringify(startFnParameters)
-         );
+         );*/
 
          forward(childSideBus, eventsTypesToForwardToParent);
          receive(childSideBus);
@@ -65,7 +81,7 @@ var interDimensionalPortal = (function(){
          startFnParameters.unshift(childSideBus);
          startFn.apply(null, startFnParameters);
 
-         console.log('worker: ready for events');
+         //console.log('worker: ready for events');
       }
    }
 
@@ -93,9 +109,9 @@ var interDimensionalPortal = (function(){
       return varArgs( function(parentSideBus, childServerArgs){
          var worker = new Worker(blobUrl);
             
-         console.log('created blob and worker');
+         //console.log('created blob and worker');
          worker.postMessage(childServerArgs);
-         console.log('sent first message to worker');
+         //console.log('sent first message to worker');
          
          forward(parentSideBus, eventTypesChildConsumes, worker);
          receive(parentSideBus, worker);

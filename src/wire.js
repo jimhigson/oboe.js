@@ -10,7 +10,7 @@ var wire = (function(){
       workerEnv(),
 
       function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
-         console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
+         //console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
 
          if( contentSource ) {
             streamingHttp(
@@ -47,7 +47,7 @@ var wire = (function(){
    
       var oboeBus = pubSub();
       
-      console.log('wiring will invoke the portal');
+      //console.log('wiring will invoke the portal');
          
       fetchAndParseChildProgram(oboeBus, httpMethodName, contentSource, body, headers, withCredentials);
       

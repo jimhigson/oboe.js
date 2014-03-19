@@ -3,7 +3,7 @@ function workerEnv(){
 
    function importAll(base){
 
-      console.log('child thread: importing scripts from domain ' + base + ' ...');
+      //console.log('child thread: importing scripts from domain ' + base + ' ...');
      
       importScripts(
          base + '/test/libs/sinon.js'
@@ -34,7 +34,7 @@ function workerEnv(){
       ,  base + '/src/interDimensionalPortal.js'
       );
 
-      console.log('...importing scripts done');
+      //console.log('...importing scripts done');
    }
 
    
