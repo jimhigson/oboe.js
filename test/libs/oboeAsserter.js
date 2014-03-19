@@ -84,11 +84,15 @@ function givenAnOboeInstance(jsonUrl) {
          return this;
       };      
       
-      this.whenGivenInput = function(json) {
-         if( typeof json != 'string' ) {
-            json = JSON.stringify(json);
+      this.whenGivenInput = function(input) {
+         var json;
+
+         if (typeof input == 'string') {
+            json = input;
+         } else {
+            json = JSON.stringify(input);
          }
-        
+
          // giving the content one char at a time makes debugging easier when
          // wanting to know how much has been written into the stream.
          for( var i = 0; i< json.length; i++) {
