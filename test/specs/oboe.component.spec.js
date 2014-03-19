@@ -1334,32 +1334,76 @@ describe("oboe component (no http, content fed in externally)", function(){
    })
  
 
-   describe('error cases', function() {
-      it('notifies of error given unquoted string keys',  function() {
-     
-         givenAnOboeInstance()
-           .andWeAreExpectingSomeErrors()
-           .whenGivenInput('{invalid:"json"}') // key not quoted, invalid json
-           .thenTheInstance
-              (   calledCallbackOnce
-              ,   wasPassedAnErrorObject
-              ); 
-      })
-      it('errors on malformed json',  function() {
-     
-         givenAnOboeInstance()
-           .andWeAreExpectingSomeErrors()
-           .whenGivenInput('{{') // invalid!
-           .thenTheInstance
-              (   calledCallbackOnce
-              ,   wasPassedAnErrorObject
-              );
-      })
+   describe('error cases:', function() {
+
+      describe('errors on unquoted keys', function(){
+         var invalidJson = '{invalid:"json"}';  // key not quoted, invalid json
+
+         // there have been bugs where this passes when passed in one char at a time
+         // but not when given as a single call         
+         
+         it('fed in as a lump',  function() {
+            givenAnOboeInstance()
+               .andWeAreExpectingSomeErrors()
+               .whenGivenInput(invalidJson)
+               .thenTheInstance
+               (   calledCallbackOnce
+                  ,   wasPassedAnErrorObject
+               );
+         })      
+         it('fed a char at a time',  function() {
+        
+            givenAnOboeInstance()
+              .andWeAreExpectingSomeErrors()
+              .whenGivenInputOneCharAtATime(invalidJson)
+              .thenTheInstance
+                 (   calledCallbackOnce
+                 ,   wasPassedAnErrorObject
+                 ); 
+         })
+      });
+      
+      describe('errors on malformed json', function(){
+         var malformedJson = '{{'; // invalid!
+         
+         it('works as a lump',  function() {
+
+            givenAnOboeInstance()
+              .andWeAreExpectingSomeErrors()
+              .whenGivenInput(malformedJson) 
+              .thenTheInstance
+                 (   calledCallbackOnce
+                 ,   wasPassedAnErrorObject
+                 );
+         })
+         it('works as chars',  function() {
+   
+            givenAnOboeInstance()
+               .andWeAreExpectingSomeErrors()
+               .whenGivenInputOneCharAtATime(malformedJson) // invalid!
+               .thenTheInstance
+               (   calledCallbackOnce
+                  ,   wasPassedAnErrorObject
+               );
+         })
+      });
+      
       it('detects error when stream halts early between children of root',  function() {
 
          givenAnOboeInstance()
             .andWeAreExpectingSomeErrors()
             .whenGivenInput('[[1,2,3],[4,5')
+            .whenInputFinishes()
+            .thenTheInstance
+            (   calledCallbackOnce
+               ,   wasPassedAnErrorObject
+            );
+      })      
+      it('detects error when stream halts early between children of root fed in a char at a time',  function() {
+
+         givenAnOboeInstance()
+            .andWeAreExpectingSomeErrors()
+            .whenGivenInputOneCharAtATime('[[1,2,3],[4,5')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce

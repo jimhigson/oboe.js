@@ -82,28 +82,45 @@ function givenAnOboeInstance(jsonUrl) {
       this.andWeAbortTheRequest = function() {    
          oboeInstance.abort();
          return this;
-      };      
-      
+      };
+
       this.whenGivenInput = function(input) {
-         var json;
+         var jsonSerialisedInput;
 
          if (typeof input == 'string') {
-            json = input;
+            jsonSerialisedInput = input;
          } else {
-            json = JSON.stringify(input);
+            jsonSerialisedInput = JSON.stringify(input);
          }
 
-         // giving the content one char at a time makes debugging easier when
-         // wanting to know how much has been written into the stream.
-         for( var i = 0; i< json.length; i++) {
-            // use 'data', not type-safe STREAM_DATA var because
-            // we might be running without the vars from
-            // src/events.js in scope
-            oboeInstance.emit('data', json.charAt(i) ); 
+         if( !jsonSerialisedInput || jsonSerialisedInput.length == 0 ) {
+            throw new Error('Faulty test - input not valid:' + input);
          }
+
+         oboeInstance.emit('data', jsonSerialisedInput );
 
          return this;
       };
+
+      this.whenGivenInputOneCharAtATime = function(input) {
+         var jsonSerialisedInput;
+
+         if (typeof input == 'string') {
+            jsonSerialisedInput = input;
+         } else {
+            jsonSerialisedInput = JSON.stringify(input);
+         }
+
+         if( !jsonSerialisedInput || jsonSerialisedInput.length == 0 ) {
+            throw new Error('Faulty test - input not valid:' + input);
+         }
+
+         for( var i = 0; i< jsonSerialisedInput.length; i++) {
+            oboeInstance.emit('data', jsonSerialisedInput.charAt(i) );
+         }
+
+         return this;
+      };      
       
       this.whenInputFinishes = function() {
          // use 'end', not type-safe STREAM_END var because

@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-81-gc08aa0b
+   // v1.14.2-86-g5351c1e
 
 /*
 
@@ -677,7 +677,7 @@ function clarinet(eventBus) {
           if (c === "{") state = OPEN_OBJECT;
           else if (c === "[") state = OPEN_ARRAY;
           else if (!whitespace(c))
-            emitError("Non-whitespace before {[.");
+            return emitError("Non-whitespace before {[.");
         continue;
 
         case OPEN_KEY:
@@ -694,8 +694,8 @@ function clarinet(eventBus) {
           }
           if(c === '"')
              state = STRING;
-          else 
-             emitError("Malformed object key should start with \" ");
+          else
+             return emitError("Malformed object key should start with \" ");
         continue;
 
         case CLOSE_KEY:
@@ -737,7 +737,8 @@ function clarinet(eventBus) {
                 textNode = "";
              }
              state  = OPEN_KEY;
-          } else emitError('Bad object');
+          } else 
+             return emitError('Bad object');
         continue;
 
         case OPEN_ARRAY: // after an array there always a value
@@ -771,7 +772,7 @@ function clarinet(eventBus) {
             numberNode += c;
             state = NUMBER_DIGIT;
           } else               
-            emitError("Bad value");
+            return emitError("Bad value");
         continue;
 
         case CLOSE_ARRAY:
@@ -793,7 +794,7 @@ function clarinet(eventBus) {
           } else if (whitespace(c))
               continue;
           else 
-             emitError('Bad array');
+             return emitError('Bad array');
         continue;
 
         case STRING:
@@ -870,13 +871,15 @@ function clarinet(eventBus) {
         case TRUE:
           if (!c)  continue; // strange buffers
           if (c==='r') state = TRUE2;
-          else emitError( 'Invalid true started with t'+ c);
+          else
+             return emitError( 'Invalid true started with t'+ c);
         continue;
 
         case TRUE2:
           if (!c)  continue;
           if (c==='u') state = TRUE3;
-          else emitError('Invalid true started with tr'+ c);
+          else
+             return emitError('Invalid true started with tr'+ c);
         continue;
 
         case TRUE3:
@@ -884,25 +887,29 @@ function clarinet(eventBus) {
           if(c==='e') {
             emitSaxValue(true);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid true started with tru'+ c);
+          } else
+             return emitError('Invalid true started with tru'+ c);
         continue;
 
         case FALSE:
           if (!c)  continue;
           if (c==='a') state = FALSE2;
-          else emitError('Invalid false started with f'+ c);
+          else
+             return emitError('Invalid false started with f'+ c);
         continue;
 
         case FALSE2:
           if (!c)  continue;
           if (c==='l') state = FALSE3;
-          else emitError('Invalid false started with fa'+ c);
+          else
+             return emitError('Invalid false started with fa'+ c);
         continue;
 
         case FALSE3:
           if (!c)  continue;
           if (c==='s') state = FALSE4;
-          else emitError('Invalid false started with fal'+ c);
+          else
+             return emitError('Invalid false started with fal'+ c);
         continue;
 
         case FALSE4:
@@ -910,19 +917,22 @@ function clarinet(eventBus) {
           if (c==='e') {
             emitSaxValue(false);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid false started with fals'+ c);
+          } else
+             return emitError('Invalid false started with fals'+ c);
         continue;
 
         case NULL:
           if (!c)  continue;
           if (c==='u') state = NULL2;
-          else emitError('Invalid null started with n'+ c);
+          else
+             return emitError('Invalid null started with n'+ c);
         continue;
 
         case NULL2:
           if (!c)  continue;
           if (c==='l') state = NULL3;
-          else emitError('Invalid null started with nu'+ c);
+          else
+             return emitError('Invalid null started with nu'+ c);
         continue;
 
         case NULL3:
@@ -930,30 +940,32 @@ function clarinet(eventBus) {
           if(c==='l') {
             emitSaxValue(null);
             state = stack.pop() || VALUE;
-          } else emitError('Invalid null started with nul'+ c);
+          } else 
+             return emitError('Invalid null started with nul'+ c);
         continue;
 
         case NUMBER_DECIMAL_POINT:
           if(c==='.') {
             numberNode += c;
             state       = NUMBER_DIGIT;
-          } else emitError('Leading zero not followed by .');
+          } else 
+             return emitError('Leading zero not followed by .');
         continue;
 
         case NUMBER_DIGIT:
           if('0123456789'.indexOf(c) !== -1) numberNode += c;
           else if (c==='.') {
             if(numberNode.indexOf('.')!==-1)
-              emitError('Invalid number has two dots');
+               return emitError('Invalid number has two dots');
             numberNode += c;
           } else if (c==='e' || c==='E') {
             if(numberNode.indexOf('e')!==-1 ||
                numberNode.indexOf('E')!==-1 )
-               emitError('Invalid number has two exponential');
+               return emitError('Invalid number has two exponential');
             numberNode += c;
           } else if (c==="+" || c==="-") {
             if(!(p==='e' || p==='E'))
-              emitError('Invalid symbol in number');
+               return emitError('Invalid symbol in number');
             numberNode += c;
           } else {
             if (numberNode) {
@@ -966,13 +978,12 @@ function clarinet(eventBus) {
         continue;
 
         default:
-          emitError("Unknown state: " + state);
+          return emitError("Unknown state: " + state);
       }
     }
     if (position >= bufferCheckPosition)
       checkBufferLength();
   }
-
 }
 
 
@@ -2388,22 +2399,27 @@ function instanceApi(oboeBus){
  * @param eventsFromChild
  */
 var interDimensionalPortal = (function(){
-   "use strict";
 
    function forward(eventEmitter, eventNames, thread){
-
-      var destination = (thread || this);
 
       eventNames.forEach(function(eventName){
 
          eventEmitter.on(eventName, function(value){
 
-            console.log(
-               (thread ? 'parent' : 'child') +
-               ' forwarding via portal "' + eventName + '"' +
-                  (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
+            /*
+            if(typeof console != 'undefined'){
+               console.log(
+                  (thread ? 'parent' : 'child') +
+                  ' forwarding via portal "' + eventName + '"' +
+                     (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
+            }
+            */
 
-            destination.postMessage([eventName, value]);
+            if( thread ){
+               thread.postMessage([eventName, value]);
+            } else {
+               postMessage([eventName, value]);
+            }
          });
       });
    }
@@ -2413,32 +2429,43 @@ var interDimensionalPortal = (function(){
       function handle(event){
          var data = event.data;
 
-         console.log( 
-            (thread ? 'parent' : 'child') +
-            ' received via portal "' + data[0] + '"' + 
-               (data[1] ? ' = ' + JSON.stringify(data[1]) : ' (no value)')
-         );
+         if(typeof console != 'undefined'){
+            console.log( 
+               (thread ? 'parent' : 'child') +
+               ' received via portal "' + data[0] + '"' + 
+                  (data[1] ? ' = ' + JSON.stringify(data[1]) : ' (no value)')
+            );
+         }
+
          eventEmitter.emit(data[0], data[1]);
       }
       
-      (thread||this).onmessage = handle;
+      // NB: Firefox doesn't like (thread||this).onmessage = handle;
+      //     because this is not defined.
+      if( thread ){
+         thread.onmessage = handle;
+      } else {
+         onmessage = handle;         
+      }
+      
    }
    
    function waitForStart( startFn, eventsTypesToForwardToParent ){
 
       var childSideBus = pubSub();
       
-      console.log('worker waiting for setup message');
+      //console.log('worker waiting for setup message');
+      
       // Wait for the one-off initialisation message. This handler will be overwritten
       // shortly when the initialisation message arrives 
-      this.onmessage = function( initialisationMessage ){
+      onmessage = function( initialisationMessage ){
 
          var startFnParameters = initialisationMessage.data;
 
-         console.log(
+         /*console.log(
             'worker: got setup message with config ' +
                JSON.stringify(startFnParameters)
-         );
+         );*/
 
          forward(childSideBus, eventsTypesToForwardToParent);
          receive(childSideBus);
@@ -2446,7 +2473,7 @@ var interDimensionalPortal = (function(){
          startFnParameters.unshift(childSideBus);
          startFn.apply(null, startFnParameters);
 
-         console.log('worker: ready for events');
+         //console.log('worker: ready for events');
       }
    }
 
@@ -2474,9 +2501,9 @@ var interDimensionalPortal = (function(){
       return varArgs( function(parentSideBus, childServerArgs){
          var worker = new Worker(blobUrl);
             
-         console.log('created blob and worker');
+         //console.log('created blob and worker');
          worker.postMessage(childServerArgs);
-         console.log('sent first message to worker');
+         //console.log('sent first message to worker');
          
          forward(parentSideBus, eventTypesChildConsumes, worker);
          receive(parentSideBus, worker);
@@ -2502,7 +2529,7 @@ var wire = (function(){
       workerEnv(),
 
       function(childThreadBus, httpMethodName, contentSource, body, headers, withCredentials){
-         console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
+         //console.log('setting up the in-worker wiring to ' + httpMethodName + ' ' + contentSource);
 
          if( contentSource ) {
             streamingHttp(
@@ -2539,7 +2566,7 @@ var wire = (function(){
    
       var oboeBus = pubSub();
       
-      console.log('wiring will invoke the portal');
+      //console.log('wiring will invoke the portal');
          
       fetchAndParseChildProgram(oboeBus, httpMethodName, contentSource, body, headers, withCredentials);
       
