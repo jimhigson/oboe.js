@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-13-gc97c46b
+   "// `git describe`" 
 
 /*
 
@@ -1170,7 +1170,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
       xhr.withCredentials = withCredentials;
       
