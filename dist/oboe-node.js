@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.2-13-gc97c46b
+   // v1.14.3-1-g6b1ec90
 
 /*
 
@@ -1021,8 +1021,28 @@ function ascentManager(oboeBus, handlers){
    });   
 }
 
-function httpTransport(){
-   return require('http');
+function httpTransport(protocol){
+
+   /**
+    * Return either the http or https client depending on the
+    * protocol, given as a string.
+    * 
+    * @param protocol {String} either 'http:' or 'https:', as is returned
+    *    by url.parse()
+    * @return {require('http')|require('https')}
+    */
+   return function(protocol) {
+      switch(protocol) {
+         case 'http:':
+            return require('http');
+         case 'https:':
+            return require('https');
+         default:
+            throw Error('protocol "' + protocol + '" not supported.' +
+               'Use BYO stream mode instead by calling like:' +
+               'oboe(ReadableStream)');
+      }
+   }
 }
 
 /**
@@ -1034,7 +1054,7 @@ function httpTransport(){
  * should be raised, allowing progressive interpretation of the response.
  *      
  * @param {Function} oboeBus an event bus local to this Oboe instance
- * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
+ * @param {XMLHttpRequest} transport the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          and therefore be Node's http
  *          but for tests a stub may be provided instead.
@@ -1044,7 +1064,7 @@ function httpTransport(){
  *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
+function streamingHttp(oboeBus, transport, method, contentSource, data, headers) {
    "use strict";
 
    function readStreamToEventBus(readableStream) {
@@ -1075,20 +1095,26 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       });
    }
    
-   function fetchHttpUrl( url ) {
-      if( !contentSource.match(/http:\/\//) ) {
-         contentSource = 'http://' + contentSource;
-      }                           
-                           
-      var parsedUrl = require('url').parse(contentSource); 
-   
-      var req = http.request({
+   function openUrlAsStream( url ) {
+      
+      var parsedUrl = require('url').parse(url),
+          client = transport( parsedUrl.protocol );
+      
+      return client.request({
          hostname: parsedUrl.hostname,
-         port: parsedUrl.port, 
+         port: parsedUrl.port,
          path: parsedUrl.pathname,
          method: method,
-         headers: headers 
+         headers: headers
       });
+   }
+   
+   function fetchUrl() {
+      if( !contentSource.match(/https?:\/\//) ) {
+         contentSource = 'http://' + contentSource;
+      }                           
+      
+      var req = openUrlAsStream(contentSource);
       
       req.on('response', function(res){
          var statusCode = res.statusCode,
@@ -1127,7 +1153,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
    }
    
    if( isString(contentSource) ) {
-      fetchHttpUrl(contentSource);
+      fetchUrl(contentSource);
    } else {
       // contentsource is a stream
       readStreamToEventBus(contentSource);   

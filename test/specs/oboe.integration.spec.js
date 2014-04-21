@@ -55,7 +55,7 @@
      
                expect( callbackSpy.calls.length ).toBe(10);   
             });      
-         })      
+         })
       
       });
 
