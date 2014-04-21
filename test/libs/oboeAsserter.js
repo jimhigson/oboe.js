@@ -38,6 +38,9 @@ function givenAnOboeInstance(jsonUrl) {
       oboeInstance.fail(function(e) {
          // Unless set up to expect them, the test isn't expecting errors.
          // Fail the test on getting an error:
+         if( !expectingErrors ) {
+            console.log('unexpected error', e.message, e);
+         }
          expect(expectingErrors).toBeTruthy();
       });
 

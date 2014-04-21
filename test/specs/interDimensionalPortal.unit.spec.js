@@ -42,53 +42,80 @@ describe('interDimensionalPortal unit', function(){
          });      
       }
          
-      it('can be used for a calc server', function(){
+      describe('with one event type sent each way', function(){
          
-         var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
-             bus = pubSub(),
-             done = sinon.stub(),
-             worker = childProgram(bus);
-   
-         bus.emit('start-fib', 39);
-         bus.on('fib-done', done);
-   
-         waitsFor(function(){return done.called}, 'calculation to come back', 5000);
-   
-         runs( function(){
-            var resultGiven = done.firstCall.args[0];
-            expect(resultGiven).toEqual({n:39, 'fib(n)':63245986}); // trust me on this one
-            worker.terminate();
-         })
-      });
-   
-      it('can send several events of same type', function(){
-   
-         var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
-             bus = pubSub(),
-             results = {},
-             worker = childProgram(bus);
-         
-         bus.emit('start-fib', 12);
-         bus.emit('start-fib', 13);
-         bus.emit('start-fib', 14);
-         bus.on('fib-done', function done(result){
-            results[result.n] = result['fib(n)'];
+         it('can make a fibonacci server', function(){
+            
+            var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
+                bus = pubSub(),
+                done = sinon.stub(),
+                worker = childProgram(bus);
+      
+            bus.emit('start-fib', 39);
+            bus.on('fib-done', done);
+      
+            waitsFor(function(){return done.called}, 'calculation to come back', 5000);
+      
+            runs( function(){
+               var resultGiven = done.firstCall.args[0];
+               expect(resultGiven).toEqual({n:39, 'fib(n)':63245986}); // trust me on this one
+               worker.terminate();
+            })
          });
-   
-         function gotAll(){
-            return results[12] && results[13] && results[14]
-         }
-   
-         waitsFor(gotAll, 'all calculations to come back', 3000);
-   
-         runs( function(){
-            expect(results).toEqual({
-               '12':144,
-               '13':233,
-               '14':377
+      
+         it('can send several events of same type', function(){
+      
+            var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
+                bus = pubSub(),
+                results = {},
+                worker = childProgram(bus);
+            
+            bus.emit('start-fib', 12);
+            bus.emit('start-fib', 13);
+            bus.emit('start-fib', 14);
+            bus.on('fib-done', function done(result){
+               results[result.n] = result['fib(n)'];
             });
-            worker.terminate();
-         })
+      
+            function gotAll(){
+               return results[12] && results[13] && results[14]
+            }
+      
+            waitsFor(gotAll, 'all calculations to come back', 3000);
+      
+            runs( function(){
+               expect(results).toEqual({
+                  '12':144,
+                  '13':233,
+                  '14':377
+               });
+               worker.terminate();
+            })
+         });
+      });
+      
+      describe('with threading explicitly disabled', function(){
+         
+         it('works as a fibonacci server', sinon.test(function(){
+         
+            this.stub(interDimensionalPortal, 'thread').returns(false);
+            
+            var childProgram = interDimensionalPortal(environment, calcServer, ['start-fib'], ['fib-done']),
+                bus = pubSub(),
+                done = sinon.stub(),
+                worker = childProgram(bus);
+   
+            bus.emit('start-fib', 39);
+            bus.on('fib-done', done);
+   
+            waitsFor(function(){return done.called}, 'calculation to come back', 5000);
+   
+            runs( function(){
+               var resultGiven = done.firstCall.args[0];
+               expect(resultGiven).toEqual({n:39, 'fib(n)':63245986}); // trust me on this one
+               worker.terminate();
+            })
+         }));
       });
    
       it('can send events of multiple types in both directions', function(){

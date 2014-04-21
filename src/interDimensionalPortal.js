@@ -22,12 +22,12 @@ var interDimensionalPortal = (function(){
             }
 
                if( thread ){
-                  try{
-                     thread.postMessage([eventName, value]);
-                  } catch(e) {
+//                try{
+                  thread.postMessage([eventName, value]);
+/*                } catch(e) {
                      throw new Error(  'Could not forward' + eventName + 'to thread' + thread +
                                        'with value' + value + ':' + e.message );
-                  }
+                  }*/
                } else {
                   // this should never fail because there should always be a parent
                   // thread - it shouldn't be able to die
@@ -102,29 +102,52 @@ var interDimensionalPortal = (function(){
          );
    }
 
-   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
-      var blobUrl = URL.createObjectURL(
-         new Blob(
-            codeForChildThread(childLibs, childServer, eventTypesChildProduces)
-         ,  {type:'text/javascript'}
-         )
-      );
       
-      return varArgs( function(parentSideBus, childServerArgs){
-         
-         console.log('-----------creating new worker---------');
-         
-         var worker = new Worker(blobUrl);
+   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
+      
+      if( interDimensionalPortal.thread() ) {
+      
+         var blobUrl = URL.createObjectURL(
+            new Blob(
+               codeForChildThread(childLibs, childServer, eventTypesChildProduces)
+            ,  {type:'text/javascript'}
+            )
+         );
+               
+         return varArgs( function(parentSideBus, childServerArgs){
             
-         worker.postMessage(childServerArgs);
-         //console.log('sent first message to worker');
-         
-         forward(parentSideBus, eventTypesChildConsumes, worker);
-         receive(parentSideBus, worker);
-         
-         return worker;
-      });
-   }
+            console.log('-----------creating new worker---------');
+            
+            var worker = new Worker(blobUrl);
+               
+            worker.postMessage(childServerArgs);
+            //console.log('sent first message to worker');
+            
+            forward(parentSideBus, eventTypesChildConsumes, worker);
+            receive(parentSideBus, worker);
+            
+            return worker;
+         });
+
+      } else {
+
+         return function(_childLibs, childServer, _eventTypesChildConsumes, _eventTypesChildProduces){
+
+            return function(/*parentSideBus, childArg1, childArg2, childArg3 ... */){
+
+               childServer.apply( null, arguments );
+
+               return {
+                  terminate: noop
+               }
+            };
+         };
+      }
+   };
 
 }());
+
+interDimensionalPortal.thread = function(){
+   return true;
+};
