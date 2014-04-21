@@ -41,7 +41,7 @@
      
                expect( callbackSpy.calls.length ).toBe(10);   
             });      
-         })
+         });
          
          it('can read from a local file', function() {
                
@@ -55,7 +55,22 @@
      
                expect( callbackSpy.calls.length ).toBe(10);   
             });      
-         })
+         });
+
+         it('can read from https', function() {
+            oboe({
+               url: 'https://localhost:7654/echoBackHeadersAsBodyJson',
+               headers:{'Content-Type':'test/oboe'}
+            }).on('node:content-type', callbackSpy)
+              .done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               expect(callbackSpy).toHaveBeenCalledWith('test/oboe');
+            });            
+
+         });
       
       });
 

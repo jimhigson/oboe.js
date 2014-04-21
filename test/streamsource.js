@@ -8,7 +8,7 @@
 
 require('color');
 
-function startServer( port, grunt ) {
+function startServer( port, grunt, client ) {
 
    "use strict";
 
@@ -198,6 +198,7 @@ function startServer( port, grunt ) {
       return app;
    }
          
+   client.create('dooby do'); // I don't have wifi, no Node.js docs here :-(
    makeApp().listen(port);
    
    verboseLog('streaming source server started on port'.green, String(port).blue);
@@ -206,13 +207,17 @@ function startServer( port, grunt ) {
 
 function exportApi(){
 
-   var server;
+   var httpServer, httpsServer;
 
-   module.exports.start = function(port, grunt){
-      server = startServer(port, grunt);          
+   module.exports.start = function(httpPort, httpsPort, grunt){
+      // create the same server on http and https:
+      
+      httpServer  = startServer(httpPort,  grunt, require('http'));
+      httpsServer = startServer(httpsPort, grunt, require('https'));
    };   
    module.exports.stop = function(){
-      server.close();
+      httpServer.close();
+      httpsServer.close();
    };
 }
 

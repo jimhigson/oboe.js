@@ -2,7 +2,8 @@ module.exports = function (grunt) {
 
    var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
 
-   var STREAM_SOURCE_PORT = 4567;
+   var STREAM_SOURCE_PORT_HTTP = 4567,
+       STREAM_SOURCE_PORT_HTTPS = 7654;
 
    // NB: source files are order sensitive
    var OBOE_BROWSER_SOURCE_FILES = [
@@ -110,7 +111,7 @@ module.exports = function (grunt) {
          options:{            
             singleRun: true,
             proxies: {
-               '/testServer'   : 'http://localhost:' + STREAM_SOURCE_PORT   
+               '/testServer'   : 'http://localhost:' + STREAM_SOURCE_PORT_HTTP   
             },         
             // test results reporter to use
             // possible values: 'dots', 'progress', 'junit'
@@ -257,7 +258,10 @@ module.exports = function (grunt) {
       }
          
       streamSource = require('./test/streamsource.js');
-      streamSource.start(STREAM_SOURCE_PORT, grunt);
+      streamSource.start(
+         STREAM_SOURCE_PORT_HTTP, 
+         STREAM_SOURCE_PORT_HTTPS, 
+         grunt);
    });
 
    grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
@@ -285,7 +289,7 @@ module.exports = function (grunt) {
    grunt.registerTask('headless-mode', function(){
       autoStartBrowsers.length = 0;
       autoStartBrowsers.push('PhantomJS');
-   })
+   });
       
    grunt.registerTask('test-start-server',   [
       'karma:persist'
