@@ -114,7 +114,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
             }
       }
    };
-
+   
    try{
    
       xhr.open(method, url, true);
@@ -122,7 +122,10 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      
+      if( !isCrossOrigin(url) ) {
+         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      }
 
       xhr.withCredentials = withCredentials;
       

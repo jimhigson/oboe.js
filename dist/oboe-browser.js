@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-13-gc97c46b
+   // v1.14.3-1-g6b1ec90
 
 /*
 
@@ -553,7 +553,7 @@ function clarinet(eventBus) {
   ,   stringTokenPattern = /[\\"\n]/g
   ,   _n = 0
   
-      // states
+      // states`
   ,   BEGIN                = _n++
   ,   VALUE                = _n++ // general stuff
   ,   OPEN_OBJECT          = _n++ // {
@@ -656,18 +656,20 @@ function clarinet(eventBus) {
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;
@@ -1162,7 +1164,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
             }
       }
    };
-
+   
    try{
    
       xhr.open(method, url, true);
@@ -1170,7 +1172,10 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      
+      if( !isCrossOrigin(url) ) {
+         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      }
 
       xhr.withCredentials = withCredentials;
       
