@@ -91,7 +91,7 @@
          });
       });
    
-      it('gets all expected callbacks by time request finishes', function () {
+      it('with an implicit GET, sees all expected callbacks by time the request finishes', function () {
    
          oboe(testUrl('tenSlowNumbers'))
              .node('![*]', callbackSpy)
@@ -113,7 +113,7 @@
             expect(callbackSpy).toHaveBeenCalledWith(9, [9], [fullResponse, 9]);
    
          });
-      })
+      });
       
            
       it('can make nested requests from arrays', function () {
@@ -451,17 +451,76 @@
       });
 
       describe('while unusual, some libraries such as ElasticSearch use the body from a GET request', function() {
-         it('can make a GET with a body', function () {
-            oboe({
-               method: 'GET', url: testUrl('echoBackBody'), body: {a: 'A', b: 'B', c: 'C'}
-            }).done(whenDoneFn)
+
+         // first, establish some background...
+         it('can make an implicit GET for some numbers', function() {
+            oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
+               .done(whenDoneFn)
 
             waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
 
             runs(function () {
-               expect(whenDoneFn).toHaveBeenCalledWith({a: 'A', b: 'B', c: 'C'});
+               expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
             })
+         });
 
+         // first, establish some background...
+         it('can make an explicit GET for some numbers', function() {
+            oboe({
+               method:'GET',
+               url:testUrl('static/json/firstTenNaturalNumbers.json')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
+            })
+         });
+
+         // make a POST with a body to prove that we can before we get onto the GET
+         it('can make a POST with a body', function () {
+            oboe({
+               method: 'POST',
+               url: testUrl('echoBackBody'),
+               body: {a: 'A', b: 'B', c: 'C'}
+            })
+               .done(whenDoneFn)
+               .fail(function(err) {
+                  console.log('there was an error:');
+                  console.log(err.thrown.stack);
+               });
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               expect(fullResponse).toEqual({a: 'A', b: 'B', c: 'C'});
+            })
+         });         
+         
+         // ... and finally, we get to the punch
+         it('can make a GET with a body', function () {
+            
+            // note that the standard http library (ie, require('http'))
+            // does not allow GET requests with bodies. This will fail until
+            // we use something else instead.
+            
+            oboe({
+               method: 'GET', 
+               url: testUrl('echoBackBody'), 
+               body: {a: 'A', b: 'B', c: 'C'}
+            })
+               .done(whenDoneFn)
+               .fail(function(err) {
+                  console.log('there was an error:');
+                  console.log(err.thrown.stack);
+               });
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               expect(fullResponse).toEqual({a: 'A', b: 'B', c: 'C'});
+            })
          });
       });
    
