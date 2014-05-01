@@ -179,7 +179,7 @@ function startServer( port, grunt ) {
       })); // enable cross-domain for all resources
       app.use(app.router);
       
-      app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
+      app.get(    '/echoBackBody',              echoBackBody);
       app.post(   '/echoBackBody',              echoBackBody);
       app.put(    '/echoBackBody',              echoBackBody);
       app.patch(  '/echoBackBody',              echoBackBody);

@@ -448,7 +448,22 @@
             expect(order).toEqual([1,2,3,4,5,6,7,8]);
          });   
         
-      });  
+      });
+
+      describe('while unusual, some libraries such as ElasticSearch use the body from a GET request', function() {
+         it('can make a GET with a body', function () {
+            oboe({
+               method: 'GET', url: testUrl('echoBackBody'), body: {a: 'A', b: 'B', c: 'C'}
+            }).done(whenDoneFn)
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               expect(whenDoneFn).toHaveBeenCalledWith({a: 'A', b: 'B', c: 'C'});
+            })
+
+         });
+      });
    
       it('emits error on 404', function () {
    
