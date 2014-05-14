@@ -26,7 +26,7 @@ function clarinet(eventBus) {
   ,   stringTokenPattern = /[\\"\n]/g
   ,   _n = 0
   
-      // states`
+      // states
   ,   BEGIN                = _n++
   ,   VALUE                = _n++ // general stuff
   ,   OPEN_OBJECT          = _n++ // {
