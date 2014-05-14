@@ -28,6 +28,12 @@ describe("detecting cross-origin-ness", function() {
    //          given in page but not ajax url
    
    describe('can parse URLs', function() {
+
+      var noInformationRegardingOrigin = {
+         protocol: '',
+         host: '',
+         port: ''
+      };      
       
       beforeEach(function() {
          this.addMatchers({
@@ -50,121 +56,95 @@ describe("detecting cross-origin-ness", function() {
       });
       
       it( 'parses absolute path only', function() {
-                  
-          expect('/foo/bar').toParseTo({
-             protocol:'',
-             host:'',
-             port:''
-          });
-         
+         expect('/foo/bar').toParseTo(noInformationRegardingOrigin);
       });
 
       it( 'parses absolute path with extension', function() {
-         
-          expect('/foo/bar.jpg').toParseTo({
-             protocol:'',
-             host:'',
-             port:''
-          });
-         
+          expect('/foo/bar.jpg').toParseTo(noInformationRegardingOrigin);
       });
 
-      it( 'parses absolute path with extension with query', function() {
-         
-          expect('/foo/bar.jpg?foo=bar&woo=doo').toParseTo({
-             protocol:'',
-             host:'',
-             port:''
-          });
-         
+      it( 'parses absolute path with extension and query', function() {
+          expect('/foo/bar.jpg?foo=bar&woo=doo').toParseTo(noInformationRegardingOrigin);
       });
 
       it( 'parses relative path only', function() {
-         
-          expect('foo/bar').toParseTo({
-             protocol:'',
-             host:'',
-             port:''
-          });
-         
+          expect('foo/bar').toParseTo(noInformationRegardingOrigin);
       });
 
       it( 'parses relative path with extension', function() {
-         
-          expect('foo/bar.jpg').toParseTo({
-             protocol:'',
-             host:'',
-             port:''
-          });
-         
+          expect('foo/bar.jpg').toParseTo(noInformationRegardingOrigin);
       });
 
-      it( 'parses a url with domain', function() {
-         
-          expect('example.com/foo/bar.jpg').toParseTo({
-             protocol:'',
-             host:'example.com',
-             port:''
-          });
-         
-      });
-
-      it( 'parses a domain with a hyphen', function() {
-         
-          expect('example-site.com/foo/bar.jpg').toParseTo({
-             protocol:'',
-             host:'example-site.com',
-             port:''
-          });
-         
-      });
-
-      it( 'parses a url with domain with a number', function() {
-
-         expect('123.com/foo/bar.jpg').toParseTo({
-            protocol:'',
-            host:'123.com',
-            port:''
-         });
-
-      });
-
-
-      it( 'parses a domain-relative path', function() {
+      it( 'parses a url with domain but no protocol', function() {
          
           expect('//example.com/foo/bar.jpg').toParseTo({
              protocol:'',
              host:'example.com',
              port:''
           });
-         
       });
 
-      it( 'parses a domain-relative path with a hypen in the domain', function() {
-         
-          expect('//example-site.com/foo/bar.jpg').toParseTo({
-             protocol:'',
-             host:'example-site.com',
-             port:''
-          });
-         
-      });
+      it( 'parses a url with one-word domain', function() {
 
-      it( 'parses a domain-relative path to the root of the domain', function() {
-         
-          expect('//example-site.com/').toParseTo({
-             protocol:'',
-             host:'example-site.com',
-             port:''
-          });
-      });
-
-      it( 'parses a domain-relative path to the implicit root of the domain', function() {
-
-         expect('//example-site.com').toParseTo({
+         expect('//database/foo/bar.jpg').toParseTo({
             protocol:'',
-            host:'example-site.com',
+            host:'database',
             port:''
+         });
+      });
+
+      it( 'parses a url with one-word domain and port', function() {
+
+         expect('//search:9200/foo/bar').toParseTo({
+            protocol:'',
+            host:'search',
+            port:'9200'
+         });
+      });
+
+
+      it( 'parses a url with domain with a hyphen', function() {
+
+         expect('//example-site.org/foo/bar.jpg').toParseTo({
+            protocol:'',
+            host:'example-site.org',
+            port:''
+         });
+      });      
+      
+      it( 'parses a url with domain with a number', function() {
+
+         expect('//123.org.uk/foo/bar.jpg').toParseTo({
+            protocol:'',
+            host:'123.org.uk',
+            port:''
+         });
+      });
+
+      it( 'parses a url with a protocol', function() {
+
+         expect('http://example.com/foo').toParseTo({
+            protocol:'http:',
+            host:'example.com',
+            port:''
+         });
+      });
+
+      it( 'parses a url with a protocol and a port', function() {
+
+         expect('http://elasticsearch:9200/tweets').toParseTo({
+            protocol:'http:',
+            host:'elasticsearch',
+            port:'9200'
+         });
+      });
+
+      it( 'parses a url with a protocol and a port implicitly at the root', function() {
+
+         expect('http://elasticsearch:9200').toParseTo({
+            protocol:'http:',
+            host:'elasticsearch',
+            port:'9200'
          });
       });      
 

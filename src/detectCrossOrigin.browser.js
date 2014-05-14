@@ -36,11 +36,10 @@ function parseUrlOrigin(url) {
    //
    // can ignore everything after that   
    
-   var URL_HOST_PATTERN = /(\w+:(?:\/\/)?)?([\w.-]+)?(?::(\d+))?\/?/,
+   var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
        urlHostMatch = URL_HOST_PATTERN.exec(url);
 
    if( !urlHostMatch ) {
-      console.log('no match for', url);
       //throw new Error('could not parse url ' + url);
       urlHostMatch = {};
    }
