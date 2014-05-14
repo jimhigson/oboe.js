@@ -16,9 +16,10 @@ function isCrossOrigin(pageLocation, urlOrigin) {
    //    2: host (or undefined)
    //    3: port (or undefined)
 
-   return   (urlOrigin.protocol  && (urlOrigin.protocol  != pageLocation.protocol)) ||
-            (urlOrigin.host      && (urlOrigin.host      != pageLocation.host))     ||
-            (urlOrigin.port      && (urlOrigin.port      != pageLocation.port));
+   return !!(  (urlOrigin.protocol  && (urlOrigin.protocol  != pageLocation.protocol)) ||
+               (urlOrigin.host      && (urlOrigin.host      != pageLocation.host))     ||
+               (urlOrigin.port      && (urlOrigin.port      != pageLocation.port))
+          );
           
 }
 
@@ -37,12 +38,12 @@ function parseUrlOrigin(url) {
    // can ignore everything after that   
    
    var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
-       urlHostMatch = URL_HOST_PATTERN.exec(url);
 
-   if( !urlHostMatch ) {
-      //throw new Error('could not parse url ' + url);
-      urlHostMatch = {};
-   }
+         // if no match, use an empty array so that
+         // subexpressions 1,2,3 are all undefined
+         // and will ultimately return all empty
+         // strings as the parse result:
+       urlHostMatch = URL_HOST_PATTERN.exec(url) || [];
    
    return {
       protocol:   urlHostMatch[1] || '',
