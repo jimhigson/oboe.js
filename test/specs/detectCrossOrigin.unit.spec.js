@@ -151,6 +151,7 @@ describe("url handling", function() {
          '/foo/bar': false,
          'foo/bar': false,         
          'http://www.current-site.co.uk/index.html': true,
+         '//www.current-site.co.uk:8080/index.html': false,
          'http://localhost:9876/foo': true,
          '//localhost:9876/foo': true,
          'http://otherhost:9876/foo': true,
@@ -162,6 +163,26 @@ describe("url handling", function() {
          'https://www.current-site.co.uk:8080': true,
          'https://www.current-site.co.uk': true
       }
+
+   ,  'http://www.current-site.co.uk:80/foo': {
+         'http://www.current-site.co.uk/foo': false,
+         'http://www.current-site.co.uk:80/foo': false
+      }
+
+   ,  'http://www.current-site.co.uk/foo': {
+         'http://www.current-site.co.uk:80/foo': false,
+         'http://www.current-site.co.uk/foo': false
+      }
+
+   ,  'https://www.current-site.co.uk:443/foo': {
+         'https://www.current-site.co.uk/foo': false,
+         'https://www.current-site.co.uk:443/foo': false
+      }
+
+   ,  'https://www.current-site.co.uk/foo': {
+         'https://www.current-site.co.uk:443/foo': false,
+         'https://www.current-site.co.uk/foo': false
+      }      
    };
    
    describe('detection of x-origin-ness', function() {
