@@ -3,10 +3,9 @@
  * current page.
  * 
  * Browser only (since cross-origin has no meaning in Node.js)
- * 
- * Actually, could we use withCredentials here?
- * 
- * @param url
+ *
+ * @param {Object} pageLocation - as in window.location
+ * @param {String} url - the url that we wish to test
  */
 function isCrossOrigin(pageLocation, url) {
    
@@ -24,6 +23,10 @@ function isCrossOrigin(pageLocation, url) {
    
    var URL_HOST_PATTERN = /(\w+:)?\/\/([\w.]+)?(?::(\d+))?\//,
        urlHostMatch = URL_HOST_PATTERN.exec(url);
+   
+   if( !urlHostMatch ) {
+      throw new Error('could not parse url ' + url);
+   }
        
    // match will have:
    //    1: protocol, with colon like 'http:' (or undefined) 

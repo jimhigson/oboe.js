@@ -38,7 +38,7 @@ describe("detecting cross origin-ness of URLS", function() {
       var expectedResults = {
          '/foo/bar': false,
          'foo/bar': false,
-         'http://localhost:9876/foo': false,
+         'http://localhost:9876/foo': true,
          '//localhost:9876/foo': true,
          'http://otherhost:9876/foo': true,
          'http://localhost:8081/foo': true,
@@ -49,14 +49,17 @@ describe("detecting cross origin-ness of URLS", function() {
       };
       
       for( var ajaxUrl in expectedResults ) {
+                  
+         var expectToBeCrossOrigin = expectedResults[ajaxUrl],
+             desc = (expectToBeCrossOrigin? 'cross-origin' : 'same-origin');
          
-         var expectedResult = expectedResults[ajaxUrl];
-         
-         it( 'should return  ' + expectedResult + ' for url ' + ajaxUrl, function( ajaxUrl, expectedResult ) {
+         it( 'should detect ' + ajaxUrl + ' as ' + desc, function( ajaxUrl, expectedResult ) {
+
+            console.log('will run expectation for', ajaxUrl);
             
-            expect( isCrossOrigin(currentPageLocation, ajaxUrl).toEqual(expectedResult) );
+            expect( isCrossOrigin(currentPageLocation, ajaxUrl)).toEqual(expectedResult);
             
-         }.bind(ajaxUrl, expectedResult));
+         }.bind(this, ajaxUrl, expectToBeCrossOrigin));
       }
    });
 });
