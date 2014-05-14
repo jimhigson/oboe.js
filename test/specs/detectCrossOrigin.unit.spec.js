@@ -202,9 +202,9 @@ describe("url handling", function() {
                   function (currentPage, ajaxUrl, expectToBeCrossOrigin) {
  
                      if( expectToBeCrossOrigin ) {
-                        expect(currentPage).toBeCrossOriginWith(ajaxUrl);
+                        expect(ajaxUrl).toBeCrossOriginOnPage(currentPage);
                      } else {
-                        expect(currentPage).not.toBeCrossOriginWith(ajaxUrl);
+                        expect(ajaxUrl).not.toBeCrossOriginOnPage(currentPage);
                      }
 
                   }.bind(this, currentPage, ajaxUrl, expectToBeCrossOrigin)
@@ -217,7 +217,7 @@ describe("url handling", function() {
 
    beforeEach(function() {
       this.addMatchers({
-         toParseTo:function(expected) {
+         toParseTo: function(expected) {
 
             var actualUrl = this.actual;
             var actualUrlParsed = parseUrlOrigin(actualUrl);
@@ -233,10 +233,10 @@ describe("url handling", function() {
                (actualUrlParsed.port     == expected.port);
          }
 
-         ,  toBeCrossOriginWith:function(ajaxUrl) {
-            var curPageUrl = this.actual;
-            var curPageHost = parseUrlOrigin(curPageUrl);
-            var ajaxHost = parseUrlOrigin(ajaxUrl);
+      ,  toBeCrossOriginOnPage: function(curPageUrl) { 
+            var ajaxUrl = this.actual,
+                ajaxHost = parseUrlOrigin(ajaxUrl),
+                curPageHost = parseUrlOrigin(curPageUrl);
 
             return isCrossOrigin(curPageHost, ajaxHost);
          }
