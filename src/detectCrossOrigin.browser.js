@@ -33,6 +33,4 @@ function isCrossOrigin(pageLocation, url) {
    return (urlHostMatch[1] && (urlHostMatch[1] != pageLocation.protocol)) &&
           (urlHostMatch[2] && (urlHostMatch[2] != pageLocation.host)) &&
           (urlHostMatch[3] && (urlHostMatch[3] != pageLocation.port));
-
-   return false;
 }
