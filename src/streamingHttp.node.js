@@ -53,7 +53,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
    }
    
    function fetchHttpUrl( url ) {
-      if( !contentSource.match(/http:\/\//) ) {
+      if( !contentSource.match(/https?:\/\//) ) {
          contentSource = 'http://' + contentSource;
       }                           
                            
