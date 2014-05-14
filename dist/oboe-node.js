@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.2-13-gc97c46b
+   // v1.14.3-2-g110245c
 
 /*
 
@@ -1085,7 +1085,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       var req = http.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
-         path: parsedUrl.pathname,
+         path: parsedUrl.path,
          method: method,
          headers: headers 
       });
