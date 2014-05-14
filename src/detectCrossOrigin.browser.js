@@ -49,5 +49,5 @@ function parseUrlOrigin(url) {
       protocol:   urlHostMatch[1] || '',
       host:       urlHostMatch[2] || '',
       port:       urlHostMatch[3] || ''
-   }
+   };
 }
