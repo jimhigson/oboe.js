@@ -1,5 +1,5 @@
 
-describe("detecting cross origin-ness of URLS", function() {
+describe("detecting cross-origin-ness", function() {
 
    // page location needs to be of the form given by window.location:
    //
@@ -43,8 +43,8 @@ describe("detecting cross origin-ness of URLS", function() {
                };
                
                return (actualUrlParsed.protocol == expected.protocol) &&
-                      (actualUrlParsed.host == expected.host) &&
-                      (actualUrlParsed.port == expected.port);
+                      (actualUrlParsed.host     == expected.host) &&
+                      (actualUrlParsed.port     == expected.port);
             }
          });
       });
@@ -109,16 +109,27 @@ describe("detecting cross origin-ness of URLS", function() {
          
       });
 
-      it( 'parses a url with domain with a hyphen', function() {
+      it( 'parses a domain with a hyphen', function() {
          
           expect('example-site.com/foo/bar.jpg').toParseTo({
              protocol:'',
-             host:'',
+             host:'example-site.com',
              port:''
           });
          
-      });      
-      
+      });
+
+      it( 'parses a url with domain with a number', function() {
+
+         expect('123.com/foo/bar.jpg').toParseTo({
+            protocol:'',
+            host:'123.com',
+            port:''
+         });
+
+      });
+
+
       it( 'parses a domain-relative path', function() {
          
           expect('//example.com/foo/bar.jpg').toParseTo({
