@@ -134,7 +134,7 @@ describe("detecting cross-origin-ness", function() {
          
           expect('//example.com/foo/bar.jpg').toParseTo({
              protocol:'',
-             host:'',
+             host:'example.com',
              port:''
           });
          
@@ -144,7 +144,7 @@ describe("detecting cross-origin-ness", function() {
          
           expect('//example-site.com/foo/bar.jpg').toParseTo({
              protocol:'',
-             host:'',
+             host:'example-site.com',
              port:''
           });
          
@@ -154,7 +154,7 @@ describe("detecting cross-origin-ness", function() {
          
           expect('//example-site.com/').toParseTo({
              protocol:'',
-             host:'',
+             host:'example-site.com',
              port:''
           });
       });
@@ -163,7 +163,7 @@ describe("detecting cross-origin-ness", function() {
 
          expect('//example-site.com').toParseTo({
             protocol:'',
-            host:'',
+            host:'example-site.com',
             port:''
          });
       });      
