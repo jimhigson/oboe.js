@@ -1,5 +1,5 @@
 
-describe("detecting cross-origin-ness", function() {
+describe("url handling", function() {
 
    // page location needs to be of the form given by window.location:
    //
@@ -34,27 +34,7 @@ describe("detecting cross-origin-ness", function() {
          host: '',
          port: ''
       };      
-      
-      beforeEach(function() {
-         this.addMatchers({
-            toParseTo:function(expected) {
-
-               var actualUrl = this.actual;
-               var actualUrlParsed = parseUrlOrigin(actualUrl);
-               
-               this.message = function(){
-                  return 'expected ' + actualUrl  
-                                   + ' to parse to ' + JSON.stringify(expected) 
-                                   + ' but got ' + JSON.stringify(actualUrlParsed);
-               };
-               
-               return (actualUrlParsed.protocol == expected.protocol) &&
-                      (actualUrlParsed.host     == expected.host) &&
-                      (actualUrlParsed.port     == expected.port);
-            }
-         });
-      });
-      
+            
       it( 'parses absolute path only', function() {
          expect('/foo/bar').toParseTo(noInformationRegardingOrigin);
       });
@@ -150,41 +130,96 @@ describe("detecting cross-origin-ness", function() {
 
    });
       
-   describe('for http page with implicit port', function() {
-      var currentPageLocation = {
-         protocol:'http:',
-         host:'www.google.co.uk',
-         port:''
-      };
-      
-      var expectedResults = {
+   
+   var testCases = {
+      'http://www.current-site.co.uk':{
          '/foo/bar': false,
          'foo/bar': false,
+         'http://www.current-site.co.uk/index.html': false,
          'http://localhost:9876/foo': true,
          '//localhost:9876/foo': true,
          'http://otherhost:9876/foo': true,
          'http://localhost:8081/foo': true,
          'https://localhost:9876/foo': true,
          'ftp://localhost:9876/foo': true,
-         '//otherhost:9876/foo': true,
-         '//localhost:8080/foo': true
-      };
+         '//localhost:8080/foo': true,
+         'http://www.current-site.co.uk:8080': true,
+         'https://www.current-site.co.uk': true
+      }
       
-      for( var ajaxUrl in expectedResults ) {
-                  
-         var expectToBeCrossOrigin = expectedResults[ajaxUrl],
-             desc = (expectToBeCrossOrigin? 'cross-origin' : 'same-origin');
+   ,  'http://www.current-site.co.uk:8080/some/page.html': {
+         '/foo/bar': false,
+         'foo/bar': false,         
+         'http://www.current-site.co.uk/index.html': true,
+         'http://localhost:9876/foo': true,
+         '//localhost:9876/foo': true,
+         'http://otherhost:9876/foo': true,
+         'http://localhost:8081/foo': true,
+         'https://localhost:9876/foo': true,
+         'ftp://localhost:9876/foo': true,
+         '//localhost:8080/foo': true,
+         'http://www.current-site.co.uk:8080': false,
+         'https://www.current-site.co.uk:8080': true,
+         'https://www.current-site.co.uk': true
+      }
+   };
+   
+   describe('detection of x-origin-ness', function() {
+      
+      for( var currentPage in testCases ) {
          
-         it( 'from ' + putTogether(currentPageLocation) + ' should detect ' + ajaxUrl + ' as ' + desc, function( ajaxUrl, expectedResult ) {
+         describe('testing from page ' + currentPage, function() {
 
-            expect( isCrossOrigin(currentPageLocation, parseUrlOrigin(ajaxUrl))).toEqual(expectedResult);
-            
-         }.bind(this, ajaxUrl, expectToBeCrossOrigin));
+            var expectedResults = testCases[currentPage];
+
+            for (var ajaxUrl in expectedResults) {
+
+               var expectToBeCrossOrigin = expectedResults[ajaxUrl],
+                   crossOriginDesc = (expectToBeCrossOrigin ? 'cross-origin' : 'same-origin');
+
+               it('should detect ' + ajaxUrl + ' as ' + crossOriginDesc, 
+                  function (currentPage, ajaxUrl, expectToBeCrossOrigin) {
+ 
+                     if( expectToBeCrossOrigin ) {
+                        expect(currentPage).toBeCrossOriginWith(ajaxUrl);
+                     } else {
+                        expect(currentPage).not.toBeCrossOriginWith(ajaxUrl);
+                     }
+
+                  }.bind(this, currentPage, ajaxUrl, expectToBeCrossOrigin)
+               );
+            }
+         });
       }
    });
-   
-   function putTogether(origin) {
-      return origin.protocol + '//' + origin.host + (origin.port? ':' + origin.port : '');
-   }
+
+
+   beforeEach(function() {
+      this.addMatchers({
+         toParseTo:function(expected) {
+
+            var actualUrl = this.actual;
+            var actualUrlParsed = parseUrlOrigin(actualUrl);
+
+            this.message = function(){
+               return 'expected ' + actualUrl
+                  + ' to parse to ' + JSON.stringify(expected)
+                  + ' but got ' + JSON.stringify(actualUrlParsed);
+            };
+
+            return (actualUrlParsed.protocol == expected.protocol) &&
+               (actualUrlParsed.host     == expected.host) &&
+               (actualUrlParsed.port     == expected.port);
+         }
+
+         ,  toBeCrossOriginWith:function(ajaxUrl) {
+            var curPageUrl = this.actual;
+            var curPageHost = parseUrlOrigin(curPageUrl);
+            var ajaxHost = parseUrlOrigin(ajaxUrl);
+
+            return isCrossOrigin(curPageHost, ajaxHost);
+         }
+      });
+   });   
    
 });
