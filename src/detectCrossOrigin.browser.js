@@ -5,10 +5,10 @@
  * Browser only (since cross-origin has no meaning in Node.js)
  *
  * @param {Object} pageLocation - as in window.location
- * @param {Object} urlOrigin - an object like window.location describing the 
+ * @param {Object} ajaxHost - an object like window.location describing the 
  *    origin of some other url
  */
-function isCrossOrigin(pageLocation, urlOrigin) {
+function isCrossOrigin(pageLocation, ajaxHost) {
    
 
    // match will have:
@@ -16,9 +16,9 @@ function isCrossOrigin(pageLocation, urlOrigin) {
    //    2: host (or undefined)
    //    3: port (or undefined)
 
-   return !!(  (urlOrigin.protocol  && (urlOrigin.protocol  != pageLocation.protocol)) ||
-               (urlOrigin.host      && (urlOrigin.host      != pageLocation.host))     ||
-               (urlOrigin.port      && (urlOrigin.port      != pageLocation.port))
+   return !!(  (ajaxHost.protocol  && (ajaxHost.protocol  != pageLocation.protocol)) ||
+               (ajaxHost.host      && (ajaxHost.host      != pageLocation.host))     ||
+               (ajaxHost.port      && (ajaxHost.port      != pageLocation.port))
           );
           
 }
