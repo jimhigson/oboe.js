@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.2-13-gc97c46b
+   // v1.14.3-2-g6701f15
 
 /*
 
@@ -552,7 +552,7 @@ function clarinet(eventBus) {
   ,   stringTokenPattern = /[\\"\n]/g
   ,   _n = 0
   
-      // states
+      // states`
   ,   BEGIN                = _n++
   ,   VALUE                = _n++ // general stuff
   ,   OPEN_OBJECT          = _n++ // {
@@ -655,18 +655,20 @@ function clarinet(eventBus) {
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;
@@ -1085,7 +1087,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       var req = http.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
-         path: parsedUrl.pathname,
+         path: parsedUrl.path,
          method: method,
          headers: headers 
       });

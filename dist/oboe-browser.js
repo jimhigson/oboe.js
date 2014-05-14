@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.3-1-g6b1ec90
+   // v1.14.3-2-g6701f15
 
 /*
 
@@ -1048,6 +1048,7 @@ function parseResponseHeaders(headerStr) {
    
    return headers;
 }
+
 function httpTransport(){
    return new XMLHttpRequest();
 }

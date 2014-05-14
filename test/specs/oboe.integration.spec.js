@@ -223,7 +223,22 @@
          
             expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
          });
-      })   
+      })
+
+      it('can send query params', function () {
+
+         var apiKeyCallback = jasmine.createSpy();
+         
+         oboe(testUrl('echoBackQueryParamsAsBodyJson?apiKey=123'))
+            .node('apiKey', apiKeyCallback)
+            .done(whenDoneFn);
+
+         waitsFor(doneCalled, ASYNC_TEST_TIMEOUT);
+
+         runs(function () {
+            expect(apiKeyCallback.mostRecentCall.args[0]).toBe('123');
+         });
+      })      
    
       it('can abort once some data has been found in not very streamed response', function () {
    
