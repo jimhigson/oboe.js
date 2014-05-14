@@ -5,10 +5,25 @@
  * Browser only (since cross-origin has no meaning in Node.js)
  *
  * @param {Object} pageLocation - as in window.location
- * @param {String} url - the url that we wish to test
+ * @param {Object} urlOrigin - an object like window.location describing the 
+ *    origin of some other url
  */
-function isCrossOrigin(pageLocation, url) {
+function isCrossOrigin(pageLocation, urlOrigin) {
    
+
+   // match will have:
+   //    1: protocol, with colon like 'http:' (or undefined) 
+   //    2: host (or undefined)
+   //    3: port (or undefined)
+
+   return   (urlOrigin.protocol  && (urlOrigin.protocol  != pageLocation.protocol)) ||
+            (urlOrigin.host      && (urlOrigin.host      != pageLocation.host))     ||
+            (urlOrigin.port      && (urlOrigin.port      != pageLocation.port));
+          
+}
+
+/* turn any url into an object like window.location */
+function parseUrlOrigin(url) {
    // url could be domain-relative
    // url could give a domain
 
@@ -19,21 +34,20 @@ function isCrossOrigin(pageLocation, url) {
    // so, same everything up to the first (single) slash 
    // if such is given
    //
-   // can ignore everything after that
+   // can ignore everything after that   
    
-   var URL_HOST_PATTERN = /(\w+:)?\/\/([\w.]+)?(?::(\d+))?\//,
+   var URL_HOST_PATTERN = /(\w+:(?:\/\/)?)?([\w.]+)?(?::(\d+))?\/?/,
        urlHostMatch = URL_HOST_PATTERN.exec(url);
-   
-   if( !urlHostMatch ) {
-      throw new Error('could not parse url ' + url);
-   }
-       
-   // match will have:
-   //    1: protocol, with colon like 'http:' (or undefined) 
-   //    2: host (or undefined)
-   //    3: port (or undefined)
 
-   return (urlHostMatch[1] && (urlHostMatch[1] != pageLocation.protocol)) &&
-          (urlHostMatch[2] && (urlHostMatch[2] != pageLocation.host)) &&
-          (urlHostMatch[3] && (urlHostMatch[3] != pageLocation.port));
+   if( !urlHostMatch ) {
+      console.log('no match for', url);
+      //throw new Error('could not parse url ' + url);
+      urlHostMatch = {};
+   }
+   
+   return {
+      protocol:   urlHostMatch[1] || '',
+      host:       urlHostMatch[2] || '',
+      port:       urlHostMatch[3] || ''
+   }
 }

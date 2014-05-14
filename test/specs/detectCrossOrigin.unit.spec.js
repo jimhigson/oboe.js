@@ -27,10 +27,141 @@ describe("detecting cross origin-ness of URLS", function() {
    //          given as non-433 in ajax url but not page, and page is https
    //          given in page but not ajax url
    
+   describe('can parse URLs', function() {
+      
+      beforeEach(function() {
+         this.addMatchers({
+            toParseTo:function(expected) {
+
+               var actualUrl = this.actual;
+               var actualUrlParsed = parseUrlOrigin(actualUrl);
+               
+               this.message = function(){
+                  return 'expected ' + actualUrl  
+                                   + ' to parse to ' + JSON.stringify(expected) 
+                                   + ' but got ' + JSON.stringify(actualUrlParsed);
+               };
+               
+               return (actualUrlParsed.protocol == expected.protocol) &&
+                      (actualUrlParsed.host == expected.host) &&
+                      (actualUrlParsed.port == expected.port);
+            }
+         });
+      });
+      
+      it( 'parses absolute path only', function() {
+                  
+          expect('/foo/bar').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses absolute path with extension', function() {
+         
+          expect('/foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses absolute path with extension with query', function() {
+         
+          expect('/foo/bar.jpg?foo=bar&woo=doo').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses relative path only', function() {
+         
+          expect('foo/bar').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses relative path with extension', function() {
+         
+          expect('foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses a url with domain', function() {
+         
+          expect('example.com/foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'example.com',
+             port:''
+          });
+         
+      });
+
+      it( 'parses a url with domain with a hyphen', function() {
+         
+          expect('example-site.com/foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });      
+      
+      it( 'parses a domain-relative path', function() {
+         
+          expect('//example.com/foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses a domain-relative path with a hypen in the domain', function() {
+         
+          expect('//example-site.com/foo/bar.jpg').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+         
+      });
+
+      it( 'parses a domain-relative path to the root of the domain', function() {
+         
+          expect('//example-site.com/').toParseTo({
+             protocol:'',
+             host:'',
+             port:''
+          });
+      });
+
+      it( 'parses a domain-relative path to the implicit root of the domain', function() {
+
+         expect('//example-site.com').toParseTo({
+            protocol:'',
+            host:'',
+            port:''
+         });
+      });      
+
+   });
       
    describe('for http page with implicit port', function() {
       var currentPageLocation = {
-         protocol:'http',
+         protocol:'http:',
          host:'www.google.co.uk',
          port:''
       };
@@ -53,13 +184,16 @@ describe("detecting cross origin-ness of URLS", function() {
          var expectToBeCrossOrigin = expectedResults[ajaxUrl],
              desc = (expectToBeCrossOrigin? 'cross-origin' : 'same-origin');
          
-         it( 'should detect ' + ajaxUrl + ' as ' + desc, function( ajaxUrl, expectedResult ) {
+         it( 'from ' + putTogether(currentPageLocation) + ' should detect ' + ajaxUrl + ' as ' + desc, function( ajaxUrl, expectedResult ) {
 
-            console.log('will run expectation for', ajaxUrl);
-            
-            expect( isCrossOrigin(currentPageLocation, ajaxUrl)).toEqual(expectedResult);
+            expect( isCrossOrigin(currentPageLocation, parseUrlOrigin(ajaxUrl))).toEqual(expectedResult);
             
          }.bind(this, ajaxUrl, expectToBeCrossOrigin));
       }
    });
+   
+   function putTogether(origin) {
+      return origin.protocol + '//' + origin.host + (origin.port? ':' + origin.port : '');
+   }
+   
 });
