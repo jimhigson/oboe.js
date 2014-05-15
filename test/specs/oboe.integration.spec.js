@@ -89,6 +89,32 @@
                expect( req.root().cookie ).toMatch('oboeIntegrationSend=123');
             })
          });
+
+         it('adds X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: testUrl('echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toEqual('XMLHttpRequest');
+            })
+         });         
+         
+         it('does not add X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toBeUndefined();
+            })
+         });         
       });
    
       it('gets all expected callbacks by time request finishes', function () {

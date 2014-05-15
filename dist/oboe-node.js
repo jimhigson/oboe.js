@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.3-2-g6701f15
+   // v1.14.4-17-gea92b18
 
 /*
 
@@ -552,7 +552,7 @@ function clarinet(eventBus) {
   ,   stringTokenPattern = /[\\"\n]/g
   ,   _n = 0
   
-      // states`
+      // states
   ,   BEGIN                = _n++
   ,   VALUE                = _n++ // general stuff
   ,   OPEN_OBJECT          = _n++ // {

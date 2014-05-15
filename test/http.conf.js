@@ -18,6 +18,7 @@ module.exports = function(config) {
       ,  'src/functional.js'                  
       ,  'src/util.js'
       ,  'src/parseResponseHeaders.browser.js'           
+      ,  'src/detectCrossOrigin.browser.js'      
       ,  'src/streamingHttp.browser.js'      
       
             

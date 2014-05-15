@@ -14,6 +14,7 @@ module.exports = function (grunt) {
    ,  'src/libs/clarinet.js'               
    ,  'src/ascentManager.js'
    ,  'src/parseResponseHeaders.browser.js'
+   ,  'src/detectCrossOrigin.browser.js'
    ,  'src/streamingHttp.browser.js'
    ,  'src/jsonPathSyntax.js'
    ,  'src/ascent.js'            
