@@ -123,7 +123,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
       
-      if( !isCrossOrigin(url) ) {
+      if( !isCrossOrigin(window.location, parseUrlOrigin(url)) ) {
          xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       }
 
