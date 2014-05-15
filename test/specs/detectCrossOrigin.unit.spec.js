@@ -166,22 +166,30 @@ describe("url handling", function() {
 
    ,  'http://www.current-site.co.uk:80/foo': {
          'http://www.current-site.co.uk/foo': false,
-         'http://www.current-site.co.uk:80/foo': false
+         'http://www.current-site.co.uk:80/foo': false,
+         '//www.current-site.co.uk/foo': false,
+         '//www.current-site.co.uk:80/foo': false         
       }
 
    ,  'http://www.current-site.co.uk/foo': {
          'http://www.current-site.co.uk:80/foo': false,
-         'http://www.current-site.co.uk/foo': false
+         'http://www.current-site.co.uk/foo': false,
+         '//www.current-site.co.uk:80/foo': false,
+         '//www.current-site.co.uk/foo': false         
       }
 
    ,  'https://www.current-site.co.uk:443/foo': {
          'https://www.current-site.co.uk/foo': false,
-         'https://www.current-site.co.uk:443/foo': false
+         'https://www.current-site.co.uk:443/foo': false,
+         '//www.current-site.co.uk/foo': false,
+         '//www.current-site.co.uk:443/foo': false         
       }
 
    ,  'https://www.current-site.co.uk/foo': {
          'https://www.current-site.co.uk:443/foo': false,
-         'https://www.current-site.co.uk/foo': false
+         'https://www.current-site.co.uk/foo': false,
+         '//www.current-site.co.uk:443/foo': false,
+         '//www.current-site.co.uk/foo': false
       }      
    };
    
@@ -206,7 +214,7 @@ describe("url handling", function() {
                      } else {
                         expect(ajaxUrl).not.toBeCrossOriginOnPage(currentPage);
                      }
-
+ 
                   }.bind(this, currentPage, ajaxUrl, expectToBeCrossOrigin)
                );
             }
