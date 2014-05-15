@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-13-gc97c46b
+   // v1.14.3-3-g7024874
 
 /*
 
@@ -656,18 +656,20 @@ function clarinet(eventBus) {
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;
@@ -1046,6 +1048,73 @@ function parseResponseHeaders(headerStr) {
    
    return headers;
 }
+
+/**
+ * Detect if a given URL is cross-origin in the scope of the
+ * current page.
+ * 
+ * Browser only (since cross-origin has no meaning in Node.js)
+ *
+ * @param {Object} pageLocation - as in window.location
+ * @param {Object} ajaxHost - an object like window.location describing the 
+ *    origin of the url that we want to ajax in
+ */
+function isCrossOrigin(pageLocation, ajaxHost) {
+
+   /*
+    * NB: defaultPort only knows http and https.
+    * Returns undefined otherwise.
+    */
+   function defaultPort(protocol) {
+      return {'http:':80, 'https:':443}[protocol];
+   }
+   
+   function portOf(location) {
+      // pageLocation should always have a protocol. ajaxHost if no port or
+      // protocol is specified, should use the port of the containing page
+      
+      return location.port || defaultPort(location.protocol||pageLocation.protocol);
+   }
+
+   // if ajaxHost doesn't give a domain, port is the same as pageLocation
+   // it can't give a protocol but not a domain
+   // it can't give a port but not a domain
+   
+   return !!(  (ajaxHost.protocol  && (ajaxHost.protocol  != pageLocation.protocol)) ||
+               (ajaxHost.host      && (ajaxHost.host      != pageLocation.host))     ||
+               (ajaxHost.host      && (portOf(ajaxHost) != portOf(pageLocation)))
+          );
+}
+
+/* turn any url into an object like window.location */
+function parseUrlOrigin(url) {
+   // url could be domain-relative
+   // url could give a domain
+
+   // cross origin means:
+   //    same domain
+   //    same port
+   //    some protocol
+   // so, same everything up to the first (single) slash 
+   // if such is given
+   //
+   // can ignore everything after that   
+   
+   var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
+
+         // if no match, use an empty array so that
+         // subexpressions 1,2,3 are all undefined
+         // and will ultimately return all empty
+         // strings as the parse result:
+       urlHostMatch = URL_HOST_PATTERN.exec(url) || [];
+   
+   return {
+      protocol:   urlHostMatch[1] || '',
+      host:       urlHostMatch[2] || '',
+      port:       urlHostMatch[3] || ''
+   };
+}
+
 function httpTransport(){
    return new XMLHttpRequest();
 }
@@ -1162,7 +1231,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
             }
       }
    };
-
+   
    try{
    
       xhr.open(method, url, true);
@@ -1170,7 +1239,10 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      
+      if( !isCrossOrigin(window.location, parseUrlOrigin(url)) ) {
+         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      }
 
       xhr.withCredentials = withCredentials;
       
@@ -1178,6 +1250,8 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       
    } catch( e ) {
 
+      console.log('error making request', e);
+      
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
       // event rather than as an exception. If we emitted now, the Oboe user

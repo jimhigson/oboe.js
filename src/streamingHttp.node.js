@@ -79,8 +79,8 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
       
       return client.request({
          hostname: parsedUrl.hostname,
-         port: parsedUrl.port,
-         path: parsedUrl.pathname,
+         port: parsedUrl.port, 
+         path: parsedUrl.path,
          method: method,
          headers: headers
       });

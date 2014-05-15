@@ -104,6 +104,32 @@
                expect( req.root().cookie ).toMatch('oboeIntegrationSend=123');
             })
          });
+
+         it('adds X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: testUrl('echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toEqual('XMLHttpRequest');
+            })
+         });         
+         
+         it('does not add X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toBeUndefined();
+            })
+         });         
       });
    
       it('gets all expected callbacks by time request finishes', function () {
@@ -238,7 +264,22 @@
          
             expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
          });
-      })   
+      })
+
+      it('can send query params', function () {
+
+         var apiKeyCallback = jasmine.createSpy();
+         
+         oboe(testUrl('echoBackQueryParamsAsBodyJson?apiKey=123'))
+            .node('apiKey', apiKeyCallback)
+            .done(whenDoneFn);
+
+         waitsFor(doneCalled, ASYNC_TEST_TIMEOUT);
+
+         runs(function () {
+            expect(apiKeyCallback.mostRecentCall.args[0]).toBe('123');
+         });
+      })      
    
       it('can abort once some data has been found in not very streamed response', function () {
    

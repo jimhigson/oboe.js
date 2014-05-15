@@ -23,6 +23,10 @@ function startServer( port, grunt, client ) {
    function echoBackHeadersAsBodyJson(req, res) {
       res.end(JSON.stringify(req.headers));
    }
+
+   function echoBackQueryParamsAsBodyJson(req, res) {
+      res.end(JSON.stringify(req.query));
+   }
    
    function echoBackHeadersAsHeaders(req, res) {
       for( var name in req.headers ) {
@@ -178,22 +182,23 @@ function startServer( port, grunt, client ) {
          credentials: true // accept cookies from cross-domain requests
       })); // enable cross-domain for all resources
       app.use(app.router);
-      
-      app.get(    '/echoBackBody',              function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
-      app.post(   '/echoBackBody',              echoBackBody);
-      app.put(    '/echoBackBody',              echoBackBody);
-      app.patch(  '/echoBackBody',              echoBackBody);
-      app.get(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
-      app.post(   '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
-      app.put(    '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
-      app.patch(  '/echoBackHeadersAsBodyJson', echoBackHeadersAsBodyJson);
-      app.get(    '/echoBackHeadersAsHeaders',  echoBackHeadersAsHeaders);      
-      app.get(    '/static/json/:name.json',    replyWithStaticJson);
-      app.get(    '/tenSlowNumbers',            replyWithTenSlowNumbers);
-      app.get(    '/twoHundredItems',           twoHundredItems);
-      app.get(    '/gzippedTwoHundredItems',    replyWithTenSlowNumbersGzipped);
-      app.get(    '/invalidJson',               replyWithInvalidJson);
-      app.get(    '/404json',                   serve404Json);
+
+      app.get(    '/echoBackBody',                  function(req, res){ res.end("POST/PUT/PATCH here, don't GET")});
+      app.post(   '/echoBackBody',                  echoBackBody);
+      app.put(    '/echoBackBody',                  echoBackBody);
+      app.patch(  '/echoBackBody',                  echoBackBody);
+      app.get(    '/echoBackHeadersAsBodyJson',     echoBackHeadersAsBodyJson);
+      app.post(   '/echoBackHeadersAsBodyJson',     echoBackHeadersAsBodyJson);
+      app.put(    '/echoBackHeadersAsBodyJson',     echoBackHeadersAsBodyJson);
+      app.patch(  '/echoBackHeadersAsBodyJson',     echoBackHeadersAsBodyJson);
+      app.get(    '/echoBackQueryParamsAsBodyJson', echoBackQueryParamsAsBodyJson);
+      app.get(    '/echoBackHeadersAsHeaders',      echoBackHeadersAsHeaders);      
+      app.get(    '/static/json/:name.json',        replyWithStaticJson);
+      app.get(    '/tenSlowNumbers',                replyWithTenSlowNumbers);
+      app.get(    '/twoHundredItems',               twoHundredItems);
+      app.get(    '/gzippedTwoHundredItems',        replyWithTenSlowNumbersGzipped);
+      app.get(    '/invalidJson',                   replyWithInvalidJson);
+      app.get(    '/404json',                       serve404Json);
 
       return app;
    }
