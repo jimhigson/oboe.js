@@ -1,26 +1,4 @@
-function httpTransport(protocol){
-
-   /**
-    * Return either the http or https client depending on the
-    * protocol, given as a string.
-    * 
-    * @param protocol {String} either 'http:' or 'https:', as is returned
-    *    by url.parse()
-    * @return {require('http')|require('https')}
-    */
-   return function(protocol) {
-      switch(protocol) {
-         case 'http:':
-            return require('http');
-         case 'https:':
-            return require('https');
-         default:
-            throw Error('protocol "' + protocol + '" not supported.' +
-               'Use BYO stream mode instead by calling like:' +
-               'oboe(ReadableStream)');
-      }
-   }
-}
+var httpTransport = functor(require('http-https'));
 
 /**
  * A wrapper around the browser XmlHttpRequest object that raises an 
@@ -74,10 +52,9 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
    
    function openUrlAsStream( url ) {
       
-      var parsedUrl = require('url').parse(url),
-          client = transport( parsedUrl.protocol );
-      
-      return client.request({
+      var parsedUrl = require('url').parse(url);
+           
+      return transport.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
          path: parsedUrl.path,

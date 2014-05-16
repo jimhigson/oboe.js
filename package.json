@@ -58,7 +58,9 @@
     "express": "~3.4.3",
     "cors": "~2.1.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "http-https": "^1.0.0"
+  },
   "jam": {
     "main": "dist/oboe-browser.js",
     "include": [
