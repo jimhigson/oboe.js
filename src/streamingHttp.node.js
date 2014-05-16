@@ -72,11 +72,11 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
       
       req.on('response', function(res){
          var statusCode = res.statusCode,
-             sucessful = String(statusCode)[0] == 2;
+             successful = String(statusCode)[0] == 2;
                                                    
          oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
                                 
-         if( sucessful ) {          
+         if( successful ) {          
                
             readStreamToEventBus(res)
             
