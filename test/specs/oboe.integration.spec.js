@@ -58,16 +58,23 @@
          });
 
          it('can read from https', function() {
+            
+            // rather than set up a https server in the tests
+            // let's just use npm since this is an integration test
+            // by confirming the Oboe.js homepage...
+
             oboe({
-               url: 'https://localhost:7654/echoBackHeadersAsBodyJson',
-               headers:{'Content-Type':'test/oboe'}
-            }).on('node:content-type', callbackSpy)
-              .done(whenDoneFn);
+               url: 'https://registry.npmjs.org/oboe'
+            })
+               .node('!.homepage', callbackSpy)
+               .done(whenDoneFn);
+
 
             waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
 
             runs(function () {
-               expect(callbackSpy).toHaveBeenCalledWith('test/oboe');
+               var oboeHomepage = 'http://oboejs.com';
+               expect(callbackSpy.mostRecentCall.args[0]).toEqual(oboeHomepage);
             });            
 
          });

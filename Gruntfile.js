@@ -2,8 +2,7 @@ module.exports = function (grunt) {
 
    var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
 
-   var STREAM_SOURCE_PORT_HTTP = 4567,
-       STREAM_SOURCE_PORT_HTTPS = 7654;
+   var STREAM_SOURCE_PORT_HTTP = 4567;
 
    // NB: source files are order sensitive
    var OBOE_BROWSER_SOURCE_FILES = [
@@ -259,10 +258,7 @@ module.exports = function (grunt) {
       }
          
       streamSource = require('./test/streamsource.js');
-      streamSource.start(
-         STREAM_SOURCE_PORT_HTTP, 
-         STREAM_SOURCE_PORT_HTTPS, 
-         grunt);
+      streamSource.start(STREAM_SOURCE_PORT_HTTP, grunt);
    });
 
    grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {

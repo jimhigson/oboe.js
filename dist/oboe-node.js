@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.3-3-g7024874
+   // v1.14.5-5-gd6558bc
 
 /*
 
@@ -1023,29 +1023,7 @@ function ascentManager(oboeBus, handlers){
    });   
 }
 
-function httpTransport(protocol){
-
-   /**
-    * Return either the http or https client depending on the
-    * protocol, given as a string.
-    * 
-    * @param protocol {String} either 'http:' or 'https:', as is returned
-    *    by url.parse()
-    * @return {require('http')|require('https')}
-    */
-   return function(protocol) {
-      switch(protocol) {
-         case 'http:':
-            return require('http');
-         case 'https:':
-            return require('https');
-         default:
-            throw Error('protocol "' + protocol + '" not supported.' +
-               'Use BYO stream mode instead by calling like:' +
-               'oboe(ReadableStream)');
-      }
-   }
-}
+var httpTransport = functor(require('http-https'));
 
 /**
  * A wrapper around the browser XmlHttpRequest object that raises an 
@@ -1099,10 +1077,9 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
    
    function openUrlAsStream( url ) {
       
-      var parsedUrl = require('url').parse(url),
-          client = transport( parsedUrl.protocol );
-      
-      return client.request({
+      var parsedUrl = require('url').parse(url);
+           
+      return transport.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
          path: parsedUrl.path,
@@ -1120,11 +1097,11 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
       
       req.on('response', function(res){
          var statusCode = res.statusCode,
-             sucessful = String(statusCode)[0] == 2;
+             successful = String(statusCode)[0] == 2;
                                                    
          oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
                                 
-         if( sucessful ) {          
+         if( successful ) {          
                
             readStreamToEventBus(res)
             

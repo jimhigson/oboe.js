@@ -14,7 +14,6 @@ var express = require('express'),
     cors = require('cors'),
     fs = require('fs'),
     http = require('http'),
-    https = require('https'),
 
     JSON_MIME_TYPE = "application/octet-stream";
 
@@ -213,28 +212,20 @@ function makeExpressApp(grunt) {
 
 function exportApi(){
 
-   var httpServer, httpsServer;
+   var httpServer;
 
-   module.exports.start = function(httpPort, httpsPort, grunt){
+   module.exports.start = function(httpPort, grunt){
       
-      // create the same server on http and https:
-      var expressApp = makeExpressApp(grunt),
-          httpsOptions = {
-             key:  fs.readFileSync('test/keys/localhost_7654.key'),
-             cert: fs.readFileSync('test/keys/localhost_7654.cert')
-          };
+      var expressApp = makeExpressApp(grunt);
 
       httpServer = http.createServer(expressApp).listen(httpPort);
-      httpsServer = https.createServer(httpsOptions, expressApp).listen(httpsPort);
 
       grunt.verbose.ok('streaming source server started on ports'.green, 
-         String(httpPort).blue,
-         String(httpsPort).blue
+         String(httpPort).blue
       );
    };   
    module.exports.stop = function(){
       httpServer.close();
-      httpsServer.close();
    };
 }
 
