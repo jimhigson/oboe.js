@@ -66,8 +66,8 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
    function fetchUrl() {
       if( !contentSource.match(/https?:\/\//) ) {
          throw new Error(
-            'Supported protocols when passing a URL into Oboe are http and https ' +
-            'if you wish to use another protocol, please pass a ReadableStream ' +
+            'Supported protocols when passing a URL into Oboe are http and https. ' +
+            'If you wish to use another protocol, please pass a ReadableStream ' +
             '(http://nodejs.org/api/stream.html#stream_class_stream_readable) like ' + 
             'oboe(fs.createReadStream("my_file")). I was given the URL: ' +
             contentSource
