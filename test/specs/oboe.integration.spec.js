@@ -78,6 +78,21 @@
             });            
 
          });
+
+         it('complains if given a non-http(s) url but is happy otherwise', function() {
+
+            expect(function() {
+               oboe('ftp://ftp.mozilla.org/pub/mozilla.org/')
+            }).toThrow();
+            
+            expect(function() {
+               oboe('http://registry.npmjs.org/oboe')
+            }).not.toThrow();
+
+            expect(function() {
+               oboe('https://registry.npmjs.org/oboe')
+            }).not.toThrow();
+         });
       
       });
 

@@ -10,7 +10,7 @@
         
       function url( path ){
          if( Platform.isNode ) {
-            return 'localhost:4567/' + path;
+            return 'http://localhost:4567/' + path;
          } else {
             return '/testServer/' + path;
          }
