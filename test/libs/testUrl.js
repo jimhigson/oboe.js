@@ -1,8 +1,9 @@
 (function(Platform) {
 
    if( Platform.isNode ) {
-      module.exports = function testUrl( path ){
-         return 'localhost:4567/' + path;
+      module.exports = function testUrl( path, https ){
+         
+         return 'http://localhost:4567/' + path;
       };
    } else {
       window.testUrl = function( path ){

@@ -131,18 +131,20 @@ function clarinet(eventBus) {
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;

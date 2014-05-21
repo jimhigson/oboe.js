@@ -3,7 +3,7 @@
 
 module.exports = (function _oboeWrapper () {
    
-   // v1.14.2-86-g5351c1e
+   // v1.14.3-84-ge5e3a2a
 
 /*
 
@@ -649,24 +649,28 @@ function clarinet(eventBus) {
    
   function write (chunk) {
          
+    eventBus('parsing').emit(chunk);  
+     
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;
@@ -1021,9 +1025,7 @@ function ascentManager(oboeBus, handlers){
    });   
 }
 
-function httpTransport(){
-   return require('http');
-}
+var httpTransport = functor(require('http-https'));
 
 /**
  * A wrapper around the browser XmlHttpRequest object that raises an 
@@ -1034,7 +1036,7 @@ function httpTransport(){
  * should be raised, allowing progressive interpretation of the response.
  *      
  * @param {Function} oboeBus an event bus local to this Oboe instance
- * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
+ * @param {XMLHttpRequest} transport the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          and therefore be Node's http
  *          but for tests a stub may be provided instead.
@@ -1044,7 +1046,7 @@ function httpTransport(){
  *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
+function streamingHttp(oboeBus, transport, method, contentSource, data, headers) {
    "use strict";
 
    function readStreamToEventBus(readableStream) {
@@ -1075,28 +1077,39 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       });
    }
    
-   function fetchHttpUrl( url ) {
-      if( !contentSource.match(/http:\/\//) ) {
-         contentSource = 'http://' + contentSource;
-      }                           
-                           
-      var parsedUrl = require('url').parse(contentSource); 
-   
-      var req = http.request({
+   function openUrlAsStream( url ) {
+      
+      var parsedUrl = require('url').parse(url);
+           
+      return transport.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
-         path: parsedUrl.pathname,
+         path: parsedUrl.path,
          method: method,
-         headers: headers 
+         headers: headers
       });
+   }
+   
+   function fetchUrl() {
+      if( !contentSource.match(/https?:\/\//) ) {
+         throw new Error(
+            'Supported protocols when passing a URL into Oboe are http and https. ' +
+            'If you wish to use another protocol, please pass a ReadableStream ' +
+            '(http://nodejs.org/api/stream.html#stream_class_stream_readable) like ' + 
+            'oboe(fs.createReadStream("my_file")). I was given the URL: ' +
+            contentSource
+         );
+      }
+      
+      var req = openUrlAsStream(contentSource);
       
       req.on('response', function(res){
          var statusCode = res.statusCode,
-             sucessful = String(statusCode)[0] == 2;
+             successful = String(statusCode)[0] == 2;
                                                    
          oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
                                 
-         if( sucessful ) {          
+         if( successful ) {          
                
             readStreamToEventBus(res)
             
@@ -1127,7 +1140,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
    }
    
    if( isString(contentSource) ) {
-      fetchHttpUrl(contentSource);
+      fetchUrl(contentSource);
    } else {
       // contentsource is a stream
       readStreamToEventBus(contentSource);   
@@ -1975,7 +1988,7 @@ var // the events which are never exported are kept as
     HTTP_START      = 'start',
     STREAM_DATA     = 'data',
     STREAM_END      = 'end',
-    ABORTING        = _S++,
+    ABORTING        = 'aborting',
 
     // SAX events butchered from Clarinet
     SAX_VALUE        = 'SAX_VALUE',
@@ -2350,20 +2363,25 @@ var interDimensionalPortal = (function(){
 
          eventEmitter.on(eventName, function(value){
 
-            /*
             if(typeof console != 'undefined'){
                console.log(
                   (thread ? 'parent' : 'child') +
                   ' forwarding via portal "' + eventName + '"' +
                      (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
             }
-            */
 
-            if( thread ){
-               thread.postMessage([eventName, value]);
-            } else {
-               postMessage([eventName, value]);
-            }
+               if( thread ){
+//                try{
+                  thread.postMessage([eventName, value]);
+/*                } catch(e) {
+                     throw new Error(  'Could not forward' + eventName + 'to thread' + thread +
+                                       'with value' + value + ':' + e.message );
+                  }*/
+               } else {
+                  // this should never fail because there should always be a parent
+                  // thread - it shouldn't be able to die
+                  postMessage([eventName, value]);
+               }
          });
       });
    }
@@ -2433,28 +2451,55 @@ var interDimensionalPortal = (function(){
          );
    }
 
-   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
-      var blobUrl = URL.createObjectURL(
-         new Blob(
-            codeForChildThread(childLibs, childServer, eventTypesChildProduces)
-         ,  {type:'text/javascript'}
-         )
-      );
       
-      return varArgs( function(parentSideBus, childServerArgs){
-         var worker = new Worker(blobUrl);
+   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
+      
+      if( interDimensionalPortal.thread() ) {
+      
+         var blobUrl = URL.createObjectURL(
+            new Blob(
+               codeForChildThread(childLibs, childServer, eventTypesChildProduces)
+            ,  {type:'text/javascript'}
+            )
+         );
+               
+         return varArgs( function(parentSideBus, childServerArgs){
             
-         //console.log('created blob and worker');
-         worker.postMessage(childServerArgs);
-         //console.log('sent first message to worker');
-         
-         forward(parentSideBus, eventTypesChildConsumes, worker);
-         receive(parentSideBus, worker);
-      });
-   }
+            console.log('-----------creating new worker---------');
+            
+            var worker = new Worker(blobUrl);
+               
+            worker.postMessage(childServerArgs);
+            //console.log('sent first message to worker');
+            
+            forward(parentSideBus, eventTypesChildConsumes, worker);
+            receive(parentSideBus, worker);
+            
+            return worker;
+         });
+
+      } else {
+
+         return function(_childLibs, childServer, _eventTypesChildConsumes, _eventTypesChildProduces){
+
+            return function(/*parentSideBus, childArg1, childArg2, childArg3 ... */){
+
+               childServer.apply( null, arguments );
+
+               return {
+                  terminate: noop
+               }
+            };
+         };
+      }
+   };
 
 }());
+
+interDimensionalPortal.thread = function(){
+   return true;
+};
 
 
 function workerEnv(){
@@ -2487,7 +2532,17 @@ var wire = (function(){
             );
          }
 
-         clarinet(childThreadBus);
+         // this event can come from either an external source or the streaming
+         // http we just created
+         childThreadBus(STREAM_END).on(function(){
+ 
+            // TODO: event is for debugging only, can be removed later
+            childThreadBus.emit('closing', 'after stream_end event, will close down the thread');
+            //https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers#Terminating_a_worker            
+            close(); // TODO: protect from doing this if not in a thread
+         });
+
+         clarinet(childThreadBus);         
       },
 
       [  // the fetcher/parser needs to know if the request is aborted:
@@ -2497,9 +2552,10 @@ var wire = (function(){
          // it needs to be able to send this data to the parser.
       ,  STREAM_DATA       , STREAM_END
       ],
- 
+
       // events to get back from the worker
-      [  SAX_KEY           , SAX_VALUE
+      [  'parsing', 'closing'
+      ,  SAX_KEY           , SAX_VALUE
       ,  SAX_OPEN_OBJECT   , SAX_CLOSE_OBJECT
       ,  SAX_OPEN_ARRAY    , SAX_CLOSE_ARRAY
       ,  FAIL_EVENT

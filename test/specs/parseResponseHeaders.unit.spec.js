@@ -23,7 +23,23 @@ describe("parsing response headers", function() {
       var parsed = parseResponseHeaders('x-title: Episode 2: Another episode');
       
       expect(parsed).toEqual({'x-title':'Episode 2: Another episode'})
-   });      
+   });
+
+   it('can parse a value containing lots of colons ": "', function(){
+
+      var parsed = parseResponseHeaders('x-title: Episode 2: Another episode: Remastered');
+
+      expect(parsed).toEqual({'x-title':'Episode 2: Another episode: Remastered'})
+   });
+
+   it('can parse two values containing lots of colons ": "', function(){
+
+      var parsed = parseResponseHeaders('x-title: Episode 2: Another episode: Remastered'  + lfcr + 
+                                        'x-subtitle: This file has: a long title' );
+
+      expect(parsed).toEqual({'x-title':'Episode 2: Another episode: Remastered',
+                              'x-subtitle': 'This file has: a long title'})
+   });   
    
    it('can parse several headers', function(){
       

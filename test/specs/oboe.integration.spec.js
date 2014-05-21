@@ -41,7 +41,7 @@
      
                expect( callbackSpy.calls.length ).toBe(10);   
             });      
-         })
+         });
          
          it('can read from a local file', function() {
                
@@ -55,7 +55,44 @@
      
                expect( callbackSpy.calls.length ).toBe(10);   
             });      
-         })      
+         });
+
+         it('can read from https', function() {
+            
+            // rather than set up a https server in the tests
+            // let's just use npm since this is an integration test
+            // by confirming the Oboe.js homepage...
+
+            oboe({
+               url: 'https://registry.npmjs.org/oboe'
+            })
+               .node('!.homepage', callbackSpy)
+               .done(whenDoneFn);
+
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+               var oboeHomepage = 'http://oboejs.com';
+               expect(callbackSpy.mostRecentCall.args[0]).toEqual(oboeHomepage);
+            });            
+
+         });
+
+         it('complains if given a non-http(s) url but is happy otherwise', function() {
+
+            expect(function() {
+               oboe('ftp://ftp.mozilla.org/pub/mozilla.org/')
+            }).toThrow();
+            
+            expect(function() {
+               oboe('http://registry.npmjs.org/oboe')
+            }).not.toThrow();
+
+            expect(function() {
+               oboe('https://registry.npmjs.org/oboe')
+            }).not.toThrow();
+         });
       
       });
 
@@ -89,6 +126,32 @@
                expect( req.root().cookie ).toMatch('oboeIntegrationSend=123');
             })
          });
+
+         it('adds X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: testUrl('echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toEqual('XMLHttpRequest');
+            })
+         });         
+         
+         it('does not add X-Requested-With to cross-domain by default on cross-domain', function () {
+
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson')
+            }).done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function(){
+               expect( req.root()['x-requested-with'] ).toBeUndefined();
+            })
+         });         
       });
    
       it('gets all expected callbacks by time request finishes', function () {
@@ -223,7 +286,22 @@
          
             expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
          });
-      })   
+      })
+
+      it('can send query params', function () {
+
+         var apiKeyCallback = jasmine.createSpy();
+         
+         oboe(testUrl('echoBackQueryParamsAsBodyJson?apiKey=123'))
+            .node('apiKey', apiKeyCallback)
+            .done(whenDoneFn);
+
+         waitsFor(doneCalled, ASYNC_TEST_TIMEOUT);
+
+         runs(function () {
+            expect(apiKeyCallback.mostRecentCall.args[0]).toBe('123');
+         });
+      })      
    
       it('can abort once some data has been found in not very streamed response', function () {
    

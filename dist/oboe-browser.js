@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.2-86-g5351c1e
+   // v1.14.3-84-ge5e3a2a
 
 /*
 
@@ -650,24 +650,28 @@ function clarinet(eventBus) {
    
   function write (chunk) {
          
+    eventBus('parsing').emit(chunk);  
+     
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
     // not continue with the parse.
     if (latestError)
       return;
       
-    if (closed) return emitError("Cannot write after close");
+    if (closed) {
+       return emitError("Cannot write after close");
+    }
 
     var i = 0;
     c = chunk[0]; 
 
     while (c) {
       p = c;
-      c = chunk.charAt(i++);
+      c = chunk[i++];
       if(!c) break;
 
       position ++;
-      if (c === "\n") {
+      if (c == "\n") {
         line ++;
         column = 0;
       } else column ++;
@@ -1046,6 +1050,73 @@ function parseResponseHeaders(headerStr) {
    
    return headers;
 }
+
+/**
+ * Detect if a given URL is cross-origin in the scope of the
+ * current page.
+ * 
+ * Browser only (since cross-origin has no meaning in Node.js)
+ *
+ * @param {Object} pageLocation - as in window.location
+ * @param {Object} ajaxHost - an object like window.location describing the 
+ *    origin of the url that we want to ajax in
+ */
+function isCrossOrigin(pageLocation, ajaxHost) {
+
+   /*
+    * NB: defaultPort only knows http and https.
+    * Returns undefined otherwise.
+    */
+   function defaultPort(protocol) {
+      return {'http:':80, 'https:':443}[protocol];
+   }
+   
+   function portOf(location) {
+      // pageLocation should always have a protocol. ajaxHost if no port or
+      // protocol is specified, should use the port of the containing page
+      
+      return location.port || defaultPort(location.protocol||pageLocation.protocol);
+   }
+
+   // if ajaxHost doesn't give a domain, port is the same as pageLocation
+   // it can't give a protocol but not a domain
+   // it can't give a port but not a domain
+   
+   return !!(  (ajaxHost.protocol  && (ajaxHost.protocol  != pageLocation.protocol)) ||
+               (ajaxHost.host      && (ajaxHost.host      != pageLocation.host))     ||
+               (ajaxHost.host      && (portOf(ajaxHost) != portOf(pageLocation)))
+          );
+}
+
+/* turn any url into an object like window.location */
+function parseUrlOrigin(url) {
+   // url could be domain-relative
+   // url could give a domain
+
+   // cross origin means:
+   //    same domain
+   //    same port
+   //    some protocol
+   // so, same everything up to the first (single) slash 
+   // if such is given
+   //
+   // can ignore everything after that   
+   
+   var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
+
+         // if no match, use an empty array so that
+         // subexpressions 1,2,3 are all undefined
+         // and will ultimately return all empty
+         // strings as the parse result:
+       urlHostMatch = URL_HOST_PATTERN.exec(url) || [];
+   
+   return {
+      protocol:   urlHostMatch[1] || '',
+      host:       urlHostMatch[2] || '',
+      port:       urlHostMatch[3] || ''
+   };
+}
+
 function httpTransport(){
    return new XMLHttpRequest();
 }
@@ -1162,7 +1233,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
             }
       }
    };
-
+   
    try{
    
       xhr.open(method, url, true);
@@ -1170,7 +1241,10 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       for( var headerName in headers ){
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      
+      if( !isCrossOrigin(window.location, parseUrlOrigin(url)) ) {
+         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      }
 
       xhr.withCredentials = withCredentials;
       
@@ -1178,6 +1252,8 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       
    } catch( e ) {
 
+      console.log('error making request', e);
+      
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
       // event rather than as an exception. If we emitted now, the Oboe user
@@ -2031,7 +2107,7 @@ var // the events which are never exported are kept as
     HTTP_START      = 'start',
     STREAM_DATA     = 'data',
     STREAM_END      = 'end',
-    ABORTING        = _S++,
+    ABORTING        = 'aborting',
 
     // SAX events butchered from Clarinet
     SAX_VALUE        = 'SAX_VALUE',
@@ -2406,20 +2482,25 @@ var interDimensionalPortal = (function(){
 
          eventEmitter.on(eventName, function(value){
 
-            /*
             if(typeof console != 'undefined'){
                console.log(
                   (thread ? 'parent' : 'child') +
                   ' forwarding via portal "' + eventName + '"' +
                      (value ? ' = ' + JSON.stringify(value) : ' (no value)'));
             }
-            */
 
-            if( thread ){
-               thread.postMessage([eventName, value]);
-            } else {
-               postMessage([eventName, value]);
-            }
+               if( thread ){
+//                try{
+                  thread.postMessage([eventName, value]);
+/*                } catch(e) {
+                     throw new Error(  'Could not forward' + eventName + 'to thread' + thread +
+                                       'with value' + value + ':' + e.message );
+                  }*/
+               } else {
+                  // this should never fail because there should always be a parent
+                  // thread - it shouldn't be able to die
+                  postMessage([eventName, value]);
+               }
          });
       });
    }
@@ -2489,28 +2570,55 @@ var interDimensionalPortal = (function(){
          );
    }
 
-   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
 
-      var blobUrl = URL.createObjectURL(
-         new Blob(
-            codeForChildThread(childLibs, childServer, eventTypesChildProduces)
-         ,  {type:'text/javascript'}
-         )
-      );
       
-      return varArgs( function(parentSideBus, childServerArgs){
-         var worker = new Worker(blobUrl);
+   return function (childLibs, childServer, eventTypesChildConsumes, eventTypesChildProduces){
+      
+      if( interDimensionalPortal.thread() ) {
+      
+         var blobUrl = URL.createObjectURL(
+            new Blob(
+               codeForChildThread(childLibs, childServer, eventTypesChildProduces)
+            ,  {type:'text/javascript'}
+            )
+         );
+               
+         return varArgs( function(parentSideBus, childServerArgs){
             
-         //console.log('created blob and worker');
-         worker.postMessage(childServerArgs);
-         //console.log('sent first message to worker');
-         
-         forward(parentSideBus, eventTypesChildConsumes, worker);
-         receive(parentSideBus, worker);
-      });
-   }
+            console.log('-----------creating new worker---------');
+            
+            var worker = new Worker(blobUrl);
+               
+            worker.postMessage(childServerArgs);
+            //console.log('sent first message to worker');
+            
+            forward(parentSideBus, eventTypesChildConsumes, worker);
+            receive(parentSideBus, worker);
+            
+            return worker;
+         });
+
+      } else {
+
+         return function(_childLibs, childServer, _eventTypesChildConsumes, _eventTypesChildProduces){
+
+            return function(/*parentSideBus, childArg1, childArg2, childArg3 ... */){
+
+               childServer.apply( null, arguments );
+
+               return {
+                  terminate: noop
+               }
+            };
+         };
+      }
+   };
 
 }());
+
+interDimensionalPortal.thread = function(){
+   return true;
+};
 
 
 function workerEnv(){
@@ -2543,7 +2651,17 @@ var wire = (function(){
             );
          }
 
-         clarinet(childThreadBus);
+         // this event can come from either an external source or the streaming
+         // http we just created
+         childThreadBus(STREAM_END).on(function(){
+ 
+            // TODO: event is for debugging only, can be removed later
+            childThreadBus.emit('closing', 'after stream_end event, will close down the thread');
+            //https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers#Terminating_a_worker            
+            close(); // TODO: protect from doing this if not in a thread
+         });
+
+         clarinet(childThreadBus);         
       },
 
       [  // the fetcher/parser needs to know if the request is aborted:
@@ -2553,9 +2671,10 @@ var wire = (function(){
          // it needs to be able to send this data to the parser.
       ,  STREAM_DATA       , STREAM_END
       ],
- 
+
       // events to get back from the worker
-      [  SAX_KEY           , SAX_VALUE
+      [  'parsing', 'closing'
+      ,  SAX_KEY           , SAX_VALUE
       ,  SAX_OPEN_OBJECT   , SAX_CLOSE_OBJECT
       ,  SAX_OPEN_ARRAY    , SAX_CLOSE_ARRAY
       ,  FAIL_EVENT

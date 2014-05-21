@@ -1,6 +1,4 @@
-function httpTransport(){
-   return require('http');
-}
+var httpTransport = functor(require('http-https'));
 
 /**
  * A wrapper around the browser XmlHttpRequest object that raises an 
@@ -11,7 +9,7 @@ function httpTransport(){
  * should be raised, allowing progressive interpretation of the response.
  *      
  * @param {Function} oboeBus an event bus local to this Oboe instance
- * @param {XMLHttpRequest} http the http implementation to use as the transport. Under normal
+ * @param {XMLHttpRequest} transport the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
  *          and therefore be Node's http
  *          but for tests a stub may be provided instead.
@@ -21,7 +19,7 @@ function httpTransport(){
  *                      Only valid if method is POST or PUT.
  * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
+function streamingHttp(oboeBus, transport, method, contentSource, data, headers) {
    "use strict";
 
    function readStreamToEventBus(readableStream) {
@@ -52,28 +50,39 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
       });
    }
    
-   function fetchHttpUrl( url ) {
-      if( !contentSource.match(/http:\/\//) ) {
-         contentSource = 'http://' + contentSource;
-      }                           
-                           
-      var parsedUrl = require('url').parse(contentSource); 
-   
-      var req = http.request({
+   function openUrlAsStream( url ) {
+      
+      var parsedUrl = require('url').parse(url);
+           
+      return transport.request({
          hostname: parsedUrl.hostname,
          port: parsedUrl.port, 
-         path: parsedUrl.pathname,
+         path: parsedUrl.path,
          method: method,
-         headers: headers 
+         headers: headers
       });
+   }
+   
+   function fetchUrl() {
+      if( !contentSource.match(/https?:\/\//) ) {
+         throw new Error(
+            'Supported protocols when passing a URL into Oboe are http and https. ' +
+            'If you wish to use another protocol, please pass a ReadableStream ' +
+            '(http://nodejs.org/api/stream.html#stream_class_stream_readable) like ' + 
+            'oboe(fs.createReadStream("my_file")). I was given the URL: ' +
+            contentSource
+         );
+      }
+      
+      var req = openUrlAsStream(contentSource);
       
       req.on('response', function(res){
          var statusCode = res.statusCode,
-             sucessful = String(statusCode)[0] == 2;
+             successful = String(statusCode)[0] == 2;
                                                    
          oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
                                 
-         if( sucessful ) {          
+         if( successful ) {          
                
             readStreamToEventBus(res)
             
@@ -104,7 +113,7 @@ function streamingHttp(oboeBus, http, method, contentSource, data, headers) {
    }
    
    if( isString(contentSource) ) {
-      fetchHttpUrl(contentSource);
+      fetchUrl(contentSource);
    } else {
       // contentsource is a stream
       readStreamToEventBus(contentSource);   
