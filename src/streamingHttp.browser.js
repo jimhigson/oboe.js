@@ -18,7 +18,9 @@ function httpTransport(){
  * @param {String} url the url to make a request to
  * @param {String|Null} data some content to be sent with the request.
  *                      Only valid if method is POST or PUT.
- * @param {Object} [headers] the http request headers to send                       
+ * @param {Object} [headers] the http request headers to send
+ * @param {boolean} withCredentials the XHR withCredentials property will be
+ *    set to this value
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials) {
            
