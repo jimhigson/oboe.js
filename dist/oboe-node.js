@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.14.6-6-gb03c75f
+   // v1.14.6-7-g8281cfa
 
 /*
 
@@ -1586,21 +1586,18 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
           // the match has succeeded. Ie, we might write ..foo or !..foo
           // and both should match identically.
           terminalCaseWhenArrivingAtRoot = rootExpr(),
-          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
-          recursiveCase = skip1(skipManyInner),
-          
+          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr,
+          recursiveCase = skip1(function(ascent) {
+             return cases(ascent);
+          }),
+
           cases = lazyUnion(
                      terminalCaseWhenArrivingAtRoot
                   ,  terminalCaseWhenPreviousExpressionIsSatisfied
-                  ,  recursiveCase
-                  );                        
-            
-      function skipManyInner(ascent) {
+                  ,  recursiveCase  
+                  );
       
-         return cases(ascent);
-      }
-      
-      return skipManyInner;
+      return cases;
    }      
    
    /**
