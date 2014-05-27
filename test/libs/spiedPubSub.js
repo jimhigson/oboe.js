@@ -30,17 +30,20 @@ function fakePubSub( eventNames ) {
    var eventsEmitted = [];   
    var eventNamesEmitted = [];
    var eventTypesEmitted = {};
-   var callCount = {};      
+   var callCount = {};
       
    function record(eventName){
       return function() {
+         
+         var args = Array.prototype.slice.apply(arguments);
+         
          eventsEmitted.push({
             type: eventName, 
-            args: arguments
+            args: args
          });
          
          eventNamesEmitted.push(eventName);
-         eventTypesEmitted[eventName].push(arguments);
+         eventTypesEmitted[eventName].push(args);
          callCount[eventName]++;
       }
    }      
@@ -72,11 +75,11 @@ function fakePubSub( eventNames ) {
    
       bus[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, eventTypes[eventName][methodName]);
-      });   
-   })
-      
+      });
+   });
+
    return bus;
-}      
+}
 
 function eventBlackBox( pubsub, eventNames ) {
    
