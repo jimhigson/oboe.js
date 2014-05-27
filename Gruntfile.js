@@ -120,6 +120,17 @@ module.exports = function (grunt) {
             // enable / disable colors in the output (reporters and logs)
             colors : true            
          }
+      ,
+         'coverage':{
+            reporters : ['coverage'],
+            preprocessors: {
+               // source files to generate coverage for
+               // (these files will be instrumented by Istanbul)
+               'src/**/*.js': ['coverage']
+            },
+            'browsers': ['PhantomJS'],
+            configFile: 'test/unit.conf.js'
+         }         
          
       ,  
          'precaptured-dev': {
@@ -377,5 +388,8 @@ module.exports = function (grunt) {
    grunt.registerTask('node-test-auto-run',   [
       'start-stream-source',
       'watch:testNode'       
+   ]);
+   grunt.registerTask('coverage',   [
+      'karma:coverage'
    ]);   
 };
