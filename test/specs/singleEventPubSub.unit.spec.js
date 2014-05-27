@@ -267,5 +267,47 @@ describe('single event pub sub', function(){
       })                        
    })
    
+   describe('hasListener method', function() {
+      
+      it('returns false when there are no listeners', function() {
+         var event = singleEventPubSub('someEventName');
+
+         expect( event.hasListener() ).toBeFalsy();
+      });
+
+      it('returns false for an id when there are no listeners', function() {
+         var event = singleEventPubSub('someEventName');
+
+         expect( event.hasListener('some_id') ).toBeFalsy();
+      });
+
+      it('returns true for a listener specified as the function', function() {
+         function exampleListener(){}
+         
+         var event = singleEventPubSub('someEventName');
+         event.on(exampleListener);
+
+         expect( event.hasListener(exampleListener) ).toBeTruthy();
+      });
+
+      it('returns true for a listener specified using an id', function() {
+         function exampleListener(){}
+
+         var event = singleEventPubSub('someEventName');
+         event.on(exampleListener, 'exampleId');
+
+         expect( event.hasListener('exampleId') ).toBeTruthy();
+      });
+
+      it('returns false given the wrong id', function() {
+         function exampleListener(){}
+
+         var event = singleEventPubSub('someEventName');
+         event.on(exampleListener, 'exampleId');
+
+         expect( event.hasListener('wrongId') ).toBeFalsy();
+      });      
+      
+   });
          
 });
