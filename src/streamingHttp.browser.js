@@ -134,8 +134,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       xhr.send(data);
       
    } catch( e ) {
-
-      console.log('error making request', e);
       
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
