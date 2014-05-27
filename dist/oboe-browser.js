@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function _oboeWrapper (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.3-84-ge5e3a2a
+   // v1.14.6-88-g5a59ffe
 
 /*
 
@@ -1137,7 +1137,9 @@ function httpTransport(){
  * @param {String} url the url to make a request to
  * @param {String|Null} data some content to be sent with the request.
  *                      Only valid if method is POST or PUT.
- * @param {Object} [headers] the http request headers to send                       
+ * @param {Object} [headers] the http request headers to send
+ * @param {boolean} withCredentials the XHR withCredentials property will be
+ *    set to this value
  */  
 function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials) {
            
@@ -1251,8 +1253,6 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       xhr.send(data);
       
    } catch( e ) {
-
-      console.log('error making request', e);
       
       // To keep a consistent interface with Node, we can't emit an event here.
       // Node's streaming http adaptor receives the error as an asynchronous
@@ -1707,26 +1707,18 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
           // the match has succeeded. Ie, we might write ..foo or !..foo
           // and both should match identically.
           terminalCaseWhenArrivingAtRoot = rootExpr(),
-          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
-          recursiveCase = skip1(skipManyInner),
-          
+          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr,
+          recursiveCase = skip1(function(ascent) {
+             return cases(ascent);
+          }),
+
           cases = lazyUnion(
                      terminalCaseWhenArrivingAtRoot
                   ,  terminalCaseWhenPreviousExpressionIsSatisfied
-                  ,  recursiveCase
-                  );                        
-            
-      function skipManyInner(ascent) {
+                  ,  recursiveCase  
+                  );
       
-         if( !ascent ) {
-            // have gone past the start, not a match:         
-            return false;
-         }      
-                                                        
-         return cases(ascent);
-      }
-      
-      return skipManyInner;
+      return cases;
    }      
    
    /**

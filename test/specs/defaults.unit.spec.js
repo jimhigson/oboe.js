@@ -127,6 +127,20 @@ describe('default settings', function(){
          { 'Content-Type' : 'application/awesome' },
          false
       )
+   });
+
+   it('passed through string bodies and does not set content-type', function(){
+      var stub = jasmine.createSpy();
+
+      applyDefaults(stub, 'http://example.com/oboez', 'POST', 'body content', undefined, undefined, true);
+
+      expect(stub).toHaveBeenCalledLike(
+         'POST',
+         'http://example.com/oboez',
+         'body content',
+         {}, 
+         false
+      )
    });   
 
 

@@ -3,7 +3,7 @@
 
 module.exports = (function _oboeWrapper () {
    
-   // v1.14.3-84-ge5e3a2a
+   // v1.14.6-88-g5a59ffe
 
 /*
 
@@ -1588,26 +1588,18 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
           // the match has succeeded. Ie, we might write ..foo or !..foo
           // and both should match identically.
           terminalCaseWhenArrivingAtRoot = rootExpr(),
-          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr, 
-          recursiveCase = skip1(skipManyInner),
-          
+          terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr,
+          recursiveCase = skip1(function(ascent) {
+             return cases(ascent);
+          }),
+
           cases = lazyUnion(
                      terminalCaseWhenArrivingAtRoot
                   ,  terminalCaseWhenPreviousExpressionIsSatisfied
-                  ,  recursiveCase
-                  );                        
-            
-      function skipManyInner(ascent) {
+                  ,  recursiveCase  
+                  );
       
-         if( !ascent ) {
-            // have gone past the start, not a match:         
-            return false;
-         }      
-                                                        
-         return cases(ascent);
-      }
-      
-      return skipManyInner;
+      return cases;
    }      
    
    /**
