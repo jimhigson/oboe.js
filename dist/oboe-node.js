@@ -2411,7 +2411,7 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 function oboe(arg1, arg2) {
 
    if( arg1 ) {
-      if (arg1.url && !(arg1 instanceof require('http').IncomingMessage)) {
+      if (arg1.url && !(arg1 instanceof require('stream').Readable)) {
    
          // method signature is:
          //    oboe({method:m, url:u, body:b, headers:{...}})
