@@ -30,5 +30,5 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       
    patternAdapter(oboeBus, jsonPathCompiler);      
       
-   return new instanceApi(oboeBus);
+   return instanceApi(oboeBus, contentSource);
 }

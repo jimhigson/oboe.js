@@ -5,7 +5,7 @@
  *    - listeners for various events to be added and removed
  *    - the http response header/headers to be read
  */
-function instanceApi(oboeBus){
+function instanceApi(oboeBus, contentSource){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
@@ -209,7 +209,9 @@ function instanceApi(oboeBus){
       
       // initially return nothing for header and root
       header         : noop,
-      root           : noop
+      root           : noop,
+      
+      source         : contentSource
    };   
 }
     

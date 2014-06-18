@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.7-3-gd3c89cd
+   // v1.14.7-4-gc8e713a
 
 /*
 
@@ -2240,7 +2240,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
  *    - listeners for various events to be added and removed
  *    - the http response header/headers to be read
  */
-function instanceApi(oboeBus){
+function instanceApi(oboeBus, contentSource){
 
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
@@ -2444,7 +2444,9 @@ function instanceApi(oboeBus){
       
       // initially return nothing for header and root
       header         : noop,
-      root           : noop
+      root           : noop,
+      
+      source         : contentSource
    };   
 }
     
@@ -2481,7 +2483,7 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       
    patternAdapter(oboeBus, jsonPathCompiler);      
       
-   return new instanceApi(oboeBus);
+   return instanceApi(oboeBus, contentSource);
 }
 
 function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){

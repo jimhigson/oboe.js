@@ -15,6 +15,39 @@
                
       var ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
 
+      describe('advertising the url on the Oboe instance', function() {
+
+         var exampleUrl = testUrl('echoBackHeadersAsBodyJson');
+         
+         it('works after instatiation', function() {
+
+            var instance = oboe({
+               url: exampleUrl
+            });
+
+            expect(instance.source).toBe(exampleUrl);
+         });
+
+         it('works from callbacks', function() {
+
+            var urlOnDone;
+            
+            oboe({
+               url: exampleUrl
+            }).done(function() {
+               urlOnDone = this.source;
+            });
+
+            waitsFor(function() {
+               return urlOnDone
+            }, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function() {
+               expect(urlOnDone).toBe(exampleUrl);
+            });
+         });         
+      });
+      
       Platform.isNode && describe('running under node', function(){
    
          var http = require('http'),

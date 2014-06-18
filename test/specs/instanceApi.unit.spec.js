@@ -1,19 +1,24 @@
 
-describe('instance api',function(){
+describe('instance api',function() {
    "use strict";
-   
-   var oboeBus, oboeInstance;
- 
-   beforeEach(function(){
+
+   var oboeBus, oboeInstance,
+       sampleUrl = 'http://example.com';
+
+   beforeEach(function () {
       oboeBus = spiedPubSub();
-            
-      oboeInstance = instanceApi(oboeBus);      
+
+      oboeInstance = instanceApi(oboeBus, sampleUrl);
    });
-      
-   function anAscent(){
-      return list(namedNode(ROOT_PATH, {}) );
+
+   function anAscent() {
+      return list(namedNode(ROOT_PATH, {}));
    }
- 
+
+   it('puts the url on the oboe instance', function(){
+      expect( oboeInstance.source).toBe( sampleUrl ); 
+   });
+   
    describe('header method', function(){
 
       it('returns undefined if not available', function() {
