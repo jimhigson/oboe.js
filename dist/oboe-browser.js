@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.14.6-7-g8281cfa
+   // v1.14.7-3-gd3c89cd
 
 /*
 
@@ -2527,7 +2527,7 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 }
 
 // export public API
-function oboe(arg1, arg2) {
+function oboe(arg1) {
 
    if( arg1 ) {
       if (arg1.url) {
@@ -2547,8 +2547,9 @@ function oboe(arg1, arg2) {
       } else {
    
          //  simple version for GETs. Signature is:
-         //    oboe( url )            
-         //                                
+         //    oboe( url )
+         //  or, under node:
+         //    oboe( readableStream )
          return applyDefaults(
             wire,
             arg1 // url

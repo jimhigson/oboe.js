@@ -1,5 +1,5 @@
 // export public API
-function oboe(arg1, arg2) {
+function oboe(arg1) {
 
    if( arg1 ) {
       if (arg1.url) {
@@ -19,8 +19,9 @@ function oboe(arg1, arg2) {
       } else {
    
          //  simple version for GETs. Signature is:
-         //    oboe( url )            
-         //                                
+         //    oboe( url )
+         //  or, under node:
+         //    oboe( readableStream )
          return applyDefaults(
             wire,
             arg1 // url
