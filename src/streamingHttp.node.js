@@ -80,7 +80,7 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
          var statusCode = res.statusCode,
              successful = String(statusCode)[0] == 2;
                                                    
-         oboeBus(HTTP_START).emit( res.statusCode, res.headers);                                
+         oboeBus(HTTP_START).emit( res.statusCode, res.headers);
                                 
          if( successful ) {          
                
@@ -101,7 +101,7 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
          );
       });
       
-      oboeBus(ABORTING).on( function(){              
+      oboeBus(ABORTING).on( function(){
          req.abort();
       });
          
