@@ -21,18 +21,29 @@ var httpTransport = functor(require('http-https'));
  */  
 function streamingHttp(oboeBus, transport, method, contentSource, data, headers) {
    "use strict";
+   
+   /* receiving data after calling .abort on Node's http has been observed in the
+      wild. Keep aborted as state so that if the request has been aborted we
+      can ignore new data from that point on */
+   var aborted = false;
 
    function readStreamToEventBus(readableStream) {
          
       // use stream in flowing mode   
       readableStream.on('data', function (chunk) {
-                                             
-         oboeBus(STREAM_DATA).emit( chunk.toString() );
+
+         // avoid reading the stream after aborting the request
+         if( !aborted ) {
+            oboeBus(STREAM_DATA).emit(chunk.toString());
+         }
       });
       
       readableStream.on('end', function() {
-               
-         oboeBus( STREAM_END ).emit();
+
+         // avoid reading the stream after aborting the request
+         if( !aborted ) {
+            oboeBus(STREAM_END).emit();
+         }
       });
    }
    
@@ -102,6 +113,7 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
       });
       
       oboeBus(ABORTING).on( function(){
+         aborted = true;
          req.abort();
       });
          
