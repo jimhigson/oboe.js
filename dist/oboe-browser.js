@@ -2567,6 +2567,8 @@ function oboe(arg1) {
 
    if ( typeof define === "function" && define.amd ) {
       define( "oboe", [], function () { return oboe; } );
+   } else if (typeof exports === 'object') {
+      module.exports = oboe;
    } else {
       window.oboe = oboe;
    }

@@ -4,6 +4,7 @@
   "version": "1.15.1",
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
+  "browser": "./dist/oboe-browser.js",
   "scripts": {
     "test": "node ./node_modules/grunt-cli/bin/grunt headless-mode default",
     "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
