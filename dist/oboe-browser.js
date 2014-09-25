@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.15.0-1-gbd91d2c
+   // v1.15.1
 
 /*
 
@@ -2532,7 +2532,17 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 function oboe(arg1) {
 
    if( arg1 ) {
-      if (arg1.url) {
+      if (isOfType(String, arg1) || isOfType(Function, arg1.read)) {
+
+         //  simple version for GETs. Signature is:
+         //    oboe( url )
+         //  or, under node:
+         //    oboe( readableStream )
+         return applyDefaults(
+            wire,
+            arg1 // url
+         );
+      } else {
    
          // method signature is:
          //    oboe({method:m, url:u, body:b, headers:{...}})
@@ -2545,16 +2555,6 @@ function oboe(arg1) {
             arg1.headers,
             arg1.withCredentials,
             arg1.cached
-         );
-      } else {
-   
-         //  simple version for GETs. Signature is:
-         //    oboe( url )
-         //  or, under node:
-         //    oboe( readableStream )
-         return applyDefaults(
-            wire,
-            arg1 // url
          );
       }
    } else {
