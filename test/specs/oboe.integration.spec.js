@@ -77,8 +77,10 @@
          });
          
          it('can read from a local file', function() {
-               
-            oboe(fs.createReadStream( 'test/json/firstTenNaturalNumbers.json' ))
+
+            var fileStream = fs.createReadStream('test/json/firstTenNaturalNumbers.json');
+            
+            oboe(fileStream)
                .node('![*]', callbackSpy)
                .done(whenDoneFn);            
                         
@@ -87,8 +89,19 @@
             runs(function () {
      
                expect( callbackSpy.calls.length ).toBe(10);   
-            });      
+            });
          });
+
+         it('doesnt get confused if a stream has a "url" property', function() {
+            var fileStream = fs.createReadStream('test/json/firstTenNaturalNumbers.json');
+            fileStream.url = 'http://howodd.com';
+
+            oboe(fileStream)
+               .done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+         });
+
 
          it('can read from https', function() {
             
