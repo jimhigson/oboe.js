@@ -5,3 +5,4 @@ libpeerconnection.log
 *.tidy
 *.backup
 .DS_Store
+coverage
