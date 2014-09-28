@@ -15,21 +15,21 @@ function ascentManager(oboeBus, handlers){
    var id = {},
        state;
 
-   function nextState(handler) {
+   function stateAfter(handler) {
       return function(param){
          state = handler( state, param);
       }
    }
    
-   for( var i in handlers ) {
+   for( var eventName in handlers ) {
 
-      oboeBus(i).on(nextState(handlers[i]), id);
+      oboeBus(eventName).on(stateAfter(handlers[eventName]), id);
    }
 
    oboeBus(ABORTING).on(function(){
       
-      for( var i in handlers ) {
-         oboeBus(i).un(id);
+      for( var eventName in handlers ) {
+         oboeBus(eventName).un(id);
       }
    });   
 }
