@@ -751,7 +751,7 @@ describe('clarinet', function(){
          bus(STREAM_DATA).emit(doc.text);
          bus(STREAM_END).emit();
          
-         iit('should have the correct event types', function(){
+         it('should have the correct event types', function(){
             expect( blackBoxRecording ).toMatchOrder( doc.events );
          });
          
@@ -761,7 +761,7 @@ describe('clarinet', function(){
 
             // don't worry about the value for error events:
             if(blackBoxSlice.type != FAIL_EVENT ){
-               iit( i + 'th event should have the correct event value', function(){
+               it( i + 'th event should have the correct event value', function(){
                   expect( blackBoxSlice.val  ).toEqual( expectedEvent[1] );
                });
             }
