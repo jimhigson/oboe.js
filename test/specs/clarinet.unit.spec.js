@@ -5,16 +5,16 @@ var docs   =
     { empty_array :
       { text      : '[]'
       , events    :
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_CLOSE , undefined]
         ]
       }
     , just_slash :
       { text      : '["\\\\"]'
       , events    :
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , "\\"]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "\\"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -22,10 +22,10 @@ var docs   =
     , zero_byte    :
       { text       : '{"foo": "\\u0000"}'
       , events     :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "foo"]
-        , [SAX_VALUE       , "\u0000"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "\u0000"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -33,10 +33,10 @@ var docs   =
     , empty_value  :
       { text       : '{"foo": ""}'
       , events     :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "foo"]
-        , [SAX_VALUE       , ""]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, ""], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -44,12 +44,12 @@ var docs   =
     , three_byte_utf8 :
       { text          : '{"matzue": "松江", "asakusa": "浅草"}'
       , events        :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "matzue"]
-        , [SAX_VALUE       , "松江"]
+        , [SAX_VALUE_OPEN, "松江"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "asakusa"]
-        , [SAX_VALUE       , "浅草"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "浅草"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -57,10 +57,10 @@ var docs   =
     , four_byte_utf8 :
       { text          : '{ "U+10ABCD": "􊯍" }'
       , events        :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "U+10ABCD"]
-        , [SAX_VALUE       , "􊯍"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "􊯍"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -68,9 +68,9 @@ var docs   =
     , bulgarian    :
       { text       : '["Да Му Еба Майката"]'
       , events     :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , "Да Му Еба Майката"]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "Да Му Еба Майката"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -78,9 +78,9 @@ var docs   =
     , codepoints_from_unicodes  :
       { text       : '["\\u004d\\u0430\\u4e8c\\ud800\\udf02"]'
       , events     :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , "\u004d\u0430\u4e8c\ud800\udf02"]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "\u004d\u0430\u4e8c\ud800\udf02"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -88,8 +88,8 @@ var docs   =
     , empty_object :
       { text       : '{}'
       , events     :
-        [ [SAX_OPEN_OBJECT  , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -97,10 +97,10 @@ var docs   =
     , foobar   :
       { text   : '{"foo": "bar"}'
       , events :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "foo"]
-        , [SAX_VALUE       , "bar"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "bar"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -108,12 +108,12 @@ var docs   =
     , as_is    :
       { text   : "{\"foo\": \"its \\\"as is\\\", \\\"yeah\", \"bar\": false}"
       , events :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "foo"]
-        , [SAX_VALUE       , 'its "as is", "yeah']
+        , [SAX_VALUE_OPEN, 'its "as is", "yeah'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "bar"]
-        , [SAX_VALUE       , false]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -121,10 +121,10 @@ var docs   =
     , array    :
       { text   : '["one", "two"]'
       , events : 
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , 'one']
-        , [SAX_VALUE      , 'two']
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 'one'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 'two'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -133,26 +133,26 @@ var docs   =
       { text   : '["foo", "bar", "baz",true,false,null,{"key":"value"},' +
                  '[null,null,null,[]]," \\\\ "]'
       , events : 
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE        , 'foo']
-        , [SAX_VALUE        , 'bar']
-        , [SAX_VALUE        , 'baz']
-        , [SAX_VALUE        , true]
-        , [SAX_VALUE        , false]
-        , [SAX_VALUE        , null]
-        , [SAX_OPEN_OBJECT  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 'foo'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 'bar'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 'baz'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , 'key']
-        , [SAX_VALUE        , 'value']
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE        , null]
-        , [SAX_VALUE        , null]
-        , [SAX_VALUE        , null]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_CLOSE_ARRAY  , undefined]
-        , [SAX_CLOSE_ARRAY  , undefined]
-        , [SAX_VALUE        , " \\ "]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        , [SAX_VALUE_OPEN, 'value'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_OPEN, " \\ "], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -160,9 +160,9 @@ var docs   =
     , simple_exp    :
       { text   : '[10e-01]'
       , events : 
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , 10e-01]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 10e-01], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -170,13 +170,13 @@ var docs   =
     , nested   :
       { text   : '{"a":{"b":"c"}}'
       , events :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "a"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "b"]
-        , [SAX_VALUE       , "c"]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "c"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -184,13 +184,13 @@ var docs   =
     , nested_array  :
       { text        : '{"a":["b", "c"]}'
       , events      :
-          [ [SAX_OPEN_OBJECT , undefined]
+          [ [SAX_VALUE_OPEN, {}]
           , [SAX_KEY         , "a"]
-          , [SAX_OPEN_ARRAY  , undefined]
-          , [SAX_VALUE       , 'b']
-          , [SAX_VALUE       , 'c']
-          , [SAX_CLOSE_ARRAY  , undefined]
-          , [SAX_CLOSE_OBJECT , undefined]
+          , [SAX_VALUE_OPEN, []]
+          , [SAX_VALUE_OPEN, 'b'], [SAX_VALUE_CLOSE, undefined]
+          , [SAX_VALUE_OPEN, 'c'], [SAX_VALUE_CLOSE, undefined]
+          , [SAX_VALUE_CLOSE  , undefined]
+          , [SAX_VALUE_CLOSE , undefined]
           
           
           ]
@@ -198,16 +198,16 @@ var docs   =
     , array_of_objs :
       { text        : '[{"a":"b"}, {"c":"d"}]'
       , events      :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_OPEN_OBJECT  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , 'a']
-        , [SAX_VALUE        , 'b']
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_OPEN_OBJECT  , undefined]
+        , [SAX_VALUE_OPEN, 'b'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , 'c']
-        , [SAX_VALUE        , 'd']
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        , [SAX_VALUE_OPEN, 'd'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -215,12 +215,12 @@ var docs   =
     , two_keys  :
       { text    : '{"a": "b", "c": "d"}'
       , events  :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "a"]
-        , [SAX_VALUE       , "b"]
+        , [SAX_VALUE_OPEN, "b"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "c"]
-        , [SAX_VALUE       , "d"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "d"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -228,14 +228,14 @@ var docs   =
     , key_true  :
       { text    : '{"foo": true, "bar": false, "baz": null}'
       , events  :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "foo"]
-        , [SAX_VALUE       , true]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "bar"]
-        , [SAX_VALUE       , false]
+        , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "baz"]
-        , [SAX_VALUE       , null]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -244,12 +244,12 @@ var docs   =
       { text               : 
         '{"foo": "bar and all\\\"", "bar": "its \\\"nice\\\""}'
       , events             :
-        [ [SAX_OPEN_OBJECT   , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY           , "foo"]
-        , [SAX_VALUE         , 'bar and all"']
+        , [SAX_VALUE_OPEN, 'bar and all"'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY           , "bar"]
-        , [SAX_VALUE         , 'its "nice"']
-        , [SAX_CLOSE_OBJECT   , undefined]
+        , [SAX_VALUE_OPEN, 'its "nice"'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE   , undefined]
         
         
         ]
@@ -258,9 +258,9 @@ var docs   =
       { text              : 
           '["foo", "bar"'
        , events           :
-         [ [SAX_OPEN_ARRAY   , undefined]
-         , [SAX_VALUE       , 'foo']
-         , [SAX_VALUE       , 'bar']
+         [ [SAX_VALUE_OPEN, []]
+         , [SAX_VALUE_OPEN, 'foo'], [SAX_VALUE_CLOSE, undefined]
+         , [SAX_VALUE_OPEN, 'bar'], [SAX_VALUE_CLOSE, undefined]
          , [FAIL_EVENT       , undefined]
          ]
        }
@@ -268,9 +268,9 @@ var docs   =
       { text             : 
           '["and you can\'t escape thi\s"]'
        , events          :
-         [ [SAX_OPEN_ARRAY   , undefined]
-         , [SAX_VALUE       , 'and you can\'t escape this']
-         , [SAX_CLOSE_ARRAY  , undefined]
+         [ [SAX_VALUE_OPEN, []]
+         , [SAX_VALUE_OPEN, 'and you can\'t escape this'], [SAX_VALUE_CLOSE, undefined]
+         , [SAX_VALUE_CLOSE  , undefined]
         ]
        }
     , nuts_and_bolts :
@@ -278,14 +278,14 @@ var docs   =
                        ', "boolean, false": false' +
                        ', "null": null }'
        , events          :
-         [ [SAX_OPEN_OBJECT  , undefined]
+         [ [SAX_VALUE_OPEN, {}]
          , [SAX_KEY          , "boolean, true"]
-         , [SAX_VALUE        , true]
+         , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
          , [SAX_KEY          , "boolean, false"]
-         , [SAX_VALUE        , false]
+         , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
          , [SAX_KEY          , "null"]
-         , [SAX_VALUE        , null]
-         , [SAX_CLOSE_OBJECT  , undefined]
+         , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+         , [SAX_VALUE_CLOSE  , undefined]
          
          
          ]
@@ -293,9 +293,9 @@ var docs   =
     , frekin_string:
       { text    : '["\\\\\\"\\"a\\""]'
       , events  :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , '\\\"\"a\"']
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, '\\\"\"a\"'], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -304,10 +304,10 @@ var docs   =
       { text    : '["\\\"and this string has an escape at the beginning",' +
                   '"and this string has no escapes"]'
       , events  :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , "\"and this string has an escape at the beginning"]
-        , [SAX_VALUE       , "and this string has no escapes"]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "\"and this string has an escape at the beginning"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, "and this string has no escapes"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         
         
         ]
@@ -343,145 +343,145 @@ var docs   =
         '"name":"LockerUploader","version":{"major":0,' +
         '"micro":1,"minor":0},"versionString":"0.0.1"}'
       , events : 
-        [ [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "CoreletAPIVersion" ]
-        , [ SAX_VALUE       , 2 ]
-        , [ SAX_KEY         , "CoreletType"]
-        , [ SAX_VALUE       , "standalone" ]
-        , [ SAX_KEY         , "documentation"]
-        , [ SAX_VALUE       , "A corelet that provides the capability to upload a folder’s contents into a user’s locker."]
-        , [ SAX_KEY          , "functions"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "Displays a dialog box that allows user to select a folder on the local system."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "ShowBrowseDialog"]
-        , [ SAX_KEY         , "parameters"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The callback function for results."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "Uploads all mp3 files in the folder provided."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "UploadFolder"]
-        , [ SAX_KEY         , "parameters"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The path to upload mp3 files from."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "path"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "string"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The callback function for progress."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true ]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "Returns the server name to the current locker service."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "GetLockerService"]
-        , [ SAX_KEY         , "parameters"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "Changes the name of the locker service."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "SetLockerService"]
-        , [ SAX_KEY         , "parameters"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The value of the locker service to set active."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "LockerService" ]
-        , [ SAX_KEY         , "required" ]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "string"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "Downloads locker files to the suggested folder."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "DownloadFile"]
-        , [ SAX_KEY         , "parameters"]
-        , [ SAX_OPEN_ARRAY   , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The origin path of the locker file."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "path"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "string"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The Window destination path of the locker file."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "destination"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "integer"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "documentation" ]
-        , [ SAX_VALUE       , "The callback function for progress."]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_KEY         , "required"]
-        , [ SAX_VALUE       , true]
-        , [ SAX_KEY         , "type"]
-        , [ SAX_VALUE       , "callback"]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_CLOSE_ARRAY  , undefined]
-        , [ SAX_KEY         , "name"]
-        , [ SAX_VALUE       , "LockerUploader"]
-        , [ SAX_KEY         , "version"]
-        , [ SAX_OPEN_OBJECT, undefined ], [ SAX_KEY, "major" ]
-        , [ SAX_VALUE       , 0]
-        , [ SAX_KEY         , "micro"]
-        , [ SAX_VALUE       , 1]
-        , [ SAX_KEY         , "minor"]
-        , [ SAX_VALUE       , 0]
-        , [ SAX_CLOSE_OBJECT , undefined]
-        , [ SAX_KEY         , "versionString"]
-        , [ SAX_VALUE       , "0.0.1"]
-        , [ SAX_CLOSE_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}], [SAX_KEY, "CoreletAPIVersion" ]
+        , [SAX_VALUE_OPEN, 2 ], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "CoreletType"]
+        , [SAX_VALUE_OPEN, "standalone" ], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "documentation"]
+        , [SAX_VALUE_OPEN, "A corelet that provides the capability to upload a folder’s contents into a user’s locker."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY          , "functions"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "Displays a dialog box that allows user to select a folder on the local system."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "ShowBrowseDialog"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "parameters"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The callback function for results."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "Uploads all mp3 files in the folder provided."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "UploadFolder"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "parameters"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The path to upload mp3 files from."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "path"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "string"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The callback function for progress."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true ], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "Returns the server name to the current locker service."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "GetLockerService"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "parameters"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "Changes the name of the locker service."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "SetLockerService"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "parameters"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The value of the locker service to set active."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "LockerService" ], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required" ]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "string"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "Downloads locker files to the suggested folder."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "DownloadFile"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "parameters"]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The origin path of the locker file."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "path"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "string"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The Window destination path of the locker file."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "destination"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "integer"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "documentation" ]
+        , [SAX_VALUE_OPEN, "The callback function for progress."], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "required"]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "type"]
+        , [SAX_VALUE_OPEN, "callback"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_KEY         , "name"]
+        , [SAX_VALUE_OPEN, "LockerUploader"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "version"]
+        , [SAX_VALUE_OPEN, {}], [SAX_KEY, "major" ]
+        , [SAX_VALUE_OPEN, 0], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "micro"]
+        , [SAX_VALUE_OPEN, 1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_KEY         , "minor"]
+        , [SAX_VALUE_OPEN, 0], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_KEY         , "versionString"]
+        , [SAX_VALUE_OPEN, "0.0.1"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         ]
       }
     , array_of_arrays    :
       { text   : '[[[["foo"]]]]'
       , events : 
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , "foo"]
-        , [SAX_CLOSE_ARRAY , undefined]
-        , [SAX_CLOSE_ARRAY , undefined]
-        , [SAX_CLOSE_ARRAY , undefined]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "foo"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -489,9 +489,9 @@ var docs   =
     , low_overflow :
       { text       : '[-9223372036854775808]'
       , events     : 
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , -9223372036854775808]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, -9223372036854775808], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -499,9 +499,9 @@ var docs   =
     , high_overflow :
       { text       : '[9223372036854775808]'
       , events     : 
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , 9223372036854775808]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 9223372036854775808], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -509,12 +509,12 @@ var docs   =
     , floats       :
       { text       : '[0.1e2, 1e1, 3.141569, 10000000000000e-10]'
       , events     :
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , 0.1e2]
-        , [SAX_VALUE      , 1e1]
-        , [SAX_VALUE      , 3.141569]
-        , [SAX_VALUE      , 10000000000000e-10]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 0.1e2], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 1e1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3.141569], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 10000000000000e-10], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -528,33 +528,33 @@ var docs   =
                      '123456789,-123456789,' +
                      '2147483647, -2147483647]'
       , events     :
-        [ [SAX_OPEN_ARRAY  , undefined]
-        , [SAX_VALUE      , 1]
-        , [SAX_VALUE      , 0]
-        , [SAX_VALUE      , -1]
-        , [SAX_VALUE      , -0.3]
-        , [SAX_VALUE      , 0.3]
-        , [SAX_VALUE      , 1343.32]
-        , [SAX_VALUE      , 3345]
-        , [SAX_VALUE      , 3.1e124]
-        , [SAX_VALUE      , 9223372036854775807]
-        , [SAX_VALUE      , -9223372036854775807]
-        , [SAX_VALUE      , 0.1e2]
-        , [SAX_VALUE      , 1e1]
-        , [SAX_VALUE      , 3.141569]
-        , [SAX_VALUE      , 10000000000000e-10]
-        , [SAX_VALUE      , 0.00011999999999999999]
-        , [SAX_VALUE      , 6E-06]
-        , [SAX_VALUE      , 6E-06]
-        , [SAX_VALUE      , 1E-06]
-        , [SAX_VALUE      , 1E-06]
-        , [SAX_VALUE      , "2009-10-20@20:38:21.539575"]
-        , [SAX_VALUE      , 9223372036854775808]
-        , [SAX_VALUE      , 123456789]
-        , [SAX_VALUE      , -123456789]
-        , [SAX_VALUE      , 2147483647]
-        , [SAX_VALUE      , -2147483647]
-        , [SAX_CLOSE_ARRAY , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 0], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, -1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, -0.3], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 0.3], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 1343.32], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3345], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3.1e124], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 9223372036854775807], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, -9223372036854775807], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 0.1e2], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 1e1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3.141569], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 10000000000000e-10], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 0.00011999999999999999], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 6E-06], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 6E-06], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 1E-06], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 1E-06], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, "2009-10-20@20:38:21.539575"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 9223372036854775808], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 123456789], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, -123456789], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 2147483647], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, -2147483647], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -567,65 +567,65 @@ var docs   =
                    '"number": "212 555-1234" }, { "type" : "fax", ' + 
                    '"number": "646 555-4567" } ] }'
       , events   :
-        [ [SAX_OPEN_OBJECT  , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , "firstName"]
-        , [SAX_VALUE        , "John"]
+        , [SAX_VALUE_OPEN, "John"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "lastName"]
-        , [SAX_VALUE        , "Smith"]
+        , [SAX_VALUE_OPEN, "Smith"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "age"]
-        , [SAX_VALUE        , 25]
+        , [SAX_VALUE_OPEN, 25], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "address"]
-        , [SAX_OPEN_OBJECT  , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , "streetAddress"]
-        , [SAX_VALUE        , "21 2nd Street"]
+        , [SAX_VALUE_OPEN, "21 2nd Street"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "city"]
-        , [SAX_VALUE        , "New York"]
+        , [SAX_VALUE_OPEN, "New York"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "state"]
-        , [SAX_VALUE        , "NY"]
+        , [SAX_VALUE_OPEN, "NY"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "postalCode"]
-        , [SAX_VALUE        , "10021"]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "10021"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         , [SAX_KEY          , "phoneNumber"]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_OPEN_OBJECT  , undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , "type"]
-        , [SAX_VALUE        , "home"]
+        , [SAX_VALUE_OPEN, "home"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "number"]
-        , [SAX_VALUE        , "212 555-1234"]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_OPEN_OBJECT  , undefined]
+        , [SAX_VALUE_OPEN, "212 555-1234"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , "type"]
-        , [SAX_VALUE        , "fax"]
+        , [SAX_VALUE_OPEN, "fax"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY          , "number"]
-        , [SAX_VALUE        , "646 555-4567"]
-        , [SAX_CLOSE_OBJECT  , undefined]
-        , [SAX_CLOSE_ARRAY   , undefined]
-        , [SAX_CLOSE_OBJECT  , undefined]
+        , [SAX_VALUE_OPEN, "646 555-4567"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE   , undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         ]
       }
     , array_null :
       { text     : '[null,false,true]'
       , events   :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , null]
-        , [SAX_VALUE       , false]
-        , [SAX_VALUE       , true]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         ]
       }
     , empty_array_comma :
       { text    : '{"a":[],"c": {}, "b": true}'
       , events  :
-        [ [SAX_OPEN_OBJECT  , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY          , "a"]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_CLOSE  , undefined]
         , [SAX_KEY         , "c"]
-        , [SAX_OPEN_OBJECT  , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
+        , [SAX_VALUE_CLOSE , undefined]
         , [SAX_KEY         , "b"]
-        , [SAX_VALUE       , true]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -633,26 +633,26 @@ var docs   =
     , incomplete_json_terminates_ending_in_number :
       { text    : '[[1,2,3],[4,5'
       , events  :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , 1]
-        , [SAX_VALUE       , 2]
-        , [SAX_VALUE       , 3]
-        , [SAX_CLOSE_ARRAY  , undefined]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , 4]    
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 2], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 4], [SAX_VALUE_CLOSE, undefined]    
         , [FAIL_EVENT       , undefined]    
         ]
       }
     , incomplete_json_terminates_ending_in_comma :
       { text    : '[[1,2,3],'
       , events  :
-        [ [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , 1]
-        , [SAX_VALUE       , 2]
-        , [SAX_VALUE       , 3]
-        , [SAX_CLOSE_ARRAY  , undefined]
+        [ [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, 1], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 2], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, 3], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
         , [FAIL_EVENT       , undefined]
         ]
       }
@@ -683,46 +683,46 @@ var docs   =
           '          }\r\n' +
           '      }\r\n')
       , events  :
-        [ [SAX_OPEN_OBJECT , undefined]
+        [ [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "glossary"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "title"]
-        , [SAX_VALUE       , "example glossary"]
+        , [SAX_VALUE_OPEN, "example glossary"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "GlossDiv"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "title"]
-        , [SAX_VALUE       , "S"]
+        , [SAX_VALUE_OPEN, "S"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "GlossList"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "GlossEntry"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "ID"]
-        , [SAX_VALUE       , "SGML"]
+        , [SAX_VALUE_OPEN, "SGML"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "SortAs"]
-        , [SAX_VALUE       , "SGML"]
+        , [SAX_VALUE_OPEN, "SGML"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "GlossTerm"]
-        , [SAX_VALUE       , "Standard Generalized Markup Language"]
+        , [SAX_VALUE_OPEN, "Standard Generalized Markup Language"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "Acronym"]
-        , [SAX_VALUE       , "SGML"]
+        , [SAX_VALUE_OPEN, "SGML"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "Abbrev"]
-        , [SAX_VALUE       , 'ISO 8879:1986']
+        , [SAX_VALUE_OPEN, 'ISO 8879:1986'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "GlossDef"]
-        , [SAX_OPEN_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, {}]
         , [SAX_KEY         , "para"]
-        , [SAX_VALUE       , 'A meta-markup language, used to create markup languages such as DocBook.']
+        , [SAX_VALUE_OPEN, 'A meta-markup language, used to create markup languages such as DocBook.'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "GlossSeeAlso"]
-        , [SAX_OPEN_ARRAY   , undefined]
-        , [SAX_VALUE       , "GML"]
-        , [SAX_VALUE       , "XML"]
-        , [SAX_CLOSE_ARRAY  , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, []]
+        , [SAX_VALUE_OPEN, "GML"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_OPEN, "XML"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE  , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         , [SAX_KEY         , "GlossSee"]
-        , [SAX_VALUE       , "markup"]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
-        , [SAX_CLOSE_OBJECT , undefined]
+        , [SAX_VALUE_OPEN, "markup"], [SAX_VALUE_CLOSE, undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
+        , [SAX_VALUE_CLOSE , undefined]
         
         
         ]
@@ -731,15 +731,12 @@ var docs   =
 
 describe('clarinet', function(){
 
-   var expectedEventNames = [ SAX_VALUE        
-                            , SAX_KEY          
-                            , SAX_OPEN_OBJECT  
-                            , SAX_CLOSE_OBJECT 
-                            , SAX_OPEN_ARRAY   
-                            , SAX_CLOSE_ARRAY  
+   var expectedEventNames = [ SAX_KEY          
+                            , SAX_VALUE_OPEN  
+                            , SAX_VALUE_CLOSE   
                             , FAIL_EVENT
                             ];
-   
+    
    for (var key in docs) {
       
       var doc = docs[key];

@@ -29,7 +29,7 @@ describe("incremental content builder", function(){
      
    describe('when root object opens', function() {
       
-      var builder = aContentBuilder().receivingEvent(SAX_OPEN_OBJECT); 
+      var builder = aContentBuilder().receivingEvent(SAX_VALUE_OPEN, {}); 
       
       it('emits correct event', function(){
          expect( builder)
@@ -52,7 +52,7 @@ describe("incremental content builder", function(){
    describe('after key is found in root object', function(){
       // above test, plus some extra events from clarinet
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_OBJECT)
+          .receivingEvent(SAX_VALUE_OPEN, {})
           .receivingEvent(SAX_KEY, 'flavour');
           
       it('emits correct event', function(){
@@ -78,7 +78,7 @@ describe("incremental content builder", function(){
       // above test, plus some extra events from clarinet
 
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_OBJECT, undefined)
+          .receivingEvent(SAX_VALUE_OPEN, {}, undefined)
           .receivingEvent(SAX_KEY,         'flavour');
           
       it('emits correct event', function(){
@@ -102,9 +102,10 @@ describe("incremental content builder", function(){
    describe('after value is found for that key', function() {
 
       var builder = aContentBuilder()
-                 .receivingEvent(SAX_OPEN_OBJECT)
+                 .receivingEvent(SAX_VALUE_OPEN, {})
                  .receivingEvent(SAX_KEY    ,  'flavour')
-                 .receivingEvent(SAX_VALUE  ,  'strawberry');
+                 .receivingEvent(SAX_VALUE_OPEN  ,  'strawberry')
+                 .receivingEvent(SAX_VALUE_CLOSE);
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
@@ -126,10 +127,10 @@ describe("incremental content builder", function(){
    describe('emits node found after root object closes', function() {
 
       var builder = aContentBuilder()
-                 .receivingEvent(SAX_OPEN_OBJECT)
+                 .receivingEvent(SAX_VALUE_OPEN, {})
                  .receivingEvent(SAX_KEY, 'flavour')
-                 .receivingEvent(SAX_VALUE, 'strawberry')
-                 .receivingEvent(SAX_CLOSE_OBJECT);
+                 .receivingEvent(SAX_VALUE_OPEN, 'strawberry').receivingEvent(SAX_VALUE_CLOSE)
+                 .receivingEvent(SAX_VALUE_CLOSE);
                  
       it('emits correct event', function(){                 
          expect(builder).toHaveEmitted(
@@ -150,10 +151,10 @@ describe("incremental content builder", function(){
    describe('first array element', function() {
 
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_OBJECT)
+          .receivingEvent(SAX_VALUE_OPEN, {})
           .receivingEvent(SAX_KEY, 'alphabet')
-          .receivingEvent(SAX_OPEN_ARRAY)
-          .receivingEvent(SAX_VALUE, 'a');
+          .receivingEvent(SAX_VALUE_OPEN, [])
+          .receivingEvent(SAX_VALUE_OPEN, 'a').receivingEvent(SAX_VALUE_CLOSE);
           
       it('emits path event with numeric paths', function(){
       
@@ -188,11 +189,11 @@ describe("incremental content builder", function(){
    describe('second array element', function() {
 
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_OBJECT)
+          .receivingEvent(SAX_VALUE_OPEN, {})
           .receivingEvent(SAX_KEY, 'alphabet')
-          .receivingEvent(SAX_OPEN_ARRAY)
-          .receivingEvent(SAX_VALUE, 'a')
-          .receivingEvent(SAX_VALUE, 'b');
+          .receivingEvent(SAX_VALUE_OPEN, [])
+          .receivingEvent(SAX_VALUE_OPEN, 'a').receivingEvent(SAX_VALUE_CLOSE)
+          .receivingEvent(SAX_VALUE_OPEN, 'b').receivingEvent(SAX_VALUE_CLOSE);
           
       it('emits events with numeric paths', function(){    
           
@@ -227,9 +228,9 @@ describe("incremental content builder", function(){
    describe('array at root', function() {
 
       var builder = aContentBuilder()
-          .receivingEvent(SAX_OPEN_ARRAY)
-          .receivingEvent(SAX_VALUE, 'a')
-          .receivingEvent(SAX_VALUE, 'b');
+          .receivingEvent(SAX_VALUE_OPEN, [])
+          .receivingEvent(SAX_VALUE_OPEN, 'a').receivingEvent(SAX_VALUE_CLOSE)
+          .receivingEvent(SAX_VALUE_OPEN, 'b').receivingEvent(SAX_VALUE_CLOSE);
           
       it('emits events with numeric paths', function(){    
           

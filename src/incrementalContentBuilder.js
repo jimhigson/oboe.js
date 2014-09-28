@@ -164,32 +164,10 @@ function incrementalContentBuilder( oboeBus ) {
       // nothing left emit that the root closed
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
-   
-   function nodeSwapped (ascent, newNode) {
 
-      var oldHead = head(ascent),
-         ascentTail = tail(ascent),
-         keyMappingToNode = keyOf(oldHead),
-         newHead = namedNode(keyOf(oldHead), newNode)
-
-      appendBuiltContent(ascent, keyMappingToNode, newNode);
- 
-      return ascent;
-   }
-                 
    var contentBuilderHandlers = {};
-   contentBuilderHandlers[SAX_OPEN_OBJECT] = function (ascent) {
-      return nodeOpened(ascent, {});
-   }; 
-   contentBuilderHandlers[SAX_OPEN_ARRAY] = function (ascent) {
-      return nodeOpened(ascent, []);
-   }; 
-   contentBuilderHandlers[SAX_KEY] = keyFound; 
-   contentBuilderHandlers[SAX_VALUE] = compose2( nodeClosed, nodeOpened ); 
-   contentBuilderHandlers[SAX_CLOSE_OBJECT] = nodeClosed;
-   contentBuilderHandlers[SAX_CLOSE_ARRAY] = nodeClosed; 
-   
-   contentBuilderHandlers[NODE_SWAPPED] = nodeSwapped; 
-   
+   contentBuilderHandlers[SAX_VALUE_OPEN] = nodeOpened;
+   contentBuilderHandlers[SAX_VALUE_CLOSE] = nodeClosed;
+   contentBuilderHandlers[SAX_KEY] = keyFound;
    return contentBuilderHandlers;
 }
