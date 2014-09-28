@@ -1476,6 +1476,52 @@ describe("oboe component (no http, content fed in externally)", function(){
    });
    
    describe('swapping out nodes', function() {
+
+      it('can selectively drop objects from an array', function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*', function( obj ) {
+               if( obj.discard ) {
+                  return null;
+               }
+            })
+            .whenGivenInput([
+               {discard:true},
+               {keep:true},
+               {discard:true}
+            ])
+            .thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+            hasRootJson([
+               null,
+               {keep:true},
+               null
+            ])
+         );
+      });
+
+      it('can replace objects', function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('{replace}', function( obj ) {
+               return {replaced:true};
+            })
+            .whenGivenInput([
+               {replace:true},
+               {keep:true},
+               {replace:true}
+            ])
+            .thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+            hasRootJson([
+               {replaced:true},
+               {keep:true},
+               {replaced:true}
+            ])
+         );
+      });      
       
       it('can transform scalar values', function() {
          
