@@ -273,8 +273,7 @@ describe('instance api',function() {
          expect(correctCallback).toHaveBeenCalled()   
       });            
       
-      it('allows nodes node to be removed in a different ' +
-         'style than they were added', function() {
+      it('allows node listeners to be removed in a different style than they were added', function() {
       
          var 
              callback1 = jasmine.createSpy('callback 1'),
