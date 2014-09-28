@@ -135,33 +135,9 @@ function incrementalContentBuilder( oboeBus ) {
    function nodeClosed( ascent ) {
 
       emitNodeClosed( ascent);
-                          
-      
-      // NEED TO HANDLE THE SWAP HERE IDEALLY. HMMMMM!!
-      
-      // This is because the ascent here will always have all the info needed.
-      // Note that the ascent that came in here will not be seen by a builder,
-      // for example if it is a simple value it won't have been
-      
-      // One solution: split SAX_VALUE into SAX_VALUE_START and SAX_VALUE_END so that
-      // the ascent manager sees the ascent with the value on it.
-      
-      // Then, the ascent manager could modify the ascent. It is the only place that sees
-      // it, afterall.
-      
-      // In fact, we can refactor so that:
-      //    SAX_OPEN_OBJECT, 
-      //    SAX_CLOSE_OBJECT, 
-      //    SAX_OPEN_ARRAY,
-      //    SAX_CLOSE_ARRAY, 
-      //    SAX_VALUE
-      
-      // Are replaced by:
-      //    SAX_OPEN (val)
-      //    SAX_CLOSE
-      
-      // pop the complete node and its path off the list. If we have
-      // nothing left emit that the root closed
+
+      // Pop the complete node and its path off the list. 
+      // If we have nothing left, emit that the root closed:
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
 

@@ -13,7 +13,7 @@ var // the events which are never exported are kept as
     NODE_CLOSED     = _S++,
 
     // called if a .node callback returns a value - 
-    NODE_SWAPPED    = _S++,
+    NODE_SWAP       = _S++,
 
     FAIL_EVENT      = 'fail',
    

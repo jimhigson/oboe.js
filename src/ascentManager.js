@@ -12,24 +12,36 @@
 function ascentManager(oboeBus, handlers){
    "use strict";
    
-   var id = {},
-       state;
+   var listenerId = {},
+       ascent;
 
    function stateAfter(handler) {
       return function(param){
-         state = handler( state, param);
+         ascent = handler( ascent, param);
       }
    }
    
    for( var eventName in handlers ) {
 
-      oboeBus(eventName).on(stateAfter(handlers[eventName]), id);
+      oboeBus(eventName).on(stateAfter(handlers[eventName]), listenerId);
    }
+   
+   oboeBus(NODE_SWAP).on(function(newNode) {
+      
+      var oldHead = head(ascent),
+          key = keyOf(oldHead),
+          newHead = namedNode(key, newNode),
+          ancestors = tail(ascent);
+      
+      nodeOf(head(ancestors))[key] = newNode;
+      
+      return cons(newHead, tail(newHead, ancestors));
+   });
 
    oboeBus(ABORTING).on(function(){
       
       for( var eventName in handlers ) {
-         oboeBus(eventName).un(id);
+         oboeBus(eventName).un(listenerId);
       }
    });   
 }

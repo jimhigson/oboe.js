@@ -1476,7 +1476,8 @@ describe("oboe component (no http, content fed in externally)", function(){
    });
    
    describe('swapping out nodes', function() {
-      iit('can change simple values', function() {
+      
+      it('can transform scalar values', function() {
          
          function isEven(n) {
             return (n % 2) == 0;

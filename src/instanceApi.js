@@ -146,13 +146,9 @@ function instanceApi(oboeBus, contentSource){
    function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
       return function() {
          var swapFor = callback.apply(this, arguments);
-         
-         console.log('returned', swapFor);
 
          if( defined(swapFor) ) {
-            console.log('swapping');
-            
-            oboeBus(NODE_SWAPPED).emit(swapFor);
+            oboeBus(NODE_SWAP).emit(swapFor);
          }
       }
    }
