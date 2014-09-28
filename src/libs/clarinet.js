@@ -365,7 +365,7 @@ function clarinet(eventBus) {
           if (!c) continue;
           if(c==='e') {
             emitValueOpen(true);
-             emitValueClose();
+            emitValueClose();
             state = stack.pop() || VALUE;
           } else
              return emitError('Invalid true started with tru'+ c);
