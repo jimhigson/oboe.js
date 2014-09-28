@@ -173,7 +173,7 @@ function givenAnOboeInstance(jsonFileName) {
             
             var cloneArguments = toArray(arguments).map(clone);
             
-            delegateCallback.apply( this, cloneArguments );
+            return delegateCallback.apply( this, cloneArguments );
          };
       }      
    }

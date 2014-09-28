@@ -11,7 +11,10 @@ var // the events which are never exported are kept as
 
     // fired whenever a node closes in the JSON stream:
     NODE_CLOSED     = _S++,
-                
+
+    // called if a .node callback returns a value - 
+    NODE_SWAPPED    = _S++,
+
     FAIL_EVENT      = 'fail',
    
     ROOT_NODE_FOUND = _S++,

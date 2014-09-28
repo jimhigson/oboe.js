@@ -1472,7 +1472,30 @@ describe("oboe component (no http, content fed in externally)", function(){
                // not the whole ten.
                hasRootJson([0,1,2,3,4,5])
             );
-      })      
+      })   
+   });
+   
+   describe('swapping out nodes', function() {
+      iit('can change simple values', function() {
+         
+         function isEven(n) {
+            return (n % 2) == 0;
+         }
+          
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('*', function( number ) {
+               
+               if (isEven(number)) {
+                  return number * 2;
+               }
+            })
+            .whenGivenInput([1,2,3,4,5])
+            .thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+               hasRootJson([1,4,3,8,5])
+            );            
+      });
    });
    
 });

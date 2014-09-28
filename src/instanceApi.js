@@ -89,7 +89,12 @@ function instanceApi(oboeBus, contentSource){
     * Add a callback where, if .forget() is called during the callback's
     * execution, the callback will be de-registered
     */
-   function addForgettableCallback(event, callback) {
+   function addForgettableCallback(event, callback, listenerId) {
+      
+      // listnerId is optional and if not given, the original
+      // callback will be used
+      listenerId = listenerId || callback;
+      
       var safeCallback = protectedCallback(callback);
    
       event.on( function() {
@@ -104,18 +109,22 @@ function instanceApi(oboeBus, contentSource){
                
          delete oboeApi.forget;
          
-         if( discard ) {          
-            event.un(callback);
+         if( discard ) {
+            event.un(listenerId);
          }
-      }, callback)
+      }, listenerId);
       
       return oboeApi; // chaining         
-   }  
-         
+   }
+      
+   /** 
+    *  wrap a callback so that if it throws, Oboe.js doesn't crash but instead
+    *  handles it like a normal error
+    */
    function protectedCallback( callback ) {
       return function() {
          try{      
-            callback.apply(oboeApi, arguments);   
+            return callback.apply(oboeApi, arguments);   
          }catch(e)  {
          
             // An error occured during the callback, publish it on the event bus 
@@ -132,33 +141,59 @@ function instanceApi(oboeBus, contentSource){
     */      
    function fullyQualifiedPatternMatchEvent(type, pattern) {
       return oboeBus(type + ':' + pattern);
-   }      
+   }
+
+   function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
+      return function() {
+         var swapFor = callback.apply(this, arguments);
+         
+         console.log('returned', swapFor);
+
+         if( defined(swapFor) ) {
+            console.log('swapping');
+            
+            oboeBus(NODE_SWAPPED).emit(swapFor);
+         }
+      }
+   }
+
+   function addSingleNodeOrPathListener(eventId, pattern, callback) {
+
+      var effectiveCallback;
+
+      if( eventId == 'node' ) {
+         effectiveCallback = wrapCallbackToSwapNodeIfSomethingReturned(callback);
+      } else {
+         effectiveCallback = callback;
+      }
       
+      addForgettableCallback(
+         fullyQualifiedPatternMatchEvent(eventId, pattern),
+         effectiveCallback,
+         callback
+      );
+   }
+
    /**
     * Add several listeners at a time, from a map
     */
-   function addListenersMap(eventId, listenerMap) {
+   function addMultipleNodeOrPathListeners(eventId, listenerMap) {
    
       for( var pattern in listenerMap ) {
-         addForgettableCallback(
-            fullyQualifiedPatternMatchEvent(eventId, pattern), 
-            listenerMap[pattern]
-         );
+         addSingleNodeOrPathListener(eventId, pattern, listenerMap[pattern]);
       }
    }    
-      
+         
    /**
     * implementation behind .onPath() and .onNode()
     */       
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
-   
+         
       if( isString(jsonPathOrListenerMap) ) {
-         addForgettableCallback(
-            fullyQualifiedPatternMatchEvent(eventId, jsonPathOrListenerMap),
-            callback
-         );
+         addSingleNodeOrPathListener(eventId, jsonPathOrListenerMap, callback);
+
       } else {
-         addListenersMap(eventId, jsonPathOrListenerMap);
+         addMultipleNodeOrPathListeners(eventId, jsonPathOrListenerMap);
       }
       
       return oboeApi; // chaining
