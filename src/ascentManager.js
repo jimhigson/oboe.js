@@ -34,8 +34,6 @@ function ascentManager(oboeBus, handlers){
           ancestors = tail(ascent);
       
       nodeOf(head(ancestors))[key] = newNode;
-      
-      return cons(newHead, tail(newHead, ancestors));
    });
 
    oboeBus(ABORTING).on(function(){
