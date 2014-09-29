@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.15.2-13-gde48737
+   // v1.15.2-17-gbf19154
 
 /*
 
@@ -1027,12 +1027,11 @@ function ascentManager(oboeBus, handlers){
       
       var oldHead = head(ascent),
           key = keyOf(oldHead),
-          newHead = namedNode(key, newNode),
           ancestors = tail(ascent);
-      
-      nodeOf(head(ancestors))[key] = newNode;
-      
-      return cons(newHead, tail(newHead, ancestors));
+
+      if( ancestors ) {
+         nodeOf(head(ancestors))[key] = newNode;
+      }
    });
 
    oboeBus(ABORTING).on(function(){
@@ -1445,9 +1444,7 @@ function incrementalContentBuilder( oboeBus ) {
    function nodeClosed( ascent ) {
 
       emitNodeClosed( ascent);
-
-      // Pop the complete node and its path off the list. 
-      // If we have nothing left, emit that the root closed:
+      
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
 
