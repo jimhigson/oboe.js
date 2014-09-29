@@ -30,10 +30,11 @@ function ascentManager(oboeBus, handlers){
       
       var oldHead = head(ascent),
           key = keyOf(oldHead),
-          newHead = namedNode(key, newNode),
           ancestors = tail(ascent);
-      
-      nodeOf(head(ancestors))[key] = newNode;
+
+      if( ancestors ) {
+         nodeOf(head(ancestors))[key] = newNode;
+      }
    });
 
    oboeBus(ABORTING).on(function(){

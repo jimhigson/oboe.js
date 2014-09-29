@@ -135,9 +135,7 @@ function incrementalContentBuilder( oboeBus ) {
    function nodeClosed( ascent ) {
 
       emitNodeClosed( ascent);
-
-      // Pop the complete node and its path off the list. 
-      // If we have nothing left, emit that the root closed:
+      
       return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
    }      
 
