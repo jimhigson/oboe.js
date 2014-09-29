@@ -1501,25 +1501,44 @@ describe("oboe component (no http, content fed in externally)", function(){
          );
       });
 
-      it('can replace objects', function() {
+      it('can replace objects found in an object', function() {
 
          givenAnOboeInstance()
             .andWeAreListeningForNodes('{replace}', function( obj ) {
                return {replaced:true};
             })
-            .whenGivenInput([
-               {replace:true},
-               {keep:true},
-               {replace:true}
-            ])
+            .whenGivenInput({
+               a: {replace: true},
+               b: {keep: true},
+               c: {replace: true}
+            })
             .thenTheInstance(
             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
             // not the whole ten.
-            hasRootJson([
-               {replaced:true},
-               {keep:true},
-               {replaced:true}
-            ])
+            hasRootJson({
+               a: {replaced: true},
+               b: {keep: true},
+               c: {replaced: true}
+            })
+         );
+      });
+
+      xit('can replace the root', function() {
+         
+         // replacing the root currently isn't supported
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!', function( obj ) {
+               return 'different_root';
+            })
+            .whenGivenInput({
+               a: 'a',
+               b: 'b'
+            })
+            .thenTheInstance(
+            // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+            // not the whole ten.
+            hasRootJson('different_root')
          );
       });      
       
