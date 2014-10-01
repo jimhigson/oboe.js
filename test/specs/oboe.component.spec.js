@@ -1474,6 +1474,70 @@ describe("oboe component (no http, content fed in externally)", function(){
             );
       })   
    });
+
+   describe('dropping nodes', function() {
+      
+      it('can drop from an array', function() {
+
+         function isEven(n) {
+            return (n % 2) == 0;
+         }
+         
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*', function( number ) {
+               if( isEven(number) ) {
+                  return oboe.drop;
+               }
+            })
+            .whenGivenInput([1,2,3,4,5,6,7])
+            .thenTheInstance(
+               hasRootJson([1,3,5,7])
+         );
+      })
+
+      it('can drop from an object', function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.*', function notDrinking( course ) {
+               if( course == 'wine' ) {
+                  return oboe.drop;
+               }
+            })
+            .whenGivenInput({
+               starter:'soup',
+               main:'fish',
+               desert:'fresh cheesecake',
+               drink:'wine'
+            })
+            .thenTheInstance(
+               hasRootJson({
+                  starter:'soup',
+                  main:'fish',
+                  desert:'fresh cheesecake'
+               })
+            );
+      });
+
+      it('can drop from an object using short-form', function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('starter', oboe.drop)
+            .whenGivenInput({
+               starter:'soup',
+               main:'fish',
+               desert:'fresh cheesecake',
+               drink:'wine'
+            })
+            .thenTheInstance(
+            hasRootJson({
+               main:'fish',
+               desert:'fresh cheesecake',
+               drink:'wine'
+            })
+         );
+      })      
+
+   });
    
    describe('swapping out nodes', function() {
 
@@ -1481,14 +1545,14 @@ describe("oboe component (no http, content fed in externally)", function(){
 
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*', function( obj ) {
-               if( obj.discard ) {
+               if( obj.nullfily ) {
                   return null;
                }
             })
             .whenGivenInput([
-               {discard:true},
+               {nullfily:true},
                {keep:true},
-               {discard:true}
+               {nullfily:true}
             ])
             .thenTheInstance(
             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
@@ -1523,7 +1587,8 @@ describe("oboe component (no http, content fed in externally)", function(){
          );
       });
 
-      xit('can replace the root', function() {
+      /*
+      it('can replace the root', function() {
          
          // replacing the root currently isn't supported
 
@@ -1540,7 +1605,8 @@ describe("oboe component (no http, content fed in externally)", function(){
             // not the whole ten.
             hasRootJson('different_root')
          );
-      });      
+      });
+      */
       
       it('can transform scalar values', function() {
          

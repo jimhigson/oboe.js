@@ -10,6 +10,8 @@ function instanceApi(oboeBus, contentSource){
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
        rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
+       emitNodeDrop = oboeBus(NODE_DROP).emit,
+       emitNodeSwap = oboeBus(NODE_SWAP).emit,
 
        /**
         * Add any kind of listener that the instance api exposes 
@@ -145,10 +147,15 @@ function instanceApi(oboeBus, contentSource){
 
    function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
       return function() {
-         var swapFor = callback.apply(this, arguments);
+         var returnValueFromCallback = callback.apply(this, arguments);
 
-         if( defined(swapFor) ) {
-            oboeBus(NODE_SWAP).emit(swapFor);
+         if( defined(returnValueFromCallback) ) {
+            
+            if( returnValueFromCallback == oboe.drop ) {
+               emitNodeDrop();
+            } else {
+               emitNodeSwap(returnValueFromCallback);
+            }
          }
       }
    }

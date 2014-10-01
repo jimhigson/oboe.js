@@ -41,3 +41,10 @@ function oboe(arg1) {
       return wire();
    }
 }
+
+/* oboe.drop is a special value. If a node callback returns this value the
+   parsed node is deleted from the JSON
+ */
+oboe.drop = function() {
+   return oboe.drop;
+};

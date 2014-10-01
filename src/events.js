@@ -14,6 +14,7 @@ var // the events which are never exported are kept as
 
     // called if a .node callback returns a value - 
     NODE_SWAP       = _S++,
+    NODE_DROP       = _S++,
 
     FAIL_EVENT      = 'fail',
    

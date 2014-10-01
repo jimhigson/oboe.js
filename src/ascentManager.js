@@ -30,10 +30,30 @@ function ascentManager(oboeBus, handlers){
       
       var oldHead = head(ascent),
           key = keyOf(oldHead),
-          ancestors = tail(ascent);
+          ancestors = tail(ascent),
+          parentNode;
 
       if( ancestors ) {
-         nodeOf(head(ancestors))[key] = newNode;
+         parentNode = nodeOf(head(ancestors));
+         parentNode[key] = newNode;
+      }
+   });
+
+   oboeBus(NODE_DROP).on(function() {
+
+      var oldHead = head(ascent),
+          key = keyOf(oldHead),
+          ancestors = tail(ascent),
+          parentNode;
+
+      if( ancestors ) {
+         parentNode = nodeOf(head(ancestors));
+         
+         if( isOfType(Array, parentNode) ) {
+            parentNode.length--;
+         } else {
+            delete parentNode[key];
+         }
       }
    });
 

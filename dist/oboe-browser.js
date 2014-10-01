@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:                    
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v1.15.2-17-gbf19154
+   // v1.15.2-20-g21799fc
 
 /*
 
@@ -1028,10 +1028,30 @@ function ascentManager(oboeBus, handlers){
       
       var oldHead = head(ascent),
           key = keyOf(oldHead),
-          ancestors = tail(ascent);
+          ancestors = tail(ascent),
+          parentNode;
 
       if( ancestors ) {
-         nodeOf(head(ancestors))[key] = newNode;
+         parentNode = nodeOf(head(ancestors));
+         parentNode[key] = newNode;
+      }
+   });
+
+   oboeBus(NODE_DROP).on(function() {
+
+      var oldHead = head(ascent),
+          key = keyOf(oldHead),
+          ancestors = tail(ascent),
+          parentNode;
+
+      if( ancestors ) {
+         parentNode = nodeOf(head(ancestors));
+         
+         if( isOfType(Array, parentNode) ) {
+            parentNode.length--;
+         } else {
+            delete parentNode[key];
+         }
       }
    });
 
@@ -2101,6 +2121,7 @@ var // the events which are never exported are kept as
 
     // called if a .node callback returns a value - 
     NODE_SWAP       = _S++,
+    NODE_DROP       = _S++,
 
     FAIL_EVENT      = 'fail',
    
@@ -2255,6 +2276,8 @@ function instanceApi(oboeBus, contentSource){
    var oboeApi,
        fullyQualifiedNamePattern = /^(node|path):./,
        rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
+       emitNodeDrop = oboeBus(NODE_DROP).emit,
+       emitNodeSwap = oboeBus(NODE_SWAP).emit,
 
        /**
         * Add any kind of listener that the instance api exposes 
@@ -2390,10 +2413,15 @@ function instanceApi(oboeBus, contentSource){
 
    function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
       return function() {
-         var swapFor = callback.apply(this, arguments);
+         var returnValueFromCallback = callback.apply(this, arguments);
 
-         if( defined(swapFor) ) {
-            oboeBus(NODE_SWAP).emit(swapFor);
+         if( defined(returnValueFromCallback) ) {
+            
+            if( returnValueFromCallback == oboe.drop ) {
+               emitNodeDrop();
+            } else {
+               emitNodeSwap(returnValueFromCallback);
+            }
          }
       }
    }
@@ -2612,6 +2640,13 @@ function oboe(arg1) {
       return wire();
    }
 }
+
+/* oboe.drop is a special value. If a node callback returns this value the
+   parsed node is deleted from the JSON
+ */
+oboe.drop = function() {
+   return oboe.drop;
+};
 
 
    if ( typeof define === "function" && define.amd ) {
