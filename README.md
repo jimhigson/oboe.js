@@ -1,10 +1,13 @@
-**Oboe.js** helps web applications respond quicker by baking streawming into http's request-response
-model.
-It glues a transport that sits **somewhere between streaming and downloading** 
-to a **JSON parser that sits somewhere between SAX and
-DOM**.
-It is small enough to be a [micro-library](http://microjs.com/#), doesn't have any 
-dependencies and doesn't care which other libraries you need it to speak to.
+Oboe.js is an [open source](LICENCE) Javascript library
+for loading JSON using streaming, combining the convenience of DOM with
+the speed and fluidity of SAX.
+
+It can parse any JSON as a stream, is small enough to be a [micro-library](http://microjs.com/#),
+doesn't have dependencies, and doesn't care which other libraries you need it to speak to.
+
+We can load trees [larger than the available memory](http://oboejs.com/examples#loading-json-trees-larger-than-the-available-ram).
+Or we can [instantiate a classical OOP models from JSON](http://oboejs.com/examples#demarshalling-json-to-an-oop-model),
+or [completely transform your JSON](http://oboejs.com/examples#transforming-json-while-it-is-streaming) while it is being read. 
 
 Oboe makes it really easy to start using json from a response before the ajax request completes. 
 Or even if it never completes.
