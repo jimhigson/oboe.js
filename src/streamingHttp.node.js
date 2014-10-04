@@ -70,7 +70,8 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
          port: parsedUrl.port, 
          path: parsedUrl.path,
          method: method,
-         headers: headers
+         headers: headers,
+         protocol: parsedUrl.protocol
       });
    }
    

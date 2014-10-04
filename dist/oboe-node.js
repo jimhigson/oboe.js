@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v1.15.2-21-g0909093
+   // v2.0.1
 
 /*
 
@@ -1134,7 +1134,8 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
          port: parsedUrl.port, 
          path: parsedUrl.path,
          method: method,
-         headers: headers
+         headers: headers,
+         protocol: parsedUrl.protocol
       });
    }
    
