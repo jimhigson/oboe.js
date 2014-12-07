@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.0.1
+   // v2.0.2-1-g46d9c44
 
 /*
 

@@ -24,7 +24,7 @@ describe('streaming http in a browser', function() {
 
       //fakeXhr.setResponseBody('here is a response body');
 
-      console.log(JSON.stringify(fakeBus.events));
+      //console.log(JSON.stringify(fakeBus.events));
    });
 
 });

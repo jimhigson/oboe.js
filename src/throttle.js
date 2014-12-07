@@ -1,45 +1,62 @@
 
-var minDataIntervalMs = 16,
-    maxDripSizeChars = 100;
-
+var 
+    maxDripSizeChars = 100,
+    maxPumpDuration = 16;
 
 /**
  * @param {Function} onInput
  * @param {Function} emitOutput
  */
 function throttle(onInput, emitOutput) {
+
+   // TODO: use high-res timers   
    
    var buffer = '',
-       scheduled;
+       scheduledTimeout;
       
    function scheduleNext() {
 
-      scheduled = window.setTimeout(actionThrottleFrame, minDataIntervalMs);
+      scheduledTimeout = window.setTimeout(dripSomeContentThrough, 0);
    }
    
-   function actionThrottleFrame() {
-      
-      var drip = buffer.substr(0, maxDripSizeChars),
-          buffer = buffer.substr(maxDripSizeChars); 
-          
-      if( drip )
+   function dripSomeContentThrough() {
+
+      var pumpStart = Date.now();
+
+      function withinPumpTime() {
+         return Date.now() < (pumpStart + maxPumpDuration);
+      }
+
+      do {
+         var drip = buffer.substr(0, maxDripSizeChars);
+         
+         buffer = buffer.substr(maxDripSizeChars);
+
          emitOutput(drip);
+
+      } while( buffer && withinPumpTime() );
       
       if( buffer )
          scheduleNext();
       else
-         scheduled = false;
+         scheduledTimeout = undefined;
    }
    
    onInput(function( dataIn ){
       
       buffer = buffer + dataIn;
 
-      if( !scheduled )
-         scheduleNext();
+      if( !scheduledTimeout ) {
+         
+         // We want to put out right away, in this frame if nothing
+         // is already scheduled. This avoids the delay of needing
+         // a new frame.
+         dripSomeContentThrough();
+      }
+         
    });
    
-   // TODO: aborting
+   // TODO: aborting - drop all buffered input and cancel timeouts
    
    // TODO: end of data event propagation
    
