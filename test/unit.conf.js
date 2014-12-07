@@ -12,6 +12,7 @@ module.exports = function(config) {
       ,  'test/libs/es5-sham.js'        
       ,  'src/functional.js'
       ,  'src/util.js'
+      ,  'src/throttle.js'
       ,  'src/lists.js' 
       ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'

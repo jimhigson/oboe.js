@@ -10,6 +10,7 @@ module.exports = function (grunt) {
    ,  'src/LICENCE.js'                
    ,  'src/functional.js'                
    ,  'src/util.js'                    
+   ,  'src/throttle.js'                    
    ,  'src/lists.js'                    
    ,  'src/libs/clarinet.js'               
    ,  'src/ascentManager.js'
@@ -34,7 +35,8 @@ module.exports = function (grunt) {
       'build/version.js'
    ,  'src/LICENCE.js'
    ,  'src/functional.js'                
-   ,  'src/util.js'                    
+   ,  'src/util.js'
+   ,  'src/throttle.js'
    ,  'src/lists.js'
    ,  'src/libs/clarinet.js'
    ,  'src/ascentManager.js'
@@ -233,7 +235,7 @@ module.exports = function (grunt) {
          testNode:{
             files: FILES_TRIGGERING_KARMA,
             tasks:[ 
-               'node-build-run']
+               'node-build-test']
          },         
          
          restartStreamSourceAndRunTests:{
