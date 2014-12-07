@@ -1,10 +1,21 @@
 describe('data throttle', function() {
 
+   var time;
+
+   beforeEach(function(){
+      time = sinon.useFakeTimers(500);
+   });
+   
+   afterEach(function(){
+      time.restore();
+      time = undefined;
+   });
+
    describe('forwards short input while the time is within budget', function() {
       
       var inputFromHttp = singleEventPubSub('data');
       var throttledOutput = fakePubSub(['data']);
-      var time = sinon.useFakeTimers(500);
+      
       
       throttle(inputFromHttp.on, throttledOutput('data').emit);
       
@@ -16,20 +27,22 @@ describe('data throttle', function() {
 
          inputFromHttp.emit('text 2');
          
-         expect( throttledOutput ).toHaveOutputEvents(
-            {type: 'data', args: ['text 1']}
-         ,  {type: 'data', args: ['text 2']}
-         );
+         expect( throttledOutput )
+            .toHaveOutputEvents(
+               {type: 'data', args: ['text 1']}
+            ,  {type: 'data', args: ['text 2']}
+            );
       });
       
-      xit( "doesn't propagate immediately once time budget is spent", function() {
+      it( "doesn't propagate immediately once time budget is spent", function() {
          
          time.tick(1);
 
          // more input should not propagate yet, we have taken too long
          inputFromHttp.emit('text 3');
 
-         expect( throttledOutput.events.length ).toBe(2);
+         expect( throttledOutput )
+            .toHaveFiredEventNames('data', 'data');
       });
       
    });
@@ -65,10 +78,24 @@ describe('data throttle', function() {
                   ' to equal ' +
                   JSON.stringify(actualEvents);
             };
-            
-            console.log(JSON.stringify(expectedEvents) == JSON.stringify(actualEvents));
-            
+                        
             return JSON.stringify(expectedEvents) == JSON.stringify(actualEvents);
+         }),
+         
+         toHaveFiredEventNames: varArgs(function( expectedEventNames ){
+            var actualBus = this.actual;
+            var actualEventNames = actualBus.events.map(function(event){
+               return event.type;
+            });
+
+            this.message = function() {
+               return 'expected events ' +
+                  JSON.stringify(expectedEventNames) +
+                  ' to equal ' +
+                  JSON.stringify(actualEventNames);
+            };
+
+            return JSON.stringify(actualEventNames) == JSON.stringify(expectedEventNames);
          })
       });
    });
