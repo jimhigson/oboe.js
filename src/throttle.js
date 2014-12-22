@@ -12,19 +12,23 @@ function throttle(onInput, emitOutput) {
    // TODO: use high-res timers   
    
    var buffer = '',
+       latch = false,
        scheduledTimeout;
       
    function scheduleNext() {
 
-      scheduledTimeout = window.setTimeout(dripSomeContentThrough, 0);
+      scheduledTimeout = window.setTimeout(function() {
+         latch = false;
+         dripSomeContentThrough();
+      }, 0);
    }
    
    function dripSomeContentThrough() {
 
       var pumpStart = Date.now();
 
-      function withinPumpTime() {
-         return Date.now() < (pumpStart + maxPumpDuration);
+      function updateLatch() {
+         latch = Date.now() < (pumpStart + maxPumpDuration);
       }
 
       do {
@@ -34,7 +38,8 @@ function throttle(onInput, emitOutput) {
 
          emitOutput(drip);
 
-      } while( buffer && withinPumpTime() );
+         updateLatch();
+      } while( buffer && !latch );
       
       if( buffer )
          scheduleNext();
@@ -59,6 +64,8 @@ function throttle(onInput, emitOutput) {
    // TODO: aborting - drop all buffered input and cancel timeouts
    
    // TODO: end of data event propagation
+   
+   // TODO: no window in window.setTimeout ?
    
 }
 
