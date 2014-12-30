@@ -82,6 +82,10 @@ module.exports.start = function(httpPort, grunt){
       function replyWithInvalidJson(req, res) {
          res.end('{{');
       }
+
+      function serve204Json(req, res) {
+         res.status(204).send();
+      }
       
       function serve404Json(req, res) {
          // our little REST endpoint with errors:
@@ -209,6 +213,7 @@ module.exports.start = function(httpPort, grunt){
       app.get('/gzippedTwoHundredItems', replyWithTenSlowNumbersGzipped);
       app.get('/invalidJson', replyWithInvalidJson);
       app.get('/404json', serve404Json);
+      app.get('/204noData', serve204Json);
    
       return app;
    }

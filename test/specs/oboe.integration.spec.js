@@ -45,7 +45,20 @@
             runs(function() {
                expect(urlOnDone).toBe(exampleUrl);
             });
-         });         
+         });
+      });
+
+      describe('can load an empty response', function() {
+
+         oboe({
+            url: testUrl('204noData')
+         })
+         .start(function(statusCode){
+            expect(statusCode).toBe(204);
+         })
+         .done(whenDoneFn);
+
+         waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
       });
       
       Platform.isNode && describe('running under node', function(){
