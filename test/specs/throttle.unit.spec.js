@@ -1,21 +1,25 @@
 ddescribe('data throttle', function() {
 
-   var time;
+   var clock;
 
    beforeEach(function(){
-      time = sinon.useFakeTimers(500);
+      clock = sinon.useFakeTimers();
    });
    
    afterEach(function(){
-      time.restore();
-      time = undefined;
+      clock.restore();
+      clock = undefined;
    });
 
    describe('forwards short input while the time is within budget', function() {
       
       var inputFromHttp = singleEventPubSub('data');
       var throttledOutput = fakePubSub(['data']);
-      
+      var datacallbackDuration = 0;
+
+      throttledOutput('data').onEmit(function () {
+         clock.now += datacallbackDuration;
+      });
       
       throttle(inputFromHttp.on, throttledOutput('data').emit);
 
@@ -34,7 +38,7 @@ ddescribe('data throttle', function() {
       
       it('fires straight through within the allowed time', function() {
 
-         time.tick(maxPumpDuration - 1); 
+         clock.tick(maxPumpDuration - 1); 
 
          inputFromHttp.emit('second drip');
          
@@ -45,11 +49,32 @@ ddescribe('data throttle', function() {
             );
       });
       
-      it("doesn't propagate immediately once time budget is spent", function() {
+      it("doesn't propagate immediately after time budget is spent", function() {
+
+         console.log('time is now', clock.now);
          
-         time.tick(1);
+         clock.tick(1);
 
          // more input should not propagate yet, we have taken too long
+         // This doesn't really work. Time should be incremented from INSIDE the
+         // callback.
+         // Would calling .tick from inside there do the job? Probably not, since
+         // we wouldn't expect the event bus listener to call the setTimeout
+         // callback.
+         //
+         // Unclear how to mock timers for this.
+         //    Need to be able to:
+         //    Advance Date.now() from inside the callback (simulating it taking some time to complete)
+         //    Seperately, make callbacks happen
+         //
+         // Looks like can't increment clock.now directly, or timeouts jumped over
+         // will not fire
+         // timeouts have property at this.timeouts[id].callAt which must be between
+         // the old clock.now and the clock.tick(¬increment) 
+         
+         
+         console.log('time is now', clock.now);
+         
          inputFromHttp.emit('third drip');
 
          expect( throttledOutput )
@@ -74,7 +99,6 @@ ddescribe('data throttle', function() {
             {type: 'data', args: [hundredChars]}
       ]);
    });
-   
    
    beforeEach(function () {
       this.addMatchers({

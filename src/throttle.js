@@ -8,17 +8,17 @@ var
  * @param {Function} emitOutput
  */
 function throttle(onInput, emitOutput) {
-
-   // TODO: use high-res timers   
    
    var buffer = '',
-       latch = false,
+       alreadyRunThisFrame = false,
        scheduledTimeout;
       
    function scheduleNext() {
 
+      console.log('scheduling a new frame');
+
       scheduledTimeout = window.setTimeout(function() {
-         latch = false;
+         alreadyRunThisFrame = true;
          dripSomeContentThrough();
       }, 0);
    }
@@ -27,8 +27,8 @@ function throttle(onInput, emitOutput) {
 
       var pumpStart = Date.now();
 
-      function updateLatch() {
-         latch = Date.now() < (pumpStart + maxPumpDuration);
+      function timeLeft() {
+         return Date.now() < (pumpStart + maxPumpDuration);         
       }
 
       do {
@@ -38,8 +38,7 @@ function throttle(onInput, emitOutput) {
 
          emitOutput(drip);
 
-         updateLatch();
-      } while( buffer && !latch );
+      } while( buffer && timeLeft() );
       
       if( buffer )
          scheduleNext();
@@ -49,7 +48,12 @@ function throttle(onInput, emitOutput) {
    
    onInput(function( dataIn ){
       
+      console.log('got some data', dataIn);
+      
       buffer = buffer + dataIn;
+      
+      console.log('buffer is now', buffer);
+      console.log('timeout exists?', !!scheduledTimeout);
 
       if( !scheduledTimeout ) {
          
@@ -60,6 +64,8 @@ function throttle(onInput, emitOutput) {
       }
          
    });
+
+   // TODO: use high-res timers
    
    // TODO: aborting - drop all buffered input and cancel timeouts
    

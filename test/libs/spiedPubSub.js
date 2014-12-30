@@ -49,12 +49,21 @@ function fakePubSub( eventNames ) {
    }      
    
    eventNames.forEach(function (eventName) {
-            
+
+      var callthroughOnEmit = function(){};
+      var recordEmit = emitRecorder(eventName);
+      
       var singleInstanceStub = {
          emit:  jasmine.createSpy(eventName + '/emit')
-                     .andCallFake(emitRecorder(eventName))
+                     .andCallFake(function(){
+                        recordEmit.apply(this, arguments);
+                        callthroughOnEmit.apply(this, arguments);
+                     })
       ,  on:    jasmine.createSpy(eventName + '/on')
       ,  un:    jasmine.createSpy(eventName + '/un')
+      ,  onEmit: function(f) {
+            callthroughOnEmit = f;
+         }
       };
 
       eventTypes[eventName] = singleInstanceStub;
