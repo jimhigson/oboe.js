@@ -47,19 +47,6 @@
             });
          });
       });
-
-      describe('can load an empty response', function() {
-
-         oboe({
-            url: testUrl('204noData')
-         })
-         .start(function(statusCode){
-            expect(statusCode).toBe(204);
-         })
-         .done(whenDoneFn);
-
-         waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
-      });
       
       Platform.isNode && describe('running under node', function(){
    
@@ -693,6 +680,26 @@
             expect( stubCallback ).toHaveBeenGivenThrowee(callbackError)
          })
       })
+
+      it('can load an empty response with 204 status code', function() {
+
+         var status;
+
+         oboe({
+            url: testUrl('204noData')
+         })
+         .start(function(s){
+            status = s;
+         })
+         .done(whenDoneFn);
+
+         waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+         runs(function() {
+            expect(fullResponse).toEqual({});
+            expect(status).toBe(204);
+         })
+      });
 
       it('emits error with incomplete json', function () {
 

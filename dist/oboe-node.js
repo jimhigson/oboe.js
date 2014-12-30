@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.0.1
+   // v2.0.2-2-g305f277
 
 /*
 
@@ -533,6 +533,17 @@ function first(test, list) {
    
    For the original go here:
       https://github.com/dscape/clarinet
+
+   We receive the events:
+      STREAM_DATA
+      STREAM_END
+      
+   We emit the events:
+      SAX_KEY
+      SAX_VALUE_OPEN
+      SAX_VALUE_CLOSE
+      FAIL_EVENT
+      
  */
 
 function clarinet(eventBus) {
@@ -608,12 +619,12 @@ function clarinet(eventBus) {
                                + position;
   }
 
-  eventBus(STREAM_DATA).on(write);
+  eventBus(STREAM_DATA).on(handleData);
 
    /* At the end of the http content close the clarinet 
     This will provide an error if the total content provided was not 
     valid json, ie if not all arrays, objects and Strings closed properly */
-  eventBus(STREAM_END).on(end);   
+  eventBus(STREAM_END).on(handleStreamEnd);   
 
   function emitError (errorString) {
      if (textNode) {
@@ -629,24 +640,45 @@ function clarinet(eventBus) {
      emitFail(errorReport(undefined, undefined, latestError));
   }
 
-  function end() {
+  function handleStreamEnd() {
+    if( state == BEGIN ) {
+      // Handle the case where the stream closes without ever receiving
+      // any input. This isn't an error - response bodies can be blank,
+      // particularly for 204 http responses
+      
+      // Because of how Oboe is currently implemented, we parse a
+      // completely empty stream as containing an empty object.
+      // This is because Oboe's done event is only fired when the
+      // root object of the JSON stream closes.
+      
+      // This should be decoupled and attached instead to the input stream
+      // from the http (or whatever) resource ending.
+      // If this decoupling could happen the SAX parser could simply emit
+      // zero events on a completely empty input.
+      emitValueOpen({});
+      emitValueClose();
+
+      closed = true;
+      return;
+    }
+  
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
  
-     if (textNode) {
-        emitValueOpen(textNode);
-        emitValueClose();
-        textNode = "";
-     }
+    if (textNode) {
+      emitValueOpen(textNode);
+      emitValueClose();
+      textNode = "";
+    }
      
-     closed = true;
+    closed = true;
   }
 
   function whitespace(c){
      return c == '\r' || c == '\n' || c == ' ' || c == '\t';
   }
    
-  function write (chunk) {
+  function handleData (chunk) {
          
     // this used to throw the error but inside Oboe we will have already
     // gotten the error when it was emitted. The important thing is to
@@ -1460,13 +1492,16 @@ function incrementalContentBuilder( oboeBus ) {
 
 
    /**
-    * For when the current node ends
+    * For when the current node ends.
     */
    function nodeClosed( ascent ) {
 
       emitNodeClosed( ascent);
-      
-      return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
+       
+      return tail( ascent) ||
+             // If there are no nodes left in the ascent the root node
+             // just closed. Emit a special event for this: 
+             emitRootClosed(nodeOf(head(ascent)));
    }      
 
    var contentBuilderHandlers = {};

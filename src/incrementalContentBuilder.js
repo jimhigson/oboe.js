@@ -130,13 +130,16 @@ function incrementalContentBuilder( oboeBus ) {
 
 
    /**
-    * For when the current node ends
+    * For when the current node ends.
     */
    function nodeClosed( ascent ) {
 
       emitNodeClosed( ascent);
-      
-      return tail( ascent) || emitRootClosed(nodeOf(head(ascent)));
+       
+      return tail( ascent) ||
+             // If there are no nodes left in the ascent the root node
+             // just closed. Emit a special event for this: 
+             emitRootClosed(nodeOf(head(ascent)));
    }      
 
    var contentBuilderHandlers = {};

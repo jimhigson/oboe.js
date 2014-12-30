@@ -2,7 +2,19 @@
 // test cases borrowed from
 //    https://github.com/dscape/clarinet/blob/master/test/clarinet.js
 var docs   =
-    { empty_array :
+    { 
+      empty_input:
+      { text      : '',
+        events    :
+        [ // bit of a hack that on completely empty
+          // input an empty object is parsed out -
+          // in future this should be simply zero
+          // events
+          [SAX_VALUE_OPEN, {}],
+          [SAX_VALUE_CLOSE]
+        ]
+      }
+    , empty_array :
       { text      : '[]'
       , events    :
         [ [SAX_VALUE_OPEN, []]
@@ -729,7 +741,7 @@ var docs   =
       }
     };
 
-describe('clarinet', function(){
+describe('clarinet', function() {
 
    var expectedEventNames = [ SAX_KEY          
                             , SAX_VALUE_OPEN  
