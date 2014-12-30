@@ -32,8 +32,8 @@ function fakePubSub( eventNames ) {
    var eventTypesEmitted = {};
    var callCount = {};
       
-   function record(eventName){
-      return function() {
+   function emitRecorder(eventName) {
+      return function record() {
          
          var args = Array.prototype.slice.apply(arguments);
          
@@ -48,37 +48,38 @@ function fakePubSub( eventNames ) {
       }
    }      
    
-   eventNames.forEach( function( eventName ){
-      eventTypes[eventName] = {
-         'emit':  jasmine.createSpy(eventName + '/emit')
-                     .andCallFake(record(eventName))
-      ,  'on':    jasmine.createSpy(eventName + '/on')
-      ,  'un':    jasmine.createSpy(eventName + '/un')
+   eventNames.forEach(function (eventName) {
+            
+      var singleInstanceStub = {
+         emit:  jasmine.createSpy(eventName + '/emit')
+                     .andCallFake(emitRecorder(eventName))
+      ,  on:    jasmine.createSpy(eventName + '/on')
+      ,  un:    jasmine.createSpy(eventName + '/un')
       };
-      
+
+      eventTypes[eventName] = singleInstanceStub;
       eventTypesEmitted[eventName] = [];
-      callCount[eventName] = 0;      
+      callCount[eventName] = 0;
    });
 
-   function bus( eventName ) {
-           
+   function fakeBus( eventName ) {
       return eventTypes[eventName];
    }
    
-   bus.events            = eventsEmitted;
-   bus.eventNames        = eventNamesEmitted;
-   bus.eventTypesEmitted = eventTypesEmitted;
-   bus.callCount         = callCount;
-   
+   fakeBus.events            = eventsEmitted;
+   fakeBus.eventNames        = eventNamesEmitted;
+   fakeBus.eventTypesEmitted = eventTypesEmitted;
+   fakeBus.callCount         = callCount;
 
-   ['emit', 'on'].forEach(function(methodName){
+   // shortcutted version of calls - bus#on and bus#emit
+   ['emit', 'on'].forEach(function(nameOfMethodOnBus){
    
-      bus[methodName] = varArgs(function(eventName, parameters){
-         apply( parameters, eventTypes[eventName][methodName]);
+      fakeBus[nameOfMethodOnBus] = varArgs(function(eventName, parameters){
+         apply( parameters, eventTypes[eventName][nameOfMethodOnBus]);
       });
    });
 
-   return bus;
+   return fakeBus;
 }
 
 function eventBlackBox( pubsub, eventNames ) {
