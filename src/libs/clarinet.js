@@ -107,13 +107,13 @@ function clarinet(eventBus) {
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
  
-     if (textNode) {
-        emitValueOpen(textNode);
-        emitValueClose();
-        textNode = "";
-     }
+    if (textNode) {
+      emitValueOpen(textNode);
+      emitValueClose();
+      textNode = "";
+    }
      
-     closed = true;
+    closed = true;
   }
 
   function whitespace(c){
