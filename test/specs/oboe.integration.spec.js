@@ -207,7 +207,7 @@
          });
          
          it('can load from a file:// URL', function() {
-            var req = oboe({
+            oboe({
                url: crossDomainUrl('/echoBackHeadersAsBodyJson')
             }).node('fileUrl', function(fileUrl){
             
