@@ -86,6 +86,10 @@ module.exports.start = function(httpPort, grunt){
       function serve204Json(req, res) {
          res.status(204).send();
       }
+
+      function testJsonDir(req, res) {
+         res.send({fileUrl:'file://' + __dirname + '/json'});
+      }
       
       function serve404Json(req, res) {
          // our little REST endpoint with errors:
@@ -214,6 +218,7 @@ module.exports.start = function(httpPort, grunt){
       app.get('/invalidJson', replyWithInvalidJson);
       app.get('/404json', serve404Json);
       app.get('/204noData', serve204Json);
+      app.get('/projectLocation', testJsonDir);
    
       return app;
    }

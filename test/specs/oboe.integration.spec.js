@@ -143,6 +143,13 @@
       });
 
       (!Platform.isNode) && describe('running under a browser', function(){
+         
+         // only worry about this in the browser
+         it( 'hasn\'t put clarinet in the global namespace', function(){
+
+            expect( window.clarinet ).toBeUndefined();
+         });
+      
          it('does not send cookies cross-domain by default', function () {
 
             document.cookie = "oboeIntegrationDontSend=123; path=/";
@@ -197,7 +204,25 @@
             runs(function(){
                expect( req.root()['x-requested-with'] ).toBeUndefined();
             })
-         });         
+         });
+         
+         it('can load from a file:// URL', function() {
+            var req = oboe({
+               url: crossDomainUrl('/echoBackHeadersAsBodyJson')
+            }).node('fileUrl', function(fileUrl){
+            
+               var testJsonFileUrl = fileUrl + '/firstTenNaturalNumbers.json';
+            
+               console.log('testing file url with' + fileUrl);
+            
+               oboe(testJsonFileUrl)
+                  .done(whenDoneFn);
+            });
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            expect(fullResponse).toEqual([0,1,2,3,4,5,6,7,8,9]);
+         });
       });
    
       it('gets all expected callbacks by time request finishes', function () {
@@ -712,15 +737,7 @@
             return !!stubCallback.calls.length;
          }, 'the request to fail', ASYNC_TEST_TIMEOUT);
       })      
-   
-      if( !Platform.isNode ) {
-         // only worry about this in the browser
-         
-         it( 'hasn\'t put clarinet in the global namespace', function(){
-         
-            expect( window.clarinet ).toBeUndefined();
-         });
-      }            
+                     
    
       function someSecondsToPass(waitSecs) {
    
