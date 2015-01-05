@@ -48,12 +48,8 @@ function ascentManager(oboeBus, handlers){
 
       if( ancestors ) {
          parentNode = nodeOf(head(ancestors));
-         
-         if( isOfType(Array, parentNode) ) {
-            parentNode.length--;
-         } else {
-            delete parentNode[key];
-         }
+ 
+         delete parentNode[key];
       }
    });
 

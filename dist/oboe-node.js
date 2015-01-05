@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.0.2-2-g305f277
+   // v2.0.3
 
 /*
 
@@ -541,9 +541,8 @@ function first(test, list) {
    We emit the events:
       SAX_KEY
       SAX_VALUE_OPEN
-      SAX_VALUE_CLOSE
-      FAIL_EVENT
-      
+      SAX_VALUE_CLOSE      
+      FAIL_EVENT      
  */
 
 function clarinet(eventBus) {
@@ -1077,12 +1076,8 @@ function ascentManager(oboeBus, handlers){
 
       if( ancestors ) {
          parentNode = nodeOf(head(ancestors));
-         
-         if( isOfType(Array, parentNode) ) {
-            parentNode.length--;
-         } else {
-            delete parentNode[key];
-         }
+ 
+         delete parentNode[key];
       }
    });
 

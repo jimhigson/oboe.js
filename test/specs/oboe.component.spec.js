@@ -1477,7 +1477,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
    describe('dropping nodes', function() {
       
-      it('can drop from an array', function() {
+      it('drops from an array leaving holes', function() {
 
          function isEven(n) {
             return (n % 2) == 0;
@@ -1491,7 +1491,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             })
             .whenGivenInput([1,2,3,4,5,6,7])
             .thenTheInstance(
-               hasRootJson([1,3,5,7])
+               hasRootJson([1, ,3, ,5, ,7]) // note holes in array!
          );
       })
 
