@@ -1,10 +1,10 @@
 // This file is the concatenation of many js files.
 // See http://github.com/jimhigson/oboe.js for the raw source
 
-// having a local undefined, window, Object etc allows slightly better minification:                    
+// having a local undefined, window, Object etc allows slightly better minification:
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v2.0.3
+   // v2.1.0-1-gce46063
 
 /*
 
@@ -2686,4 +2686,12 @@ oboe.drop = function() {
    } else {
       window.oboe = oboe;
    }
-})(window, Object, Array, Error, JSON);
+})((function(){
+   // Access to the window object throws an exception in HTML5 web workers so
+   // point it to "self" if it runs in a web worker
+      try {
+         return window;
+      } catch (e) {
+         return self;
+      }
+   }()), Object, Array, Error, JSON);
