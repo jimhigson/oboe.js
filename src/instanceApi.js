@@ -93,7 +93,7 @@ function instanceApi(oboeBus, contentSource){
     */
    function addForgettableCallback(event, callback, listenerId) {
       
-      // listnerId is optional and if not given, the original
+      // listenerId is optional and if not given, the original
       // callback will be used
       listenerId = listenerId || callback;
       
