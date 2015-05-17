@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.0-1-gce46063
+   // v2.1.1-1-gb70a959
 
 /*
 
@@ -2283,7 +2283,7 @@ function instanceApi(oboeBus, contentSource){
     */
    function addForgettableCallback(event, callback, listenerId) {
       
-      // listnerId is optional and if not given, the original
+      // listenerId is optional and if not given, the original
       // callback will be used
       listenerId = listenerId || callback;
       
@@ -2524,7 +2524,13 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 // export public API
 function oboe(arg1) {
 
-   var nodeStreamMethodNames = list('resume', 'pause', 'pipe', 'unpipe', 'unshift'),
+   // We use duck-typing to detect if the parameter given is a stream, with the
+   // below list of parameters.
+   // Unpipe and unshift would normally be present on a stream but this breaks
+   // compatibility with Request streams.
+   // See https://github.com/jimhigson/oboe.js/issues/65
+   
+   var nodeStreamMethodNames = list('resume', 'pause', 'pipe'),
        isStream = partialComplete(
                      hasAllProperties
                   ,  nodeStreamMethodNames

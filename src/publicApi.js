@@ -1,7 +1,13 @@
 // export public API
 function oboe(arg1) {
 
-   var nodeStreamMethodNames = list('resume', 'pause', 'pipe', 'unpipe', 'unshift'),
+   // We use duck-typing to detect if the parameter given is a stream, with the
+   // below list of parameters.
+   // Unpipe and unshift would normally be present on a stream but this breaks
+   // compatibility with Request streams.
+   // See https://github.com/jimhigson/oboe.js/issues/65
+   
+   var nodeStreamMethodNames = list('resume', 'pause', 'pipe'),
        isStream = partialComplete(
                      hasAllProperties
                   ,  nodeStreamMethodNames

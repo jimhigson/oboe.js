@@ -48,10 +48,11 @@
          });
       });
       
-      Platform.isNode && describe('running under node', function(){
+      Platform.isNode && describe('when running under node', function(){
    
          var http = require('http'),
-             fs = require('fs');
+             fs = require('fs'),
+             request = require('request');
       
          it('can read from a stream that is passed in', function() {
          
@@ -73,8 +74,26 @@
             runs(function () {
      
                expect( callbackSpy.calls.length ).toBe(10);   
-            });      
+            });
          });
+         
+         it('can read from a stream from Request - https://github.com/jimhigson/oboe.js/issues/65', function() {
+            
+            oboe(request('http://localhost:4567/tenSlowNumbers'))
+               .node('![*]', callbackSpy)
+               .done(whenDoneFn)
+               .on('error', function(e) {
+                  console.log(e);
+               });
+               
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+
+               expect( callbackSpy.calls.length ).toBe(10);
+            });
+         });
+         
          
          it('can read from a local file', function() {
 

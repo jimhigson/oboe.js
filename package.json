@@ -58,7 +58,8 @@
     "karma-firefox-launcher": "~0.1.0",
     "karma-jasmine": "~0.1.5",
     "karma-safari-launcher": "~0.1.1",
-    "matchdep": "~0.1.2"
+    "matchdep": "~0.1.2",
+    "request": "^2.55.0"
   },
   "dependencies": {
     "http-https": "^1.0.0"
