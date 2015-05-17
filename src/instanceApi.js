@@ -83,7 +83,14 @@ function instanceApi(oboeBus, contentSource){
     * removed using .un(callback)
     */
    function addProtectedCallback(eventName, callback) {
-      oboeBus(eventName).on(protectedCallback(callback), callback);
+      oboeBus(eventName).on(
+         protectedCallback(
+            provideInstanceDuringCallback(
+               callback
+            )
+         )
+      ,  callback
+      );
       return oboeApi; // chaining            
    }
 
@@ -97,7 +104,11 @@ function instanceApi(oboeBus, contentSource){
       // callback will be used
       listenerId = listenerId || callback;
       
-      var safeCallback = protectedCallback(callback);
+      var safeCallback =   protectedCallback(
+                              provideInstanceDuringCallback(
+                                 callback
+                              )
+                           );
    
       event.on( function() {
       
@@ -119,6 +130,20 @@ function instanceApi(oboeBus, contentSource){
       return oboeApi; // chaining         
    }
       
+   function provideInstanceDuringCallback(callback) {
+      return function() {
+         var oldInstance = oboe.instance;
+         
+         oboe.instance = oboeApi;
+         
+         var rtn = apply(arguments, oboeApi);
+         
+         oboe.instance = oldInstance;
+         
+         return rtn;
+      }
+   }
+
    /** 
     *  wrap a callback so that if it throws, Oboe.js doesn't crash but instead
     *  handles it like a normal error
@@ -230,12 +255,16 @@ function instanceApi(oboeBus, contentSource){
       on             : addListener,
       addListener    : addListener, 
       removeListener : removeListener,
-      emit           : oboeBus.emit,                
+      emit           : oboeBus.emit,
                 
+      // forgettable, protected, swappable
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
       path           : partialComplete(addNodeOrPathListenerApi, 'path'),
       
-      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),            
+      // forgettable, protected
+      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),
+      
+      // protected            
       start          : partialComplete(addProtectedCallback, HTTP_START ),
       
       // fail doesn't use protectedCallback because 
