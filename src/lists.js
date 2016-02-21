@@ -33,7 +33,7 @@ var emptyList = null,
 /**
  * Get the tail of a list.
  * 
- * Ie, head(cons(a,b)) = a
+ * Ie, tail(cons(a,b)) = b
  */
     tail = attr(1);
 
