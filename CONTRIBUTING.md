@@ -26,7 +26,13 @@ We're not trying to be mean, it just helps keep the issues tab cleaner so we can
 ## Reporting Bugs / Requesting Features
 
 If you've found an issue, please submit it in
-[the issues](https://github.com/jimhigson/oboe.js/issues). A link to a
+[the issues](https://github.com/jimhigson/oboe.js/issues).
+
+To increase our ability to help, please:
+- If it's a server-side bug, fork our
+[bug-template](https://github.com/JuanCaicedo/oboe-bug-template), recreate your
+bug, and then provide a link to that repo.
+- If it's a client-side template, provide a link to a
 [jsbin](https://jsbin.com/)/[codepen](http://codepen.io/)/[plunkr](https://plnkr.co/)
 that demonstrates the issue (if it's on the client), or a github repo
 (if it's on the server), greatly increases our ability to help.
@@ -48,12 +54,6 @@ the faster it can get merged!
 
 ### What does Oboe need help with?
 
-#### An oboe.js StackOverflow tag
-
-If you have enough [reputation on StackOverflow](http://stackoverflow.com/help/whats-reputation)
-to make a tag for `oboe.js`, please do that for us! That will help us keep track
- of questions being asked on there and respond to them faster.
-
 #### Helping others!
 
 There is a [Google Group](https://groups.google.com/forum/#!forum/oboejs) for
@@ -66,4 +66,6 @@ library, please stop in.
 showing common use-cases, and it could always use some more. Feel free to submit
 a PR to [the website](https://github.com/jimhigson/oboe.js-website).
 - We would also like to showcase applications using Oboe, so if you've published
-one and want to share it, file it [in the website issues](https://github.com/jimhigson/oboe.js-website/issues) and we'll showcase it!
+one and want to share it, file it
+[in the website issues](https://github.com/jimhigson/oboe.js-website/issues)
+and we'll showcase it!
