@@ -49,7 +49,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
     */
    function handleProgress() {
 
-     if (String(xhr.status)[0] == 2) {
+     if (String(xhr.status)[0] === '2') {
        
         var textSoFar = xhr.responseText,
             newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
