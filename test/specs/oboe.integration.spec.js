@@ -111,6 +111,22 @@
             });
          });
 
+         it('can read an empty key', function() {
+
+            var fileStream = fs.createReadStream('test/json/emptyKey.json');
+
+            oboe(fileStream)
+                .node('!.*', callbackSpy)
+                .done(whenDoneFn);
+
+            waitsFor(doneCalled, 'the request to have called done', ASYNC_TEST_TIMEOUT);
+
+            runs(function () {
+
+               expect( callbackSpy.calls.length ).toBe(2);
+            });
+         });
+
          it('doesnt get confused if a stream has a "url" property', function() {
             var fileStream = fs.createReadStream('test/json/firstTenNaturalNumbers.json');
             fileStream.url = 'http://howodd.com';
