@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v2.1.2-2-g8cc8edc
+   // v2.1.2-14-g0737717
 
 /*
 
@@ -367,7 +367,7 @@ var emptyList = null,
 /**
  * Get the tail of a list.
  * 
- * Ie, head(cons(a,b)) = a
+ * Ie, tail(cons(a,b)) = b
  */
     tail = attr(1);
 
@@ -588,7 +588,7 @@ function clarinet(eventBus) {
   ,   latestError                
   ,   c                    
   ,   p                    
-  ,   textNode             = ""
+  ,   textNode             = undefined
   ,   numberNode           = ""     
   ,   slashed              = false
   ,   closed               = false
@@ -606,7 +606,7 @@ function clarinet(eventBus) {
      
     var maxActual = 0;
      
-    if (textNode.length > MAX_BUFFER_LENGTH) {
+    if (textNode !== undefined && textNode.length > MAX_BUFFER_LENGTH) {
       emitError("Max buffer length exceeded: textNode");
       maxActual = Math.max(maxActual, textNode.length);
     }
@@ -627,10 +627,10 @@ function clarinet(eventBus) {
   eventBus(STREAM_END).on(handleStreamEnd);   
 
   function emitError (errorString) {
-     if (textNode) {
+     if (textNode !== undefined) {
         emitValueOpen(textNode);
         emitValueClose();
-        textNode = "";
+        textNode = undefined;
      }
 
      latestError = Error(errorString + "\nLn: "+line+
@@ -665,10 +665,10 @@ function clarinet(eventBus) {
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
  
-    if (textNode) {
+    if (textNode !== undefined) {
       emitValueOpen(textNode);
       emitValueClose();
-      textNode = "";
+      textNode = undefined;
     }
      
     closed = true;
@@ -738,26 +738,26 @@ function clarinet(eventBus) {
             if(state === CLOSE_OBJECT) {
               stack.push(CLOSE_OBJECT);
 
-               if (textNode) {
+               if (textNode !== undefined) {
                   // was previously (in upstream Clarinet) one event
                   //  - object open came with the text of the first
                   emitValueOpen({});
                   emitSaxKey(textNode);
-                  textNode = "";
+                  textNode = undefined;
                }
                depth++;
             } else {
-               if (textNode) {
+               if (textNode !== undefined) {
                   emitSaxKey(textNode);
-                  textNode = "";
+                  textNode = undefined;
                }
             }
              state  = VALUE;
           } else if (c==='}') {
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              emitValueClose();
             depth--;
@@ -765,10 +765,10 @@ function clarinet(eventBus) {
           } else if(c===',') {
             if(state === CLOSE_OBJECT)
               stack.push(CLOSE_OBJECT);
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              state  = OPEN_KEY;
           } else 
@@ -812,17 +812,17 @@ function clarinet(eventBus) {
         case CLOSE_ARRAY:
           if(c===',') {
             stack.push(CLOSE_ARRAY);
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              state  = VALUE;
           } else if (c===']') {
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              emitValueClose();
             depth--;
@@ -834,6 +834,10 @@ function clarinet(eventBus) {
         continue;
 
         case STRING:
+          if (textNode === undefined) {
+              textNode = "";
+          }
+
           // thanks thejh, this is an about 50% performance improvement.
           var starti              = i-1;
            
@@ -857,10 +861,6 @@ function clarinet(eventBus) {
             if (c === '"' && !slashed) {
               state = stack.pop() || VALUE;
               textNode += chunk.substring(starti, i-1);
-              if(!textNode) {
-                 emitValueOpen("");
-                 emitValueClose();
-              }
               break;
             }
             if (c === '\\' && !slashed) {
