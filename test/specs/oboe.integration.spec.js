@@ -1,6 +1,14 @@
 
 (function(Platform) {
 
+    // Used to spy on global functions like setTimeout
+    var globalContext;
+    if ( !Platform.isNode ) {
+      globalContext = window;
+    } else {
+      globalContext = GLOBAL;
+    }
+
    describe("oboe integration (real http)", function() {
 
       var oboe =     Platform.isNode
@@ -284,7 +292,7 @@
 
       it('continues to parse after a callback throws an exception', function () {
 
-         spyOn(window, 'setTimeout');
+         spyOn(globalContext, 'setTimeout');
          oboe(testUrl('static/json/tenRecords.json'))
             .node('{id name}', function(){
 
@@ -301,9 +309,9 @@
          );
 
          runs(function () {
-            expect(window.setTimeout.calls.length).toEqual(10);
+            expect(globalContext.setTimeout.calls.length).toEqual(10);
             for(var i = 0; i < 10; i++) {
-              expect(window.setTimeout.calls[i].args[0]).toThrow('uh oh!')
+              expect(globalContext.setTimeout.calls[i].args[0]).toThrow('uh oh!')
             }
          });
       })
@@ -674,7 +682,7 @@
          var callbackError = new Error('I am a bad callback');
              stubCallback = jasmine.createSpy('error callback').andThrow(callbackError);
 
-         spyOn(window, 'setTimeout');
+         spyOn(globalContext, 'setTimeout');
          oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
             .node('!.*', stubCallback)
 
@@ -683,7 +691,7 @@
          }, 'the callback to be called', ASYNC_TEST_TIMEOUT)
 
          runs( function() {
-            expect(window.setTimeout.mostRecentCall.args[0]).toThrow(callbackError)
+            expect(globalContext.setTimeout.mostRecentCall.args[0]).toThrow(callbackError)
          });
       })
 
@@ -692,7 +700,7 @@
          var callbackError = new Error('I am a bad callback');
             stubCallback = jasmine.createSpy('error callback').andThrow(callbackError);
 
-         spyOn(window, 'setTimeout');
+         spyOn(globalContext, 'setTimeout');
          oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
             .done(stubCallback)
 
@@ -702,7 +710,7 @@
 
 
          runs( function() {
-            expect(window.setTimeout.mostRecentCall.args[0]).toThrow(callbackError)
+            expect(globalContext.setTimeout.mostRecentCall.args[0]).toThrow(callbackError)
          });
       })
 
