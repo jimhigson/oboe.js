@@ -48,24 +48,25 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
     * the progress event or the request being complete.
     */
    function handleProgress() {
-                        
-      var textSoFar = xhr.responseText,
-          newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
-      
-      
-      /* Raise the event for new text.
-      
-         On older browsers, the new text is the whole response. 
-         On newer/better ones, the fragment part that we got since 
-         last progress. */
-         
-      if( newText ) {
-         emitStreamData( newText );
-      } 
 
-      numberOfCharsAlreadyGivenToCallback = len(textSoFar);
+     if (String(xhr.status)[0] === '2') {
+
+        var textSoFar = xhr.responseText,
+            newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
+
+        /* Raise the event for new text.
+
+           On older browsers, the new text is the whole response.
+           On newer/better ones, the fragment part that we got since
+           last progress. */
+
+        if( newText ) {
+           emitStreamData( newText );
+        }
+
+        numberOfCharsAlreadyGivenToCallback = len(textSoFar);
+      }
    }
-   
    
    if('onprogress' in xhr){  // detect browser support for progressive delivery
       xhr.onprogress = handleProgress;

@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.1-1-gb70a959
+   // v2.1.2-4-g64d46f1
 
 /*
 
@@ -366,7 +366,7 @@ var emptyList = null,
 /**
  * Get the tail of a list.
  * 
- * Ie, head(cons(a,b)) = a
+ * Ie, tail(cons(a,b)) = b
  */
     tail = attr(1);
 
