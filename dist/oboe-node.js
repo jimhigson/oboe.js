@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.1-1-gb70a959
+   // v2.1.3
 
 /*
 
@@ -366,7 +366,7 @@ var emptyList = null,
 /**
  * Get the tail of a list.
  * 
- * Ie, head(cons(a,b)) = a
+ * Ie, tail(cons(a,b)) = b
  */
     tail = attr(1);
 
@@ -587,7 +587,7 @@ function clarinet(eventBus) {
   ,   latestError                
   ,   c                    
   ,   p                    
-  ,   textNode             = ""
+  ,   textNode             = undefined
   ,   numberNode           = ""     
   ,   slashed              = false
   ,   closed               = false
@@ -605,7 +605,7 @@ function clarinet(eventBus) {
      
     var maxActual = 0;
      
-    if (textNode.length > MAX_BUFFER_LENGTH) {
+    if (textNode !== undefined && textNode.length > MAX_BUFFER_LENGTH) {
       emitError("Max buffer length exceeded: textNode");
       maxActual = Math.max(maxActual, textNode.length);
     }
@@ -626,10 +626,10 @@ function clarinet(eventBus) {
   eventBus(STREAM_END).on(handleStreamEnd);   
 
   function emitError (errorString) {
-     if (textNode) {
+     if (textNode !== undefined) {
         emitValueOpen(textNode);
         emitValueClose();
-        textNode = "";
+        textNode = undefined;
      }
 
      latestError = Error(errorString + "\nLn: "+line+
@@ -664,10 +664,10 @@ function clarinet(eventBus) {
     if (state !== VALUE || depth !== 0)
       emitError("Unexpected end");
  
-    if (textNode) {
+    if (textNode !== undefined) {
       emitValueOpen(textNode);
       emitValueClose();
-      textNode = "";
+      textNode = undefined;
     }
      
     closed = true;
@@ -737,26 +737,26 @@ function clarinet(eventBus) {
             if(state === CLOSE_OBJECT) {
               stack.push(CLOSE_OBJECT);
 
-               if (textNode) {
+               if (textNode !== undefined) {
                   // was previously (in upstream Clarinet) one event
                   //  - object open came with the text of the first
                   emitValueOpen({});
                   emitSaxKey(textNode);
-                  textNode = "";
+                  textNode = undefined;
                }
                depth++;
             } else {
-               if (textNode) {
+               if (textNode !== undefined) {
                   emitSaxKey(textNode);
-                  textNode = "";
+                  textNode = undefined;
                }
             }
              state  = VALUE;
           } else if (c==='}') {
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              emitValueClose();
             depth--;
@@ -764,10 +764,10 @@ function clarinet(eventBus) {
           } else if(c===',') {
             if(state === CLOSE_OBJECT)
               stack.push(CLOSE_OBJECT);
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              state  = OPEN_KEY;
           } else 
@@ -811,17 +811,17 @@ function clarinet(eventBus) {
         case CLOSE_ARRAY:
           if(c===',') {
             stack.push(CLOSE_ARRAY);
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              state  = VALUE;
           } else if (c===']') {
-             if (textNode) {
+             if (textNode !== undefined) {
                 emitValueOpen(textNode);
                 emitValueClose();
-                textNode = "";
+                textNode = undefined;
              }
              emitValueClose();
             depth--;
@@ -833,6 +833,10 @@ function clarinet(eventBus) {
         continue;
 
         case STRING:
+          if (textNode === undefined) {
+              textNode = "";
+          }
+
           // thanks thejh, this is an about 50% performance improvement.
           var starti              = i-1;
            
@@ -856,10 +860,6 @@ function clarinet(eventBus) {
             if (c === '"' && !slashed) {
               state = stack.pop() || VALUE;
               textNode += chunk.substring(starti, i-1);
-              if(!textNode) {
-                 emitValueOpen("");
-                 emitValueClose();
-              }
               break;
             }
             if (c === '\\' && !slashed) {
@@ -2188,10 +2188,10 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
 }
 
-/** 
+/**
  * The instance API is the thing that is returned when oboe() is called.
  * it allows:
- * 
+ *
  *    - listeners for various events to be added and removed
  *    - the http response header/headers to be read
  */
@@ -2204,77 +2204,77 @@ function instanceApi(oboeBus, contentSource){
        emitNodeSwap = oboeBus(NODE_SWAP).emit,
 
        /**
-        * Add any kind of listener that the instance api exposes 
-        */          
+        * Add any kind of listener that the instance api exposes
+        */
        addListener = varArgs(function( eventId, parameters ){
-             
+
             if( oboeApi[eventId] ) {
-       
-               // for events added as .on(event, callback), if there is a 
+
+               // for events added as .on(event, callback), if there is a
                // .event() equivalent with special behaviour , pass through
-               // to that: 
-               apply(parameters, oboeApi[eventId]);                     
+               // to that:
+               apply(parameters, oboeApi[eventId]);
             } else {
-       
+
                // we have a standard Node.js EventEmitter 2-argument call.
                // The first parameter is the listener.
                var event = oboeBus(eventId),
                    listener = parameters[0];
-       
+
                if( fullyQualifiedNamePattern.test(eventId) ) {
-                
-                  // allow fully-qualified node/path listeners 
-                  // to be added                                             
-                  addForgettableCallback(event, listener);                  
+
+                  // allow fully-qualified node/path listeners
+                  // to be added
+                  addForgettableCallback(event, listener);
                } else  {
-       
-                  // the event has no special handling, pass through 
-                  // directly onto the event bus:          
+
+                  // the event has no special handling, pass through
+                  // directly onto the event bus:
                   event.on( listener);
                }
             }
-                
+
             return oboeApi; // chaining
        }),
- 
+
        /**
-        * Remove any kind of listener that the instance api exposes 
-        */ 
+        * Remove any kind of listener that the instance api exposes
+        */
        removeListener = function( eventId, p2, p3 ){
-             
+
             if( eventId == 'done' ) {
-            
+
                rootNodeFinishedEvent.un(p2);
-               
+
             } else if( eventId == 'node' || eventId == 'path' ) {
-      
-               // allow removal of node and path 
-               oboeBus.un(eventId + ':' + p2, p3);          
+
+               // allow removal of node and path
+               oboeBus.un(eventId + ':' + p2, p3);
             } else {
-      
+
                // we have a standard Node.js EventEmitter 2-argument call.
                // The second parameter is the listener. This may be a call
                // to remove a fully-qualified node/path listener but requires
                // no special handling
                var listener = p2;
 
-               oboeBus(eventId).un(listener);                  
+               oboeBus(eventId).un(listener);
             }
-               
-            return oboeApi; // chaining      
-       };                               
-                        
-   /** 
+
+            return oboeApi; // chaining
+       };
+
+   /**
     * Add a callback, wrapped in a try/catch so as to not break the
-    * execution of Oboe if an exception is thrown (fail events are 
+    * execution of Oboe if an exception is thrown (fail events are
     * fired instead)
-    * 
+    *
     * The callback is used as the listener id so that it can later be
     * removed using .un(callback)
     */
    function addProtectedCallback(eventName, callback) {
       oboeBus(eventName).on(protectedCallback(callback), callback);
-      return oboeApi; // chaining            
+      return oboeApi; // chaining
    }
 
    /**
@@ -2282,55 +2282,55 @@ function instanceApi(oboeBus, contentSource){
     * execution, the callback will be de-registered
     */
    function addForgettableCallback(event, callback, listenerId) {
-      
+
       // listenerId is optional and if not given, the original
       // callback will be used
       listenerId = listenerId || callback;
-      
+
       var safeCallback = protectedCallback(callback);
-   
+
       event.on( function() {
-      
+
          var discard = false;
-             
+
          oboeApi.forget = function(){
             discard = true;
-         };           
-         
-         apply( arguments, safeCallback );         
-               
+         };
+
+         apply( arguments, safeCallback );
+
          delete oboeApi.forget;
-         
+
          if( discard ) {
             event.un(listenerId);
          }
       }, listenerId);
-      
-      return oboeApi; // chaining         
+
+      return oboeApi; // chaining
    }
-      
-   /** 
+
+   /**
     *  wrap a callback so that if it throws, Oboe.js doesn't crash but instead
-    *  handles it like a normal error
+    *  throw the error in another event loop
     */
    function protectedCallback( callback ) {
       return function() {
-         try{      
-            return callback.apply(oboeApi, arguments);   
+         try{
+            return callback.apply(oboeApi, arguments);
          }catch(e)  {
-         
-            // An error occured during the callback, publish it on the event bus 
-            oboeBus(FAIL_EVENT).emit( errorReport(undefined, undefined, e));
-         }      
-      }   
+            setTimeout(function() {
+              throw e;
+            });
+         }
+      }
    }
 
    /**
     * Return the fully qualified event for when a pattern matches
     * either a node or a path
-    * 
+    *
     * @param type {String} either 'node' or 'path'
-    */      
+    */
    function fullyQualifiedPatternMatchEvent(type, pattern) {
       return oboeBus(type + ':' + pattern);
    }
@@ -2340,7 +2340,7 @@ function instanceApi(oboeBus, contentSource){
          var returnValueFromCallback = callback.apply(this, arguments);
 
          if( defined(returnValueFromCallback) ) {
-            
+
             if( returnValueFromCallback == oboe.drop ) {
                emitNodeDrop();
             } else {
@@ -2359,7 +2359,7 @@ function instanceApi(oboeBus, contentSource){
       } else {
          effectiveCallback = callback;
       }
-      
+
       addForgettableCallback(
          fullyQualifiedPatternMatchEvent(eventId, pattern),
          effectiveCallback,
@@ -2371,32 +2371,32 @@ function instanceApi(oboeBus, contentSource){
     * Add several listeners at a time, from a map
     */
    function addMultipleNodeOrPathListeners(eventId, listenerMap) {
-   
+
       for( var pattern in listenerMap ) {
          addSingleNodeOrPathListener(eventId, pattern, listenerMap[pattern]);
       }
-   }    
-         
+   }
+
    /**
     * implementation behind .onPath() and .onNode()
-    */       
+    */
    function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
-         
+
       if( isString(jsonPathOrListenerMap) ) {
          addSingleNodeOrPathListener(eventId, jsonPathOrListenerMap, callback);
 
       } else {
          addMultipleNodeOrPathListeners(eventId, jsonPathOrListenerMap);
       }
-      
+
       return oboeApi; // chaining
    }
-      
-   
+
+
    // some interface methods are only filled in after we receive
-   // values and are noops before that:          
+   // values and are noops before that:
    oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
-      oboeApi.root = functor(rootNode);   
+      oboeApi.root = functor(rootNode);
    });
 
    /**
@@ -2404,45 +2404,44 @@ function instanceApi(oboeBus, contentSource){
     * instance API
     */
    oboeBus(HTTP_START).on( function(_statusCode, headers) {
-   
+
       oboeApi.header =  function(name) {
-                           return name ? headers[name] 
+                           return name ? headers[name]
                                        : headers
                                        ;
                         }
    });
-                                                               
+
    /**
-    * Construct and return the public API of the Oboe instance to be 
+    * Construct and return the public API of the Oboe instance to be
     * returned to the calling application
-    */       
+    */
    return oboeApi = {
       on             : addListener,
-      addListener    : addListener, 
+      addListener    : addListener,
       removeListener : removeListener,
-      emit           : oboeBus.emit,                
-                
+      emit           : oboeBus.emit,
+
       node           : partialComplete(addNodeOrPathListenerApi, 'node'),
       path           : partialComplete(addNodeOrPathListenerApi, 'path'),
-      
-      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),            
+
+      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),
       start          : partialComplete(addProtectedCallback, HTTP_START ),
-      
-      // fail doesn't use protectedCallback because 
+
+      // fail doesn't use protectedCallback because
       // could lead to non-terminating loops
       fail           : oboeBus(FAIL_EVENT).on,
-      
+
       // public api calling abort fires the ABORTING event
       abort          : oboeBus(ABORTING).emit,
-      
+
       // initially return nothing for header and root
       header         : noop,
       root           : noop,
-      
+
       source         : contentSource
-   };   
+   };
 }
-    
 
 /**
  * This file sits just behind the API which is used to attain a new

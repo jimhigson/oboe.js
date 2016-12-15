@@ -233,7 +233,7 @@ module.exports = function (grunt) {
          testNode:{
             files: FILES_TRIGGERING_KARMA,
             tasks:[ 
-               'node-build-run']
+               'node-build']
          },         
          
          restartStreamSourceAndRunTests:{

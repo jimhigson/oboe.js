@@ -1,39 +1,39 @@
 describe("oboe component (no http, content fed in externally)", function(){
 
-     
+
 /*
    a more jasmine-y version of the next test might look like this:
-    
+
    describe('empty object detected with bang',  function() {
-            
+
       var callback = jasmine.createSpy('callback');
-      var oboe = anOboe().node('!', callback).afterInput('{}')      
+      var oboe = anOboe().node('!', callback).afterInput('{}')
       giveInput(oboe, '{}');
-            
-      it( 'should find the empty object at root', function(){            
-            
+
+      it( 'should find the empty object at root', function(){
+
          expect(
-         
+
             nodesFoundBy(
                anOboe().listeningForNodesAt('!').afterInput('{}')
             )
-               
+
          ).toIncludeNode( {}, atRoot )
       })
-      
-      it( 'should not find anything else', function(){            
-            
+
+      it( 'should not find anything else', function(){
+
          expect(
-         
-            nodesFoundBy(         
+
+            nodesFoundBy(
                anOboe().listeningForNodes('!').afterInput('{}')
             ).length
-               
+
          ).toBe(1)
-      })      
-            
+      })
+
    })*/
-   
+
    it('handles empty object detected with bang',  function() {
 
       givenAnOboeInstance()
@@ -44,7 +44,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('handles empty object detected with bang when explicitly selected',  function() {
 
       givenAnOboeInstance()
@@ -55,8 +55,8 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
 
-   })   
-   
+   })
+
    it('gives the oboe instance as context',  function() {
 
       givenAnOboeInstance()
@@ -64,7 +64,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          .whenGivenInput('{}')
          .thenTheInstance( wasGivenTheOboeAsContext() );
    })
-   
+
 
    it('find only emits when has whole object',  function() {
 
@@ -96,7 +96,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             matched({}).atRootOfJson()
           );
    })
-   
+
    it('emits path to listener when root array starts',  function() {
 
       // clarinet doesn't notify of matches to objects (SAX_OPEN_OBJECT) until the
@@ -105,15 +105,15 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForPaths('!')
-         .whenGivenInputPart('[1') // the minimum string required for clarinet 
+         .whenGivenInputPart('[1') // the minimum string required for clarinet
                                // to emit SAX_OPEN_ARRAY. Won't emit with '['.
           .thenTheInstance(
             foundNMatches(1),
             matched([]).atRootOfJson()
           );
    })
-   
-     
+
+
    it('emits empty object node detected with single star',  function() {
       // *
       givenAnOboeInstance()
@@ -124,7 +124,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('doesnt detect spurious path off empty object',  function() {
 
       givenAnOboeInstance()
@@ -133,7 +133,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          .thenTheInstance(
             foundNoMatches
          );
-   })   
+   })
 
    it('handles empty object detected with double dot',  function() {
       // *
@@ -156,7 +156,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with hyphen in the name',  function() {
 
       givenAnOboeInstance()
@@ -167,7 +167,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with underscore in the name',  function() {
 
       givenAnOboeInstance()
@@ -178,7 +178,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with quoted hyphen in the name',  function() {
 
       givenAnOboeInstance()
@@ -188,8 +188,8 @@ describe("oboe component (no http, content fed in externally)", function(){
             matched("s"),
             foundOneMatch
          );
-   })   
-   
+   })
+
    it('can detect nodes with quoted underscore in the name',  function() {
 
       givenAnOboeInstance()
@@ -200,7 +200,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with quoted unusual ascii chars in the name',  function() {
 
       givenAnOboeInstance()
@@ -211,7 +211,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with non-ascii keys',  function() {
 
       //pinyin: Wǒ tǎoyàn IE liúlǎn qì!
@@ -224,7 +224,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('can detect nodes with non-ascii keys and values',  function() {
 
       // hope you have a good unicode font!
@@ -236,8 +236,8 @@ describe("oboe component (no http, content fed in externally)", function(){
             matched("☁"),
             foundOneMatch
          );
-   })                  
-   
+   })
+
    it('notifies of path before given the json value for a property',  function() {
 
       givenAnOboeInstance()
@@ -260,7 +260,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('is able to notify of null',  function() {
 
       givenAnOboeInstance()
@@ -273,7 +273,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('is able to notify of boolean true',  function() {
 
       givenAnOboeInstance()
@@ -286,7 +286,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             foundOneMatch
          );
    })
-   
+
    it('is able to notify of boolean false',  function() {
 
       givenAnOboeInstance()
@@ -298,7 +298,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             matched(false).atPath(['pens']),
             foundOneMatch
          );
-   })         
+   })
 
    it('notifies of multiple children of root',  function() {
 
@@ -312,7 +312,7 @@ describe("oboe component (no http, content fed in externally)", function(){
          ,   foundNMatches(3)
          );
    })
-   
+
    it('notifies of multiple children of root when selecting the root',  function() {
 
       givenAnOboeInstance()
@@ -326,8 +326,8 @@ describe("oboe component (no http, content fed in externally)", function(){
          ,   matched({"a":"A", "b":"B", "c":"C"})
          ,   foundNMatches(3)
          );
-   })   
-   
+   })
+
    it('does not notify spuriously of descendant of roots when key is actually in another object',  function() {
 
       givenAnOboeInstance()
@@ -335,20 +335,20 @@ describe("oboe component (no http, content fed in externally)", function(){
          .whenGivenInput([{a:'a'}])
          .thenTheInstance(foundNoMatches);
    })
-   
+
    it('does not notify spuriously of found child of root when ndoe is not child of root',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('!.a')
          .whenGivenInput([{a:'a'}])
          .thenTheInstance(foundNoMatches);
-   })      
+   })
 
    describe('progressive output', function(){
-   
+
       describe('giving notification of multiple properties of an object without waiting for entire object',  function(){
-   
-         it( 'gives no notification on seeing just the key', function(){ 
+
+         it( 'gives no notification on seeing just the key', function(){
             givenAnOboeInstance()
                .andWeAreListeningForNodes('!.*')
                .whenGivenInputPart('{"a":')
@@ -377,9 +377,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                );
          });
       })
-      
+
       describe('giving root progressively as root json object is built up',  function() {
-   
+
          it('can supply root after seeing first key with undefined value', function(){
             givenAnOboeInstance()
                .whenGivenInputPart('{"a":')
@@ -395,7 +395,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                   hasRootJson({a:'A'})
                )
          });
-         
+
          it('gives second key with undefined value', function(){
             givenAnOboeInstance()
                .whenGivenInputPart('{"a":"A","b":')
@@ -420,10 +420,10 @@ describe("oboe component (no http, content fed in externally)", function(){
                   gaveFinalCallbackWithRootJson({a:'A', b:'B'})
                );
          });
-      })   
-      
+      })
+
       describe('giving root progressively as root json array is built up',  function() {
-   
+
          // let's feed it the array [11,22] in drips of one or two chars at a time:
          it('has nothing on array open', function(){
             givenAnOboeInstance()
@@ -455,19 +455,19 @@ describe("oboe component (no http, content fed in externally)", function(){
                .whenGivenInputPart('[11,2')
                .thenTheInstance(
                   hasRootJson([11])
-               )            
+               )
          });
          it('has everything when the array closes', function(){
             givenAnOboeInstance()
                .whenGivenInput('[11,22]')
                .thenTheInstance(
                   hasRootJson([11,22])
-               )            
+               )
          });
          it('notified correctly of the final root', function(){
             givenAnOboeInstance()
                .whenGivenInput('[11,22]')
-               .whenInputFinishes()               
+               .whenInputFinishes()
                .thenTheInstance(
                   gaveFinalCallbackWithRootJson([11,22])
                )
@@ -522,7 +522,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                                // be used here because that is an allowed
                                // value in json
          );
-   })   
+   })
    it('notifies of paths inside arrays',  function() {
 
       givenAnOboeInstance()
@@ -531,73 +531,73 @@ describe("oboe component (no http, content fed in externally)", function(){
          .thenTheInstance(
             foundNMatches(4)
          );
-   })   
-   
-   describe('correctly give index inside arrays', function(){   
+   })
+
+   describe('correctly give index inside arrays', function(){
       it('when finding objects in array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
             .whenGivenInput( [{}, {}, 'this_one'] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })      
+      })
       it('when finding arrays inside array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
             .whenGivenInput( [[], [], 'this_one'] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })   
+      })
       it('when finding arrays inside arrays etc',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2][2]')
-            .whenGivenInput( [   
-                                 [], 
-                                 [], 
-                                 [  
-                                    [], 
-                                    [], 
+            .whenGivenInput( [
+                                 [],
+                                 [],
+                                 [
+                                    [],
+                                    [],
                                     ['this_array']
                                  ]
                              ] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })   
+      })
       it('when finding strings inside array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
             .whenGivenInput( ['', '', 'this_one'] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })   
+      })
       it('when finding numbers inside array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
             .whenGivenInput( [1, 1, 'this_one'] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })         
+      })
       it('when finding nulls inside array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForPaths('![2]')
             .whenGivenInput( [null, null, 'this_one'] )
             .thenTheInstance(
                foundNMatches(1)
             );
-      })      
+      })
    })
-   
+
    it('notifies of paths inside objects',  function() {
 
       givenAnOboeInstance()
@@ -606,11 +606,11 @@ describe("oboe component (no http, content fed in externally)", function(){
          .thenTheInstance(
             foundNMatches(4)
          );
-   })      
+   })
 
    describe('selecting by index', function(){
       it('notifies of array elements',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.testArray[2]')
             .whenGivenInput('{"testArray":["a","b","this_one"]}')
@@ -619,9 +619,9 @@ describe("oboe component (no http, content fed in externally)", function(){
             ,   foundOneMatch
             );
       })
-      
+
       it('notifies nested array elements',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.testArray[2][2]')
             .whenGivenInput( {"testArray":
@@ -637,9 +637,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                   .withGrandparent( ["a","b", ["x","y","this_one"]] )
             ,   foundOneMatch
             );
-      })   
+      })
       it('can notify nested array elements by passing the root array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.$testArray[2][2]')
             .whenGivenInput( {"testArray":
@@ -654,12 +654,12 @@ describe("oboe component (no http, content fed in externally)", function(){
                            ])
             ,   foundOneMatch
             );
-      })        
+      })
    });
 
    describe('deeply nested objects', function(){
       it('notifies with star pattern',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('*')
             .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
@@ -677,9 +677,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                   .atRootOfJson()
             ,   foundNMatches(5)
             );
-      })   
+      })
       it('notifies of with double dot pattern',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('..')
             .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
@@ -697,9 +697,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                   .atRootOfJson()
             ,   foundNMatches(5)
             );
-      })   
+      })
       it('notifies of objects with double dot star pattern',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('..*')
             .whenGivenInput({"a":{"b":{"c":{"d":"e"}}}})
@@ -717,9 +717,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                   .atRootOfJson()
             ,   foundNMatches(5)
             );
-      })   
+      })
    });
-   
+
    it('can express all but root as a pattern',  function() {
 
       givenAnOboeInstance()
@@ -735,29 +735,29 @@ describe("oboe component (no http, content fed in externally)", function(){
                .atPath(['a', 'b'])
          ,   matched({b:{c:{d:"e"}}})
                .atPath(['a'])
-               
+
          ,   foundNMatches(4)
          );
-   })   
+   })
    it('can detect similar ancestors',  function() {
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('foo..foo')
-         
+
          .whenGivenInput({"foo":{"foo":{"foo":{"foo":"foo"}}}})
          .thenTheInstance(
              matched("foo")
          ,   matched({"foo":"foo"})
          ,   matched({"foo":{"foo":"foo"}})
-         ,   matched({"foo":{"foo":{"foo":"foo"}}})   
+         ,   matched({"foo":{"foo":{"foo":"foo"}}})
          ,   foundNMatches(4)
          );
-   })   
+   })
 
    it('can detect inside the second object element of an array',  function() {
 
-      // this fails in incrementalJsonBuilder if we don't set the curKey to the 
-      // length of the array when we detect an object and and the parent of the 
+      // this fails in incrementalJsonBuilder if we don't set the curKey to the
+      // length of the array when we detect an object and and the parent of the
       // object that ended was an array
 
       givenAnOboeInstance()
@@ -818,7 +818,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                .withParent([0,1])
          ,  foundOneMatch
          );
-   })   
+   })
    it('can give an array back when just partially done',  function() {
 
       givenAnOboeInstance()
@@ -832,7 +832,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
    describe('json arrays give correct parent and grandparent', function(){
       it('gives parent and grandparent for every item of an array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
@@ -845,14 +845,14 @@ describe("oboe component (no http, content fed in externally)", function(){
                   .withGrandparent({array:['a']})
             ,  matched('b')
                   .withParent(['a', 'b'])
-                  .withGrandparent({array:['a','b']})               
+                  .withGrandparent({array:['a','b']})
             ,  matched('c')
                   .withParent(['a', 'b', 'c'])
-                  .withGrandparent({array:['a','b','c']})               
+                  .withGrandparent({array:['a','b','c']})
             );
-      })   
+      })
       it('is correct for array of objects',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
@@ -863,13 +863,13 @@ describe("oboe component (no http, content fed in externally)", function(){
                matched({'a':1})
                   .withParent([{'a':1}])
             ,  matched({'b':2})
-                  .withParent([{'a':1},{'b':2}])               
+                  .withParent([{'a':1},{'b':2}])
             ,  matched({'c':3})
-                  .withParent([{'a':1},{'b':2},{'c':3}])               
+                  .withParent([{'a':1},{'b':2},{'c':3}])
             );
-      })   
+      })
       it('is correct for object in a mixed array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
@@ -878,42 +878,11 @@ describe("oboe component (no http, content fed in externally)", function(){
             )
             .thenTheInstance(
                matched({'a':1})
-                  .withParent([{'a':1}])         
-            );
-      })   
-      it('has correct parent for string in mixed array',  function() {
-   
-         givenAnOboeInstance()
-            .andWeAreListeningForNodes('!.array.*')
-            .whenGivenInput({
-                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-               }
-            )
-            .thenTheInstance(
-            
-               matched('b')
-                  .withParent([{'a':1},'b'])
-                  
-            );
-      })   
-      it('has correct parent for second object in mixed array',  function() {
-   
-         givenAnOboeInstance()
-            .andWeAreListeningForNodes('!.array.*')
-            .whenGivenInput({
-                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
-               }
-            )
-            .thenTheInstance(
-                  
-               matched({'c':3})
-                  .withParent([{'a':1},'b',{'c':3}])
-   
+                  .withParent([{'a':1}])
             );
       })
-         
-      it('has correct parent for empty object in mixed array',  function() {
-        
+      it('has correct parent for string in mixed array',  function() {
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
@@ -921,45 +890,76 @@ describe("oboe component (no http, content fed in externally)", function(){
                }
             )
             .thenTheInstance(
-            
-               matched({})
-                  .withParent([{'a':1},'b',{'c':3}, {}])
-                                                
+
+               matched('b')
+                  .withParent([{'a':1},'b'])
+
             );
-      
-      })   
-      it('has correct parent for singleton string array in mixed array',  function() {
-   
+      })
+      it('has correct parent for second object in mixed array',  function() {
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
                   array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
                }
             )
-            .thenTheInstance(  
-                                        
-               matched(['d'])            
-                  .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-                  
+            .thenTheInstance(
+
+               matched({'c':3})
+                  .withParent([{'a':1},'b',{'c':3}])
+
             );
-      })   
+      })
+
+      it('has correct parent for empty object in mixed array',  function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+
+               matched({})
+                  .withParent([{'a':1},'b',{'c':3}, {}])
+
+            );
+
+      })
+      it('has correct parent for singleton string array in mixed array',  function() {
+
+         givenAnOboeInstance()
+            .andWeAreListeningForNodes('!.array.*')
+            .whenGivenInput({
+                  array : [{'a':1},'b',{'c':3}, {}, ['d'], 'e']
+               }
+            )
+            .thenTheInstance(
+
+               matched(['d'])
+                  .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
+
+            );
+      })
       it('gives correct parent for singleton string array in singleton array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
                   array : [['d']]
                }
             )
-            .thenTheInstance(  
-                                        
-               matched(['d'])            
+            .thenTheInstance(
+
+               matched(['d'])
                   .withParent([['d']])
-                  
+
             );
-      })   
+      })
       it('gives correct parent for last string in a mixed array',  function() {
-   
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.array.*')
             .whenGivenInput({
@@ -967,106 +967,106 @@ describe("oboe component (no http, content fed in externally)", function(){
                }
             )
             .thenTheInstance(
-            
+
                matched('e')
                   .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
-                  
+
             );
       })
-   
+
       it('gives correct parent for opening object in a mixed array at root of json',  function() {
          // same test as above but without the object wrapper around the array:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-            
+
                matched({'a':1})
                   .withParent([{'a':1}])
-                  
+
             );
       })
-   
+
       it('gives correct parent for string in a mixed array at root of json',  function() {
          // same test as above but without the object wrapper around the array:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-   
+
                matched('b')
-                  .withParent([{'a':1},'b'])               
-   
+                  .withParent([{'a':1},'b'])
+
             );
       })
-   
+
       it('gives correct parent for second object in a mixed array at root of json',  function() {
          // same test as above but without the object wrapper around the array:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-                  
+
                matched({'c':3})
                   .withParent([{'a':1},'b',{'c':3}])
-   
+
             );
       })
-   
+
       it('gives correct parent for empty object in a mixed array at root of json',  function() {
-         
+
          // same test as above but without the object wrapper around the array:
-       
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-   
+
                matched({})
-                  .withParent([{'a':1},'b',{'c':3}, {}])                              
-   
+                  .withParent([{'a':1},'b',{'c':3}, {}])
+
             );
-    
+
       })
-   
+
       it('gives correct parent for singleton string array in a mixed array at root of json',  function() {
          // same test as above but without the object wrapper around the array:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-                                 
+
                matched(['d'])
                   .withParent([{'a':1},'b',{'c':3}, {}, ['d']])
-   
+
             );
-      })   
+      })
       it('gives correct parent for singleton string array in a singleton array at root of json',  function() {
          // non-mixed array, easier version:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([['d']])
             .thenTheInstance(
-                                 
+
                matched(['d'])
                   .withParent([['d']])
-   
+
             );
       })
-   
+
       it('gives correct parent for final string in a mixed array at root of json',  function() {
          // same test as above but without the object wrapper around the array:
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*')
             .whenGivenInput([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             .thenTheInstance(
-   
+
                matched('e')
                   .withParent([{'a':1},'b',{'c':3}, {}, ['d'], 'e'])
             );
@@ -1097,7 +1097,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
          ,   foundNMatches(5)
          );
-   })   
+   })
    it('passes ancestors of found object correctly',  function() {
 
       givenAnOboeInstance()
@@ -1117,17 +1117,17 @@ describe("oboe component (no http, content fed in externally)", function(){
              matched('first_find')
                .withParent( {find:'first_find'} )
                .withGrandparent( [{find:'first_find'}] )
-               
+
          ,   matched('second_find')
                .withParent({find:'second_find'})
                .withGrandparent({padding:{find:'second_find'}})
-               
+
          ,   matched('third_find')
               .withParent({padding:{find:'second_find'}, find:'third_find'})
               .withGrandparent([
                     {find:'first_find'}
                  ,  {padding:{find:'second_find'}, find:'third_find'}
-                 ])                          
+                 ])
          );
    })
 
@@ -1164,14 +1164,14 @@ describe("oboe component (no http, content fed in externally)", function(){
          .whenGivenInput({
 
             foods: [
-               {  name:'aubergine', 
+               {  name:'aubergine',
                   colour:'purple' // match this
                },
                {name:'apple', colour:'red'},
                {name:'nuts', colour:'brown'}
             ],
             non_foods: [
-               {  name:'brick', 
+               {  name:'brick',
                   colour:'red'    // and this
                },
                {name:'poison', colour:'pink'},
@@ -1183,7 +1183,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                ,   matched('red')
                ,   foundNMatches(2)
                );
-   })      
+   })
    it('matches nested selector separated by a single star selector',  function() {
 
       givenAnOboeInstance()
@@ -1207,7 +1207,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                ,   matched('nuts')
                ,   foundNMatches(3)
                );
-   })   
+   })
    it('gets all simple objects from an array',  function() {
 
       // this test is similar to the following one, except it does not use ! in the pattern
@@ -1224,7 +1224,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                (   foundNMatches(3)
                ,   matched({name:'aubergine'})
                ,   matched({name:'apple'})
-               ,   matched({name:'nuts'})   
+               ,   matched({name:'nuts'})
                );
    })
 
@@ -1232,7 +1232,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       givenAnOboeInstance()
          .andWeAreListeningForNodes('$foods.*')
-         .whenGivenInput({        
+         .whenGivenInput({
             foods: [
                {name:'aubergine'},
                {name:'apple'},
@@ -1245,7 +1245,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                (   foundNMatches(3)
                ,   matched([{name:'aubergine'}])
                ,   matched([{name:'aubergine'},{name:'apple'}])
-               ,   matched([{name:'aubergine'},{name:'apple'},{name:'nuts'}])   
+               ,   matched([{name:'aubergine'},{name:'apple'},{name:'nuts'}])
                );
    })
 
@@ -1274,17 +1274,17 @@ describe("oboe component (no http, content fed in externally)", function(){
                ,   foundNMatches(3)
                );
    })
-   
-   describe('duck types', function(){   
+
+   describe('duck types', function(){
       // only smoke-testing duck types here, tested thoroughly in jsonpath unit tests
-   
+
       it('can detect',  function() {
-   
+
          givenAnOboeInstance()
             // we want the bi-lingual objects
             .andWeAreListeningForNodes('{en fr}')
             .whenGivenInput({
-   
+
                foods: [
                   {name:{en:'aubergine',  fr:'aubergine' }, colour:'purple'},
                   {name:{en:'apple',      fr:'pomme'     }, colour:'red'   },
@@ -1302,15 +1302,15 @@ describe("oboe component (no http, content fed in externally)", function(){
                   ,   matched({en:'nuts',       fr:'noix'      })
                   ,   foundNMatches(3)
                   );
-      })   
+      })
       it('can detect by matches with additional keys',  function() {
-   
+
          givenAnOboeInstance()
             // we want the bi-lingual English and German words, but we still want the ones that have
             // French as well
             .andWeAreListeningForNodes('{en de}')
             .whenGivenInput({
-   
+
                foods: [
                   {name:{en:'aubergine',  fr:'aubergine',   de: 'aubergine' }, colour:'purple'},
                   {name:{en:'apple',      fr:'pomme',       de: 'apfel'     }, colour:'red'   },
@@ -1329,9 +1329,9 @@ describe("oboe component (no http, content fed in externally)", function(){
                   ,   foundNMatches(3)
                   );
       })
-      
+
    })
- 
+
 
    describe('error cases:', function() {
 
@@ -1339,8 +1339,8 @@ describe("oboe component (no http, content fed in externally)", function(){
          var invalidJson = '{invalid:"json"}';  // key not quoted, invalid json
 
          // there have been bugs where this passes when passed in one char at a time
-         // but not when given as a single call         
-         
+         // but not when given as a single call
+
          it('fed in as a lump',  function() {
             givenAnOboeInstance()
                .andWeAreExpectingSomeErrors()
@@ -1349,34 +1349,34 @@ describe("oboe component (no http, content fed in externally)", function(){
                (   calledCallbackOnce
                   ,   wasPassedAnErrorObject
                );
-         })      
+         })
          it('fed a char at a time',  function() {
-        
+
             givenAnOboeInstance()
               .andWeAreExpectingSomeErrors()
               .whenGivenInputOneCharAtATime(invalidJson)
               .thenTheInstance
                  (   calledCallbackOnce
                  ,   wasPassedAnErrorObject
-                 ); 
+                 );
          })
       });
-      
+
       describe('errors on malformed json', function(){
          var malformedJson = '{{'; // invalid!
-         
+
          it('works as a lump',  function() {
 
             givenAnOboeInstance()
               .andWeAreExpectingSomeErrors()
-              .whenGivenInputPart(malformedJson) 
+              .whenGivenInputPart(malformedJson)
               .thenTheInstance
                  (   calledCallbackOnce
                  ,   wasPassedAnErrorObject
                  );
          })
          it('works as chars',  function() {
-   
+
             givenAnOboeInstance()
                .andWeAreExpectingSomeErrors()
                .whenGivenInputOneCharAtATime(malformedJson) // invalid!
@@ -1386,7 +1386,7 @@ describe("oboe component (no http, content fed in externally)", function(){
                );
          })
       });
-      
+
       it('detects error when stream halts early between children of root',  function() {
 
          givenAnOboeInstance()
@@ -1397,7 +1397,7 @@ describe("oboe component (no http, content fed in externally)", function(){
             (   calledCallbackOnce
                ,   wasPassedAnErrorObject
             );
-      })      
+      })
       it('detects error when stream halts early between children of root fed in a char at a time',  function() {
 
          givenAnOboeInstance()
@@ -1408,16 +1408,16 @@ describe("oboe component (no http, content fed in externally)", function(){
             (   calledCallbackOnce
                ,   wasPassedAnErrorObject
             );
-      })      
+      })
       it('detects error when stream halts early between children of root',  function() {
          // currently failing: clarinet is not detecting the error
-         givenAnOboeInstance() 
+         givenAnOboeInstance()
             .andWeAreExpectingSomeErrors()
             .whenGivenInputPart('[[1,2,3],')
             .whenInputFinishes()
             .thenTheInstance
             (   calledCallbackOnce
-               ,   wasPassedAnErrorObject 
+               ,   wasPassedAnErrorObject
             );
       })
       it('detects error when stream halts early inside mid-tree node',  function() {
@@ -1430,39 +1430,42 @@ describe("oboe component (no http, content fed in externally)", function(){
             (   calledCallbackOnce
             ,   wasPassedAnErrorObject
             );
-      })      
+      })
       it('calls error listener if an error is thrown in the callback',  function() {
-     
+
+         spyOn(window, 'setTimeout');
+
          givenAnOboeInstance()
            .andWeHaveAFaultyCallbackListeningFor('!') // just want the root object
-           .andWeAreExpectingSomeErrors()
            .whenGivenInputPart('{}') // valid json, should provide callback
            .thenTheInstance
-              (   calledCallbackOnce
-              ,   wasPassedAnErrorObject
-              );
+           ({
+             testAgainst: function() {
+               expect(window.setTimeout.mostRecentCall.args[0]).toThrow()
+             }
+           });
       })
    });
-   
+
    describe('aborting a request', function(){
 
       it('does not throw an error', function(){
-      
+
          expect( function(){
-         
+
             givenAnOboeInstance()
                .andWeAreListeningForPaths('*')
                .whenGivenInputPart('[1')
                .andWeAbortTheRequest();
-             
-         }).not.toThrow();                                  
+
+         }).not.toThrow();
       });
 
       it('can abort once some data has been found in response',  function() {
-          
-         // we should be able to abort even when given all the content at once 
-          
-         var asserter = givenAnOboeInstance();         
+
+         // we should be able to abort even when given all the content at once
+
+         var asserter = givenAnOboeInstance();
             asserter.andWeAreListeningForNodes('![5]', function(){
                 asserter.andWeAbortTheRequest();
              })
@@ -1472,17 +1475,17 @@ describe("oboe component (no http, content fed in externally)", function(){
                // not the whole ten.
                hasRootJson([0,1,2,3,4,5])
             );
-      })   
+      })
    });
 
    describe('dropping nodes', function() {
-      
+
       it('drops from an array leaving holes', function() {
 
          function isEven(n) {
             return (n % 2) == 0;
          }
-         
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('!.*', function( number ) {
                if( isEven(number) ) {
@@ -1535,10 +1538,10 @@ describe("oboe component (no http, content fed in externally)", function(){
                drink:'wine'
             })
          );
-      })      
+      })
 
    });
-   
+
    describe('swapping out nodes', function() {
 
       it('can selectively drop objects from an array', function() {
@@ -1589,7 +1592,7 @@ describe("oboe component (no http, content fed in externally)", function(){
 
       /*
       it('can replace the root', function() {
-         
+
          // replacing the root currently isn't supported
 
          givenAnOboeInstance()
@@ -1607,16 +1610,16 @@ describe("oboe component (no http, content fed in externally)", function(){
          );
       });
       */
-      
+
       it('can transform scalar values', function() {
-         
+
          function isEven(n) {
             return (n % 2) == 0;
          }
-          
+
          givenAnOboeInstance()
             .andWeAreListeningForNodes('*', function( number ) {
-               
+
                if (isEven(number)) {
                   return number * 2;
                }
@@ -1626,9 +1629,8 @@ describe("oboe component (no http, content fed in externally)", function(){
             // because the request was aborted on index array 5, we got 6 numbers (inc zero)
             // not the whole ten.
                hasRootJson([1,4,3,8,5])
-            );            
+            );
       });
    });
-   
-});
 
+});
