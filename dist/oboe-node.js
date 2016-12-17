@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.3
+   // v2.1.3-2-gc85b5c4
 
 /*
 
@@ -1871,161 +1871,162 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 
 });
 
-/** 
- * A pub/sub which is responsible for a single event type. A 
+/**
+ * A pub/sub which is responsible for a single event type. A
  * multi-event type event bus is created by pubSub by collecting
  * several of these.
- * 
- * @param {String} eventType                   
+ *
+ * @param {String} eventType
  *    the name of the events managed by this singleEventPubSub
- * @param {singleEventPubSub} [newListener]    
+ * @param {singleEventPubSub} [newListener]
  *    place to notify of new listeners
- * @param {singleEventPubSub} [removeListener] 
+ * @param {singleEventPubSub} [removeListener]
  *    place to notify of when listeners are removed
  */
 function singleEventPubSub(eventType, newListener, removeListener){
 
-   /** we are optimised for emitting events over firing them.
-    *  As well as the tuple list which stores event ids and
-    *  listeners there is a list with just the listeners which 
-    *  can be iterated more quickly when we are emitting
-    */
-   var listenerTupleList,
-       listenerList;
+  /** we are optimised for emitting events over firing them.
+   *  As well as the tuple list which stores event ids and
+   *  listeners there is a list with just the listeners which
+   *  can be iterated more quickly when we are emitting
+   */
+  var listenerTupleList,
+      listenerList;
 
-   function hasId(id){
-      return function(tuple) {
-         return tuple.id == id;      
-      };  
-   }
-              
-   return {
+  function hasId(id){
+    return function(tuple) {
+      return tuple.id == id;
+    };
+  }
 
-      /**
-       * @param {Function} listener
-       * @param {*} listenerId 
-       *    an id that this listener can later by removed by. 
-       *    Can be of any type, to be compared to other ids using ==
-       */
-      on:function( listener, listenerId ) {
-         
-         var tuple = {
-            listener: listener
-         ,  id:       listenerId || listener // when no id is given use the
-                                             // listener function as the id
-         };
+  return {
 
-         if( newListener ) {
-            newListener.emit(eventType, listener, tuple.id);
-         }
-         
-         listenerTupleList = cons( tuple,    listenerTupleList );
-         listenerList      = cons( listener, listenerList      );
+    /**
+     * @param {Function} listener
+     * @param {*} listenerId
+     *    an id that this listener can later by removed by.
+     *    Can be of any type, to be compared to other ids using ==
+     */
+    on:function( listener, listenerId ) {
 
-         return this; // chaining
-      },
-     
-      emit:function () {                                                                                           
-         applyEach( listenerList, arguments );
-      },
-      
-      un: function( listenerId ) {
-             
-         var removed;             
-              
-         listenerTupleList = without(
-            listenerTupleList,
-            hasId(listenerId),
-            function(tuple){
-               removed = tuple;
-            }
-         );    
-         
-         if( removed ) {
-            listenerList = without( listenerList, function(listener){
-               return listener == removed.listener;
-            });
-         
-            if( removeListener ) {
-               removeListener.emit(eventType, removed.listener, removed.id);
-            }
-         }
-      },
-      
-      listeners: function(){
-         // differs from Node EventEmitter: returns list, not array
-         return listenerList;
-      },
-      
-      hasListener: function(listenerId){
-         var test = listenerId? hasId(listenerId) : always;
-      
-         return defined(first( test, listenerTupleList));
+      var tuple = {
+        listener: listener
+        ,  id:       listenerId || listener // when no id is given use the
+        // listener function as the id
+      };
+
+      if( newListener ) {
+        newListener.emit(eventType, listener, tuple.id);
       }
-   };
+
+      listenerTupleList = cons( tuple,    listenerTupleList );
+      listenerList      = cons( listener, listenerList      );
+
+      return this; // chaining
+    },
+
+    emit:function () {
+      applyEach( listenerList, arguments );
+    },
+
+    un: function( listenerId ) {
+
+      var removed;
+
+      listenerTupleList = without(
+        listenerTupleList,
+        hasId(listenerId),
+        function(tuple){
+          removed = tuple;
+        }
+      );
+
+      if( removed ) {
+        listenerList = without( listenerList, function(listener){
+          return listener == removed.listener;
+        });
+
+        if( removeListener ) {
+          removeListener.emit(eventType, removed.listener, removed.id);
+        }
+      }
+    },
+
+    listeners: function(){
+      // differs from Node EventEmitter: returns list, not array
+      return listenerList;
+    },
+
+    hasListener: function(listenerId){
+      var test = listenerId? hasId(listenerId) : always;
+
+      return defined(first( test, listenerTupleList));
+    }
+  };
 }
+
 /**
  * pubSub is a curried interface for listening to and emitting
  * events.
- * 
+ *
  * If we get a bus:
- *    
+ *
  *    var bus = pubSub();
- * 
+ *
  * We can listen to event 'foo' like:
- * 
+ *
  *    bus('foo').on(myCallback)
- *    
+ *
  * And emit event foo like:
- * 
+ *
  *    bus('foo').emit()
- *    
+ *
  * or, with a parameter:
- * 
+ *
  *    bus('foo').emit('bar')
- *     
- * All functions can be cached and don't need to be 
+ *
+ * All functions can be cached and don't need to be
  * bound. Ie:
- * 
+ *
  *    var fooEmitter = bus('foo').emit
  *    fooEmitter('bar');  // emit an event
  *    fooEmitter('baz');  // emit another
- *    
+ *
  * There's also an uncurried[1] shortcut for .emit and .on:
- * 
+ *
  *    bus.on('foo', callback)
  *    bus.emit('foo', 'bar')
- * 
+ *
  * [1]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub(){
 
    var singles = {},
        newListener = newSingle('newListener'),
-       removeListener = newSingle('removeListener'); 
-      
+       removeListener = newSingle('removeListener');
+
    function newSingle(eventName) {
       return singles[eventName] = singleEventPubSub(
-         eventName, 
-         newListener, 
+         eventName,
+         newListener,
          removeListener
-      );   
-   }      
+      );
+   }
 
    /** pubSub instances are functions */
-   function pubSubInstance( eventName ){   
-      
-      return singles[eventName] || newSingle( eventName );   
+   function pubSubInstance( eventName ){
+
+      return singles[eventName] || newSingle( eventName );
    }
 
    // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
    ['emit', 'on', 'un'].forEach(function(methodName){
-   
+
       pubSubInstance[methodName] = varArgs(function(eventName, parameters){
          apply( parameters, pubSubInstance( eventName )[methodName]);
-      });   
+      });
    });
-         
+
    return pubSubInstance;
 }
 
@@ -2197,250 +2198,250 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
  */
 function instanceApi(oboeBus, contentSource){
 
-   var oboeApi,
-       fullyQualifiedNamePattern = /^(node|path):./,
-       rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
-       emitNodeDrop = oboeBus(NODE_DROP).emit,
-       emitNodeSwap = oboeBus(NODE_SWAP).emit,
+  var oboeApi,
+      fullyQualifiedNamePattern = /^(node|path):./,
+      rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
+      emitNodeDrop = oboeBus(NODE_DROP).emit,
+      emitNodeSwap = oboeBus(NODE_SWAP).emit,
 
-       /**
-        * Add any kind of listener that the instance api exposes
-        */
-       addListener = varArgs(function( eventId, parameters ){
+      /**
+       * Add any kind of listener that the instance api exposes
+       */
+      addListener = varArgs(function( eventId, parameters ){
 
-            if( oboeApi[eventId] ) {
+        if( oboeApi[eventId] ) {
 
-               // for events added as .on(event, callback), if there is a
-               // .event() equivalent with special behaviour , pass through
-               // to that:
-               apply(parameters, oboeApi[eventId]);
-            } else {
+          // for events added as .on(event, callback), if there is a
+          // .event() equivalent with special behaviour , pass through
+          // to that:
+          apply(parameters, oboeApi[eventId]);
+        } else {
 
-               // we have a standard Node.js EventEmitter 2-argument call.
-               // The first parameter is the listener.
-               var event = oboeBus(eventId),
-                   listener = parameters[0];
+          // we have a standard Node.js EventEmitter 2-argument call.
+          // The first parameter is the listener.
+          var event = oboeBus(eventId),
+              listener = parameters[0];
 
-               if( fullyQualifiedNamePattern.test(eventId) ) {
+          if( fullyQualifiedNamePattern.test(eventId) ) {
 
-                  // allow fully-qualified node/path listeners
-                  // to be added
-                  addForgettableCallback(event, listener);
-               } else  {
+            // allow fully-qualified node/path listeners
+            // to be added
+            addForgettableCallback(event, listener);
+          } else  {
 
-                  // the event has no special handling, pass through
-                  // directly onto the event bus:
-                  event.on( listener);
-               }
-            }
+            // the event has no special handling, pass through
+            // directly onto the event bus:
+            event.on( listener);
+          }
+        }
 
-            return oboeApi; // chaining
-       }),
+        return oboeApi; // chaining
+      }),
 
-       /**
-        * Remove any kind of listener that the instance api exposes
-        */
-       removeListener = function( eventId, p2, p3 ){
+      /**
+       * Remove any kind of listener that the instance api exposes
+       */
+      removeListener = function( eventId, p2, p3 ){
 
-            if( eventId == 'done' ) {
+        if( eventId == 'done' ) {
 
-               rootNodeFinishedEvent.un(p2);
+          rootNodeFinishedEvent.un(p2);
 
-            } else if( eventId == 'node' || eventId == 'path' ) {
+        } else if( eventId == 'node' || eventId == 'path' ) {
 
-               // allow removal of node and path
-               oboeBus.un(eventId + ':' + p2, p3);
-            } else {
+          // allow removal of node and path
+          oboeBus.un(eventId + ':' + p2, p3);
+        } else {
 
-               // we have a standard Node.js EventEmitter 2-argument call.
-               // The second parameter is the listener. This may be a call
-               // to remove a fully-qualified node/path listener but requires
-               // no special handling
-               var listener = p2;
+          // we have a standard Node.js EventEmitter 2-argument call.
+          // The second parameter is the listener. This may be a call
+          // to remove a fully-qualified node/path listener but requires
+          // no special handling
+          var listener = p2;
 
-               oboeBus(eventId).un(listener);
-            }
+          oboeBus(eventId).un(listener);
+        }
 
-            return oboeApi; // chaining
-       };
+        return oboeApi; // chaining
+      };
 
-   /**
-    * Add a callback, wrapped in a try/catch so as to not break the
-    * execution of Oboe if an exception is thrown (fail events are
-    * fired instead)
-    *
-    * The callback is used as the listener id so that it can later be
-    * removed using .un(callback)
-    */
-   function addProtectedCallback(eventName, callback) {
-      oboeBus(eventName).on(protectedCallback(callback), callback);
-      return oboeApi; // chaining
-   }
+  /**
+   * Add a callback, wrapped in a try/catch so as to not break the
+   * execution of Oboe if an exception is thrown (fail events are
+   * fired instead)
+   *
+   * The callback is used as the listener id so that it can later be
+   * removed using .un(callback)
+   */
+  function addProtectedCallback(eventName, callback) {
+    oboeBus(eventName).on(protectedCallback(callback), callback);
+    return oboeApi; // chaining
+  }
 
-   /**
-    * Add a callback where, if .forget() is called during the callback's
-    * execution, the callback will be de-registered
-    */
-   function addForgettableCallback(event, callback, listenerId) {
+  /**
+   * Add a callback where, if .forget() is called during the callback's
+   * execution, the callback will be de-registered
+   */
+  function addForgettableCallback(event, callback, listenerId) {
 
-      // listenerId is optional and if not given, the original
-      // callback will be used
-      listenerId = listenerId || callback;
+    // listenerId is optional and if not given, the original
+    // callback will be used
+    listenerId = listenerId || callback;
 
-      var safeCallback = protectedCallback(callback);
+    var safeCallback = protectedCallback(callback);
 
-      event.on( function() {
+    event.on( function() {
 
-         var discard = false;
+      var discard = false;
 
-         oboeApi.forget = function(){
-            discard = true;
-         };
+      oboeApi.forget = function(){
+        discard = true;
+      };
 
-         apply( arguments, safeCallback );
+      apply( arguments, safeCallback );
 
-         delete oboeApi.forget;
+      delete oboeApi.forget;
 
-         if( discard ) {
-            event.un(listenerId);
-         }
-      }, listenerId);
-
-      return oboeApi; // chaining
-   }
-
-   /**
-    *  wrap a callback so that if it throws, Oboe.js doesn't crash but instead
-    *  throw the error in another event loop
-    */
-   function protectedCallback( callback ) {
-      return function() {
-         try{
-            return callback.apply(oboeApi, arguments);
-         }catch(e)  {
-            setTimeout(function() {
-              throw e;
-            });
-         }
+      if( discard ) {
+        event.un(listenerId);
       }
-   }
+    }, listenerId);
 
-   /**
-    * Return the fully qualified event for when a pattern matches
-    * either a node or a path
-    *
-    * @param type {String} either 'node' or 'path'
-    */
-   function fullyQualifiedPatternMatchEvent(type, pattern) {
-      return oboeBus(type + ':' + pattern);
-   }
+    return oboeApi; // chaining
+  }
 
-   function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
-      return function() {
-         var returnValueFromCallback = callback.apply(this, arguments);
-
-         if( defined(returnValueFromCallback) ) {
-
-            if( returnValueFromCallback == oboe.drop ) {
-               emitNodeDrop();
-            } else {
-               emitNodeSwap(returnValueFromCallback);
-            }
-         }
+  /**
+   *  wrap a callback so that if it throws, Oboe.js doesn't crash but instead
+   *  throw the error in another event loop
+   */
+  function protectedCallback( callback ) {
+    return function() {
+      try{
+        return callback.apply(oboeApi, arguments);
+      }catch(e)  {
+        setTimeout(function() {
+          throw new Error(e.message);
+        });
       }
-   }
+    }
+  }
 
-   function addSingleNodeOrPathListener(eventId, pattern, callback) {
+  /**
+   * Return the fully qualified event for when a pattern matches
+   * either a node or a path
+   *
+   * @param type {String} either 'node' or 'path'
+   */
+  function fullyQualifiedPatternMatchEvent(type, pattern) {
+    return oboeBus(type + ':' + pattern);
+  }
 
-      var effectiveCallback;
+  function wrapCallbackToSwapNodeIfSomethingReturned( callback ) {
+    return function() {
+      var returnValueFromCallback = callback.apply(this, arguments);
 
-      if( eventId == 'node' ) {
-         effectiveCallback = wrapCallbackToSwapNodeIfSomethingReturned(callback);
-      } else {
-         effectiveCallback = callback;
+      if( defined(returnValueFromCallback) ) {
+
+        if( returnValueFromCallback == oboe.drop ) {
+          emitNodeDrop();
+        } else {
+          emitNodeSwap(returnValueFromCallback);
+        }
       }
+    }
+  }
 
-      addForgettableCallback(
-         fullyQualifiedPatternMatchEvent(eventId, pattern),
-         effectiveCallback,
-         callback
-      );
-   }
+  function addSingleNodeOrPathListener(eventId, pattern, callback) {
 
-   /**
-    * Add several listeners at a time, from a map
-    */
-   function addMultipleNodeOrPathListeners(eventId, listenerMap) {
+    var effectiveCallback;
 
-      for( var pattern in listenerMap ) {
-         addSingleNodeOrPathListener(eventId, pattern, listenerMap[pattern]);
-      }
-   }
+    if( eventId == 'node' ) {
+      effectiveCallback = wrapCallbackToSwapNodeIfSomethingReturned(callback);
+    } else {
+      effectiveCallback = callback;
+    }
 
-   /**
-    * implementation behind .onPath() and .onNode()
-    */
-   function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
+    addForgettableCallback(
+      fullyQualifiedPatternMatchEvent(eventId, pattern),
+      effectiveCallback,
+      callback
+    );
+  }
 
-      if( isString(jsonPathOrListenerMap) ) {
-         addSingleNodeOrPathListener(eventId, jsonPathOrListenerMap, callback);
+  /**
+   * Add several listeners at a time, from a map
+   */
+  function addMultipleNodeOrPathListeners(eventId, listenerMap) {
 
-      } else {
-         addMultipleNodeOrPathListeners(eventId, jsonPathOrListenerMap);
-      }
+    for( var pattern in listenerMap ) {
+      addSingleNodeOrPathListener(eventId, pattern, listenerMap[pattern]);
+    }
+  }
 
-      return oboeApi; // chaining
-   }
+  /**
+   * implementation behind .onPath() and .onNode()
+   */
+  function addNodeOrPathListenerApi( eventId, jsonPathOrListenerMap, callback ){
+
+    if( isString(jsonPathOrListenerMap) ) {
+      addSingleNodeOrPathListener(eventId, jsonPathOrListenerMap, callback);
+
+    } else {
+      addMultipleNodeOrPathListeners(eventId, jsonPathOrListenerMap);
+    }
+
+    return oboeApi; // chaining
+  }
 
 
-   // some interface methods are only filled in after we receive
-   // values and are noops before that:
-   oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
-      oboeApi.root = functor(rootNode);
-   });
+  // some interface methods are only filled in after we receive
+  // values and are noops before that:
+  oboeBus(ROOT_PATH_FOUND).on( function(rootNode) {
+    oboeApi.root = functor(rootNode);
+  });
 
-   /**
-    * When content starts make the headers readable through the
-    * instance API
-    */
-   oboeBus(HTTP_START).on( function(_statusCode, headers) {
+  /**
+   * When content starts make the headers readable through the
+   * instance API
+   */
+  oboeBus(HTTP_START).on( function(_statusCode, headers) {
 
-      oboeApi.header =  function(name) {
-                           return name ? headers[name]
-                                       : headers
-                                       ;
-                        }
-   });
+    oboeApi.header =  function(name) {
+      return name ? headers[name]
+        : headers
+      ;
+    }
+  });
 
-   /**
-    * Construct and return the public API of the Oboe instance to be
-    * returned to the calling application
-    */
-   return oboeApi = {
-      on             : addListener,
-      addListener    : addListener,
-      removeListener : removeListener,
-      emit           : oboeBus.emit,
+  /**
+   * Construct and return the public API of the Oboe instance to be
+   * returned to the calling application
+   */
+  return oboeApi = {
+    on             : addListener,
+    addListener    : addListener,
+    removeListener : removeListener,
+    emit           : oboeBus.emit,
 
-      node           : partialComplete(addNodeOrPathListenerApi, 'node'),
-      path           : partialComplete(addNodeOrPathListenerApi, 'path'),
+    node           : partialComplete(addNodeOrPathListenerApi, 'node'),
+    path           : partialComplete(addNodeOrPathListenerApi, 'path'),
 
-      done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),
-      start          : partialComplete(addProtectedCallback, HTTP_START ),
+    done           : partialComplete(addForgettableCallback, rootNodeFinishedEvent),
+    start          : partialComplete(addProtectedCallback, HTTP_START ),
 
-      // fail doesn't use protectedCallback because
-      // could lead to non-terminating loops
-      fail           : oboeBus(FAIL_EVENT).on,
+    // fail doesn't use protectedCallback because
+    // could lead to non-terminating loops
+    fail           : oboeBus(FAIL_EVENT).on,
 
-      // public api calling abort fires the ABORTING event
-      abort          : oboeBus(ABORTING).emit,
+    // public api calling abort fires the ABORTING event
+    abort          : oboeBus(ABORTING).emit,
 
-      // initially return nothing for header and root
-      header         : noop,
-      root           : noop,
+    // initially return nothing for header and root
+    header         : noop,
+    root           : noop,
 
-      source         : contentSource
-   };
+    source         : contentSource
+  };
 }
 
 /**

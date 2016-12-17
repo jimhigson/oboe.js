@@ -1,51 +1,25 @@
 
 describe("oboe loaded using require", function() {
-     
-   it('is not on the global namespace by default', function () {
 
-      expect(window.oboe).toBe(undefined)
-   })
-   
-   it('can be loaded using require', function () {
+  it('is not on the global namespace by default', function () {
 
-      var doneTest;
+    expect(window.oboe).toBe(undefined);
+  });
 
-      require(['oboe'], function(oboe){
-         expect(require('oboe')).toBeOboe()
-         doneTest = true;
-      });
-      
-      waitsFor('oboe to load using require', function(){return doneTest});
+  it('can be loaded using require', function (done) {
 
-   })
-   
-   it('it not on global after being loaded', function () {
+    require(['oboe'], function(oboe){
+      expect(oboe).not.toBe(undefined);
+      expect(oboe('foo.json')).not.toBe(undefined);
+      done();
+    });
+  });
 
-      var doneTest;
+  it('it not on global after being loaded', function (done) {
 
-      require(['oboe'], function(oboe){
-         expect(window.oboe).toBe(undefined)
-         doneTest = true;
-      });
-      
-      waitsFor('oboe to load using require', function(){return doneTest});
-
-   })      
-   
-   beforeEach(function(){
-      this.addMatchers({
-         toBeOboe:function(){
-         
-            var potentialOboe = this.actual;
-            
-            return !!(  potentialOboe && 
-                        potentialOboe('foo.json').node
-                     );          
-         }
-      })
-   });
-   
-});  
-
-
-
+    require(['oboe'], function(oboe){
+      expect(window.oboe).toBe(undefined);
+      done();
+    });
+  });
+});
