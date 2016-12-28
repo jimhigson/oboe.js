@@ -2,7 +2,7 @@
 // test cases borrowed from
 //    https://github.com/dscape/clarinet/blob/master/test/clarinet.js
 var docs   =
-    { 
+    {
       empty_input:
       { text      : '',
         events    :
@@ -27,8 +27,8 @@ var docs   =
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, "\\"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , zero_byte    :
@@ -38,8 +38,8 @@ var docs   =
         , [SAX_KEY         , "foo"]
         , [SAX_VALUE_OPEN, "\u0000"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , empty_value  :
@@ -49,8 +49,8 @@ var docs   =
         , [SAX_KEY         , "foo"]
         , [SAX_VALUE_OPEN, ""], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , three_byte_utf8 :
@@ -62,8 +62,8 @@ var docs   =
         , [SAX_KEY         , "asakusa"]
         , [SAX_VALUE_OPEN, "浅草"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , four_byte_utf8 :
@@ -73,8 +73,8 @@ var docs   =
         , [SAX_KEY         , "U+10ABCD"]
         , [SAX_VALUE_OPEN, "􊯍"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , bulgarian    :
@@ -83,8 +83,8 @@ var docs   =
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, "Да Му Еба Майката"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , codepoints_from_unicodes  :
@@ -93,8 +93,8 @@ var docs   =
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, "\u004d\u0430\u4e8c\ud800\udf02"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , empty_object :
@@ -102,8 +102,8 @@ var docs   =
       , events     :
         [ [SAX_VALUE_OPEN, {}]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , foobar   :
@@ -113,8 +113,8 @@ var docs   =
         , [SAX_KEY         , "foo"]
         , [SAX_VALUE_OPEN, "bar"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , as_is    :
@@ -126,25 +126,25 @@ var docs   =
         , [SAX_KEY         , "bar"]
         , [SAX_VALUE_OPEN, false], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , array    :
       { text   : '["one", "two"]'
-      , events : 
+      , events :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, 'one'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_OPEN, 'two'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , array_fu :
       { text   : '["foo", "bar", "baz",true,false,null,{"key":"value"},' +
                  '[null,null,null,[]]," \\\\ "]'
-      , events : 
+      , events :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, 'foo'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_OPEN, 'bar'], [SAX_VALUE_CLOSE, undefined]
@@ -165,18 +165,18 @@ var docs   =
         , [SAX_VALUE_CLOSE  , undefined]
         , [SAX_VALUE_OPEN, " \\ "], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , simple_exp    :
       { text   : '[10e-01]'
-      , events : 
+      , events :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, 10e-01], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , nested   :
@@ -189,8 +189,8 @@ var docs   =
         , [SAX_VALUE_OPEN, "c"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , nested_array  :
@@ -203,8 +203,8 @@ var docs   =
           , [SAX_VALUE_OPEN, 'c'], [SAX_VALUE_CLOSE, undefined]
           , [SAX_VALUE_CLOSE  , undefined]
           , [SAX_VALUE_CLOSE , undefined]
-          
-          
+
+
           ]
       }
     , array_of_objs :
@@ -220,8 +220,8 @@ var docs   =
         , [SAX_VALUE_OPEN, 'd'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , two_keys  :
@@ -233,8 +233,8 @@ var docs   =
         , [SAX_KEY         , "c"]
         , [SAX_VALUE_OPEN, "d"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , key_true  :
@@ -248,12 +248,12 @@ var docs   =
         , [SAX_KEY         , "baz"]
         , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , obj_strange_strings  :
-      { text               : 
+      { text               :
         '{"foo": "bar and all\\\"", "bar": "its \\\"nice\\\""}'
       , events             :
         [ [SAX_VALUE_OPEN, {}]
@@ -262,12 +262,12 @@ var docs   =
         , [SAX_KEY           , "bar"]
         , [SAX_VALUE_OPEN, 'its "nice"'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE   , undefined]
-        
-        
+
+
         ]
-      } 
+      }
     , bad_foo_bar         :
-      { text              : 
+      { text              :
           '["foo", "bar"'
        , events           :
          [ [SAX_VALUE_OPEN, []]
@@ -277,7 +277,7 @@ var docs   =
          ]
        }
     , string_invalid_escape:
-      { text             : 
+      { text             :
           '["and you can\'t escape thi\s"]'
        , events          :
          [ [SAX_VALUE_OPEN, []]
@@ -298,8 +298,8 @@ var docs   =
          , [SAX_KEY          , "null"]
          , [SAX_VALUE_OPEN, null], [SAX_VALUE_CLOSE, undefined]
          , [SAX_VALUE_CLOSE  , undefined]
-         
-         
+
+
          ]
       }
     , frekin_string:
@@ -308,8 +308,8 @@ var docs   =
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, '\\\"\"a\"'], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , array_of_string_insanity  :
@@ -320,15 +320,15 @@ var docs   =
         , [SAX_VALUE_OPEN, "\"and this string has an escape at the beginning"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_OPEN, "and this string has no escapes"], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
-        
-        
+
+
         ]
       }
     , non_utf8           :
-      { text   : 
+      { text   :
         '{"CoreletAPIVersion":2,"CoreletType":"standalone",' +
         '"documentation":"A corelet that provides the capability to upload' +
-        ' a folder’s contents into a user’s locker.","functions":[' + 
+        ' a folder’s contents into a user’s locker.","functions":[' +
         '{"documentation":"Displays a dialog box that allows user to ' +
         'select a folder on the local system.","name":' +
         '"ShowBrowseDialog","parameters":[{"documentation":"The ' +
@@ -354,7 +354,7 @@ var docs   =
         '"callback","required":true,"type":"callback"}]}],' +
         '"name":"LockerUploader","version":{"major":0,' +
         '"micro":1,"minor":0},"versionString":"0.0.1"}'
-      , events : 
+      , events :
         [ [SAX_VALUE_OPEN, {}], [SAX_KEY, "CoreletAPIVersion" ]
         , [SAX_VALUE_OPEN, 2 ], [SAX_VALUE_CLOSE, undefined]
         , [SAX_KEY         , "CoreletType"]
@@ -484,7 +484,7 @@ var docs   =
       }
     , array_of_arrays    :
       { text   : '[[[["foo"]]]]'
-      , events : 
+      , events :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, []]
@@ -494,28 +494,28 @@ var docs   =
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , low_overflow :
       { text       : '[-9223372036854775808]'
-      , events     : 
+      , events     :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, -9223372036854775808], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , high_overflow :
       { text       : '[9223372036854775808]'
-      , events     : 
+      , events     :
         [ [SAX_VALUE_OPEN, []]
         , [SAX_VALUE_OPEN, 9223372036854775808], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , floats       :
@@ -527,8 +527,8 @@ var docs   =
         , [SAX_VALUE_OPEN, 3.141569], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_OPEN, 10000000000000e-10], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , numbers_game :
@@ -567,16 +567,16 @@ var docs   =
         , [SAX_VALUE_OPEN, 2147483647], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_OPEN, -2147483647], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , johnsmith  :
       { text     : '{ "firstName": "John", "lastName" : "Smith", "age" : ' +
-                   '25, "address" : { "streetAddress": "21 2nd Street", ' + 
+                   '25, "address" : { "streetAddress": "21 2nd Street", ' +
                    '"city" : "New York", "state" : "NY", "postalCode" : ' +
-                   ' "10021" }, "phoneNumber": [ { "type" : "home", ' + 
-                   '"number": "212 555-1234" }, { "type" : "fax", ' + 
+                   ' "10021" }, "phoneNumber": [ { "type" : "home", ' +
+                   '"number": "212 555-1234" }, { "type" : "fax", ' +
                    '"number": "646 555-4567" } ] }'
       , events   :
         [ [SAX_VALUE_OPEN, {}]
@@ -638,8 +638,8 @@ var docs   =
         , [SAX_KEY         , "b"]
         , [SAX_VALUE_OPEN, true], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     , incomplete_json_terminates_ending_in_number :
@@ -652,8 +652,8 @@ var docs   =
         , [SAX_VALUE_OPEN, 3], [SAX_VALUE_CLOSE, undefined]
         , [SAX_VALUE_CLOSE  , undefined]
         , [SAX_VALUE_OPEN, []]
-        , [SAX_VALUE_OPEN, 4], [SAX_VALUE_CLOSE, undefined]    
-        , [FAIL_EVENT       , undefined]    
+        , [SAX_VALUE_OPEN, 4], [SAX_VALUE_CLOSE, undefined]
+        , [FAIL_EVENT       , undefined]
         ]
       }
     , incomplete_json_terminates_ending_in_comma :
@@ -669,7 +669,7 @@ var docs   =
         ]
       }
     , json_org  :
-      { text    : 
+      { text    :
           ('{\r\n' +
           '          "glossary": {\n' +
           '              "title": "example glossary",\n\r' +
@@ -679,7 +679,7 @@ var docs   =
           '                      "GlossEntry": {\r\n' +
           '                          "ID": "SGML",\r\n' +
           '      \t\t\t\t\t"SortAs": "SGML",\r\n' +
-          '      \t\t\t\t\t"GlossTerm": "Standard Generalized ' + 
+          '      \t\t\t\t\t"GlossTerm": "Standard Generalized ' +
           'Markup Language",\r\n' +
           '      \t\t\t\t\t"Acronym": "SGML",\r\n' +
           '      \t\t\t\t\t"Abbrev": "ISO 8879:1986",\r\n' +
@@ -735,38 +735,43 @@ var docs   =
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE , undefined]
         , [SAX_VALUE_CLOSE , undefined]
-        
-        
+
+
         ]
       }
     };
 
 describe('clarinet', function() {
 
-   var expectedEventNames = [ SAX_KEY          
-                            , SAX_VALUE_OPEN  
-                            , SAX_VALUE_CLOSE   
+   var expectedEventNames = [ SAX_KEY
+                            , SAX_VALUE_OPEN
+                            , SAX_VALUE_CLOSE
                             , FAIL_EVENT
                             ];
-    
+
+  var times = false;
    for (var key in docs) {
-      
+     if(times) {
+       continue;
+     }
+     times = true;
+
       var doc = docs[key];
-      
-      describe('case ' + key, function(doc){
-                  
+
+      describe('case ' + key, function(){
+
          var bus = pubSub(),
              blackBoxRecording = eventBlackBox(bus, expectedEventNames);
-         
+
          clarinet(bus);
-         
+
          bus(STREAM_DATA).emit(doc.text);
          bus(STREAM_END).emit();
-         
+
          it('should have the correct event types', function(){
             expect( blackBoxRecording ).toMatchOrder( doc.events );
          });
-         
+
          doc.events.forEach(function( expectedEvent, i ){
 
             var blackBoxSlice = blackBoxRecording[i];
@@ -779,39 +784,46 @@ describe('clarinet', function() {
             }
          });
 
-      }.bind(null, doc));
+      });
    }
 
    beforeEach(function(){
 
-      this.addMatchers({
-         toMatchOrder: function(expected){
+     jasmine.addMatchers({
+         toMatchOrder: function(){
+           return {
+             compare: function(actual, expected) {
+                var result = {};
 
-            var actual = this.actual;
+                var actualEventOrder = actual.map( function(e){
+                   return e.type;
+                });
+                var expectedEventOrder = expected.map( function(a){
+                   return a[0];
+                });
 
-            var actualEventOrder = actual.map( function(e){
-               return e.type;
-            });
-            var expectedEventOrder = expected.map( function(a){
-               return a[0];
-            });
+                var lengthsMatch = actualEventOrder.length == expectedEventOrder.length;
+                var everyEventMatches = actualEventOrder.every(function( actualEvent, i ){
+                  return actualEvent == expectedEventOrder[i];
+                });
 
-            this.message = function(){
-               return 'events not in correct order. We have:\n' +
-                  JSON.stringify(
-                     actualEventOrder.map(prettyPrintEvent)
-                  ) + '\nbut wanted:\n' +
-                  JSON.stringify(
-                     expectedEventOrder.map(prettyPrintEvent)
-                  );
-            };
+                result.pass = lengthsMatch && everyEventMatches;
+                if(!result.pass) {
+                   result.message = 'events not in correct order. We have:\n' +
+                     JSON.stringify(
+                       actualEventOrder.map(prettyPrintEvent)
+                     ) + '\nbut wanted:\n' +
+                     JSON.stringify(
+                       expectedEventOrder.map(prettyPrintEvent)
+                     );
+               }
 
-            return actualEventOrder.length == expectedEventOrder.length &&
-                   actualEventOrder.every(function( actualEvent, i ){
-                      return actualEvent == expectedEventOrder[i];
-                   });
+               return result;
+
+             }
+           };
          }
-      })
+     });
    });
-   
+
 });
