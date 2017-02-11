@@ -10,9 +10,12 @@
     "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
     "test-run": "node ./node_modules/grunt-cli/bin/grunt test-run",
     "test-node": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
+    "test-browser": "karma start test/unit.conf.js --single-run",
+    "test-concat": "grunt start-stream-source && karma start test/concat.conf.js --single-run",
     "browser-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
     "node-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
-    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes"
+    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
+    "clean-dist": "rm dist/*.js && rm build/*.js"
   },
   "repository": {
     "type": "git",
@@ -41,7 +44,6 @@
     "express": "~3.4.3",
     "get-json": "0.0.1",
     "grunt": "~0.4.1",
-    "grunt-clear": "~0.2.1",
     "grunt-cli": "~0.1.9",
     "grunt-concurrent": "~0.3.1",
     "grunt-contrib-clean": "~0.5.0",

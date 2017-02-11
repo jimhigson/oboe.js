@@ -88,8 +88,6 @@ module.exports = function (grunt) {
 
     pkg:grunt.file.readJSON("package.json")
 
-    ,  clean: ['dist/*.js', 'build/*.js']
-
     ,  concat: {
       browser:{
         src: OBOE_BROWSER_SOURCE_FILES,
@@ -149,20 +147,6 @@ module.exports = function (grunt) {
         configFile: 'test/unit.conf.js'
       }
 
-      ,
-      'precaptured-dev': {
-        // for doing a single test run with already captured browsers during development.
-        // this is good for running tests in browsers karma can't easily start such as
-        // IE running inside a Windows VM on a unix dev environment
-        browsers: [],
-        configFile: 'test/unit.conf.js',
-        singleRun: 'true'
-      }
-      ,
-      'single-dev': {
-        browsers: autoStartBrowsers,
-        configFile: 'test/unit.conf.js'
-      }
       ,
       'single-concat': {
         browsers: autoStartBrowsers,
@@ -277,6 +261,7 @@ module.exports = function (grunt) {
   var streamSource;
 
   grunt.registerTask('start-stream-source', function () {
+    this.async()
     grunt.log.ok('do we have a streaming source already?', !!streamSource);
 
     // if we previously loaded the streamsource, stop it to let the new one in:
@@ -286,7 +271,7 @@ module.exports = function (grunt) {
     }
 
     streamSource = require('./test/streamsource.js');
-    streamSource.start(STREAM_SOURCE_PORT_HTTP, grunt);
+    streamSource.start(STREAM_SOURCE_PORT_HTTP);
   });
 
   grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
@@ -341,6 +326,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('browser-build-test',      [
+    'start-stream-source',
     'karma:single-dev',
     'karma:single-browser-http',
     'browser-build',
@@ -364,15 +350,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default',      [
-
-    'clear',
-    'clean',
-    'start-stream-source',
-
     'browser-build-test',
-
     'node-build-test',
-
     'dist-sizes'
   ]);
 
