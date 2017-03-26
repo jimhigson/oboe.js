@@ -254,10 +254,20 @@ module.exports = function (grunt) {
       }
     }
 
+    , express: {
+      test: {
+        options: {
+          script: './test/streamsource.js',
+          port: 4567
+        }
+      }
+    }
+
   });
 
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+  grunt.loadNpmTasks('grunt-express-server');
   var streamSource;
 
   grunt.registerTask('start-stream-source', function () {
@@ -272,6 +282,10 @@ module.exports = function (grunt) {
 
     streamSource = require('./test/streamsource.js');
     streamSource.start(STREAM_SOURCE_PORT_HTTP);
+  });
+
+  grunt.registerTask('test-concat', function() {
+    runNpmScript('test-concat', this.async());
   });
 
   grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
@@ -373,5 +387,9 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('coverage',   [
     'karma:coverage'
+  ]);
+  grunt.registerTask('run-test-concat', [
+    'express:test',
+    'test-concat'
   ]);
 };

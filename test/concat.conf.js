@@ -1,6 +1,8 @@
 module.exports = function(config) {
   config.set({
 
+    port:3000,
+
     browsers: ['PhantomJS'],
 
     frameworks:['jasmine'],

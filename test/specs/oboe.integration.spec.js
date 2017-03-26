@@ -172,7 +172,7 @@
         });
       });
 
-      it('adds X-Requested-With to cross-domain by default on cross-domain', function(done) {
+      xit('adds X-Requested-With to cross-domain by default on cross-domain', function(done) {
 
         oboe({
           url: testUrl('echoBackHeadersAsBodyJson')
