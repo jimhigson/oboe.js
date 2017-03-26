@@ -11,7 +11,7 @@
     "test-run": "node ./node_modules/grunt-cli/bin/grunt test-run",
     "test-node": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
     "test-browser": "karma start test/unit.conf.js --single-run",
-    "test-concat": "karma start test/concat.conf.js --single-run",
+    "test-concat": "grunt test-concat",
     "browser-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
     "node-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",

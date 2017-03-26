@@ -7,7 +7,7 @@
       };
    } else {
       window.testUrl = function( path ){
-        return 'http://localhost:4567/' + path;
+        return '/testServer/' + path;
       };
 
       window.crossDomainUrl = function (path){

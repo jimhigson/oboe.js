@@ -14,6 +14,8 @@ var express = require('express'),
     cors = require('cors'),
     fs = require('fs'),
     http = require('http'),
+    zlib = require('zlib'),
+    path = require('path'),
 
     JSON_MIME_TYPE = "application/octet-stream",
 
@@ -21,15 +23,11 @@ var express = require('express'),
 
 var PORT = process.env.PORT || 3000;
 
-var verboseLog = console.log,
-    errorLog = console.error;
-
 function echoBackBody(req, res) {
   req.pipe(res);
 }
 
 function echoBackHeadersAsBodyJson(req, res) {
-  // console.log('here')
   res.end(JSON.stringify(req.headers));
 }
 
@@ -50,12 +48,11 @@ function replyWithTenSlowNumbers(_req, res) {
   var NUMBER_INTERVAL = 250;
   var MAX_NUMBER = 9;
 
-  verboseLog(
-    'slow number server: will write numbers 0 ..' +
-      String(MAX_NUMBER).blue +
-      ' out as a json array at a rate of one per',
-    String(NUMBER_INTERVAL).blue + 'ms'
-  );
+  var msg = 'slow number server: will write numbers 0-' +
+      MAX_NUMBER +
+      ' out as a json array at a rate of one per' +
+      NUMBER_INTERVAL + 'ms';
+  console.log(msg);
 
   res.write('[\n');
 
@@ -69,7 +66,7 @@ function replyWithTenSlowNumbers(_req, res) {
 
       res.end(']');
       clearInterval(inervalId);
-      verboseLog('slow number server: finished writing out');
+      console.log('slow number server: finished writing out');
     } else {
       res.write(',\n');
       curNumber++;
@@ -96,23 +93,24 @@ function serve404Json(req, res) {
   ));
 }
 
+function incompleteJson(req, res) {
+  var jsonPath = path.join(__dirname, './json/incomplete.json');
+  var incomplete = fs.readFileSync(jsonPath, 'utf8');
+  console.log("incomplete", incomplete);
+  res.write(incomplete);
+  res.end();
+}
+
 function replyWithStaticJson(req, res) {
-  sendJsonOkHeaders(res);
 
   if( !req.url ) {
     throw new Error('no url given');
   }
 
-  var filename = 'test/json/' + req.params.name + '.json';
+  var filename = 'json/' + req.params.name + '.json';
 
-  verboseLog('will respond with contents of file ' + filename);
-
-  require('fs').createReadStream(filename)
-    .on('error', function(err){
-      errorLog('could not read static file ' + filename +
-               ' ' + err);
-    }).pipe(res);
-
+  var json = require(path.join(__dirname, './' + filename));
+  res.json(json);
 }
 
 function sendJsonOkHeaders(res) {
@@ -162,13 +160,12 @@ function twoHundredItems(_req, res) {
 function replyWithTenSlowNumbersGzipped(req, serverResponse){
 
   // request out non-gzipped stream and re-serve gzipped
-  require('http').get({
+  http.get({
     host: 'localhost',
     path: '/twoHundredItems',
     port: httpPort })
     .on('response', function(clientResponse){
 
-      var zlib = require('zlib');
 
       //res.writeHead(200, { 'content-encoding': 'gzip' });
 
@@ -212,6 +209,7 @@ app.get('/gzippedTwoHundredItems', replyWithTenSlowNumbersGzipped);
 app.get('/invalidJson', replyWithInvalidJson);
 app.get('/404json', serve404Json);
 app.get('/204noData', serve204Json);
+app.get('/incompleteJson', incompleteJson)
 
 httpServer = http.createServer(app).listen(PORT, function() {
   console.log('Express server listening on port ' + PORT);

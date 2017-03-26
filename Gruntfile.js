@@ -17,7 +17,8 @@ module.exports = function (grunt) {
     });
   }
 
-  var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
+  // var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
+  var autoStartBrowsers = ['PhantomJS'];
 
   var STREAM_SOURCE_PORT_HTTP = 4567;
 
@@ -148,7 +149,7 @@ module.exports = function (grunt) {
       }
 
       ,
-      'single-concat': {
+      'concat': {
         browsers: autoStartBrowsers,
         configFile: 'test/concat.conf.js'
       }
@@ -340,13 +341,13 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('browser-build-test',      [
-    'start-stream-source',
-    'karma:single-dev',
-    'karma:single-browser-http',
-    'browser-build',
-    'karma:single-concat',
-    'karma:single-minified',
-    'karma:single-amd'
+    'test-concat',
+    // 'start-stream-source',
+    // 'karma:single-browser-http',
+    // 'browser-build',
+    // 'karma:single-concat',
+    // 'karma:single-minified',
+    // 'karma:single-amd'
   ]);
 
   grunt.registerTask('build',      [
@@ -388,8 +389,8 @@ module.exports = function (grunt) {
   grunt.registerTask('coverage',   [
     'karma:coverage'
   ]);
-  grunt.registerTask('run-test-concat', [
+  grunt.registerTask('test-concat', [
     'express:test',
-    'test-concat'
+    'karma:concat'
   ]);
 };
