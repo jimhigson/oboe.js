@@ -1,5 +1,8 @@
 (function(Platform) {
 
+  var ASYNC_TEST_TIMEOUT = 60 * 1000; // 60 seconds
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = ASYNC_TEST_TIMEOUT;
+
   // Used to spy on global functions like setTimeout
   var globalContext;
 
@@ -13,14 +16,14 @@
     };
     globalContext = window;
   } else {
+    process.on('uncaughtException', function(e) {
+      console.error('caught error', e);
+    });
     globalContext = GLOBAL;
   }
 
 
   describe("oboe integration (real http)", function() {
-
-    var ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = ASYNC_TEST_TIMEOUT;
 
     var oboe;
     var testUrl;
@@ -240,7 +243,9 @@
       waitsForAndRuns(function() {
         // console.log('callbackSpy.calls.count()', callbackSpy.calls.count())
         return callbackSpy.calls.count() == 100;
-      }, done, 40 * 1000);
+      }, function() {
+        done();
+      }, 40 * 1000);
     });
 
     it('continues to parse after a callback throws an exception', function(done) {

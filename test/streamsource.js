@@ -48,12 +48,6 @@ function replyWithTenSlowNumbers(_req, res) {
   var NUMBER_INTERVAL = 250;
   var MAX_NUMBER = 9;
 
-  var msg = 'slow number server: will write numbers 0-' +
-      MAX_NUMBER +
-      ' out as a json array at a rate of one per' +
-      NUMBER_INTERVAL + 'ms';
-  console.log(msg);
-
   res.write('[\n');
 
   var curNumber = 0;
@@ -66,7 +60,6 @@ function replyWithTenSlowNumbers(_req, res) {
 
       res.end(']');
       clearInterval(inervalId);
-      console.log('slow number server: finished writing out');
     } else {
       res.write(',\n');
       curNumber++;
@@ -96,7 +89,6 @@ function serve404Json(req, res) {
 function incompleteJson(req, res) {
   var jsonPath = path.join(__dirname, './json/incomplete.json');
   var incomplete = fs.readFileSync(jsonPath, 'utf8');
-  console.log("incomplete", incomplete);
   res.write(incomplete);
   res.end();
 }
@@ -147,7 +139,6 @@ function twoHundredItems(_req, res) {
 
       clearInterval(inervalId);
 
-      console.log('db server: finished writing to stream');
     } else {
       res.write(',');
     }
