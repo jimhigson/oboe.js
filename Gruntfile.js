@@ -17,7 +17,8 @@ module.exports = function (grunt) {
     });
   }
 
-  var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
+  // var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari'];
+  var autoStartBrowsers = ['PhantomJS'];
 
   var STREAM_SOURCE_PORT_HTTP = 4567;
 
@@ -88,8 +89,6 @@ module.exports = function (grunt) {
 
     pkg:grunt.file.readJSON("package.json")
 
-    ,  clean: ['dist/*.js', 'build/*.js']
-
     ,  concat: {
       browser:{
         src: OBOE_BROWSER_SOURCE_FILES,
@@ -138,56 +137,46 @@ module.exports = function (grunt) {
         colors : true
       }
       ,
-      'coverage':{
+      coverage:{
         reporters : ['coverage'],
         preprocessors: {
           // source files to generate coverage for
           // (these files will be instrumented by Istanbul)
           'src/**/*.js': ['coverage']
         },
-        'browsers': ['PhantomJS'],
-        configFile: 'test/unit.conf.js'
-      }
-
-      ,
-      'precaptured-dev': {
-        // for doing a single test run with already captured browsers during development.
-        // this is good for running tests in browsers karma can't easily start such as
-        // IE running inside a Windows VM on a unix dev environment
-        browsers: [],
-        configFile: 'test/unit.conf.js',
-        singleRun: 'true'
-      }
-      ,
-      'single-dev': {
-        browsers: autoStartBrowsers,
+        browsers: ['PhantomJS'],
         configFile: 'test/unit.conf.js'
       }
       ,
-      'single-concat': {
+      concat: {
         browsers: autoStartBrowsers,
         configFile: 'test/concat.conf.js'
       }
       ,
-      'single-minified': {
+      minified: {
         browsers: autoStartBrowsers,
         configFile: 'test/min.conf.js'
       }
 
       ,
-      'single-amd': {
+      amd: {
         browsers: autoStartBrowsers,
         configFile: 'test/amd.conf.js'
       }
 
       ,
-      'single-browser-http': {
+      http: {
         browsers: autoStartBrowsers,
         configFile: 'test/http.conf.js'
       }
+      ,
+      unit: {
+        browsers: autoStartBrowsers,
+        configFile: 'test/unit.conf.js'
+      }
 
       ,
-      'persist': {
+      persist: {
         // for setting up a persistent karma server.
         // To start the server, the task is:
         //    karma:persist
@@ -270,13 +259,24 @@ module.exports = function (grunt) {
       }
     }
 
+    , express: {
+      test: {
+        options: {
+          script: './test/streamsource.js',
+          port: 4567
+        }
+      }
+    }
+
   });
 
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+  grunt.loadNpmTasks('grunt-express-server');
   var streamSource;
 
   grunt.registerTask('start-stream-source', function () {
+    this.async()
     grunt.log.ok('do we have a streaming source already?', !!streamSource);
 
     // if we previously loaded the streamsource, stop it to let the new one in:
@@ -286,11 +286,11 @@ module.exports = function (grunt) {
     }
 
     streamSource = require('./test/streamsource.js');
-    streamSource.start(STREAM_SOURCE_PORT_HTTP, grunt);
+    streamSource.start(STREAM_SOURCE_PORT_HTTP);
   });
 
-  grunt.registerTask("jasmine_node_oboe", "Runs jasmine-node.", function() {
-    runNpmScript('test-node', this.async());
+  grunt.registerTask('jasmine-node', 'Runs jasmine-node.', function() {
+    runNpmScript('jasmine-node', this.async());
   });
 
   // change the auto-starting browsers so that future tests will use
@@ -326,11 +326,6 @@ module.exports = function (grunt) {
     'jasmine_node_oboe'
   ]);
 
-  grunt.registerTask('node',      [
-    'start-stream-source',
-    'node-build-test'
-  ]);
-
   grunt.registerTask('browser-build',      [
     'exec:createGitVersionJs',
     'concat:browser',
@@ -341,12 +336,10 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('browser-build-test',      [
-    'karma:single-dev',
-    'karma:single-browser-http',
-    'browser-build',
-    'karma:single-concat',
-    'karma:single-minified',
-    'karma:single-amd'
+    'test-concat',
+    'test-http',
+    'test-minified',
+    'test-amd'
   ]);
 
   grunt.registerTask('build',      [
@@ -356,23 +349,14 @@ module.exports = function (grunt) {
 
   // build and run just the integration tests.
   grunt.registerTask('build-integration-test',      [
-    'build',
-    'start-stream-source',
-    'karma:single-concat',
+    'test-concat',
     'jasmine_node_oboe',
     'dist-sizes'
   ]);
 
   grunt.registerTask('default',      [
-
-    'clear',
-    'clean',
-    'start-stream-source',
-
     'browser-build-test',
-
     'node-build-test',
-
     'dist-sizes'
   ]);
 
@@ -394,5 +378,38 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('coverage',   [
     'karma:coverage'
+  ]);
+  grunt.registerTask('test-concat', [
+    'express:test',
+    'karma:concat'
+  ]);
+  grunt.registerTask('test-http', [
+    'express:test',
+    'karma:http'
+  ]);
+  grunt.registerTask('test-minified', [
+    'express:test',
+    'karma:minified'
+  ]);
+  grunt.registerTask('test-amd', [
+    'express:test',
+    'karma:amd'
+  ]);
+  grunt.registerTask('test-unit', [
+    'express:test',
+    'karma:unit'
+  ]);
+  grunt.registerTask('test-node', [
+    'express:test',
+    'jasmine-node'
+  ]);
+
+  grunt.registerTask('test', [
+    'test-concat',
+    'test-http',
+    'test-minified',
+    'test-amd',
+    'test-unit',
+    'test-node'
   ]);
 };

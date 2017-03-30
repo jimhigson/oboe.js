@@ -1,10 +1,26 @@
+var STREAM_SOURCE_PORT_HTTP = 4567;
+
 module.exports = function(config) {
   config.set({
 
-    frameworks:['jasmine'],
+    browsers: ['PhantomJS'],
+
+    frameworks: ['jasmine'],
 
     // base path, that will be used to resolve files and exclude
     basePath : '..',
+
+    proxies: {
+      '/testServer'   : 'http://localhost:' + STREAM_SOURCE_PORT_HTTP
+    },
+
+    // test results reporter to use
+    // possible values: 'dots', 'progress', 'junit'
+    reporters : ['progress'],
+
+    // enable / disable colors in the output (reporters and logs)
+    colors : true,
+
 
     // list of files / patterns to load in the browser
     files : [
@@ -44,10 +60,7 @@ module.exports = function(config) {
     logLevel : config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch : false,
+    autoWatch : true
 
-    // Continuous Integration mode
-    // if true, it capture browsers, run tests and exit
-    singleRun : true
   });
 };
