@@ -3,7 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.3-2-gc85b5c4
+   "// `git describe`" 
 
 /*
 
@@ -2488,7 +2488,8 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
       JSON.parse(JSON.stringify(headers))
       : {};
 
-   if( body ) {
+   if ( typeof(FormData) !== 'undefined' && body instanceof FormData ) { /* leave body unchanged */ }
+   else if( body ) {
       if( !isString(body) ) {
 
          // If the body is not a string, stringify it. This allows objects to
@@ -2498,6 +2499,7 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
          // Default Content-Type to JSON unless given otherwise.
          headers['Content-Type'] = headers['Content-Type'] || 'application/json';
       }
+      headers['Content-Length'] = headers['Content-Length'] || body.length;
    } else {
       body = null;
    }
