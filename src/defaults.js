@@ -7,7 +7,8 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
       JSON.parse(JSON.stringify(headers))
       : {};
 
-   if( body ) {
+   if ( defined(FormData) && body instanceof FormData ) { /* leave body unchanged */ }
+   else if( body ) {
       if( !isString(body) ) {
 
          // If the body is not a string, stringify it. This allows objects to
