@@ -7,7 +7,7 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
       JSON.parse(JSON.stringify(headers))
       : {};
 
-   if ( defined(FormData) && body instanceof FormData ) { /* leave body unchanged */ }
+   if ( typeof(FormData) !== 'undefined' && body instanceof FormData ) { /* leave body unchanged */ }
    else if( body ) {
       if( !isString(body) ) {
 
