@@ -167,7 +167,9 @@ function clarinet(eventBus) {
     c = chunk[0]; 
 
     while (c) {
-      p = c;
+      if (i > 0) {
+        p = c;
+      }
       c = chunk[i++];
       if(!c) break;
 
