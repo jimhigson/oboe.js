@@ -63,7 +63,7 @@
     "karma-phantomjs-launcher": "1.0.2",
     "karma-safari-launcher": "1.0.0",
     "matchdep": "~0.1.2",
-    "request": "^2.55.0",
+    "request": "2.81.0",
     "sinon": "=1.17.3"
   },
   "dependencies": {
