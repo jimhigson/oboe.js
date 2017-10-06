@@ -4,7 +4,7 @@
 // having a local undefined, window, Object etc allows slightly better minification:
 (function  (window, Object, Array, Error, JSON, undefined ) {
 
-   // v2.1.3-2-gc85b5c4
+   // v2.1.3-15-g7432b49
 
 /*
 
@@ -694,7 +694,9 @@ function clarinet(eventBus) {
     c = chunk[0]; 
 
     while (c) {
-      p = c;
+      if (i > 0) {
+        p = c;
+      }
       c = chunk[i++];
       if(!c) break;
 
@@ -2604,6 +2606,7 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
          // Default Content-Type to JSON unless given otherwise.
          headers['Content-Type'] = headers['Content-Type'] || 'application/json';
       }
+      headers['Content-Length'] = headers['Content-Length'] || body.length;
    } else {
       body = null;
    }
