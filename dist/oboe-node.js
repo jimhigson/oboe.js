@@ -3,8 +3,7 @@
 
 module.exports = (function  () {
    
-   // v2.1.3-15-g7432b49
-
+   // v2.1.4-1-gbe6f756
 /*
 
 Copyright (c) 2013, Jim Higson
