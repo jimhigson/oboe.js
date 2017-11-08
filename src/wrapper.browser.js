@@ -17,7 +17,7 @@
    // Access to the window object throws an exception in HTML5 web workers so
    // point it to "self" if it runs in a web worker
       try {
-         return window;
+         return global || window;
       } catch (e) {
          return self;
       }
