@@ -66,9 +66,12 @@ concat(OBOE_BROWSER_SOURCE_FILES).then(data => {
   const browserWrap = wrapper('browser');
   fs.writeFileSync('build/oboe-browser.concat.js', browserWrap[0]+data+browserWrap[1]);
   fs.writeFileSync('build/oboe-browser.min.js', uglify.minify(fs.readFileSync('build/oboe-browser.concat.js','utf8')).code,'utf8');
+  fs.copyFileSync('build/oboe-browser.concat.js', 'dist/oboe-browser.js');
+  fs.copyFileSync('build/oboe-browser.min.js', 'dist/oboe-browser.min.js');
 });
 
 concat(OBOE_NODE_SOURCE_FILES).then(data => {
   const nodeWrap = wrapper('node');
   fs.writeFileSync('build/oboe-node.concat.js', nodeWrap[0]+data+nodeWrap[1]);
+  fs.copyFileSync('build/oboe-node.concat.js', 'dist/oboe-node.js');
 });
