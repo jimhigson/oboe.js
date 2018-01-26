@@ -1,3 +1,7 @@
+import { NODE_CLOSED, NODE_OPENED } from './events';
+import { reverseList, listAsArray, tail, map } from './lists';
+import { keyOf, nodeOf } from './ascent';
+
 /** 
  *  The pattern adaptor listens for newListener and removeListener
  *  events. When patterns are added or removed it compiles the JSONPath
@@ -110,3 +114,5 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
    })
 
 }
+ 
+export { patternAdapter };

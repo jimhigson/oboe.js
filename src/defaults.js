@@ -1,3 +1,5 @@
+import { isString } from './util';
+
 function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached ){
 
    headers = headers ?
@@ -40,3 +42,5 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 
    return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials || false );
 }
+
+export { applyDefaults };

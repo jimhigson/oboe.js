@@ -1,3 +1,8 @@
+import { SAX_KEY, SAX_VALUE_CLOSE, SAX_VALUE_OPEN, NODE_OPENED, NODE_CLOSED, ROOT_PATH_FOUND, ROOT_NODE_FOUND } from './events';
+import { namedNode, nodeOf, keyOf } from './ascent';
+import { isOfType, len } from './util';
+import { head, tail, cons } from './lists';
+
 /** 
  * This file provides various listeners which can be used to build up
  * a changing ascent based on the callbacks provided by Clarinet. It listens
@@ -148,3 +153,5 @@ function incrementalContentBuilder( oboeBus ) {
    contentBuilderHandlers[SAX_KEY] = keyFound;
    return contentBuilderHandlers;
 }
+
+export { incrementalContentBuilder, ROOT_PATH };
