@@ -1,3 +1,10 @@
+import { pubSub } from '../../src/pubSub';
+import * as sinon from 'sinon'
+import { NODE_CLOSED, NODE_OPENED, ROOT_PATH_FOUND, SAX_VALUE_OPEN, SAX_VALUE_CLOSE, SAX_KEY } from '../../src/events';
+import { incrementalContentBuilder, ROOT_PATH } from '../../src/incrementalContentBuilder';
+import { ascentManager } from '../../src/ascentManager';
+import { cons, emptyList, head, tail } from '../../src/lists';
+
 describe("incremental content builder", function(){
 
   function IncrementalContentBuilderAsserter(){
@@ -320,7 +327,7 @@ describe("incremental content builder", function(){
             }, 'ascent match');
 
 
-            this.message = function(){
+            var message = (function(){
               if( !emit.called ) {
                 return 'no events have been emitted at all';
               }
@@ -342,9 +349,9 @@ describe("incremental content builder", function(){
                 'all calls were :' +
                 '\n                     \t' +
                 emit.args.map( reportArgs ).join('\n                     \t')
-            };
+            });
 
-            return {pass: emit.calledWithMatch( ascentMatch )};
+            return {pass: emit.calledWithMatch( ascentMatch ), message: message};
           }
         }
       }
