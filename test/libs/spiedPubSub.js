@@ -1,3 +1,6 @@
+import { pubSub } from '../../src/pubSub';
+import { varArgs } from '../../src/functional';
+
 function spiedPubSub() {
 
   var realPubSub = pubSub();
@@ -98,3 +101,5 @@ function eventBlackBox( pubsub, eventNames ) {
 
   return recording;
 }
+
+export { spiedPubSub, fakePubSub, eventBlackBox };

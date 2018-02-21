@@ -1,15 +1,13 @@
-var oboe;
-var sinon;
+import * as isNode from 'detect-node';
+import { oboe } from '../../src/publicApi';
+import * as sinon from 'sinon';
+
 var globalContext;
 var module = module ? module : undefined;
 
-if(module && module.exports) {
-  sinon = require('sinon');
-  oboe = require('../../dist/oboe-node.js');
+if(isNode) {
   globalContext = GLOBAL;
 } else {
-  sinon = window.sinon;
-  oboe = window.oboe;
   globalContext = window;
 }
 
@@ -429,3 +427,16 @@ if (module && module.exports) {
     wasPassedAnErrorObject: wasPassedAnErrorObject
   };
 }
+
+export {
+  givenAnOboeInstance,
+  matched,
+  foundNoMatches,
+  foundOneMatch,
+  calledCallbackOnce,
+  wasPassedAnErrorObject,
+  wasGivenTheOboeAsContext,
+  hasRootJson,
+  foundNMatches,
+  gaveFinalCallbackWithRootJson
+};
