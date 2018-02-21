@@ -1,3 +1,5 @@
+import { oboe } from '../../src/publicApi';
+
 (function(Platform) {
 
   function now() {
@@ -7,15 +9,12 @@
   describe("oboe performance (real http)", function(){
 
     // Used to spy on global functions like setTimeout
-    var globalContext;
-    var oboe;
+    var globalContext;    
 
     if ( !Platform.isNode ) {
-      globalContext = window;
-      oboe = window.oboe;
+      globalContext = window;      
     } else {
-      globalContext = GLOBAL;
-      oboe = require('../../dist/oboe-node.js');
+      globalContext = GLOBAL;      
     }
 
     function url( path ){
