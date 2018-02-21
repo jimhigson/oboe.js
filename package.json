@@ -41,6 +41,7 @@
   "devDependencies": {
     "color": "~0.4.4",
     "cors": "~2.1.1",
+    "detect-node": "^2.0.3",
     "doctoc": "~0.4.3",
     "express": "~3.4.3",
     "get-json": "0.0.1",
@@ -66,9 +67,10 @@
     "karma-jasmine": "1.0.2",
     "karma-phantomjs-launcher": "1.0.2",
     "karma-safari-launcher": "1.0.0",
+    "karma-webpack": "^2.0.9",
     "matchdep": "~0.1.2",
     "request": "2.81.0",
-    "sinon": "=1.17.3",
+    "sinon": "^2.4.1",
     "webpack": "^3.10.0"
   },
   "dependencies": {
