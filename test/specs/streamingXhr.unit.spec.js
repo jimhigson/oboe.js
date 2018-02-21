@@ -1,3 +1,6 @@
+import { pubSub } from '../../src/pubSub';
+import { streamingHttp } from '../../src/streamingHttp.browser';
+import { ABORTING } from '../../src/events';
 
 describe("streamingHttp", function(){
    "use strict";

@@ -1,3 +1,31 @@
+import {
+  givenAnOboeInstance,
+  matched,
+  foundNoMatches,
+  foundOneMatch,
+  calledCallbackOnce,
+  wasPassedAnErrorObject,
+  wasGivenTheOboeAsContext,
+  hasRootJson,
+  foundNMatches,
+  gaveFinalCallbackWithRootJson
+} from '../libs/oboeAsserter';
+
+import { oboe } from '../../src/publicApi';
+
+window.givenAnOboeInstance = givenAnOboeInstance;
+window.matched = matched;
+window.foundNoMatches = foundNoMatches;
+window.foundOneMatch = foundOneMatch;
+window.calledCallbackOnce = calledCallbackOnce;
+window.wasPassedAnErrorObject = wasPassedAnErrorObject;
+window.wasGivenTheOboeAsContext = wasGivenTheOboeAsContext;
+window.hasRootJson = hasRootJson;
+window.foundNMatches = foundNMatches;
+window.gaveFinalCallbackWithRootJson = gaveFinalCallbackWithRootJson;
+
+window.oboe = oboe;
+
 (function(Platform) {
   describe("oboe component (no http, content fed in externally)", function(){
 
