@@ -1,5 +1,4 @@
 import { arrayAsList, foldR } from './lists';
-import { len } from './util';
 
 /** 
  * Partially complete a function.
@@ -106,7 +105,7 @@ function attr(key) {
  
        var maybeValue;
  
-       for (var i = 0; i < len(fns); i++) {
+       for (var i = 0; i < attr('length')(fns); i++) {
  
           maybeValue = apply(params, fns[i]);
  
