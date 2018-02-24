@@ -71,6 +71,7 @@
     "matchdep": "~0.1.2",
     "request": "2.81.0",
     "sinon": "^2.4.1",
+    "uglifyjs-webpack-plugin": "^1.2.1",
     "webpack": "^3.10.0"
   },
   "dependencies": {
