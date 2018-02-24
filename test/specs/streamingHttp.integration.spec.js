@@ -2,7 +2,7 @@ import { HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING } from '../..
 import { fakePubSub } from '../libs/spiedPubSub';
 import { streamingHttp, httpTransport } from '../../src/streamingHttp.browser';
 import { ASYNC_TEST_TIMEOUT } from '../libs/testVars';
-import '../libs/platform';
+import * as Platform from '../libs/platform';
 import '../libs/testUrl';
 
 /* Tests the streaming xhr without stubbing anything. Really just a test that
@@ -107,7 +107,6 @@ describe('streaming xhr integration (real http)', function() {
       );
 
      waitUntil(STREAM_END).isFiredOn(oboeBus, function() {
-       console.log(expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder);
        expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
        expect(streamedContentPassedTo(oboeBus)).toParseTo({})
        done();
