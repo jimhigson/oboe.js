@@ -120,9 +120,12 @@ module.exports = function (grunt) {
       createGitVersionJs:{
         command: "echo \"`git describe`\" > build/version.txt"
       },
-      webpack:{
+      webpackBrowser: {
         command: "npm run webpack"
       },
+      webpackNode: {
+        command: "npm run webpack -- --config webpack.config.node.js"
+      }      
     }
 
     ,  watch:{
@@ -214,7 +217,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('node-build',      [
     'exec:createGitVersionJs',
-    'exec:webpack'
+    'exec:webpackNode'
   ]);
 
   grunt.registerTask('node-build-test',      [
@@ -229,7 +232,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('browser-build',      [
     'exec:createGitVersionJs',
-    'exec:webpack'
+    'exec:webpackBrowser'
   ]);
 
   grunt.registerTask('browser-build-test',      [
@@ -242,7 +245,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build',      [
-    'exec:webpack'
+    'exec:webpackBrowser'
   ]);
 
   // build and run just the integration tests.
