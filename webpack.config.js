@@ -10,13 +10,13 @@ module.exports = {
     'oboe-browser': './src/entry.js',
     'oboe-browser.min': './src/entry.js',
   },
+  target: 'web',
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     library: "oboe",
     libraryTarget: 'umd2',
     libraryExport: 'default',
-    target: 'browser',
     umdNamedDefine: true
   },
   plugins: [
