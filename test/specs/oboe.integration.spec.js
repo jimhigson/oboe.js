@@ -1,15 +1,30 @@
 (function(Platform) {
 
   // Used to spy on global functions like setTimeout
-  var globalContext = window;
+  var globalContext;
+
+  if ( !Platform.isNode ) {
+    globalContext = window;
+  } else {
+    globalContext = GLOBAL;
+  }
+
 
   describe("oboe integration (real http)", function() {
 
     var ASYNC_TEST_TIMEOUT = 15 * 1000; // 15 seconds
     jasmine.DEFAULT_TIMEOUT_INTERVAL = ASYNC_TEST_TIMEOUT;
 
-    var oboe = window.oboe;
-    var testUrl = window.testUrl;
+    var oboe;
+    var testUrl;
+
+    if (Platform.isNode) {
+      oboe = require('../../dist/oboe-node.js') ;
+      testUrl = require('../libs/testUrl.js');
+    } else {
+      oboe = window.oboe;
+      testUrl = window.testUrl;
+    }
 
     describe('advertising the url on the Oboe instance', function() {
 
@@ -38,7 +53,102 @@
       });
     });
 
-    describe('running under a browser', function(){
+    Platform.isNode && describe('when running under node', function(){
+
+      var http = require('http'),
+          fs = require('fs'),
+          request = require('request');
+
+      it('can read from a stream that is passed in', function(done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy');
+
+        http.request( 'http://localhost:4567/tenSlowNumbers' )
+          .on('response', function( res ) {
+
+            oboe(res)
+              .node('![*]', callbackSpy)
+              .done(function() {
+                expect(callbackSpy.calls.count()).toBe(10);
+                done();
+              });
+          }).end();
+      });
+
+      it('can read from a stream from Request - https://github.com/jimhigson/oboe.js/issues/65', function(done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy');
+
+        oboe(request('http://localhost:4567/tenSlowNumbers'))
+          .node('![*]', callbackSpy)
+          .done(function() {
+            expect(callbackSpy.calls.count()).toBe(10);
+            done();
+          });
+      });
+
+      it('can read from a local file', function(done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy');
+        var fileStream = fs.createReadStream('test/json/firstTenNaturalNumbers.json');
+
+        oboe(fileStream)
+          .node('![*]', callbackSpy)
+          .done(function() {
+            expect(callbackSpy.calls.count()).toBe(10);
+            done();
+          });
+      });
+
+      it('can read an empty key', function(done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy');
+        var fileStream = fs.createReadStream('test/json/emptyKey.json');
+
+        oboe(fileStream)
+          .node('!.*', callbackSpy)
+          .done(function() {
+            expect(callbackSpy.calls.count()).toBe(2);
+            done();
+          });
+      });
+
+      it('doesnt get confused if a stream has a "url" property', function(done) {
+        var fileStream = fs.createReadStream('test/json/firstTenNaturalNumbers.json');
+        fileStream.url = 'http://howodd.com';
+
+        oboe(fileStream)
+          .done(done);
+      });
+
+      // Tests that depend on network connections can be brittle. Skip for now.
+      xit('can read from https', function(done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy');
+
+        // rather than set up a https server in the tests
+        // let's just use npm since this is an integration test
+        // by confirming the Oboe.js homepage...
+
+        oboe({
+          url: 'https://registry.npmjs.org/oboe'
+        })
+          .node('!.homepage', callbackSpy)
+          .done(function(obj) {
+            var oboeHomepage = 'http://oboejs.com';
+            expect(callbackSpy.calls.mostRecent().args[0]).toEqual(oboeHomepage);
+            done();
+          });
+      });
+
+      xit('complains if given a non-http(s) url', function(done) {
+        expect(function() {
+          oboe('ftp://ftp.mozilla.org/pub/mozilla.org/')
+        }).toThrow();
+
+        expect(function() {
+          oboe('http://registry.npmjs.org/oboe')
+        }).not.toThrow();
+      });
+
+    });
+
+    (!Platform.isNode) && describe('running under a browser', function(){
       it('does not send cookies cross-domain by default', function(done) {
         document.cookie = "oboeIntegrationDontSend=123; path=/";
 
@@ -251,7 +361,7 @@
         url:testUrl('echoBackHeadersAsBodyJson'),
         body:{'potatoes':3, 'cabbages':4}
       }).done(function(json){
-        var contentType = json['content-type'].split(';')[0];
+        contentType = json['content-type'].split(';')[0];
         expect(contentType).toBe('application/json');
         done();
       });
@@ -265,7 +375,7 @@
         body:{'potatoes':3, 'cabbages':4},
         headers:{'Content-Type':'application/vegetableDiffThing'}
       }).done(function(json){
-        var contentType = json['content-type'].split(';')[0];
+        contentType = json['content-type'].split(';')[0];
         expect(contentType).toBe('application/vegetableDiffThing');
         done();
       });
@@ -513,9 +623,13 @@
         });
     });
 
-    it( "hasn't put clarinet in the global namespace", function(){
-      expect( window.clarinet ).toBeUndefined();
-    });
+    if( !Platform.isNode ) {
+      // only worry about this in the browser
+
+      it( "hasn't put clarinet in the global namespace", function(){
+        expect( window.clarinet ).toBeUndefined();
+      });
+    }
 
     // This is the equivalent of the old waitsFor/runs syntax
     // which was removed from Jasmine 2

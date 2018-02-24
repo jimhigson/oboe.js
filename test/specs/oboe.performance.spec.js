@@ -7,12 +7,15 @@
   describe("oboe performance (real http)", function(){
 
     // Used to spy on global functions like setTimeout
-    var globalContext;    
+    var globalContext;
+    var oboe;
 
     if ( !Platform.isNode ) {
-      globalContext = window;      
+      globalContext = window;
+      oboe = window.oboe;
     } else {
-      globalContext = GLOBAL;      
+      globalContext = GLOBAL;
+      oboe = require('../../dist/oboe-node.js');
     }
 
     function url( path ){
