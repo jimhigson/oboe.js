@@ -1,5 +1,5 @@
 /*!
- * v2.1.4-18-g579fbd1
+ * v2.1.4-27-g4646007
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -74,7 +74,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -740,8 +740,8 @@ var nodeOf = Object(__WEBPACK_IMPORTED_MODULE_0__functional__["c" /* attr */])('
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lists__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functional__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__defaults__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__wire__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__defaults__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__wire__ = __webpack_require__(10);
 
 
 
@@ -980,6 +980,12 @@ function incrementalContentBuilder( oboeBus ) {
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("url");
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -990,7 +996,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_0__publicApi__["a" /* oboe */]);
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1045,19 +1051,19 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return wire; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pubSub__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ascentManager__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pubSub__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ascentManager__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__incrementalContentBuilder__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__patternAdapter__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__jsonPath__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__instanceApi__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__libs_clarinet__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__streamingHttp_node__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__patternAdapter__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__jsonPath__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__instanceApi__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__libs_clarinet__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__streamingHttp_node__ = __webpack_require__(19);
 
 
 
@@ -1106,12 +1112,12 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return pubSub; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__singleEventPubSub__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__singleEventPubSub__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functional__ = __webpack_require__(0);
 
 
@@ -1185,7 +1191,7 @@ function pubSub(){
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1295,7 +1301,7 @@ function singleEventPubSub(eventType, newListener, removeListener){
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1372,7 +1378,7 @@ function ascentManager(oboeBus, handlers){
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1501,7 +1507,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1511,7 +1517,7 @@ function patternAdapter(oboeBus, jsonPathCompiler) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ascent__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__incrementalContentBuilder__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__jsonPathSyntax__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__jsonPathSyntax__ = __webpack_require__(16);
 
 
 
@@ -1888,7 +1894,7 @@ var jsonPathCompiler = Object(__WEBPACK_IMPORTED_MODULE_5__jsonPathSyntax__["a" 
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2016,7 +2022,7 @@ var jsonPathSyntax = (function() {
  
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2289,7 +2295,7 @@ function instanceApi(oboeBus, contentSource){
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2804,26 +2810,20 @@ function clarinet(eventBus) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return httpTransport; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return streamingHttp; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functional__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__parseResponseHeaders_browser__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__functional__ = __webpack_require__(0);
 
 
 
 
-
-
-function httpTransport(){
-   return new XMLHttpRequest();
-}
+var httpTransport = Object(__WEBPACK_IMPORTED_MODULE_1__functional__["f" /* functor */])(__webpack_require__(20));
 
 /**
  * A wrapper around the browser XmlHttpRequest object that raises an 
@@ -2834,255 +2834,170 @@ function httpTransport(){
  * should be raised, allowing progressive interpretation of the response.
  *      
  * @param {Function} oboeBus an event bus local to this Oboe instance
- * @param {XMLHttpRequest} xhr the xhr to use as the transport. Under normal
+ * @param {XMLHttpRequest} transport the http implementation to use as the transport. Under normal
  *          operation, will have been created using httpTransport() above
- *          but for tests a stub can be provided instead.
+ *          and therefore be Node's http
+ *          but for tests a stub may be provided instead.
  * @param {String} method one of 'GET' 'POST' 'PUT' 'PATCH' 'DELETE'
- * @param {String} url the url to make a request to
+ * @param {String} contentSource the url to make a request to, or a stream to read from
  * @param {String|Null} data some content to be sent with the request.
  *                      Only valid if method is POST or PUT.
- * @param {Object} [headers] the http request headers to send
- * @param {boolean} withCredentials the XHR withCredentials property will be
- *    set to this value
+ * @param {Object} [headers] the http request headers to send                       
  */  
-function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials) {
-           
+function streamingHttp(oboeBus, transport, method, contentSource, data, headers) {
    "use strict";
    
-   var emitStreamData = oboeBus(__WEBPACK_IMPORTED_MODULE_1__events__["m" /* STREAM_DATA */]).emit,
-       emitFail       = oboeBus(__WEBPACK_IMPORTED_MODULE_1__events__["b" /* FAIL_EVENT */]).emit,
-       numberOfCharsAlreadyGivenToCallback = 0,
-       stillToSendStartEvent = true;
+   /* receiving data after calling .abort on Node's http has been observed in the
+      wild. Keep aborted as state so that if the request has been aborted we
+      can ignore new data from that point on */
+   var aborted = false;
 
-   // When an ABORTING message is put on the event bus abort 
-   // the ajax request         
-   oboeBus( __WEBPACK_IMPORTED_MODULE_1__events__["a" /* ABORTING */] ).on( function(){
-  
-      // if we keep the onreadystatechange while aborting the XHR gives 
-      // a callback like a successful call so first remove this listener
-      // by assigning null:
-      xhr.onreadystatechange = null;
-            
-      xhr.abort();
-   });
-
-   /** 
-    * Handle input from the underlying xhr: either a state change,
-    * the progress event or the request being complete.
-    */
-   function handleProgress() {
-                        
-      var textSoFar = xhr.responseText,
-          newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback);
-      
-      
-      /* Raise the event for new text.
-      
-         On older browsers, the new text is the whole response. 
-         On newer/better ones, the fragment part that we got since 
-         last progress. */
+   function readStreamToEventBus(readableStream) {
          
-      if( newText ) {
-         emitStreamData( newText );
-      } 
+      // use stream in flowing mode   
+      readableStream.on('data', function (chunk) {
 
-      numberOfCharsAlreadyGivenToCallback = Object(__WEBPACK_IMPORTED_MODULE_2__util__["e" /* len */])(textSoFar);
+         // avoid reading the stream after aborting the request
+         if( !aborted ) {
+            oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["m" /* STREAM_DATA */]).emit(chunk.toString());
+         }
+      });
+      
+      readableStream.on('end', function() {
+
+         // avoid reading the stream after aborting the request
+         if( !aborted ) {
+            oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["n" /* STREAM_END */]).emit();
+         }
+      });
    }
    
+   function readStreamToEnd(readableStream, callback){
+      var content = '';
    
-   if('onprogress' in xhr){  // detect browser support for progressive delivery
-      xhr.onprogress = handleProgress;
-   }
+      readableStream.on('data', function (chunk) {
+                                             
+         content += chunk.toString();
+      });
       
-   xhr.onreadystatechange = function() {
-
-      function sendStartIfNotAlready() {
-         // Internet Explorer is very unreliable as to when xhr.status etc can
-         // be read so has to be protected with try/catch and tried again on 
-         // the next readyState if it fails
-         try{
-            stillToSendStartEvent && oboeBus( __WEBPACK_IMPORTED_MODULE_1__events__["c" /* HTTP_START */] ).emit(
-               xhr.status,
-               Object(__WEBPACK_IMPORTED_MODULE_3__parseResponseHeaders_browser__["a" /* parseResponseHeaders */])(xhr.getAllResponseHeaders()) );
-            stillToSendStartEvent = false;
-         } catch(e){/* do nothing, will try again on next readyState*/}
-      }
-      
-      switch( xhr.readyState ) {
+      readableStream.on('end', function() {
                
-         case 2: // HEADERS_RECEIVED
-         case 3: // LOADING
-            return sendStartIfNotAlready();
-            
-         case 4: // DONE
-            sendStartIfNotAlready(); // if xhr.status hasn't been available yet, it must be NOW, huh IE?
-            
-            // is this a 2xx http code?
-            var successful = String(xhr.status)[0] == 2;
-            
-            if( successful ) {
-               // In Chrome 29 (not 28) no onprogress is emitted when a response
-               // is complete before the onload. We need to always do handleInput
-               // in case we get the load but have not had a final progress event.
-               // This looks like a bug and may change in future but let's take
-               // the safest approach and assume we might not have received a 
-               // progress event for each part of the response
-               handleProgress();
+         callback( content );
+      });
+   }
+   
+   function openUrlAsStream( url ) {
+      
+      var parsedUrl = __webpack_require__(7).parse(url);
+           
+      return transport.request({
+         hostname: parsedUrl.hostname,
+         port: parsedUrl.port, 
+         path: parsedUrl.path,
+         method: method,
+         headers: headers,
+         protocol: parsedUrl.protocol
+      });
+   }
+   
+   function fetchUrl() {
+      if( !contentSource.match(/https?:\/\//) ) {
+         throw new Error(
+            'Supported protocols when passing a URL into Oboe are http and https. ' +
+            'If you wish to use another protocol, please pass a ReadableStream ' +
+            '(http://nodejs.org/api/stream.html#stream_class_stream_readable) like ' + 
+            'oboe(fs.createReadStream("my_file")). I was given the URL: ' +
+            contentSource
+         );
+      }
+      
+      var req = openUrlAsStream(contentSource);
+      
+      req.on('response', function(res){
+         var statusCode = res.statusCode,
+             successful = String(statusCode)[0] == 2;
+                                                   
+         oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["c" /* HTTP_START */]).emit( res.statusCode, res.headers);
+                                
+         if( successful ) {          
                
-               oboeBus(__WEBPACK_IMPORTED_MODULE_1__events__["n" /* STREAM_END */]).emit();
-            } else {
-
-               emitFail( Object(__WEBPACK_IMPORTED_MODULE_1__events__["o" /* errorReport */])(
-                  xhr.status, 
-                  xhr.responseText
-               ));
-            }
+            readStreamToEventBus(res)
+            
+         } else {
+            readStreamToEnd(res, function(errorBody){
+               oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["b" /* FAIL_EVENT */]).emit( 
+                  Object(__WEBPACK_IMPORTED_MODULE_0__events__["o" /* errorReport */])( statusCode, errorBody )
+               );
+            });
+         }      
+      });
+      
+      req.on('error', function(e) {
+         oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["b" /* FAIL_EVENT */]).emit( 
+            Object(__WEBPACK_IMPORTED_MODULE_0__events__["o" /* errorReport */])(undefined, undefined, e )
+         );
+      });
+      
+      oboeBus(__WEBPACK_IMPORTED_MODULE_0__events__["a" /* ABORTING */]).on( function(){
+         aborted = true;
+         req.abort();
+      });
+         
+      if( data ) {
+         req.write(data);
       }
-   };
-   
-   try{
-   
-      xhr.open(method, url, true);
-   
-      for( var headerName in headers ){
-         xhr.setRequestHeader(headerName, headers[headerName]);
-      }
       
-      if( !Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["a" /* isCrossOrigin */])(window.location, Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["b" /* parseUrlOrigin */])(url)) ) {
-         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-      }
-
-      xhr.withCredentials = withCredentials;
-      
-      xhr.send(data);
-      
-   } catch( e ) {
-      
-      // To keep a consistent interface with Node, we can't emit an event here.
-      // Node's streaming http adaptor receives the error as an asynchronous
-      // event rather than as an exception. If we emitted now, the Oboe user
-      // has had no chance to add a .fail listener so there is no way
-      // the event could be useful. For both these reasons defer the
-      // firing to the next JS frame.  
-      window.setTimeout(
-         Object(__WEBPACK_IMPORTED_MODULE_4__functional__["j" /* partialComplete */])(emitFail, Object(__WEBPACK_IMPORTED_MODULE_1__events__["o" /* errorReport */])(undefined, undefined, e))
-      ,  0
-      );
-   }            
-}
- 
-
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isCrossOrigin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseUrlOrigin; });
-/**
- * Detect if a given URL is cross-origin in the scope of the
- * current page.
- * 
- * Browser only (since cross-origin has no meaning in Node.js)
- *
- * @param {Object} pageLocation - as in window.location
- * @param {Object} ajaxHost - an object like window.location describing the 
- *    origin of the url that we want to ajax in
- */
-function isCrossOrigin(pageLocation, ajaxHost) {
-
-   /*
-    * NB: defaultPort only knows http and https.
-    * Returns undefined otherwise.
-    */
-   function defaultPort(protocol) {
-      return {'http:':80, 'https:':443}[protocol];
+      req.end();         
    }
    
-   function portOf(location) {
-      // pageLocation should always have a protocol. ajaxHost if no port or
-      // protocol is specified, should use the port of the containing page
-      
-      return location.port || defaultPort(location.protocol||pageLocation.protocol);
+   if( Object(__WEBPACK_IMPORTED_MODULE_2__util__["d" /* isString */])(contentSource) ) {
+      fetchUrl(contentSource);
+   } else {
+      // contentsource is a stream
+      readStreamToEventBus(contentSource);   
    }
 
-   // if ajaxHost doesn't give a domain, port is the same as pageLocation
-   // it can't give a protocol but not a domain
-   // it can't give a port but not a domain
-   
-   return !!(  (ajaxHost.protocol  && (ajaxHost.protocol  != pageLocation.protocol)) ||
-               (ajaxHost.host      && (ajaxHost.host      != pageLocation.host))     ||
-               (ajaxHost.host      && (portOf(ajaxHost) != portOf(pageLocation)))
-          );
 }
 
-/* turn any url into an object like window.location */
-function parseUrlOrigin(url) {
-   // url could be domain-relative
-   // url could give a domain
-
-   // cross origin means:
-   //    same domain
-   //    same port
-   //    some protocol
-   // so, same everything up to the first (single) slash 
-   // if such is given
-   //
-   // can ignore everything after that   
-   
-   var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
-
-         // if no match, use an empty array so that
-         // subexpressions 1,2,3 are all undefined
-         // and will ultimately return all empty
-         // strings as the parse result:
-       urlHostMatch = URL_HOST_PATTERN.exec(url) || [];
-   
-   return {
-      protocol:   urlHostMatch[1] || '',
-      host:       urlHostMatch[2] || '',
-      port:       urlHostMatch[3] || ''
-   };
-}
- 
 
 
 
 /***/ }),
 /* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return parseResponseHeaders; });
-// based on gist https://gist.github.com/monsur/706839
+var http = exports.http = __webpack_require__(21)
+var https = exports.https = __webpack_require__(22)
+var url = __webpack_require__(7)
 
-/**
- * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
- * headers according to the format described here:
- * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
- * This method parses that string into a user-friendly key/value pair object.
- */
-function parseResponseHeaders(headerStr) {
-   var headers = {};
-   
-   headerStr && headerStr.split('\u000d\u000a')
-      .forEach(function(headerPair){
-   
-         // Can't use split() here because it does the wrong thing
-         // if the header value has the string ": " in it.
-         var index = headerPair.indexOf('\u003a\u0020');
-         
-         headers[headerPair.substring(0, index)] 
-                     = headerPair.substring(index + 2);
-      });
-   
-   return headers;
+exports.get = function(opt, cb) {
+  return getMod(opt).get(opt, cb)
 }
- 
+
+exports.request = function(opt, cb) {
+  return getMod(opt).request(opt, cb)
+}
+
+exports.getModule = getMod
+function getMod(opt) {
+  if (typeof opt === 'string')
+    opt = url.parse(opt)
+
+  return opt.protocol === 'https:' ? https : http
+}
 
 
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+module.exports = require("http");
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+module.exports = require("https");
 
 /***/ })
 /******/ ])["default"];
