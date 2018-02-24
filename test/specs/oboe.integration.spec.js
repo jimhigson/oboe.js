@@ -1,8 +1,3 @@
-import '../libs/testUrl';
-import { oboe } from '../../src/publicApi';
-
-window.oboe = oboe;
-
 (function(Platform) {
 
   // Used to spy on global functions like setTimeout

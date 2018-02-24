@@ -1,5 +1,3 @@
-import { oboe } from '../../src/publicApi';
-
 (function(Platform) {
 
   function now() {
