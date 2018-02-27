@@ -1,2 +1,2 @@
-var testsContext = require.context(".", true, /(!publicApi)*\..*unit\.spec\.js/);
+var testsContext = require.context(".", true, /(unit|component)\.spec\.js/);
 testsContext.keys().forEach(testsContext);
