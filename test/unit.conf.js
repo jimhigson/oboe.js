@@ -28,6 +28,13 @@ module.exports = function (config) {
         path: path.resolve(__dirname, "dist"),
         filename: 'bundle.js',
         library: 'oboe'
+      },
+
+      resolve: {
+        alias: {
+          './defaults': path.resolve(__dirname, './mocks/defaults.js'),
+          './wire': path.resolve(__dirname, './mocks/wire.js')
+        }
       }
     },
 

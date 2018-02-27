@@ -1,3 +1,8 @@
+import { calledLikeMatcher} from '../libs/calledLikeMatcher'
+import { applyDefaults } from '../mocks/defaults';
+import { wire } from '../mocks/wire';
+
+import { oboe } from '../../src/publicApi';
 
 /*
    Tests that calling the public api gets through correctly to the writing
@@ -9,11 +14,6 @@ describe("public api", function(){
 
    describe("propagates through to wiring function", function(){
   
-      beforeEach(function() {
-         spyOn(window, 'applyDefaults');      
-         spyOn(window, 'wire');      
-      });
-
       it('exports a usable function for GETs', function(){   
       
          oboe('http://example.com/oboez')
@@ -188,9 +188,9 @@ describe("public api", function(){
       
    });
    
-   this.beforeEach(function(){
+   beforeEach(function(){
    
-      this.addMatchers(calledLikeMatcher);
+      jasmine.addMatchers(calledLikeMatcher);
    })   
       
 });
