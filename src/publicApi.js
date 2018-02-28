@@ -37,7 +37,8 @@ function oboe(arg1) {
             arg1.body,
             arg1.headers,
             arg1.withCredentials,
-            arg1.cached
+            arg1.cached,
+            arg1.disableBufferCheck
          );
          
       }

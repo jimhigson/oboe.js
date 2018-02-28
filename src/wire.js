@@ -4,7 +4,7 @@
  * and introduces them to each other.
  */
 
-function wire (httpMethodName, contentSource, body, headers, withCredentials){
+function wire (httpMethodName, contentSource, body, headers, withCredentials, disableBufferCheck){
 
    var oboeBus = pubSub();
    
@@ -24,7 +24,10 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       );
    }
 
-   clarinet(oboeBus);
+   var options = {
+      disableBufferCheck: disableBufferCheck
+   };
+   clarinet(oboeBus, options);
 
    ascentManager(oboeBus, incrementalContentBuilder(oboeBus));
       
