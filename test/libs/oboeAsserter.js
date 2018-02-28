@@ -3,8 +3,6 @@ import { oboe } from '../../src/publicApi';
 import * as sinon from 'sinon';
 
 var globalContext;
-var module = module ? module : undefined;
-
 if(isNode) {
   globalContext = GLOBAL;
 } else {
@@ -409,22 +407,6 @@ function matched(obj) {
       this.atPath([]);
       return this;
     }
-  };
-}
-
-// Export if node
-if (module && module.exports) {
-  module.exports = {
-    givenAnOboeInstance: givenAnOboeInstance,
-    matched: matched,
-    hasRootJson: hasRootJson,
-    wasGivenTheOboeAsContext: wasGivenTheOboeAsContext,
-    foundOneMatch: foundOneMatch,
-    gaveFinalCallbackWithRootJson: gaveFinalCallbackWithRootJson,
-    calledCallbackOnce: calledCallbackOnce,
-    foundNoMatches: foundNoMatches,
-    foundNMatches: foundNMatches,
-    wasPassedAnErrorObject: wasPassedAnErrorObject
   };
 }
 
