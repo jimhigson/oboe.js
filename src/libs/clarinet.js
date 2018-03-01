@@ -21,10 +21,10 @@ import { SAX_KEY, SAX_VALUE_OPEN, SAX_VALUE_CLOSE, FAIL_EVENT, STREAM_DATA, STRE
       FAIL_EVENT      
  */
 
-function clarinet(eventBus) {
+function clarinet(eventBus, options) {
   "use strict";
    
-  var 
+  var disableBufferCheck   = options && options.disableBufferCheck ? true : false,
       // shortcut some events on the bus
       emitSaxKey           = eventBus(SAX_KEY).emit,
       emitValueOpen        = eventBus(SAX_VALUE_OPEN).emit,
@@ -499,7 +499,7 @@ function clarinet(eventBus) {
           return emitError("Unknown state: " + state);
       }
     }
-    if (position >= bufferCheckPosition)
+    if (!disableBufferCheck && position >= bufferCheckPosition)
       checkBufferLength();
   }
 }
