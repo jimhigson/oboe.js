@@ -1,3 +1,4 @@
+import { cons, emptyList, foldR1, foldR, list, applyEach, without, listAsArray, all, map, head, tail, reverseList, arrayAsList } from '../../src/lists';
 
 describe("Lists", function(){
 

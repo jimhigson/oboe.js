@@ -1,3 +1,10 @@
+import { always, compose2, partialComplete, lazyIntersection, lazyUnion } from './functional';
+import { head, list, arrayAsList, tail, foldR } from './lists';
+import { keyOf, nodeOf } from './ascent'
+import { len, hasAllProperties } from './util';
+import { ROOT_PATH } from './incrementalContentBuilder';
+import { jsonPathSyntax } from './jsonPathSyntax';
+
 /**
  * The jsonPath evaluator compiler used for Oboe.js. 
  * 
@@ -362,3 +369,5 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
    }
 
 });
+
+export { jsonPathCompiler };

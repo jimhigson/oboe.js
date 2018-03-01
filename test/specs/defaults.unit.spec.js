@@ -1,3 +1,7 @@
+import { applyDefaults } from '../../src/defaults';
+import { calledLikeMatcher} from '../libs/calledLikeMatcher';
+import * as sinon from 'sinon'
+
 describe('default settings', function(){
    
    var noBody = null,
@@ -7,15 +11,15 @@ describe('default settings', function(){
 
       var stub = jasmine.createSpy();
 
-      applyDefaults(stub, 'http://example.com/oboez'); 
-      
+      applyDefaults(stub, 'http://example.com/oboez');       
+
       expect(stub).toHaveBeenCalledLike(
          'GET',
          'http://example.com/oboez',
          noBody,
          noHeaders,
          false
-      )
+      )      
    });
 
    it('can make URL uncacheable', function(){
@@ -110,7 +114,7 @@ describe('default settings', function(){
          'POST',
          'http://example.com/oboez',
          '{"foo":"bar"}',
-         { 'Content-Type' : 'application/json' },
+         { 'Content-Type' : 'application/json', 'Content-Length': 13 },
          false
       )
    });
@@ -124,7 +128,7 @@ describe('default settings', function(){
          'POST',
          'http://example.com/oboez',
          '{"foo":"bar"}',
-         { 'Content-Type' : 'application/awesome' },
+         { 'Content-Type' : 'application/awesome', 'Content-Length': 13 },
          false
       )
    });
@@ -138,15 +142,15 @@ describe('default settings', function(){
          'POST',
          'http://example.com/oboez',
          'body content',
-         {}, 
+         { 'Content-Length': 12 }, 
          false
       )
    });   
 
 
-   this.beforeEach(function(){
+   beforeEach(function(){
 
-      this.addMatchers(calledLikeMatcher);
+      jasmine.addMatchers(calledLikeMatcher);
    })
    
 });

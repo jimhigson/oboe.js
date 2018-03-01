@@ -1,3 +1,13 @@
+import { pubSub } from './pubSub';
+import { ascentManager } from './ascentManager';
+import { incrementalContentBuilder } from './incrementalContentBuilder';
+import { patternAdapter } from './patternAdapter';
+import { jsonPathCompiler } from './jsonPath';
+import { instanceApi } from './instanceApi';
+import { clarinet } from './libs/clarinet';
+
+import { streamingHttp, httpTransport } from './streamingHttp.node';
+
 /**
  * This file sits just behind the API which is used to attain a new
  * Oboe instance. It creates the new components that are required
@@ -32,3 +42,5 @@ function wire (httpMethodName, contentSource, body, headers, withCredentials){
       
    return instanceApi(oboeBus, contentSource);
 }
+
+export { wire };

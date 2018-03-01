@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = function(config) {
    config.set({
 
@@ -8,22 +10,25 @@ module.exports = function(config) {
 
       // list of files / patterns to load in the browser
       files : [
-         'test/libs/es5-shim.js'
-      ,  'test/libs/es5-sham.js'
-      ,  'test/libs/sinon.js'
-      ,  'test/libs/sinon-ie.js'
-      ,  'test/libs/*.js'
-
-      ,  'src/events.js'
-      ,  'src/functional.js'
-      ,  'src/util.js'
-      ,  'src/parseResponseHeaders.browser.js'
-      ,  'src/detectCrossOrigin.browser.js'
-      ,  'src/streamingHttp.browser.js'
-
-
-      ,  'test/specs/streamingHttp.integration.spec.js'
+        {pattern: 'test/specs/streamingHttp.integration.spec.js', watched: false}
       ],
+
+      preprocessors: {
+        'test/specs/streamingHttp.integration.spec.js': ['webpack']
+      },
+
+      webpack: {
+        // karma watches the test entry points
+        // (you don't need to specify the entry option)
+        // webpack watches dependencies
+  
+        // webpack configuration
+        output: {
+          path: path.resolve(__dirname, "dist"),
+          filename: 'bundle.js',
+          library: 'oboe'
+        }
+      },
 
       // level of logging
       // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG

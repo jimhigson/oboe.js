@@ -1,3 +1,9 @@
+import { spiedPubSub } from '../libs/spiedPubSub';
+import { instanceApi } from '../../src/instanceApi';
+import { list, head } from '../../src/lists';
+import { patternAdapter } from '../../src/patternAdapter';
+import { namedNode } from '../../src/ascent';
+import { NODE_CLOSED, NODE_OPENED, HTTP_START, ROOT_PATH_FOUND } from '../../src/events';
 
 describe('instance api and pattern adaptor composed',function(){
   "use strict";

@@ -1,3 +1,5 @@
+import { varArgs, compose, compose2, attr } from '../../src/functional';
+import { cons, emptyList, head } from '../../src/lists';
 
 describe("functional", function() {
 

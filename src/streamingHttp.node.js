@@ -1,3 +1,7 @@
+import { STREAM_DATA, STREAM_END, HTTP_START, FAIL_EVENT, errorReport, ABORTING } from './events';
+import { functor } from './functional';
+import { isString } from './util';
+
 var httpTransport = functor(require('http-https'));
 
 /**
@@ -133,3 +137,5 @@ function streamingHttp(oboeBus, transport, method, contentSource, data, headers)
    }
 
 }
+
+export { httpTransport, streamingHttp };

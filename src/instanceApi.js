@@ -1,3 +1,8 @@
+import { ROOT_NODE_FOUND, ROOT_PATH_FOUND, NODE_DROP, NODE_SWAP, HTTP_START, FAIL_EVENT, ABORTING } from './events';
+import { partialComplete, noop, apply, varArgs, functor } from './functional';
+import { isString, defined } from './util';
+import { oboe } from './publicApi';
+
 /**
  * The instance API is the thing that is returned when oboe() is called.
  * it allows:
@@ -252,3 +257,7 @@ function instanceApi(oboeBus, contentSource){
     source         : contentSource
   };
 }
+  
+export {
+    instanceApi
+};

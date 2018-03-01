@@ -1,9 +1,79 @@
+import { HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING } from '../../src/events';
+import { fakePubSub } from '../libs/spiedPubSub';
+import { streamingHttp, httpTransport } from '../../src/streamingHttp.browser';
+import { ASYNC_TEST_TIMEOUT } from '../libs/testVars';
+import * as Platform from '../libs/platform';
+import '../libs/testUrl';
+
 /* Tests the streaming xhr without stubbing anything. Really just a test that
 *  we've got the interface of the in-browser XHR object pinned down  */
 
 
 describe('streaming xhr integration (real http)', function() {
    "use strict";
+
+  beforeEach(function () {
+    jasmine.addMatchers({
+      toHaveGivenStreamEventsInCorrectOrder: function () {
+        return {
+          compare: function (actual, expected) {
+            var result = {};
+            var eventNames = actual.eventNames;
+
+            result.pass = eventNames[0] === HTTP_START
+              && eventNames[1] === STREAM_DATA
+              && eventNames[eventNames.length - 1] === STREAM_END;
+
+            if (!result.pass) {
+              result.message = 'events not in correct order. We have: ' +
+                JSON.stringify(
+                  eventNames.map(prettyPrintEvent)
+                ) + ' but should follow "start", "data"*, "end"';
+
+            }
+
+            return result;
+          }
+
+        };
+
+
+
+      },
+
+      toParseTo: function () {
+        return {
+          compare: function (actual, expected) {
+            var result = {};
+            var normalisedActual;
+            if (!actual) {
+              result.pass = false;
+              result.message = 'no content has been received';
+              return result;
+            }
+
+            try {
+              normalisedActual = JSON.stringify(JSON.parse(actual));
+            } catch (e) {
+              result.pass = false;
+              result.message = "Expected to be able to parse the found " +
+                "content as json '" + actual + "' but it " +
+                "could not be parsed";
+              return result;
+            }
+
+            result.pass = normalisedActual === JSON.stringify(expected);
+            if (!result.pass) {
+              result.message = "The found json parsed but did not match " + JSON.stringify(expected) +
+                " because found " + this.actual;
+
+            }
+            return result;
+          }
+        };
+      }
+    });
+  });
 
    var emittedEvents = [HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING];
 
@@ -452,72 +522,7 @@ describe('streaming xhr integration (real http)', function() {
       }).join('');
    }
 
-   beforeEach(function(){
 
-      jasmine.addMatchers({
-         toHaveGivenStreamEventsInCorrectOrder: function(){
-           return {
-             compare: function(actual, expected) {
-               var result = {};
-               var eventNames = actual.eventNames;
-
-               result.pass = eventNames[0] === HTTP_START
-                 && eventNames[1] === STREAM_DATA
-                 && eventNames[eventNames.length-1] === STREAM_END;
-
-               if(!result.pass) {
-                 result.message = 'events not in correct order. We have: ' +
-                     JSON.stringify(
-                       eventNames.map(prettyPrintEvent)
-                     ) + ' but should follow "start", "data"*, "end"';
-
-               }
-
-               return result;
-             }
-
-           };
-
-
-
-         },
-
-         toParseTo: function(){
-           return {
-             compare: function(actual, expected) {
-               var result = {};
-               var normalisedActual;
-               if( !actual ) {
-                 result.pass = false;
-                 result.message = 'no content has been received';
-                 return result;
-               }
-
-               try {
-                   normalisedActual = JSON.stringify( JSON.parse(actual) );
-               } catch (e) {
-                 result.pass = false;
-                 result.message = "Expected to be able to parse the found " +
-                   "content as json '" + actual + "' but it " +
-                   "could not be parsed";
-                 return result;
-               }
-
-               result.pass = normalisedActual === JSON.stringify(expected);
-               if (!result.pass) {
-                 result.message = "The found json parsed but did not match " + JSON.stringify(expected) +
-                   " because found " + this.actual;
-
-               }
-               return result;
-             }
-           };
-         }
-      });
-
-
-
-   });
 
 
 });

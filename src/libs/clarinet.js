@@ -1,3 +1,5 @@
+import { SAX_KEY, SAX_VALUE_OPEN, SAX_VALUE_CLOSE, FAIL_EVENT, STREAM_DATA, STREAM_END, errorReport } from '../events';
+
 /* 
    This is a slightly hacked-up browser only version of clarinet 
    
@@ -501,3 +503,5 @@ function clarinet(eventBus) {
       checkBufferLength();
   }
 }
+
+export { clarinet };

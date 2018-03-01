@@ -1,15 +1,11 @@
-var oboe;
-var sinon;
-var globalContext;
-var module = module ? module : undefined;
+import * as isNode from 'detect-node';
+import { oboe } from '../../src/publicApi';
+import * as sinon from 'sinon';
 
-if(module && module.exports) {
-  sinon = require('sinon');
-  oboe = require('../../dist/oboe-node.js');
+var globalContext;
+if(isNode) {
   globalContext = GLOBAL;
 } else {
-  sinon = window.sinon;
-  oboe = window.oboe;
   globalContext = window;
 }
 
@@ -414,18 +410,15 @@ function matched(obj) {
   };
 }
 
-// Export if node
-if (module && module.exports) {
-  module.exports = {
-    givenAnOboeInstance: givenAnOboeInstance,
-    matched: matched,
-    hasRootJson: hasRootJson,
-    wasGivenTheOboeAsContext: wasGivenTheOboeAsContext,
-    foundOneMatch: foundOneMatch,
-    gaveFinalCallbackWithRootJson: gaveFinalCallbackWithRootJson,
-    calledCallbackOnce: calledCallbackOnce,
-    foundNoMatches: foundNoMatches,
-    foundNMatches: foundNMatches,
-    wasPassedAnErrorObject: wasPassedAnErrorObject
-  };
-}
+export {
+  givenAnOboeInstance,
+  matched,
+  foundNoMatches,
+  foundOneMatch,
+  calledCallbackOnce,
+  wasPassedAnErrorObject,
+  wasGivenTheOboeAsContext,
+  hasRootJson,
+  foundNMatches,
+  gaveFinalCallbackWithRootJson
+};

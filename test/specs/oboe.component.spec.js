@@ -1,49 +1,29 @@
+import {
+  givenAnOboeInstance,
+  matched,
+  foundNoMatches,
+  foundOneMatch,
+  calledCallbackOnce,
+  wasPassedAnErrorObject,
+  wasGivenTheOboeAsContext,
+  hasRootJson,
+  foundNMatches,
+  gaveFinalCallbackWithRootJson
+} from '../libs/oboeAsserter';
+
+import { oboe } from '../../src/publicApi';
+
 (function(Platform) {
   describe("oboe component (no http, content fed in externally)", function(){
 
     var path;
-    var givenAnOboeInstance;
-    var oboe;
-    var asserter;
-    var matched;
-    var wasGivenTheOboeAsContext;
-    var hasRootJson;
-    var calledCallbackOnce;
-    var gaveFinalCallbackWithRootJson;
-    var foundOneMatch;
-    var wasPassedAnErrorObject;
-    var foundNMatches;
-    var foundNoMatches;
 
     // Used to spy on global functions like setTimeout
     var globalContext;
     if ( !Platform.isNode ) {
       globalContext = window;
-      givenAnOboeInstance = window.givenAnOboeInstance;
-      oboe = window.oboe;
-      matched = window.matched;
-      wasGivenTheOboeAsContext = window.wasGivenTheOboeAsContext;
-      hasRootJson = window.hasRootJson;
-      calledCallbackOnce = window.calledCallbackOnce;
-      gaveFinalCallbackWithRootJson = window.gaveFinalCallbackWithRootJson;
-      foundOneMatch = window.foundOneMatch;
-      wasPassedAnErrorObject = window.wasPassedAnErrorObject;
-      foundNMatches = window.foundNMatches;
-      foundNoMatches = window.foundNoMatches;
     } else {
       globalContext = GLOBAL;
-      oboe = require('../../dist/oboe-node.js');
-      asserter = require('../libs/oboeAsserter.js');
-      givenAnOboeInstance = asserter.givenAnOboeInstance;
-      matched = asserter.matched;
-      wasGivenTheOboeAsContext = asserter.wasGivenTheOboeAsContext;
-      hasRootJson = asserter.hasRootJson;
-      calledCallbackOnce = asserter.calledCallbackOnce;
-      gaveFinalCallbackWithRootJson = asserter.gaveFinalCallbackWithRootJson;
-      foundOneMatch = asserter.foundOneMatch;
-      wasPassedAnErrorObject = asserter.wasPassedAnErrorObject;
-      foundNMatches = asserter.foundNMatches;
-      foundNoMatches = asserter.foundNoMatches;
     }
 
     /*

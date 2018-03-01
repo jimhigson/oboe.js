@@ -1,3 +1,6 @@
+import { pubSub } from '../../src/pubSub';
+import { noop } from '../../src/functional';
+
 describe('pub sub', function(){
 
    it('is able to provide a single event pubsub', function(){

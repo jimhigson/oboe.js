@@ -1,3 +1,5 @@
+import { jsonPathSyntax } from '../../src/jsonPathSyntax';
+
 jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDesc) {
 
   describe('json path token parser', function () {
@@ -175,7 +177,7 @@ jsonPathSyntax(function (pathNodeDesc, doubleDotDesc, dotDesc, bangDesc, emptyDe
         toNotMatch: function () {
           return {
             compare: function(actual) {
-              var foundResults = this.actual;
+              var foundResults = actual;
 
               return {
                 pass: !foundResults

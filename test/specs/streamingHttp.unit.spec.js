@@ -1,3 +1,8 @@
+import { fakePubSub } from '../libs/spiedPubSub';
+import { HTTP_START, STREAM_DATA, STREAM_END, FAIL_EVENT, ABORTING } from '../../src/events';
+import * as sinon from 'sinon';
+import { streamingHttp } from '../../src/streamingHttp.browser';
+
 describe('streaming http in a browser', function() {
 
    function fakeBusWithEventsForStreamingHttp() {
@@ -19,12 +24,9 @@ describe('streaming http in a browser', function() {
 
       streamingHttp(fakeBus, fakeXhr, 'GET', 'http://example.com', null, {}, false);
       
-      debugger;
       fakeXhr.respond(200, {}, responseBody);
 
       //fakeXhr.setResponseBody('here is a response body');
-
-      console.log(JSON.stringify(fakeBus.events));
    });
 
 });

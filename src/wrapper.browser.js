@@ -1,3 +1,5 @@
+import { oboe } from './publicApi';
+
 // This file is the concatenation of many js files.
 // See http://github.com/jimhigson/oboe.js for the raw source
 
@@ -22,3 +24,4 @@
          return self;
       }
    }()), Object, Array, Error, JSON);
+   

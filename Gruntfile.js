@@ -21,108 +21,17 @@ module.exports = function (grunt) {
 
   var STREAM_SOURCE_PORT_HTTP = 4567;
 
-  // NB: source files are order sensitive
-  var OBOE_BROWSER_SOURCE_FILES = [
-    'build/version.js'
-    ,  'src/LICENCE.js'
-    ,  'src/functional.js'
-    ,  'src/util.js'
-    ,  'src/lists.js'
-    ,  'src/libs/clarinet.js'
-    ,  'src/ascentManager.js'
-    ,  'src/parseResponseHeaders.browser.js'
-    ,  'src/detectCrossOrigin.browser.js'
-    ,  'src/streamingHttp.browser.js'
-    ,  'src/jsonPathSyntax.js'
-    ,  'src/ascent.js'
-    ,  'src/incrementalContentBuilder.js'
-    ,  'src/jsonPath.js'
-    ,  'src/singleEventPubSub.js'
-    ,  'src/pubSub.js'
-    ,  'src/events.js'
-    ,  'src/patternAdapter.js'
-    ,  'src/instanceApi.js'
-    ,  'src/wire.js'
-    ,  'src/defaults.js'
-    ,  'src/publicApi.js'
-  ];
-
-  var OBOE_NODE_SOURCE_FILES = [
-    'build/version.js'
-    ,  'src/LICENCE.js'
-    ,  'src/functional.js'
-    ,  'src/util.js'
-    ,  'src/lists.js'
-    ,  'src/libs/clarinet.js'
-    ,  'src/ascentManager.js'
-    ,  'src/streamingHttp.node.js'
-    ,  'src/jsonPathSyntax.js'
-    ,  'src/ascent.js'
-    ,  'src/incrementalContentBuilder.js'
-    ,  'src/jsonPath.js'
-    ,  'src/singleEventPubSub.js'
-    ,  'src/pubSub.js'
-    ,  'src/events.js'
-    ,  'src/patternAdapter.js'
-    ,  'src/instanceApi.js'
-    ,  'src/wire.js'
-    ,  'src/defaults.js'
-    ,  'src/publicApi.js'
-  ];
-
   var FILES_TRIGGERING_KARMA = [
     'src/**/*.js',
     'test/specs/*.spec.js',
     'test/libs/*.js'
   ];
 
-  // load the wrapper file for packaging source targeted at either
-  // browser or node
-  function wrapper(target){
-    return require('fs')
-      .readFileSync('src/wrapper.' + target + '.js', 'utf8')
-      .split('// ---contents--- //');
-  }
-
   grunt.initConfig({
 
     pkg:grunt.file.readJSON("package.json")
 
     ,  clean: ['dist/*.js', 'build/*.js']
-
-    ,  concat: {
-      browser:{
-        src: OBOE_BROWSER_SOURCE_FILES,
-        dest: 'build/oboe-browser.concat.js'
-      },
-      node:{
-        src: OBOE_NODE_SOURCE_FILES,
-        dest: 'build/oboe-node.concat.js'
-      }
-    }
-
-    ,  wrap: {
-      browserPackage: {
-        src: 'build/oboe-browser.concat.js',
-        dest: '.',
-        wrapper: wrapper('browser')
-      },
-
-      nodePackage: {
-        src: 'build/oboe-node.concat.js',
-        dest: '.',
-        wrapper: wrapper('node')
-      }
-    }
-
-
-    ,  uglify: {
-      build:{
-        files:{
-          'build/oboe-browser.min.js': 'build/oboe-browser.concat.js'
-        }
-      }
-    }
 
     ,  karma: {
       options:{
@@ -200,20 +109,6 @@ module.exports = function (grunt) {
       }
     }
 
-    ,  copy: {
-      browserDist: {
-        files: [
-          {src: ['build/oboe-browser.min.js'],    dest: 'dist/oboe-browser.min.js'}
-          ,  {src: ['build/oboe-browser.concat.js'], dest: 'dist/oboe-browser.js'    }
-        ]
-      },
-      nodeDist: {
-        files: [
-          {src: ['build/oboe-node.concat.js'],    dest: 'dist/oboe-node.js'}
-        ]
-      }
-    }
-
     ,  exec:{
       // these might not go too well on Windows :-) - get Cygwin.
       reportMinifiedSize:{
@@ -223,8 +118,14 @@ module.exports = function (grunt) {
         command: "echo Size after gzip is `gzip --best --stdout dist/oboe-browser.min.js | wc -c` bytes - max 5120"
       },
       createGitVersionJs:{
-        command: "echo \"// `git describe`\" > build/version.js"
-      }
+        command: "echo \"`git describe`\" > build/version.txt"
+      },
+      webpackBrowser: {
+        command: "npm run webpack"
+      },
+      webpackNode: {
+        command: "npm run webpack -- --config webpack.config.node.js"
+      }      
     }
 
     ,  watch:{
@@ -316,9 +217,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('node-build',      [
     'exec:createGitVersionJs',
-    'concat:node',
-    'wrap:nodePackage',
-    'copy:nodeDist'
+    'exec:webpackNode'
   ]);
 
   grunt.registerTask('node-build-test',      [
@@ -333,11 +232,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('browser-build',      [
     'exec:createGitVersionJs',
-    'concat:browser',
-    'concat:node',
-    'wrap:browserPackage',
-    'uglify',
-    'copy:browserDist'
+    'exec:webpackBrowser'
   ]);
 
   grunt.registerTask('browser-build-test',      [
@@ -350,8 +245,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build',      [
-    'browser-build',
-    'node-build'
+    'exec:webpackBrowser'
   ]);
 
   // build and run just the integration tests.

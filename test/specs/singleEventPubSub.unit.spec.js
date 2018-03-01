@@ -1,3 +1,7 @@
+import { singleEventPubSub } from '../../src/singleEventPubSub';
+import { noop } from '../../src/functional';
+import { list } from '../../src/lists';
+
 describe('single event pub sub', function(){
 
   beforeEach(function(){

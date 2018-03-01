@@ -1,3 +1,6 @@
+import { list, cons } from '../../src/lists';
+import { ROOT_PATH } from '../../src/incrementalContentBuilder';
+
 /** pass me an object with only one child at each level and will return a nodeStack
  *  and pathStack which describes the only possibly descent top-to-bottom
  *  
@@ -27,3 +30,5 @@ function ascentFrom( description ) {
          
    return ascent;            
 }
+
+export { ascentFrom };

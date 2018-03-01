@@ -1,3 +1,6 @@
+import { singleEventPubSub } from './singleEventPubSub';
+import { varArgs, apply } from './functional';
+
 /**
  * pubSub is a curried interface for listening to and emitting
  * events.
@@ -62,3 +65,5 @@ function pubSub(){
 
    return pubSubInstance;
 }
+ 
+export { pubSub };

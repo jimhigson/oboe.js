@@ -1,3 +1,5 @@
+import { varArgs, lazyUnion, attr } from './functional';
+
 var jsonPathSyntax = (function() {
  
    var
@@ -113,3 +115,6 @@ var jsonPathSyntax = (function() {
    }; 
 
 }());
+
+ export { jsonPathSyntax };
+ 

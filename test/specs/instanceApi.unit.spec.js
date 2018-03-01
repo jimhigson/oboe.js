@@ -1,3 +1,9 @@
+import { spiedPubSub } from '../libs/spiedPubSub';
+import { instanceApi } from '../../src/instanceApi';
+import { list } from '../../src/lists';
+import { HTTP_START, ROOT_NODE_FOUND, ROOT_PATH_FOUND, ROOT_PATH, FAIL_EVENT, ABORTING } from '../../src/events';
+import { namedNode } from '../../src/ascent';
+import { ROOT_PATH } from '../../src/incrementalContentBuilder';
 
 describe('instance api',function() {
   "use strict";
