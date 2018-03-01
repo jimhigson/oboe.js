@@ -1,3 +1,7 @@
+import { jsonPathCompiler } from '../../src/jsonPath';
+import { ROOT_PATH } from '../../src/incrementalContentBuilder';
+import { cons, emptyList } from '../../src/lists';
+import { ascentFrom } from '../libs/ascentFrom';
 
 describe('jsonPath', function(){
 

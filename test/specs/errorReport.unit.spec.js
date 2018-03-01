@@ -1,3 +1,4 @@
+import { errorReport } from '../../src/events'
 
 describe("error report", function() {
 

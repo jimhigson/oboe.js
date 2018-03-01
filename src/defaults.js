@@ -1,5 +1,7 @@
-function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached, disableBufferCheck ){
+import { isString } from './util';
 
+function applyDefaults( passthrough, url, httpMethodName, body, headers, withCredentials, cached, disableBufferCheck ){
+  
    headers = headers ?
       // Shallow-clone the headers array. This allows it to be
       // modified without side effects to the caller. We don't
@@ -40,3 +42,5 @@ function applyDefaults( passthrough, url, httpMethodName, body, headers, withCre
 
    return passthrough( httpMethodName || 'GET', modifiedUrl(url, cached), body, headers, withCredentials || false, disableBufferCheck || false );
 }
+
+export { applyDefaults };

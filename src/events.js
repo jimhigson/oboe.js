@@ -43,3 +43,24 @@ function errorReport(statusCode, body, error) {
       thrown:error
    };
 }    
+
+export {
+    NODE_OPENED,
+    NODE_CLOSED,
+    NODE_SWAP,
+    NODE_DROP,
+    FAIL_EVENT,
+    ROOT_NODE_FOUND,
+    ROOT_PATH_FOUND,
+
+    HTTP_START,
+    STREAM_DATA,
+    STREAM_END,
+    ABORTING,
+
+    SAX_KEY,
+    SAX_VALUE_OPEN,
+    SAX_VALUE_CLOSE,
+
+    errorReport
+};

@@ -1,3 +1,5 @@
+import { noop, attr, varArgs, flip } from './functional';
+
 /**
  * Like cons in Lisp
  */
@@ -190,3 +192,21 @@ function first(test, list) {
                   ? head(list) 
                   : first(test,tail(list))); 
 }
+
+export {
+    cons,
+    emptyList,
+    head,
+    tail,
+    arrayAsList,
+    list,
+    listAsArray,
+    map,
+    foldR,
+    foldR1,
+    without,
+    all,
+    applyEach,
+    reverseList,
+    first
+};

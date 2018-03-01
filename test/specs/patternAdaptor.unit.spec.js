@@ -1,3 +1,11 @@
+import { spiedPubSub } from '../libs/spiedPubSub';
+import { patternAdapter } from '../../src/patternAdapter';
+import { noop } from '../../src/functional';
+import { NODE_CLOSED, NODE_OPENED } from '../../src/events';
+import { ascentFrom } from '../libs/ascentFrom';
+import { listAsArray, list, head } from '../../src/lists';
+import { namedNode } from '../../src/ascent';
+
 describe('patternAdapter', function() {
 
    it('compiles the correct pattern when patterns are listened to', function(){

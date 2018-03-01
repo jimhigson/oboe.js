@@ -13,10 +13,9 @@ module.exports = function(config) {
       ,  'test/libs/sinon.js'
       ,  'test/libs/sinon-ie.js'
       ,  'test/libs/platform.js'
-      ,  'test/libs/*.js'
+      ,  'test/libs/testUrl.js'
       ,  'dist/oboe-browser.min.js'
 
-      ,  'test/specs/oboe.component.spec.js'
       ,  'test/specs/oboe.integration.spec.js'
       ,  'test/specs/oboe.performance.spec.js'
       ],

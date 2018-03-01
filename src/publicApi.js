@@ -1,3 +1,9 @@
+import { list } from './lists';
+import { partialComplete } from './functional';
+import { hasAllProperties, isString } from './util';
+import { applyDefaults } from './defaults';
+import { wire } from './wire';
+
 // export public API
 function oboe(arg1) {
 
@@ -55,3 +61,5 @@ function oboe(arg1) {
 oboe.drop = function() {
    return oboe.drop;
 };
+ 
+export { oboe };

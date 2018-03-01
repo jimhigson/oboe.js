@@ -1,3 +1,6 @@
+import { all } from './lists';
+import { attr, partialComplete } from './functional';
+
 /**
  * This file defines some loosely associated syntactic sugar for 
  * Javascript programming 
@@ -42,3 +45,11 @@ function hasAllProperties(fieldList, o) {
                   return (field in o);         
                }, fieldList);
 }
+
+export {
+    isOfType,
+    len,
+    isString,
+    defined,
+    hasAllProperties
+};

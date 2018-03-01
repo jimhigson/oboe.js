@@ -63,3 +63,5 @@ function parseUrlOrigin(url) {
       port:       urlHostMatch[3] || ''
    };
 }
+ 
+export { isCrossOrigin, parseUrlOrigin };

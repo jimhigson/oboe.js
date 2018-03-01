@@ -22,3 +22,5 @@ function parseResponseHeaders(headerStr) {
    
    return headers;
 }
+ 
+export { parseResponseHeaders };

@@ -1,4 +1,6 @@
-
+import { keyOf, nodeOf } from './ascent';
+import { NODE_SWAP, NODE_DROP, ABORTING } from './events';
+import { head, tail } from './lists';
 /** 
  * A bridge used to assign stateless functions to listen to clarinet.
  * 
@@ -60,3 +62,5 @@ function ascentManager(oboeBus, handlers){
       }
    });   
 }
+
+export { ascentManager };

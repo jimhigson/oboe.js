@@ -1,3 +1,4 @@
+import { parseUrlOrigin, isCrossOrigin } from '../../src/detectCrossOrigin.browser';
 
 describe("url handling", function() {
 

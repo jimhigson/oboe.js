@@ -1,3 +1,7 @@
+import { eventBlackBox } from '../libs/spiedPubSub';
+import { pubSub } from '../../src/pubSub';
+import { SAX_KEY, SAX_VALUE_OPEN, SAX_VALUE_CLOSE, FAIL_EVENT, STREAM_DATA, STREAM_END, errorReport } from '../../src/events';
+import { clarinet } from '../../src/libs/clarinet';
 
 // test cases borrowed from
 //    https://github.com/dscape/clarinet/blob/master/test/clarinet.js

@@ -1,3 +1,4 @@
+import { parseResponseHeaders } from '../../src/parseResponseHeaders.browser';
 
 describe("parsing response headers", function() {
 
