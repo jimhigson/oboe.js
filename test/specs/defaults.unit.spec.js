@@ -18,6 +18,7 @@ describe('default settings', function(){
          'http://example.com/oboez',
          noBody,
          noHeaders,
+         false,
          false
       )      
    });
@@ -34,6 +35,7 @@ describe('default settings', function(){
          'http://example.com/oboez?_=123',
          noBody,
          noHeaders,
+         false,
          false
       )
 
@@ -52,6 +54,7 @@ describe('default settings', function(){
          'http://example.com/oboez?foo=bar&_=456',
          noBody,
          noHeaders,
+         false,
          false
       )
 
@@ -70,6 +73,7 @@ describe('default settings', function(){
          'http://example.com/oboez',
          noBody,
          noHeaders,
+         false,
          false
       )
 
@@ -86,6 +90,7 @@ describe('default settings', function(){
          'http://example.com/oboez',
          noBody,
          noHeaders,
+         false,
          false
       )
    });
@@ -101,7 +106,8 @@ describe('default settings', function(){
          'http://example.com/oboez',
          noBody,
          noHeaders,
-         true
+         true,
+         false
       )
    });
 
@@ -115,6 +121,7 @@ describe('default settings', function(){
          'http://example.com/oboez',
          '{"foo":"bar"}',
          { 'Content-Type' : 'application/json', 'Content-Length': 13 },
+         false,
          false
       )
    });
@@ -129,6 +136,7 @@ describe('default settings', function(){
          'http://example.com/oboez',
          '{"foo":"bar"}',
          { 'Content-Type' : 'application/awesome', 'Content-Length': 13 },
+         false,
          false
       )
    });
@@ -143,9 +151,26 @@ describe('default settings', function(){
          'http://example.com/oboez',
          'body content',
          { 'Content-Length': 12 }, 
+         false,
          false
       )
-   });   
+   });
+
+   it('allows disableBufferCheck to be given', function(){
+
+      var stub = jasmine.createSpy();
+
+      applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, undefined, undefined, true);
+
+      expect(stub).toHaveBeenCalledLike(
+         'GET',
+         'http://example.com/oboez',
+         noBody,
+         noHeaders,
+         false,
+         true
+      )
+   });
 
 
    beforeEach(function(){
