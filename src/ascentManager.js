@@ -14,8 +14,8 @@ import { head, tail } from './lists'
 function ascentManager (oboeBus, handlers) {
   'use strict'
 
-  var listenerId = {},
-    ascent
+  var listenerId = {}
+  var ascent
 
   function stateAfter (handler) {
     return function (param) {
@@ -28,10 +28,10 @@ function ascentManager (oboeBus, handlers) {
   }
 
   oboeBus(NODE_SWAP).on(function (newNode) {
-    var oldHead = head(ascent),
-      key = keyOf(oldHead),
-      ancestors = tail(ascent),
-      parentNode
+    var oldHead = head(ascent)
+    var key = keyOf(oldHead)
+    var ancestors = tail(ascent)
+    var parentNode
 
     if (ancestors) {
       parentNode = nodeOf(head(ancestors))
@@ -40,10 +40,10 @@ function ascentManager (oboeBus, handlers) {
   })
 
   oboeBus(NODE_DROP).on(function () {
-    var oldHead = head(ascent),
-      key = keyOf(oldHead),
-      ancestors = tail(ascent),
-      parentNode
+    var oldHead = head(ascent)
+    var key = keyOf(oldHead)
+    var ancestors = tail(ascent)
+    var parentNode
 
     if (ancestors) {
       parentNode = nodeOf(head(ancestors))

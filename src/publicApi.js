@@ -12,11 +12,11 @@ function oboe (arg1) {
   // compatibility with Request streams.
   // See https://github.com/jimhigson/oboe.js/issues/65
 
-  var nodeStreamMethodNames = list('resume', 'pause', 'pipe'),
-    isStream = partialComplete(
-      hasAllProperties
-      , nodeStreamMethodNames
-    )
+  var nodeStreamMethodNames = list('resume', 'pause', 'pipe')
+  var isStream = partialComplete(
+    hasAllProperties,
+    nodeStreamMethodNames
+  )
 
   if (arg1) {
     if (isStream(arg1) || isString(arg1)) {

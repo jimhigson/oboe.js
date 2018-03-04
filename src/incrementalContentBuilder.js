@@ -33,10 +33,10 @@ var ROOT_PATH = {}
  * function given.
  */
 function incrementalContentBuilder (oboeBus) {
-  var emitNodeOpened = oboeBus(NODE_OPENED).emit,
-    emitNodeClosed = oboeBus(NODE_CLOSED).emit,
-    emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit,
-    emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit
+  var emitNodeOpened = oboeBus(NODE_OPENED).emit
+  var emitNodeClosed = oboeBus(NODE_CLOSED).emit
+  var emitRootOpened = oboeBus(ROOT_PATH_FOUND).emit
+  var emitRootClosed = oboeBus(ROOT_NODE_FOUND).emit
 
   function arrayIndicesAreKeys (possiblyInconsistentAscent, newDeepestNode) {
     /* for values in arrays we aren't pre-warned of the coming paths
@@ -52,9 +52,8 @@ function incrementalContentBuilder (oboeBus) {
         len(parentNode),
         newDeepestNode
       )
-      :
       // nothing needed, return unchanged
-      possiblyInconsistentAscent
+      : possiblyInconsistentAscent
   }
 
   function nodeOpened (ascent, newDeepestNode) {
@@ -67,9 +66,9 @@ function incrementalContentBuilder (oboeBus) {
 
     // we discovered a non-root node
 
-    var arrayConsistentAscent = arrayIndicesAreKeys(ascent, newDeepestNode),
-      ancestorBranches = tail(arrayConsistentAscent),
-      previouslyUnmappedName = keyOf(head(arrayConsistentAscent))
+    var arrayConsistentAscent = arrayIndicesAreKeys(ascent, newDeepestNode)
+    var ancestorBranches = tail(arrayConsistentAscent)
+    var previouslyUnmappedName = keyOf(head(arrayConsistentAscent))
 
     appendBuiltContent(
       ancestorBranches,
@@ -127,9 +126,9 @@ function incrementalContentBuilder (oboeBus) {
     emitNodeClosed(ascent)
 
     return tail(ascent) ||
-             // If there are no nodes left in the ascent the root node
-             // just closed. Emit a special event for this:
-             emitRootClosed(nodeOf(head(ascent)))
+      // If there are no nodes left in the ascent the root node
+      // just closed. Emit a special event for this:
+      emitRootClosed(nodeOf(head(ascent)))
   }
 
   var contentBuilderHandlers = {}

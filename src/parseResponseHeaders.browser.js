@@ -16,7 +16,7 @@ function parseResponseHeaders (headerStr) {
       var index = headerPair.indexOf('\u003a\u0020')
 
       headers[headerPair.substring(0, index)] =
-                     headerPair.substring(index + 2)
+        headerPair.substring(index + 2)
     })
 
   return headers

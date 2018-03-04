@@ -22,21 +22,21 @@ function cons (x, xs) {
 /**
  * The empty list
  */
-var emptyList = null,
+var emptyList = null
 
-  /**
+/**
  * Get the head of a list.
  *
  * Ie, head(cons(a,b)) = a
  */
-  head = attr(0),
+var head = attr(0)
 
-  /**
+/**
  * Get the tail of a list.
  *
  * Ie, tail(cons(a,b)) = b
  */
-  tail = attr(1)
+var tail = attr(1)
 
 /**
  * Converts an array to a list
@@ -132,7 +132,7 @@ function without (list, test, removedFn) {
  */
 function all (fn, list) {
   return !list ||
-          (fn(head(list)) && all(fn, tail(list)))
+    (fn(head(list)) && all(fn, tail(list)))
 }
 
 /**
@@ -169,9 +169,9 @@ function reverseList (list) {
 
 function first (test, list) {
   return list &&
-               (test(head(list))
-                 ? head(list)
-                 : first(test, tail(list)))
+    (test(head(list))
+      ? head(list)
+      : first(test, tail(list)))
 }
 
 export {

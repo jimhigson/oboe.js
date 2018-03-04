@@ -13,8 +13,8 @@ function isOfType (T, maybeSomething) {
   return maybeSomething && maybeSomething.constructor === T
 }
 
-var len = attr('length'),
-  isString = partialComplete(isOfType, String)
+var len = attr('length')
+var isString = partialComplete(isOfType, String)
 
 /**
  * I don't like saying this:
@@ -38,9 +38,9 @@ function defined (value) {
  */
 function hasAllProperties (fieldList, o) {
   return (o instanceof Object) &&
-               all(function (field) {
-                 return (field in o)
-               }, fieldList)
+    all(function (field) {
+      return (field in o)
+    }, fieldList)
 }
 
 export {
