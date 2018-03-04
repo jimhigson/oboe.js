@@ -1,5 +1,5 @@
-import { singleEventPubSub } from './singleEventPubSub';
-import { varArgs, apply } from './functional';
+import { singleEventPubSub } from './singleEventPubSub'
+import { varArgs, apply } from './functional'
 
 /**
  * pubSub is a curried interface for listening to and emitting
@@ -35,35 +35,32 @@ import { varArgs, apply } from './functional';
  *
  * [1]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
-function pubSub(){
+function pubSub () {
+  var singles = {},
+    newListener = newSingle('newListener'),
+    removeListener = newSingle('removeListener')
 
-   var singles = {},
-       newListener = newSingle('newListener'),
-       removeListener = newSingle('removeListener');
+  function newSingle (eventName) {
+    return singles[eventName] = singleEventPubSub(
+      eventName,
+      newListener,
+      removeListener
+    )
+  }
 
-   function newSingle(eventName) {
-      return singles[eventName] = singleEventPubSub(
-         eventName,
-         newListener,
-         removeListener
-      );
-   }
+  /** pubSub instances are functions */
+  function pubSubInstance (eventName) {
+    return singles[eventName] || newSingle(eventName)
+  }
 
-   /** pubSub instances are functions */
-   function pubSubInstance( eventName ){
+  // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
+  ['emit', 'on', 'un'].forEach(function (methodName) {
+    pubSubInstance[methodName] = varArgs(function (eventName, parameters) {
+      apply(parameters, pubSubInstance(eventName)[methodName])
+    })
+  })
 
-      return singles[eventName] || newSingle( eventName );
-   }
-
-   // add convenience EventEmitter-style uncurried form of 'emit' and 'on'
-   ['emit', 'on', 'un'].forEach(function(methodName){
-
-      pubSubInstance[methodName] = varArgs(function(eventName, parameters){
-         apply( parameters, pubSubInstance( eventName )[methodName]);
-      });
-   });
-
-   return pubSubInstance;
+  return pubSubInstance
 }
- 
-export { pubSub };
+
+export { pubSub }

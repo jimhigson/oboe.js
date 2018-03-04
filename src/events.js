@@ -2,65 +2,65 @@
  * This file declares some constants to use as names for event types.
  */
 
-var // the events which are never exported are kept as 
-    // the smallest possible representation, in numbers:
-    _S = 1,
+var // the events which are never exported are kept as
+  // the smallest possible representation, in numbers:
+  _S = 1,
 
-    // fired whenever a new node starts in the JSON stream:
-    NODE_OPENED     = _S++,
+  // fired whenever a new node starts in the JSON stream:
+  NODE_OPENED = _S++,
 
-    // fired whenever a node closes in the JSON stream:
-    NODE_CLOSED     = _S++,
+  // fired whenever a node closes in the JSON stream:
+  NODE_CLOSED = _S++,
 
-    // called if a .node callback returns a value - 
-    NODE_SWAP       = _S++,
-    NODE_DROP       = _S++,
+  // called if a .node callback returns a value -
+  NODE_SWAP = _S++,
+  NODE_DROP = _S++,
 
-    FAIL_EVENT      = 'fail',
-   
-    ROOT_NODE_FOUND = _S++,
-    ROOT_PATH_FOUND = _S++,
-   
-    HTTP_START      = 'start',
-    STREAM_DATA     = 'data',
-    STREAM_END      = 'end',
-    ABORTING        = _S++,
+  FAIL_EVENT = 'fail',
 
-    // SAX events butchered from Clarinet
-    SAX_KEY          = _S++,
-    SAX_VALUE_OPEN   = _S++,
-    SAX_VALUE_CLOSE  = _S++;
-    
-function errorReport(statusCode, body, error) {
-   try{
-      var jsonBody = JSON.parse(body);
-   }catch(e){}
+  ROOT_NODE_FOUND = _S++,
+  ROOT_PATH_FOUND = _S++,
 
-   return {
-      statusCode:statusCode,
-      body:body,
-      jsonBody:jsonBody,
-      thrown:error
-   };
-}    
+  HTTP_START = 'start',
+  STREAM_DATA = 'data',
+  STREAM_END = 'end',
+  ABORTING = _S++,
+
+  // SAX events butchered from Clarinet
+  SAX_KEY = _S++,
+  SAX_VALUE_OPEN = _S++,
+  SAX_VALUE_CLOSE = _S++
+
+function errorReport (statusCode, body, error) {
+  try {
+    var jsonBody = JSON.parse(body)
+  } catch (e) {}
+
+  return {
+    statusCode: statusCode,
+    body: body,
+    jsonBody: jsonBody,
+    thrown: error
+  }
+}
 
 export {
-    NODE_OPENED,
-    NODE_CLOSED,
-    NODE_SWAP,
-    NODE_DROP,
-    FAIL_EVENT,
-    ROOT_NODE_FOUND,
-    ROOT_PATH_FOUND,
+  NODE_OPENED,
+  NODE_CLOSED,
+  NODE_SWAP,
+  NODE_DROP,
+  FAIL_EVENT,
+  ROOT_NODE_FOUND,
+  ROOT_PATH_FOUND,
 
-    HTTP_START,
-    STREAM_DATA,
-    STREAM_END,
-    ABORTING,
+  HTTP_START,
+  STREAM_DATA,
+  STREAM_END,
+  ABORTING,
 
-    SAX_KEY,
-    SAX_VALUE_OPEN,
-    SAX_VALUE_CLOSE,
+  SAX_KEY,
+  SAX_VALUE_OPEN,
+  SAX_VALUE_CLOSE,
 
-    errorReport
-};
+  errorReport
+}

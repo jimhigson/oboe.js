@@ -1,3 +1,3 @@
-import { oboe } from './publicApi';
+import { oboe } from './publicApi'
 
-export default oboe;
+export default oboe

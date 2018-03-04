@@ -1,19 +1,19 @@
-import { attr } from './functional';
+import { attr } from './functional'
 
 /**
  * Get a new key->node mapping
- * 
+ *
  * @param {String|Number} key
  * @param {Object|Array|String|Number|null} node a value found in the json
  */
-function namedNode(key, node) {
-  return {key:key, node:node};
+function namedNode (key, node) {
+  return {key: key, node: node}
 }
 
 /** get the key of a namedNode */
-var keyOf = attr('key');
+var keyOf = attr('key')
 
 /** get the node from a namedNode */
-var nodeOf = attr('node');
+var nodeOf = attr('node')
 
-export { namedNode, keyOf, nodeOf };
+export { namedNode, keyOf, nodeOf }

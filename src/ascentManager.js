@@ -1,66 +1,62 @@
-import { keyOf, nodeOf } from './ascent';
-import { NODE_SWAP, NODE_DROP, ABORTING } from './events';
-import { head, tail } from './lists';
-/** 
+import { keyOf, nodeOf } from './ascent'
+import { NODE_SWAP, NODE_DROP, ABORTING } from './events'
+import { head, tail } from './lists'
+/**
  * A bridge used to assign stateless functions to listen to clarinet.
- * 
+ *
  * As well as the parameter from clarinet, each callback will also be passed
  * the result of the last callback.
- * 
+ *
  * This may also be used to clear all listeners by assigning zero handlers:
- * 
+ *
  *    ascentManager( clarinet, {} )
  */
-function ascentManager(oboeBus, handlers){
-   "use strict";
-   
-   var listenerId = {},
-       ascent;
+function ascentManager (oboeBus, handlers) {
+  'use strict'
 
-   function stateAfter(handler) {
-      return function(param){
-         ascent = handler( ascent, param);
-      }
-   }
-   
-   for( var eventName in handlers ) {
+  var listenerId = {},
+    ascent
 
-      oboeBus(eventName).on(stateAfter(handlers[eventName]), listenerId);
-   }
-   
-   oboeBus(NODE_SWAP).on(function(newNode) {
-      
-      var oldHead = head(ascent),
-          key = keyOf(oldHead),
-          ancestors = tail(ascent),
-          parentNode;
+  function stateAfter (handler) {
+    return function (param) {
+      ascent = handler(ascent, param)
+    }
+  }
 
-      if( ancestors ) {
-         parentNode = nodeOf(head(ancestors));
-         parentNode[key] = newNode;
-      }
-   });
+  for (var eventName in handlers) {
+    oboeBus(eventName).on(stateAfter(handlers[eventName]), listenerId)
+  }
 
-   oboeBus(NODE_DROP).on(function() {
+  oboeBus(NODE_SWAP).on(function (newNode) {
+    var oldHead = head(ascent),
+      key = keyOf(oldHead),
+      ancestors = tail(ascent),
+      parentNode
 
-      var oldHead = head(ascent),
-          key = keyOf(oldHead),
-          ancestors = tail(ascent),
-          parentNode;
+    if (ancestors) {
+      parentNode = nodeOf(head(ancestors))
+      parentNode[key] = newNode
+    }
+  })
 
-      if( ancestors ) {
-         parentNode = nodeOf(head(ancestors));
- 
-         delete parentNode[key];
-      }
-   });
+  oboeBus(NODE_DROP).on(function () {
+    var oldHead = head(ascent),
+      key = keyOf(oldHead),
+      ancestors = tail(ascent),
+      parentNode
 
-   oboeBus(ABORTING).on(function(){
-      
-      for( var eventName in handlers ) {
-         oboeBus(eventName).un(listenerId);
-      }
-   });   
+    if (ancestors) {
+      parentNode = nodeOf(head(ancestors))
+
+      delete parentNode[key]
+    }
+  })
+
+  oboeBus(ABORTING).on(function () {
+    for (var eventName in handlers) {
+      oboeBus(eventName).un(listenerId)
+    }
+  })
 }
 
-export { ascentManager };
+export { ascentManager }

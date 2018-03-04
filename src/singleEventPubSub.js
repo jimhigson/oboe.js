@@ -1,6 +1,6 @@
-import { cons, applyEach, without, first } from './lists';
-import { defined } from './util';
-import { always } from './functional';
+import { cons, applyEach, without, first } from './lists'
+import { defined } from './util'
+import { always } from './functional'
 
 /**
  * A pub/sub which is responsible for a single event type. A
@@ -14,20 +14,19 @@ import { always } from './functional';
  * @param {singleEventPubSub} [removeListener]
  *    place to notify of when listeners are removed
  */
-function singleEventPubSub(eventType, newListener, removeListener){
-
+function singleEventPubSub (eventType, newListener, removeListener) {
   /** we are optimised for emitting events over firing them.
    *  As well as the tuple list which stores event ids and
    *  listeners there is a list with just the listeners which
    *  can be iterated more quickly when we are emitting
    */
   var listenerTupleList,
-      listenerList;
+    listenerList
 
-  function hasId(id){
-    return function(tuple) {
-      return tuple.id == id;
-    };
+  function hasId (id) {
+    return function (tuple) {
+      return tuple.id == id
+    }
   }
 
   return {
@@ -38,62 +37,60 @@ function singleEventPubSub(eventType, newListener, removeListener){
      *    an id that this listener can later by removed by.
      *    Can be of any type, to be compared to other ids using ==
      */
-    on:function( listener, listenerId ) {
-
+    on: function (listener, listenerId) {
       var tuple = {
-        listener: listener
-        ,  id:       listenerId || listener // when no id is given use the
+        listener: listener,
+        id: listenerId || listener // when no id is given use the
         // listener function as the id
-      };
-
-      if( newListener ) {
-        newListener.emit(eventType, listener, tuple.id);
       }
 
-      listenerTupleList = cons( tuple,    listenerTupleList );
-      listenerList      = cons( listener, listenerList      );
+      if (newListener) {
+        newListener.emit(eventType, listener, tuple.id)
+      }
 
-      return this; // chaining
+      listenerTupleList = cons(tuple, listenerTupleList)
+      listenerList = cons(listener, listenerList)
+
+      return this // chaining
     },
 
-    emit:function () {
-      applyEach( listenerList, arguments );
+    emit: function () {
+      applyEach(listenerList, arguments)
     },
 
-    un: function( listenerId ) {
-
-      var removed;
+    un: function (listenerId) {
+      var removed
 
       listenerTupleList = without(
         listenerTupleList,
         hasId(listenerId),
-        function(tuple){
-          removed = tuple;
+        function (tuple) {
+          removed = tuple
         }
-      );
+      )
 
-      if( removed ) {
-        listenerList = without( listenerList, function(listener){
-          return listener == removed.listener;
-        });
+      if (removed) {
+        listenerList = without(listenerList, function (listener) {
+          return listener == removed.listener
+        })
 
-        if( removeListener ) {
-          removeListener.emit(eventType, removed.listener, removed.id);
+        if (removeListener) {
+          removeListener.emit(eventType, removed.listener, removed.id)
         }
       }
     },
 
-    listeners: function(){
+    listeners: function () {
       // differs from Node EventEmitter: returns list, not array
-      return listenerList;
+      return listenerList
     },
 
-    hasListener: function(listenerId){
-      var test = listenerId? hasId(listenerId) : always;
+    hasListener: function (listenerId) {
+      var test = listenerId ? hasId(listenerId) : always
 
-      return defined(first( test, listenerTupleList));
+      return defined(first(test, listenerTupleList))
     }
-  };
+  }
 }
-  
-export { singleEventPubSub };
+
+export { singleEventPubSub }
