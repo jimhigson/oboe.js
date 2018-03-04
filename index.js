@@ -1,3 +1,3 @@
-var oboe = require('./dist/oboe-node');
+var oboe = require('./dist/oboe-node')
 
-module.exports = oboe;
+module.exports = oboe
