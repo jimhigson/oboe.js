@@ -14,7 +14,7 @@ function isCrossOrigin (pageLocation, ajaxHost) {
     * Returns undefined otherwise.
     */
   function defaultPort (protocol) {
-    return {'http:': 80, 'https:': 443}[protocol]
+    return { 'http:': 80, 'https:': 443 }[protocol]
   }
 
   function portOf (location) {
@@ -29,8 +29,8 @@ function isCrossOrigin (pageLocation, ajaxHost) {
   // it can't give a port but not a domain
 
   return !!((ajaxHost.protocol && (ajaxHost.protocol != pageLocation.protocol)) ||
-               (ajaxHost.host && (ajaxHost.host != pageLocation.host)) ||
-               (ajaxHost.host && (portOf(ajaxHost) != portOf(pageLocation)))
+    (ajaxHost.host && (ajaxHost.host != pageLocation.host)) ||
+    (ajaxHost.host && (portOf(ajaxHost) != portOf(pageLocation)))
   )
 }
 
@@ -48,13 +48,13 @@ function parseUrlOrigin (url) {
   //
   // can ignore everything after that
 
-  var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/,
+  var URL_HOST_PATTERN = /(\w+:)?(?:\/\/)([\w.-]+)?(?::(\d+))?\/?/
 
-    // if no match, use an empty array so that
-    // subexpressions 1,2,3 are all undefined
-    // and will ultimately return all empty
-    // strings as the parse result:
-    urlHostMatch = URL_HOST_PATTERN.exec(url) || []
+  // if no match, use an empty array so that
+  // subexpressions 1,2,3 are all undefined
+  // and will ultimately return all empty
+  // strings as the parse result:
+  var urlHostMatch = URL_HOST_PATTERN.exec(url) || []
 
   return {
     protocol: urlHostMatch[1] || '',

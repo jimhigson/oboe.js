@@ -31,10 +31,10 @@ function httpTransport () {
 function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredentials) {
   'use strict'
 
-  var emitStreamData = oboeBus(STREAM_DATA).emit,
-    emitFail = oboeBus(FAIL_EVENT).emit,
-    numberOfCharsAlreadyGivenToCallback = 0,
-    stillToSendStartEvent = true
+  var emitStreamData = oboeBus(STREAM_DATA).emit
+  var emitFail = oboeBus(FAIL_EVENT).emit
+  var numberOfCharsAlreadyGivenToCallback = 0
+  var stillToSendStartEvent = true
 
   // When an ABORTING message is put on the event bus abort
   // the ajax request
@@ -52,14 +52,14 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
     * the progress event or the request being complete.
     */
   function handleProgress () {
-    var textSoFar = xhr.responseText,
-      newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback)
+    var textSoFar = xhr.responseText
+    var newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback)
 
-      /* Raise the event for new text.
+    /* Raise the event for new text.
 
-         On older browsers, the new text is the whole response.
-         On newer/better ones, the fragment part that we got since
-         last progress. */
+       On older browsers, the new text is the whole response.
+       On newer/better ones, the fragment part that we got since
+       last progress. */
 
     if (newText) {
       emitStreamData(newText)

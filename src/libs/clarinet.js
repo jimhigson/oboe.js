@@ -24,57 +24,56 @@ import { SAX_KEY, SAX_VALUE_OPEN, SAX_VALUE_CLOSE, FAIL_EVENT, STREAM_DATA, STRE
 function clarinet (eventBus) {
   'use strict'
 
-  var
-    // shortcut some events on the bus
-    emitSaxKey = eventBus(SAX_KEY).emit,
-    emitValueOpen = eventBus(SAX_VALUE_OPEN).emit,
-    emitValueClose = eventBus(SAX_VALUE_CLOSE).emit,
-    emitFail = eventBus(FAIL_EVENT).emit,
+  // shortcut some events on the bus
+  var emitSaxKey = eventBus(SAX_KEY).emit
+  var emitValueOpen = eventBus(SAX_VALUE_OPEN).emit
+  var emitValueClose = eventBus(SAX_VALUE_CLOSE).emit
+  var emitFail = eventBus(FAIL_EVENT).emit
 
-    MAX_BUFFER_LENGTH = 64 * 1024,
-    stringTokenPattern = /[\\"\n]/g,
-    _n = 0,
+  var MAX_BUFFER_LENGTH = 64 * 1024
+  var stringTokenPattern = /[\\"\n]/g
+  var _n = 0
 
-    // states
-    BEGIN = _n++,
-    VALUE = _n++, // general stuff
-    OPEN_OBJECT = _n++, // {
-    CLOSE_OBJECT = _n++, // }
-    OPEN_ARRAY = _n++, // [
-    CLOSE_ARRAY = _n++, // ]
-    STRING = _n++, // ""
-    OPEN_KEY = _n++, // , "a"
-    CLOSE_KEY = _n++, // :
-    TRUE = _n++, // r
-    TRUE2 = _n++, // u
-    TRUE3 = _n++, // e
-    FALSE = _n++, // a
-    FALSE2 = _n++, // l
-    FALSE3 = _n++, // s
-    FALSE4 = _n++, // e
-    NULL = _n++, // u
-    NULL2 = _n++, // l
-    NULL3 = _n++, // l
-    NUMBER_DECIMAL_POINT = _n++, // .
-    NUMBER_DIGIT = _n, // [0-9]
+  // states
+  var BEGIN = _n++
+  var VALUE = _n++ // general stuff
+  var OPEN_OBJECT = _n++ // {
+  var CLOSE_OBJECT = _n++ // }
+  var OPEN_ARRAY = _n++ // [
+  var CLOSE_ARRAY = _n++ // ]
+  var STRING = _n++ // ""
+  var OPEN_KEY = _n++ // , "a"
+  var CLOSE_KEY = _n++ // :
+  var TRUE = _n++ // r
+  var TRUE2 = _n++ // u
+  var TRUE3 = _n++ // e
+  var FALSE = _n++ // a
+  var FALSE2 = _n++ // l
+  var FALSE3 = _n++ // s
+  var FALSE4 = _n++ // e
+  var NULL = _n++ // u
+  var NULL2 = _n++ // l
+  var NULL3 = _n++ // l
+  var NUMBER_DECIMAL_POINT = _n++ // .
+  var NUMBER_DIGIT = _n // [0-9]
 
-    // setup initial parser values
-    bufferCheckPosition = MAX_BUFFER_LENGTH,
-    latestError,
-    c,
-    p,
-    textNode = undefined,
-    numberNode = '',
-    slashed = false,
-    closed = false,
-    state = BEGIN,
-    stack = [],
-    unicodeS = null,
-    unicodeI = 0,
-    depth = 0,
-    position = 0,
-    column = 0, // mostly for error reporting
-    line = 1
+  // setup initial parser values
+  var bufferCheckPosition = MAX_BUFFER_LENGTH
+  var latestError
+  var c
+  var p
+  var textNode
+  var numberNode = ''
+  var slashed = false
+  var closed = false
+  var state = BEGIN
+  var stack = []
+  var unicodeS = null
+  var unicodeI = 0
+  var depth = 0
+  var position = 0
+  var column = 0 // mostly for error reporting
+  var line = 1
 
   function checkBufferLength () {
     var maxActual = 0
@@ -89,7 +88,7 @@ function clarinet (eventBus) {
     }
 
     bufferCheckPosition = (MAX_BUFFER_LENGTH - maxActual) +
-                               position
+      position
   }
 
   eventBus(STREAM_DATA).on(handleData)
@@ -107,8 +106,8 @@ function clarinet (eventBus) {
     }
 
     latestError = Error(errorString + '\nLn: ' + line +
-                                       '\nCol: ' + column +
-                                       '\nChr: ' + c)
+      '\nCol: ' + column +
+      '\nChr: ' + c)
 
     emitFail(errorReport(undefined, undefined, latestError))
   }
@@ -443,7 +442,7 @@ function clarinet (eventBus) {
             numberNode += c
           } else if (c === 'e' || c === 'E') {
             if (numberNode.indexOf('e') !== -1 ||
-               numberNode.indexOf('E') !== -1) { return emitError('Invalid number has two exponential') }
+              numberNode.indexOf('E') !== -1) { return emitError('Invalid number has two exponential') }
             numberNode += c
           } else if (c === '+' || c === '-') {
             if (!(p === 'e' || p === 'E')) { return emitError('Invalid symbol in number') }

@@ -9,12 +9,6 @@ var TIME_BETWEEN_RECORDS = 15
 // 80 records but only every other one has a URL:
 var NUMBER_OF_RECORDS = 80
 
-function sendJsonHeaders (res) {
-  var JSON_MIME_TYPE = 'application/octet-stream'
-  res.setHeader('Content-Type', JSON_MIME_TYPE)
-  res.writeHead(200)
-}
-
 function serveItemList (_req, res) {
   console.log('slow fake db server: send simulated database data')
 
@@ -72,8 +66,8 @@ function serveItem (req, res) {
 }
 
 function routing () {
-  var Router = require('node-simple-router'),
-    router = Router()
+  var Router = require('node-simple-router')
+  var router = Router()
 
   router.get('/db', serveItemList)
   router.get('/item/:id', serveItem)
@@ -81,6 +75,6 @@ function routing () {
   return router
 }
 
-var server = require('http').createServer(routing()).listen(PORT)
+require('http').createServer(routing()).listen(PORT)
 
 console.log('Benchmark server started on port', String(PORT))

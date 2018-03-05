@@ -36,16 +36,17 @@ import { varArgs, apply } from './functional'
  * [1]: http://zvon.org/other/haskell/Outputprelude/uncurry_f.html
  */
 function pubSub () {
-  var singles = {},
-    newListener = newSingle('newListener'),
-    removeListener = newSingle('removeListener')
+  var singles = {}
+  var newListener = newSingle('newListener')
+  var removeListener = newSingle('removeListener')
 
   function newSingle (eventName) {
-    return singles[eventName] = singleEventPubSub(
+    singles[eventName] = singleEventPubSub(
       eventName,
       newListener,
       removeListener
     )
+    return singles[eventName]
   }
 
   /** pubSub instances are functions */

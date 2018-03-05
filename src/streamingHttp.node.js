@@ -87,8 +87,8 @@ function streamingHttp (oboeBus, transport, method, contentSource, data, headers
     var req = openUrlAsStream(contentSource)
 
     req.on('response', function (res) {
-      var statusCode = res.statusCode,
-        successful = String(statusCode)[0] == 2
+      var statusCode = res.statusCode
+      var successful = String(statusCode)[0] == 2
 
       oboeBus(HTTP_START).emit(res.statusCode, res.headers)
 

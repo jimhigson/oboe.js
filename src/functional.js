@@ -15,24 +15,24 @@ import { arrayAsList, foldR } from './lists'
  *  // gives "I'm Guybrush Threepwood, a mighty pirate!"
  */
 var partialComplete = varArgs(function (fn, args) {
-    // this isn't the shortest way to write this but it does
-    // avoid creating a new array each time to pass to fn.apply,
-    // otherwise could just call boundArgs.concat(callArgs)
+  // this isn't the shortest way to write this but it does
+  // avoid creating a new array each time to pass to fn.apply,
+  // otherwise could just call boundArgs.concat(callArgs)
 
-    var numBoundArgs = args.length
+  var numBoundArgs = args.length
 
-    return varArgs(function (callArgs) {
-      for (var i = 0; i < callArgs.length; i++) {
-        args[numBoundArgs + i] = callArgs[i]
-      }
+  return varArgs(function (callArgs) {
+    for (var i = 0; i < callArgs.length; i++) {
+      args[numBoundArgs + i] = callArgs[i]
+    }
 
-      args.length = numBoundArgs + callArgs.length
+    args.length = numBoundArgs + callArgs.length
 
-      return fn.apply(this, args)
-    })
-  }),
+    return fn.apply(this, args)
+  })
+})
 
-  /**
+/**
 * Compose zero or more functions:
 *
 *    compose(f1, f2, f3)(x) = f1(f2(f3(x))))
@@ -41,17 +41,17 @@ var partialComplete = varArgs(function (fn, args) {
 *
 *    compose(f1, f2, f3)(x,y) = f1(f2(f3(x,y))))
 */
-  compose = varArgs(function (fns) {
-    var fnsList = arrayAsList(fns)
+var compose = varArgs(function (fns) {
+  var fnsList = arrayAsList(fns)
 
-    function next (params, curFn) {
-      return [apply(params, curFn)]
-    }
+  function next (params, curFn) {
+    return [apply(params, curFn)]
+  }
 
-    return varArgs(function (startParams) {
-      return foldR(next, startParams, fnsList)[0]
-    })
+  return varArgs(function (startParams) {
+    return foldR(next, startParams, fnsList)[0]
   })
+})
 
 /**
 * A more optimised version of compose that takes exactly two functions
@@ -150,8 +150,8 @@ function apply (args, fn) {
 *
 */
 function varArgs (fn) {
-  var numberOfFixedArguments = fn.length - 1,
-    slice = Array.prototype.slice
+  var numberOfFixedArguments = fn.length - 1
+  var slice = Array.prototype.slice
 
   if (numberOfFixedArguments == 0) {
     // an optimised case for when there are no fixed args:
@@ -180,7 +180,7 @@ function varArgs (fn) {
     }
 
     argsHolder[numberOfFixedArguments] =
-       slice.call(arguments, numberOfFixedArguments)
+      slice.call(arguments, numberOfFixedArguments)
 
     return fn.apply(this, argsHolder)
   }
@@ -212,7 +212,7 @@ function lazyIntersection (fn1, fn2) {
 /**
 * A function which does nothing
 */
-function noop () {}
+function noop () { }
 
 /**
 * A function which is always happy

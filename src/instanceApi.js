@@ -11,62 +11,62 @@ import { oboe } from './publicApi'
  *    - the http response header/headers to be read
  */
 function instanceApi (oboeBus, contentSource) {
-  var oboeApi,
-    fullyQualifiedNamePattern = /^(node|path):./,
-    rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND),
-    emitNodeDrop = oboeBus(NODE_DROP).emit,
-    emitNodeSwap = oboeBus(NODE_SWAP).emit,
+  var oboeApi
+  var fullyQualifiedNamePattern = /^(node|path):./
+  var rootNodeFinishedEvent = oboeBus(ROOT_NODE_FOUND)
+  var emitNodeDrop = oboeBus(NODE_DROP).emit
+  var emitNodeSwap = oboeBus(NODE_SWAP).emit
 
-    /**
+  /**
        * Add any kind of listener that the instance api exposes
        */
-    addListener = varArgs(function (eventId, parameters) {
-      if (oboeApi[eventId]) {
-        // for events added as .on(event, callback), if there is a
-        // .event() equivalent with special behaviour , pass through
-        // to that:
-        apply(parameters, oboeApi[eventId])
+  var addListener = varArgs(function (eventId, parameters) {
+    if (oboeApi[eventId]) {
+      // for events added as .on(event, callback), if there is a
+      // .event() equivalent with special behaviour , pass through
+      // to that:
+      apply(parameters, oboeApi[eventId])
+    } else {
+      // we have a standard Node.js EventEmitter 2-argument call.
+      // The first parameter is the listener.
+      var event = oboeBus(eventId)
+      var listener = parameters[0]
+
+      if (fullyQualifiedNamePattern.test(eventId)) {
+        // allow fully-qualified node/path listeners
+        // to be added
+        addForgettableCallback(event, listener)
       } else {
-        // we have a standard Node.js EventEmitter 2-argument call.
-        // The first parameter is the listener.
-        var event = oboeBus(eventId),
-          listener = parameters[0]
-
-        if (fullyQualifiedNamePattern.test(eventId)) {
-          // allow fully-qualified node/path listeners
-          // to be added
-          addForgettableCallback(event, listener)
-        } else {
-          // the event has no special handling, pass through
-          // directly onto the event bus:
-          event.on(listener)
-        }
+        // the event has no special handling, pass through
+        // directly onto the event bus:
+        event.on(listener)
       }
+    }
 
-      return oboeApi // chaining
-    }),
+    return oboeApi // chaining
+  })
 
-    /**
+  /**
        * Remove any kind of listener that the instance api exposes
        */
-    removeListener = function (eventId, p2, p3) {
-      if (eventId == 'done') {
-        rootNodeFinishedEvent.un(p2)
-      } else if (eventId == 'node' || eventId == 'path') {
-        // allow removal of node and path
-        oboeBus.un(eventId + ':' + p2, p3)
-      } else {
-        // we have a standard Node.js EventEmitter 2-argument call.
-        // The second parameter is the listener. This may be a call
-        // to remove a fully-qualified node/path listener but requires
-        // no special handling
-        var listener = p2
+  var removeListener = function (eventId, p2, p3) {
+    if (eventId == 'done') {
+      rootNodeFinishedEvent.un(p2)
+    } else if (eventId == 'node' || eventId == 'path') {
+      // allow removal of node and path
+      oboeBus.un(eventId + ':' + p2, p3)
+    } else {
+      // we have a standard Node.js EventEmitter 2-argument call.
+      // The second parameter is the listener. This may be a call
+      // to remove a fully-qualified node/path listener but requires
+      // no special handling
+      var listener = p2
 
-        oboeBus(eventId).un(listener)
-      }
-
-      return oboeApi // chaining
+      oboeBus(eventId).un(listener)
     }
+
+    return oboeApi // chaining
+  }
 
   /**
    * Add a callback, wrapped in a try/catch so as to not break the
@@ -210,7 +210,7 @@ function instanceApi (oboeBus, contentSource) {
    * Construct and return the public API of the Oboe instance to be
    * returned to the calling application
    */
-  return oboeApi = {
+  oboeApi = {
     on: addListener,
     addListener: addListener,
     removeListener: removeListener,
@@ -235,6 +235,8 @@ function instanceApi (oboeBus, contentSource) {
 
     source: contentSource
   }
+
+  return oboeApi
 }
 
 export {

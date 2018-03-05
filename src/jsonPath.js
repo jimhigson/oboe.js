@@ -28,8 +28,8 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
   var NAME_INDEX = 2
   var FIELD_LIST_INDEX = 3
 
-  var headKey = compose2(keyOf, head),
-    headNode = compose2(nodeOf, head)
+  var headKey = compose2(keyOf, head)
+  var headNode = compose2(nodeOf, head)
 
   /**
     * Create an evaluator function for a named path node, expressed in the
@@ -39,11 +39,11 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     *    [2]
     */
   function nameClause (previousExpr, detection) {
-    var name = detection[NAME_INDEX],
+    var name = detection[NAME_INDEX]
 
-      matchesName = (!name || name == '*')
-        ? always
-        : function (ascent) { return headKey(ascent) == name }
+    var matchesName = (!name || name == '*')
+      ? always
+      : function (ascent) { return headKey(ascent) == name }
 
     return lazyIntersection(matchesName, previousExpr)
   }
@@ -61,14 +61,14 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     if (!fieldListStr) { return previousExpr } // don't wrap at all, return given expr as-is
 
     var hasAllrequiredFields = partialComplete(
-        hasAllProperties,
-        arrayAsList(fieldListStr.split(/\W+/))
-      ),
+      hasAllProperties,
+      arrayAsList(fieldListStr.split(/\W+/))
+    )
 
-      isMatch = compose2(
-        hasAllrequiredFields,
-        headNode
-      )
+    var isMatch = compose2(
+      hasAllrequiredFields,
+      headNode
+    )
 
     return lazyIntersection(isMatch, previousExpr)
   }
@@ -141,21 +141,20 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
       return always
     }
 
-    var
-      // In JSONPath .. is equivalent to !.. so if .. reaches the root
-      // the match has succeeded. Ie, we might write ..foo or !..foo
-      // and both should match identically.
-      terminalCaseWhenArrivingAtRoot = rootExpr(),
-      terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr,
-      recursiveCase = skip1(function (ascent) {
-        return cases(ascent)
-      }),
+    // In JSONPath .. is equivalent to !.. so if .. reaches the root
+    // the match has succeeded. Ie, we might write ..foo or !..foo
+    // and both should match identically.
+    var terminalCaseWhenArrivingAtRoot = rootExpr()
+    var terminalCaseWhenPreviousExpressionIsSatisfied = previousExpr
+    var recursiveCase = skip1(function (ascent) {
+      return cases(ascent)
+    })
 
-      cases = lazyUnion(
-        terminalCaseWhenArrivingAtRoot
-        , terminalCaseWhenPreviousExpressionIsSatisfied
-        , recursiveCase
-      )
+    var cases = lazyUnion(
+      terminalCaseWhenArrivingAtRoot
+      , terminalCaseWhenPreviousExpressionIsSatisfied
+      , recursiveCase
+    )
 
     return cases
   }
@@ -236,12 +235,12 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
 
     if (detected) {
       var compiledParser = expressionsReader(
-          clauseEvaluatorGenerators,
-          parserGeneratedSoFar,
-          detected
-        ),
+        clauseEvaluatorGenerators,
+        parserGeneratedSoFar,
+        detected
+      )
 
-        remainingUnparsedJsonPath = jsonPath.substr(len(detected[0]))
+      var remainingUnparsedJsonPath = jsonPath.substr(len(detected[0]))
 
       return onSuccess(remainingUnparsedJsonPath, compiledParser)
     }
@@ -339,7 +338,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
       return compileJsonPathToFunction(jsonPath, always)
     } catch (e) {
       throw Error('Could not compile "' + jsonPath +
-                      '" because ' + e.message
+        '" because ' + e.message
       )
     }
   }
