@@ -94,7 +94,7 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
         sendStartIfNotAlready() // if xhr.status hasn't been available yet, it must be NOW, huh IE?
 
         // is this a 2xx http code?
-        var successful = String(xhr.status)[0] == 2
+        var successful = String(xhr.status)[0] === '2'
 
         if (successful) {
           // In Chrome 29 (not 28) no onprogress is emitted when a response

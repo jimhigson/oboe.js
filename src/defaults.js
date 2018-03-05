@@ -25,7 +25,7 @@ function applyDefaults (passthrough, url, httpMethodName, body, headers, withCre
   // support cache busting like jQuery.ajax({cache:false})
   function modifiedUrl (baseUrl, cached) {
     if (cached === false) {
-      if (baseUrl.indexOf('?') == -1) {
+      if (baseUrl.indexOf('?') === -1) {
         baseUrl += '?'
       } else {
         baseUrl += '&'

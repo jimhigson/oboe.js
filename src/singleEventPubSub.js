@@ -25,7 +25,7 @@ function singleEventPubSub (eventType, newListener, removeListener) {
 
   function hasId (id) {
     return function (tuple) {
-      return tuple.id == id
+      return tuple.id === id
     }
   }
 
@@ -71,7 +71,7 @@ function singleEventPubSub (eventType, newListener, removeListener) {
 
       if (removed) {
         listenerList = without(listenerList, function (listener) {
-          return listener == removed.listener
+          return listener === removed.listener
         })
 
         if (removeListener) {

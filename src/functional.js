@@ -153,13 +153,13 @@ function varArgs (fn) {
   var numberOfFixedArguments = fn.length - 1
   var slice = Array.prototype.slice
 
-  if (numberOfFixedArguments == 0) {
+  if (numberOfFixedArguments === 0) {
     // an optimised case for when there are no fixed args:
 
     return function () {
       return fn.call(this, slice.call(arguments))
     }
-  } else if (numberOfFixedArguments == 1) {
+  } else if (numberOfFixedArguments === 1) {
     // an optimised case for when there are is one fixed args:
 
     return function () {

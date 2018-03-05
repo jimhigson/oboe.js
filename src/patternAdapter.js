@@ -80,7 +80,7 @@ function patternAdapter (oboeBus, jsonPathCompiler) {
       // if the fully qualified match event listener is later removed, clean up
       // by removing the underlying listener if it was the last using that pattern:
 
-      if (removedEventName == fullEventName) {
+      if (removedEventName === fullEventName) {
         if (!oboeBus(removedEventName).listeners()) {
           predicateEvent.un(fullEventName)
         }

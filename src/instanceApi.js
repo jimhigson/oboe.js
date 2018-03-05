@@ -50,9 +50,9 @@ function instanceApi (oboeBus, contentSource) {
        * Remove any kind of listener that the instance api exposes
        */
   var removeListener = function (eventId, p2, p3) {
-    if (eventId == 'done') {
+    if (eventId === 'done') {
       rootNodeFinishedEvent.un(p2)
-    } else if (eventId == 'node' || eventId == 'path') {
+    } else if (eventId === 'node' || eventId === 'path') {
       // allow removal of node and path
       oboeBus.un(eventId + ':' + p2, p3)
     } else {
@@ -142,7 +142,7 @@ function instanceApi (oboeBus, contentSource) {
       var returnValueFromCallback = callback.apply(this, arguments)
 
       if (defined(returnValueFromCallback)) {
-        if (returnValueFromCallback == oboe.drop) {
+        if (returnValueFromCallback === oboe.drop) {
           emitNodeDrop()
         } else {
           emitNodeSwap(returnValueFromCallback)
@@ -154,7 +154,7 @@ function instanceApi (oboeBus, contentSource) {
   function addSingleNodeOrPathListener (eventId, pattern, callback) {
     var effectiveCallback
 
-    if (eventId == 'node') {
+    if (eventId === 'node') {
       effectiveCallback = wrapCallbackToSwapNodeIfSomethingReturned(callback)
     } else {
       effectiveCallback = callback
