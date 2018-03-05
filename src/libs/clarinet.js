@@ -113,7 +113,7 @@ function clarinet (eventBus) {
   }
 
   function handleStreamEnd () {
-    if (state == BEGIN) {
+    if (state === BEGIN) {
       // Handle the case where the stream closes without ever receiving
       // any input. This isn't an error - response bodies can be blank,
       // particularly for 204 http responses
@@ -146,7 +146,7 @@ function clarinet (eventBus) {
   }
 
   function whitespace (c) {
-    return c == '\r' || c == '\n' || c == ' ' || c == '\t'
+    return c === '\r' || c === '\n' || c === ' ' || c === '\t'
   }
 
   function handleData (chunk) {
@@ -170,7 +170,7 @@ function clarinet (eventBus) {
       if (!c) break
 
       position++
-      if (c == '\n') {
+      if (c === '\n') {
         line++
         column = 0
       } else column++
@@ -301,6 +301,7 @@ function clarinet (eventBus) {
           // thanks thejh, this is an about 50% performance improvement.
           var starti = i - 1
 
+          // eslint-disable-next-line no-labels
           STRING_BIGLOOP: while (true) {
             // zero means "no unicode active". 1-4 mean "parse some more". end after 4.
             while (unicodeI > 0) {
@@ -315,6 +316,7 @@ function clarinet (eventBus) {
                 unicodeI++
               }
               // we can just break here: no stuff we skipped that still has to be sliced out or so
+              // eslint-disable-next-line no-labels
               if (!c) break STRING_BIGLOOP
             }
             if (c === '"' && !slashed) {
