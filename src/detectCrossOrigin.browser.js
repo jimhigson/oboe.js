@@ -21,16 +21,16 @@ function isCrossOrigin (pageLocation, ajaxHost) {
     // pageLocation should always have a protocol. ajaxHost if no port or
     // protocol is specified, should use the port of the containing page
 
-    return location.port || defaultPort(location.protocol || pageLocation.protocol)
+    return String(location.port || defaultPort(location.protocol || pageLocation.protocol))
   }
 
   // if ajaxHost doesn't give a domain, port is the same as pageLocation
   // it can't give a protocol but not a domain
   // it can't give a port but not a domain
 
-  return !!((ajaxHost.protocol && (ajaxHost.protocol != pageLocation.protocol)) ||
-    (ajaxHost.host && (ajaxHost.host != pageLocation.host)) ||
-    (ajaxHost.host && (portOf(ajaxHost) != portOf(pageLocation)))
+  return !!((ajaxHost.protocol && (ajaxHost.protocol !== pageLocation.protocol)) ||
+    (ajaxHost.host && (ajaxHost.host !== pageLocation.host)) ||
+    (ajaxHost.host && (portOf(ajaxHost) !== portOf(pageLocation)))
   )
 }
 
