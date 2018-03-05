@@ -41,9 +41,9 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
   function nameClause (previousExpr, detection) {
     var name = detection[NAME_INDEX]
 
-    var matchesName = (!name || name == '*')
+    var matchesName = (!name || name === '*')
       ? always
-      : function (ascent) { return headKey(ascent) == name }
+      : function (ascent) { return String(headKey(ascent)) === name }
 
     return lazyIntersection(matchesName, previousExpr)
   }
@@ -93,7 +93,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     * Eg, for JSONPath ".foo" we need skip1(nameClause(always, [,'foo']))
     */
   function skip1 (previousExpr) {
-    if (previousExpr == always) {
+    if (previousExpr === always) {
       /* If there is no previous expression this consume command
             is at the start of the jsonPath.
             Since JSONPath specifies what we'd like to find but not
@@ -106,7 +106,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
        *  false otherwise
        */
     function notAtRoot (ascent) {
-      return headKey(ascent) != ROOT_PATH
+      return headKey(ascent) !== ROOT_PATH
     }
 
     return lazyIntersection(
@@ -132,7 +132,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     * a match when given to previousExpr.
     */
   function skipMany (previousExpr) {
-    if (previousExpr == always) {
+    if (previousExpr === always) {
       /* If there is no previous expression this consume command
             is at the start of the jsonPath.
             Since JSONPath specifies what we'd like to find but not
@@ -165,7 +165,7 @@ var jsonPathCompiler = jsonPathSyntax(function (pathNodeSyntax,
     */
   function rootExpr () {
     return function (ascent) {
-      return headKey(ascent) == ROOT_PATH
+      return headKey(ascent) === ROOT_PATH
     }
   }
 
