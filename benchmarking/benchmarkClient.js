@@ -26,10 +26,18 @@ function aggregateWithJsonParse () {
   var getJson = require('get-json')
 
   getJson(DB_URL, function (err, records) {
+    if (err) {
+      console.error(err)
+    }
+
     records.data.forEach(function (record) {
       var url = record.url
 
       getJson(url, function (err, record) {
+        if (err) {
+          console.error(err)
+        }
+
         console.log(record.name)
         console.log(process.memoryUsage().heapUsed)
       })
@@ -62,7 +70,7 @@ function aggregateWithClarinet () {
   })
 
   outerClarinetStream.on('value', function (value) {
-    if (outerKey == 'url') {
+    if (outerKey === 'url') {
       innerRequest(value)
     }
   })
@@ -89,7 +97,7 @@ function aggregateWithClarinet () {
     })
 
     innerClarinetStream.on('value', function (value) {
-      if (innerKey == 'name') {
+      if (innerKey === 'name') {
         console.log(value)
         console.log(process.memoryUsage().heapUsed)
       }

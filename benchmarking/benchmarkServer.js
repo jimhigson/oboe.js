@@ -17,7 +17,7 @@ function serveItemList (_req, res) {
   var i = 0
 
   var inervalId = setInterval(function () {
-    if (i % 2 == 0) {
+    if (i % 2 === 0) {
       res.write(JSON.stringify({
         'id': i,
         'url': 'http://localhost:4444/item/' + i
@@ -28,7 +28,7 @@ function serveItemList (_req, res) {
       }))
     }
 
-    if (i == NUMBER_OF_RECORDS) {
+    if (i === NUMBER_OF_RECORDS) {
       res.end(']}')
 
       clearInterval(inervalId)
