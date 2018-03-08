@@ -110,7 +110,7 @@
       })
 
       // Tests that depend on network connections can be brittle. Skip for now.
-      xit('can read from https', function (done) {
+      it('can read from https', function (done) {
         var callbackSpy = jasmine.createSpy('callbackSpy')
 
         // rather than set up a https server in the tests
@@ -128,7 +128,7 @@
           })
       })
 
-      xit('complains if given a non-http(s) url', function (done) {
+      it('complains if given a non-http(s) url', function () {
         expect(function () {
           oboe('ftp://ftp.mozilla.org/pub/mozilla.org/')
         }).toThrow()
@@ -220,10 +220,9 @@
       }, done, 40 * 1000)
     })
 
-    xit('continues to parse after a callback throws an exception', function (done) {
+    it('continues to parse after a callback throws an exception', function (done) {
       var callbackSpy = jasmine.createSpy('callbackSpy')
 
-      spyOn(globalContext, 'setTimeout')
       oboe(testUrl('static/json/tenRecords.json'))
         .node('{id name}', function () {
           callbackSpy()
@@ -235,13 +234,13 @@
       }, function () {
         expect(globalContext.setTimeout.calls.count()).toEqual(10)
         for (var i = 0; i < 10; i++) {
-          expect(function () {
-            globalContext.setTimeout.calls.argsFor(i)[0]()
-          }).toThrowError('uh oh!')
-          expect(globalContext.setTimeout.calls.argsFor(i)[0]).toThrow('uh oh!')
+          expect(globalContext.setTimeout.calls.argsFor(i)[0]).toThrowError('uh oh!')
         }
         done()
       }, ASYNC_TEST_TIMEOUT)
+
+      // delay spy until after waitsForAndRuns as it calls setTimeout
+      spyOn(globalContext, 'setTimeout')
     })
 
     it('can abort once some data has been found in streamed response', function (done) {
@@ -490,8 +489,8 @@
         })
     })
 
-    xit('emits error on 404 in nodejs style too', function (done) {
-      oboe(testUrl('doesNotExist'))
+    it('emits error on 404 in nodejs style too', function (done) {
+      oboe(testUrl('404json'))
         .on('fail', function (err) {
           expect(err.statusCode).toBe(404)
           expect(err.jsonBody).toEqual({
@@ -535,10 +534,9 @@
         })
     })
 
-    xit('throws done callback errors in a separate event loop', function (done) {
-      var callbackError = new Error('I am a bad callback')
+    it('throws done callback errors in a separate event loop', function (done) {
+      var callbackError = jasmine.createSpy().and.throwError('I am a bad callback')
 
-      spyOn(globalContext, 'setTimeout')
       oboe(testUrl('static/json/firstTenNaturalNumbers.json'))
         .done(callbackError)
 
@@ -548,6 +546,8 @@
         expect(globalContext.setTimeout.calls.mostRecent().args[0]).toThrowError('I am a bad callback')
         done()
       }, ASYNC_TEST_TIMEOUT)
+
+      spyOn(globalContext, 'setTimeout')
     })
 
     it('can load an empty response with 204 status code', function (done) {
@@ -561,14 +561,10 @@
       })
     })
 
-    xit('emits error with incomplete json', function (done) {
+    it('emits error with incomplete json', function (done) {
       oboe(testUrl('static/json/incomplete.json'))
         .fail(function (err) {
-          console.log(err)
-          expect(err.jsonBody).toEqual({
-            found: 'false',
-            errorMessage: 'some error'
-          })
+          expect(err.thrown.message).toMatch('Unexpected end')
           done()
         })
     })
