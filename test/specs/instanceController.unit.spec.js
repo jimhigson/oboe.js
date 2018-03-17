@@ -1,6 +1,4 @@
 
+describe('instance controller', function () {
 
-describe('instance controller',function(){
- 
-
-});
+})

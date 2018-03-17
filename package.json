@@ -16,7 +16,8 @@
     "browser-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
     "node-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "standard": "standard"
   },
   "repository": {
     "type": "git",
@@ -41,7 +42,6 @@
   "devDependencies": {
     "color": "~0.4.4",
     "cors": "~2.1.1",
-    "detect-node": "^2.0.3",
     "doctoc": "~0.4.3",
     "express": "~3.4.3",
     "get-json": "0.0.1",
@@ -71,6 +71,7 @@
     "matchdep": "~0.1.2",
     "request": "2.81.0",
     "sinon": "^2.4.1",
+    "standard": "^11.0.0",
     "uglifyjs-webpack-plugin": "^1.2.1",
     "webpack": "^3.10.0"
   },
@@ -89,6 +90,20 @@
     "categories": [
       "AJAX & Websockets",
       "Parsers & Compilers"
+    ]
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/**",
+      "dist",
+      "test/require",
+      "test/libs/es5-*.js"
+    ],
+    "env": "jasmine",
+    "globals": [
+      "Platform",
+      "crossDomainUrl",
+      "XMLHttpRequest"
     ]
   }
 }
