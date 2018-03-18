@@ -1,3 +1,7 @@
+if (!process.env.CHROME_BIN) {
+  process.env.CHROME_BIN = require('puppeteer').executablePath()
+}
+
 module.exports = function (grunt) {
   function runNpmScript (command, cb) {
     var opts = {
@@ -44,7 +48,18 @@ module.exports = function (grunt) {
         reporters: ['progress'],
 
         // enable / disable colors in the output (reporters and logs)
-        colors: true
+        colors: true,
+
+        customLaunchers: {
+          ChromeHeadlessMemory: {
+            base: 'ChromeHeadless',
+            flags: ['-enable-precise-memory-info']
+
+          }
+        },
+
+        browserDisconnectTimeout: 30000,
+        browserNoActivityTimeout: 30000
       },
 
       'coverage': {
@@ -102,6 +117,11 @@ module.exports = function (grunt) {
         browsers: [],
         singleRun: false,
         background: true
+      },
+
+      'chrome-minified': {
+        browsers: ['ChromeHeadlessMemory'],
+        configFile: 'test/min.conf.js'
       }
     },
 
@@ -245,6 +265,7 @@ module.exports = function (grunt) {
     'browser-build',
     'karma:single-concat',
     'karma:single-minified',
+    'karma:chrome-minified',
     'karma:single-amd'
   ])
 
