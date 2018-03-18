@@ -27,7 +27,7 @@ function aggregateWithJsonParse () {
 
   getJson(DB_URL, function (err, records) {
     if (err) {
-      console.error(err)
+      return console.error(err)
     }
 
     records.data.forEach(function (record) {
@@ -35,7 +35,7 @@ function aggregateWithJsonParse () {
 
       getJson(url, function (err, record) {
         if (err) {
-          console.error(err)
+          return console.error(err)
         }
 
         console.log(record.name)
