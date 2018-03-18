@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = function (config) {
   config.set({
@@ -25,7 +25,7 @@ module.exports = function (config) {
 
       // webpack configuration
       output: {
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
         library: 'oboe'
       },
@@ -48,5 +48,5 @@ module.exports = function (config) {
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
     singleRun: true
-  });
-};
+  })
+}
