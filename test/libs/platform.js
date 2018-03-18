@@ -37,5 +37,25 @@
   Platform.isPhantom = (typeof window !== 'undefined') &&
     (window.navigator.userAgent.indexOf('PhantomJS') !== -1)
 
+  Platform.isChrome = (function isChrome () {
+    var winNav = window.navigator
+    var vendorName = winNav.vendor
+    var isOpera = winNav.userAgent.indexOf('OPR') > -1
+    var isIEedge = winNav.userAgent.indexOf('Edge') > -1
+    var isIOSChrome = winNav.userAgent.match('CriOS')
+
+    if (isIOSChrome) {
+      return true
+    } else if (
+      vendorName === 'Google Inc.' &&
+      isOpera === false &&
+      isIEedge === false
+    ) {
+      return true
+    } else {
+      return false
+    }
+  })()
+
   console.log('platform detection:', Platform)
 })(typeof exports === 'undefined' ? window.Platform = {} : exports)
