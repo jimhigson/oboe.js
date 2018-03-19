@@ -14,7 +14,7 @@ import {
 import { oboe } from '../../src/publicApi';
 
 (function (Platform) {
-  fdescribe('oboe component (no http, content fed in externally)', function () {
+  describe('oboe component (no http, content fed in externally)', function () {
     // Used to spy on global functions like setTimeout
     var globalContext
     if (!Platform.isNode) {
