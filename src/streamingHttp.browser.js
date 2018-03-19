@@ -53,7 +53,7 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
     */
   function handleProgress () {
     var textSoFar = xhr.responseText
-    var newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback)
+    var newText = (' ' + textSoFar.substr(numberOfCharsAlreadyGivenToCallback)).substr(1)
 
     /* Raise the event for new text.
 
@@ -72,26 +72,26 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
     xhr.onprogress = handleProgress
   }
 
-  xhr.onreadystatechange = function () {
-    function sendStartIfNotAlready () {
-      // Internet Explorer is very unreliable as to when xhr.status etc can
-      // be read so has to be protected with try/catch and tried again on
-      // the next readyState if it fails
-      try {
-        stillToSendStartEvent && oboeBus(HTTP_START).emit(
-          xhr.status,
-          parseResponseHeaders(xhr.getAllResponseHeaders()))
-        stillToSendStartEvent = false
-      } catch (e) { /* do nothing, will try again on next readyState */ }
-    }
+  function sendStartIfNotAlready (xhr) {
+    // Internet Explorer is very unreliable as to when xhr.status etc can
+    // be read so has to be protected with try/catch and tried again on
+    // the next readyState if it fails
+    try {
+      stillToSendStartEvent && oboeBus(HTTP_START).emit(
+        xhr.status,
+        parseResponseHeaders(xhr.getAllResponseHeaders()))
+      stillToSendStartEvent = false
+    } catch (e) { /* do nothing, will try again on next readyState */ }
+  }
 
+  xhr.onreadystatechange = function () {
     switch (xhr.readyState) {
       case 2: // HEADERS_RECEIVED
       case 3: // LOADING
-        return sendStartIfNotAlready()
+        return sendStartIfNotAlready(xhr)
 
       case 4: // DONE
-        sendStartIfNotAlready() // if xhr.status hasn't been available yet, it must be NOW, huh IE?
+        sendStartIfNotAlready(xhr) // if xhr.status hasn't been available yet, it must be NOW, huh IE?
 
         // is this a 2xx http code?
         var successful = String(xhr.status)[0] === '2'
