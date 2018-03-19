@@ -102,6 +102,10 @@ module.exports = function (grunt) {
         browsers: [],
         singleRun: false,
         background: true
+      },
+
+      'single-heap': {
+        configFile: 'test/heap.conf.js'
       }
     },
 
