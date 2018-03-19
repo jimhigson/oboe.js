@@ -17,7 +17,8 @@
     "node-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
     "webpack": "webpack",
-    "standard": "standard"
+    "standard": "standard",
+    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build karma:single-heap"
   },
   "repository": {
     "type": "git",
@@ -70,7 +71,6 @@
     "karma-safari-launcher": "1.0.0",
     "karma-webpack": "^2.0.9",
     "matchdep": "~0.1.2",
-    "puppeteer": "^1.2.0",
     "request": "2.81.0",
     "sinon": "^2.4.1",
     "standard": "^11.0.1",
