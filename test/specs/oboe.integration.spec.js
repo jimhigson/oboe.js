@@ -581,46 +581,6 @@
       })
     }
 
-    if (Platform.isChrome) {
-      describe('heap tests', function () {
-        var startingHeap
-        var peakHeap
-
-        beforeEach(function () {
-          startingHeap = window.performance.memory.usedJSHeapSize
-          peakHeap = startingHeap
-        })
-
-        afterEach(function () {
-          console.log('Starting Heap: ', startingHeap)
-          console.log('Peak Heap: ', peakHeap)
-          console.log('Ending Heap: ', window.performance.memory.usedJSHeapSize)
-          expect(((window.performance.memory.usedJSHeapSize - startingHeap) / startingHeap) * 100).toBeLessThan(10)
-        })
-
-        // only run this on node as we don't have the necessary info elsewhere
-        fit('should not grow memory by more than 10% over time', function (done) {
-          var nodes = []
-
-          oboe({
-            url: testUrl('largeResponse?limit=10000')
-          })
-            .on('node:!.*', function (node) {
-              peakHeap = Math.max(peakHeap, window.performance.memory.usedJSHeapSize)
-              nodes.push(node)
-              return oboe.drop
-            })
-            .fail(function (error) {
-              console.error(error.thrown)
-              done(error.thrown)
-            })
-            .done(function (fullResponse) {
-              done()
-            })
-        }, 30000)
-      })
-    }
-
     // This is the equivalent of the old waitsFor/runs syntax
     // which was removed from Jasmine 2
     function waitsForAndRuns (escapeFunction, runFunction, escapeTime) {
