@@ -581,6 +581,19 @@
       })
     }
 
+    describe('when receiving a error response with payload', function () {
+      it('should only call "fail"', function (done) {
+        var doneCallback = jasmine.createSpy('done')
+
+        oboe(testUrl('401withData'))
+          .fail(function () {
+            expect(doneCallback).not.toHaveBeenCalled()
+            done()
+          })
+          .done(doneCallback)
+      })
+    })
+
     // This is the equivalent of the old waitsFor/runs syntax
     // which was removed from Jasmine 2
     function waitsForAndRuns (escapeFunction, runFunction, escapeTime) {

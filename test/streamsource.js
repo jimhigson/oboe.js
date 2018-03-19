@@ -203,6 +203,14 @@ module.exports.start = function (httpPort, grunt) {
       }, 1)
     }
 
+    function serve401withData (req, res) {
+      console.log(401)
+      res.status(401)
+      res.setHeader('content-type', JSON_MIME_TYPE)
+      res.write('{"code":1,"message":"Invalid credentials"}')
+      res.end()
+    }
+
     var app = express()
 
     app.use(cors({
@@ -232,6 +240,7 @@ module.exports.start = function (httpPort, grunt) {
     app.get('/invalidJson', replyWithInvalidJson)
     app.get('/404json', serve404Json)
     app.get('/204noData', serve204Json)
+    app.get('/401withData', serve401withData)
 
     app.get('/largeResponse', serveLargeResponse)
 
