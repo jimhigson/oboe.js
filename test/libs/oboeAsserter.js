@@ -57,6 +57,13 @@ function givenAnOboeInstance (jsonFileName) {
       return this
     }
 
+    this.andWeAreListeningForAnNodeUsingOn = function (pattern, callback, scope) {
+      spiedCallback = callback ? sinon.spy(callback) : sinon.stub()
+
+      oboeInstance.on('node:' + pattern, argumentClone(spiedCallback), scope)
+      return this
+    }
+
     this.andWeHaveAFaultyCallbackListeningFor = function (pattern) {
       spiedCallback = sinon.stub().throws()
 
