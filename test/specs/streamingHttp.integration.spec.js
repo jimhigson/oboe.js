@@ -446,25 +446,6 @@ describe('streaming xhr integration (real http)', function () {
     })
   })
 
-  describe('when the request is unsuccessful', function () {
-    it('should not process the stream', function (done) {
-      var oboeBus = fakePubSub(emittedEvents)
-
-      streamingHttp(
-        oboeBus,
-        httpTransport(),
-        'GET',
-        '/testServer/401withData',
-        null // this is a GET: no data to send
-      )
-
-      waitUntil(FAIL_EVENT).isFiredOn(oboeBus, function () {
-        expect(oboeBus.callCount[STREAM_DATA]).toBe(0)
-        done()
-      })
-    })
-  })
-
   // This is the equivalent of the old waitsFor/runs syntax
   // which was removed from Jasmine 2
   function waitsForAndRuns (escapeFunction, runFunction, escapeTime) {
