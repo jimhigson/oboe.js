@@ -13,6 +13,9 @@ require('color')
 var express = require('express')
 var cors = require('cors')
 var http = require('http')
+var multer = require('multer')
+var storage = multer.memoryStorage()
+var upload = multer({ storage: storage })
 
 var JSON_MIME_TYPE = 'application/octet-stream'
 
@@ -203,6 +206,14 @@ module.exports.start = function (httpPort, grunt) {
       }, 1)
     }
 
+    function acceptFormDataStreamResponse (req, res) {
+      if (!req.file) {
+        res.end('{"error": "No file provided"}')
+      } else {
+        res.end(req.file.buffer)
+      }
+    }
+
     var app = express()
 
     app.use(cors({
@@ -234,6 +245,8 @@ module.exports.start = function (httpPort, grunt) {
     app.get('/204noData', serve204Json)
 
     app.get('/largeResponse', serveLargeResponse)
+
+    app.post('/acceptFormDataStreamResponse', upload.single('file'), acceptFormDataStreamResponse)
 
     return app
   }
