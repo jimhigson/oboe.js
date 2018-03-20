@@ -204,7 +204,6 @@ module.exports.start = function (httpPort, grunt) {
     }
 
     function serve401withData (req, res) {
-      console.log(401)
       res.status(401)
       res.setHeader('content-type', JSON_MIME_TYPE)
       res.write('{"code":1,"message":"Invalid credentials"}')
