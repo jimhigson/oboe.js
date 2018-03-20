@@ -144,6 +144,24 @@ describe('default settings', function () {
     )
   })
 
+  describe('when formData is provided', function () {
+    it('should passed through formData bodies and does not set content-type', function () {
+      var stub = jasmine.createSpy()
+
+      var formData = new FormData()
+
+      applyDefaults(stub, 'http://example.com/oboez', 'POST', formData, undefined, undefined, true)
+
+      expect(stub).toHaveBeenCalledLike(
+        'POST',
+        'http://example.com/oboez',
+        formData,
+        noHeaders,
+        false
+      )
+    })
+  })
+
   beforeEach(function () {
     jasmine.addMatchers(calledLikeMatcher)
   })

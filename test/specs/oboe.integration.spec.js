@@ -575,6 +575,27 @@
 
     if (!Platform.isNode) {
       // only worry about this in the browser
+      describe('when formData is provided', function () {
+        it('should be sent to the server', function (done) {
+          // create blob
+          var formBlob = new Blob(['{"foo":"bar"}'], { type: 'text/json' })
+
+          // add to form data
+          var formData = new FormData()
+          formData.append('file', formBlob)
+
+          // send formData via oboe
+          oboe({
+            method: 'POST',
+            url: testUrl('acceptFormDataStreamResponse'),
+            body: formData
+          })
+            .done(function (response) {
+              expect(response).toEqual({ 'foo': 'bar' })
+              done()
+            })
+        })
+      })
 
       it("hasn't put clarinet in the global namespace", function () {
         expect(window.clarinet).toBeUndefined()

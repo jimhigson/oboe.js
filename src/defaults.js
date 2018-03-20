@@ -9,15 +9,17 @@ function applyDefaults (passthrough, url, httpMethodName, body, headers, withCre
     : {}
 
   if (body) {
-    if (!isString(body)) {
-      // If the body is not a string, stringify it. This allows objects to
-      // be given which will be sent as JSON.
-      body = JSON.stringify(body)
+    if (!(typeof (FormData) !== 'undefined' && body instanceof FormData)) {
+      if (!isString(body)) {
+        // If the body is not a string, stringify it. This allows objects to
+        // be given which will be sent as JSON.
+        body = JSON.stringify(body)
 
-      // Default Content-Type to JSON unless given otherwise.
-      headers['Content-Type'] = headers['Content-Type'] || 'application/json'
+        // Default Content-Type to JSON unless given otherwise.
+        headers['Content-Type'] = headers['Content-Type'] || 'application/json'
+      }
+      headers['Content-Length'] = headers['Content-Length'] || body.length
     }
-    headers['Content-Length'] = headers['Content-Length'] || body.length
   } else {
     body = null
   }
