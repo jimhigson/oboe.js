@@ -236,6 +236,23 @@ function instanceApi (oboeBus, contentSource) {
     source: contentSource
   }
 
+  function unsupportedOperation () {
+    throw new Error('Native Promises are not available and no Promise Library, via oboe.Promise, has been provided. Promise API cannot be supported.')
+  }
+
+  if (oboe.Promise || (typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1)) {
+    var promise = new (oboe.Promise || Promise)(function (resolve, reject) {
+      partialComplete(addForgettableCallback, rootNodeFinishedEvent)(resolve)
+      oboeBus(FAIL_EVENT).on(reject)
+    })
+
+    oboeApi.then = promise.then.bind(promise)
+    oboeApi.catch = promise.catch.bind(promise)
+  } else {
+    oboeApi.then = unsupportedOperation
+    oboeApi.catch = unsupportedOperation
+  }
+
   return oboeApi
 }
 
