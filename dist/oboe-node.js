@@ -1,5 +1,5 @@
 /*!
- * v2.1.4-32-g21a73e2
+ * v2.1.4-40-g295d630
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2640,12 +2640,12 @@ function clarinet(eventBus) {
             }
             if (c === '"' && !slashed) {
               state = stack.pop() || VALUE;
-              textNode += chunk.substring(starti, i-1);
+              textNode += (' ' + chunk.substring(starti, i-1)).substr(1);
               break;
             }
             if (c === '\\' && !slashed) {
               slashed = true;
-              textNode += chunk.substring(starti, i-1);
+              textNode += (' ' + chunk.substring(starti, i-1)).substr(1);
                c = chunk.charAt(i++);
               if (!c) break;
             }
@@ -2673,13 +2673,13 @@ function clarinet(eventBus) {
             var reResult = stringTokenPattern.exec(chunk);
             if (!reResult) {
               i = chunk.length+1;
-              textNode += chunk.substring(starti, i-1);
+              textNode += (' ' + chunk.substring(starti, i-1)).substr(1);
               break;
             }
             i = reResult.index+1;
             c = chunk.charAt(reResult.index);
             if (!c) {
-              textNode += chunk.substring(starti, i-1);
+              textNode += (' ' + chunk.substring(starti, i-1)).substr(1);
               break;
             }
           }

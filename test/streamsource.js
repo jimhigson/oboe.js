@@ -50,8 +50,8 @@ module.exports.start = function (httpPort, grunt) {
 
       verboseLog(
         'slow number server: will write numbers 0 ..' +
-               String(MAX_NUMBER).blue +
-               ' out as a json array at a rate of one per',
+        String(MAX_NUMBER).blue +
+        ' out as a json array at a rate of one per',
         String(NUMBER_INTERVAL).blue + 'ms'
       )
 
@@ -105,7 +105,7 @@ module.exports.start = function (httpPort, grunt) {
       require('fs').createReadStream(filename)
         .on('error', function (err) {
           errorLog('could not read static file ' + filename +
-                  ' ' + err)
+            ' ' + err)
         }).pipe(res)
     }
 
@@ -169,6 +169,47 @@ module.exports.start = function (httpPort, grunt) {
         })
     }
 
+    function serveLargeResponse (req, res) {
+      var limit = parseInt(req.query.limit, 10)
+      var dataLength = 2 // for []
+      var i = 0
+
+      var sendEventToClient = function (event) {
+        var data = (i > 1 ? ',' : '') + JSON.stringify(event)
+        dataLength += data.length
+        res.write(data)
+      }
+
+      req.setTimeout(0)
+      res.setTimeout(0)
+
+      res.writeHead(200, {
+        'content-type': 'application/json'
+      })
+      res.write('[')
+
+      var timer = setInterval(function () {
+        if (i >= limit) {
+          clearInterval(timer)
+          console.log('Sent ' + i + ' events. Length ' + dataLength)
+          res.end(']')
+        } else {
+          sendEventToClient({
+            foo: 'barbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbarbar',
+            bar: 'bazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbaz',
+            counter: i++
+          })
+        }
+      }, 1)
+    }
+
+    function serve401withData (req, res) {
+      res.status(401)
+      res.setHeader('content-type', JSON_MIME_TYPE)
+      res.write('{"code":1,"message":"Invalid credentials"}')
+      res.end()
+    }
+
     var app = express()
 
     app.use(cors({
@@ -198,6 +239,9 @@ module.exports.start = function (httpPort, grunt) {
     app.get('/invalidJson', replyWithInvalidJson)
     app.get('/404json', serve404Json)
     app.get('/204noData', serve204Json)
+    app.get('/401withData', serve401withData)
+
+    app.get('/largeResponse', serveLargeResponse)
 
     return app
   }

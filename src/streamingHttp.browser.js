@@ -52,46 +52,48 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
     * the progress event or the request being complete.
     */
   function handleProgress () {
-    var textSoFar = xhr.responseText
-    var newText = textSoFar.substr(numberOfCharsAlreadyGivenToCallback)
+    if (String(xhr.status)[0] === '2') {
+      var textSoFar = xhr.responseText
+      var newText = (' ' + textSoFar.substr(numberOfCharsAlreadyGivenToCallback)).substr(1)
 
-    /* Raise the event for new text.
+      /* Raise the event for new text.
 
        On older browsers, the new text is the whole response.
        On newer/better ones, the fragment part that we got since
        last progress. */
 
-    if (newText) {
-      emitStreamData(newText)
-    }
+      if (newText) {
+        emitStreamData(newText)
+      }
 
-    numberOfCharsAlreadyGivenToCallback = len(textSoFar)
+      numberOfCharsAlreadyGivenToCallback = len(textSoFar)
+    }
   }
 
   if ('onprogress' in xhr) { // detect browser support for progressive delivery
     xhr.onprogress = handleProgress
   }
 
-  xhr.onreadystatechange = function () {
-    function sendStartIfNotAlready () {
-      // Internet Explorer is very unreliable as to when xhr.status etc can
-      // be read so has to be protected with try/catch and tried again on
-      // the next readyState if it fails
-      try {
-        stillToSendStartEvent && oboeBus(HTTP_START).emit(
-          xhr.status,
-          parseResponseHeaders(xhr.getAllResponseHeaders()))
-        stillToSendStartEvent = false
-      } catch (e) { /* do nothing, will try again on next readyState */ }
-    }
+  function sendStartIfNotAlready (xhr) {
+    // Internet Explorer is very unreliable as to when xhr.status etc can
+    // be read so has to be protected with try/catch and tried again on
+    // the next readyState if it fails
+    try {
+      stillToSendStartEvent && oboeBus(HTTP_START).emit(
+        xhr.status,
+        parseResponseHeaders(xhr.getAllResponseHeaders()))
+      stillToSendStartEvent = false
+    } catch (e) { /* do nothing, will try again on next readyState */ }
+  }
 
+  xhr.onreadystatechange = function () {
     switch (xhr.readyState) {
       case 2: // HEADERS_RECEIVED
       case 3: // LOADING
-        return sendStartIfNotAlready()
+        return sendStartIfNotAlready(xhr)
 
       case 4: // DONE
-        sendStartIfNotAlready() // if xhr.status hasn't been available yet, it must be NOW, huh IE?
+        sendStartIfNotAlready(xhr) // if xhr.status hasn't been available yet, it must be NOW, huh IE?
 
         // is this a 2xx http code?
         var successful = String(xhr.status)[0] === '2'
