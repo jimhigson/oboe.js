@@ -1457,7 +1457,7 @@ import { oboe } from '../../src/publicApi';
           }
 
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('!.*', function (number) {
+            .andWeAreListeningForANodeUsingOn('!.*', function (number) {
               if (isEven(number)) {
                 return oboe.drop
               }
@@ -1471,7 +1471,7 @@ import { oboe } from '../../src/publicApi';
 
         it('can drop from an object', function () {
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('!.*', function notDrinking (course) {
+            .andWeAreListeningForANodeUsingOn('!.*', function notDrinking (course) {
               if (course === 'wine') {
                 return oboe.drop
               }
@@ -1493,7 +1493,7 @@ import { oboe } from '../../src/publicApi';
 
         it('can drop from an object using short-form', function () {
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('starter', oboe.drop)
+            .andWeAreListeningForANodeUsingOn('starter', oboe.drop)
             .whenGivenInput({
               starter: 'soup',
               main: 'fish',
@@ -1599,7 +1599,7 @@ import { oboe } from '../../src/publicApi';
       describe('when using "on"', function () {
         it('can selectively drop objects from an array', function () {
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('!.*', function (obj) {
+            .andWeAreListeningForANodeUsingOn('!.*', function (obj) {
               if (obj.nullfily) {
                 return null
               }
@@ -1622,7 +1622,7 @@ import { oboe } from '../../src/publicApi';
 
         it('can replace objects found in an object', function () {
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('{replace}', function (obj) {
+            .andWeAreListeningForANodeUsingOn('{replace}', function (obj) {
               return { replaced: true }
             })
             .whenGivenInput({
@@ -1647,7 +1647,7 @@ import { oboe } from '../../src/publicApi';
           }
 
           givenAnOboeInstance()
-            .andWeAreListeningForAnNodeUsingOn('*', function (number) {
+            .andWeAreListeningForANodeUsingOn('*', function (number) {
               if (isEven(number)) {
                 return number * 2
               }
