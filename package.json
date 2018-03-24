@@ -18,7 +18,7 @@
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
     "webpack": "webpack",
     "standard": "standard",
-    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build karma:single-heap"
+    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-heap"
   },
   "repository": {
     "type": "git",

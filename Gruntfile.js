@@ -211,6 +211,15 @@ module.exports = function (grunt) {
     autoStartBrowsers.push('PhantomJS')
   })
 
+  grunt.registerTask('headless-chrome-mode', function () {
+    if (!process.env.CHROME_BIN) {
+      process.env.CHROME_BIN = require('puppeteer').executablePath()
+    }
+
+    autoStartBrowsers.length = 0
+    autoStartBrowsers.push('ChromeHeadless')
+  })
+
   grunt.registerTask('test-start-server', [
     'karma:persist'
   ])
