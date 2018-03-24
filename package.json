@@ -18,7 +18,8 @@
     "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
     "webpack": "webpack",
     "standard": "standard",
-    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-heap"
+    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-heap",
+    "test-fetch": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-browser-http"
   },
   "repository": {
     "type": "git",
@@ -105,7 +106,12 @@
     "globals": [
       "Platform",
       "crossDomainUrl",
-      "XMLHttpRequest"
+      "XMLHttpRequest",
+      "fetch",
+      "self",
+      "Headers",
+      "TextDecoder",
+      "Uint8Array"
     ]
   }
 }
