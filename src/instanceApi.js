@@ -35,7 +35,7 @@ function instanceApi (oboeBus, contentSource) {
       if (fullyQualifiedNamePattern.test(eventId)) {
         // allow fully-qualified node/path listeners
         // to be added
-        addForgettableCallback(event, listener)
+        addForgettableCallback(event, wrapCallbackToSwapNodeIfSomethingReturned(listener))
       } else {
         // the event has no special handling, pass through
         // directly onto the event bus:

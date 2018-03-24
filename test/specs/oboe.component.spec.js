@@ -1449,6 +1449,66 @@ import { oboe } from '../../src/publicApi';
             })
           )
       })
+
+      describe('when using "on"', function () {
+        it('drops from an array leaving holes', function () {
+          function isEven (n) {
+            return (n % 2) === 0
+          }
+
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('!.*', function (number) {
+              if (isEven(number)) {
+                return oboe.drop
+              }
+            })
+            .whenGivenInput([1, 2, 3, 4, 5, 6, 7])
+            .thenTheInstance(
+              // note holes in array!
+              hasRootJson([1, , 3, , 5, , 7]) // eslint-disable-line no-sparse-arrays
+            )
+        })
+
+        it('can drop from an object', function () {
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('!.*', function notDrinking (course) {
+              if (course === 'wine') {
+                return oboe.drop
+              }
+            })
+            .whenGivenInput({
+              starter: 'soup',
+              main: 'fish',
+              desert: 'fresh cheesecake',
+              drink: 'wine'
+            })
+            .thenTheInstance(
+              hasRootJson({
+                starter: 'soup',
+                main: 'fish',
+                desert: 'fresh cheesecake'
+              })
+            )
+        })
+
+        it('can drop from an object using short-form', function () {
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('starter', oboe.drop)
+            .whenGivenInput({
+              starter: 'soup',
+              main: 'fish',
+              desert: 'fresh cheesecake',
+              drink: 'wine'
+            })
+            .thenTheInstance(
+              hasRootJson({
+                main: 'fish',
+                desert: 'fresh cheesecake',
+                drink: 'wine'
+              })
+            )
+        })
+      })
     })
 
     describe('swapping out nodes', function () {
@@ -1534,6 +1594,71 @@ import { oboe } from '../../src/publicApi';
             // not the whole ten.
             hasRootJson([1, 4, 3, 8, 5])
           )
+      })
+
+      describe('when using "on"', function () {
+        it('can selectively drop objects from an array', function () {
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('!.*', function (obj) {
+              if (obj.nullfily) {
+                return null
+              }
+            })
+            .whenGivenInput([
+              { nullfily: true },
+              { keep: true },
+              { nullfily: true }
+            ])
+            .thenTheInstance(
+              // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+              // not the whole ten.
+              hasRootJson([
+                null,
+                { keep: true },
+                null
+              ])
+            )
+        })
+
+        it('can replace objects found in an object', function () {
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('{replace}', function (obj) {
+              return { replaced: true }
+            })
+            .whenGivenInput({
+              a: { replace: true },
+              b: { keep: true },
+              c: { replace: true }
+            })
+            .thenTheInstance(
+              // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+              // not the whole ten.
+              hasRootJson({
+                a: { replaced: true },
+                b: { keep: true },
+                c: { replaced: true }
+              })
+            )
+        })
+
+        it('can transform scalar values', function () {
+          function isEven (n) {
+            return (n % 2) === 0
+          }
+
+          givenAnOboeInstance()
+            .andWeAreListeningForANodeUsingOn('*', function (number) {
+              if (isEven(number)) {
+                return number * 2
+              }
+            })
+            .whenGivenInput([1, 2, 3, 4, 5])
+            .thenTheInstance(
+              // because the request was aborted on index array 5, we got 6 numbers (inc zero)
+              // not the whole ten.
+              hasRootJson([1, 4, 3, 8, 5])
+            )
+        })
       })
     })
   })
