@@ -19,7 +19,8 @@
     "webpack": "webpack",
     "standard": "standard",
     "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-heap",
-    "test-fetch": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-browser-http"
+    "test-fetch": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build headless-chrome-mode karma:single-browser-http",
+    "test-chrome-based": "npm run test-heap && npm run test-fetch"
   },
   "repository": {
     "type": "git",
