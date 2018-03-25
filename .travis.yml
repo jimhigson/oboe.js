@@ -13,6 +13,5 @@ jobs:
       node_js: 9
       before_install:
         - npm i puppeteer
-      script: npm run test-heap
-      script: npm run test-fetch
+      script: npm run test-chrome-based
       
