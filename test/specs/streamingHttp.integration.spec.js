@@ -391,8 +391,7 @@ describe('streaming xhr integration (real http)', function () {
       })
     })
 
-    // TODO, this test should work
-    xit('gives multiple callbacks when loading a gzipped streaming resource', function (done) {
+    it('gives multiple callbacks when loading a gzipped streaming resource', function (done) {
       var oboeBus = fakePubSub(emittedEvents)
       streamingHttp(
         oboeBus,
@@ -418,11 +417,10 @@ describe('streaming xhr integration (real http)', function () {
         expect(oboeBus).toHaveGivenStreamEventsInCorrectOrder()
         done()
       })
-    })
+    }, 10000)
   }
 
-  // TODO test should pass
-  xit('does not call back with zero-length bites', function (done) {
+  it('does not call back with zero-length bites', function (done) {
     // since this is a large file, even serving locally we're going to get multiple callbacks:
     var oboeBus = fakePubSub(emittedEvents)
     streamingHttp(
@@ -443,6 +441,8 @@ describe('streaming xhr integration (real http)', function () {
       dripsReceived.forEach(function (drip) {
         expect(drip.length).not.toEqual(0)
       })
+
+      done()
     })
   })
 

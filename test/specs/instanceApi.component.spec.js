@@ -42,7 +42,7 @@ describe('instance api and pattern adaptor composed', function () {
     return ascent
   }
 
-  xit('has chainable methods that don\'t explode', function () {
+  it('has chainable methods that don\'t explode', function () {
     // test that nothing forgot to return 'this':
 
     expect(function () {

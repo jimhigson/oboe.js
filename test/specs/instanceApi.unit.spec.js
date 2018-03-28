@@ -199,41 +199,49 @@ describe('instance api', function () {
       expect(nodeCallback.calls.count()).toBe(1)
     })
 
-    xit('doesn\'t call node callback after callback is removed', function () {
-      var nodeCallback = jasmine.createSpy('node callback')
-      var ascent = list(namedNode('node', {}))
+    describe('after callback is removed', function () {
+      beforeEach(function () {
+        oboeBus.un.and.callThrough()
+      })
 
-      oboeInstance.on('node', 'a_pattern', nodeCallback)
-      oboeInstance.removeListener('node', 'a_pattern', nodeCallback)
+      it('doesn\'t call node callback', function () {
+        var nodeCallback = jasmine.createSpy('node callback')
+        var ascent = list(namedNode('node', {}))
 
-      oboeBus('node:a_pattern').emit({}, ascent)
+        oboeInstance.on('node', 'a_pattern', nodeCallback)
+        oboeInstance.removeListener('node', 'a_pattern', nodeCallback)
 
-      expect(nodeCallback).not.toHaveBeenCalled()
-    })
+        oboeBus('node:a_pattern').emit({}, ascent)
 
-    it('doesn\'t call node callback after callback is removed using 2-arg form', function () {
-      var nodeCallback = jasmine.createSpy('node callback')
-      var ascent = list(namedNode('node', {}))
+        expect(nodeCallback).not.toHaveBeenCalled()
+      })
 
-      // oboeInstance.on('node', 'a_pattern', nodeCallback);
-      oboeInstance.on('node', 'a_pattern', nodeCallback)
-      oboeInstance.removeListener('node:a_pattern', nodeCallback)
+      describe('using 2-arg form', function () {
+        it('doesn\'t call node callback', function () {
+          var nodeCallback = jasmine.createSpy('node callback')
+          var ascent = list(namedNode('node', {}))
 
-      oboeBus('node:a_pattern').emit({}, ascent)
+          // oboeInstance.on('node', 'a_pattern', nodeCallback);
+          oboeInstance.on('node', 'a_pattern', nodeCallback)
+          oboeInstance.removeListener('node:a_pattern', nodeCallback)
 
-      expect(nodeCallback).not.toHaveBeenCalled()
-    })
+          oboeBus('node:a_pattern').emit({}, ascent)
 
-    xit('doesn\'t call path callback after callback is removed', function () {
-      var pathCallback = jasmine.createSpy('path callback')
-      var ascent = list(namedNode('path', {}))
+          expect(nodeCallback).not.toHaveBeenCalled()
+        })
+      })
 
-      oboeInstance.on('path', 'a_pattern', pathCallback)
-      oboeInstance.removeListener('path', 'a_pattern', pathCallback)
+      it('doesn\'t call path callback', function () {
+        var pathCallback = jasmine.createSpy('path callback')
+        var ascent = list(namedNode('path', {}))
 
-      oboeBus('path:a_pattern').emit({}, ascent)
+        oboeInstance.on('path', 'a_pattern', pathCallback)
+        oboeInstance.removeListener('path', 'a_pattern', pathCallback)
 
-      expect(pathCallback).not.toHaveBeenCalled()
+        oboeBus('path:a_pattern').emit({}, ascent)
+
+        expect(pathCallback).not.toHaveBeenCalled()
+      })
     })
 
     it('doesn\'t call path callback after callback is removed using 2-arg form', function () {
@@ -493,7 +501,12 @@ describe('instance api', function () {
     })
   })
 
-  xdescribe('unknown event types', function () {
+  describe('unknown event types', function () {
+    beforeEach(function () {
+      oboeBus.emit.and.callThrough()
+      oboeBus.on.and.callThrough()
+    })
+
     it('can be added and fired', function () {
       var spy1 = jasmine.createSpy('xyzzy callback')
       var spy2 = jasmine.createSpy('end of universe callback')

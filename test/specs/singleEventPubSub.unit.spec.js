@@ -15,7 +15,7 @@ describe('single event pub sub', function () {
             var filtered = actual.filter(function (item, i) {
               var match = expected[i]
               // deep compare lists
-              if (item.length) {
+              if (item && item.length) {
                 var subFiltered = item.filter(function (subItem, subI) {
                   return subItem === match[subI]
                 })
@@ -32,7 +32,7 @@ describe('single event pub sub', function () {
     })
   })
 
-  xit('is able to subscribe', function () {
+  it('is able to subscribe', function () {
     var events = singleEventPubSub('someEventName')
 
     expect(function () {
@@ -40,7 +40,7 @@ describe('single event pub sub', function () {
     }).not.toThrow()
   })
 
-  xit('is able to notify a subscribed function without an event object', function () {
+  it('is able to notify a subscribed function without an event object', function () {
     var events = singleEventPubSub('someEventName')
     var listener = jasmine.createSpy('listener')
 
@@ -51,7 +51,7 @@ describe('single event pub sub', function () {
     expect(listener).toHaveBeenCalled()
   })
 
-  xit('is able to notify a subscribed function with a event parameter', function () {
+  it('is able to notify a subscribed function with a event parameter', function () {
     var events = singleEventPubSub('someEventName')
     var listener = jasmine.createSpy('listener')
 
@@ -62,7 +62,7 @@ describe('single event pub sub', function () {
     expect(listener).toHaveBeenCalledWith('somethingFunky')
   })
 
-  xit('notifies of new listeners when added without an id', function () {
+  it('notifies of new listeners when added without an id', function () {
     var newListener = singleEventPubSub('newListener')
     var someEventName = singleEventPubSub('someEventName', newListener)
     var listenerListener = jasmine.createSpy('listenerListener')
@@ -73,7 +73,7 @@ describe('single event pub sub', function () {
     expect(listenerListener).toHaveBeenCalledWith('someEventName', noop, noop)
   })
 
-  xit('notifies of new listeners when added with an id', function () {
+  it('notifies of new listeners when added with an id', function () {
     var newListener = singleEventPubSub('newListener')
     var someEventName = singleEventPubSub('someEventName', newListener)
     var listenerListener = jasmine.createSpy('listenerListener')
@@ -84,7 +84,7 @@ describe('single event pub sub', function () {
     expect(listenerListener).toHaveBeenCalledWith('someEventName', noop, 'id1')
   })
 
-  xit('notifies multiple listeners of the same event', function () {
+  it('notifies multiple listeners of the same event', function () {
     var events = singleEventPubSub('someEventName')
     var listenerA = jasmine.createSpy('listenerA')
     var listenerA2 = jasmine.createSpy('listenerA2')
@@ -98,7 +98,7 @@ describe('single event pub sub', function () {
     expect(listenerA2).toHaveBeenCalled()
   })
 
-  xit('can pass through multiple parameters', function () {
+  it('can pass through multiple parameters', function () {
     var events = singleEventPubSub('someEventName')
     var listener = jasmine.createSpy('listener')
 
@@ -109,7 +109,7 @@ describe('single event pub sub', function () {
     expect(listener).toHaveBeenCalledWith('a', 'b', 'c')
   })
 
-  xit('can pass multiple parameters to multiple listeners', function () {
+  it('can pass multiple parameters to multiple listeners', function () {
     var events = singleEventPubSub('someEventName')
     var listener = jasmine.createSpy('listener')
     var listener2 = jasmine.createSpy('listener2')
@@ -123,7 +123,7 @@ describe('single event pub sub', function () {
     expect(listener2).toHaveBeenCalledWith('a', 'b', 'c')
   })
 
-  xit('allows many listeners to be registered for an event', function () {
+  it('allows many listeners to be registered for an event', function () {
     var events = singleEventPubSub('someEventName')
     var listenerA = jasmine.createSpy('listenerA')
 
@@ -140,7 +140,7 @@ describe('single event pub sub', function () {
     expect(listenerA.calls.count()).toBe(30)
   })
 
-  xit('has a chainable on function', function () {
+  it('has a chainable on function', function () {
     var events = singleEventPubSub('someEventName')
     var listenerA = jasmine.createSpy('listenerA')
     var listenerB = jasmine.createSpy('listenerB')
@@ -153,7 +153,7 @@ describe('single event pub sub', function () {
     expect(listenerB).toHaveBeenCalled()
   })
 
-  xit('allows an event to be removed', function () {
+  it('allows an event to be removed', function () {
     var events = singleEventPubSub('someEventName')
     var listener1 = jasmine.createSpy('listener1')
     var listener2 = jasmine.createSpy('listener2')
@@ -173,7 +173,7 @@ describe('single event pub sub', function () {
     expect(listener2.calls.count()).toBe(2)
   })
 
-  xit('allows an event to be removed by an id', function () {
+  it('allows an event to be removed by an id', function () {
     var events = singleEventPubSub('someEventName')
     var listener1 = jasmine.createSpy('listener1')
     var listener2 = jasmine.createSpy('listener2')
@@ -198,7 +198,7 @@ describe('single event pub sub', function () {
     expect(listener2.calls.count()).toBe(2)
   })
 
-  xit('does not fire removeListener if nothing is removed', function () {
+  it('does not fire removeListener if nothing is removed', function () {
     var newListener = singleEventPubSub('newListener')
     var removeListener = singleEventPubSub('removeListener')
     var events = singleEventPubSub('someEventName', newListener, removeListener)
@@ -213,7 +213,7 @@ describe('single event pub sub', function () {
     expect(removeListenerListener).not.toHaveBeenCalled()
   })
 
-  xit('fires removeListener when a listener is removed', function () {
+  it('fires removeListener when a listener is removed', function () {
     var newListener = singleEventPubSub('newListener')
     var removeListener = singleEventPubSub('removeListener')
     var events = singleEventPubSub('someEventName', newListener, removeListener)
@@ -228,7 +228,7 @@ describe('single event pub sub', function () {
     expect(removeListenerListener).toHaveBeenCalled()
   })
 
-  xit('does not crash if asked to emit without listeners', function () {
+  it('does not crash if asked to emit without listeners', function () {
     var events = singleEventPubSub('someEventName')
 
     expect(function () {
@@ -237,18 +237,18 @@ describe('single event pub sub', function () {
   })
 
   describe('listeners method', function () {
-    xit('can return listeners when there haven\'t been any', function () {
+    it('can return listeners when there haven\'t been any', function () {
       var events = singleEventPubSub('someEventName')
 
       expect(events.listeners('testEventType')).toBeFalsy()
     })
 
-    xit('can return listeners when one has been added', function () {
+    it('can return listeners when one has been added', function () {
       var events = singleEventPubSub('someEventName')
 
       events.on(noop)
 
-      expect(events.listeners('testEventType')).toBeList(list(noop))
+      expect(events.listeners('testEventType')).toBeList([noop, undefined])
     })
 
     it('can return listeners when second is added', function () {
@@ -260,17 +260,17 @@ describe('single event pub sub', function () {
       expect(events.listeners('testEventType')).toBeList(list(noop, noop))
     })
 
-    xit('can return listeners when one is removed', function () {
+    it('can return listeners when one is removed', function () {
       var events = singleEventPubSub('someEventName')
 
       events.on(noop)
       events.on(noop)
       events.un(noop)
 
-      expect(events.listeners('testEventType')).toBeList(list(noop))
+      expect(events.listeners('testEventType')).toBeList([noop, undefined])
     })
 
-    xit('can return listeners when all are removed', function () {
+    it('can return listeners when all are removed', function () {
       var events = singleEventPubSub('someEventName')
 
       events.on(noop)
@@ -283,19 +283,19 @@ describe('single event pub sub', function () {
   })
 
   describe('hasListener method', function () {
-    xit('returns false when there are no listeners', function () {
+    it('returns false when there are no listeners', function () {
       var event = singleEventPubSub('someEventName')
 
       expect(event.hasListener()).toBeFalsy()
     })
 
-    xit('returns false for an id when there are no listeners', function () {
+    it('returns false for an id when there are no listeners', function () {
       var event = singleEventPubSub('someEventName')
 
       expect(event.hasListener('some_id')).toBeFalsy()
     })
 
-    xit('returns true for a listener specified as the function', function () {
+    it('returns true for a listener specified as the function', function () {
       function exampleListener () {}
 
       var event = singleEventPubSub('someEventName')
@@ -304,7 +304,7 @@ describe('single event pub sub', function () {
       expect(event.hasListener(exampleListener)).toBeTruthy()
     })
 
-    xit('returns true for a listener specified using an id', function () {
+    it('returns true for a listener specified using an id', function () {
       function exampleListener () {}
 
       var event = singleEventPubSub('someEventName')
@@ -313,7 +313,7 @@ describe('single event pub sub', function () {
       expect(event.hasListener('exampleId')).toBeTruthy()
     })
 
-    xit('returns false given the wrong id', function () {
+    it('returns false given the wrong id', function () {
       function exampleListener () {}
 
       var event = singleEventPubSub('someEventName')
