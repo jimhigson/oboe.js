@@ -6,6 +6,10 @@ node_js:
   - "6"
   - "5"
   - "4"
+before_install:
+  - npm i -g npm@latest
+install:
+  - npm ci
 
 jobs: 
   include:
