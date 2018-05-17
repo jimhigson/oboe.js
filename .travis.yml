@@ -9,8 +9,9 @@ node_js:
 
 jobs: 
   include:
-    - stage: heap
+    - stage: chrome-based-tests
       node_js: 9
       before_install:
         - npm i puppeteer
-      script: npm run test-heap
+      script: npm run test-chrome-based
+      
