@@ -1,178 +1,171 @@
+import { spiedPubSub } from '../libs/spiedPubSub'
+import { instanceApi } from '../../src/instanceApi'
+import { list, head } from '../../src/lists'
+import { patternAdapter } from '../../src/patternAdapter'
+import { namedNode } from '../../src/ascent'
+import { NODE_CLOSED, NODE_OPENED, HTTP_START, ROOT_PATH_FOUND } from '../../src/events'
 
-describe('instance api and pattern adaptor composed',function(){
-  "use strict";
+describe('instance api and pattern adaptor composed', function () {
+  'use strict'
 
-  var bus, api, matches;
+  var bus, api, matches
 
-  beforeEach(function(){
-    bus = spiedPubSub();
+  beforeEach(function () {
+    bus = spiedPubSub()
 
-    matches = {};
+    matches = {}
 
-    function jsonPathCompiler(pattern){
-
-      function compiled ( ascent ){
-        if( matches[pattern] === ascent ) {
-          return head(ascent);
+    function jsonPathCompiler (pattern) {
+      function compiled (ascent) {
+        if (matches[pattern] === ascent) {
+          return head(ascent)
         } else {
-          return false;
+          return false
         }
       }
 
-      return compiled;
+      return compiled
     }
 
-    api = instanceApi(bus);
+    api = instanceApi(bus)
 
     // For now, tie the patternAdapter into the bus. These tests are
     // for the composition between patternAdaptor and instanceApi
-    patternAdapter(bus, jsonPathCompiler);
-  });
+    patternAdapter(bus, jsonPathCompiler)
+  })
 
-  function anAscentMatching(pattern) {
-    var ascent = list(namedNode('node', {}));
+  function anAscentMatching (pattern) {
+    var ascent = list(namedNode('node', {}))
 
-    matches[pattern] = ascent;
+    matches[pattern] = ascent
 
-    return ascent;
+    return ascent
   }
 
-  xit('has chainable methods that don\'t explode',  function() {
+  it('has chainable methods that don\'t explode', function () {
     // test that nothing forgot to return 'this':
 
-    expect(function(){
-      function fn(){}
+    expect(function () {
+      function fn () { }
 
       api
         .path('*', fn)
         .node('*', fn)
         .fail(fn)
-      // fails at this point, fail return undefined
+        // fails at this point, fail return undefined
         .path('*', fn)
-        .path({'*':fn})
-        .node({'*': fn})
+        .path({ '*': fn })
+        .node({ '*': fn })
         .done(fn)
-        .path({'*':fn})
+        .path({ '*': fn })
         .start(fn)
-        .on('path','*', fn)
-        .on('node','*', fn)
+        .on('path', '*', fn)
+        .on('node', '*', fn)
         .fail(fn)
-        .on('path','*', fn)
-        .on('path',{'*':fn})
-        .on('node',{'*': fn})
-        .on('path',{'*':fn})
-        .on('done',fn)
-        .on('start',fn);
-    }).not.toThrow();
-  });
+        .on('path', '*', fn)
+        .on('path', { '*': fn })
+        .on('node', { '*': fn })
+        .on('path', { '*': fn })
+        .on('done', fn)
+        .on('start', fn)
+    }).not.toThrow()
+  })
 
-  describe('header method', function(){
+  describe('header method', function () {
+    it('returns undefined if not available', function () {
+      expect(api.header()).toBeUndefined()
+    })
 
-    it('returns undefined if not available', function() {
+    it('can provide object once available', function () {
+      var headers = { 'x-remainingRequests': 100 }
 
-      expect( api.header() ).toBeUndefined();
-    });
+      bus(HTTP_START).emit(200, headers)
 
-    it('can provide object once available', function() {
+      expect(api.header()).toEqual(headers)
+    })
 
-      var headers = {"x-remainingRequests": 100};
+    it('can provide single header once available', function () {
+      var headers = { 'x-remainingRequests': 100 }
 
-      bus(HTTP_START).emit( 200, headers );
+      bus(HTTP_START).emit(200, headers)
 
-      expect( api.header() ).toEqual(headers);
-    });
+      expect(api.header('x-remainingRequests')).toEqual(100)
+    })
 
-    it('can provide single header once available', function() {
-      var headers = {"x-remainingRequests": 100};
+    it('gives undefined for non-existent single header', function () {
+      var headers = { 'x-remainingRequests': 100 }
 
-      bus(HTTP_START).emit( 200, headers );
+      bus(HTTP_START).emit(200, headers)
 
-      expect( api.header('x-remainingRequests') ).toEqual(100);
-    });
+      expect(api.header('x-remainingBathtubs')).toBeUndefined()
+    })
+  })
 
-    it('gives undefined for non-existent single header', function() {
-      var headers = {"x-remainingRequests": 100};
+  describe('root method', function () {
+    it('returns undefined if not available', function () {
+      expect(api.root()).toBeUndefined()
+    })
 
-      bus(HTTP_START).emit( 200, headers );
+    it('can provide object once available', function () {
+      var root = { I: 'am', the: 'root' }
 
-      expect( api.header('x-remainingBathtubs') ).toBeUndefined();
-    });
-  });
+      bus(ROOT_PATH_FOUND).emit(root)
 
-  describe('root method', function(){
+      expect(api.root()).toEqual(root)
+    })
+  })
 
-    it('returns undefined if not available', function() {
+  describe('node and path callbacks', function () {
+    it('calls node callback on matching node', function () {
+      var callback = jasmine.createSpy('node callback')
+      var ascent = anAscentMatching('a_pattern')
 
-      expect( api.root() ).toBeUndefined();
-    });
-
-    it('can provide object once available', function() {
-
-      var root = {I:'am', the:'root'};
-
-      bus(ROOT_PATH_FOUND).emit(  root);
-
-      expect( api.root() ).toEqual(root);
-    });
-  });
-
-  describe('node and path callbacks', function(){
-    it('calls node callback on matching node', function() {
-
-      var callback = jasmine.createSpy('node callback'),
-          ascent = anAscentMatching('a_pattern');
-
-      api.on('node', 'a_pattern', callback);
+      api.on('node', 'a_pattern', callback)
 
       expect(callback).not.toHaveBeenCalled()
 
-      bus(NODE_CLOSED).emit( ascent)
+      bus(NODE_CLOSED).emit(ascent)
 
       expect(callback).toHaveBeenCalled()
-    });
+    })
 
-    it('calls path callback on matching path', function() {
+    it('calls path callback on matching path', function () {
+      var callback = jasmine.createSpy()
+      var ascent = anAscentMatching('a_pattern')
 
-      var callback = jasmine.createSpy(),
-          ascent = anAscentMatching('a_pattern');
-
-      api.on('path', 'a_pattern', callback);
+      api.on('path', 'a_pattern', callback)
 
       expect(callback).not.toHaveBeenCalled()
 
-      bus(NODE_OPENED).emit( ascent)
+      bus(NODE_OPENED).emit(ascent)
 
       expect(callback).toHaveBeenCalled()
-    });
+    })
 
-    it('does not call node callback on non-matching node', function() {
+    it('does not call node callback on non-matching node', function () {
+      var callback = jasmine.createSpy()
+      var ascent = anAscentMatching('a_pattern')
 
-      var callback = jasmine.createSpy(),
-          ascent = anAscentMatching('a_pattern');
+      api.on('node', 'a_different_pattern', callback)
 
-      api.on('node', 'a_different_pattern', callback);
-
-      bus(NODE_CLOSED).emit( ascent)
+      bus(NODE_CLOSED).emit(ascent)
 
       expect(callback).not.toHaveBeenCalled()
-    });
+    })
 
-    it('calls node callback again on second match', function() {
+    it('calls node callback again on second match', function () {
+      var callback = jasmine.createSpy()
+      var ascent = anAscentMatching('a_pattern')
 
-      var callback = jasmine.createSpy(),
-          ascent = anAscentMatching('a_pattern');
+      api.on('node', 'a_pattern', callback)
 
-      api.on('node', 'a_pattern', callback);
-
-      bus(NODE_CLOSED).emit( ascent)
+      bus(NODE_CLOSED).emit(ascent)
 
       expect(callback.calls.count()).toBe(1)
 
-      bus(NODE_CLOSED).emit( ascent)
+      bus(NODE_CLOSED).emit(ascent)
 
       expect(callback.calls.count()).toBe(2)
-    });
-
-  });
-
-});
+    })
+  })
+})

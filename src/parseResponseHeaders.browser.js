@@ -6,19 +6,20 @@
  * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
  * This method parses that string into a user-friendly key/value pair object.
  */
-function parseResponseHeaders(headerStr) {
-   var headers = {};
-   
-   headerStr && headerStr.split('\u000d\u000a')
-      .forEach(function(headerPair){
-   
-         // Can't use split() here because it does the wrong thing
-         // if the header value has the string ": " in it.
-         var index = headerPair.indexOf('\u003a\u0020');
-         
-         headers[headerPair.substring(0, index)] 
-                     = headerPair.substring(index + 2);
-      });
-   
-   return headers;
+function parseResponseHeaders (headerStr) {
+  var headers = {}
+
+  headerStr && headerStr.split('\u000d\u000a')
+    .forEach(function (headerPair) {
+      // Can't use split() here because it does the wrong thing
+      // if the header value has the string ": " in it.
+      var index = headerPair.indexOf('\u003a\u0020')
+
+      headers[headerPair.substring(0, index)] =
+        headerPair.substring(index + 2)
+    })
+
+  return headers
 }
+
+export { parseResponseHeaders }

@@ -1,53 +1,52 @@
-module.exports = function(config) {
+const path = require('path')
+
+module.exports = function (config) {
   config.set({
 
-    frameworks:['jasmine'],
+    frameworks: ['jasmine'],
 
     // base path, that will be used to resolve files and exclude
-    basePath : '..',
+    basePath: '..',
 
     // list of files / patterns to load in the browser
-    files : [
-      'test/libs/es5-shim.js'
-      ,  'test/libs/es5-sham.js'
-      ,  'src/functional.js'
-      ,  'src/util.js'
-      ,  'src/lists.js'
-      ,  'test/libs/sinon.js'
-      ,  'test/libs/sinon-ie.js'
-      ,  'test/libs/*.js'
-      ,  'src/libs/clarinet.js'
-      ,  'src/ascentManager.js'
-      ,  'src/parseResponseHeaders.browser.js'
-      ,  'src/detectCrossOrigin.browser.js'
-      ,  'src/streamingHttp.browser.js'
-      ,  'src/jsonPathSyntax.js'
-      ,  'src/ascent.js'
-      ,  'src/incrementalContentBuilder.js'
-      ,  'src/jsonPath.js'
-      ,  'src/singleEventPubSub.js'
-      ,  'src/pubSub.js'
-      ,  'src/events.js'
-      ,  'src/patternAdapter.js'
-      ,  'src/instanceApi.js'
-      ,  'src/wire.js'
-      ,  'src/defaults.js'
-      ,  'src/publicApi.js'
-
-      ,  'test/specs/clarinet.unit.spec.js'
-      ,  'test/specs/*.unit.spec.js'
-      ,  'test/specs/*.component.spec.js'
+    files: [
+      'test/test_index.js'
     ],
+
+    preprocessors: {
+      // add webpack as preprocessor
+      'test/test_index.js': ['webpack']
+    },
+
+    webpack: {
+      // karma watches the test entry points
+      // (you don't need to specify the entry option)
+      // webpack watches dependencies
+
+      // webpack configuration
+      output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bundle.js',
+        library: 'oboe'
+      },
+
+      resolve: {
+        alias: {
+          './defaults': path.resolve(__dirname, './mocks/defaults.js'),
+          './wire': path.resolve(__dirname, './mocks/wire.js')
+        }
+      }
+    },
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-    logLevel : config.LOG_INFO,
+    logLevel: config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch : false,
+    autoWatch: false,
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun : true
-  });
-};
+    singleRun: true
+  })
+}

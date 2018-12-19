@@ -1,152 +1,150 @@
-describe('default settings', function(){
-   
-   var noBody = null,
-       noHeaders = {};
-   
-   it('uses no-body, no-headers, GET, withoutCredentials as the default', function(){
+import { applyDefaults } from '../../src/defaults'
+import { calledLikeMatcher } from '../libs/calledLikeMatcher'
+import * as sinon from 'sinon'
 
-      var stub = jasmine.createSpy();
+describe('default settings', function () {
+  var noBody = null
+  var noHeaders = {}
 
-      applyDefaults(stub, 'http://example.com/oboez'); 
-      
-      expect(stub).toHaveBeenCalledLike(
-         'GET',
-         'http://example.com/oboez',
-         noBody,
-         noHeaders,
-         false
-      )
-   });
+  it('uses no-body, no-headers, GET, withoutCredentials as the default', function () {
+    var stub = jasmine.createSpy()
 
-   it('can make URL uncacheable', function(){
-      var time = sinon.useFakeTimers(123);
-      
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez')
 
-      applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, undefined, false);
+    expect(stub).toHaveBeenCalledLike(
+      'GET',
+      'http://example.com/oboez',
+      noBody,
+      noHeaders,
+      false
+    )
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'GET',
-         'http://example.com/oboez?_=123',
-         noBody,
-         noHeaders,
-         false
-      )
+  it('can make URL uncacheable', function () {
+    var time = sinon.useFakeTimers(123)
 
-      time.restore();
-   });
+    var stub = jasmine.createSpy()
 
-   it('can disable caching if url already has a query param', function(){
-      var time = sinon.useFakeTimers(456);
+    applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, undefined, false)
 
-      var stub = jasmine.createSpy();
+    expect(stub).toHaveBeenCalledLike(
+      'GET',
+      'http://example.com/oboez?_=123',
+      noBody,
+      noHeaders,
+      false
+    )
 
-      applyDefaults(stub, 'http://example.com/oboez?foo=bar', undefined, undefined, undefined, undefined, false);
+    time.restore()
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'GET',
-         'http://example.com/oboez?foo=bar&_=456',
-         noBody,
-         noHeaders,
-         false
-      )
+  it('can disable caching if url already has a query param', function () {
+    var time = sinon.useFakeTimers(456)
 
-      time.restore();
-   });   
+    var stub = jasmine.createSpy()
 
-   it('can explicitly be not uncacheable', function(){
-      var time = sinon.useFakeTimers(123);
+    applyDefaults(stub, 'http://example.com/oboez?foo=bar', undefined, undefined, undefined, undefined, false)
 
-      var stub = jasmine.createSpy();
+    expect(stub).toHaveBeenCalledLike(
+      'GET',
+      'http://example.com/oboez?foo=bar&_=456',
+      noBody,
+      noHeaders,
+      false
+    )
 
-      applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, undefined, true);
+    time.restore()
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'GET',
-         'http://example.com/oboez',
-         noBody,
-         noHeaders,
-         false
-      )
+  it('can explicitly be not uncacheable', function () {
+    var time = sinon.useFakeTimers(123)
 
-      time.restore();
-   });
+    var stub = jasmine.createSpy()
 
-   it('allows method to be specified', function(){
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, undefined, true)
 
-      applyDefaults(stub, 'http://example.com/oboez', 'POST', undefined, undefined, undefined, true);
+    expect(stub).toHaveBeenCalledLike(
+      'GET',
+      'http://example.com/oboez',
+      noBody,
+      noHeaders,
+      false
+    )
 
-      expect(stub).toHaveBeenCalledLike(
-         'POST',
-         'http://example.com/oboez',
-         noBody,
-         noHeaders,
-         false
-      )
-   });
+    time.restore()
+  })
 
-   it('allows withCredentials to be given', function(){
+  it('allows method to be specified', function () {
+    var stub = jasmine.createSpy()
 
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', undefined, undefined, undefined, true)
 
-      applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, true);
+    expect(stub).toHaveBeenCalledLike(
+      'POST',
+      'http://example.com/oboez',
+      noBody,
+      noHeaders,
+      false
+    )
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'GET',
-         'http://example.com/oboez',
-         noBody,
-         noHeaders,
-         true
-      )
-   });
+  it('allows withCredentials to be given', function () {
+    var stub = jasmine.createSpy()
 
-   it('stringifies JSON bodies and sets content-type if not already given', function(){
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez', undefined, undefined, undefined, true)
 
-      applyDefaults(stub, 'http://example.com/oboez', 'POST', {'foo':'bar'}, undefined, undefined, true);
+    expect(stub).toHaveBeenCalledLike(
+      'GET',
+      'http://example.com/oboez',
+      noBody,
+      noHeaders,
+      true
+    )
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'POST',
-         'http://example.com/oboez',
-         '{"foo":"bar"}',
-         { 'Content-Type' : 'application/json' },
-         false
-      )
-   });
+  it('stringifies JSON bodies and sets content-type if not already given', function () {
+    var stub = jasmine.createSpy()
 
-   it('stringifies JSON bodies and leaves content-type as-is if already given', function(){
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', { 'foo': 'bar' }, undefined, undefined, true)
 
-      applyDefaults(stub, 'http://example.com/oboez', 'POST', {'foo':'bar'}, { 'Content-Type' : 'application/awesome' }, undefined, true);
+    expect(stub).toHaveBeenCalledLike(
+      'POST',
+      'http://example.com/oboez',
+      '{"foo":"bar"}',
+      { 'Content-Type': 'application/json', 'Content-Length': 13 },
+      false
+    )
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'POST',
-         'http://example.com/oboez',
-         '{"foo":"bar"}',
-         { 'Content-Type' : 'application/awesome' },
-         false
-      )
-   });
+  it('stringifies JSON bodies and leaves content-type as-is if already given', function () {
+    var stub = jasmine.createSpy()
 
-   it('passed through string bodies and does not set content-type', function(){
-      var stub = jasmine.createSpy();
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', { 'foo': 'bar' }, { 'Content-Type': 'application/awesome' }, undefined, true)
 
-      applyDefaults(stub, 'http://example.com/oboez', 'POST', 'body content', undefined, undefined, true);
+    expect(stub).toHaveBeenCalledLike(
+      'POST',
+      'http://example.com/oboez',
+      '{"foo":"bar"}',
+      { 'Content-Type': 'application/awesome', 'Content-Length': 13 },
+      false
+    )
+  })
 
-      expect(stub).toHaveBeenCalledLike(
-         'POST',
-         'http://example.com/oboez',
-         'body content',
-         {}, 
-         false
-      )
-   });   
+  it('passed through string bodies and does not set content-type', function () {
+    var stub = jasmine.createSpy()
 
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', 'body content', undefined, undefined, true)
 
-   this.beforeEach(function(){
+    expect(stub).toHaveBeenCalledLike(
+      'POST',
+      'http://example.com/oboez',
+      'body content',
+      { 'Content-Length': 12 },
+      false
+    )
+  })
 
-      this.addMatchers(calledLikeMatcher);
-   })
-   
-});
+  beforeEach(function () {
+    jasmine.addMatchers(calledLikeMatcher)
+  })
+})

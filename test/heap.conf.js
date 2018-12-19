@@ -1,5 +1,10 @@
+if (!process.env.CHROME_BIN) {
+  process.env.CHROME_BIN = require('puppeteer').executablePath()
+}
+
 module.exports = function (config) {
   config.set({
+    browsers: ['ChromeHeadlessMemory'],
 
     frameworks: ['jasmine'],
 
@@ -10,10 +15,11 @@ module.exports = function (config) {
     files: [
       'test/libs/es5-shim.js',
       'test/libs/es5-sham.js',
-      'test/require/require.js',
+      'test/libs/platform.js',
+      'test/libs/testUrl.js',
       'dist/oboe-browser.min.js',
 
-      'test/specs/amd.integration.spec.js'
+      'test/specs/oboe.heap.integration.spec.js'
     ],
 
     // level of logging
@@ -25,6 +31,16 @@ module.exports = function (config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: true
+    singleRun: true,
+
+    customLaunchers: {
+      ChromeHeadlessMemory: {
+        base: 'ChromeHeadless',
+        flags: ['-enable-precise-memory-info']
+      }
+    },
+
+    browserDisconnectTimeout: 30000,
+    browserNoActivityTimeout: 30000
   })
 }

@@ -4,7 +4,10 @@
   "version": "2.1.4",
   "description": "Oboe.js reads json, giving you the objects as they are found without waiting for the stream to finish",
   "main": "./dist/oboe-node.js",
-  "browser": "./dist/oboe-browser.js",
+  "browser": {
+    "./dist/oboe-node.js": "./dist/oboe-browser.js",
+    "./src/streamingHttp.node.js": "./src/streamingHttp.browser.js"
+  },
   "scripts": {
     "test": "node ./node_modules/grunt-cli/bin/grunt headless-mode default",
     "test-start-server": "node ./node_modules/grunt-cli/bin/grunt test-start-server",
@@ -12,7 +15,10 @@
     "test-node": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
     "browser-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt test-auto-run",
     "node-test-auto-run": "node ./node_modules/grunt-cli/bin/grunt node-test-auto-run",
-    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes"
+    "dist-sizes": "node ./node_modules/grunt-cli/bin/grunt dist-sizes",
+    "webpack": "webpack",
+    "standard": "standard",
+    "test-heap": "node ./node_modules/grunt-cli/bin/grunt start-stream-source browser-build karma:single-heap"
   },
   "repository": {
     "type": "git",
@@ -57,14 +63,19 @@
     "jasmine-core": "2.5.2",
     "jasmine-node": "~1.11.0",
     "karma": "1.3.0",
+    "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "1.1.1",
     "karma-firefox-launcher": "1.0.0",
     "karma-jasmine": "1.0.2",
     "karma-phantomjs-launcher": "1.0.2",
     "karma-safari-launcher": "1.0.0",
+    "karma-webpack": "^2.0.9",
     "matchdep": "~0.1.2",
     "request": "2.81.0",
-    "sinon": "=1.17.3"
+    "sinon": "^2.4.1",
+    "standard": "^11.0.1",
+    "uglifyjs-webpack-plugin": "^1.2.1",
+    "webpack": "^3.10.0"
   },
   "dependencies": {
     "http-https": "^1.0.0"
@@ -81,6 +92,20 @@
     "categories": [
       "AJAX & Websockets",
       "Parsers & Compilers"
+    ]
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/**",
+      "dist",
+      "test/require",
+      "test/libs/es5-*.js"
+    ],
+    "env": "jasmine",
+    "globals": [
+      "Platform",
+      "crossDomainUrl",
+      "XMLHttpRequest"
     ]
   }
 }
