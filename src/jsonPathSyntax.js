@@ -38,12 +38,12 @@ var jsonPathSyntax = (function () {
   })
 
   var possiblyCapturing = /(\$?)/
-  var namedNode = /([\w-_]+|\*)/
+  var namedNode = /([@|\w-_]+|\*)/
   var namePlaceholder = /()/
   var nodeInArrayNotation = /\["([^"]+)"\]/
   var numberedNodeInArrayNotation = /\[(\d+|\*)\]/
-  var fieldList = /{([\w ]*?)}/
-  var optionalFieldList = /(?:{([\w ]*?)})?/
+  var fieldList = /{([@|\w ]*?)}/
+  var optionalFieldList = /(?:{([@|\w ]*?)})?/
 
   //   foo or *
   var jsonPathNamedNodeInObjectNotation = jsonPathClause(
