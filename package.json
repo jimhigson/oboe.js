@@ -44,7 +44,7 @@
     "color": "~0.4.4",
     "cors": "~2.1.1",
     "doctoc": "~0.4.3",
-    "express": "~3.4.3",
+    "express": "~4.17.1",
     "get-json": "0.0.1",
     "grunt": "~0.4.1",
     "grunt-clear": "~0.2.1",
