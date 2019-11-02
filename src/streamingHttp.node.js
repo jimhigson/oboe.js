@@ -1,6 +1,7 @@
 import { STREAM_DATA, STREAM_END, HTTP_START, FAIL_EVENT, errorReport, ABORTING } from './events'
 import { functor } from './functional'
 import { isString } from './util'
+import { URL } from 'url'
 
 var httpTransport = functor(require('http-https'))
 
@@ -60,13 +61,13 @@ function streamingHttp (oboeBus, transport, method, contentSource, data, headers
     })
   }
 
-  function openUrlAsStream (url) {
-    var parsedUrl = require('url').parse(url)
+  function openUrlAsStream (uri) {
+    var parsedUrl = new URL(uri)
 
     return transport.request({
       hostname: parsedUrl.hostname,
       port: parsedUrl.port,
-      path: parsedUrl.path,
+      path: parsedUrl.pathname + (parsedUrl.search || ''),
       method: method,
       headers: headers,
       protocol: parsedUrl.protocol
