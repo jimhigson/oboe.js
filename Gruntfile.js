@@ -266,15 +266,10 @@ module.exports = function (grunt) {
   ])
 
   grunt.registerTask('default', [
-
-    'clear',
     'clean',
     'start-stream-source',
-
     'browser-build-test',
-
     'node-build-test',
-
     'dist-sizes'
   ])
 
