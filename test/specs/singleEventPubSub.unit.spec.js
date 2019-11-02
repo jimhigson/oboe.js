@@ -9,7 +9,7 @@ describe('single event pub sub', function () {
         return {
           compare: function (actual, expected) {
             if (!actual || !actual.length || !expected || !expected.length) {
-              return {pass: false}
+              return { pass: false }
             }
 
             var filtered = actual.filter(function (item, i) {
@@ -19,13 +19,13 @@ describe('single event pub sub', function () {
                 var subFiltered = item.filter(function (subItem, subI) {
                   return subItem === match[subI]
                 })
-                return {pass: subFiltered.length === match.length}
+                return { pass: subFiltered.length === match.length }
               }
 
               return item === expected[i]
             })
 
-            return {pass: filtered.length === expected.length}
+            return { pass: filtered.length === expected.length }
           }
         }
       }

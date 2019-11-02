@@ -255,7 +255,7 @@ describe('jsonPath', function () {
       it('returns captured node with array numbered notation', function () {
         expect(matchOf('$["2"].l2').against(
 
-          ascentFrom({ '2': { l2: 'leaf' } })
+          ascentFrom({ 2: { l2: 'leaf' } })
 
         )).toSpecifyNode({ l2: 'leaf' })
       })

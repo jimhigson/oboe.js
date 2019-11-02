@@ -140,7 +140,7 @@ describe('public api', function () {
         oboe({
           method: 'PUT',
           url: 'http://example.com/oboez',
-          'body': 'my_data'
+          body: 'my_data'
         })
 
         expect(applyDefaults).toHaveBeenCalledLike(

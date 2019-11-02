@@ -20,7 +20,7 @@ import { oboe } from '../../src/publicApi';
     if (!Platform.isNode) {
       globalContext = window
     } else {
-      globalContext = GLOBAL // eslint-disable-line node/no-deprecated-api
+      globalContext = GLOBAL || global // eslint-disable-line no-undef
     }
 
     /*
@@ -180,7 +180,7 @@ import { oboe } from '../../src/publicApi';
     it('can detect nodes with underscore in the name', function () {
       givenAnOboeInstance()
         .andWeAreListeningForNodes('!.a_string')
-        .whenGivenInput({ 'a_string': 's' })
+        .whenGivenInput({ a_string: 's' })
         .thenTheInstance(
           matched('s'),
           foundOneMatch
@@ -200,7 +200,7 @@ import { oboe } from '../../src/publicApi';
     it('can detect nodes with quoted underscore in the name', function () {
       givenAnOboeInstance()
         .andWeAreListeningForNodes('!["a_string"]')
-        .whenGivenInput({ 'a_string': 's' })
+        .whenGivenInput({ a_string: 's' })
         .thenTheInstance(
           matched('s'),
           foundOneMatch
@@ -313,13 +313,13 @@ import { oboe } from '../../src/publicApi';
     it('notifies of multiple children of root when selecting the root', function () {
       givenAnOboeInstance()
         .andWeAreListeningForNodes('$!.*')
-        .whenGivenInput({ 'a': 'A', 'b': 'B', 'c': 'C' })
+        .whenGivenInput({ a: 'A', b: 'B', c: 'C' })
         .thenTheInstance(
           // rather than getting the fully formed objects, we should now see the root object
           // being grown step by step:
-          matched({ 'a': 'A' })
-          , matched({ 'a': 'A', 'b': 'B' })
-          , matched({ 'a': 'A', 'b': 'B', 'c': 'C' })
+          matched({ a: 'A' })
+          , matched({ a: 'A', b: 'B' })
+          , matched({ a: 'A', b: 'B', c: 'C' })
           , foundNMatches(3)
         )
     })
@@ -601,7 +601,7 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.testArray[2][2]')
           .whenGivenInput({
-            'testArray':
+            testArray:
               ['a', 'b',
                 ['x', 'y', 'this_one']
               ]
@@ -619,7 +619,7 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.$testArray[2][2]')
           .whenGivenInput({
-            'testArray':
+            testArray:
               ['a', 'b',
                 ['x', 'y', 'this_one']
               ]
@@ -638,7 +638,7 @@ import { oboe } from '../../src/publicApi';
       it('notifies with star pattern', function () {
         givenAnOboeInstance()
           .andWeAreListeningForNodes('*')
-          .whenGivenInput({ 'a': { 'b': { 'c': { 'd': 'e' } } } })
+          .whenGivenInput({ a: { b: { c: { d: 'e' } } } })
           .thenTheInstance(
             matched('e')
               .atPath(['a', 'b', 'c', 'd'])
@@ -657,7 +657,7 @@ import { oboe } from '../../src/publicApi';
       it('notifies of with double dot pattern', function () {
         givenAnOboeInstance()
           .andWeAreListeningForNodes('..')
-          .whenGivenInput({ 'a': { 'b': { 'c': { 'd': 'e' } } } })
+          .whenGivenInput({ a: { b: { c: { d: 'e' } } } })
           .thenTheInstance(
             matched('e')
               .atPath(['a', 'b', 'c', 'd'])
@@ -676,7 +676,7 @@ import { oboe } from '../../src/publicApi';
       it('notifies of objects with double dot star pattern', function () {
         givenAnOboeInstance()
           .andWeAreListeningForNodes('..*')
-          .whenGivenInput({ 'a': { 'b': { 'c': { 'd': 'e' } } } })
+          .whenGivenInput({ a: { b: { c: { d: 'e' } } } })
           .thenTheInstance(
             matched('e')
               .atPath(['a', 'b', 'c', 'd'])
@@ -697,7 +697,7 @@ import { oboe } from '../../src/publicApi';
     it('can express all but root as a pattern', function () {
       givenAnOboeInstance()
         .andWeAreListeningForNodes('*..*')
-        .whenGivenInput({ 'a': { 'b': { 'c': { 'd': 'e' } } } })
+        .whenGivenInput({ a: { b: { c: { d: 'e' } } } })
         .thenTheInstance(
           matched('e')
             .atPath(['a', 'b', 'c', 'd'])
@@ -716,12 +716,12 @@ import { oboe } from '../../src/publicApi';
       givenAnOboeInstance()
         .andWeAreListeningForNodes('foo..foo')
 
-        .whenGivenInput({ 'foo': { 'foo': { 'foo': { 'foo': 'foo' } } } })
+        .whenGivenInput({ foo: { foo: { foo: { foo: 'foo' } } } })
         .thenTheInstance(
           matched('foo')
-          , matched({ 'foo': 'foo' })
-          , matched({ 'foo': { 'foo': 'foo' } })
-          , matched({ 'foo': { 'foo': { 'foo': 'foo' } } })
+          , matched({ foo: 'foo' })
+          , matched({ foo: { foo: 'foo' } })
+          , matched({ foo: { foo: { foo: 'foo' } } })
           , foundNMatches(4)
         )
     })
@@ -821,41 +821,41 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, { 'b': 2 }, { 'c': 3 }]
+            array: [{ a: 1 }, { b: 2 }, { c: 3 }]
           }
           )
           .thenTheInstance(
-            matched({ 'a': 1 })
-              .withParent([{ 'a': 1 }])
-            , matched({ 'b': 2 })
-              .withParent([{ 'a': 1 }, { 'b': 2 }])
-            , matched({ 'c': 3 })
-              .withParent([{ 'a': 1 }, { 'b': 2 }, { 'c': 3 }])
+            matched({ a: 1 })
+              .withParent([{ a: 1 }])
+            , matched({ b: 2 })
+              .withParent([{ a: 1 }, { b: 2 }])
+            , matched({ c: 3 })
+              .withParent([{ a: 1 }, { b: 2 }, { c: 3 }])
           )
       })
       it('is correct for object in a mixed array', function () {
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
-            matched({ 'a': 1 })
-              .withParent([{ 'a': 1 }])
+            matched({ a: 1 })
+              .withParent([{ a: 1 }])
           )
       })
       it('has correct parent for string in mixed array', function () {
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
 
             matched('b')
-              .withParent([{ 'a': 1 }, 'b'])
+              .withParent([{ a: 1 }, 'b'])
 
           )
       })
@@ -863,13 +863,13 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
 
-            matched({ 'c': 3 })
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }])
+            matched({ c: 3 })
+              .withParent([{ a: 1 }, 'b', { c: 3 }])
 
           )
       })
@@ -878,13 +878,13 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
 
             matched({})
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}])
 
           )
       })
@@ -892,13 +892,13 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
 
             matched(['d'])
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d']])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}, ['d']])
 
           )
       })
@@ -920,13 +920,13 @@ import { oboe } from '../../src/publicApi';
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.array.*')
           .whenGivenInput({
-            array: [{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e']
+            array: [{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e']
           }
           )
           .thenTheInstance(
 
             matched('e')
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
 
           )
       })
@@ -936,11 +936,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
-            matched({ 'a': 1 })
-              .withParent([{ 'a': 1 }])
+            matched({ a: 1 })
+              .withParent([{ a: 1 }])
 
           )
       })
@@ -950,11 +950,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
             matched('b')
-              .withParent([{ 'a': 1 }, 'b'])
+              .withParent([{ a: 1 }, 'b'])
 
           )
       })
@@ -964,11 +964,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
-            matched({ 'c': 3 })
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }])
+            matched({ c: 3 })
+              .withParent([{ a: 1 }, 'b', { c: 3 }])
 
           )
       })
@@ -978,11 +978,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
             matched({})
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}])
 
           )
       })
@@ -992,11 +992,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
             matched(['d'])
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d']])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}, ['d']])
 
           )
       })
@@ -1019,11 +1019,11 @@ import { oboe } from '../../src/publicApi';
 
         givenAnOboeInstance()
           .andWeAreListeningForNodes('!.*')
-          .whenGivenInput([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+          .whenGivenInput([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           .thenTheInstance(
 
             matched('e')
-              .withParent([{ 'a': 1 }, 'b', { 'c': 3 }, {}, ['d'], 'e'])
+              .withParent([{ a: 1 }, 'b', { c: 3 }, {}, ['d'], 'e'])
           )
       })
     })
