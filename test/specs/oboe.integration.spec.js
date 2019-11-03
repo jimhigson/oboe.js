@@ -331,7 +331,7 @@
       oboe({
         method: 'PUT',
         url: testUrl('echoBackHeadersAsBodyJson'),
-        body: { 'potatoes': 3, 'cabbages': 4 }
+        body: { potatoes: 3, cabbages: 4 }
       }).done(function (json) {
         var contentType = json['content-type'].split(';')[0]
         expect(contentType).toBe('application/json')
@@ -343,7 +343,7 @@
       oboe({
         method: 'PUT',
         url: testUrl('echoBackHeadersAsBodyJson'),
-        body: { 'potatoes': 3, 'cabbages': 4 },
+        body: { potatoes: 3, cabbages: 4 },
         headers: { 'Content-Type': 'application/vegetableDiffThing' }
       }).done(function (json) {
         var contentType = json['content-type'].split(';')[0]
@@ -563,6 +563,14 @@
 
     it('emits error with incomplete json', function (done) {
       oboe(testUrl('static/json/incomplete.json'))
+        .fail(function (err) {
+          expect(err.thrown.message).toMatch('Unexpected end')
+          done()
+        })
+    })
+
+    it('emits error with incompleteObject json', function (done) {
+      oboe(testUrl('static/json/incompleteObject.json'))
         .fail(function (err) {
           expect(err.thrown.message).toMatch('Unexpected end')
           done()
