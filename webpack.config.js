@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const webpack = require('webpack')
 
 const version = fs.readFileSync('./build/version.txt', 'utf8')
@@ -11,6 +11,18 @@ module.exports = {
     'oboe-browser.min': './src/entry.js'
   },
   target: 'web',
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        output: {
+          comments: false
+        }
+      },
+      extractComments: false,
+      parallel: true
+    })]
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
@@ -20,9 +32,6 @@ module.exports = {
     umdNamedDefine: true
   },
   plugins: [
-    new UglifyJsPlugin({
-      test: /min/
-    }),
     new webpack.BannerPlugin(version)
   ]
 }

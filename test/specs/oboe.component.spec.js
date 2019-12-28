@@ -20,7 +20,7 @@ import { oboe } from '../../src/publicApi';
     if (!Platform.isNode) {
       globalContext = window
     } else {
-      globalContext = GLOBAL // eslint-disable-line node/no-deprecated-api
+      globalContext = global // eslint-disable-line node/no-deprecated-api
     }
 
     /*

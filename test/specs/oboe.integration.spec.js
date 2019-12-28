@@ -5,7 +5,7 @@
   if (!Platform.isNode) {
     globalContext = window
   } else {
-    globalContext = GLOBAL || global // eslint-disable-line node/no-deprecated-api
+    globalContext = global // eslint-disable-line node/no-deprecated-api
   }
 
   describe('oboe integration (real http)', function () {

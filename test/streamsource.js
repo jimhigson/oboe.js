@@ -218,7 +218,6 @@ module.exports.start = function (httpPort, grunt) {
       },
       credentials: true // accept cookies from cross-domain requests
     })) // enable cross-domain for all resources
-    app.use(app.router)
 
     app.get('/echoBackBody', function (req, res) {
       res.end("POST/PUT/PATCH here, don't GET")
