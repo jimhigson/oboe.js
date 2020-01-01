@@ -85,8 +85,8 @@ module.exports.start = function (httpPort, grunt) {
       // our little REST endpoint with errors:
       res.status(404).send(JSON.stringify(
         {
-          'found': 'false',
-          'errorMessage': 'was not found'
+          found: 'false',
+          errorMessage: 'was not found'
         }
       ))
     }
@@ -125,13 +125,13 @@ module.exports.start = function (httpPort, grunt) {
 
       var inervalId = setInterval(function () {
         res.write(JSON.stringify({
-          'id': i,
-          'url': 'http://localhost:4444/item/' + i,
+          id: i,
+          url: 'http://localhost:4444/item/' + i,
           // let's get some entropy in here for gzip:
-          'number1': Math.random(),
-          'number2': Math.random(),
-          'number3': Math.random(),
-          'number4': Math.random()
+          number1: Math.random(),
+          number2: Math.random(),
+          number3: Math.random(),
+          number4: Math.random()
         }))
 
         if (i === NUMBER_OF_RECORDS) {
@@ -153,7 +153,8 @@ module.exports.start = function (httpPort, grunt) {
       require('http').get({
         host: 'localhost',
         path: '/twoHundredItems',
-        port: httpPort })
+        port: httpPort
+      })
         .on('response', function (clientResponse) {
           var zlib = require('zlib')
 
@@ -218,7 +219,6 @@ module.exports.start = function (httpPort, grunt) {
       },
       credentials: true // accept cookies from cross-domain requests
     })) // enable cross-domain for all resources
-    app.use(app.router)
 
     app.get('/echoBackBody', function (req, res) {
       res.end("POST/PUT/PATCH here, don't GET")
@@ -248,11 +248,11 @@ module.exports.start = function (httpPort, grunt) {
 
   var expressApp = makeExpressApp(grunt)
 
-  httpServer = http.createServer(expressApp).listen(httpPort)
-
-  grunt.verbose.ok('streaming source server started on ports'.green,
-    String(httpPort).blue
-  )
+  httpServer = http.createServer(expressApp).listen(httpPort, () => {
+    grunt.verbose.ok('streaming source server started on ports'.green,
+      String(httpPort).blue
+    )
+  })
 }
 
 module.exports.stop = function () {

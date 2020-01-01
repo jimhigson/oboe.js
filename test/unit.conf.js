@@ -3,7 +3,7 @@ const path = require('path')
 module.exports = function (config) {
   config.set({
 
-    frameworks: ['jasmine'],
+    frameworks: ['es6-shim', 'jasmine'],
 
     // base path, that will be used to resolve files and exclude
     basePath: '..',
@@ -22,6 +22,7 @@ module.exports = function (config) {
       // karma watches the test entry points
       // (you don't need to specify the entry option)
       // webpack watches dependencies
+      mode: 'development',
 
       // webpack configuration
       output: {

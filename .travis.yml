@@ -1,16 +1,14 @@
 language: node_js
 node_js:
-  - "9"
+  - "13"
+  - "12"
+  - "10"
   - "8"
-  - "7"
-  - "6"
-  - "5"
-  - "4"
 
 jobs: 
   include:
     - stage: heap
-      node_js: 9
+      node_js: 13
       before_install:
         - npm i puppeteer
       script: npm run test-heap

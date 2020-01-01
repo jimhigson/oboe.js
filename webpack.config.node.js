@@ -5,6 +5,7 @@ const webpack = require('webpack')
 const version = fs.readFileSync('./build/version.txt', 'utf8')
 
 module.exports = {
+  mode: 'production',
   entry: './src/entry.js',
   target: 'node',
   output: {

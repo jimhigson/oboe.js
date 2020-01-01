@@ -148,7 +148,7 @@ describe('incremental content builder', function () {
       expect(builder).toHaveEmitted(
         NODE_OPENED
         , anAscentContaining(
-          { key: ROOT_PATH, node: { 'alphabet': ['a'] } }
+          { key: ROOT_PATH, node: { alphabet: ['a'] } }
           , { key: 'alphabet', node: ['a'] }
           , { key: 0, node: 'a' }
         )
@@ -159,7 +159,7 @@ describe('incremental content builder', function () {
       expect(builder).toHaveEmitted(
         NODE_CLOSED
         , anAscentContaining(
-          { key: ROOT_PATH, node: { 'alphabet': ['a'] } }
+          { key: ROOT_PATH, node: { alphabet: ['a'] } }
           , { key: 'alphabet', node: ['a'] }
           , { key: 0, node: 'a' }
         )
@@ -167,7 +167,7 @@ describe('incremental content builder', function () {
     })
 
     it('reports correct root', function () {
-      expect(builder).toHaveEmittedRootWhichIsNow({ 'alphabet': ['a'] })
+      expect(builder).toHaveEmittedRootWhichIsNow({ alphabet: ['a'] })
     })
   })
 
@@ -183,7 +183,7 @@ describe('incremental content builder', function () {
       expect(builder).toHaveEmitted(
         NODE_OPENED
         , anAscentContaining(
-          { key: ROOT_PATH, node: { 'alphabet': ['a', 'b'] } }
+          { key: ROOT_PATH, node: { alphabet: ['a', 'b'] } }
           , { key: 'alphabet', node: ['a', 'b'] }
           , { key: 1, node: 'b' }
         )
@@ -194,7 +194,7 @@ describe('incremental content builder', function () {
       expect(builder).toHaveEmitted(
         NODE_CLOSED
         , anAscentContaining(
-          { key: ROOT_PATH, node: { 'alphabet': ['a', 'b'] } }
+          { key: ROOT_PATH, node: { alphabet: ['a', 'b'] } }
           , { key: 'alphabet', node: ['a', 'b'] }
           , { key: 1, node: 'b' }
         )
@@ -202,7 +202,7 @@ describe('incremental content builder', function () {
     })
 
     it('reports correct root', function () {
-      expect(builder).toHaveEmittedRootWhichIsNow({ 'alphabet': ['a', 'b'] })
+      expect(builder).toHaveEmittedRootWhichIsNow({ alphabet: ['a', 'b'] })
     })
   })
 

@@ -47,14 +47,14 @@ module.exports = function (grunt) {
         colors: true
       },
 
-      'coverage': {
+      coverage: {
         reporters: ['coverage'],
         preprocessors: {
           // source files to generate coverage for
           // (these files will be instrumented by Istanbul)
           'src/**/*.js': ['coverage']
         },
-        'browsers': ['PhantomJS'],
+        browsers: ['PhantomJS'],
         configFile: 'test/unit.conf.js'
       },
 
@@ -92,7 +92,7 @@ module.exports = function (grunt) {
         configFile: 'test/http.conf.js'
       },
 
-      'persist': {
+      persist: {
         // for setting up a persistent karma server.
         // To start the server, the task is:
         //    karma:persist
@@ -172,7 +172,7 @@ module.exports = function (grunt) {
 
     concurrent: {
       watchDev: {
-        tasks: [ 'watch:karmaAndSize', 'watch:restartStreamSourceAndRunTests' ],
+        tasks: ['watch:karmaAndSize', 'watch:restartStreamSourceAndRunTests'],
         options: {
           logConcurrentOutput: true
         }
@@ -266,15 +266,10 @@ module.exports = function (grunt) {
   ])
 
   grunt.registerTask('default', [
-
-    'clear',
     'clean',
     'start-stream-source',
-
     'browser-build-test',
-
     'node-build-test',
-
     'dist-sizes'
   ])
 

@@ -49,10 +49,10 @@ function fakePubSub (eventNames) {
 
   eventNames.forEach(function (eventName) {
     eventTypes[eventName] = {
-      'emit': jasmine.createSpy(eventName + '/emit')
+      emit: jasmine.createSpy(eventName + '/emit')
         .and.callFake(record(eventName)),
-      'on': jasmine.createSpy(eventName + '/on'),
-      'un': jasmine.createSpy(eventName + '/un')
+      on: jasmine.createSpy(eventName + '/on'),
+      un: jasmine.createSpy(eventName + '/un')
     }
 
     eventTypesEmitted[eventName] = []

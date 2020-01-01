@@ -7,7 +7,7 @@ import { attr } from './functional'
  * @param {Object|Array|String|Number|null} node a value found in the json
  */
 function namedNode (key, node) {
-  return {key: key, node: node}
+  return { key: key, node: node }
 }
 
 /** get the key of a namedNode */

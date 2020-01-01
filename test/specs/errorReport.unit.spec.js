@@ -2,7 +2,7 @@ import { errorReport } from '../../src/events'
 
 describe('error report', function () {
   it('should parse json if json is given as the body', function () {
-    var jsonFromServer = {something: 'went wrong'}
+    var jsonFromServer = { something: 'went wrong' }
 
     var report = errorReport(
       0,
