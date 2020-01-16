@@ -5,7 +5,7 @@
   if (!Platform.isNode) {
     globalContext = window
   } else {
-    globalContext = GLOBAL || global // eslint-disable-line no-undef
+    globalContext = global // eslint-disable-line no-undef
   }
 
   describe('oboe integration (real http)', function () {
