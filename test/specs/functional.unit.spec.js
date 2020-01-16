@@ -66,7 +66,7 @@ describe('functional', function () {
     })
 
     it('can compose head to take an item off a list and then use it', function () {
-      var list = cons({a: 1}, emptyList)
+      var list = cons({ a: 1 }, emptyList)
 
       expect(compose(attr('a'), head)(list)).toBe(1)
     })
@@ -97,7 +97,7 @@ describe('functional', function () {
       })
 
       it('can compose head to take an item off a list and then use it', function () {
-        var list = cons({a: 1}, emptyList)
+        var list = cons({ a: 1 }, emptyList)
 
         expect(compose2(attr('a'), head)(list)).toBe(1)
       })
@@ -120,7 +120,7 @@ describe('functional', function () {
     it('can get a value from an object at the named key', function () {
       var getA = attr('A')
 
-      expect(getA({A: 'B'})).toBe('B')
+      expect(getA({ A: 'B' })).toBe('B')
     })
 
     it('can get the length of a string', function () {

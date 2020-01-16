@@ -105,7 +105,7 @@ describe('default settings', function () {
   it('stringifies JSON bodies and sets content-type if not already given', function () {
     var stub = jasmine.createSpy()
 
-    applyDefaults(stub, 'http://example.com/oboez', 'POST', { 'foo': 'bar' }, undefined, undefined, true)
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', { foo: 'bar' }, undefined, undefined, true)
 
     expect(stub).toHaveBeenCalledLike(
       'POST',
@@ -119,7 +119,7 @@ describe('default settings', function () {
   it('stringifies JSON bodies and leaves content-type as-is if already given', function () {
     var stub = jasmine.createSpy()
 
-    applyDefaults(stub, 'http://example.com/oboez', 'POST', { 'foo': 'bar' }, { 'Content-Type': 'application/awesome' }, undefined, true)
+    applyDefaults(stub, 'http://example.com/oboez', 'POST', { foo: 'bar' }, { 'Content-Type': 'application/awesome' }, undefined, true)
 
     expect(stub).toHaveBeenCalledLike(
       'POST',

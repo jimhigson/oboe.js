@@ -113,7 +113,7 @@ describe('streaming xhr integration (real http)', function () {
       'GET',
       '/testServer/echoBackHeadersAsHeaders',
       null, // this is a GET, no data to send
-      {'specialheader': 'specialValue'}
+      { specialheader: 'specialValue' }
     )
 
     waitUntil(STREAM_END).isFiredOn(oboeBus, function () {
@@ -121,7 +121,7 @@ describe('streaming xhr integration (real http)', function () {
         .toHaveBeenCalledWith(
           200,
           jasmine.objectContaining({
-            'specialheader': 'specialValue'
+            specialheader: 'specialValue'
           })
         )
       done()
@@ -159,7 +159,7 @@ describe('streaming xhr integration (real http)', function () {
       'GET',
       '/testServer/echoBackHeadersAsHeaders',
       null, // this is a GET, no data to send
-      {'specialheader': 'specialValue'}
+      { specialheader: 'specialValue' }
     )
 
     waitUntil(STREAM_END).isFiredOn(oboeBus, function () {
@@ -292,7 +292,7 @@ describe('streaming xhr integration (real http)', function () {
   })
 
   it('can make a post request', function (done) {
-    var payload = {'thisWill': 'bePosted', 'andShould': 'be', 'echoed': 'back'}
+    var payload = { thisWill: 'bePosted', andShould: 'be', echoed: 'back' }
 
     // in practice, since we're running on an internal network and this is a small file,
     // we'll probably only get one callback
@@ -313,7 +313,7 @@ describe('streaming xhr integration (real http)', function () {
   })
 
   it('can make a put request', function (done) {
-    var payload = {'thisWill': 'bePut', 'andShould': 'be', 'echoed': 'back'}
+    var payload = { thisWill: 'bePut', andShould: 'be', echoed: 'back' }
 
     // in practice, since we're running on an internal network and this is a small file,
     // we'll probably only get one callback
@@ -339,7 +339,7 @@ describe('streaming xhr integration (real http)', function () {
       return
     }
 
-    var payload = {'thisWill': 'bePatched', 'andShould': 'be', 'echoed': 'back'}
+    var payload = { thisWill: 'bePatched', andShould: 'be', echoed: 'back' }
 
     // in practice, since we're running on an internal network and this is a small file,
     // we'll probably only get one callback

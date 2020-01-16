@@ -34,7 +34,7 @@ describe('instance api', function () {
     })
 
     it('can provide object once available', function () {
-      var headers = {'x-remainingRequests': 100}
+      var headers = { 'x-remainingRequests': 100 }
 
       oboeBus(HTTP_START).emit(200, headers)
 
@@ -42,7 +42,7 @@ describe('instance api', function () {
     })
 
     it('can provide single header once available', function () {
-      var headers = {'x-remainingRequests': 100}
+      var headers = { 'x-remainingRequests': 100 }
 
       oboeBus(HTTP_START).emit(200, headers)
 
@@ -50,7 +50,7 @@ describe('instance api', function () {
     })
 
     it('gives undefined for non-existent single header', function () {
-      var headers = {'x-remainingRequests': 100}
+      var headers = { 'x-remainingRequests': 100 }
 
       oboeBus(HTTP_START).emit(200, headers)
 
@@ -64,7 +64,7 @@ describe('instance api', function () {
     })
 
     it('can provide object once available', function () {
-      var root = {I: 'am', the: 'root'}
+      var root = { I: 'am', the: 'root' }
 
       oboeBus(ROOT_PATH_FOUND).emit(root)
 
@@ -291,7 +291,7 @@ describe('instance api', function () {
 
       oboeInstance.node('pattern1', callback1)
       oboeInstance.on('node', 'pattern2', callback2)
-      oboeInstance.on('node', {pattern3: callback3})
+      oboeInstance.on('node', { pattern3: callback3 })
 
       oboeInstance.removeListener('node:pattern1', callback1)
       oboeInstance.removeListener('node:pattern2', callback2)
@@ -315,9 +315,9 @@ describe('instance api', function () {
 
       expect(startCallback).not.toHaveBeenCalled()
 
-      oboeBus(HTTP_START).emit(200, {a_header: 'foo'})
+      oboeBus(HTTP_START).emit(200, { a_header: 'foo' })
 
-      expect(startCallback).toHaveBeenCalledWith(200, {a_header: 'foo'})
+      expect(startCallback).toHaveBeenCalledWith(200, { a_header: 'foo' })
     })
 
     it('notifies .start listener when http response starts', function () {
@@ -327,9 +327,9 @@ describe('instance api', function () {
 
       expect(startCallback).not.toHaveBeenCalled()
 
-      oboeBus(HTTP_START).emit(200, {a_header: 'foo'})
+      oboeBus(HTTP_START).emit(200, { a_header: 'foo' })
 
-      expect(startCallback).toHaveBeenCalledWith(200, {a_header: 'foo'})
+      expect(startCallback).toHaveBeenCalledWith(200, { a_header: 'foo' })
     })
 
     it('can be de-registered', function () {
@@ -338,7 +338,7 @@ describe('instance api', function () {
       oboeInstance.on('start', startCallback)
       oboeInstance.removeListener('start', startCallback)
 
-      oboeBus(HTTP_START).emit(200, {a_header: 'foo'})
+      oboeBus(HTTP_START).emit(200, { a_header: 'foo' })
 
       expect(startCallback).not.toHaveBeenCalled()
     })
@@ -444,7 +444,7 @@ describe('instance api', function () {
       var e = 'an error'
       var nodeCallback = jasmine.createSpy('node callback').and.throwError(e)
 
-      oboeInstance.on('node', {'a_pattern': nodeCallback})
+      oboeInstance.on('node', { a_pattern: nodeCallback })
 
       spyOn(window, 'setTimeout')
       expect(function () {

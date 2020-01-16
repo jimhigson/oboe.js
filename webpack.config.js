@@ -6,6 +6,7 @@ const webpack = require('webpack')
 const version = fs.readFileSync('./build/version.txt', 'utf8')
 
 module.exports = {
+  mode: 'production',
   entry: {
     'oboe-browser': './src/entry.js',
     'oboe-browser.min': './src/entry.js'

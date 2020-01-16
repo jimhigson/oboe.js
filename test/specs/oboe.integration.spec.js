@@ -5,7 +5,7 @@
   if (!Platform.isNode) {
     globalContext = window
   } else {
-    globalContext = global // eslint-disable-line node/no-deprecated-api
+    globalContext = global // eslint-disable-line no-undef
   }
 
   describe('oboe integration (real http)', function () {
@@ -331,7 +331,7 @@
       oboe({
         method: 'PUT',
         url: testUrl('echoBackHeadersAsBodyJson'),
-        body: { 'potatoes': 3, 'cabbages': 4 }
+        body: { potatoes: 3, cabbages: 4 }
       }).done(function (json) {
         var contentType = json['content-type'].split(';')[0]
         expect(contentType).toBe('application/json')
@@ -343,7 +343,7 @@
       oboe({
         method: 'PUT',
         url: testUrl('echoBackHeadersAsBodyJson'),
-        body: { 'potatoes': 3, 'cabbages': 4 },
+        body: { potatoes: 3, cabbages: 4 },
         headers: { 'Content-Type': 'application/vegetableDiffThing' }
       }).done(function (json) {
         var contentType = json['content-type'].split(';')[0]

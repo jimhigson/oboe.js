@@ -19,12 +19,12 @@ function serveItemList (_req, res) {
   var inervalId = setInterval(function () {
     if (i % 2 === 0) {
       res.write(JSON.stringify({
-        'id': i,
-        'url': 'http://localhost:4444/item/' + i
+        id: i,
+        url: 'http://localhost:4444/item/' + i
       }))
     } else {
       res.write(JSON.stringify({
-        'id': i
+        id: i
       }))
     }
 
@@ -52,15 +52,15 @@ function serveItem (req, res) {
     // this is realistic looking but randomly generated object fro
     // <project>/test/json/oneHundredrecords.json
     res.end(JSON.stringify({
-      'id': id,
-      'url': 'http://localhost:4444/item/' + id,
-      'guid': '046447ee-da78-478c-b518-b612111942a5',
-      'picture': 'http://placehold.it/32x32',
-      'age': 37,
-      'name': 'Humanoid robot number ' + id,
-      'company': 'Robotomic',
-      'phone': '806-587-2379',
-      'email': 'payton@robotomic.com'
+      id: id,
+      url: 'http://localhost:4444/item/' + id,
+      guid: '046447ee-da78-478c-b518-b612111942a5',
+      picture: 'http://placehold.it/32x32',
+      age: 37,
+      name: 'Humanoid robot number ' + id,
+      company: 'Robotomic',
+      phone: '806-587-2379',
+      email: 'payton@robotomic.com'
     }))
   }, TIME_BETWEEN_RECORDS)
 }

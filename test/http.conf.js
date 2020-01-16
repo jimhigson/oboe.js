@@ -10,7 +10,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'test/specs/streamingHttp.integration.spec.js', watched: false}
+      { pattern: 'test/specs/streamingHttp.integration.spec.js', watched: false }
     ],
 
     preprocessors: {
@@ -27,7 +27,8 @@ module.exports = function (config) {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
         library: 'oboe'
-      }
+      },
+      mode: 'production'
     },
 
     // level of logging

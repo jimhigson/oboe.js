@@ -11,11 +11,11 @@ function ascentFrom (description) {
     // this for won't loop but it is the most obvious way to extract a
     // key/value pair where the key is unknown
     for (var i in obj) {
-      return {key: i, node: obj[i]}
+      return { key: i, node: obj[i] }
     }
   }
 
-  var ascent = list({key: ROOT_PATH, node: description})
+  var ascent = list({ key: ROOT_PATH, node: description })
   var curDesc = description
 
   while (typeof curDesc === 'object') {
