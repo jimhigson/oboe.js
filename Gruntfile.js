@@ -92,6 +92,11 @@ module.exports = function (grunt) {
         configFile: 'test/http.conf.js'
       },
 
+      'single-worker': {
+        browsers: autoStartBrowsers,
+        configFile: 'test/worker.conf.js'
+      },
+
       persist: {
         // for setting up a persistent karma server.
         // To start the server, the task is:
@@ -249,7 +254,8 @@ module.exports = function (grunt) {
     'browser-build',
     'karma:single-concat',
     'karma:single-minified',
-    'karma:single-amd'
+    'karma:single-amd',
+    'karma:single-worker'
   ])
 
   grunt.registerTask('build', [
