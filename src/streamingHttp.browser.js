@@ -124,7 +124,7 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
       xhr.setRequestHeader(headerName, headers[headerName])
     }
 
-    if (!isCrossOrigin(window.location, parseUrlOrigin(url))) {
+    if (!isCrossOrigin(location, parseUrlOrigin(url))) {
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     }
 
@@ -138,7 +138,7 @@ function streamingHttp (oboeBus, xhr, method, url, data, headers, withCredential
     // has had no chance to add a .fail listener so there is no way
     // the event could be useful. For both these reasons defer the
     // firing to the next JS frame.
-    window.setTimeout(
+    setTimeout(
       partialComplete(emitFail, errorReport(undefined, undefined, e))
       , 0
     )
