@@ -21,6 +21,9 @@ module.exports = {
     umdNamedDefine: true,
     globalObject: `typeof self !== 'undefined' ? self : this`
   },
+  optimization: {
+    minimize: false
+  },
   plugins: [
     new UglifyJsPlugin({
       test: /min/
