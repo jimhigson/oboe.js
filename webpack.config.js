@@ -19,7 +19,17 @@ module.exports = {
     libraryTarget: 'umd2',
     libraryExport: 'default',
     umdNamedDefine: true,
-    globalObject: `typeof self !== 'undefined' ? self : this`
+    globalObject: `(function(){
+      if (typeof self !== 'undefined') {
+          return self;
+      } else if (typeof window !== 'undefined') {
+          return window;
+      } else if (typeof global !== 'undefined') {
+          return global;
+      } else {
+          return Function('return this')();
+      }
+  })()`
   },
   optimization: {
     minimize: false
