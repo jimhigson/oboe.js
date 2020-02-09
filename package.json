@@ -77,7 +77,8 @@
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
-    "karma-cli": "^2.0.0"
+    "karma-cli": "^2.0.0",
+    "worker-plugin": "^3.2.0"
   },
   "dependencies": {
     "http-https": "^1.0.0"
