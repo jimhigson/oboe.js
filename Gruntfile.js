@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     })
   }
 
-  var autoStartBrowsers = (process.env.KARMA_BROSWERS || 'Chrome,Firefox,Safari').split(',')
+  var autoStartBrowsers = (process.env.KARMA_BROWSERS || 'Chrome,Firefox,Safari').split(',')
 
   var STREAM_SOURCE_PORT_HTTP = 4567
 
