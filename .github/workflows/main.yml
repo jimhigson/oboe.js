@@ -1,0 +1,13 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: travis-ci/actions@master
+    - name: Test on Travis CI
+      env:
+        TRAVIS_TOKEN: ${{ secrets.TRAVIS_TOKEN }}
