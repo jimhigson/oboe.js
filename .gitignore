@@ -6,3 +6,4 @@ libpeerconnection.log
 *.backup
 .DS_Store
 coverage
+tmp

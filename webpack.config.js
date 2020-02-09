@@ -18,7 +18,21 @@ module.exports = {
     library: 'oboe',
     libraryTarget: 'umd2',
     libraryExport: 'default',
-    umdNamedDefine: true
+    umdNamedDefine: true,
+    globalObject: `(function(){
+      if (typeof self !== 'undefined') {
+          return self;
+      } else if (typeof window !== 'undefined') {
+          return window;
+      } else if (typeof global !== 'undefined') {
+          return global;
+      } else {
+          return Function('return this')();
+      }
+  })()`
+  },
+  optimization: {
+    minimize: false
   },
   plugins: [
     new UglifyJsPlugin({

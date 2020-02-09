@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     })
   }
 
-  var autoStartBrowsers = ['Chrome', 'Firefox', 'Safari']
+  var autoStartBrowsers = (process.env.KARMA_BROWSERS || 'Chrome,Firefox,Safari').split(',')
 
   var STREAM_SOURCE_PORT_HTTP = 4567
 
@@ -90,6 +90,11 @@ module.exports = function (grunt) {
       'single-browser-http': {
         browsers: autoStartBrowsers,
         configFile: 'test/http.conf.js'
+      },
+
+      'single-worker': {
+        browsers: autoStartBrowsers,
+        configFile: 'test/worker.conf.js'
       },
 
       persist: {
@@ -249,7 +254,8 @@ module.exports = function (grunt) {
     'browser-build',
     'karma:single-concat',
     'karma:single-minified',
-    'karma:single-amd'
+    'karma:single-amd',
+    'karma:single-worker'
   ])
 
   grunt.registerTask('build', [
