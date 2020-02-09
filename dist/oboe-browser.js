@@ -1,5 +1,5 @@
 /*!
- * v2.1.4-117-g5f3eac8
+ * v2.1.4-119-g7461bbb
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11,7 +11,17 @@
 		exports["oboe"] = factory();
 	else
 		root["oboe"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+})((function(){
+      if (typeof self !== 'undefined') {
+          return self;
+      } else if (typeof window !== 'undefined') {
+          return window;
+      } else if (typeof global !== 'undefined') {
+          return global;
+      } else {
+          return Function('return this')();
+      }
+  })(), function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
