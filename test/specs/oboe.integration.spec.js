@@ -56,14 +56,29 @@
         var callbackSpy = jasmine.createSpy('callbackSpy')
 
         http.request('http://localhost:4567/tenSlowNumbers')
-          .on('response', function (res) {
-            oboe(res)
-              .node('![*]', callbackSpy)
-              .done(function () {
-                expect(callbackSpy.calls.count()).toBe(10)
-                done()
-              })
-          }).end()
+        .on('response', function (res) {
+          oboe(res)
+          .node('![*]', callbackSpy)
+          .done(function () {
+            expect(callbackSpy.calls.count()).toBe(10)
+            done()
+          })
+        }).end()
+      })
+
+      var stream = require('stream')
+      it('can read from a duplex stream', function (done) {
+        var callbackSpy = jasmine.createSpy('callbackSpy')
+        var duplex = fs
+          .createReadStream('test/json/firstTenNaturalNumbers.json')
+          .pipe(new stream.PassThrough())
+
+        oboe(duplex)
+          .node('![*]', callbackSpy)
+          .done(function () {
+            expect(callbackSpy.calls.count()).toBe(10)
+            done()
+          })
       })
 
       it('can read from a stream from Request - https://github.com/jimhigson/oboe.js/issues/65', function (done) {

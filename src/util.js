@@ -37,11 +37,20 @@ function defined (value) {
  * is not an object.
  */
 function hasAllProperties (fieldList, o) {
-  return (o instanceof Object) &&
+  return isObject(o) &&
     all(function (field) {
       return (field in o)
     }, fieldList)
 }
+
+/**
+ * Determines whether param `o` is an object or not.
+ * Streams in Node > 12 don't
+ */
+function isObject(o) {
+    return o !== null && typeof o === 'object'
+}
+
 
 export {
   isOfType,
