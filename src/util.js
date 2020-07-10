@@ -37,11 +37,24 @@ function defined (value) {
  * is not an object.
  */
 function hasAllProperties (fieldList, o) {
-  return (o instanceof Object) &&
+  return isObject(o) &&
     all(function (field) {
       return (field in o)
     }, fieldList)
 }
+
+/**
+ * Determines whether param `o` is an object or not.
+ * Streams _sometimes_ in Node for a currently
+ * unknown reason don't be an instance of Object.
+ * Meaning that `o instanceof Object === false`.
+ *
+ * @see https://github.com/jimhigson/oboe.js/pull/214
+ */
+function isObject(o) {
+    return o !== null && typeof o === 'object'
+}
+
 
 export {
   isOfType,
