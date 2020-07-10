@@ -45,7 +45,11 @@ function hasAllProperties (fieldList, o) {
 
 /**
  * Determines whether param `o` is an object or not.
- * Streams in Node > 12 don't
+ * Streams _sometimes_ in Node for a currently
+ * unknown reason don't be an instance of Object.
+ * Meaning that `o instanceof Object === false`.
+ *
+ * @see https://github.com/jimhigson/oboe.js/pull/214
  */
 function isObject(o) {
     return o !== null && typeof o === 'object'
