@@ -2948,7 +2948,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
          xhr.setRequestHeader(headerName, headers[headerName]);
       }
       
-      if( !Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["a" /* isCrossOrigin */])(window.location, Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["b" /* parseUrlOrigin */])(url)) ) {
+      if( !Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["a" /* isCrossOrigin */])(location, Object(__WEBPACK_IMPORTED_MODULE_0__detectCrossOrigin_browser__["b" /* parseUrlOrigin */])(url)) ) {
          xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       }
 
@@ -2964,7 +2964,7 @@ function streamingHttp(oboeBus, xhr, method, url, data, headers, withCredentials
       // has had no chance to add a .fail listener so there is no way
       // the event could be useful. For both these reasons defer the
       // firing to the next JS frame.  
-      window.setTimeout(
+      setTimeout(
          Object(__WEBPACK_IMPORTED_MODULE_4__functional__["j" /* partialComplete */])(emitFail, Object(__WEBPACK_IMPORTED_MODULE_1__events__["o" /* errorReport */])(undefined, undefined, e))
       ,  0
       );
