@@ -1,3 +1,21 @@
+Archive note (2024)
+===================
+
+This project is now archived. As of 2024, no code changes have been made in 5 years, and I (Jim) have not had the time to port it to new technology, or maintain it in a way that it deserves.
+
+For existing projects using this code, it should continue to work, but I would recommend looking for other solutions.
+
+I (Jim) still think there is a clear gap in the market for a streaming-first JSON parser that doesn't wait for responses to finish before it starts using them. For anyone who is interested
+in making that project, reach out and I'd be happy to discuss. Today, with modern javascript and typescript (ie async iterators), a much nicer modern API could be made than the one I created in 2013.
+
+Many thanks to [https://github.com/JuanCaicedo](JuanCaicedo) and [https://github.com/Aigeec](Aigeec) in particular for continuing to contribute fixes and modernise this project through to ~2020.
+
+The [Oboe.js website](oboejs.com) has been ported to a static site Github Pages, and the plan is to keep it online with a deprecation notice.
+
+The original README follows below.
+
+----
+
 Oboe.js is an [open source](LICENCE) Javascript library
 for loading JSON using streaming, combining the convenience of DOM with
 the speed and fluidity of SAX.
