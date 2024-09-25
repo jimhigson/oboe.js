@@ -70,11 +70,13 @@ function incrementalContentBuilder (oboeBus) {
     var ancestorBranches = tail(arrayConsistentAscent)
     var previouslyUnmappedName = keyOf(head(arrayConsistentAscent))
 
-    appendBuiltContent(
-      ancestorBranches,
-      previouslyUnmappedName,
-      newDeepestNode
-    )
+    if (ancestorBranches) {
+      appendBuiltContent(
+        ancestorBranches,
+        previouslyUnmappedName,
+        newDeepestNode
+      )
+    }
 
     return cons(
       namedNode(previouslyUnmappedName, newDeepestNode),
