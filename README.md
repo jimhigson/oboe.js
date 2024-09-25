@@ -8,9 +8,9 @@ For existing projects using this code, it should continue to work, but I would r
 I (Jim) still think there is a clear gap in the market for a streaming-first JSON parser that doesn't wait for responses to finish before it starts using them. For anyone who is interested
 in making that project, reach out and I'd be happy to discuss. Today, with modern javascript and typescript (ie async iterators), a much nicer modern API could be made than the one I created in 2013.
 
-Many thanks to [https://github.com/JuanCaicedo](JuanCaicedo) and [https://github.com/Aigeec](Aigeec) in particular for continuing to contribute fixes and modernise this project through to ~2020.
+Many thanks to [JuanCaicedo](https://github.com/JuanCaicedo) and [Aigeec](https://github.com/Aigeec) in particular for continuing to contribute fixes and modernise this project through to ~2020.
 
-The [Oboe.js website](oboejs.com) has been ported to a static site Github Pages, and the plan is to keep it online with a deprecation notice.
+The [Oboe.js website](http://oboejs.com) has been ported to a static site Github Pages, and the plan is to keep it online with a deprecation notice.
 
 The original README follows below.
 
