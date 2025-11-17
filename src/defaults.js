@@ -17,7 +17,6 @@ function applyDefaults (passthrough, url, httpMethodName, body, headers, withCre
       // Default Content-Type to JSON unless given otherwise.
       headers['Content-Type'] = headers['Content-Type'] || 'application/json'
     }
-    headers['Content-Length'] = headers['Content-Length'] || body.length
   } else {
     body = null
   }
