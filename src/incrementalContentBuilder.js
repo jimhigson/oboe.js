@@ -87,7 +87,9 @@ function incrementalContentBuilder (oboeBus) {
     * parsed JSON
     */
   function appendBuiltContent (ancestorBranches, key, node) {
-    nodeOf(head(ancestorBranches))[key] = node
+    if (ancestorBranches) {
+      nodeOf(head(ancestorBranches))[key] = node
+    }
   }
 
   /**

@@ -569,6 +569,14 @@
         })
     })
 
+    it('emits error with incompleteObject json', function (done) {
+      oboe(testUrl('static/json/incompleteObject.json'))
+        .fail(function (err) {
+          expect(err.thrown.message).toMatch('Unexpected end')
+          done()
+        })
+    })
+
     if (!Platform.isNode) {
       // only worry about this in the browser
 
